@@ -22,6 +22,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
@@ -33,11 +34,13 @@ import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.reader.Readers;
 import org.labkey.remoteapi.CommandException;
@@ -64,11 +67,10 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 /**
  * Static methods for getting properties of and communicating with a running LabKey server
@@ -84,7 +86,7 @@ public class WebTestHelper
     public static final int MAX_LEAK_LIMIT = 0;
     public static final int GC_ATTEMPT_LIMIT = 6;
     private static boolean USE_CONTAINER_RELATIVE_URL = true;
-    private static Set<Cookie> savedCookies = Collections.emptySet();
+    private static final Map<String, Map<String, Cookie>> savedCookies = new HashMap<>();
 
     public static void setUseContainerRelativeUrl(boolean useContainerRelativeUrl)
     {
@@ -94,9 +96,16 @@ public class WebTestHelper
     /**
      * Save cookies to be used by HTTP requests
      */
-    public static void setDefaultSession(WebDriver driver)
+    public static void saveSession(String user, WebDriver driver)
     {
-        savedCookies = new HashSet<>(driver.manage().getCookies());
+        HashMap<String, Cookie> currentCookies = new HashMap<>();
+        driver.manage().getCookies().forEach(c -> currentCookies.put(c.getName(), c));
+        savedCookies.put(user, currentCookies);
+    }
+
+    public static Map<String, Cookie> getCookies(String user)
+    {
+        return savedCookies.getOrDefault(user, Collections.emptyMap());
     }
 
     public static boolean isUseContainerRelativeUrl()
@@ -454,7 +463,94 @@ public class WebTestHelper
                 .setDefaultConnectionConfig(connectionConfig)
                 .setSSLSocketFactory(socketFactory);
 
+        Map<String, Cookie> cookies = getCookies(username);
+        if (!cookies.isEmpty())
+        {
+            CookieStore cookieStore = new BasicCookieStore();
+            cookies.values().forEach(c -> cookieStore.addCookie(seleniumCookieToApacheCookie(c)));
+            clientBuilder.setDefaultCookieStore(cookieStore);
+        }
+
         return clientBuilder;
+    }
+
+    @NotNull
+    private static org.apache.http.cookie.Cookie seleniumCookieToApacheCookie(Cookie c)
+    {
+        return new org.apache.http.cookie.Cookie()
+        {
+            @Override
+            public String getName()
+            {
+                return c.getName();
+            }
+
+            @Override
+            public String getValue()
+            {
+                return c.getValue();
+            }
+
+            @Override
+            public String getComment()
+            {
+                return c.toString();
+            }
+
+            @Override
+            public String getCommentURL()
+            {
+                return null;
+            }
+
+            @Override
+            public Date getExpiryDate()
+            {
+                return c.getExpiry();
+            }
+
+            @Override
+            public boolean isPersistent()
+            {
+                return false;
+            }
+
+            @Override
+            public String getDomain()
+            {
+                return c.getDomain();
+            }
+
+            @Override
+            public String getPath()
+            {
+                return c.getPath();
+            }
+
+            @Override
+            public int[] getPorts()
+            {
+                return new int[0];
+            }
+
+            @Override
+            public boolean isSecure()
+            {
+                return c.isSecure();
+            }
+
+            @Override
+            public int getVersion()
+            {
+                return 0;
+            }
+
+            @Override
+            public boolean isExpired(Date date)
+            {
+                return getExpiryDate() != null && date.compareTo(getExpiryDate()) > 0;
+            }
+        };
     }
 
     public static HttpClientContext getBasicHttpContext()
@@ -513,7 +609,7 @@ public class WebTestHelper
      */
     public static SimpleHttpResponse getHttpResponse(String url)
     {
-        return getHttpResponse(url, "GET", PasswordUtil.getUsername(), PasswordUtil.getPassword(), savedCookies);
+        return getHttpResponse(url, "GET", PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
     /**
@@ -523,7 +619,7 @@ public class WebTestHelper
      */
     public static SimpleHttpResponse getHttpResponse(String url, String requestMethod)
     {
-        return getHttpResponse(url, requestMethod, PasswordUtil.getUsername(), PasswordUtil.getPassword(), savedCookies);
+        return getHttpResponse(url, requestMethod, PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
     /**
@@ -532,7 +628,7 @@ public class WebTestHelper
      */
     public static SimpleHttpResponse getHttpResponse(String url, String username, String password)
     {
-        return getHttpResponse(url, "GET", username, password, Collections.emptySet());
+        return getHttpResponse(url, "GET", username, password);
     }
 
     /**
@@ -542,17 +638,16 @@ public class WebTestHelper
      */
     public static SimpleHttpResponse getHttpResponse(String url, String requestMethod, String username, String password)
     {
-        return getHttpResponse(url, requestMethod, username, password, Collections.emptySet());
+        return getHttpResponse(url, requestMethod, username, password, savedCookies.get(username));
     }
 
     /**
-     *
      * @param url Absolute URL or relative LabKey URL
      * @param requestMethod e.g. "GET" or "POST"
      * @param cookies Provided by {@link WebDriver.Options#getCookies()}
      */
     @LogMethod(quiet = true)
-    public static SimpleHttpResponse getHttpResponse(@LoggedParam String url, String requestMethod, String username, String password, Set<Cookie> cookies)
+    public static SimpleHttpResponse getHttpResponse(@LoggedParam String url, String requestMethod, String username, String password, @Nullable Map<String, Cookie> cookies)
     {
         if (url.startsWith("/"))
             url = getBaseURL() + url;
@@ -560,7 +655,8 @@ public class WebTestHelper
         SimpleHttpRequest request = new SimpleHttpRequest(url);
         request.setRequestMethod(requestMethod);
         request.setLogin(username, password);
-        request.setCookies(cookies);
+        if (cookies != null)
+            request.setCookies(cookies.values());
         try
         {
             return request.getResponse();

@@ -179,7 +179,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertSignedInNotImpersonating();
 
         _userHelper.saveCurrentDisplayName();
-        WebTestHelper.setDefaultSession(getDriver());
+        WebTestHelper.saveSession(PasswordUtil.getUsername(), getDriver());
     }
 
     /**
@@ -324,6 +324,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         attemptSignIn(email, password);
         waitForElementToDisappear(Locator.lkButton("Sign In"));
         Assert.assertEquals("Logged in as wrong user", email, getCurrentUser());
+        WebTestHelper.saveSession(email, getDriver());
     }
 
     public void attemptSignIn(String email, String password)
@@ -614,7 +615,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             assertTextPresent("Please wait, this page will automatically update with progress information");
             goToHome();
 
-            WebTestHelper.setDefaultSession(getDriver());
+            WebTestHelper.saveSession(email, getDriver());
         }
 
         if (bootstrapped || "Sign In".equals(getDriver().getTitle()))

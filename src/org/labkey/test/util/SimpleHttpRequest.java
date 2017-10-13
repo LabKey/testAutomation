@@ -25,10 +25,10 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A test utility for performing arbitrary HTTP requests
@@ -148,7 +148,7 @@ public class SimpleHttpRequest
         setCookies(driver.manage().getCookies());
     }
 
-    public void setCookies(Set<Cookie> cookies)
+    public void setCookies(Collection<Cookie> cookies)
     {
         _cookies = new HashMap<>();
         for (Cookie cookie : cookies)

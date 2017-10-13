@@ -27,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.xmlbeans.XmlException;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseWebDriverTest;
@@ -65,7 +66,7 @@ public class APITestHelper
 
     public void runApiTests() throws Exception
     {
-        runApiTests(null, null);
+        runApiTests(PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
     public void runApiTests(String username, String password) throws Exception
@@ -147,7 +148,7 @@ public class APITestHelper
         return testCase;
     }
 
-    private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch, String username, String password, boolean acceptErrors) throws UnsupportedEncodingException
+    private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch, @NotNull String username, @NotNull String password, boolean acceptErrors) throws UnsupportedEncodingException
     {
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpUriRequest method = null;
@@ -165,12 +166,12 @@ public class APITestHelper
                 break;
         }
 
-        try (CloseableHttpClient client = (CloseableHttpClient)(
-                username == null ?
-                        WebTestHelper.getHttpClient() :
-                        WebTestHelper.getHttpClient(username, password)))
-        {
+        org.openqa.selenium.Cookie csrf = WebTestHelper.getCookies(username).get("X-LABKEY-CSRF");
+        if (csrf != null)
+            method.setHeader(csrf.getName(), csrf.getValue());
 
+        try (CloseableHttpClient client = (CloseableHttpClient) WebTestHelper.getHttpClient(username, password))
+        {
             response = client.execute(method, context);
             int status = response.getStatusLine().getStatusCode();
             String responseBody = WebTestHelper.getHttpResponseBody(response);
