@@ -108,7 +108,8 @@ public class NabAssayTest extends AbstractQCAssayTest
     private static final String PLATE_TEMPLATE_NAME = "NabAssayTest Template";
     private static final String STUDY_FOLDER = TEST_ASSAY_PRJ_NAB + "/Study 1";
     private static final String STUDY_FOLDER_ENCODED = "Nab%20Test%20Verify%20Project/Study%201";
-    private static String NABJS_INCLUDE = "<script type=\"text/javascript\">" +
+    private static final String TEST_DIV_ID = "testDiv";
+    private static String NABJS_WIKI = "<script type=\"text/javascript\">" +
             "var runOnce = false;\n" +
             "function runNabAssayTest(config)\n" +
             "{\n" +
@@ -142,24 +143,27 @@ public class NabAssayTest extends AbstractQCAssayTest
             "                            {\n" +
             "                               if (graph.length == 0) return;\n" +
             "                               if (graph.url.indexOf('" + STUDY_FOLDER_ENCODED + "') < 0) throw 'GetStudyGraphURL failure';\n" +
-            "                               var done = Ext4.create(\"Ext.form.TextField\", { renderTo : config.renderTo, value : 'Success!'});\n" +
+            "                               var node = document.createElement('div');\n" +
+            "                               var textnode = document.createTextNode('Success!');\n" +
+            "                               node.appendChild(textnode);\n" +
+            "                               document.getElementById(config.renderTo).appendChild(node);\n" +
             "                            },\n" +
-            "                            failure : function(response) {throw 'GetStudyGraphURL failure: ' + JSON.stringify(response);}\n" +
+            "                            failure : function() {throw 'GetStudyGraphURL failure';}\n" +
             "                        }\n" +
             "                        var nabStudyGraphURl = LABKEY.Assay.getStudyNabGraphURL(studyRunsGraphConfig);\n" +
             "                    },\n" +
-            "                    failure : function(response) {throw 'GetStudyNabRuns failure 2: ' + JSON.stringify(response);}\n" +
+            "                    failure : function() {throw 'GetStudyNabRuns failure 2';}\n" +
             "                }\n" +
             "                var nabStudyRuns = LABKEY.Assay.getStudyNabRuns(studyRunsConfig);\n" +
             "            }\n" +
             "        },\n" +
-            "        failure : function(response) {throw 'GetNabRuns failure 2: ' + JSON.stringify(response);}\n" +
+            "        failure : function() {throw 'GetNabRuns failure 2';}\n" +
             "    };\n" +
             "    var nabRuns = LABKEY.Assay.getNAbRuns(runsConfig);\n" +
-            "}" +
-            "</script>\n";
-
-    private static final String TEST_DIV_NAME = "testDiv";
+            "}\n" +
+            "runNabAssayTest({renderTo : '" + TEST_DIV_ID + "'});\n" +
+            "</script>\n" +
+            "<div id=\"" + TEST_DIV_ID + "\"></div>";
 
     @Override
     public List<String> getAssociatedModules()
@@ -576,7 +580,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickFolder(TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickButton("Import Data");
-        checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", "ParticipantVisitDate"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("participantVisitResolver", "ParticipantVisitDate"));
         clickButton("Next");
 
         // verify that 'Participant ID', 'Visit ID', and 'Date' fields are included
@@ -602,9 +606,10 @@ public class NabAssayTest extends AbstractQCAssayTest
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
-        wikiHelper.setWikiBody(NABJS_INCLUDE + ClientAPITest.getFullSource("runNabAssayTest({renderTo : 'testDiv'})"));
+        wikiHelper.setWikiBody(NABJS_WIKI);
         wikiHelper.saveWikiPage();
-        waitForWikiDivPopulation(TEST_DIV_NAME, 30);
+        waitForWikiDivPopulation(TEST_DIV_ID, 30);
+        waitForElements(Locator.id(TEST_DIV_ID).child(Locator.tagWithText("div", "Success!")), 2);
 
         portalHelper.removeWebPart(WIKIPAGE_NAME);
 
