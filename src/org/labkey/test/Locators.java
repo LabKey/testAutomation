@@ -23,8 +23,8 @@ public abstract class Locators
     public static final Locator.IdLocator DEVELOPER_MENU = Locator.id("devMenuPopupLink");
     public static final Locator.IdLocator projectBar = Locator.id("projectBar");
     public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
-    public static final Locator.XPathLocator labkeyError = Locator.tagWithClass("*", "labkey-error");
-    public static final Locator.XPathLocator alertWarning = Locator.tagWithClass("*", "alert alert-warning");
+    public static final Locator.XPathLocator labkeyError = Locator.byClass("labkey-error");
+    public static final Locator.XPathLocator alertWarning = Locator.byClass("alert").withClass("alert-warning");
     public static final Locator signInLink = Locator.tagWithAttributeContaining("a", "href", "login.view");
     public static final Locator.XPathLocator folderTab = Locator.tagWithClass("div", "lk-nav-tabs-ct").append(Locator.tagWithClass("ul", "lk-nav-tabs")).childTag("li");
 
@@ -59,17 +59,13 @@ public abstract class Locators
         return Locator.css(".footer-block");
     }
 
-    public static Locator.XPathLocator bootstrapMenuItem(String text)
+    public static Locator.XPathLocator pageSignal(String signalName)
     {
-        return Locator.xpath("//li/a[contains(text(), " + Locator.xq(text) + ")]");
+        return Locator.id("testSignals").childTag("div").withAttribute("name", signalName);
     }
-    public static Locator pageSignal(String signalName)
+    public static Locator.XPathLocator pageSignal(String signalName, String value)
     {
-        return Locator.css("#testSignals > div[name=" + Locator.cq(signalName) + "]");
-    }
-    public static Locator pageSignal(String signalName, String value)
-    {
-        return Locator.css("#testSignals > div[name=" + Locator.cq(signalName) + "][value=" + Locator.cq(value) + "]");
+        return pageSignal(signalName).withAttribute("value", value);
     }
 
     public static Locator termsOfUseCheckbox()
