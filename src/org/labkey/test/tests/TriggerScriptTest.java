@@ -70,11 +70,13 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private static final String DATASET_NAME = "Demographics";
     private static final String INDIVIDUAL_TEST = "Individual Test ";
     private static final String API_TEST = "API Test ";
-    private static final String ARCHIVE_TEST = "Archive Test ";
     private static final String IMPORT_TEST = "Import Test ";
 
     private static final String DATA_CLASSES_SCHEMA = "exp.data";
     private static final String DATA_CLASSES_NAME = "DataClassTest";
+
+    private static final String COMMENTS_FIELD = "Comments";
+    private static final String COUNTRY_FIELD = "Country";
 
     protected final PortalHelper _portalHelper = new PortalHelper(this);
 
@@ -83,25 +85,16 @@ public class TriggerScriptTest extends BaseWebDriverTest
     {
         return Arrays.asList("Query", STUDY_SCHEMA, SIMPLE_MODULE, TRIGGER_MODULE);
     }
-    @Nullable
 
+    @Nullable
     @Override
     protected String getProjectName()
     {
         return "Test Trigger Script Project";
     }
 
-    protected String getFolderName()
-    {
-        return "My Study";
-    }
-
-    private String getStudyFolder()
-    {
-        return getProjectName() + "/" + getFolderName();
-    }
-
-    @Override public BrowserType bestBrowser()
+    @Override
+    public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
     }
@@ -142,7 +135,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         public static EmployeeRecord fromMap(Map<String, Object> map)
         {
             EmployeeRecord newbie = new EmployeeRecord((String)map.get("Name"), (String)map.get("ssn"), (String)map.get("Company"));
-            if(map.containsKey("Key"))
+            if (map.containsKey("Key"))
                 newbie.key = (Long)map.get("Key");
 
             return newbie;
@@ -152,7 +145,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
         {
             return "Name\tSSN\tCompany\n";
         }
-
     }
 
     /**
@@ -186,8 +178,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
         };
 
         _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns );
-        //Setup study and dataset
-        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
 
         log("Create list in subfolder to prevent query validation failure");
         _listHelper.createList(getProjectName(), "People",
@@ -203,7 +193,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         _portalHelper.addWebPart("Datasets");
         _portalHelper.addWebPart("Data Classes");
-
     }
 
     @Before
@@ -386,16 +375,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @Test
     public void testDatasetIndividualTriggers() throws Exception
     {
-        GoToDataUI goToDataset = new GoToDataUI()
-        {
-            @Override
-            public void goToDataUIPage()
-            {
-                goToDataset(DATASET_NAME);
-            }
-        };
+        GoToDataUI goToDataset = () -> goToDataset(DATASET_NAME);
 
-        doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true );
+        doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true, false);
 
         //For some reason these only get logged for datasets...
         checkExpectedErrors(4);
@@ -406,13 +388,12 @@ public class TriggerScriptTest extends BaseWebDriverTest
     //TODO: enable this test when Issue 25741 is resolved
     public void testDatasetImportTriggers() throws Exception
     {
-        String flagField = "Comments"; //Field to watch in trigger script
+        String flagField = COMMENTS_FIELD; //Field to watch in trigger script
         String testName = IMPORT_TEST;
 
         String delimiter = "\t";
 
-
-        Map<String,String> caughtAfter = new HashMap();
+        Map<String,String> caughtAfter = new HashMap<>();
         String badParticipant = "101";
         Date date1 = new Date();
         caughtAfter.put("ParticipantId", badParticipant);
@@ -420,7 +401,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         caughtAfter.put("Gender", "f");
         caughtAfter.put(flagField, "AfterInsert");
 
-        Map<String,String> changedBefore = new HashMap();
+        Map<String,String> changedBefore = new HashMap<>();
         String key2 = "102";
         Date date2 = new Date();
         changedBefore.put("ParticipantId", key2);
@@ -441,7 +422,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
         goToDataset(DATASET_NAME);
         clickButton("Import Data");
         setFormElement(Locator.id("tsv3"), tsvData);
-
     }
 
     @Test
@@ -458,17 +438,10 @@ public class TriggerScriptTest extends BaseWebDriverTest
     public void testDataClassIndividualTriggers() throws Exception
     {
         //Generate delegate to move to dataset UI
-        GoToDataUI goToDataset = new GoToDataUI()
-        {
-            @Override
-            public void goToDataUIPage()
-            {
-                goToDataClass(DATA_CLASSES_NAME);
-            }
-        };
+        GoToDataUI goToDataset = () -> goToDataClass(DATA_CLASSES_NAME);
 
         setupDataClass();
-        doIndividualTriggerTest("query", goToDataset, "Name", false );
+        doIndividualTriggerTest("query", goToDataset, "Name", false, true);
         deleteDataClass();
     }
 
@@ -492,21 +465,21 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private void doAPITriggerTest(String schemaName, String queryName, String keyColumnName, boolean requiresDate) throws Exception
     {
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        String flagField = "Comments"; //Field to watch in trigger script
-        String updateField = "Country"; //field that is set by trigger scripts and Updates
+        String flagField = COMMENTS_FIELD; //Field to watch in trigger script
+        String updateField = COUNTRY_FIELD; //field that is set by trigger scripts and Updates
 
-        Map<String,Object> row1 = new HashMap();
+        Map<String,Object> row1 = new HashMap<>();
         String text1 = "123";
         row1.put(keyColumnName, text1);
-        if(requiresDate)
+        if (requiresDate)
             row1.put("Date", new Date());
 
         row1.put(flagField, "AfterInsert");
 
-        Map<String,Object> row2 = new HashMap();
+        Map<String,Object> row2 = new HashMap<>();
         String text2 = "321";
         row2.put(keyColumnName, text2);
-        if(requiresDate)
+        if (requiresDate)
             row2.put("Date", new Date());
 
         String testName = API_TEST;
@@ -525,9 +498,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
         log("** " + testName + step + " Event");
         insCmd = new InsertRowsCommand(schemaName, queryName);
 
-        Map<String,Object> row3 = new HashMap();
+        Map<String,Object> row3 = new HashMap<>();
         row3.put(keyColumnName, "213");
-        if(requiresDate)
+        if (requiresDate)
             row3.put("Date", new Date());
 
         row2.put(flagField, testName);
@@ -536,7 +509,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         insCmd.addRow(row3);
         SaveRowsResponse resp = insCmd.execute(cn, getProjectName());
         row2 = resp.getRows().get(0);
-        Assert.assertEquals("API BeforeInsert", row2.get("Country"));
+        Assert.assertEquals("API BeforeInsert", row2.get(COUNTRY_FIELD));
 
         row3 = resp.getRows().get(1);
 
@@ -577,8 +550,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
         delCmd = new DeleteRowsCommand(schemaName, queryName);
         delCmd.addRow(row3);
         assertAPIErrorMessage(delCmd, BEFORE_DELETE_ERROR, cn);
-
-
     }
 
     /**
@@ -589,25 +560,32 @@ public class TriggerScriptTest extends BaseWebDriverTest
      * @param requiresDate
      * @throws Exception
      */
-    private void doIndividualTriggerTest(String schemaName, GoToDataUI goToData, String keyColumnName, boolean requiresDate) throws Exception
+    private void doIndividualTriggerTest(String schemaName, GoToDataUI goToData, String keyColumnName, boolean requiresDate, boolean toLower) throws Exception
     {
-        String flagField = "Comments"; //Field to watch in trigger script
-        String updateField = "Country"; //Field updated by trigger script
+        String flagField = COMMENTS_FIELD; //Field to watch in trigger script
+        String updateField = COUNTRY_FIELD; //Field updated by trigger script
         String testName = INDIVIDUAL_TEST;
 
-        Map<String,String> caughtAfter = new HashMap();
+        if (toLower)
+        {
+            // This is a compromise to get around casing problems for Dataset v DataClass domain columns
+            flagField = flagField.toLowerCase();
+            updateField = updateField.toLowerCase();
+        }
+
+        Map<String,String> caughtAfter = new HashMap<>();
         String badParticipant = "101345";
         Date date1 = new Date();
         caughtAfter.put(keyColumnName, badParticipant);
-        if(requiresDate)
+        if (requiresDate)
             caughtAfter.put("date", date1.toString());
         caughtAfter.put(flagField, "AfterInsert");
 
-        Map<String,String> changedBefore = new HashMap();
+        Map<String,String> changedBefore = new HashMap<>();
         String key2 = "103506";
         Date date2 = new Date();
         changedBefore.put(keyColumnName, key2);
-        if(requiresDate)
+        if (requiresDate)
             changedBefore.put("date", date2.toString());
         changedBefore.put(flagField, testName);
 
@@ -821,11 +799,11 @@ public class TriggerScriptTest extends BaseWebDriverTest
         clickButton("Create");
         clickButton("Add Field", 0);
         clickButton("Add Field", 0);
-        setFormElement(Locator.input("ff_name0"), "Comments");
-        setFormElement(Locator.input("ff_name1"), "Country");
+        setFormElement(Locator.input("ff_name0"), COMMENTS_FIELD);
+        setFormElement(Locator.input("ff_name1"), COUNTRY_FIELD);
 
-        setFormElement(Locator.input("ff_label0"), "Comments");
-        setFormElement(Locator.input("ff_label1"), "Country");
+        setFormElement(Locator.input("ff_label0"), COMMENTS_FIELD);
+        setFormElement(Locator.input("ff_label1"), COUNTRY_FIELD);
         clickButton("Save");
     }
 
