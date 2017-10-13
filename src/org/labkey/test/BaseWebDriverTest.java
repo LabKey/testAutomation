@@ -2387,14 +2387,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     }
 
-    public String waitForWikiDivPopulation(String testDivName, int waitSeconds)
+    public String waitForWikiDivPopulation(String testDivId, int waitSeconds)
     {
         while (waitSeconds-- > 0)
         {
-            log("Waiting for " + testDivName + " div to render...");
-            if (isElementPresent(Locator.id(testDivName)))
+            log("Waiting for " + testDivId + " div to render...");
+            if (isElementPresent(Locator.id(testDivId)))
             {
-                String divHtml = (String)executeScript("return document.getElementById('" + testDivName + "').innerHTML;");
+                String divHtml = (String)executeScript("return document.getElementById('" + testDivId + "').innerHTML;");
                 if (divHtml.length() > 0)
                     return divHtml;
             }
