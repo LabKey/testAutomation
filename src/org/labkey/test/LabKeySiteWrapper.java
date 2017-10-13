@@ -247,6 +247,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 signOut();
             simpleSignIn();
         }
+        WebTestHelper.saveSession(PasswordUtil.getUsername(), getDriver());
     }
 
     @LogMethod
