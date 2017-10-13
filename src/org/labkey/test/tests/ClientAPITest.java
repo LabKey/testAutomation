@@ -17,6 +17,8 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.Before;
@@ -48,7 +50,9 @@ import org.openqa.selenium.TimeoutException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -799,10 +803,96 @@ public class ClientAPITest extends BaseWebDriverTest
         assertTrue("No autocomplete value found for " + AUTOCOMPLETE_USER + errMsg, testPassed);
     }
 
+    @Test
+    public void contentTypeResponseTest()
+    {
+        // 30509: For 401 and 404, respond with same ContentType as request
+        log("Testing response content type for 404");
+        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Command command = new Command("bam", "boozled");
+
+        Map<String, Object> expectedProps = new HashMap<>();
+        expectedProps.put("success", false);
+        expectedProps.put("exception", "No LabKey Server module registered to handle request for controller: bam");
+
+        runCommand(cn, command, "application/json", 404, expectedProps);
+        runCommand(cn, command, "text/xml", 404, expectedProps);
+        runCommand(cn, command, "text/html", 404, null);
+
+        // An API location/command that requires permissions
+        log("Testing response content type for 401");
+        cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), "bad connection password");
+        command = new Command("core", "getExtContainerAdminTree.api");
+
+        expectedProps = new HashMap<>();
+        expectedProps.put("success", false);
+        expectedProps.put("exception", "User does not have permission to perform this operation");
+
+        runCommand(cn, command, "application/json", 401, null);
+        runCommand(cn, command, "text/xml", 401, null);
+        runCommand(cn, command, "text/html", 401, null);
+    }
+
+    /**
+     * Run a Command that makes a request using the specified contentType. That contentType, expectedStatus,
+     * and expectedProps are checked against the response to validate if an expected response was received.
+     */
+    private void runCommand(Connection cn, Command source, String contentType, int expectedStatus, @Nullable Map<String, Object> expectedProps)
+    {
+        CommandException exception = null;
+
+        try
+        {
+            new Command(source)
+            {
+                @Override
+                protected HttpUriRequest getHttpRequest(Connection connection, String folderPath) throws CommandException, URISyntaxException
+                {
+                    HttpUriRequest request = super.getHttpRequest(connection, folderPath);
+                    request.setHeader("Content-Type", contentType);
+
+                    return request;
+                }
+            }.execute(cn, "/" + getProjectName());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Unable to runCommand", e);
+        }
+        catch (CommandException e)
+        {
+            exception = e;
+        }
+
+        if (exception != null)
+        {
+            String responseContentType = exception.getContentType() == null ? "null" : exception.getContentType();
+
+            assertEquals("Expected status code to match", expectedStatus, exception.getStatusCode());
+            assertTrue("Expected contentType to match", responseContentType.contains(contentType));
+
+            // Command only supports parsing the body of a JSON response.
+            if ("application/json".equalsIgnoreCase(contentType) && expectedProps != null && expectedProps.size() > 0)
+            {
+                Map<String, Object> body = exception.getProperties();
+
+                assertTrue("Expected properties in the response", body != null);
+                for (Map.Entry<String, Object> prop : expectedProps.entrySet())
+                {
+                    assertTrue("Expected body property not available", body.containsKey(prop.getKey()));
+                    assertTrue("Expected body value for \"" + prop.getKey() + "\"", prop.getValue().equals(body.get(prop.getKey())));
+                }
+            }
+        }
+        else
+        {
+            throw new RuntimeException("runCommand currently expects the command to fail. Valid responses not yet supported.");
+        }
+    }
+
     @Override
     public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
     }
-
 }
