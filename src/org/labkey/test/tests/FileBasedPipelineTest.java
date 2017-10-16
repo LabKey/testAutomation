@@ -255,6 +255,63 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
     }
 
+    @Test
+    public void testScriptTimeout()
+    {
+        final String folderName = "testScriptTimeout";
+
+        final String importAction = "timeout script test";
+        final String protocolName = "timeout_script_test";
+        final String[] targetFiles = {SAMPLE_FILE.getName()};
+        final Map<String, String> protocolProperties = Maps.of(
+                "protocolName", protocolName);
+
+        _containerHelper.createSubfolder(getProjectName(), folderName);
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(SAMPLE_FILE);
+
+        final String jobDescription = "@files/sample (timeout_script_test)";
+
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
+
+        goToModule("Pipeline");
+        waitForPipelineJobsToComplete(1, jobDescription, true);
+        clickAndWait(Locator.linkWithText("ERROR"));
+        assertTextPresent(
+                "INFO : hello script timeout world!",
+                "Process killed after exceeding timeout of 1 seconds");
+        assertTextNotPresent("goodbye script timeout world!");
+    }
+
+    @Test
+    public void testExecTimeout()
+    {
+        final String folderName = "testExecTimeout";
+
+        final String importAction = "timeout exec test";
+        final String protocolName = "timeout_exec_test";
+        final String[] targetFiles = {SAMPLE_FILE.getName()};
+        final Map<String, String> protocolProperties = Maps.of(
+                "protocolName", protocolName);
+
+        _containerHelper.createSubfolder(getProjectName(), folderName);
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(SAMPLE_FILE);
+
+        final String jobDescription = "@files/sample (timeout_exec_test)";
+
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
+
+        goToModule("Pipeline");
+        waitForPipelineJobsToComplete(1, jobDescription, true);
+        clickAndWait(Locator.linkWithText("ERROR"));
+        assertTextPresent(
+                "INFO : hello node timeout world!",
+                "ERROR : Process killed after exceeding timeout of 1 seconds");
+        assertTextNotPresent("goodbye node timeout world!");
+    }
+
+
     @LogMethod
     private void verifyPipelineAnalysisDeleted(@LoggedParam String pipelineName, String protocolName)
     {

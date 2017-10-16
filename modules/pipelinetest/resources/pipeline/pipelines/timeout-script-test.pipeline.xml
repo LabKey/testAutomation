@@ -1,0 +1,31 @@
+<pipeline xmlns="http://labkey.org/pipeline/xml"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          name="timeout-script-test" version="0.0">
+    <description>timeout script test</description>
+    <tasks>
+        <task xsi:type="ScriptTaskType">
+            <inputs>
+                <file name="input.txt"/>
+            </inputs>
+            <outputs>
+                <file name="output.foo"/>
+            </outputs>
+            <script interpreter="r" timeout="1">
+              <![CDATA[
+cat("hello script timeout world!\n")
+f = file(description="${output.foo}", open="w")
+cat(file=f, sep="", "hello script timeout world!\n")
+flush(con=f)
+
+# sleep longer than the script timeout
+Sys.sleep(10)
+cat("goodbye script timeout world!\n")
+cat(file=f, sep="", "goodbye script timeout world\n")
+flush(con=f)
+              ]]>
+            </script>
+        </task>
+    </tasks>
+
+</pipeline>
+

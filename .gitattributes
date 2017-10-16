@@ -171,6 +171,9 @@ modules/pipelinetest/resources/pipeline/pipelines/create-matrix.pipeline.xml -te
 modules/pipelinetest/resources/pipeline/pipelines/r-copy-inline.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/pipelines/r-copy.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/pipelines/r-localtask-assayimport.pipeline.xml -text
+modules/pipelinetest/resources/pipeline/pipelines/timeout-exec-test.js -text
+modules/pipelinetest/resources/pipeline/pipelines/timeout-exec-test.pipeline.xml -text
+modules/pipelinetest/resources/pipeline/pipelines/timeout-script-test.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/pipelines/two-steps.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/pipelines/with-output-location.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/tasks/filter-lines.R -text

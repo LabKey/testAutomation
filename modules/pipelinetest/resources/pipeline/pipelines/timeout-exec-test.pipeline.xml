@@ -1,0 +1,19 @@
+<pipeline xmlns="http://labkey.org/pipeline/xml"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          name="timeout-exec-test" version="0.0">
+    <description>timeout exec test</description>
+    <tasks>
+        <task xsi:type="ExecTaskType">
+            <inputs>
+                <file name="input.txt"/>
+            </inputs>
+            <outputs>
+                <file name="output.tsv"/>
+            </outputs>
+            <exec exe="node" timeout="1">
+                node pipeline/pipelines/timeout-exec-test.js
+            </exec>
+        </task>
+    </tasks>
+
+</pipeline>
