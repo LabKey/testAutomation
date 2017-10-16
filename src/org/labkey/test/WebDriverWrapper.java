@@ -1584,7 +1584,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         executeAsyncScript("" +
                 "try " +
                 "{" +
-                "  LABKEY.Utils.onReady(callback);" +
+                "  if (jQuery) {" +
+                "    jQuery.onReady(callback);" +
+                "  } else {" +
+                "    LABKEY.Utils.onReady(callback);" +
+                "  }" +
                 "}" +
                 "catch(e)" +
                 "{" +
