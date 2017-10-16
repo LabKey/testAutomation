@@ -29,7 +29,9 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
 
     public String getFileRoot()
     {
-        return getSelectedOptionText(elementCache().fileRootSelect);
+        Locator.XPathLocator selectedNodeLoc = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span");
+        waitForElement(selectedNodeLoc);
+        return getText(selectedNodeLoc);
     }
 
     public CustomizeFilesWebPartPage setFileRoot(String menuOption)
