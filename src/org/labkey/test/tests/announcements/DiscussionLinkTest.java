@@ -67,7 +67,7 @@ public class DiscussionLinkTest extends BaseWebDriverTest
         setFormElement(Locator.name("name"), WIKI_NAME);
         wikiHelper.saveWikiPage();
         //Confirm link present using AssertElementPresent by text
-        click(Locator.linkContainingText(WIKI_NAME));
+        clickAndWait(Locator.linkContainingText(WIKI_NAME));
         waitForElement(Locator.linkContainingText("Discussion"));
         //goto l and feel
         ProjectSettingsPage projectSettingsPage = goToProjectSettings();
