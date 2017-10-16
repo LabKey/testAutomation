@@ -81,7 +81,7 @@ public class StudyHelper
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
                                              @Nullable String categoryName, boolean isCategoryNameNew, @Nullable Boolean shared, Boolean demographicsPresent, String... ptids)
     {
-        if( !_test.isElementPresent(Locator.xpath("//span[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
+        if (!_test.isElementPresent(Locators.bodyTitle("Manage " + participantString + " Groups")) )
         {
             _test.clickProject(projectName);
             if (!projectName.equals(studyFolder))
