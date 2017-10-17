@@ -44,8 +44,8 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
-import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.api.ProjectMenu;
+import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.internal.ImpersonateGroupWindow;
 import org.labkey.test.components.internal.ImpersonateRoleWindow;
@@ -814,7 +814,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 //                        return redirectRequest;
 //                }
             };
-            try (CloseableHttpClient redirectClient = getHttpClientBuilder().setRedirectStrategy(redirectStrategy).build())
+            try (CloseableHttpClient redirectClient = getHttpClientBuilder()
+                    .setRedirectStrategy(redirectStrategy) /* Clear cookies so that we don't actually log out */
+                    .setDefaultCookieStore(null).build())
             {
                 method = new HttpPost(getBaseURL() + "/login/logout.view");
                 List<NameValuePair> args = new ArrayList<>();
