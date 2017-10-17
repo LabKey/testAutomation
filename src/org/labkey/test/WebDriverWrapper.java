@@ -2606,6 +2606,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 Locator.xpath("//table[@id=" + Locator.xq(tableName) + "]/tbody/tr").findElements(getDriver()).size();
     }
 
+    /**
+     * @deprecated Slow to return false
+     */
+    @Deprecated
     public boolean isButtonPresent(String text)
     {
         try
