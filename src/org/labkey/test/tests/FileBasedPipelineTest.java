@@ -272,15 +272,20 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
         final String jobDescription = "@files/sample (timeout_script_test)";
 
+        checkErrors();
+
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
 
         goToModule("Pipeline");
         waitForPipelineJobsToComplete(1, jobDescription, true);
+        resetErrors();
+
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
                 "INFO : hello script timeout world!",
                 "Process killed after exceeding timeout of 1 seconds");
         assertTextNotPresent("goodbye script timeout world!");
+
     }
 
     @Test
@@ -300,14 +305,18 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
         final String jobDescription = "@files/sample (timeout_exec_test)";
 
+        checkErrors();
+
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
 
         goToModule("Pipeline");
         waitForPipelineJobsToComplete(1, jobDescription, true);
+        resetErrors();
+
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
                 "INFO : hello node timeout world!",
-                "ERROR : Process killed after exceeding timeout of 1 seconds");
+                "Process killed after exceeding timeout of 1 seconds");
         assertTextNotPresent("goodbye node timeout world!");
     }
 
