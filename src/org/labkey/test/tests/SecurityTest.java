@@ -23,12 +23,12 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -496,6 +496,8 @@ public class SecurityTest extends BaseWebDriverTest
 
         // create the project and set permissions
         _containerHelper.createProject(PROJECT_NAME, null);
+        // Add a non-group permission
+        _permissionsHelper.setUserPermissions(ADMIN_USER_TEMPLATE, "Editor");
         _permissionsHelper.createPermissionsGroup("Administrators");
         _permissionsHelper.clickManageGroup("Administrators");
         setFormElement(Locator.name("names"), ADMIN_USER_TEMPLATE);
@@ -515,6 +517,10 @@ public class SecurityTest extends BaseWebDriverTest
         createUserAndNotify(SITE_ADMIN_USER, PasswordUtil.getUsername());
         createUserAndNotify(NORMAL_USER, NORMAL_USER_TEMPLATE);
         createUserAndNotify(TO_BE_DELETED_USER, NORMAL_USER_TEMPLATE);
+        log("Verify individual (non-group) permissions were cloned");
+        goToProjectHome();
+        ApiPermissionsHelper helper = new ApiPermissionsHelper(this);
+        helper.assertPermissionSetting(PROJECT_ADMIN_USER, "Editor");
 
         // verify permissions
         checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators", 2);
