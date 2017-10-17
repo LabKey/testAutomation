@@ -292,8 +292,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     }
                     catch (WebDriverException rethrow)
                     {
-                        log("ERROR: Failed to initialize FirefoxDriver. Ensure that you are not using a version newer than 45.");
-                        throw rethrow;
+                        throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. Ensure that you are not using a version newer than 45.", rethrow);
                     }
                 }
                 break;
@@ -1584,11 +1583,34 @@ public abstract class WebDriverWrapper implements WrapsDriver
         executeAsyncScript("" +
                 "try " +
                 "{" +
-                "  if (jQuery) {" +
-                "    jQuery.onReady(callback);" +
-                "  } else {" +
-                "    LABKEY.Utils.onReady(callback);" +
-                "  }" +
+                "  jQuery.onReady(callback);" +
+                "}" +
+                "catch(e)" +
+                "{" +
+                "  callback();" +
+                "}");
+        executeAsyncScript("" +
+                "try " +
+                "{" +
+                "  Ext.onReady(callback);" +
+                "}" +
+                "catch(e)" +
+                "{" +
+                "  callback();" +
+                "}");
+        executeAsyncScript("" +
+                "try " +
+                "{" +
+                "  Ext4.onReady(callback);" +
+                "}" +
+                "catch(e)" +
+                "{" +
+                "  callback();" +
+                "}");
+        executeAsyncScript("" +
+                "try " +
+                "{" +
+                "  LABKEY.Utils.onReady(callback);" +
                 "}" +
                 "catch(e)" +
                 "{" +
