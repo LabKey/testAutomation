@@ -296,7 +296,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         // create the users for emailApiTest
         for (String user : EMAIL_RECIPIENTS)
-            createUser(user, null);
+            _userHelper.createUser(user);
         new UIUserHelper(this).cloneUser(AUTOCOMPLETE_USER, PasswordUtil.getUsername());
     }
 

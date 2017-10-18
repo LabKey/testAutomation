@@ -1606,12 +1606,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _permissionsHelper.setUserPermissions(userName, permissions);
     }
 
-    @Deprecated
-    public CreateUserResponse createUser(String userName, @Nullable String cloneUserName)
-    {
-        return _userHelper.createUser(userName);
-    }
-
     public void createSiteDeveloper(String userEmail)
     {
         ensureAdminMode();

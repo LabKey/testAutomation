@@ -433,7 +433,7 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testSimplePasswordReset()
     {
-        createUser(PASSWORD_RESET_USER, null);
+        _userHelper.createUser(PASSWORD_RESET_USER);
         enableEmailRecorder();
 
         goToSiteUsers();

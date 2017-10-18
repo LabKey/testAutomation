@@ -70,8 +70,8 @@ public class SecurityApiTest extends BaseWebDriverTest
     public void createUsers(){
 
         //setup the project, users and groups
-        createUser(USER_1, null);
-        createUser(USER_2, null);
+        _userHelper.createUser(USER_1);
+        _userHelper.createUser(USER_2);
 
         _containerHelper.createProject(PROJECT_NAME, null);
         _permissionsHelper.createPermissionsGroup(GROUP_1, USER_1);

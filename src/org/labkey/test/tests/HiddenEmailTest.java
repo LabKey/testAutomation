@@ -82,7 +82,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     private void createUsersAndGroups()
     {
         // Create users and groups
-        createUser(ADMIN_USER, null);
+        _userHelper.createUser(ADMIN_USER);
 
         pushLocation();
         goToSiteAdmins();

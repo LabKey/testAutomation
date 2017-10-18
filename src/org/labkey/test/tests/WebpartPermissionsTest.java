@@ -164,7 +164,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
     {
         //create users
         for(String user : users)
-                createUser(user, null);
+            _userHelper.createUser(user);
         //create dummy project
         _containerHelper.createProject(DUMMY_PROJECT_NAME, "Collaboration");
 

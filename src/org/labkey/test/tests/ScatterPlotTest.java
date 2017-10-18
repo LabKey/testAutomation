@@ -32,7 +32,6 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
-import org.labkey.test.pages.ManageDatasetsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -669,7 +668,7 @@ public class ScatterPlotTest extends GenericChartsTest
         doAndWaitForPageToLoad(() -> fireEvent(svgCircleLoc.waitForElement(shortWait()), SeleniumEvent.click));
         waitForElement(Locator.pageHeader("APX-1: Abbreviated Physical Exam"));
         // verify that only developers can see the button to add point click function
-        createUser(DEVELOPER_USER, null);
+        _userHelper.createUser(DEVELOPER_USER);
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setUserPermissions(DEVELOPER_USER, "Editor");

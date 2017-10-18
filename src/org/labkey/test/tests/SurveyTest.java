@@ -100,7 +100,7 @@ public class SurveyTest extends BaseWebDriverTest
         createSurveyDesign(folderName, null, null, subfolderSurveyDesign, null, "lists", "listA");
 
         log("Add users that will be used for permissions testing");
-        createUser(EDITOR, null);
+        _userHelper.createUser(EDITOR);
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setUserPermissions(EDITOR, "Reader");
