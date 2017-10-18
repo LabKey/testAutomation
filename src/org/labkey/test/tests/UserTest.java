@@ -157,7 +157,7 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testChangeUserEmail()
     {
-        createUserAndNotify(CHANGE_EMAIL_USER, NORMAL_USER);
+        new UIUserHelper(this).cloneUser(CHANGE_EMAIL_USER, NORMAL_USER);
         setInitialPassword(CHANGE_EMAIL_USER, TEST_PASSWORD);
 
         //change their email address

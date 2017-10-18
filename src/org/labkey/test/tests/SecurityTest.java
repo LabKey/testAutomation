@@ -487,8 +487,9 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void clonePermissionsTest()
     {
+        UIUserHelper uiUserHelper = new UIUserHelper(this);
         // create admin templates, plus test bogus & duplicate email addresses
-        createUserAndNotify(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
+        uiUserHelper.createUser(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, true, false);
         assertTextPresent("Failed to create user bogus@bogus@bogus: Invalid email address",
                 NORMAL_USER_TEMPLATE + " was already a registered system user.");//here to see this user's profile and history.");
         //nav trail check
@@ -513,10 +514,10 @@ public class SecurityTest extends BaseWebDriverTest
         clickButton("Update Group Membership");
 
         // create users and verify permissions
-        createUserAndNotify(PROJECT_ADMIN_USER, ADMIN_USER_TEMPLATE);
-        createUserAndNotify(SITE_ADMIN_USER, PasswordUtil.getUsername());
-        createUserAndNotify(NORMAL_USER, NORMAL_USER_TEMPLATE);
-        createUserAndNotify(TO_BE_DELETED_USER, NORMAL_USER_TEMPLATE);
+        uiUserHelper.cloneUser(PROJECT_ADMIN_USER, ADMIN_USER_TEMPLATE);
+        uiUserHelper.cloneUser(SITE_ADMIN_USER, PasswordUtil.getUsername());
+        uiUserHelper.cloneUser(NORMAL_USER, NORMAL_USER_TEMPLATE);
+        uiUserHelper.cloneUser(TO_BE_DELETED_USER, NORMAL_USER_TEMPLATE);
         log("Verify individual (non-group) permissions were cloned");
         goToProjectHome();
         ApiPermissionsHelper helper = new ApiPermissionsHelper(this);

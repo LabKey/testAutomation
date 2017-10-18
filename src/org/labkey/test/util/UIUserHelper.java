@@ -32,19 +32,18 @@ public class UIUserHelper extends AbstractUserHelper
         super(driverWrapper);
     }
 
-    @Override
-    public CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess)
+    public CreateUserResponse cloneUser(String userName, String cloneUserName, boolean sendEmail, boolean verifySuccess)
     {
         getWrapper().goToSiteUsers();
         getWrapper().clickButton("Add Users");
 
         getWrapper().setFormElement(Locator.name("newUsers"), userName);
         getWrapper().setCheckbox(Locator.checkboxByName("sendMail").findElement(getWrapper().getDriver()), sendEmail);
-        //            if (cloneUserName != null)
-//            {
-//                checkCheckbox("cloneUserCheck");
-//                setFormElement("cloneUser", cloneUserName);
-//            }
+        if (cloneUserName != null)
+        {
+            getWrapper().checkCheckbox(Locator.id("cloneUserCheck"));
+            getWrapper().setFormElement(Locator.name("cloneUser"), cloneUserName);
+        }
         getWrapper().clickButton("Add Users");
 
         if (verifySuccess)
@@ -88,6 +87,17 @@ public class UIUserHelper extends AbstractUserHelper
             }
         };
         return fakeResponse;
+    }
+
+    public CreateUserResponse cloneUser(String userName, String cloneUserName)
+    {
+        return cloneUser(userName, cloneUserName, true, true);
+    }
+
+    @Override
+    public CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess)
+    {
+        return cloneUser(userName, null, sendEmail, verifySuccess);
     }
 
     @Override

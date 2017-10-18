@@ -1612,31 +1612,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return _userHelper.createUser(userName);
     }
 
-    @Deprecated
-    public void createUserAndNotify(String userName, String cloneUserName)
-    {
-        createUserAndNotify(userName, cloneUserName, true);
-    }
-
-    @Deprecated
-    public void createUserAndNotify(String userName, String cloneUserName, boolean verifySuccess)
-    {
-        ensureAdminMode();
-        goToSiteUsers();
-        clickButton("Add Users");
-
-        setFormElement(Locator.name("newUsers"), userName);
-        if (cloneUserName != null)
-        {
-            checkCheckbox(Locator.id("cloneUserCheck"));
-            setFormElement(Locator.name("cloneUser"), cloneUserName);
-        }
-        clickButton("Add Users");
-
-        if (verifySuccess)
-            assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
-    }
-
     public void createSiteDeveloper(String userEmail)
     {
         ensureAdminMode();

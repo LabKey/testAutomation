@@ -44,6 +44,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
@@ -296,7 +297,7 @@ public class ClientAPITest extends BaseWebDriverTest
         // create the users for emailApiTest
         for (String user : EMAIL_RECIPIENTS)
             createUser(user, null);
-        createUserAndNotify(AUTOCOMPLETE_USER, PasswordUtil.getUsername());
+        new UIUserHelper(this).cloneUser(AUTOCOMPLETE_USER, PasswordUtil.getUsername());
     }
 
     protected String waitForDivPopulation()
