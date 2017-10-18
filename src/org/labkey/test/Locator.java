@@ -36,14 +36,11 @@ import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public abstract class Locator extends By
@@ -121,9 +118,9 @@ public abstract class Locator extends By
         }
 
         @Override
-        public By toBy()
+        protected By getBy()
         {
-            return wrappedLocator.toBy();
+            return wrappedLocator.getBy();
         }
     }
 
@@ -286,12 +283,7 @@ public abstract class Locator extends By
         return wrappedContext.getValue();
     }
 
-    /**
-     * @deprecated For internal use only; has inconsistent behavior for CSSLocator and NameLocator.
-     * TODO: Make protected and un-deprecate when able
-     */
-    @Deprecated
-    public abstract By toBy();
+    protected abstract By getBy();
 
     public LazyWebElement findWhenNeeded(SearchContext context)
     {
@@ -321,7 +313,7 @@ public abstract class Locator extends By
 
     public List<WebElement> findElements(SearchContext context)
     {
-        List<WebElement> elements = context.findElements(this.toBy());
+        List<WebElement> elements = context.findElements(this.getBy());
         boolean matchText = _text != null;
         boolean matchContains = _contains != null && !_contains.isEmpty();
         int index = 0;
@@ -1103,9 +1095,9 @@ public abstract class Locator extends By
         }
 
         @Override
-        public By toBy()
+        protected By getBy()
         {
-            return _cssLoc.toBy();
+            return _cssLoc.getBy();
         }
     }
 
@@ -1159,7 +1151,7 @@ public abstract class Locator extends By
             return new XPathLocator("("+getLoc()+")["+(index+1)+"]");
         }
 
-        public By toBy()
+        protected By getBy()
         {
             return By.xpath(getLoc());
         }
@@ -1411,7 +1403,7 @@ public abstract class Locator extends By
             if (!(context instanceof WebDriver || context instanceof WrapsDriver) || context instanceof WebElement)
                 return decorateWebElements(context.findElements(By.xpath(getRelativeXPath())));
             else
-                return decorateWebElements(context.findElements(this.toBy()));
+                return decorateWebElements(context.findElements(this.getBy()));
         }
 
         private String getRelativeXPath()
@@ -1437,9 +1429,9 @@ public abstract class Locator extends By
             _id = id.contains(" ") ? null : id;
         }
 
-        public By toBy()
+        protected By getBy()
         {
-            return _id == null ? super.toBy() : By.id(_id);
+            return _id == null ? super.getBy() : By.id(_id);
         }
 
         public String toString()
@@ -1481,7 +1473,7 @@ public abstract class Locator extends By
             return "name=" + getLoc() + (_index != null ? " index=" + _index : "");
         }
 
-        public By toBy()
+        protected By getBy()
         {
             return By.name(getLoc());
         }
@@ -1633,7 +1625,7 @@ public abstract class Locator extends By
             return "css=" + getLoc();
         }
 
-        public By toBy()
+        protected By getBy()
         {
             if (getLoc().contains(":contains("))
                 throw new IllegalArgumentException("CSS3 does not support the ':contains' pseudo-class: '" + getLoc() + "'");
@@ -1667,7 +1659,7 @@ public abstract class Locator extends By
             return "link=" + _linkText;
         }
 
-        public By toBy()
+        protected By getBy()
         {
             return By.linkText(_linkText);
         }
