@@ -143,7 +143,6 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
             subMenuItem.click();
         }
         WebElement item = Locators.menuItem(subMenuLabels[subMenuLabels.length - 1])
-                .notHidden()
                 .waitForElement(elementCache().findOpenMenu(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         getWrapper().fireEvent(item, WebDriverWrapper.SeleniumEvent.mouseover); /* mouseOver causes selenium to attempt
                                 to scroll the item into view, and if that can't be done we'll fail here.  See if firing
