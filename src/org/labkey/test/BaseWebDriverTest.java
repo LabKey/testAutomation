@@ -1304,19 +1304,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         popLocation();
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionExportHelper}
-     */
-    @Deprecated
-    protected void clickExportToText()
-    {
-        doAndWaitForPageSignal(() ->
-                clickButton("Export", 0),
-                DataRegionTable.PANEL_SHOW_SIGNAL);
-        _extHelper.clickSideTab("Text");
-        clickButton("Export to Text");
-    }
-
     @LogMethod
     protected void prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, int locationIndex)
     {
