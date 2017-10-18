@@ -1542,16 +1542,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#getFullColumnValues(String...)}
-     */
-    @Deprecated
-    public List<List<String>> getColumnValues(String tableName, String... columnNames)
-    {
-        DataRegionTable table = new DataRegionTable(tableName, getDriver());
-        return table.getFullColumnValues(columnNames);
-    }
-
-    /**
      * @deprecated Use {@link org.labkey.test.components.PropertiesEditor} from _assayHelper or _listHelper
      */
     @Deprecated
