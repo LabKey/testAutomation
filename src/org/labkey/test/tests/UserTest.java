@@ -27,6 +27,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -467,30 +468,22 @@ public class UserTest extends BaseWebDriverTest
 
     private void checkRequiredField(String name, boolean select)
     {
-        waitAndClick(Locator.xpath("//div[@class='gwt-Label' and contains(text(),'" + name + "')]"));
-
-        String prefix = getPropertyXPath("Field Properties");
-        click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
-
-        Locator checkboxLocator = Locator.xpath(prefix + "//span/input[@name='required']");
-
-        if (isChecked(checkboxLocator) != select)
-            click(checkboxLocator);
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
+        fieldProperties
+                .selectField(name).properties()
+                .selectValidatorsTab()
+                .required.set(select);
     }
 
     private void verifyFieldChecked(String name)
     {
-        Locator fieldLocator = Locator.xpath("//div[@class='gwt-Label' and contains(text(),'" + name + "')]");
-        waitForElement(fieldLocator);
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
+        Boolean isChecked = fieldProperties
+                .selectField(name).properties()
+                .selectValidatorsTab()
+                .required.get();
 
-        click(fieldLocator);
-
-        String prefix = getPropertyXPath("Field Properties");
-        click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
-
-        Locator checkboxLocator = Locator.xpath(prefix + "//span/input[@name='required']");
-
-        assertTrue("Checkbox not set for element: " + name, isChecked(checkboxLocator));
+        assertTrue("Field should be set to required: " + name, isChecked);
     }
 
     private void navigateToUserDetails(String userEmail)
