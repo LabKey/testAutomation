@@ -230,4 +230,15 @@ public class GpatAssayTest extends BaseWebDriverTest
                 "Header", "HCJDRSZ07IVO6P", "HCJDRSZ07IL1GX", "HCJDRSZ07H5SPZ",
                 "CACCAGACAGGTGTTATGGTGTGTGCCTGTAATCCCAGCTACTTGGGAGGGAGCTCAGGT");
     }
+
+    /**
+     * @deprecated Use {@link org.labkey.test.components.PropertiesEditor} from _assayHelper or _listHelper
+     */
+    @Deprecated
+    public String getPropertyXPath(String propertyHeading)
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+            return "//h3[text() = '" + propertyHeading + "']/../..";
+        return "//td[text() = '" + propertyHeading + "']/../..";
+    }
 }

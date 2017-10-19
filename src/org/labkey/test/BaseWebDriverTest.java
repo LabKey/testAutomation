@@ -1542,35 +1542,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.components.PropertiesEditor} from _assayHelper or _listHelper
-     */
-    @Deprecated
-    public String getPropertyXPath(String propertyHeading)
-    {
-        if (IS_BOOTSTRAP_LAYOUT)
-            return "//h3[text() = '" + propertyHeading + "']/../..";
-        return "//td[text() = '" + propertyHeading + "']/../..";
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#checkAll()}
-     */
-    @Deprecated
-    public void checkAllOnPage(String dataRegionName)
-    {
-        new DataRegionTable(dataRegionName, getDriver()).checkAll();
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#checkCheckbox(int)}
-     */
-    @Deprecated
-    public void checkDataRegionCheckbox(String dataRegionName, int index)
-    {
-        new DataRegionTable(dataRegionName, getDriver()).checkCheckbox(index);
-    }
-
-    /**
      * Create a user with the specified permissions for the specified project
      */
     public void createUserWithPermissions(String userName, String projectName, String permissions)
