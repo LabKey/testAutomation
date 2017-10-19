@@ -355,7 +355,7 @@ public class ExtHelper
 
     public static Locator.XPathLocator locateExt3GridCell(Locator row, int cellIndex)
     {
-        return Locator.xpath("(" + ((Locator.XPathLocator)row).getPath() + "//td[contains(@class, 'x-grid3-cell')])[" + cellIndex + "]");
+        return Locator.xpath("(" + ((Locator.XPathLocator) row).toXpath() + "//td[contains(@class, 'x-grid3-cell')])[" + cellIndex + "]");
     }
 
     public void clickXGridPanelCheckbox(int index, boolean keepExisting)

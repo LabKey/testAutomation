@@ -1378,15 +1378,6 @@ public abstract class Locator extends By
             return new XPathLocator("((" + String.join(")|(", xpaths) + "))");
         }
 
-        /**
-         * @deprecated Use {@link #getLoc()}
-         */
-        @Deprecated
-        public String getPath()
-        {
-            return getLoc();
-        }
-
         public String toString()
         {
             return "xpath="+toXpath();

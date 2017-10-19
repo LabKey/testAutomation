@@ -727,7 +727,7 @@ public class ListHelper extends LabKeySiteWrapper
     public void addLookupField(String areaTitle, int index, String name, String label, LookupInfo type)
     {
         String prefix = areaTitle==null ? "" : getPropertyXPath(areaTitle);
-        String addField = prefix + "//span" + Locator.lkButton("Add Field").getPath();
+        String addField = prefix + "//span" + Locator.lkButton("Add Field").toXpath();
         click(Locator.xpath(addField));
         waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         setColumnName(prefix, index, name);
