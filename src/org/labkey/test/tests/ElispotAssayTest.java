@@ -129,16 +129,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assayDesigner.setName(TEST_ASSAY_ELISPOT);
         assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
         assayDesigner.setDescription(TEST_ASSAY_ELISPOT_DESC);
-
-
-        // set the specimenId field default value to be : last entered
-/*
-        Locator specimenField = Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//div[@id='name1']");
-        click(specimenField);
-        click(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//span[text()='Advanced']"));
-        selectOptionByValue(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//select[@class='gwt-ListBox']"), "LAST_ENTERED");
-*/
         assayDesigner.saveAndClose();
+
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
@@ -244,7 +236,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickButton("Copy to Study");
         assertTextPresent("All data is marked for copying to study");
         assertTextPresent(STUDY_FOLDER);
-}
+    }
 
     private void verifyDataRegion(DataRegionTable table, SortDirection sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
     {
@@ -305,7 +297,6 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         //create a new elispot template
         createTemplate();
-
     }
 
     protected void uploadFluorospotFile(String filePath, String uniqueifier, String finalButton)
@@ -325,7 +316,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
     protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground, boolean fluorospot)
     {
-        if(subtractBackground)
+        if (subtractBackground)
             checkCheckbox(Locator.checkboxByName("subtractBackground"));
         for (int i = 0; i < 4; i++)
         {
@@ -407,9 +398,6 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         clickAndWait(Locator.linkWithText("view runs"));
         clickAndWait(Locator.linkContainingText("details"));
-
-        // TODO: Antigen Stats view has changed; more changes to test may be needed (dave 3/30/2015)
-//        new DataRegionTable("AntigenStats", this).setSort("SpecimenLsid/Property/ParticipantID", SortDirection.ASC);
 
         assertTextPresent(
                 "Plate Summary Information",
@@ -508,13 +496,6 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickButton("Create", 0);
         waitForElement(Locator.tagWithText("label", "Background Wells"));
 
-        //TODO: Causes template creation to fail
-//        log("Fail to create duplicate well group");
-//        click(Locator.xpath("//div[contains(@class, 'x-form-trigger-arrow')]"));
-//        Locator.css(".x-combo-list-item").contains("Background Wells").waitForElement(_driver, WAIT_FOR_JAVASCRIPT).click();
-//        clickButton("Create", 0);
-//        assertAlert("Group : Background Wells already exists.");
-
         highlightWells("CONTROL", "Background Wells", "A1", "B3");
         highlightWells("CONTROL", "Background Wells", "C4", "D6");
         highlightWells("CONTROL", "Background Wells", "E7", "F9");
@@ -565,10 +546,6 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         // verify there is a spot count value of 747.747 and a custom column added by the transform
         clickAndWait(Locator.linkContainingText("AID_0161456 W5"));
-/*        assertTextPresent(                                                // TODO: different with new ELispot
-                "747.7",
-                "Custom Elispot Column",
-                "transformed!");             */
     }
 
     protected void doBackgroundSubtractionTest()
@@ -589,16 +566,6 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         DataRegionTable.waitForDataRegion(this, "Runs");
     }
 
-    private final static String FILE4_PLATE_SUMMARY_POST_SUBTRACTION =
-            "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n\n" +
-            "A\n1.0\n0.0\n0.0\n0.0\n1.0\n0.0\n0.0\n4.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "B\n0.0\n1.0\n0.0\n0.0\n0.0\n0.0\n0.0\n6.0\n1.0\n2.0\n0.0\n0.0\n\n" +
-            "C\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n20.0\n243.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "D\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n21.0\n264.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "E\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n277.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "F\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n3.0\n277.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "G\n6.0\n5.0\n7.0\n8.0\n4.0\n5.0\n38.0\n709.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "H\n14.0\n6.0\n6.0\n4.0\n17.0\n11.0\n49.0\n731.0\n0.0\n0.0\n0.0\n0.0";
     protected void verifyBackgroundSubtractionOnExistingRun()
     {
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
@@ -644,22 +611,11 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         column = runTable.getColumnDataAsText("Background Subtraction");
-        for(String item : column)
+        for (String item : column)
         {
             assertEquals("Background subtraction should be true for all runs.", "true", item);
         }
     }
-
-    private final static String FILE5_PLATE_SUMMARY_POST_SUBTRACTION =
-            "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n\n" +
-            "A\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n8.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "B\n0.0\n0.0\n0.0\n1.0\n1.0\n0.0\n0.0\n3.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "C\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n14.0\n149.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "D\n0.0\n2.0\n0.0\n0.0\n0.0\n0.0\n19.0\n195.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "E\n0.5\n0.0\n0.0\n0.5\n8.5\n0.0\n1.5\n234.5\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "F\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n266.5\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "G\n15.0\n11.0\n12.0\n12.0\n9.0\n7.0\n61.0\n680.0\n0.0\n0.0\n0.0\n0.0\n\n" +
-            "H\n6.0\n4.0\n11.0\n20.0\n26.0\n12.0\n46.0\n576.0\n0.0\n0.0\n0.0\n0.0";
 
     protected void verifyBackgroundSubtractionOnNewRun()
     {
@@ -673,14 +629,11 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         DataRegionTable runTable = new DataRegionTable("Runs", this);
         assertTextPresent("AID_0161456 W8");
         List<String> column = runTable.getColumnDataAsText("Background Subtraction");
-        for(String item : column)
-        {
+        for (String item : column)
             assertEquals("Background subtraction should be true for all runs.", "true", item);
-        }
 
         clickAndWait(Locator.linkWithText("run details"));
         waitForElement(Locator.css("#plate-summary-div-1 table"));
-        //assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         DataRegionTable detailsTable = new CrosstabDataRegion("AntigenStats", this);
         Map<String, String> expectedBackgroundMedians = new HashMap<>();
@@ -700,25 +653,20 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertEquals(Arrays.asList("10.0","9.0","6.0","10.0","18.0","7.0","11.0","244.0","0.0","0.0","0.0","0.0"), plateSummary.getRowValues(E));
     }
 
-    protected void highlightWell(String type, String group, String cell)
-    {
-        highlightWells(type, group, cell, cell);
-    }
-
     protected void highlightWells(String type, String group, String startCell, String endCell)
     {
         Locator start = Locator.css(".Cell-"+startCell);
         Locator end = Locator.css(".Cell-"+endCell);
-        if(group != null & !"".equals(group))
+        if (group != null & !"".equals(group))
         {
-            if(!getText(Locator.css(".gwt-TabBarItem-selected")).equals(type))
+            if (!getText(Locator.css(".gwt-TabBarItem-selected")).equals(type))
             {
                 Locator.css(".gwt-Label").withText(type).findElement(getDriver()).click();
                 //want for switch
             }
-            if(!isChecked(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+group+"']]")))
+            if (!isChecked(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+group+"']]")))
                 click(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+group+"']]"));
-            if(!getAttribute(start, "style").contains("rgb(255, 255, 255)"))
+            if (!getAttribute(start, "style").contains("rgb(255, 255, 255)"))
                 click(start);
         }
         else
@@ -748,9 +696,6 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     {
         clickAndWait(Locator.linkContainingText("AID_TNTC"));
 
-//        DataRegionTable table = new CrosstabDataRegion("AntigenStats", this);
-//        assertEquals("TNTC", table.getDataAsText());
-
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addColumn("NormalizedSpotCount");
         _customizeViewsHelper.applyCustomView();
@@ -761,7 +706,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         List<String> normalizedSpotCount = dataTable.getColumnDataAsText("NormalizedSpotCount");
         for (int i=0; i < cellWell.size(); i++)
         {
-            if(!"TNTC".equals(spotCount.get(i)))
+            if (!"TNTC".equals(spotCount.get(i)))
             {
                 int cpw = NumberUtils.toInt(cellWell.get(i), 0);
                 Float sc = NumberUtils.toFloat(spotCount.get(i));
