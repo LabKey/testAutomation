@@ -1055,15 +1055,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    /**
-     * @deprecated Use {@link #getAlertIfPresent()}
-     */
-    @Deprecated
-    public boolean isAlertPresent()
-    {
-        return null != getAlertIfPresent();
-    }
-
     public String acceptAlert()
     {
         Alert alert = waitForAlert();
@@ -2430,7 +2421,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)}
      */
     @Deprecated
-    public String getTableCellText(String tableId, int row, int column)
+    private String getTableCellText(String tableId, int row, int column)
     {
         return getTableCellText(Locator.xpath("//table[@id=" + Locator.xq(tableId) + "]"), row, column);
     }
@@ -2446,51 +2437,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @deprecated Use {@link DataRegionTable#getDataAsText(int, String)}
-     */
-    @Deprecated public String getTableCellText(String tableId, int row, String columnTitle)
-    {
-        return getTableCellText(tableId, row, getColumnIndex(tableId, columnTitle));
-    }
-
-    /**
-     * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)}
-     */
-    @Deprecated public boolean isTableCellEqual(String tableName, int row, int column, String value)
-    {
-        return value.equals(getTableCellText(tableName, row, column));
-    }
-
-    /**
-     * @deprecated Use {@link DataRegionTable#getDataAsText(int, String)}
-     */
-    @Deprecated public boolean isTableCellEqual(String tableName, int row, String columnTitle, String value)
-    {
-        return value.equals(getTableCellText(tableName, row, columnTitle));
-    }
-
-    /**
-     * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)}
-     */
-    @Deprecated public boolean areTableCellsEqual(String tableNameA, int rowA, int columnA, String tableNameB, int rowB, int columnB)
-    {
-        return getTableCellText(tableNameA, rowA, columnA).equals(getTableCellText(tableNameB, rowB, columnB));
-    }
-
-    /**
      * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)} and {@link org.junit.Assert#assertEquals(Object, Object)}
      */
     @Deprecated public void assertTableCellTextEquals(String tableName, int row, int column, String value)
     {
         assertEquals(tableName + "." + String.valueOf(row) + "." + String.valueOf(column) + " != \"" + value + "\"", value, getTableCellText(tableName, row, column));
-    }
-
-    /**
-     * @deprecated Use {@link DataRegionTable#getDataAsText(int, String)} and {@link org.junit.Assert#assertEquals(Object, Object)}
-     */
-    @Deprecated public void assertTableCellTextEquals(String tableName, int row, String columnTitle, String value)
-    {
-        assertTableCellTextEquals(tableName, row, getColumnIndex(tableName, columnTitle), value);
     }
 
     /**
@@ -2507,14 +2458,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @deprecated Use {@link DataRegionTable#getDataAsText(int, String)} and {@link #assertElementContains(Locator, String)}
-     */
-    @Deprecated public void assertTableCellContains(String tableName, int row, String columnTitle, String... strs)
-    {
-        assertTableCellContains(tableName, row, getColumnIndex(tableName, columnTitle), strs);
-    }
-
-    /**
      * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)}
      */
     @Deprecated public void assertTableCellNotContains(String tableName, int row, int column, String... strs)
@@ -2525,58 +2468,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             assertFalse(tableName + "." + row + "." + column + " should not contain \'" + str + "\'", cellText.contains(str));
         }
-    }
-
-    /**
-     * @deprecated Use {@link DataRegionTable#getDataAsText(int, String)}
-     */
-    @Deprecated public void assertTableCellNotContains(String tableName, int row, String columnTitle, String... strs)
-    {
-        assertTableCellNotContains(tableName, row, getColumnIndex(tableName, columnTitle), strs);
-    }
-
-    /**
-     * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)}
-     */
-    @Deprecated public void assertTableCellsEqual(String tableName, int rowA, int columnA, int rowB, int columnB)
-    {
-        assertTableCellsEqual(tableName, rowA, columnA, tableName, rowB, columnB);
-    }
-
-    /**
-     * @deprecated Use {@link DataRegionTable#getDataAsText(int, String)}
-     */
-    @Deprecated public void assertTableCellsEqual(String tableName, int rowA, String columnTitleA, int rowB, String columnTitleB)
-    {
-        assertTableCellsEqual(tableName, rowA, getColumnIndex(tableName, columnTitleA), tableName, rowB, getColumnIndex(tableName, columnTitleB));
-    }
-
-    /**
-     * @deprecated Use {@link DataRegionTable#getDataAsText(int, String)}
-     */
-    @Deprecated public void assertTableCellsEqual(String tableNameA, int rowA, String columnTitleA, String tableNameB, int rowB, String columnTitleB)
-    {
-        assertTableCellsEqual(tableNameA, rowA, getColumnIndex(tableNameA, columnTitleA), tableNameB, rowB, getColumnIndex(tableNameB, columnTitleB));
-    }
-
-    /**
-     * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)}
-     */
-    @Deprecated public void assertTableCellsEqual(String tableNameA, int rowA, int columnA, String tableNameB, int rowB, int columnB)
-    {
-        assertTrue("Table cells not equal: " + tableNameA + "." + String.valueOf(rowA) + "." + String.valueOf(columnA) + " & " + tableNameB + "." + String.valueOf(rowB) + "." + String.valueOf(columnB), areTableCellsEqual(tableNameA, rowA, columnA, tableNameB, rowB, columnB));
-    }
-
-    /**
-     * @deprecated Use {@link DataRegionTable#getColumnIndex(String)}
-     */
-    @Deprecated public int getColumnIndex(String tableName, String columnTitle)
-    {
-        int col = Locator.xpath("//table[@id='"+tableName+"']/tbody/tr[contains(@id, 'dataregion_column_header_row') and not(contains(@id, 'spacer'))]/td[./div/.='"+columnTitle+"']/preceding-sibling::*").findElements(getDriver()).size();
-        if(col == 0)
-            throw new IllegalArgumentException("Column '" + columnTitle + "' not found in table '" + tableName + "'");
-
-        return col;
     }
 
     // Specifies cell values in a TSV string -- values are separated by tabs, rows are separated by \n
@@ -2629,7 +2520,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @deprecated Slow to return false
+     * @deprecated Slow to return false. Use a specific Locator
      */
     @Deprecated
     public boolean isButtonPresent(String text)
