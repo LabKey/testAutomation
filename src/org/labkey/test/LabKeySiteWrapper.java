@@ -745,7 +745,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         // Do these checks via direct http requests the primary upgrade window seems to interfere with this test, #15853
 
-        HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
         HttpUriRequest method;
         int status;
@@ -755,14 +754,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             // These requests should NOT redirect to the upgrade page
 
             method = new HttpGet(getBaseURL() + "/login/resetPassword.view");
-            response = client.execute(method, context);
+            response = client.execute(method, WebTestHelper.getBasicHttpContext());
             status = response.getStatusLine().getStatusCode();
             assertEquals("Unexpected response", HttpStatus.SC_OK, status);
             assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             EntityUtils.consume(response.getEntity());
 
             method = new HttpGet(getBaseURL() + "/admin/maintenance.view");
-            response = client.execute(method, context);
+            response = client.execute(method, WebTestHelper.getBasicHttpContext());
             status = response.getStatusLine().getStatusCode();
             assertEquals("Unexpected response", HttpStatus.SC_OK, status);
             assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
@@ -823,7 +822,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 args.add(new BasicNameValuePair("login", PasswordUtil.getUsername()));
                 args.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
                 ((HttpPost) method).setEntity(new UrlEncodedFormEntity(args));
-                response = redirectClient.execute(method, context);
+                response = redirectClient.execute(method, WebTestHelper.getBasicHttpContext());
                 status = response.getStatusLine().getStatusCode();
                 assertEquals("Unexpected response", HttpStatus.SC_OK, status);
                 // TODO: check login, once http-equiv redirect is sorted out
