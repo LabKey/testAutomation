@@ -176,7 +176,7 @@ public class UserTest extends BaseWebDriverTest
 
         simpleSignIn();
 
-        deleteUsers(true, CHANGE_EMAIL_USER_ALTERNATE);
+        _userHelper.deleteUsers(true, CHANGE_EMAIL_USER_ALTERNATE);
     }
 
     @Test
@@ -257,7 +257,7 @@ public class UserTest extends BaseWebDriverTest
         log("If you got here there were no errors using the new email account.");
         stopImpersonating();
 
-        deleteUsers(false, SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED);
+        _userHelper.deleteUsers(false, SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED);
     }
 
     private void changeEmailAddress(String currentEmail, String newEmail, String password)

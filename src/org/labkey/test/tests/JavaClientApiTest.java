@@ -116,7 +116,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         _permissionsHelper.assertGroupDoesNotExist(GROUP_NAME, PROJECT_NAME);
 
         //delete the user
-        deleteUsers(true, USER_NAME);
+        _userHelper.deleteUsers(true, USER_NAME);
     }
 
     protected void doQueryTest() throws Exception

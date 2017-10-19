@@ -1573,12 +1573,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _userHelper.deleteUsers(false, userEmails);
     }
 
-    @Deprecated @LogMethod
-    public void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
-    {
-        _userHelper.deleteUsers(failIfNotFound, userEmails);
-    }
-
     /**
      * Used by CohortTest and StudyCohortExportTest
      * Returns the data region for the the cohort table to enable setting
