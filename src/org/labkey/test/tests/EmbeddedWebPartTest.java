@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -28,6 +29,8 @@ import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ResetTracker;
 import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
@@ -35,7 +38,6 @@ import java.util.List;
 public class EmbeddedWebPartTest extends BaseWebDriverTest
 {
     {setIsBootstrapWhitelisted(true);}
-    ResetTracker resetTracker = null;
 
     protected  final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "Embedded web part test";
 
@@ -56,7 +58,6 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         _rReportHelper.ensureRConfig();
         log("Setup project and list module");
         _containerHelper.createProject(getProjectName(), null);
-        resetTracker = new ResetTracker(this);
     }
 
     @Test
@@ -88,13 +89,18 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         String rReportName = TRICKY_CHARACTERS + "new R report";
         new RReportHelper(this).createRReport(rReportName);
 
-        waitForElement(Locator.xpath("//table[contains(@class, 'labkey-data-region')]"), WAIT_FOR_JAVASCRIPT);
-
-        resetTracker.startTrackingRefresh();
+        WebElement el = Locator.css(":root").findElement(getDriver());
 
         DataRegionTable.DataRegion(getDriver()).find().goToReport(false, rReportName);
 
-        resetTracker.assertWasNotRefreshed();
+        try
+        {
+            el.isDisplayed();
+        }
+        catch (NoSuchElementException fail)
+        {
+            Assert.fail("Query Web Part triggered an unexpected page load");
+        }
     }
 
     @Override
