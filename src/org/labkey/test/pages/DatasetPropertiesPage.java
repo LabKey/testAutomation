@@ -16,6 +16,7 @@
 package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
@@ -78,7 +79,9 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
         public ResultWindow confirm()
         {
             _window.clickButton("Yes", false);
-            return new ResultWindow();
+            ResultWindow resultWindow = new ResultWindow();
+            WebDriverWrapper.waitFor(() -> resultWindow.getResult().equals("Success"), WAIT_FOR_JAVASCRIPT);
+            return resultWindow;
         }
 
         public DatasetPropertiesPage reject()
