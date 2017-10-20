@@ -48,18 +48,6 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
         return webPartLoc(title).index(index).waitForElement(driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    @Deprecated
-    public BodyWebPart(BaseWebDriverTest test, String title, int index)
-    {
-        this(test.getDriver(), title, index);
-    }
-
-    @Deprecated
-    public BodyWebPart(BaseWebDriverTest test, String title)
-    {
-        this(test.getDriver(), title, 0);
-    }
-
     @Override
     protected void waitForReady() {}
 }

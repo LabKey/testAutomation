@@ -45,7 +45,7 @@ public class InsertIssueDefPage extends LabKeyPage
 
     public InsertIssueDefPage(WebDriver driver, IssueListDefDataRegion originDataRegion)
     {
-        this(driver, originDataRegion.getTableName());
+        this(driver, originDataRegion.getDataRegionName());
     }
 
     public InsertIssueDefPage setLabel(String label)

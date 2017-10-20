@@ -191,8 +191,7 @@ public class ETLScheduler extends LabKeyPage
             if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
             {
                 new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
-                        .withChild(Locator.lkButton("Reset State...")).findElement(this))
-                        .clickMenuButton(true, false,"Reset");
+                                .withChild(Locator.lkButton("Reset State...")).findElement(this)).clickSubMenu(true, "Reset");
             }else
             {
                 _test._ext4Helper.clickExt4MenuButton(false, elements().resetStateButton, false, "Reset");
@@ -207,8 +206,7 @@ public class ETLScheduler extends LabKeyPage
             if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
             {
                 new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
-                    .withChild(Locator.lkButton("Reset State...")).findElement(this))
-                        .clickMenuButton(false, false,"Truncate and Reset");    // don't wait for page; need to dismiss alert first
+                            .withChild(Locator.lkButton("Reset State...")).findElement(this)).clickSubMenu(false, "Truncate and Reset");
             }else
             {
                 _test._ext4Helper.clickExt4MenuButton(false, elements().resetStateButton, false, "Truncate and Reset");

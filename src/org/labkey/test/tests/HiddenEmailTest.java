@@ -116,14 +116,16 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(CHECKED_USER));
+        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(CHECKED_USER));
         clickButton("Submit");
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(ADMIN_USER));
+        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(ADMIN_USER));
         clickButton("Submit");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("user/Email", "Email");
-        _customizeViewsHelper.addCustomizeViewColumn("user/ModifiedBy/Email", "Email");
-        _customizeViewsHelper.addCustomizeViewColumn("ModifiedBy/Email", "Email");
+        _customizeViewsHelper.addColumn("user/Email", "Email");
+        _customizeViewsHelper.addColumn("user/ModifiedBy/Email", "Email");
+        _customizeViewsHelper.addColumn("ModifiedBy/Email", "Email");
         _customizeViewsHelper.saveCustomView(EMAIL_VIEW, true);
         stopImpersonating();
     }
@@ -136,7 +138,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addQueryWebPart(null, "core", "Users", null);
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("ModifiedBy/Email", "Email");
+        _customizeViewsHelper.addColumn("ModifiedBy/Email", "Email");
         _customizeViewsHelper.saveCustomView(EMAIL_VIEW, true);
     }
 

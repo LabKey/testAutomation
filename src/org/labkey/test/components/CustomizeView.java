@@ -293,12 +293,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         _driver.clickAndWait(elements().revertButton);
     }
 
-    @Deprecated
-    public void addCustomizeViewColumn(String column_name)
-    {
-        addColumn(column_name);
-    }
-
     /**
      * add a column to an already open customize view grid
      *
@@ -377,12 +371,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         WebElement fieldRow = expandPivots(fieldKeyParts);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
         new Checkbox(checkbox).check();
-    }
-
-    @Deprecated
-    public void addCustomizeViewColumn(String fieldKey, String column_name)
-    {
-        addColumn(fieldKey, column_name);
     }
 
     public void addColumn(String[] fieldKeyParts, String label)
@@ -568,12 +556,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
         _driver._ext4Helper.selectComboBoxItem(itemXPath, order.toString());
         itemXPath.append("//tr").findElement(this).click(); // Sort direction doesn't stick without this
-    }
-
-    @Deprecated
-    public void removeCustomizeViewColumn(String fieldKey)
-    {
-        removeColumn(fieldKey);
     }
 
     public void removeColumn(String fieldKey)

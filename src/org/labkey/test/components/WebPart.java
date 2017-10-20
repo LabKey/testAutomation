@@ -148,7 +148,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            new BootstrapMenu(getDriver(), elementCache().UX_MENU).clickMenuButton(wait, false, items);
+            new BootstrapMenu(getDriver(), elementCache().UX_MENU).clickSubMenu(wait, items);
         }
         else
         {

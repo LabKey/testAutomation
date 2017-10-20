@@ -37,12 +37,6 @@ public class VagrantUtil
         _imageName = imageName;
     }
 
-    @Deprecated
-    public VagrantUtil(String vagrantDirPath, String imageName)
-    {
-        this(new File(vagrantDirPath), imageName);
-    }
-
     public void setCommandTimeout(int commandTimeout)
     {
         _commandTimeout = commandTimeout;

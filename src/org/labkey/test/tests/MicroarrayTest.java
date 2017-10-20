@@ -99,7 +99,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         fireEvent(Locator.name("data"), SeleniumEvent.change);
         waitForFormElementToEqual(Locator.id("idCol1"), "0");
         clickButton("Submit");
-        DataRegionTable.waitForDataRegion(this, "Material");
+        DataRegion(getDriver()).withName("Material").waitFor();
 
         // First try importing the runs individually
         goToDashboard();

@@ -688,7 +688,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
     protected void assertHrefContains(DataRegionTable table, String columnTitle, String expected)
     {
-        assertTrue("Expected column '" + columnTitle + "' to be in table, was not found.", table.getColumn(columnTitle) != -1);
+        assertTrue("Expected column '" + columnTitle + "' to be in table, was not found.", table.getColumnIndex(columnTitle) != -1);
         String href = table.getHref(0, columnTitle);
         assertNotNull("Expected column '" + columnTitle + "' to have href containing '" + expected + "', was null", href);
         assertTrue("Expected column '" + columnTitle + "' to have href containing '" + expected + "', got '" + href + "'", href.contains(expected));

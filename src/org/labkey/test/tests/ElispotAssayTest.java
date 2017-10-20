@@ -125,7 +125,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         log("Setting up Elispot assay");
 
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
         assayDesigner.setName(TEST_ASSAY_ELISPOT);
         assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
         assayDesigner.setDescription(TEST_ASSAY_ELISPOT_DESC);
@@ -173,7 +173,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         log("Setting up Fluorospot assay");
 
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
         assayDesigner.setName(TEST_ASSAY_FLUOROSPOT);
         assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
         assayDesigner.setDescription(TEST_ASSAY_FLUOROSPOT_DESC);
@@ -373,7 +373,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         // show the normalized spot count column and verify it is calculated correctly
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("NormalizedSpotCount");
+        _customizeViewsHelper.addColumn("NormalizedSpotCount");
         _customizeViewsHelper.applyCustomView();
 
         DataRegionTable dataTable = new DataRegionTable("Data", this);
@@ -533,7 +533,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         AssayDesignerPage assayDesigner = _assayHelper.clickEditAssayDesign();
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         assayDesigner.saveAndClose();
-        DataRegionTable.waitForDataRegion(this, "Runs");
+        DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
 
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
@@ -563,7 +563,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         _assayHelper.clickEditAssayDesign();
         waitAndClick(Locator.css("div#partdelete_removeTransformScript0 span"));
         clickButton("Save & Close");
-        DataRegionTable.waitForDataRegion(this, "Runs");
+        DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
     }
 
     protected void verifyBackgroundSubtractionOnExistingRun()

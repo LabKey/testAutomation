@@ -778,11 +778,6 @@ public class Ext4Helper
             return l;
         }
 
-        public static Locator.XPathLocator windowHeader(String title)
-        {
-            return Window.Locators.title().withText(title).parent();
-        }
-
         /**
          * @deprecated Use {@link org.labkey.test.components.ext4.Window}
          */
@@ -805,27 +800,9 @@ public class Ext4Helper
          * @deprecated Use {@link org.labkey.test.components.ext4.Window}
          */
         @Deprecated
-        public static Locator.XPathLocator windowWithTitleContaining(String partialTitle)
-        {
-            return window().withDescendant(Window.Locators.title().containing(partialTitle));
-        }
-
-        /**
-         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
-         */
-        @Deprecated
         public static Locator.XPathLocator windowButton(String windowTitle, String buttonText)
         {
             return window(windowTitle).append(ext4Button(buttonText));
-        }
-
-        /**
-         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
-         */
-        @Deprecated
-        public static Locator.XPathLocator windowBody(String title)
-        {
-            return window(title).append(Locator.tagWithClass("div", _cssPrefix + "window-body"));
         }
 
         public static Locator.XPathLocator formItemWithLabel(String label)

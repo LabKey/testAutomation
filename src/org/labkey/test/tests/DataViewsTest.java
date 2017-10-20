@@ -74,7 +74,7 @@ public class DataViewsTest extends ParticipantListTest
         clickAndWait(Locator.linkWithText("Manage Views"));
         new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("*","lk-menu-drop")
                 .withPredicate(Locator.xpath("//a/span[contains(text(),'Add Report')]"))
-                .findElement(getDriver())).clickMenuButton(true, false,"R Report");
+                .findElement(getDriver())).clickSubMenu(true, "R Report");
         clickButton("Save", "Please enter a report name:");
 
         Locator locator = Ext4Helper.Locators.window("Save Report").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));

@@ -24,12 +24,6 @@ import java.util.Map;
 
 public class DatasetInsertPage extends InsertPage
 {
-    @Deprecated
-    public DatasetInsertPage(BaseWebDriverTest test, String datasetName)
-    {
-        this(test.getDriver(), datasetName);
-    }
-
     public DatasetInsertPage(WebDriver driver, String datasetName)
     {
         super(driver, "Insert new entry: " + datasetName);

@@ -155,7 +155,7 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
     {
         protected ReorderReportsWindow(WebDriver driver)
         {
-            super(Window().withTitleContaining("Reorder Reports and Charts"), driver);
+            super(Window(driver).withTitleContaining("Reorder Reports and Charts"));
         }
 
         public List<WebElement> getCategories()

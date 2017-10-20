@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
@@ -188,7 +187,7 @@ public class PivotQueryTest extends ReportTest
 
         click(Locator.linkWithText("view data"));
         DataRegionTable table = new DataRegionTable("Dataset", this);
-        table.clickInsertNewRowDropdown();
+        table.clickInsertNewRow();
         waitForElement(Locator.name("quf_ParticipantId"));
         setFormElement(Locator.name("quf_ParticipantId"), "PID_Float");
         setFormElement(Locator.name("quf_date"), "1/1/2001");

@@ -36,17 +36,6 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         Ext4Helper.Locators.ext4Button("Apply").waitForElement(this, 10000);
     }
 
-    @Deprecated
-    public ChartTypeDialog(BaseWebDriverTest test)
-    {
-        this(test.getDriver());
-    }
-
-    @Deprecated // Does nothing
-    public void waitForDialog()
-    {
-    }
-
     public ChartTypeDialog setChartType(ChartType chartType)
     {
         switch(chartType)

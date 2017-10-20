@@ -116,17 +116,6 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     }
 
     /**
-     * @deprecated Use {@link DataRegionTable(WebElement, WebDriver)}
-     * @param test Necessary while DRT methods live in BWDT
-     * @param table table element that contains data region
-     */
-    @Deprecated
-    public DataRegionTable(WebDriverWrapper test, WebElement table)
-    {
-        this(table, null, test);
-    }
-
-    /**
      * @param regionName 'lk-region-name' of the table
      */
     public DataRegionTable(String regionName, WebDriverWrapper test)
@@ -330,21 +319,9 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     }
 
     @Deprecated
-    public static DataRegionTable waitForDataRegion(WebDriverWrapper test, String regionName)
-    {
-        return DataRegion(test.getDriver()).withName(regionName).waitFor();
-    }
-
-    @Deprecated
     public static DataRegionTable findDataRegion(WebDriverWrapper test)
     {
         return DataRegion(test.getDriver()).find();
-    }
-
-    @Deprecated
-    public static DataRegionTable findDataRegionWithin(WebDriverWrapper test, SearchContext context)
-    {
-        return DataRegion(test.getDriver()).find(context);
     }
 
     public static DataRegionTable findDataRegionWithinWebpart(WebDriverWrapper test, String webPartTitle)
@@ -606,24 +583,6 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         if (i < 0)
             TestLogger.log("Column '" + name + "' not found");
         return i;
-    }
-
-    /**
-     * @deprecated Renamed: {@link #getColumnIndex(String)}
-     */
-    @Deprecated
-    public int getColumn(String name)
-    {
-        return getColumnIndex(name);
-    }
-
-    /**
-     * @deprecated Use more accurately named {@link #getColumnLabels()}
-     */
-    @Deprecated
-    public List<String> getColumnHeaders()
-    {
-        return getColumnLabels();
     }
 
     public List<String> getColumnLabels()
@@ -1588,18 +1547,6 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
 
     @Deprecated // use clickInsertNewRow()
     public void clickInsertNewRowDropdown()
-    {
-        clickInsertNewRow();
-    }
-
-    @Deprecated // use clickImportBulkData()
-    public void clickImportBulkDataDropdown()
-    {
-        clickImportBulkData();
-    }
-
-    @Deprecated // use clickInsertNewRow()
-    public void clickInsertNewRowButton()
     {
         clickInsertNewRow();
     }

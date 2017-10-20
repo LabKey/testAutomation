@@ -90,7 +90,7 @@ public class ProteinRegionTable extends DataRegionTable
         }
         else
         {
-            String group = getDataAsText(getProtRow(getProtCount() - 1), getColumn("Group"));
+            String group = getDataAsText(getProtRow(getProtCount() - 1), getColumnIndex("Group"));
             if (group.contains("-"))
             {
                 String[] parts = group.split("-");

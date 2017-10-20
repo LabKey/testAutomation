@@ -37,12 +37,6 @@ public class ExperimentalFeaturesHelper
         setExperimentalFeature(cn, feature, false);
     }
 
-    @Deprecated
-    public static void setExperimentalFeature(Connection cn, String feature, boolean enable, BaseWebDriverTest ignore)
-    {
-        setExperimentalFeature(cn, feature, enable);
-    }
-
     public static void setExperimentalFeature(Connection cn, String feature, boolean enable)
     {
         TestLogger.log((enable ? "Enabling" : "Disabling") + " experimental feature " + feature);

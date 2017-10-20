@@ -726,7 +726,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void addLookupField(String areaTitle, int index, String name, String label, LookupInfo type)
     {
-        String prefix = areaTitle==null ? "" : getPropertyXPath(areaTitle);
+        String prefix = areaTitle==null ? "" : "//h3[text() = '" + areaTitle + "']/../..";
         String addField = prefix + "//span" + Locator.lkButton("Add Field").toXpath();
         click(Locator.xpath(addField));
         waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -962,27 +962,5 @@ public class ListHelper extends LabKeySiteWrapper
     {
         public static Locator.XPathLocator maxCheckbox = Locator.xpath("//input[@name='isMaxText']");
         public static Locator.XPathLocator scaleTextbox = Locator.xpath("//input[@name='scale']");
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.components.PropertiesEditor}
-     */
-    @Deprecated
-    public String getPropertyXPath(String propertyHeading)
-    {
-        if (IS_BOOTSTRAP_LAYOUT)
-            return "//h3[text() = '" + propertyHeading + "']/../..";
-        return "//td[text() = '" + propertyHeading + "']/../..";
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.components.PropertiesEditor}
-     */
-    @Deprecated
-    public String getPropertyXPathContains(String propertyHeading)
-    {
-        if (IS_BOOTSTRAP_LAYOUT)
-            return "//h3[contains(text(), '" + propertyHeading + "')]/../..";
-        return "//td[contains(text(), '" + propertyHeading + "')]/../..";
     }
 }

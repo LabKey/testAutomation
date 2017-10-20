@@ -285,7 +285,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     private void saveAfterApplyingView(String name, String newColumnLabel, String newColumnDisplayName)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn(newColumnLabel);
+        _customizeViewsHelper.addColumn(newColumnLabel);
         _customizeViewsHelper.applyCustomView();
         assertTextPresent(newColumnDisplayName, "unsaved");
 
@@ -293,7 +293,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertTextNotPresent(newColumnDisplayName);
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn(newColumnLabel);
+        _customizeViewsHelper.addColumn(newColumnLabel);
         _customizeViewsHelper.applyCustomView();
         _customizeViewsHelper.saveUnsavedViewGridClosed(name);
         assertTextNotPresent("unsaved");

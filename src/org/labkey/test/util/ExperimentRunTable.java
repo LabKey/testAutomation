@@ -45,7 +45,7 @@ public class ExperimentRunTable extends DataRegionTable
 
     public int getNameColumn()
     {
-        return getColumn("Name");
+        return getColumnIndex("Name");
     }
 
     public boolean hasRun(String name)

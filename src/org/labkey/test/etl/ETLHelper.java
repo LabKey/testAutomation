@@ -334,7 +334,7 @@ public class ETLHelper
     void insertDatasetRow(String id, String name)
     {
         _test.log("inserting dataset row " + name);
-        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRowDropdown();
+        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRow();
         _test.waitForElement(Locator.name("quf_ParticipantId"));
         _test.setFormElement(Locator.name("quf_ParticipantId"), name);
         _test.setFormElement(Locator.name("quf_date"), getDate());
@@ -392,7 +392,7 @@ public class ETLHelper
         _test.log("inserting transfer row rowid " + rowId);
         _test.goToProjectHome();
         _test.clickAndWait(Locator.xpath("//span[text()='Transfers']"));
-        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRowDropdown();
+        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRow();
         _test.waitForElement(Locator.name("quf_rowid"));
         _test.setFormElement(Locator.name("quf_rowid"), rowId);
         _test.setFormElement(Locator.name("quf_transferstart"), transferStart);
@@ -428,7 +428,7 @@ public class ETLHelper
         _test.log("inserting row to 180 column table");
         _test.clickTab("Portal");
         _test.waitAndClickAndWait(Locators.qwp180columnSource);
-        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRowDropdown();
+        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRow();
         _test.waitForElement(Locator.name("quf_field180"));
         fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
         _test.clickButton("Submit");
@@ -827,7 +827,7 @@ public class ETLHelper
                     String actual = drt.getDataAsText(row, _columns[col]);
                     String expected = _data.get(row)[col];
                     if (null != expected)
-                        assertTrue("Expected value " + expected + " in row " + String.valueOf(row + 1) + " column " + String.valueOf(col + 1) + " of DataRegion " + drt.getTableName() + " but found " + actual, actual.equalsIgnoreCase(expected));
+                        assertTrue("Expected value " + expected + " in row " + String.valueOf(row + 1) + " column " + String.valueOf(col + 1) + " of DataRegion " + drt.getDataRegionName() + " but found " + actual, actual.equalsIgnoreCase(expected));
                 }
             }
         }
@@ -968,7 +968,7 @@ public class ETLHelper
         protected void verifyResults()
         {
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test.getDriver());
-            assertEquals("column mismatch for data region " + drt.getTableName(), Arrays.asList(_columns), drt.getColumnLabels());
+            assertEquals("column mismatch for data region " + drt.getDataRegionName(), Arrays.asList(_columns), drt.getColumnLabels());
             assertEquals(1, drt.getDataRowCount());
             String actual = drt.getDataAsText(0, "Transform Id");
             assertTrue(_transformId.equalsIgnoreCase(actual));

@@ -46,7 +46,6 @@ import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
@@ -2141,8 +2140,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             log("WARNING: Pipeline appears stalled. Showing all unfinished jobs.");
             PipelineStatusTable pipelineStatusTable = new PipelineStatusTable(this);
             pipelineStatusTable.setContainerFilter(DataRegionTable.ContainerFilterType.ALL_FOLDERS);
-            addUrlParameter(pipelineStatusTable.getTableName() + ".Status~notin=COMPLETE;CANCELLED;ERROR&" +
-                    pipelineStatusTable.getTableName() + ".Status~doesnotcontain=WAIT");
+            addUrlParameter(pipelineStatusTable.getDataRegionName() + ".Status~notin=COMPLETE;CANCELLED;ERROR&" +
+                    pipelineStatusTable.getDataRegionName() + ".Status~doesnotcontain=WAIT");
             final List<String> descriptions = pipelineStatusTable.getColumnDataAsText("Description");
             fail("Timed out waiting for pipeline job to start. Waiting on " + (descriptions.isEmpty() ? "<unknown>" : descriptions));
         }

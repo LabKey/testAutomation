@@ -100,7 +100,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
     {
         new BootstrapMenu(getDriver(), Locator.tagWithClass("div", "lk-menu-drop")
                     .withDescendant(Locator.tag("span").withText("Request Options")).findElement(getDriver())
-            ).clickMenuButton(true, false,"Create New Request");
+            ).clickSubMenu(true, "Create New Request");
 
         selectOptionByText(Locator.name("destinationLocation"), "Aurum Health KOSH Lab, Orkney, South Africa (Endpoint Lab, Repository)");
         setFormElement(Locator.id("input0"), "Assay Plan");

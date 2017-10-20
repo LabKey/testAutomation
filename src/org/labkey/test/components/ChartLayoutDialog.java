@@ -32,17 +32,6 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         super("Customize look and feel", driver);
     }
 
-    @Deprecated
-    public ChartLayoutDialog(BaseWebDriverTest test)
-    {
-        this(test.getDriver());
-    }
-
-    @Deprecated // Does nothing
-    public void waitForDialog()
-    {
-    }
-
     public List<String> getAvailableTabs()
     {
         return getWrapper().getTexts(Locator.xpath("//div[contains(@class, 'navigation-panel')]//div[contains(@class, 'item')]").findElements(this));

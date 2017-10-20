@@ -55,8 +55,8 @@ import static org.junit.Assert.assertEquals;
 @Deprecated
 public abstract class StudyBaseTest extends BaseWebDriverTest
 {
-    protected static final String ARCHIVE_TEMP_DIR = getStudySampleDataPath() + "drt_temp";
-    protected static final String SPECIMEN_ARCHIVE_A = getStudySampleDataPath() + "specimens/sample_a.specimens";
+    protected static final String ARCHIVE_TEMP_DIR = StudyHelper.getStudySampleDataPath() + "drt_temp";
+    protected static final String SPECIMEN_ARCHIVE_A = StudyHelper.getStudySampleDataPath() + "specimens/sample_a.specimens";
     protected int datasetCount = getDatasetCount();
     protected int visitCount = 65;
 
@@ -107,24 +107,6 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         return Arrays.asList("study");
     }
 
-    /**
-     * @deprecated TODO: Inline and remove
-     */
-    @Deprecated
-    protected static String getStudySampleDataPath()
-    {
-        return StudyHelper.getStudySampleDataPath();
-    }
-
-    /**
-     * @deprecated TODO: Inline and remove
-     */
-    @Deprecated
-    protected String getPipelinePath()
-    {
-        return StudyHelper.getPipelinePath();
-    }
-
     protected String getProjectName()
     {
         return "StudyVerifyProject";
@@ -165,7 +147,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     }
     protected void startSpecimenImport(int completeJobsExpected, String specimenArchivePath)
     {
-        _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(TestFileUtils.getLabKeyRoot(), specimenArchivePath), new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), completeJobsExpected);
+        _specimenImporter = new SpecimenImporter(new File(StudyHelper.getPipelinePath()), new File(TestFileUtils.getLabKeyRoot(), specimenArchivePath), new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), completeJobsExpected);
         _specimenImporter.startImport();
     }
 
@@ -196,14 +178,14 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
         deleteLogFiles(".");
         deleteLogFiles("datasets");
-        TestFileUtils.deleteDir(new File(getPipelinePath(), "assaydata"));
-        TestFileUtils.deleteDir(new File(getPipelinePath(), "reports_temp"));
+        TestFileUtils.deleteDir(new File(StudyHelper.getPipelinePath(), "assaydata"));
+        TestFileUtils.deleteDir(new File(StudyHelper.getPipelinePath(), "reports_temp"));
         TestFileUtils.deleteDir(new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR));
     }
 
     private void deleteLogFiles(String directoryName)
     {
-        File dataRoot = new File(getPipelinePath() + directoryName);
+        File dataRoot = new File(StudyHelper.getPipelinePath() + directoryName);
         File[] logFiles = dataRoot.listFiles(new FilenameFilter(){
             public boolean accept(File dir, String name)
             {
@@ -290,13 +272,13 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void initializePipeline()
     {
-        initializePipeline(getPipelinePath());
+        initializePipeline(StudyHelper.getPipelinePath());
     }
     
     protected void initializePipeline(String pipelinePath)
     {
         if(pipelinePath==null)
-            pipelinePath = getPipelinePath();
+            pipelinePath = StudyHelper.getPipelinePath();
 
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));

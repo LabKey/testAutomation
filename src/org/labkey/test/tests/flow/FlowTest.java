@@ -525,8 +525,7 @@ public class FlowTest extends BaseFlowTest
         if (IS_BOOTSTRAP_LAYOUT)
         {
             new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
-                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
-                    .clickMenuButton(true, false, "Inline");
+                        .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Inline");
         }else
         {
             _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Inline");
@@ -568,8 +567,7 @@ public class FlowTest extends BaseFlowTest
         if (IS_BOOTSTRAP_LAYOUT)
         {
             new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
-                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
-                    .clickMenuButton(true, false, "Thumbnail");
+                        .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Thumbnail");
         }else
         {
             _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
@@ -613,8 +611,7 @@ public class FlowTest extends BaseFlowTest
         if (IS_BOOTSTRAP_LAYOUT)
         {
             new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
-                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
-                    .clickMenuButton(true, false, "Thumbnail");
+                        .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Thumbnail");
         }else
         {
             _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
@@ -789,8 +786,7 @@ public class FlowTest extends BaseFlowTest
         if (IS_BOOTSTRAP_LAYOUT)
         {
             new BootstrapMenu(getDriver(), Locator.tagWithClass("div", "lk-menu-drop")
-                .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
-                    .clickMenuButton(true, false, "Edit");
+                    .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Edit");
         }else
         {
             _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Edit");
@@ -853,8 +849,7 @@ public class FlowTest extends BaseFlowTest
         if (IS_BOOTSTRAP_LAYOUT)
         {
             new BootstrapMenu(getDriver(), Locator.tagWithClass("div", "lk-menu-drop")
-                    .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
-                    .clickMenuButton(true, false, "Delete");
+                        .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Delete");
         }else
         {
             _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Delete");

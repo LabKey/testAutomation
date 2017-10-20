@@ -164,19 +164,6 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
             getWrapper().clickAndWait(item, 0);
     }
 
-    /**
-     * @deprecated Use {@link #clickSubMenu(boolean, String...)} or {@link #openMenuTo(String...)}
-     */
-    @Deprecated
-    public WebElement clickMenuButton(boolean wait, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
-    {
-        if (onlyOpen)
-            return openMenuTo(subMenuLabels);
-        else
-            clickSubMenu(wait, subMenuLabels);
-        return null;
-    }
-
     @Override
     protected Elements newElementCache()
     {

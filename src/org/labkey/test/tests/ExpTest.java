@@ -176,7 +176,7 @@ public class ExpTest extends BaseWebDriverTest
 
         // Customize the view to add the newly joined column
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("WrappedRowId/Created", "Wrapped Row Id editedCreated");
+        _customizeViewsHelper.addColumn("WrappedRowId/Created", "Wrapped Row Id editedCreated");
         _customizeViewsHelper.applyCustomView();
         // Verify that it was joined and formatted correctly
         assertTextPresent(dateFormat.format(new Date()), 5);

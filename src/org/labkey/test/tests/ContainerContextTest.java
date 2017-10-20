@@ -227,11 +227,11 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Inserting row into list");
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Issue15610-List"));
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();
+        DataRegionTable.findDataRegion(this).clickInsertNewRow();
         selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_A + "-Study");
         clickButton("Submit");
 
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();
+        DataRegionTable.findDataRegion(this).clickInsertNewRow();
         selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_B + "-Study");
         clickButton("Submit");
 
@@ -293,7 +293,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         table.goToReport("Create R Report");
         _RReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
         _RReportHelper.saveReport(reportName);
-        DataRegionTable.waitForDataRegion(this, "query");
+        DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
 
         log("** Executing background R script");
         table.goToReport(reportName);

@@ -44,12 +44,6 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         super(driver);
     }
 
-    @Deprecated
-    public AssayDesignerPage(BaseWebDriverTest test)
-    {
-        this(test.getDriver());
-    }
-
     @Override
     public void waitForReady()
     {
@@ -167,17 +161,6 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         return elementCache().dataFieldsPanel;
     }
 
-    /**
-     * File-based assay domains match the names of the xml generating them
-     * So we need a generalized method for accessing
-     * @param domainTitle text
-     * @return
-     */
-    public PropertiesEditor fields(String domainTitle)
-    {
-        return PropertiesEditor(getDriver()).withTitle(domainTitle).findWhenNeeded();
-    }
-
     public AssayDesignerPage addBatchField(String name, @Nullable String label, @Nullable String type)
     {
         return addBatchField(name, label, FieldDefinition.ColumnType.valueOf(type));
@@ -219,41 +202,6 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
     {
         dataFields().addField(new FieldDefinition(name).setLabel(label).setType(type));
         return this;
-    }
-
-    public void removeDataField(String name)
-    {
-        dataFields().selectField(name).markForDeletion();
-    }
-
-    @Deprecated
-    public void removeField(String xpathSection, String name)
-    {
-        final String xpathDelete1 = "input[contains(@id, '-input') and starts-with(@id, 'name')][";
-        final String xpathDelete2 = "]/./ancestor::tr[contains(@class, 'editor-field-row')]/./descendant::div[contains(@id, 'partdelete')]";
-        List<WebElement> inputBoxes;
-        WebElement theBox = null;
-        int index = 1;
-
-        inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'name') and contains(@value, '')]").findElements(getDriver());
-        for (WebElement we : inputBoxes)
-        {
-            if (we.getAttribute("value").trim().toLowerCase().equals(name.trim().toLowerCase()))
-            {
-                theBox = we;
-                break;
-            }
-            else
-            {
-                index++;
-            }
-        }
-
-        if (theBox != null)
-        {
-            Locator.xpath(xpathSection + xpathDelete1 + index + xpathDelete2).findElement(getDriver()).click();
-            clickButton("OK", 0);
-        }
     }
 
     @Override

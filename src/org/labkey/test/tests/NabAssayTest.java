@@ -762,7 +762,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         _assayHelper.clickEditAssayDesign();
 
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         assayDesigner.saveAndClose();
 

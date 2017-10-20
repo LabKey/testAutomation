@@ -107,7 +107,7 @@ public abstract class AbstractAssayHelper
     {
         createAssayAndEdit(type, name).saveAndClose();
 
-        DataRegionTable.waitForDataRegion(_test, "AssayList");
+        DataRegionTable.DataRegion(_test.getDriver()).withName("AssayList").waitFor();
     }
 
     public AssayDesignerPage createAssayAndEdit(String type, String name)
@@ -185,10 +185,9 @@ public abstract class AbstractAssayHelper
         if (IS_BOOTSTRAP_LAYOUT)
         {
             new BootstrapMenu(_test.getDriver(),
-                    Locator.tagWithClass("div", "lk-menu-drop")
-                            .withChild(Locator.linkWithText(MANAGE_LINK_TEXT))
-                            .waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT))
-                    .clickMenuButton(wait, false, subMenuLabels);
+                        Locator.tagWithClass("div", "lk-menu-drop")
+                                .withChild(Locator.linkWithText(MANAGE_LINK_TEXT))
+                                .waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(wait, subMenuLabels);
         }
         else
             _test._ext4Helper.clickExt4MenuButton(wait, Locator.linkWithText(MANAGE_LINK_TEXT), false, subMenuLabels);

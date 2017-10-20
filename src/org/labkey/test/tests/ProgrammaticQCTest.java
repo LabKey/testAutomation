@@ -105,7 +105,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         goToProjectHome();
         clickAndWait(Locator.linkContainingText("QC Assay"));
         _assayHelper.clickEditAssayDesign();
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
         assayDesigner.addTransformScript((TestFileUtils.getSampleData("qc/validator.jar")));
         assayDesigner.saveAndClose();
         goToProjectHome();
@@ -128,7 +128,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), assayName);
 
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         if (addQCScript)
         {

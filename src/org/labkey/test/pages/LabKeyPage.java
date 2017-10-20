@@ -28,6 +28,10 @@ import java.util.List;
 
 public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWrapper
 {
+    /**
+     * @deprecated Most methods are accessible directly due to extending WebDriverWrapper
+     * If BWDT methods are needed in a subclass; stash an instance in the subclass
+     */
     @Deprecated
     protected BaseWebDriverTest _test;
     private WrapsDriver _wrapsDriver;

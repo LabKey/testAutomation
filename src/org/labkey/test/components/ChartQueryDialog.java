@@ -28,12 +28,6 @@ public class ChartQueryDialog extends ChartWizardDialog<ChartQueryDialog.Element
         super("Select a query", driver);
     }
 
-    @Deprecated
-    public ChartQueryDialog(BaseWebDriverTest test)
-    {
-        this(test.getDriver());
-    }
-
     public ChartQueryDialog selectSchema(String schemaName)
     {
         elementCache().schemaCombo.selectComboBoxItem(schemaName);

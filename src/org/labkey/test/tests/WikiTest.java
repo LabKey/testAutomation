@@ -104,7 +104,7 @@ public class WikiTest extends BaseWebDriverTest
         setFormElement(Locator.name("formFiles[0]"), file);
         wikiHelper.saveWikiPage();
 
-        DataRegionTable.waitForDataRegion(this, WIKI_PAGE_WEBPART_ID);
+        DataRegionTable.DataRegion(getDriver()).withName(WIKI_PAGE_WEBPART_ID).waitFor();
         assertTextPresent(file.getName(), "Some HTML content");
         final Locator.XPathLocator wikiTitleLink = Locator.linkContainingText("_Test Wiki").withAttribute("href");
         assertElementPresent(wikiTitleLink);

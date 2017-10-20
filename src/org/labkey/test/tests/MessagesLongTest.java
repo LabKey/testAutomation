@@ -390,8 +390,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         if (IS_BOOTSTRAP_LAYOUT)
         {
             new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
-                    .withDescendant(Locator.lkButton(USERS_UPDATE_BUTTON)).findElement(getDriver())
-                    ).clickMenuButton(false, false,"For messages");
+                        .withDescendant(Locator.lkButton(USERS_UPDATE_BUTTON)).findElement(getDriver())
+                        ).clickSubMenu(false, "For messages");
         }else
         {
             click(Locator.lkButton(USERS_UPDATE_BUTTON));

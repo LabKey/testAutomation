@@ -350,7 +350,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickAndWait(Locator.linkWithText(runName));
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("TargetStudy", "Target Study");
+        _customizeViewsHelper.addColumn("TargetStudy", "Target Study");
         _customizeViewsHelper.saveDefaultView();
 
         DataRegionTable table = new DataRegionTable("Data", this);

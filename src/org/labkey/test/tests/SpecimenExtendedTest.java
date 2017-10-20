@@ -22,8 +22,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
-
-import java.io.File;
+import org.labkey.test.util.StudyHelper;
 
 @Category({Specimen.class})
 public class SpecimenExtendedTest extends SpecimenBaseTest
@@ -58,7 +57,7 @@ public class SpecimenExtendedTest extends SpecimenBaseTest
 
         importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
 
-        setPipelineRoot(getPipelinePath());
+        setPipelineRoot(StudyHelper.getPipelinePath());
 
         setupRequestabilityRules();
         startSpecimenImport(2);

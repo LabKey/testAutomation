@@ -125,18 +125,6 @@ public class UserNotificationsPanel extends WebDriverComponent<UserNotifications
         return notificationItemListlist;
     }
 
-    @Deprecated
-    public List<NotificationPanelItem> getNotificationsOfType(NotificationTypes notificationType)
-    {
-        return getNotificationsOfType(notificationType.textValue);
-    }
-
-    @Deprecated
-    public NotificationPanelItem findNotificationInList(String searchBody, @Nullable NotificationTypes notificationType)
-    {
-        return findNotificationInList(searchBody, notificationType.textValue);
-    }
-
     public NotificationPanelItem findNotificationInList(String searchBody, @Nullable String notificationType)
     {
         List<NotificationPanelItem> notificationItemList;
@@ -188,22 +176,6 @@ public class UserNotificationsPanel extends WebDriverComponent<UserNotifications
         protected List<WebElement> findNotificationsOfType(String notificationType)
         {
             return Locator.id("notificationtype-" + notificationType).child(visibleNotification).findElements(this);
-        }
-    }
-
-    @Deprecated
-    public enum NotificationTypes
-    {
-        ISSUES("Issues", "notificationtype-Issues"),
-        STUDY("Study", "notificationtype-Study");
-
-        private final String textValue;
-        private final String tagId;
-
-        NotificationTypes(String value, String id)
-        {
-            textValue = value;
-            tagId = id;
         }
     }
 }

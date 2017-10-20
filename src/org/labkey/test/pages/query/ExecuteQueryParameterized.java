@@ -33,12 +33,6 @@ public class ExecuteQueryParameterized extends LabKeyPage
 {
     private final Elements _elements;
 
-    @Deprecated
-    public ExecuteQueryParameterized(BaseWebDriverTest test)
-    {
-        this(test.getDriver());
-    }
-
     public ExecuteQueryParameterized(WebDriver driver)
     {
         super(driver);

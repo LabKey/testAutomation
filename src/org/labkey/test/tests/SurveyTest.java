@@ -119,7 +119,7 @@ public class SurveyTest extends BaseWebDriverTest
             clickFolder(folder);
         if (tabName != null && !isElementPresent(Locator.xpath("//li[contains(@class, 'tab-nav-active')]/a").withText(tabName)))
             clickAndWait(Locator.linkWithText(tabName));
-        DataRegionTable.waitForDataRegion(this, "query");
+        DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
         createSurveyDesign(designName, description, schemaName, queryName, null);
     }
 

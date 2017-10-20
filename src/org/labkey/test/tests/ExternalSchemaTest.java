@@ -461,12 +461,12 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         table = new DataRegionTable("query", this);
 
         assertEquals("Expected 'Text' column to contain '" + text + "' for newly inserted row",
-                text, table.getDataAsText(0, table.getColumn("Text")));
+                text, table.getDataAsText(0, table.getColumnIndex("Text")));
         assertEquals("Expected 'IntNotNull' column to contain '" + intNotNull + "' for newly inserted row",
-                String.valueOf(intNotNull), table.getDataAsText(0, table.getColumn("IntNotNull")));
+                String.valueOf(intNotNull), table.getDataAsText(0, table.getColumnIndex("IntNotNull")));
 
         // get newly inserted pk
-        String rowidStr = table.getDataAsText(0, table.getColumn("RowId"));
+        String rowidStr = table.getDataAsText(0, table.getColumnIndex("RowId"));
         assertTrue("Expected to find the RowId for the new row instead of '" + rowidStr + "'",
                 rowidStr != null && !rowidStr.equals(""));
         return Integer.parseInt(rowidStr);
@@ -498,11 +498,11 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("query", this);
         int row = table.getRowIndex(String.valueOf(pk));
         assertTrue("Expected to find row with pk='" + pk + "'", row > -1);
-        
+
         assertEquals("Expected 'Text' column to contain '" + text + "' for updated row",
-                text, table.getDataAsText(row, table.getColumn("Text")));
+                text, table.getDataAsText(row, table.getColumnIndex("Text")));
         assertEquals("Expected 'IntNotNull' column to contain '" + intNotNull + "' for updated row",
-                String.valueOf(intNotNull), table.getDataAsText(row, table.getColumn("IntNotNull")));
+                String.valueOf(intNotNull), table.getDataAsText(row, table.getColumnIndex("IntNotNull")));
     }
 
     private void _deleteViaForm(String containerPath, int[] pk)

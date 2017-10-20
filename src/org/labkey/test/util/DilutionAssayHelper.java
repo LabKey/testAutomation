@@ -139,12 +139,4 @@ public class DilutionAssayHelper
                     .clickSubMenu(true, subMenuLabels);
         }
     }
-
-    // don't use this; it replicates locators to find bootstrapmenus;
-    @Deprecated
-    private Locator.XPathLocator detailMenu(String text)
-    {
-        return Locator.tagWithClassContaining("div", "lk-menu-drop")
-                .withChild(Locator.tagWithAttribute("a", "data-toggle", "dropdown").withText(text));
-    }
 }

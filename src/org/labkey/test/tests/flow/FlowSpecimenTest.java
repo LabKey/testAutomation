@@ -206,10 +206,10 @@ public class FlowSpecimenTest extends BaseFlowTest
     {
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.showHiddenItems();
-        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "SpecimenID");
-        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "SpecimenID/GlobalUniqueId");
-        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "SpecimenID/Volume");
-        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "SpecimenID/Specimen/SequenceNum");
+        _customizeViewsHelper.addColumn(lookupPrefix + "SpecimenID");
+        _customizeViewsHelper.addColumn(lookupPrefix + "SpecimenID/GlobalUniqueId");
+        _customizeViewsHelper.addColumn(lookupPrefix + "SpecimenID/Volume");
+        _customizeViewsHelper.addColumn(lookupPrefix + "SpecimenID/Specimen/SequenceNum");
         _customizeViewsHelper.saveCustomView();
 
         // verify the specimen columns are present

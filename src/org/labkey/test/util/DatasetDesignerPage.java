@@ -38,12 +38,6 @@ public class DatasetDesignerPage extends BaseDesignerPage
         _elements = new Elements();
     }
 
-    @Deprecated
-    public DatasetDesignerPage(BaseWebDriverTest test)
-    {
-        this(test.getDriver());
-    }
-
     public void waitForReady()
     {
         super.waitForReady();

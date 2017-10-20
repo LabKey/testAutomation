@@ -505,7 +505,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("** Try to edit file-based default view");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeCustomizeViewColumn("Color");
+        _customizeViewsHelper.removeColumn("Color");
         CustomizeView.SaveWindow saveWindow = _customizeViewsHelper.clickSave();
         assertFalse("should not be able to select default view", saveWindow.defaultViewRadio.isEnabled());
         saveWindow.cancel();
@@ -514,7 +514,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("** Try to edit overridable file-based view");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("Color");
+        _customizeViewsHelper.addColumn("Color");
         saveWindow = _customizeViewsHelper.clickSave();
 
         assertTrue("should be able to select default view", saveWindow.defaultViewRadio.isEnabled());
@@ -768,7 +768,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         //Issue 11307: Inconsistencies saving session view over file-based view
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("CreatedBy");
+        _customizeViewsHelper.addColumn("CreatedBy");
         _customizeViewsHelper.applyCustomView();
         // Wait for the save button to appear
         waitForElement(Locator.xpath("//div[contains(@class, 'lk-region-context-bar')]//span[contains(@class, 'unsavedview-save')]"));
