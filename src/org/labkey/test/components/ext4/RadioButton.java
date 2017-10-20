@@ -40,7 +40,7 @@ public class RadioButton extends Checkbox
 
     public static class RadioButtonFinder extends FormItemFinder<RadioButton, RadioButtonFinder>
     {
-        protected RadioButtonFinder() {}
+        public RadioButtonFinder() {}
 
         @Override
         protected RadioButton construct(WebElement el)
