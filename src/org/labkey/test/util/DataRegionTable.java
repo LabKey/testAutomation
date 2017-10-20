@@ -16,8 +16,6 @@
 package org.labkey.test.util;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
@@ -27,11 +25,9 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ColumnChartRegion;
-import org.labkey.test.components.Component;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PagingWidget;
 import org.labkey.test.components.SummaryStatisticsDialog;
-import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
@@ -45,8 +41,6 @@ import org.openqa.selenium.WebElement;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -59,24 +53,16 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
-import static org.labkey.test.Locators.pageSignal;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
  * Component wrapper class for interacting with a LabKey Data Region (see clientapi/dom/DataRegion.js)
  */
-public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements> implements WebDriverWrapper.PageLoadListener
+public class DataRegionTable extends DataRegion
 {
-    public static final String UPDATE_SIGNAL = "dataRegionUpdate";
-    public static final String PANEL_SHOW_SIGNAL = "dataRegionPanelShow";
-    public static final String PANEL_HIDE_SIGNAL = "dataRegionPanelHide";
-    private static final int DEFAULT_WAIT = 30000;
-
-    private final WebDriverWrapper _webDriverWrapper;
-    private final WebElement _el;
-
-    // Set once when requested
-    private String _regionName;
+    public static final String UPDATE_SIGNAL = DataRegion.UPDATE_SIGNAL;
+    public static final String PANEL_SHOW_SIGNAL = DataRegion.PANEL_SHOW_SIGNAL;
+    public static final String PANEL_HIDE_SIGNAL = DataRegion.PANEL_HIDE_SIGNAL;
 
     // Cached items
     private CustomizeView _customizeView;
@@ -85,65 +71,31 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     private final List<String> _columnLabels = new ArrayList<>();
     private final List<String> _columnNames = new ArrayList<>();
     private final Map<String, Integer> _mapRows = new HashMap<>();
-    private String _tableId;
     private final Map<Integer, Map<Integer, String>> _dataCache = new TreeMap<>();
-
-    // Settable
-    private boolean _isAsync = false;
-
-    private DataRegionTable(WebElement el, String name, WebDriverWrapper driverWrapper)
-    {
-        _webDriverWrapper = driverWrapper;
-        if ((el == null) == (name == null))
-            throw new IllegalArgumentException("Specify either a table element or data region name");
-
-        if (el == null)
-        {
-            _el = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver()).withTimeout(10000);
-            _regionName = name;
-        }
-        else
-        {
-            _el = el;
-        }
-        if (_el instanceof RefindingWebElement)
-        {
-            ((RefindingWebElement) _el).
-                    withRefindListener(element -> clearCache());
-        }
-
-        _webDriverWrapper.addPageLoadListener(this);
-    }
 
     /**
      * @param regionName 'lk-region-name' of the table
      */
-    public DataRegionTable(String regionName, WebDriverWrapper test)
+    public DataRegionTable(String regionName, WebDriverWrapper driverWrapper)
     {
-        this(null, regionName, test);
+        super(Locators.dataRegion(regionName).refindWhenNeeded(driverWrapper.getDriver()).withTimeout(10000), driverWrapper);
+        setRegionName(regionName);
     }
 
     protected DataRegionTable(WebElement table, WebDriver driver)
     {
-        this(table, null, new WebDriverWrapperImpl(driver));
+        super(table, new WebDriverWrapperImpl(driver));
     }
 
     public DataRegionTable(String regionName, WebDriver driver)
     {
-        this(null, regionName, new WebDriverWrapperImpl(driver));
-    }
-
-    @Override
-    public WebElement getComponentElement()
-    {
-        return _el;
+        this(regionName, new WebDriverWrapperImpl(driver));
     }
 
     @Override
     public Elements elementCache()
     {
-        getComponentElement().isDisplayed(); // Trigger cache reset
-        return super.elementCache();
+        return (Elements) super.elementCache();
     }
 
     @Override
@@ -152,65 +104,22 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         return new Elements();
     }
 
+    @Deprecated // Inline and remove
     public Elements elements()
     {
         return elementCache();
     }
 
-    public DataRegionApi api()
-    {
-        return new DataRegionApi();
-    }
-
-    public WebDriverWrapper getWrapper()
-    {
-        return _webDriverWrapper;
-    }
-
-    public WebDriver getDriver()
-    {
-        return getWrapper().getDriver();
-    }
-
-    protected boolean isAsync()
-    {
-        return _isAsync;
-    }
-
-    public void setAsync(boolean async)
-    {
-        _isAsync = async;
-    }
-
-    public void afterPageLoad()
-    {
-        clearCache();
-    }
-
     protected void clearCache()
     {
+        super.clearCache();
+        _pagingWidget = null;
         _customizeView = null;
         _exportHelper = null;
-        _pagingWidget = null;
-        _tableId = null;
         _columnLabels.clear();
         _columnNames.clear();
         _mapRows.clear();
         _dataCache.clear();
-        clearElementCache();
-    }
-
-    /**
-     * Triggered by clientapi/dom/DataRegion.js
-     */
-    protected String getUpdateSignal()
-    {
-        return UPDATE_SIGNAL + "-" + getDataRegionName();
-    }
-
-    public String doAndWaitForUpdate(Runnable run)
-    {
-        return getWrapper().doAndWaitForPageSignal(run, getUpdateSignal());
     }
 
     protected boolean hasSelectors()
@@ -242,8 +151,8 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         {
             String menuButtonText = IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views";
             getWrapper().doAndWaitForPageSignal(() ->
-                    clickHeaderMenu(menuButtonText, false, "Customize Grid"),
-                    DataRegionTable.PANEL_SHOW_SIGNAL);
+                            clickHeaderMenu(menuButtonText, false, "Customize Grid"),
+                    DataRegion.PANEL_SHOW_SIGNAL);
         }
         return getCustomizeView();
     }
@@ -329,16 +238,6 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         return DataRegion(test.getDriver()).find(new RefindingWebElement(PortalHelper.Locators.webPart(webPartTitle), test.getDriver()));
     }
 
-    public String getDataRegionName()
-    {
-        if (_regionName == null)
-        {
-            String regionName = StringUtils.trimToNull(getComponentElement().getAttribute("lk-region-form")); // new UI
-            _regionName = regionName != null ? regionName : getComponentElement().getAttribute("lk-region-name"); // old UI
-        }
-        return _regionName;
-    }
-
     /**
      * @deprecated Use {@link #getDataRegionName()}
      * Rename to better match terminology in DataRegion.js
@@ -349,19 +248,6 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         return getDataRegionName();
     }
 
-    private String getTableId()
-    {
-        if (_tableId == null)
-        {
-            String id = _el.getAttribute("id");
-            if (id.endsWith("-form"))
-                _tableId = id.replace("-form", "");
-            else
-                _tableId = id;
-        }
-        return _tableId;
-    }
-
     public int getColumnCount()
     {
         return elements().getColumnHeaders().size() - (hasSelectors() ? 1 : 0);
@@ -370,16 +256,6 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     public boolean hasSummaryStatisticRow()
     {
         return Locator.css("tr.labkey-col-total").findElements(getComponentElement()).size() > 0;
-    }
-
-    public List<WebElement> getHeaderButtons()
-    {
-        return elements().getAllHeaderButtons();
-    }
-
-    public WebElement getHeaderButton(String buttonText)
-    {
-        return elements().getHeaderButton(buttonText);
     }
 
     /**
@@ -401,7 +277,7 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     {
         String expected = firstRow + " - " + lastRow + " of " + totalRows;
         String fullPaginationText = Locator.css(".labkey-pagination")
-                .findElement(IS_BOOTSTRAP_LAYOUT ? elements().UX_ButtonBar : this).getText();
+                .findElement(IS_BOOTSTRAP_LAYOUT ? elements().getButtonBar() : this).getText();
 
         Pattern pattern = Pattern.compile("\\d+ - \\d+ of \\d+");
         Matcher matcher = pattern.matcher(fullPaginationText);
@@ -1405,26 +1281,6 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         getWrapper().waitForElement(Locator.css("svg"));
     }
 
-    private String replaceParameter(String param, String newValue)
-    {
-        URL url = getWrapper().getURL();
-        String file = url.getFile();
-        String encodedParam = EscapeUtil.encode(param);
-        file = file.replaceAll("&" + Pattern.quote(encodedParam) + "=\\p{Alnum}+?", "");
-        if (newValue != null)
-            file += "&" + encodedParam + "=" + EscapeUtil.encode(newValue);
-
-        try
-        {
-            url = new URL(url.getProtocol(), url.getHost(), url.getPort(), file);
-        }
-        catch (MalformedURLException mue)
-        {
-            throw new RuntimeException(mue);
-        }
-        return url.getFile();
-    }
-
     // ======== Side facet panel =========
 
     public DatasetFacetPanel openSideFilterPanel()
@@ -1438,86 +1294,9 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         return new DatasetFacetPanel(panelEl, this);
     }
 
-    @Deprecated
-    public void clickHeaderButtonByText(String buttonText)
-    {
-        clickHeaderButton(buttonText);
-    }
-
-    public void clickHeaderButtonAndWait(String buttonText)
-    {
-        getWrapper().clickAndWait(elements().getHeaderButton(buttonText));
-    }
-
-    public void clickHeaderButton(String buttonText)
-    {
-        elements().getHeaderButton(buttonText).click();
-    }
-
     public void clickExportButton()
     {
         elements().getExportButton().click();
-    }
-
-    public BootstrapMenu openHeaderMenu(String buttonText, String ... subMenuLabels)
-    {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            BootstrapMenu headerMenu = new BootstrapMenu(getDriver(), elements().getHeaderMenu(buttonText));
-            headerMenu.openMenuTo(subMenuLabels);
-            return headerMenu;
-        }
-        else
-        {
-            getWrapper()._ext4Helper.clickExt4MenuButton(false, elements().getHeaderButton(buttonText), true, subMenuLabels);
-            return null;
-        }
-    }
-
-    public void clickHeaderMenu(String buttonText, String ... subMenuLabels)
-    {
-        clickHeaderMenu(buttonText, true, subMenuLabels);
-    }
-
-    public void clickHeaderMenu(String buttonText, boolean wait, String ... subMenuLabels)
-    {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new BootstrapMenu(getDriver(), elements().getHeaderMenu(buttonText))
-                    .clickSubMenu(wait,  subMenuLabels);
-        }
-        else
-        {
-            getWrapper()._ext4Helper.clickExt4MenuButton(wait, elements().getHeaderButton(buttonText), false, subMenuLabels);
-        }
-    }
-
-    public boolean hasHeaderMenu(String buttonText)
-    {
-        try
-        {
-            elements().getHeaderButton(buttonText);
-            return true;
-        }
-        catch(NoSuchElementException e)
-        {
-            return false;
-        }
-    }
-
-    public List<String> getHeaderMenuOptions(String buttonText)
-    {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            BootstrapMenu menu = BootstrapMenu.find(getDriver(), elements().buttonBar, buttonText);
-            menu.expand();
-            return getWrapper().getTexts(menu.findVisibleMenuItems());
-        }
-        else
-        {
-            List<WebElement> menuItems = getWrapper()._ext4Helper.getMenuItems(elements().getHeaderButton(buttonText));
-            return getWrapper().getTexts(menuItems);
-        }
     }
 
     public boolean columnHasChartOption(String columnName, String chartType)
@@ -1606,41 +1385,12 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         return IS_BOOTSTRAP_LAYOUT ? "Import bulk data" : "Import Bulk Data";
     }
 
-    public void goToView(String... menuTexts)
-    {
-        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views", menuTexts);
-    }
-
-    public void goToReport(String... menuTexts)
-    {
-        goToReport(true, menuTexts);
-    }
-
-    public void goToReport(boolean waitForRefresh, String... menuTexts)
-    {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            BootstrapMenu menu = getReportMenu();
-            menu.clickSubMenu(waitForRefresh,  menuTexts);
-        }
-        else
-        {
-            throw new NotImplementedException("This is only implemented in the new UI");
-        }
-    }
-
-    @NotNull
-    public BootstrapMenu getReportMenu()
-    {
-        return new BootstrapMenu(getDriver(), elements().getHeaderMenu("Charts / Reports"));
-    }
-
     public void clickApplyGridFilter()
     {
         goToView("Apply Grid Filter");
     }
 
-    public static class Locators
+    public static class Locators extends DataRegion.Locators
     {
         public static Locator.XPathLocator dataRegion()
         {
@@ -1656,16 +1406,6 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
                 return form(regionName).withDescendant(table(regionName));
             else
                 return table(regionName);
-        }
-
-        public static Locator.XPathLocator form()
-        {
-            return Locator.tag("form").withAttribute("lk-region-form");
-        }
-
-        public static Locator.XPathLocator form(String regionName)
-        {
-            return Locator.tagWithAttribute("form", "lk-region-form", regionName);
         }
 
         public static Locator.XPathLocator table()
@@ -1702,21 +1442,8 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         }
     }
 
-    public class Elements extends Component.ElementCache
+    public class Elements extends ElementCache
     {
-        public Elements()
-        {
-            getWrapper().waitForElement(pageSignal(getUpdateSignal()), DEFAULT_WAIT);
-        }
-
-        private final WebElement buttonBar = Locator.tagWithClass("*", "labkey-button-bar").findWhenNeeded(this);
-        private final WebElement UX_ButtonBar = Locator.tagWithClass("div", "lk-region-bar").findWhenNeeded(this);
-
-        public WebElement getButtonBar()
-        {
-            return IS_BOOTSTRAP_LAYOUT ? UX_ButtonBar : buttonBar;
-        }
-
         private Boolean _selectors;
         protected boolean hasSelectors()
         {
@@ -1727,9 +1454,6 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
             return _selectors;
         }
 
-        private List<WebElement> allHeaderButtons;
-        private Map<String, WebElement> headerButtons;
-        private Map<String, WebElement> headerMenus;
         private final WebElement columnHeaderRow = Locator.id(getTableId() + "-column-header-row").findWhenNeeded(this);
         private List<WebElement> columnHeaders;
         private final Map<String, WebElement> columnHeadersByName = new CaseInsensitiveHashMap<>();
@@ -1839,100 +1563,12 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
             return columnHeaders;
         }
 
-        protected List<WebElement> getAllHeaderButtons()
-        {
-            if (allHeaderButtons == null)
-                allHeaderButtons = ImmutableList.copyOf(Locator.css("a.labkey-button, a.labkey-menu-button")
-                        .findElements(IS_BOOTSTRAP_LAYOUT? UX_ButtonBar : buttonBar));
-            return allHeaderButtons;
-        }
-
-        protected WebElement getHeaderButton(String text)
-        {
-            WebElement button = getHeaderButtonOrNull(text);
-            if (button == null)
-                throw new NoSuchElementException("No header button: " + text);
-            return button;
-        }
-
-        protected WebElement getHeaderButtonOrNull(String text)
-        {
-            if (headerButtons == null)
-                headerButtons = new CaseInsensitiveHashMap<>();
-
-            if (!headerButtons.containsKey(text)) // This assumes buttons can't be added after data region is created
-            {
-                String title = "Grid Views".equals(text) ? "Grid views" : text;
-                headerButtons.put(text, Locator.findAnyElementOrNull(
-                        "Button with title or text: " + text,
-                        buttonBar,
-                        Locator.lkButton().withAttribute("title", title),
-                        Locator.lkButton(text),
-                        Locator.tagWithAttribute("a", "data-original-title", title)));
-            }
-            return headerButtons.get(text);
-        }
-
         protected WebElement getExportButton()
         {
             WebElement button = getHeaderButtonOrNull("Export");
             if (null != button)
                 return button;
             return getHeaderButton("Export / Sign Data");
-        }
-
-        // Only works with new UX
-        protected WebElement getHeaderMenu(String text)
-        {
-            if (headerMenus == null)
-                headerMenus = new TreeMap<>();
-
-            if (!headerMenus.containsKey(text))
-            {
-                headerMenus.put(text, Locator.findAnyElement(
-                        "menu with data-original-title " + text,
-                        buttonBar,
-                        Locator.tagWithClassContaining("div", "lk-menu-drop")
-                                .withChild(Locator.tagWithAttribute("a", "data-toggle", "dropdown").withText(text)),
-                        Locator.tagWithClassContaining("div", "lk-menu-drop")
-                                .withChild(Locator.tagWithAttribute("a", "data-original-title", text)),
-                        Locator.tagWithClassContaining("div", "lk-menu-drop")
-                                .withChild(Locator.tagWithAttribute("a", "title", text))));
-            }
-            return headerMenus.get(text);
-        }
-    }
-
-    private abstract class BaseDataRegionApi
-    {
-        final String regionJS = "LABKEY.DataRegions['" + getDataRegionName() + "']";
-
-        public void executeScript(String methodWithArgs)
-        {
-            getWrapper().executeScript(regionJS + "." + methodWithArgs);
-        }
-
-        public void callMethod(String apiMethod, String... args)
-        {
-            String dataRegionMethod = apiMethod + "(" + String.join(", ", args) + ");";
-            executeScript(dataRegionMethod);
-        }
-    }
-
-    public class DataRegionApi extends BaseDataRegionApi
-    {
-        public DataRegionApiExpectingRefresh expectingRefresh()
-        {
-            return new DataRegionApiExpectingRefresh();
-        }
-    }
-
-    public class DataRegionApiExpectingRefresh extends BaseDataRegionApi
-    {
-        @Override
-        public void executeScript(String methodWithArgs)
-        {
-            doAndWaitForUpdate(() -> super.executeScript(methodWithArgs));
         }
     }
 

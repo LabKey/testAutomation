@@ -839,6 +839,7 @@ src/org/labkey/test/util/ChartHelper.java -text
 src/org/labkey/test/util/ComponentQuery.java -text
 src/org/labkey/test/util/Crawler.java -text
 src/org/labkey/test/util/DataIntegrationHelper.java -text
+src/org/labkey/test/util/DataRegion.java -text
 src/org/labkey/test/util/DataRegionElecSignHelper.java -text
 src/org/labkey/test/util/DataRegionExportHelper.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
@@ -885,6 +886,7 @@ src/org/labkey/test/util/RReportHelper.java -text
 src/org/labkey/test/util/ReadOnlyTest.java -text
 src/org/labkey/test/util/RelativeUrl.java -text
 src/org/labkey/test/util/RemoteConnectionHelper.java -text
+src/org/labkey/test/util/ReportDataRegion.java -text
 src/org/labkey/test/util/ScatterPlotReportHelper.java -text
 src/org/labkey/test/util/SchemaHelper.java -text
 src/org/labkey/test/util/SearchHelper.java -text
