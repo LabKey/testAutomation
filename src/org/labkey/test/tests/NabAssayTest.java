@@ -245,7 +245,7 @@ public class NabAssayTest extends AbstractQCAssayTest
                 .setDescription(TEST_ASSAY_NAB_DESC)
                 .save();
 
-        clickAndWait(Locator.linkWithText("configure templates"));
+        clickAndWait(Locator.lkButton("configure templates"));
 
         clickAndWait(Locator.linkWithText("new 96 well (8x12) NAb single-plate template"));
 
