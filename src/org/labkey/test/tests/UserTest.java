@@ -188,15 +188,8 @@ public class UserTest extends BaseWebDriverTest
         enableEmailRecorder();
 
         log("Turn on support for self service email.");
-        try
-        {
-            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL()+"/login/setAuthenticationParameter.view?parameter=SelfServiceEmailChanges&enabled=true");
-            assertEquals("Failed to set authentication param to enable self service email via http get", 200, getResponse);
-        }
-        catch (IOException ioe)
-        {
-            throw new RuntimeException("Failed to enable 'user self service email' feature.", ioe);
-        }
+        int getResponse = WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfServiceEmailChanges&enabled=true").getResponseCode();
+        assertEquals("Failed to set authentication param to enable self service email via http get", 200, getResponse);
 
         log("Create a new user.");
         _userHelper.createUser(SELF_SERVICE_EMAIL_USER, true, true);

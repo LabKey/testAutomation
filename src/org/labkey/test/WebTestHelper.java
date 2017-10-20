@@ -597,12 +597,6 @@ public class WebTestHelper
         return builder.toString();
     }
 
-    @Deprecated
-    public static int getHttpGetResponse(String url) throws IOException
-    {
-        return getHttpResponse(url).getResponseCode();
-    }
-
     /**
      * Get response to GET using default username:password and cached session
      * @param url Absolute URL or relative LabKey URL

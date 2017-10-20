@@ -72,7 +72,7 @@ public class ResourceEncodingTest extends BaseWebDriverTest
             try
             {
                 String minFileName = baseFileName + ".min.js";
-                int responseCode = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/" + minFileName);
+                int responseCode = WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/" + minFileName).getResponseCode();
                 Assert.assertEquals("Minified file should not be present: " + minFileName, HttpStatus.SC_NOT_FOUND, responseCode);
 
                 assertGzipResource(baseFileName + ".js");
@@ -102,7 +102,7 @@ public class ResourceEncodingTest extends BaseWebDriverTest
             try
             {
                 String jsFileName = baseFileName + ".js";
-                int responseCode = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/" + jsFileName);
+                int responseCode = WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/" + jsFileName).getResponseCode();
                 Assert.assertEquals("Non-minified file should not be available: " + jsFileName, HttpStatus.SC_NOT_FOUND, responseCode);
 
                 assertGzipResource(baseFileName + ".min.js");
@@ -116,9 +116,9 @@ public class ResourceEncodingTest extends BaseWebDriverTest
 
     private void assertGzipResource(String fileName) throws IOException
     {
-        int responseCode = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/" + fileName);
+        int responseCode = WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/" + fileName).getResponseCode();
         Assert.assertEquals("File not available: " + fileName, HttpStatus.SC_OK, responseCode);
-        responseCode = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/" + fileName + ".gz");
+        responseCode = WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/" + fileName + ".gz").getResponseCode();
         Assert.assertEquals("GZ file not available: " + fileName, HttpStatus.SC_OK, responseCode);
     }
 

@@ -63,11 +63,11 @@ public class SecurityLDAPTest extends BaseWebDriverTest
         deleteUsersIfPresent(LDAP_USER);
         try
         {
-            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=AutoCreateAccounts&enabled=true");
+            int getResponse = WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=AutoCreateAccounts&enabled=true").getResponseCode();
             assertEquals("failed to set authentication param to enable ldap user auto-create via http get", 200, getResponse);
         }
-        catch (IOException e){
-            throw (new RuntimeException("failed to enable ldap user auto-create", e));
+        catch (Exception e){
+            throw new RuntimeException("failed to enable ldap user auto-create", e);
         }
         signOut();
 
@@ -93,11 +93,11 @@ public class SecurityLDAPTest extends BaseWebDriverTest
         deleteUsersIfPresent(LDAP_USER);
         try
         {
-            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=AutoCreateAccounts&enabled=false");
+            int getResponse = WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=AutoCreateAccounts&enabled=false").getResponseCode();
             assertEquals("failed to set authentication param to disable ldap user auto-create via http get", 200, getResponse);
         }
-        catch (IOException e){
-            throw (new RuntimeException("failed to disable ldap user auto-create", e));
+        catch (Exception e){
+            throw new RuntimeException("failed to disable ldap user auto-create", e);
         }
         signOut();
 
@@ -110,5 +110,4 @@ public class SecurityLDAPTest extends BaseWebDriverTest
         // cleanup: sign admin back in
         signIn();
     }
-
 }

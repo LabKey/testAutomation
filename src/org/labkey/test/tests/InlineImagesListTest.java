@@ -206,7 +206,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
         shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
         String src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
         assertTrue("Wrong image in popup: " + src, src.contains(LRG_PNG_FILE.getName()));
-        assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpGetResponse(src));
+        assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
 
         // Commenting out for now. There is a random behavior where sometimes the thumbnail image will not show up when you move from one cell to another.
         /*
@@ -285,7 +285,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
         shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
         src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
         assertTrue("Wrong image in popup: " + src, src.contains(LRG_PNG_FILE.getName()));
-        assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpGetResponse(src));
+        assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
 
         log("Export the grid to excel.");
         list = new DataRegionTable("query", this);
