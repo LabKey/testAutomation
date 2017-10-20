@@ -23,6 +23,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PasswordUtil;
+import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -69,8 +70,9 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
         deleteSiteWideTermsOfUsePage();
         goToAdminConsole().clickSiteWideTerms();
-        Locator.CssLocator button = Locator.css(".labkey-disabled-button");
-        assertElementContains(button, "DELETE PAGE");
+        WebElement button = Locator.css(".labkey-disabled-button").findElement(getDriver());
+        assertEquals("Delete Page", button.getText());
+        assertEquals("_termsOfUse", getFormElement(Locator.id("wiki-input-name").findElement(getDriver())));
     }
 
     // test that the admin console link directs to a page for editing when page has already been created.
