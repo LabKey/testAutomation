@@ -136,16 +136,15 @@ public class DataViewsPermissionsTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
-        impersonate (EDITOR_USER);
+        impersonate(EDITOR_USER);
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 4");
         sleep(1000);
-        _ext4Helper.clickWindowButton("Report 4","Save",0,0);
+        _ext4Helper.clickWindowButton("Report 4", "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
         stopImpersonating();
 
-        clickProject("StudyVerifyProject");
-        clickFolder(getFolderName());
+        navigateToFolder("StudyVerifyProject", getFolderName());
         sleep(500);
         impersonate(AUTHOR_USER);
         PortalHelper portalHelper1 = new PortalHelper(this);
@@ -158,7 +157,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 5");
         sleep(1000);
-        _ext4Helper.clickWindowButton("Report 5","Save",0,0);
+        _ext4Helper.clickWindowButton("Report 5", "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
 
         verifyMineCheckbox();

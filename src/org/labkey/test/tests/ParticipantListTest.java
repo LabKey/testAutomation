@@ -110,8 +110,7 @@ public class ParticipantListTest extends StudyBaseTest
     private void doParticipantListWebPartTest()
     {
         log("Participant List Webpart Test");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText("Overview"));
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Mouse List");
@@ -136,7 +135,7 @@ public class ParticipantListTest extends StudyBaseTest
         //Mouse down on GROUP 1 to remove it.
         _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0);
         waitForText("Found 13 mice of 138.");
-        
+
         //Check if all PTIDs of GROUP 2 are visible
         assertTextPresent(PTIDS_TWO);
 
@@ -166,7 +165,7 @@ public class ParticipantListTest extends StudyBaseTest
         _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_THREE);
         int group2Height = _extHelper.getExtElementHeight("normalwrap-gridcell", 8);
         int group3Height = _extHelper.getExtElementHeight("normalwrap-gridcell", 11);
-        assertTrue("Expected " + PARTICIPANT_GROUP_THREE + " grid cell to wrap text (group3height="+group3Height+",group2Height="+group2Height, group3Height > group2Height);
+        assertTrue("Expected " + PARTICIPANT_GROUP_THREE + " grid cell to wrap text (group3height=" + group3Height + ",group2Height=" + group2Height, group3Height > group2Height);
         // drag the east handle to the right so that the group three doesn't wrap anymore
         dragAndDrop(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-east')]"), 250, 0);
         group2Height = _extHelper.getExtElementHeight("normalwrap-gridcell", 8);

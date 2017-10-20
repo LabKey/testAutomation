@@ -346,7 +346,7 @@ public class DataReportsTest extends ReportTest
 
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
-        DataRegionTable.DataRegion(getDriver()).find().goToReport( "Create R Report");
+        DataRegionTable.DataRegion(getDriver()).find().goToReport("Create R Report");
         setCodeEditorValue("script-report-editor", "labkey.data");
         clickReportTab();
         waitForText(R_SORT1);
@@ -360,7 +360,7 @@ public class DataReportsTest extends ReportTest
         log("Check saved R script");
         DataRegionTable.DataRegion(getDriver()).find().goToView("default");
         pushLocation();
-        DataRegionTable.DataRegion(getDriver()).find().goToReport( R_SCRIPTS[0]);
+        DataRegionTable.DataRegion(getDriver()).find().goToReport(R_SCRIPTS[0]);
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertTextPresent("null device", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
@@ -374,15 +374,14 @@ public class DataReportsTest extends ReportTest
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setUserPermissions(AUTHOR_USER, "Author");
         impersonate(AUTHOR_USER);
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
         stopImpersonating();
         popLocation();
 
         log("Create second R script");
-        DataRegionTable.DataRegion(getDriver()).find().goToReport( "Create R Report");
+        DataRegionTable.DataRegion(getDriver()).find().goToReport("Create R Report");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
@@ -411,14 +410,13 @@ public class DataReportsTest extends ReportTest
         impersonate(R_USER);
 
         log("Access shared R script");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         pushLocation();
         assertElementNotPresent(Locator.xpath("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
-        DataRegionTable.DataRegion(getDriver()).find().goToReport( R_SCRIPTS[1]);
+        DataRegionTable.DataRegion(getDriver()).find().goToReport(R_SCRIPTS[1]);
         goBack();
-        DataRegionTable.DataRegion(getDriver()).find().goToReport( AUTHOR_REPORT);
+        DataRegionTable.DataRegion(getDriver()).find().goToReport(AUTHOR_REPORT);
 
         popLocation();
         log("Change user permission");
@@ -431,10 +429,9 @@ public class DataReportsTest extends ReportTest
         _permissionsHelper.exitPermissionsUI();
 
         log("Create a new R script that uses other R scripts");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
-        DataRegionTable.DataRegion(getDriver()).find().goToReport( "Create R Report");
+        DataRegionTable.DataRegion(getDriver()).find().goToReport("Create R Report");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         _ext4Helper.checkCheckbox(R_SCRIPTS[1]);
@@ -444,15 +441,13 @@ public class DataReportsTest extends ReportTest
         log("Test editing R scripts");
         signOut();
         signIn();
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
         resaveReport();
 
         log("Check that edit worked");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[1]);
 
         clickReportTab();

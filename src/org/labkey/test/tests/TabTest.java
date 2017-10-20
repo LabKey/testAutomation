@@ -59,8 +59,7 @@ public class TabTest extends SimpleModuleTest
          */
         PortalHelper portalHelper = new PortalHelper(this);
 
-        clickProject(getProjectName());
-        clickFolder(FOLDER_NAME);
+        navigateToFolder(getProjectName(), FOLDER_NAME);
 
         // Move tabs
         portalHelper.enableTabEditMode();

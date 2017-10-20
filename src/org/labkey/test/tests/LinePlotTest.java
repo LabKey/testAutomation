@@ -66,8 +66,7 @@ public class LinePlotTest extends GenericChartsTest
         LookAndFeelLinePlot lookAndFeelDialog;
         SaveChartDialog saveChartDialog;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         chartTypeDialog = clickAddChart("study", QUERY_APX_1);
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Line)
                 .setYAxis(MEASURE_1_WEIGHT)
@@ -149,8 +148,7 @@ public class LinePlotTest extends GenericChartsTest
     {
         ChartTypeDialog chartTypeDialog;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("APXpulse", "Is Less Than", "100");
@@ -185,8 +183,7 @@ public class LinePlotTest extends GenericChartsTest
     {
         ChartTypeDialog chartTypeDialog;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText("Types"));
 
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
@@ -215,8 +212,7 @@ public class LinePlotTest extends GenericChartsTest
         LookAndFeelLinePlot lookAndFeelDialog;
         List<WebElement> points;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         openSavedPlotInEditMode(LINE_PLOT_NAME_DR);
 
         // Verify default styling for point at origin - blue circles
@@ -276,8 +272,7 @@ public class LinePlotTest extends GenericChartsTest
 
         log("Validate that export of the line plot works.");
         goToProjectHome();
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickTab("Clinical and Assay Data");
         waitForElement(Locator.linkWithText(LINE_PLOT_NAME_DR + " Colored"));
         clickAndWait(Locator.linkWithText(LINE_PLOT_NAME_DR + " Colored"), WAIT_FOR_PAGE);
@@ -312,8 +307,7 @@ public class LinePlotTest extends GenericChartsTest
     {
         LookAndFeelLinePlot lookAndFeelDialog;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         openSavedPlotInEditMode(LINE_PLOT_NAME_MV);
 
         log("Check Line Plot Point Click Function (Developer Only)");
@@ -367,8 +361,7 @@ public class LinePlotTest extends GenericChartsTest
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setUserPermissions(DEVELOPER_USER, "Editor");
         impersonate(DEVELOPER_USER);
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(LINE_PLOT_NAME_MV + " PointClickFn"));
         clickAndWait(Ext4Helper.Locators.ext4Button("Edit"), WAIT_FOR_PAGE);
         waitForText(CHART_TITLE);

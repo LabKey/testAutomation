@@ -83,8 +83,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
     private void doMostlyNumericDataPlotTest()
     {
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
 
         log("Go to the schema browser and modify some of the fields.");
         goToSchemaBrowser();
@@ -139,13 +138,12 @@ public class ScatterPlotTest extends GenericChartsTest
         log("Change the column's reporting status to 'dimension'");
         datasetFieldsPanel.fieldProperties().selectReportingTab().dimension.check();
 
-        doAndWaitForPageToLoad(()->{
+        doAndWaitForPageToLoad(() -> {
             click(Locator.linkWithSpan("Save"));
             waitForText("APX-1: Abbreviated Physical Exam Dataset Properties");
         });
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         ChartTypeDialog chartTypeDialog = clickAddChart("study", QUERY_APX_1);
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
                 .setYAxis(MEASURE_6_HEENT)
@@ -153,8 +151,7 @@ public class ScatterPlotTest extends GenericChartsTest
                 .clickApply();
         assertTextPresent("The y-axis measure '6. HEENT' had 34 value(s) that could not be converted to a number and are not included in the plot");
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         chartTypeDialog = clickAddChart("study", QUERY_APX_1);
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Bar)
                 .setYAxis(MEASURE_6_HEENT)
@@ -186,8 +183,7 @@ public class ScatterPlotTest extends GenericChartsTest
         LookAndFeelScatterPlot lookAndFeelDialog;
         SaveChartDialog saveChartDialog;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         chartTypeDialog = clickAddChart("study", QUERY_APX_1);
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
                 .setYAxis(MEASURE_1_WEIGHT)
@@ -250,8 +246,7 @@ public class ScatterPlotTest extends GenericChartsTest
     {
         ChartTypeDialog chartTypeDialog;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("APXpulse", "Is Less Than", "100");
@@ -288,8 +283,7 @@ public class ScatterPlotTest extends GenericChartsTest
     {
         ChartTypeDialog chartTypeDialog;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText("Types"));
 
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
@@ -330,8 +324,7 @@ public class ScatterPlotTest extends GenericChartsTest
         LookAndFeelScatterPlot lookAndFeelDialog;
         List<WebElement> points;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         openSavedPlotInEditMode(SCATTER_PLOT_NAME_DR);
 
         // Verify default styling for point at origin - blue circles
@@ -453,8 +446,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         log("Validate that export of the bar plot works.");
         goToProjectHome();
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickTab("Clinical and Assay Data");
         waitForElement(Locator.linkWithText(SCATTER_PLOT_NAME_DR + " Colored"));
         clickAndWait(Locator.linkWithText(SCATTER_PLOT_NAME_DR + " Colored"), WAIT_FOR_PAGE);
@@ -492,8 +484,7 @@ public class ScatterPlotTest extends GenericChartsTest
         int listIndex;
 
         log("Remove color and shape measures.");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
 
         EditDatasetDefinitionPage editDatasetPage = _studyHelper.goToManageDatasets()
                 .selectDatasetByName("APX-1")
@@ -536,8 +527,7 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot();
 
         log("Remove x-axis measure.");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
 
         clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
         clickButton("Manage", WAIT_FOR_PAGE);
@@ -587,8 +577,7 @@ public class ScatterPlotTest extends GenericChartsTest
     private void doDeleteQueryTest()
     {
         log("Remove color and shape measures.");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
 
         clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
         clickButton("Manage", WAIT_FOR_PAGE);
@@ -620,8 +609,7 @@ public class ScatterPlotTest extends GenericChartsTest
     {
         LookAndFeelScatterPlot lookAndFeelDialog;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         openSavedPlotInEditMode(SCATTER_PLOT_NAME_MV);
 
         log("Check Scatter Plot Point Click Function (Developer Only)");
@@ -675,8 +663,7 @@ public class ScatterPlotTest extends GenericChartsTest
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setUserPermissions(DEVELOPER_USER, "Editor");
         impersonate(DEVELOPER_USER);
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(SCATTER_PLOT_NAME_MV + " PointClickFn"));
         clickAndWait(Ext4Helper.Locators.ext4Button("Edit"), WAIT_FOR_PAGE);
         waitForText(CHART_TITLE);
@@ -712,8 +699,7 @@ public class ScatterPlotTest extends GenericChartsTest
         expectedBinSizeCounts.put("2 points", 1);
         expectedBinSizeCounts.put("3 points", 1);
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText("CPF-1: Follow-up Chemistry Panel"));
         DataRegionTable drt = new DataRegionTable("Dataset", getDriver());
         drt.goToReport("Create Chart");
@@ -767,8 +753,7 @@ public class ScatterPlotTest extends GenericChartsTest
     @LogMethod
     private void doAxisManualRangeScatterPlotTest()
     {
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         openSavedPlotInEditMode(SCATTER_PLOT_NAME_BIN);
         assertSVG(SCATTER_PLOT_CPF_1);
         validateBinWarningMsg(false);

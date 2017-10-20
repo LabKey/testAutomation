@@ -280,8 +280,7 @@ public class FilterTest extends BaseWebDriverTest
         issuesHelper.addIssue(projectIssue2);
 
         _containerHelper.createSubfolder(getProjectName(), "subfolder");
-        clickProject(getProjectName());
-        clickFolder("subfolder");
+        navigateToFolder(getProjectName(), "subfolder");
 
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
@@ -292,8 +291,7 @@ public class FilterTest extends BaseWebDriverTest
         clickProject(getProjectName());
         IssuesTest.addLookupValues(this, "issues", "Type", Arrays.asList("typed", "typee"));
 
-        clickProject(getProjectName());
-        clickFolder("subfolder");
+        navigateToFolder(getProjectName(), "subfolder");
 
         HashMap<String, String> subfolderIssue = new HashMap<>();
         subfolderIssue.put("title", "subfolder issue1");

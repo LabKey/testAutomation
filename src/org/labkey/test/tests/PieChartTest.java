@@ -68,8 +68,7 @@ public class PieChartTest extends GenericChartsTest
 
         log("Create a pie chart and then set different values using the dialogs.");
         goToProjectHome();
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         chartTypeDialog = clickAddChart("study", AE_1_QUERY_NAME);
 
         log("Set the minimal attributes necessary to create a pie chart.");
@@ -102,7 +101,7 @@ public class PieChartTest extends GenericChartsTest
 
         // Changing gradient just to make sure no errors are generated. Didn't have time to validate that color had change in the pie chart.
         pieChartLookAndFeel.setGradientColor(COLOR_RED)
-            .clickApply();
+                .clickApply();
 
         sleep(3000);  // TODO Is there a better trigger?
 
@@ -163,7 +162,7 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertTrue("Percentages in svg not as expected. Expected '(AE)18%11%Fever", svgText.contains("(AE)18%11%Fever"));
         Assert.assertTrue("Expected Title '" + PLOT_TITLE + "' wasn't present.", svgText.contains(PLOT_TITLE));
         String svgWidth = getAttribute(Locator.css("svg"), "width");
-        String svgHeight= getAttribute(Locator.css("svg"), "height");
+        String svgHeight = getAttribute(Locator.css("svg"), "height");
         Assert.assertEquals("Width of svg not expected.", "500", svgWidth);
         Assert.assertEquals("Height of svg not expected.", "500", svgHeight);
 
@@ -188,8 +187,7 @@ public class PieChartTest extends GenericChartsTest
         log("Go to the '" + DATA_SOURCE_1 + "' grid to create a pie chart from a column.");
 
         goToProjectHome();
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickTab("Clinical and Assay Data");
         waitForElement(Locator.linkWithText(DATA_SOURCE_1));
         click(Locator.linkWithText(DATA_SOURCE_1));
@@ -243,8 +241,7 @@ public class PieChartTest extends GenericChartsTest
 
         log("Validate that export of the pie chart works.");
         goToProjectHome();
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickTab("Clinical and Assay Data");
         waitForElement(Locator.linkWithText(PIE_CHART_SAVE_NAME));
         clickAndWait(Locator.linkWithText(PIE_CHART_SAVE_NAME), WAIT_FOR_PAGE);

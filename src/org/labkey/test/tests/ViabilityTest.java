@@ -239,8 +239,7 @@ public class ViabilityTest extends AbstractViabilityTest
         // add the transform script to the assay
         log("** Uploading Viability Runs with a transform script");
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
         _assayHelper.clickEditAssayDesign(true);
 
@@ -296,8 +295,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         log("** Test Target Study as Result Domain Field");
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
         _assayHelper.clickEditAssayDesign(true);
         waitForElement(Locator.lkButton("Add Script"));
@@ -307,8 +305,7 @@ public class ViabilityTest extends AbstractViabilityTest
         _listHelper.addField("Guava Assay Result Fields", "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
         clickButton("Save & Close");
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
         clickButton("Import Data");
 
@@ -327,7 +324,7 @@ public class ViabilityTest extends AbstractViabilityTest
                 getSelectedOptionValue(Locator.name("_pool_1604505335_0_TargetStudy")),
                 getSelectedOptionValue(Locator.name("_pool_161400006115_3_TargetStudy")));
         uncheckCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
-        
+
         // clear TargetStudy for 'vial2' and set the TargetStudy for 'vial3' and 'xyzzy'
         selectOptionByText(Locator.name("_pool_161400006105_2_TargetStudy"), "[None]");
         selectOptionByText(Locator.name("_pool_161400006115_3_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");

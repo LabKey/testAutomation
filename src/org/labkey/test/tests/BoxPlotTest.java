@@ -54,8 +54,7 @@ public class BoxPlotTest extends GenericChartsTest
         ChartTypeDialog chartTypeDialog;
         LookAndFeelBoxPlot lookAndFeelBoxPlot;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         chartTypeDialog = clickAddChart("study", "RCF-1 (RCF-1: Reactogenicity-Day 2)");
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box)
                 .setYAxis("4c.Induration 1st measure")
@@ -117,8 +116,7 @@ public class BoxPlotTest extends GenericChartsTest
         ChartTypeDialog chartTypeDialog;
         LookAndFeelBoxPlot lookAndFeelBoxPlot;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText("RCH-1: Reactogenicity-Day 1"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("RCHtempc", "Is Less Than", "39");
@@ -151,7 +149,7 @@ public class BoxPlotTest extends GenericChartsTest
 
         // We need to specifically click the last element because those are the outliers.
         List<WebElement> paths = svgPathLoc.findElements(getDriver());
-        fireEvent(paths.get(paths.size()-1), SeleniumEvent.click);
+        fireEvent(paths.get(paths.size() - 1), SeleniumEvent.click);
         _extHelper.waitForExtDialog("Data Point Information");
         assertTextPresent("RCHtempc:");
         clickButton("OK", 0);
@@ -165,8 +163,7 @@ public class BoxPlotTest extends GenericChartsTest
     @LogMethod
     private void doQuickChartBoxPlotTest()
     {
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText("Types"));
 
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);

@@ -158,7 +158,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         final String protocolName = "assay_import";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
         final Map<String, String> protocolProperties = Maps.of(
-            "protocolName", protocolName);
+                "protocolName", protocolName);
 
         final Map<String, Set<String>> outputFiles = new HashMap<>();
         outputFiles.put("r-localtask-assayimport.xml", Collections.emptySet());
@@ -182,8 +182,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         assayDesignerPage.addDataField("Age", "Age", FieldDefinition.ColumnType.Integer);
         assayDesignerPage.save();
 
-        clickProject(getProjectName());
-        clickFolder(folderName);
+        navigateToFolder(getProjectName(), folderName);
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 

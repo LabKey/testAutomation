@@ -372,14 +372,13 @@ public abstract class AbstractContainerHelper
     public void deleteFolder(String project, @LoggedParam String folderName, int waitTime)
     {
         _test.log("Deleting folder " + folderName + " under project " + project);
-        _test.clickProject(project);
-        _test.clickFolder(folderName);
+        _test.navigateToFolder(project, folderName);
         _test.ensureAdminMode();
         _test.goToFolderManagement();
         _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName));
         _test.clickButton("Delete", waitTime);
         // confirm delete subfolders if present
-        if(_test.isTextPresent("This folder has subfolders."))
+        if (_test.isTextPresent("This folder has subfolders."))
             _test.clickButton("Delete All Folders", waitTime);
         // confirm delete:
         _test.clickButton("Delete", waitTime);
@@ -396,8 +395,7 @@ public abstract class AbstractContainerHelper
     public void renameFolder(String project, @LoggedParam String folderName, @LoggedParam String newFolderName, boolean createAlias)
     {
         _test.log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
-        _test.clickProject(project);
-        _test.clickFolder(folderName);
+        _test.navigateToFolder(project, folderName);
         final String expectedContainerPath = _test.getCurrentContainerPath().replace("/" + folderName, "/" + newFolderName);
         _test.goToFolderManagement();
         _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName).notHidden());
@@ -430,8 +428,7 @@ public abstract class AbstractContainerHelper
     public void moveFolder(@LoggedParam String projectName, @LoggedParam String folderName, @LoggedParam String newParent, boolean createAlias) throws CommandException
     {
         _test.log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
-        _test.clickProject(projectName);
-        _test.clickFolder(folderName);
+        _test.navigateToFolder(projectName, folderName);
         _test.goToFolderManagement();
         _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName));
         _test.clickButton("Move");

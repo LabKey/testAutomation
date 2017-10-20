@@ -66,8 +66,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _userHelper.createUser(USER1);
         _userHelper.createUser(USER2);
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.setUserPermissions(USER1, "Reader");
         permissionsHelper.setUserPermissions(USER2, "Editor");
@@ -371,8 +370,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         LookAndFeelTimeChart lookAndFeelDialog;
 
         log("Check Time Chart Point Click Function (Developer Only)");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         goToManageViews();
         waitForText(REPORT_NAME_1);
         clickReportDetailsLink(REPORT_NAME_1);
@@ -463,8 +461,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         LookAndFeelTimeChart lookAndFeelDialog;
 
         log("Create multi-measure time chart.");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         chartTypeDialog = clickAddChart("study", "Lab Results");
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
                 .setYAxis(CD4_MEASURE_LABEL)
@@ -628,8 +625,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         ChartTypeDialog chartTypeDialog;
         LookAndFeelTimeChart lookAndFeelDialog;
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         goToManageViews();
         clickReportDetailsLink(REPORT_NAME_3);
         click(Locator.linkContainingText("Edit Report"));
@@ -647,11 +643,11 @@ public class TimeChartDateBasedTest extends TimeChartTest
         timeChartWizard = new TimeChartWizard(this);
         chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.setYAxis("Hemoglobin", true).clickApply();
-        timeChartWizard.verifySvgChart(6, new String[]{GROUP2_PTIDS[0]+" Hemoglobin", GROUP2_PTIDS[1]+" Hemoglobin"});
+        timeChartWizard.verifySvgChart(6, new String[]{GROUP2_PTIDS[0] + " Hemoglobin", GROUP2_PTIDS[1] + " Hemoglobin"});
 
         chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.setYAxisSide(2, ChartTypeDialog.YAxisSide.Right).clickApply();
-        timeChartWizard.verifySvgChart(6, new String[]{GROUP2_PTIDS[0]+" Hemoglobin", GROUP2_PTIDS[1]+" Hemoglobin"});
+        timeChartWizard.verifySvgChart(6, new String[]{GROUP2_PTIDS[0] + " Hemoglobin", GROUP2_PTIDS[1] + " Hemoglobin"});
         waitForElement(Locator.css("svg text").withText("Hemoglobin")); // y-axis right label
         waitForElement(Locator.css("svg text").withText("12.0")); // y-axis min range
         waitForElement(Locator.css("svg text").withText("21.0")); // y-axis max range
@@ -752,8 +748,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
     {
         log("Test time chart from a filtered grid");
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText("Physical Exam"));
 
         String ptid = "249318596";

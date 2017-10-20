@@ -269,10 +269,9 @@ public class TimeChartAPITest extends TimeChartTest
         PortalHelper portalHelper = new PortalHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
         // check multi-measure calls to LABKEY.Query.Visualization.getData API requesting date information
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         // create new wiki to add to Demo study folder, or edit existing one
-        if(isTextPresent(WIKIPAGE_NAME))
+        if (isTextPresent(WIKIPAGE_NAME))
         {
             portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
         }
@@ -303,7 +302,7 @@ public class TimeChartAPITest extends TimeChartTest
             // check title is present
             waitForElement(Locator.name("configTitle").withText(testTitle));
             // check # of rows
-            if (testRowCounts!=null)
+            if (testRowCounts != null)
             {
                 waitForElement(Locator.paginationText(testRowCounts[testIndex]), WAIT_FOR_JAVASCRIPT);
             }

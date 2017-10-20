@@ -66,8 +66,7 @@ public class ReportSecurityTest extends ReportTest
     @LogMethod
     protected void setupDatasetSecurity()
     {
-        clickProject(getProjectName());
-        clickFolder("My Study");
+        navigateToFolder(getProjectName(), "My Study");
 
         // create a test group and give it container read perms
         _permissionsHelper.enterPermissionsUI();
@@ -89,7 +88,10 @@ public class ReportSecurityTest extends ReportTest
         enterStudySecurity();
 
         // enable advanced study security
-        doAndWaitForPageToLoad(() -> { selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ"); click(Locator.lkButton("Update Type")); } );
+        doAndWaitForPageToLoad(() -> {
+            selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
+            click(Locator.lkButton("Update Type"));
+        });
 
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
         clickAndWait(Locator.id("groupUpdateButton"));
@@ -102,8 +104,7 @@ public class ReportSecurityTest extends ReportTest
     protected void doReportSecurity()
     {
         // create charts
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
 
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         //_extHelper.clickMenuButton("Charts", "Create Chart View (deprecated)");
@@ -120,7 +121,7 @@ public class ReportSecurityTest extends ReportTest
         setFormElement(Locator.name("reportName"), "participant chart");
         clickButton("OK", 0);
 
-       // waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
+        // waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
 
         //_extHelper.clickMenuButton("Grid Views", "default");
         dt.goToView("default");
@@ -147,8 +148,8 @@ public class ReportSecurityTest extends ReportTest
         clickFolder(getFolderName());
         goToManageViews();
 
-        BootstrapMenu.find(getDriver(),"Add Report")
-                .clickSubMenu(true,"Grid View");
+        BootstrapMenu.find(getDriver(), "Add Report")
+                .clickSubMenu(true, "Grid View");
 
         //clickAddReport("Grid View");
         setFormElement(Locator.name("label"), TEST_GRID_VIEW);
@@ -156,8 +157,7 @@ public class ReportSecurityTest extends ReportTest
         clickButton("Create View");
 
         // test security
-        clickProject(getProjectName());
-        clickFolder("My Study");
+        navigateToFolder(getProjectName(), "My Study");
 
         goToManageViews();
         clickReportPermissionsLink("participant chart");
@@ -173,8 +173,7 @@ public class ReportSecurityTest extends ReportTest
 
         goToAdminConsole();
         impersonate(TEST_USER);
-        clickProject(getProjectName());
-        clickFolder("My Study");
+        navigateToFolder(getProjectName(), "My Study");
 
         assertElementNotPresent(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         clickAndWait(Locator.linkWithText("participant chart"));
@@ -183,7 +182,7 @@ public class ReportSecurityTest extends ReportTest
         clickAndWait(Locator.linkWithText(TEST_GRID_VIEW));
         assertTextPresent("999320016");
         pushLocation();
-       // _extHelper.clickMenuButton("Grid Views", "default");
+        // _extHelper.clickMenuButton("Grid Views", "default");
         dt.goToView("default");
         assertTextPresent("User does not have read permission on this dataset.");
 /*

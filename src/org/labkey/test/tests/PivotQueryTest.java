@@ -135,7 +135,8 @@ public class PivotQueryTest extends ReportTest
     }
 
     @Test
-    public void testPivotQueryChartingTextFieldMeasure(){
+    public void testPivotQueryChartingTextFieldMeasure()
+    {
         //Create new query "LuminexPivotString" based on study/LuminexAssay
         String LUMINEX_PIVOT_STRING = "LuminexPivotString";
         String CONC_INRANGE_STRING = "ConcInRangeString";
@@ -152,7 +153,7 @@ public class PivotQueryTest extends ReportTest
         "        ConcInRange_MIN\n" +
         "BY AnalyteName\n";
 
-        createQuery(getProjectName(), LUMINEX_PIVOT_STRING, "study",querySource, null,false);
+        createQuery(getProjectName(), LUMINEX_PIVOT_STRING, "study", querySource, null, false);
 
         //Edit definition LuminexAssay
         // Make field ConcInRangeString a measure
@@ -176,7 +177,7 @@ public class PivotQueryTest extends ReportTest
         Checkbox measure = Checkbox.Checkbox(Locator.tagWithName("input", "measure")).findWhenNeeded(datasetFieldsPanel);
         measure.check();
 
-        doAndWaitForPageToLoad(()->{
+        doAndWaitForPageToLoad(() -> {
             click(Locator.linkWithSpan("Save"));
             waitForText("LuminexAssay Dataset Properties");
         });
@@ -196,8 +197,7 @@ public class PivotQueryTest extends ReportTest
         clickButton("Submit");
 
         // Create a chart with the analyte as the y-axis
-        clickProject(getProjectName());
-        clickFolder(getProjectName());
+        navigateToFolder(getProjectName(), getProjectName());
         ChartTypeDialog chartTypeDialog;
         chartTypeDialog = clickAddChart("study", LUMINEX_PIVOT_STRING);
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
@@ -206,7 +206,7 @@ public class PivotQueryTest extends ReportTest
                 .clickApply();
 
         //Confirm warning message indicating a non-numeric value could not be used.
-        assertTextPresent("The y-axis measure '" + MEASURE_COLUMN +"' had 1 value(s) that could not be converted to a number and are not included in the plot");
+        assertTextPresent("The y-axis measure '" + MEASURE_COLUMN + "' had 1 value(s) that could not be converted to a number and are not included in the plot");
     }
 
     @Override public BrowserType bestBrowser()

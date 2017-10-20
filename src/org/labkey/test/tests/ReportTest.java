@@ -89,8 +89,7 @@ public abstract class ReportTest extends StudyBaseTest
     @LogMethod
     protected void cleanPipelineItem(String item)
     {
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         deletePipelineJob(item, false);
     }
 

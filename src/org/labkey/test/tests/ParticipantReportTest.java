@@ -100,8 +100,7 @@ public class ParticipantReportTest extends ReportTest
     @LogMethod
     private void doParticipantGroupCategoriesTest()
     {
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
 
         // Check that groups have correct number of members
         clickAndWait(Locator.linkWithText("Mice"));
@@ -144,17 +143,16 @@ public class ParticipantReportTest extends ReportTest
     {
         log("Testing Participant Report");
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         goToManageViews();
-        BootstrapMenu.find(getDriver(),"Add Report")
-                .clickSubMenu(true,"Mouse Report");
+        BootstrapMenu.find(getDriver(), "Add Report")
+                .clickSubMenu(true, "Mouse Report");
         // select some measures from a dataset
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "cpf-1");
-        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
+        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//input[contains(@class, 'x4-form-text') and @type='text']"));
         waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][18]"));
         assertEquals("Wrong number of measures visible after filtering.", 17, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')]")));
 
@@ -174,9 +172,9 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "2a. Creatinine");
-        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
-        waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][5]"), WAIT_FOR_JAVASCRIPT);
-        assertEquals("Wrong number of measures visible after filtering.", 4, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
+        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//input[contains(@class, 'x4-form-text') and @type='text']"));
+        waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][5]"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Wrong number of measures visible after filtering.", 4, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')]")));
         _ext4Helper.selectGridItem("queryName", "CPS-1", -1, "measuresGridPanel", true);
         clickButton("Select", 0);
 
@@ -317,8 +315,8 @@ public class ParticipantReportTest extends ReportTest
 
         // Test group filtering
         goToManageViews();
-        BootstrapMenu.find(getDriver(),"Add Report")
-                .clickSubMenu(true,"Mouse Report");
+        BootstrapMenu.find(getDriver(), "Add Report")
+                .clickSubMenu(true, "Mouse Report");
         // select some measures from a dataset
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
@@ -344,7 +342,7 @@ public class ParticipantReportTest extends ReportTest
 
         //Check if all PTIDs of GROUP 1 are visible.
         List<String> ptid_list2 = Arrays.asList(PTIDS_TWO);
-        for(String ptid : PTIDS_ONE)
+        for (String ptid : PTIDS_ONE)
         {
             assertTextPresent(ptid);
 
@@ -366,12 +364,12 @@ public class ParticipantReportTest extends ReportTest
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 13 Results"));
 
         //Check if all PTIDs of GROUP 2 are visible
-        for(String ptid : PTIDS_TWO)
+        for (String ptid : PTIDS_TWO)
         {
             assertElementPresent(Locator.linkWithText(ptid));
         }
         //Make sure none from Group 1 are visible.
-        for(String ptid : PTIDS_ONE)
+        for (String ptid : PTIDS_ONE)
         {
             assertTextNotPresent(ptid);
         }
@@ -383,13 +381,13 @@ public class ParticipantReportTest extends ReportTest
 
         //Participant report with specimen fields.
         goToManageViews();
-        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Mouse Report");
+        BootstrapMenu.find(getDriver(), "Add Report").clickSubMenu(true, "Mouse Report");
         // select some measures from a dataset
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "primary type vial counts blood");
-        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
+        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//input[contains(@class, 'x4-form-text') and @type='text']"));
 
         _ext4Helper.selectGridItem("label", "Blood (Whole):VialCount", -1, "measuresGridPanel", true);
         _ext4Helper.selectGridItem("label", "Blood (Whole):AvailableCount", -1, "measuresGridPanel", true);
@@ -440,7 +438,7 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "demographic");
-        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
+        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//input[contains(@class, 'x4-form-text') and @type='text']"));
 
         _ext4Helper.selectGridItem("label", "1.Date of Birth", -1, "measuresGridPanel", true);
         _ext4Helper.selectGridItem("label", "2.What is your sex?", -1, "measuresGridPanel", true);
@@ -477,8 +475,7 @@ public class ParticipantReportTest extends ReportTest
     @LogMethod
     private void doParticipantReportFilterTest()
     {
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickTab("Clinical and Assay Data");
         waitAndClickAndWait(Locator.linkWithText(PARTICIPANT_REPORT5_NAME));
 
@@ -536,8 +533,7 @@ public class ParticipantReportTest extends ReportTest
     @LogMethod
     private void doParticipantListFilterTest()
     {
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickTab("Mice");
         waitForText("Found 25 enrolled mice of 138."); // Not in any cohort deselected initially
 
@@ -573,7 +569,7 @@ public class ParticipantReportTest extends ReportTest
         waitForText("Found 1 enrolled mouse of 138.");
 
         setFormElement(Locator.id("participantsDiv1.filter"), PTIDS_ONE[0]);
-        waitForText("No mouse IDs contain \""+PTIDS_ONE[0]+"\".");
+        waitForText("No mouse IDs contain \"" + PTIDS_ONE[0] + "\".");
         _ext4Helper.selectAllParticipantFilter();
         waitForText("Found 1 enrolled mouse of 138.");
     }

@@ -223,11 +223,13 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         log("Setting study-level read permissions for group " + group + " in project " + project + " to " + perms);
         if (isElementPresent(Locator.permissionRendered()) && isButtonPresent("Save and Finish"))
             clickButton("Save and Finish");
-        clickProject(project);
-        clickFolder(folder);
+        navigateToFolder(project, folder);
         enterStudySecurity();
 
-        doAndWaitForPageToLoad(() -> { selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ"); click(Locator.lkButton("Update Type")); });
+        doAndWaitForPageToLoad(() -> {
+            selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
+            click(Locator.lkButton("Update Type"));
+        });
 
         click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
 

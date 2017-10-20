@@ -56,10 +56,9 @@ public abstract class GenericChartsTest extends ReportTest
         testPlots();
 
         log("Verify saved plots");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickTab("Clinical and Assay Data");
-        for(int i = 0; i < _plots.size(); i++)
+        for (int i = 0; i < _plots.size(); i++)
         {
             log("Verify " + _plots.get(i));
             Locator loc = Locator.linkWithText(_plots.get(i));

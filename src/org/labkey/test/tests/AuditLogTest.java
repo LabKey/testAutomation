@@ -358,8 +358,7 @@ public class AuditLogTest extends BaseWebDriverTest
         verifyListAuditLogQueries(Visibility.ParentFolder);
         stopImpersonating();
         // now give access to the sub-folder
-        clickProject(AUDIT_TEST_PROJECT);
-        clickFolder(AUDIT_TEST_SUBFOLDER);
+        navigateToFolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER);
         _securityHelper.setProjectPerm(AUDIT_TEST_USER2, "Folder Administrator");
         impersonate(AUDIT_TEST_USER2);
         verifyListAuditLogQueries(Visibility.All);
@@ -369,8 +368,7 @@ public class AuditLogTest extends BaseWebDriverTest
         // audit log events from the child forder if using a CurrentAndSubFolders container filter
         createUserWithPermissions(AUDIT_TEST_USER3, AUDIT_TEST_PROJECT, "Editor");
         clickButton("Save and Finish");
-        clickProject(AUDIT_TEST_PROJECT);
-        clickFolder(AUDIT_TEST_SUBFOLDER);
+        navigateToFolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER);
         _securityHelper.setProjectPerm(AUDIT_TEST_USER3, "Folder Administrator");
         impersonate(AUDIT_TEST_USER3);
         verifyListAuditLogQueries(Visibility.ChildFolder);

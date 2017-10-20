@@ -117,8 +117,7 @@ public class DatasetExportTest extends AssayResultsExportTest
     @Override
     protected void goToDataRegionPage()
     {
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText("1 dataset"));
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
     }
