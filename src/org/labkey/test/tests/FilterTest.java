@@ -545,14 +545,7 @@ public class FilterTest extends BaseWebDriverTest
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
             log("** Checking filter present in R view");
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            {
-                region.clickHeaderMenu("Charts / Reports", R_VIEW);
-            }
-            else
-            {
-                region.clickHeaderMenu("Reports", R_VIEW);
-            }
+            region.goToReport(R_VIEW);
             Locator.tagWithClass("table", "labkey-r-tsvout").waitForElement(getDriver(), 10000);
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
             region.goToView("default");

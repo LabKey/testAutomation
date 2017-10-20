@@ -481,7 +481,7 @@ public class FlowTest extends BaseFlowTest
         List<String> columnHeaders = fcsAnalysisTable.getColumnLabels();
         List<String> actualMeasures = columnHeaders.subList(columnHeaders.size() - 4, columnHeaders.size());
         assertEquals("Expected measure columns are missing", expectedMeasures, actualMeasures);
-        fcsAnalysisTable.clickHeaderMenu( IS_BOOTSTRAP_LAYOUT ? "Charts / Reports" : "Charts", "Create Chart");
+        fcsAnalysisTable.goToReport("Create Chart");
 
         // The new plot dialog shows all values from the grid that could be used in any aspect of a plot. So need to add these two values.
         expectedMeasures.add("Compensation Matrix");

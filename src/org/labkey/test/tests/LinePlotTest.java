@@ -154,7 +154,7 @@ public class LinePlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("APXpulse", "Is Less Than", "100");
-        datasetTable.clickHeaderMenu("Charts / Reports", "Create Chart");
+        datasetTable.goToReport("Create Chart");
 
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Line)

@@ -234,7 +234,7 @@ public class FolderTest extends BaseWebDriverTest
         {
             beginAt(href);
             waitForElement(Locator.tagWithAttribute("a", "data-original-title", "Grid views"));
-            assertNotNull(Locator.tagWithAttribute("a", "data-original-title","Charts / Reports"));
+            assertElementPresent(Locator.tagWithAttribute("a", "data-original-title","Charts / Reports"));
             assertElementPresent(Locator.lkButton("Design"));
             assertElementPresent(Locator.tagWithAttribute("a", "data-original-title","edit"));
             assertElementPresent(Locator.tagWithAttribute("a", "data-original-title","details"));

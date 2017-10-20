@@ -253,7 +253,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("APXpulse", "Is Less Than", "100");
-        datasetTable.clickHeaderMenu("Charts / Reports", "Create Chart");
+        datasetTable.goToReport("Create Chart");
 
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
@@ -714,7 +714,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("CPF-1: Follow-up Chemistry Panel"));
         DataRegionTable drt = new DataRegionTable("Dataset", getDriver());
-        drt.clickHeaderMenu("Charts / Reports", "Create Chart");
+        drt.goToReport("Create Chart");
 
         // create scatter lot with point geom
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());

@@ -761,7 +761,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         region.setFilter("ParticipantId", "Equals", ptid);
         assertTextPresent(ptid);
 
-        region.clickHeaderMenu("Charts / Reports", "Create Chart");
+        region.goToReport("Create Chart");
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
                 .setYAxis("Pulse")

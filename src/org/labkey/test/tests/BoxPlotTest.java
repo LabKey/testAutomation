@@ -122,7 +122,7 @@ public class BoxPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("RCH-1: Reactogenicity-Day 1"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("RCHtempc", "Is Less Than", "39");
-        datasetTable.clickHeaderMenu("Charts / Reports", "Create Chart");
+        datasetTable.goToReport("Create Chart");
 
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box)

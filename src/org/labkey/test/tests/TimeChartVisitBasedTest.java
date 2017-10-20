@@ -154,7 +154,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
 
         log("Create a Time Chart from the measure in the new query");
         DataRegionTable query = new DataRegionTable("query", getDriver());
-        query.clickHeaderMenu("Charts / Reports", "Create Chart");
+        query.goToReport("Create Chart");
         // note: the 'My APX Query' query should already be selected
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
