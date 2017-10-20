@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Data;
@@ -34,6 +33,7 @@ import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.ReportDataRegion;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
@@ -546,7 +546,7 @@ public class FilterTest extends BaseWebDriverTest
             region.goToReport(R_VIEW);
             Locator.tagWithClass("table", "labkey-r-tsvout").waitForElement(getDriver(), 10000);
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
-            region.goToView("default");
+            new ReportDataRegion(TABLE_NAME, this).goToView("default");
 
             log("** Checking filter values in filter dialog");
             region = new DataRegionTable(TABLE_NAME, this);
