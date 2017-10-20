@@ -124,12 +124,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void initializeFolder()
     {
-        openProjectMenu();
-        int response = -1;
-        try{
-            response = WebTestHelper.getHttpResponse(getBaseURL() + "/" + WebTestHelper.stripContextPath(getAttribute(Locator.linkWithText(getProjectName()), "href"))).getResponseCode();
-        }
-        catch (NoSuchElementException | IOException ignore){/*No link or bad response*/}
+        int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("project", getProjectName(), "begin")).getResponseCode();
 
         if (HttpStatus.SC_OK != response)
         {
