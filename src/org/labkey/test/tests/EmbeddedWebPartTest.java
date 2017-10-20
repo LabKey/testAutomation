@@ -26,7 +26,6 @@ import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.ResetTracker;
 import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.NoSuchElementException;
