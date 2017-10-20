@@ -170,10 +170,15 @@ public class Ext4Helper
 
     public void closeComboList(Locator.XPathLocator comboBox)
     {
+        closeComboList(comboBox, false);
+    }
+
+    public void closeComboList(Locator.XPathLocator comboBox, boolean forceClose)
+    {
         Locator arrowTrigger = comboBox.append("//div[contains(@class,'arrow')]");
 
         // close combo manually if it is a multi-select combo-box
-        if (isOpenComboBoxMultiSelect())
+        if (forceClose || isOpenComboBoxMultiSelect())
             _test.click(arrowTrigger);
 
         // menu should disappear
