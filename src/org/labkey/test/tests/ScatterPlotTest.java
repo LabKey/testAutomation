@@ -32,6 +32,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
+import org.labkey.test.pages.ViewDatasetDataPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -119,8 +120,9 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Submit");
 
         log("Go and edit the column definition to be a measure");
-        table.clickHeaderButtonAndWait("Manage");
-        clickAndWait(Locator.linkWithText("edit definition"));
+        new ViewDatasetDataPage(getDriver())
+                .clickManageDataset()
+                .clickEditDefinition();
 
         final PropertiesEditor datasetFieldsPanel = PropertiesEditor(getDriver()).withTitle("Dataset Fields").findWhenNeeded();
         waitForElement(Locator.lkButton("Export Fields"));
