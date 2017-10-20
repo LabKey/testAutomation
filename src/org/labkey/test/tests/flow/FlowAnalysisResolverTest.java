@@ -75,6 +75,9 @@ public class FlowAnalysisResolverTest extends BaseFlowTest
         clickButton("Finish");
         waitForText("Experiment Run Graph");
         assertTextPresent(FCS_FILE, 4);
+
+        // verify attachments present
+        assertTextPresent("readme.txt");
     }
 
     private String getMatchedFileForName(String name)
