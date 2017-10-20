@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
@@ -741,8 +740,8 @@ public class WikiLongTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsersIfPresent(USER1);
-        deleteProject(PROJECT2_NAME, afterTest);
-        deleteProject(PROJECT_NAME, afterTest);
+        _containerHelper.deleteProject(PROJECT2_NAME, afterTest);
+        _containerHelper.deleteProject(PROJECT_NAME, afterTest);
     }
 
     @Override

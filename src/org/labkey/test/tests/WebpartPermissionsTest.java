@@ -172,8 +172,8 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
 
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
-        deleteProject(DUMMY_PROJECT_NAME, false); // Project should be deleted during test
+        _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(DUMMY_PROJECT_NAME, false);
 
         deleteUsersIfPresent(users);
     }

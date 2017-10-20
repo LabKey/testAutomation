@@ -473,7 +473,7 @@ public class MS1Test extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         log("Cleaning up MS1 BVT...");
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
         try{purgeFiles();}
         catch(Throwable ignore) {}
         log("MS1 BVT cleaned up successfully.");

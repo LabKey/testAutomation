@@ -1266,15 +1266,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.AbstractContainerHelper#deleteProject(String, boolean)}
-     */
-    @Deprecated
-    public void deleteProject(String project, boolean failIfFail)
-    {
-        _containerHelper.deleteProject(project, failIfFail);
-    }
-
-    /**
      * @deprecated Use {@link org.labkey.test.util.PortalHelper#addWebPart(String)}
      */
     @Deprecated public void addWebPart(String webPartName)

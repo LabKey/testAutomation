@@ -162,7 +162,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         deleteAllRuns();
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
         try
         {
             beginAt("/admin/begin.view");

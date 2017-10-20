@@ -153,8 +153,8 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         checkCheckbox(Locator.checkboxByName("enableHelpMenu"));
         clickButtonContainingText("Save");
 
-        deleteProject(getProjectName(), afterTest);
-        deleteProject(getProjectAlteredName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectAlteredName(), afterTest);
     }
 
     @Override

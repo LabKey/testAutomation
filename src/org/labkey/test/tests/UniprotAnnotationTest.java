@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import com.google.common.base.Function;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -132,6 +131,6 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 }

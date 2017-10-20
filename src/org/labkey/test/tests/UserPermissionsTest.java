@@ -83,7 +83,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         log(this.getClass().getName() + " Cleaning Up");
-        deleteProject(PERM_PROJECT_NAME, afterTest);
+        _containerHelper.deleteProject(PERM_PROJECT_NAME, afterTest);
 
         deleteUsersIfPresent(GAMMA_EDITOR_USER, GAMMA_AUTHOR_USER, GAMMA_READER_USER, GAMMA_PROJECT_ADMIN_USER);
     }

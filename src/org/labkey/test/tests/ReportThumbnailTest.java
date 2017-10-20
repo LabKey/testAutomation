@@ -95,10 +95,10 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(PROJECT_NAME, afterTest);
+        _containerHelper.deleteProject(PROJECT_NAME, afterTest);
         // besides the default project, the test also creates a project to verify
         // roundtrip (import/export) of thumbs
-        deleteProject(PROJECT_NAME_ROUNDTRIP, afterTest);
+        _containerHelper.deleteProject(PROJECT_NAME_ROUNDTRIP, afterTest);
     }
 
     @Test

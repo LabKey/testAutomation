@@ -88,7 +88,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
         try {deleteEngine();}
         catch (WebDriverException t) {}
     }

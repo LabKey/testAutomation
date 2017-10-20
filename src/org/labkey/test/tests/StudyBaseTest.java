@@ -174,7 +174,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
 
         deleteLogFiles(".");
         deleteLogFiles("datasets");
