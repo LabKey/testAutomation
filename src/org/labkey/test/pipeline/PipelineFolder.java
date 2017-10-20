@@ -18,6 +18,7 @@ package org.labkey.test.pipeline;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
@@ -88,8 +89,9 @@ public class PipelineFolder
         _test._containerHelper.createProject(projectName, null);
         _test._containerHelper.createSubfolder(projectName, projectName, _folderName, _folderType, _tabs);
 
+        PortalHelper portalHelper = new PortalHelper(_test);
         for (String webPartName : _webParts)
-            _test.addWebPart(webPartName);
+            portalHelper.addWebPart(webPartName);
 
         _test.pushLocation();
         setupPipeline();

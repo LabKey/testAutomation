@@ -27,6 +27,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TextSearcher;
 
 import java.io.File;
@@ -246,7 +247,7 @@ public class MS1Test extends BaseWebDriverTest
         log("Testing peptide search view");
         clickProject(project);
         ensureAdminMode();
-        addWebPart("Peptide Search");
+        new PortalHelper(this).addWebPart("Peptide Search");
 
         setFormElement(Locator.id("pepSeq"), "EASGDLPEAQIVK, AVVQDPALKPLALVYGEATSR");
         uncheckCheckbox(Locator.checkboxByName("exact"));

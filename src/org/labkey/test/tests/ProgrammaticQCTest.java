@@ -23,6 +23,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.*;
@@ -98,7 +99,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         log("Defining a QC test assay at the project level");
 
         clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
-        addWebPart("Assay List");
+        new PortalHelper(this).addWebPart("Assay List");
 
         _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampleData("ProgrammaticQC/QC Assay.xar"), 1);
 
@@ -117,7 +118,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         log("Defining a transform test assay at the project level");
 
         clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
-        addWebPart("Assay List");
+        new PortalHelper(this).addWebPart("Assay List");
 
         clickButton("Manage Assays");
         clickButton("New Assay Design");

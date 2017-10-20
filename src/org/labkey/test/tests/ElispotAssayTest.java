@@ -33,6 +33,7 @@ import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
@@ -293,7 +294,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         //add the Assay List web part so we can create a new elispot assay
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
-        addWebPart("Assay List");
+        new PortalHelper(this).addWebPart("Assay List");
 
         //create a new elispot template
         createTemplate();

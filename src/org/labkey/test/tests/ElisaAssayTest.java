@@ -22,6 +22,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -83,7 +84,7 @@ public class ElisaAssayTest extends AbstractQCAssayTest
 
         //add the Assay List web part so we can create a new ELISA assay
         clickProject(TEST_ASSAY_PRJ_ELISA);
-        addWebPart("Assay List");
+        new PortalHelper(this).addWebPart("Assay List");
 
         //create a new ELISA template
         createTemplate();

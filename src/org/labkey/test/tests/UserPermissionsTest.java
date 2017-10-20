@@ -30,10 +30,8 @@ import org.openqa.selenium.WebElement;
 import java.util.Arrays;
 import java.util.List;
 
-import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
 public class UserPermissionsTest extends BaseWebDriverTest
@@ -111,12 +109,12 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         _containerHelper.createSubfolder(PERM_PROJECT_NAME, PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
         _containerHelper.createSubfolder(PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, GAMMA_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
-        addWebPart("Messages");
+        portalHelper.addWebPart("Messages");
         assertElementPresent(Locator.linkWithText("Messages"));
-        addWebPart("Wiki");
+        portalHelper.addWebPart("Wiki");
         assertTextPresent("Wiki");
         assertElementPresent(Locator.linkWithText("Create a new wiki page"));
-        addWebPart("Wiki Table of Contents");
+        portalHelper.addWebPart("Wiki Table of Contents");
 
         //Create Reader User
         clickProject(PERM_PROJECT_NAME);

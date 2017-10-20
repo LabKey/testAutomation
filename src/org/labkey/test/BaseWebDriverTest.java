@@ -1265,15 +1265,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return "/project/" + EscapeUtil.encode(getProjectName()) + "/begin.view?";
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.util.PortalHelper#addWebPart(String)}
-     */
-    @Deprecated public void addWebPart(String webPartName)
-    {
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart(webPartName);
-    }
-
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();

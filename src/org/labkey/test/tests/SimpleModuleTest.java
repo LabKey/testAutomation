@@ -689,7 +689,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickProject(getProjectName());
 
         //add Simple Module Web Part
-        addWebPart("Simple Module Web Part");
+        new PortalHelper(this).addWebPart("Simple Module Web Part");
         assertTextPresent("This is a web part view in the simple test module");
 
         Boolean value = (Boolean)executeScript("return LABKEY.moduleContext.simpletest.scriptLoaded");
@@ -701,7 +701,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         //create a list for our query
         clickProject(getProjectName());
-        addWebPart("Lists");
+        new PortalHelper(this).addWebPart("Lists");
 
         log("Creating list for query/view/report test...");
         createPeopleListInFolder(getProjectName());
