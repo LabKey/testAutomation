@@ -96,7 +96,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
         refresh();
         assignedTo = new InsertPage(getDriver()).assignedTo();
         assertEquals("", assignedTo.get());
-        assertEquals(Arrays.asList("", displayNameFromEmail(USER)), getTexts(assignedTo.getOptions()));
+        assertEquals(Arrays.asList("", _userHelper.getDisplayNameForEmail(USER)), getTexts(assignedTo.getOptions()));
     }
 
     @Test

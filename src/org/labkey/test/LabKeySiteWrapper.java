@@ -462,7 +462,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         log("Attempting to change user email from " + userEmail + " to " + newUserEmail);
 
         goToSiteUsers();
-        clickAndWait(Locator.linkContainingText(displayNameFromEmail(userEmail)));
+        clickAndWait(Locator.linkContainingText(_userHelper.getDisplayNameForEmail(userEmail)));
 
         clickButton("Change Email");
 
@@ -1386,31 +1386,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             throw new IllegalStateException("Failed to stop impersonating");
     }
 
-    /**
-     * @deprecated TODO: Inline and remove
-     */
-    @Deprecated
-    public String displayNameFromEmail(String email)
-    {
-        return _userHelper.getDisplayNameForEmail(email);
-    }
-
-    /**
-     * @deprecated TODO: Inline and remove in 17.3
-     */
-    @Deprecated
-    protected static String getDefaultDisplayName(String email)
-    {
-        return AbstractUserHelper.getDefaultDisplayName(email);
-    }
-
     public void goToHome()
     {
         beginAt("/project/home/begin.view");
     }
 
     /**
-     * @deprecated Use {@link #clickButton(String)}
+     * @deprecated Use {@link #clickButton(String)} or {@link #submit(Locator)}
      */
     @Deprecated
     public void submit()

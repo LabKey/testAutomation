@@ -285,12 +285,12 @@ public class MessagesLongTest extends BaseWebDriverTest
         uncheckCheckbox(Locator.checkboxByName("expires"));
         checkCheckbox(Locator.checkboxByName("assignedTo"));
         uncheckCheckbox(Locator.checkboxByName("formatPicker"));
-        selectOptionByText(Locator.name("defaultAssignedTo"), displayNameFromEmail(USER1));
+        selectOptionByText(Locator.name("defaultAssignedTo"), _userHelper.getDisplayNameForEmail(USER1));
         clickButton("Save");
 
         log("Check if status and expires work");
         clickButton("New");
-        assertTextPresent(displayNameFromEmail(USER1));
+        assertTextPresent(_userHelper.getDisplayNameForEmail(USER1));
         clickButton("Cancel");
         clickAndWait(Locator.linkWithText(MSG2_TITLE));
         clickRespondButton();
@@ -441,13 +441,13 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Submit");
         assertTextPresent("This user doesn't have permission");
         setFormElement(Locator.id(MEMBER_LIST), USER1);
-        selectOptionByText(Locator.name("assignedTo"), displayNameFromEmail(USER3));
+        selectOptionByText(Locator.name("assignedTo"), _userHelper.getDisplayNameForEmail(USER3));
         clickButton("Submit");
         clickAndWait(Locator.linkWithText("view message or respond"));
         verifyMemberList();
         assertElementPresent(IS_BOOTSTRAP_LAYOUT ?
-                Locator.tagWithName("div", "webpart").withDescendant(Locator.tag("td").withText("Assigned" + NBSP + "To: " + displayNameFromEmail(USER3))) :
-                Locator.tagWithName("table", "webpart").append(Locator.tag("td").withText("Assigned" + NBSP + "To: " + displayNameFromEmail(USER3))));
+                Locator.tagWithName("div", "webpart").withDescendant(Locator.tag("td").withText("Assigned" + NBSP + "To: " + _userHelper.getDisplayNameForEmail(USER3))) :
+                Locator.tagWithName("table", "webpart").append(Locator.tag("td").withText("Assigned" + NBSP + "To: " + _userHelper.getDisplayNameForEmail(USER3))));
         impersonate(USER1);
         clickProject(PROJECT_NAME);
 
@@ -458,7 +458,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
         // should be display name only
         assertTextNotPresent(USER3);
-        assertTextPresent(displayNameFromEmail(USER3));
+        assertTextPresent(_userHelper.getDisplayNameForEmail(USER3));
         stopImpersonating();
 
         log("Verify member list failed user lookup reports error");
@@ -471,16 +471,16 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButtonContainingText("Submit", NOT_A_USER + ": Invalid");
 
         log("Verify member list autocomplete only shows display name, not email");
-        setFormElement(Locator.id(MEMBER_LIST), displayNameFromEmail(RESPONDER));
+        setFormElement(Locator.id(MEMBER_LIST), _userHelper.getDisplayNameForEmail(RESPONDER));
         setFormElement(Locator.id("body"), "Another response again woo hoo");
-        assertTextPresent(displayNameFromEmail(RESPONDER));
+        assertTextPresent(_userHelper.getDisplayNameForEmail(RESPONDER));
         assertTextNotPresent(RESPONDER);
 
         log("Verify redisplay is display name only, even if email entered in member list.");
         // Also tests persistence of member list changes.
         setFormElement(Locator.id(MEMBER_LIST),USER1);
         clickButton("Submit");
-        assertTextPresent(displayNameFromEmail("Members: " +USER1));
+        assertTextPresent(_userHelper.getDisplayNameForEmail("Members: " + USER1));
         assertTextNotPresent(USER1);
         stopImpersonatingRole();
         log("Verify admin user still sees email address");
@@ -491,7 +491,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
     private void verifyMemberList()
     {
-        assertTextPresent("Members: "+ USER1 + " (" + displayNameFromEmail(USER1) +")");
+        assertTextPresent("Members: "+ USER1 + " (" + _userHelper.getDisplayNameForEmail(USER1) +")");
     }
 
 

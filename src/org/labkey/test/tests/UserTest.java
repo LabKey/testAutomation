@@ -349,9 +349,9 @@ public class UserTest extends BaseWebDriverTest
         clickButton("Save");
         clickAndWait(Locator.linkWithText("New Issue"));
         assertElementNotPresent(createAssignedToOptionLocator(disabledUserId));
-        assertTextNotPresent(displayNameFromEmail(DEACTIVATED_USER));
+        assertTextNotPresent(_userHelper.getDisplayNameForEmail(DEACTIVATED_USER));
         assertElementPresent(createAssignedToOptionLocator(normalUserId));
-        assertTextPresent(displayNameFromEmail(NORMAL_USER));
+        assertTextPresent(_userHelper.getDisplayNameForEmail(NORMAL_USER));
 
         log("Reactivate user");
         goToSiteUsers();
@@ -438,7 +438,7 @@ public class UserTest extends BaseWebDriverTest
         enableEmailRecorder();
 
         goToSiteUsers();
-        clickAndWait(Locator.linkWithText(displayNameFromEmail(PASSWORD_RESET_USER)));
+        clickAndWait(Locator.linkWithText(_userHelper.getDisplayNameForEmail(PASSWORD_RESET_USER)));
         doAndWaitForPageToLoad(() -> {
             clickButtonContainingText("Reset Password", 0);
             assertAlertContains("You are about to clear the user's current password");

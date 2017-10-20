@@ -16,7 +16,6 @@
 package org.labkey.test.tests.issues;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -124,7 +123,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
         _permissionsHelper.addMemberToRole(projectGroup, "Editor", PermissionsHelper.MemberType.group, getProjectName());
 
         final String title = "Child Issue";
-        final String assignTo = displayNameFromEmail(USER);
+        final String assignTo = _userHelper.getDisplayNameForEmail(USER);
         final String customValue = "Value for shared domain";
         final String listDef = SHARED_LIST_DEF;
         final String inheritedField = "inheritedfield";

@@ -788,7 +788,7 @@ public class ClientAPITest extends BaseWebDriverTest
         JSONArray entries = (JSONArray)completionValues.get("completions");
         assertTrue("No autocompletion entries returned" + errMsg, entries.size() > 0);
         boolean testPassed = false;
-        String displayName = displayNameFromEmail(AUTOCOMPLETE_USER);
+        String displayName = _userHelper.getDisplayNameForEmail(AUTOCOMPLETE_USER);
         for (JSONObject entry : (List<JSONObject>)entries)
         {
             // The order in the response isn't guaranteed. Loop to find one we know should be in the list.

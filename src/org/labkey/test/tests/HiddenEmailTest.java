@@ -102,7 +102,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         impersonate(CHECKED_USER);
         goToMyAccount();
         clickButton("Edit");
-        setFormElement(Locator.name("quf_FirstName"), displayNameFromEmail(CHECKED_USER));
+        setFormElement(Locator.name("quf_FirstName"), _userHelper.getDisplayNameForEmail(CHECKED_USER));
         clickButton("Submit");
         stopImpersonating();
     }
@@ -117,10 +117,10 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         clickButton("Done");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
         DataRegionTable.findDataRegion(this).clickInsertNewRow();
-        selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(CHECKED_USER));
+        selectOptionByText(Locator.name("quf_user"), _userHelper.getDisplayNameForEmail(CHECKED_USER));
         clickButton("Submit");
         DataRegionTable.findDataRegion(this).clickInsertNewRow();
-        selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(ADMIN_USER));
+        selectOptionByText(Locator.name("quf_user"), _userHelper.getDisplayNameForEmail(ADMIN_USER));
         clickButton("Submit");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addColumn("user/Email", "Email");
