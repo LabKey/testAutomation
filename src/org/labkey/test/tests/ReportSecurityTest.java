@@ -36,7 +36,7 @@ public class ReportSecurityTest extends ReportTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsersIfPresent(TEST_USER);
+        _userHelper.deleteUsers(false, TEST_USER);
         super.doCleanup(afterTest);
     }
 
@@ -107,7 +107,6 @@ public class ReportSecurityTest extends ReportTest
         navigateToFolder(getProjectName(), getFolderName());
 
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
-        //_extHelper.clickMenuButton("Charts", "Create Chart View (deprecated)");
         DataRegionTable dt = new DataRegionTable("Dataset", getDriver());
         dt.goToReport("Create Chart View (deprecated)");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
@@ -121,12 +120,7 @@ public class ReportSecurityTest extends ReportTest
         setFormElement(Locator.name("reportName"), "participant chart");
         clickButton("OK", 0);
 
-        // waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
-
-        //_extHelper.clickMenuButton("Grid Views", "default");
         dt.goToView("default");
-        //waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
-        //_extHelper.clickMenuButton("Charts", "Create Chart View (deprecated)");
         dt.goToReport("Create Chart View (deprecated)");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
 
@@ -141,8 +135,6 @@ public class ReportSecurityTest extends ReportTest
         setFormElement(Locator.name("description"), "a private chart");
         checkCheckbox(Locator.checkboxByName("shareReport"));
         clickButton("OK", 0);
-
-        //waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
 
         // create grid view
         clickFolder(getFolderName());
@@ -182,15 +174,8 @@ public class ReportSecurityTest extends ReportTest
         clickAndWait(Locator.linkWithText(TEST_GRID_VIEW));
         assertTextPresent("999320016");
         pushLocation();
-        // _extHelper.clickMenuButton("Grid Views", "default");
         dt.goToView("default");
         assertTextPresent("User does not have read permission on this dataset.");
-/*
-        no longer showing the query button by default.
-        popLocation();
-        clickMenuButton("Query", "Query:APX-1: Abbreviated Physical Exam");
-        assertTextPresent("User does not have read permission on this dataset.");
-*/
         stopImpersonating();
     }
 }
