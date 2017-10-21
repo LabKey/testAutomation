@@ -380,7 +380,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true, false);
 
         //For some reason these only get logged for datasets...
-        checkExpectedErrors(4);
+        checkExpectedErrors(2);
     }
 
     @Ignore("Issue 25741: JS triggers for bulk import data (CSV or Excel) of datasets don't fire\n")

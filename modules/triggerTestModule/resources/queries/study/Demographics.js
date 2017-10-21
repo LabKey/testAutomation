@@ -14,13 +14,13 @@ function init(event, errors) {
 function beforeInsert(row, errors) {
 	console.log("beforeInsert got triggered");
 	console.log("row is: " + row);
-	if(row.Comments == "Individual Test ") {
+	if(row.Comments == "Individual Test") {
 		row.Country = "Inserting Single";
 		row.Comments = "BeforeDelete"; //set this for next test step
 	}
-	else if(row.Comments == "Import Test ")
+	else if(row.Comments == "Import Test")
 		row.Country = "Importing TSV";
-	else if(row.Comments == "API Test ")
+	else if(row.Comments == "API Test")
 		row.Country = "API BeforeInsert";
 	console.log("edited row is: " + row);
 	console.log(shared.sampleFunc("this is from the shared function"));
