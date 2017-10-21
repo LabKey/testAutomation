@@ -33,20 +33,25 @@ public class EmailRecordTable extends Table
 {
     private static final String RECORDER_CHECKBOX_NAME = "emailRecordOn";
     private static final String _regionName = "EmailRecord";
-    private static final String _headerClass = "labkey-column-header labkey-col-header-filter";
     private static final int _headerRows = 2;
     private static final int _footerRows = 1;
-    private boolean _recordOn;
 
     public EmailRecordTable(WebDriver driver)
     {
         super(driver, new RefindingWebElement(emailLocator(), driver).withTimeout(WAIT_FOR_JAVASCRIPT));
+        ((RefindingWebElement) getComponentElement()).withRefindListener(el -> clearElementCache());
     }
 
     public EmailRecordTable(BaseWebDriverTest test)
     {
         this(test.getDriver());
-        test.waitForText("Mail Record");
+    }
+
+    @Override
+    protected Elements elementCache()
+    {
+        getComponentElement().isDisplayed();
+        return super.elementCache();
     }
 
     public int getEmailCount()
@@ -58,6 +63,7 @@ public class EmailRecordTable extends Table
     public void startRecording()
     {
         getWrapper().checkCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
+        clearElementCache();
     }
 
     public void stopRecording()
