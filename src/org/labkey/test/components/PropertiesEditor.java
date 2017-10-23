@@ -719,10 +719,10 @@ public class PropertiesEditor extends WebPartPanel
 
     public enum PhiSelectType
     {
-        NotPHI("Not PHI", org.labkey.api.data.PHI.NotPHI.getRank()),
-        Limited("Limited PHI", org.labkey.api.data.PHI.Limited.getRank()),
-        PHI("Full PHI", org.labkey.api.data.PHI.PHI.getRank()),
-        Restricted("Restricted", org.labkey.api.data.PHI.Restricted.getRank());
+        NotPHI("Not PHI", org.labkey.api.data.PHI.NotPHI.ordinal()),
+        Limited("Limited PHI", org.labkey.api.data.PHI.Limited.ordinal()),
+        PHI("Full PHI", org.labkey.api.data.PHI.PHI.ordinal()),
+        Restricted("Restricted", org.labkey.api.data.PHI.Restricted.ordinal());
 
         String _text;
         int _rank;
