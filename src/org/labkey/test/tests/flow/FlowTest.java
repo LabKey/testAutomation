@@ -439,21 +439,9 @@ public class FlowTest extends BaseFlowTest
 
         setSelectedFields(getContainerPath(), "flow", query1, "MostColumns", new String[] {"RowId", "Count","WellCount"});
         setSelectedFields(getContainerPath(), "flow", query1, "AllColumns", new String[] {"RowId", "Count","WellCount", "FilePathRoot"});
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            table.clickHeaderMenu("Grid views", "MostColumns");
-        }else
-        {
-            _extHelper.clickMenuButton("Grid Views", "MostColumns");
-        }
+        table.goToView("MostColumns");
         assertTextNotPresent("File Path Root");
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            table.clickHeaderMenu("Grid views", "AllColumns");
-        }else
-        {
-            _extHelper.clickMenuButton("Grid Views", "AllColumns");
-        }
+        table.goToView("AllColumns");
         assertTextPresent("File Path Root");
     }
 

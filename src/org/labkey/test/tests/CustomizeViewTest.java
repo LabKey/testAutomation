@@ -319,10 +319,8 @@ public class CustomizeViewTest extends BaseWebDriverTest
         }
 
         DataRegionTable drt = new DataRegionTable("query", getDriver());
-        drt.clickHeaderMenu("Grid views", "default");
-
-        drt = new DataRegionTable("query", getDriver());
-        drt.openHeaderMenu("Grid views");
+        drt.goToView("default");
+        drt.getViewsMenu().expand();
         assertTextPresentInThisOrder("default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
     }
 

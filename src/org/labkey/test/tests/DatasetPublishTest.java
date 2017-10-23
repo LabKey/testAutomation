@@ -128,7 +128,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         goToDataset(datasetName);
         new DataRegionTable("Dataset", getDriver())
-                .clickHeaderMenu("Grid views",true, "Edit Snapshot");
+                .goToView("Edit Snapshot");
         doAndWaitForPageToLoad(() ->
         {
             clickButton("Update Snapshot", 0);
