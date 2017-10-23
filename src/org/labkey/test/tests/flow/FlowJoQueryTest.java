@@ -18,12 +18,18 @@ package org.labkey.test.tests.flow;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ExecuteSqlCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -48,6 +54,8 @@ public class FlowJoQueryTest extends BaseFlowTest
     public void _doTestSteps()
     {
         verifyQueryTest();
+
+        verifyTableMethods();
 
         verifyNestedBooleans();
 
@@ -158,6 +166,29 @@ public class FlowJoQueryTest extends BaseFlowTest
         region.setFilter("AbsDifference", "Is Greater Than or Equal To", "2", longWaitForPage);
         region.setFilter("PercentDifference", "Is Greater Than or Equal To", "2.5", longWaitForPage);
         assertTextPresent("No data to show");
+    }
+
+    @LogMethod
+    private void verifyTableMethods()
+    {
+        String sql = "SELECT\n" +
+                "  cm.Name,\n" +
+                "  cm.Value('Spill(APC-A:Alexa 680-A)') AS E1\n" +
+                "FROM CompensationMatrices cm";
+        ExecuteSqlCommand cmd = new ExecuteSqlCommand("flow", sql);
+
+        Connection conn = createDefaultConnection(true);
+        SelectRowsResponse r;
+        try
+        {
+            r = cmd.execute(conn, getContainerPath());
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        assertTrue("Expected some rows", r.getRowCount().intValue() > 0);
     }
 
     private void verifyWSPImport()
