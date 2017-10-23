@@ -33,6 +33,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
@@ -70,34 +72,19 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         uncheckCheckbox(Locator.checkboxById("inherit"));
 
         // Delete all site-level settings
-        while (isElementPresent(Locator.tagWithAttribute("img", "alt", "delete")))
+        for (WebElement deleteButton : Locator.tagWithAttribute("img", "alt", "delete").findElements(getDriver()))
         {
-            click(Locator.tagWithAttribute("img", "alt", "delete"));
-            sleep(500);
+            deleteButton.click();
+            shortWait().until(ExpectedConditions.stalenessOf(deleteButton));
         }
 
-        clickButton("Add", 0);
-        clickButton("Add", 0);
-        clickButton("Add", 0);
-        sleep(500);
-
-        // This is disgusting. For some reason a simple XPath doesn't seem to work: we have to get the id right,
-        // and unfortunately the id is dependent on how many inherited indicators we had, which can vary by server.
-        // So we have to try all possible ids.
-        int completedCount = 0;
         String[] mvIndicators = new String[] {"Q", "N", "Z"};
-        int index = 1; // xpath is 1-based
-        while (completedCount < 3 && index < 1000)
+        for (int i = 0; i < mvIndicators.length; i++)
         {
-            String xpathString = "//div[@id='mvIndicatorsDiv']//input[@name='mvIndicators' and @id='mvIndicators" + index + "']";
-            if (isElementPresent(Locator.xpath(xpathString)))
-            {
-                String mvIndicator = mvIndicators[completedCount++];
-                setFormElement(Locator.xpath(xpathString), mvIndicator);
-            }
-            index++;
+            clickButton("Add", 0);
+            WebElement mvInput = Locator.css("#mvIndicatorsDiv input[name=mvIndicators]").index(i).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+            setFormElement(mvInput, mvIndicators[i]);
         }
-
         clickButton("Save");
     }
 
