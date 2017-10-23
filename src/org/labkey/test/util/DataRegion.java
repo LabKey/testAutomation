@@ -173,11 +173,6 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
         return elementCache().getHeaderButton(buttonText);
     }
 
-    public void setContainerFilter(ContainerFilterType filterType)
-    {
-        getViewsMenu().clickSubMenu(isAsync(), "Folder Filter", filterType.getLabel());
-    }
-
     protected String replaceParameter(String param, String newValue)
     {
         URL url = getWrapper().getURL();
@@ -428,25 +423,6 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
         public void executeScript(String methodWithArgs)
         {
             doAndWaitForUpdate(() -> super.executeScript(methodWithArgs));
-        }
-    }
-
-    public enum ContainerFilterType
-    {
-        CURRENT_FOLDER("Current folder"),
-        CURRENT_AND_SUBFOLDERS("Current folder and subfolders"),
-        ALL_FOLDERS("All folders");
-
-        private final String _label;
-
-        ContainerFilterType(String label)
-        {
-            _label = label;
-        }
-
-        public String getLabel()
-        {
-            return _label;
         }
     }
 }
