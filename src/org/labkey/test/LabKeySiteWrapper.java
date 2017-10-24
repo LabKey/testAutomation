@@ -99,24 +99,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
-    public static boolean IS_BOOTSTRAP_LAYOUT = true; // use to toggle between ux refresh UI and standard labkey
+    @Deprecated
+    public static boolean IS_BOOTSTRAP_LAYOUT = true;
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
 
     public boolean isGuestModeTest()
     {
         return false;
-    }
-
-    /**
-     * Don't use me.
-     */
-    @Deprecated
-    protected boolean isExperimentalUXEnabled()
-    {
-        Boolean useExperimentalCoreUI = (Boolean) executeScript("return LABKEY.experimental.useExperimentalCoreUI;");
-        if (useExperimentalCoreUI == null)
-            useExperimentalCoreUI = true; // In the future, absence of this flag means new UX is finalized.
-        return useExperimentalCoreUI ;
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -572,7 +561,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         log("Server is running.");
         WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
-        IS_BOOTSTRAP_LAYOUT = isExperimentalUXEnabled();
     }
 
     @LogMethod
