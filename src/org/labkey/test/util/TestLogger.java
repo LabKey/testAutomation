@@ -57,6 +57,11 @@ public class TestLogger
         return indentStr;
     }
 
+    public static void debug(String msg)
+    {
+        // TODO: Log at debug level if/when we convert to Log4J or similar
+    }
+
     public static void log(String str)
     {
         log(str, System.out);

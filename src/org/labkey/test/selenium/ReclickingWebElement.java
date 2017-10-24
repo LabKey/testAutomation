@@ -37,7 +37,7 @@ public class ReclickingWebElement extends WebElementDecorator
         {
             if (getDriver() != null)
             {
-                TestLogger.log("Retry click: " + tryAgain.getMessage().split("\n")[0]);
+                TestLogger.debug("Retry click: " + tryAgain.getMessage().split("\n")[0]);
                 boolean clickBlocked = tryAgain.getMessage().contains("Other element would receive the click");
                 revealElement(getWrappedElement(), clickBlocked);
                 super.click();
