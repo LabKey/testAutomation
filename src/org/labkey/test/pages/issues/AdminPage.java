@@ -170,10 +170,10 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         public EnumSelect<SortDirection> commentSortSelect = EnumSelect.EnumSelect(Locator.name("sortDirection"), SortDirection.class).findWhenNeeded(this);
         public RadioButton assignedToAllProjectUsersRadio = RadioButton(Locator.css(".assigned-to-group-project > input")).findWhenNeeded(this);
         public RadioButton assignedToSpecificGroupRadio = RadioButton(Locator.css(".assigned-to-group-specific > input")).findWhenNeeded(this);
-        public OptionSelect assignedToSpecificGroupSelect = OptionSelect(Locator.css("select.assigned-to-group")).findWhenNeeded(this);
+        public OptionSelect<OptionSelect.SelectOption> assignedToSpecificGroupSelect = OptionSelect(Locator.css("select.assigned-to-group")).findWhenNeeded(this);
         public RadioButton noDefaultAssignedToRadio = RadioButton(Locator.css(".assigned-to-empty > input")).findWhenNeeded(this);
         public RadioButton specificDefaultAssignedToRadio = RadioButton(Locator.css(".assigned-to-specific-user > input")).findWhenNeeded(this);
-        public OptionSelect defaultAssignedToSelect = OptionSelect(Locator.css("select.assigned-to-user")).findWhenNeeded(this);
+        public OptionSelect<OptionSelect.SelectOption> defaultAssignedToSelect = OptionSelect(Locator.css("select.assigned-to-user")).findWhenNeeded(this);
         public PropertiesEditor configureFieldsPanel = PropertiesEditor(getDriver()).withTitle("Configure Fields").findWhenNeeded();
     }
 

@@ -245,7 +245,7 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         final Select autoCopyTargetSelect = Select(Locator.id("autoCopyTarget")).findWhenNeeded(this);
         final Select plateTemplateSelect = Select(Locator.id("plateTemplate")).findWhenNeeded(this);
         final Select detectionMethodSelect = Select(Locator.id("detectionMethod")).findWhenNeeded(this);
-        final OptionSelect<MetadataInputFormat> metadataInputSelect = OptionSelect(Locator.id("metadataInputFormat")).findWhenNeeded(this);
+        final OptionSelect<MetadataInputFormat> metadataInputSelect = OptionSelect.finder(Locator.id("metadataInputFormat"), MetadataInputFormat.class).findWhenNeeded(this);
         final Checkbox debugScriptCheckbox = Checkbox(Locator.checkboxByName("debugScript")).findWhenNeeded(this);
         final Checkbox editableRunsCheckbox = Checkbox(Locator.checkboxByName("editableRunProperties")).findWhenNeeded(this);
         final Checkbox editableResultCheckbox = Checkbox(Locator.checkboxByName("editableResultProperties")).findWhenNeeded(this);

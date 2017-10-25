@@ -26,9 +26,14 @@ public class OptionSelect<T extends OptionSelect.SelectOption> extends SelectWra
         super(element);
     }
 
-    public static <O extends SelectOption> Component.SimpleComponentFinder<OptionSelect> OptionSelect(Locator loc)
+    public static Component.SimpleComponentFinder<OptionSelect<SelectOption>> OptionSelect(Locator loc)
     {
-        return new Component.SimpleComponentFinder<OptionSelect>(loc)
+        return finder(loc, SelectOption.class);
+    }
+
+    public static <O extends SelectOption> Component.SimpleComponentFinder<OptionSelect<O>> finder(Locator loc, Class<O> optionClass)
+    {
+        return new Component.SimpleComponentFinder<OptionSelect<O>>(loc)
         {
             @Override
             protected OptionSelect<O> construct(WebElement el)
@@ -79,7 +84,10 @@ public class OptionSelect<T extends OptionSelect.SelectOption> extends SelectWra
     public interface SelectOption
     {
         String getValue();
-        String getText();
+        default String getText()
+        {
+            return null;
+        }
 
         static SelectOption option(String value, String text)
         {
