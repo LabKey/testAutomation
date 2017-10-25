@@ -17,6 +17,7 @@ package org.labkey.test.components.html;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 public class RadioButton extends Checkbox
@@ -28,19 +29,44 @@ public class RadioButton extends Checkbox
 
     public static SimpleComponentFinder<RadioButton> RadioButton(Locator loc)
     {
-        return new SimpleComponentFinder<RadioButton>(loc)
-        {
-            @Override
-            protected RadioButton construct(WebElement el)
-            {
-                return new RadioButton(el);
-            }
-        };
+        return finder().locatedBy(loc);
+    }
+
+    public static RadioButtonFinder finder()
+    {
+        return new RadioButtonFinder();
     }
 
     protected void assertElementType()
     {
         String type = getComponentElement().getCssValue("type");
         Assert.assertEquals("Not a checkbox: " + getComponentElement().toString(), "checkbox", type);
+    }
+
+    public static class RadioButtonFinder extends ComponentFinder<SearchContext, RadioButton, RadioButtonFinder>
+    {
+        private Locator loc = Locator.radioButton();
+
+        public SimpleComponentFinder<RadioButton> withName(String name)
+        {
+            return super.locatedBy(Locator.radioButtonByName(name));
+        }
+
+        public SimpleComponentFinder<RadioButton> withNameAndValue(String name, String value)
+        {
+            return super.locatedBy(Locator.radioButtonByNameAndValue(name, value));
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return loc;
+        }
+
+        @Override
+        protected RadioButton construct(WebElement el)
+        {
+            return new RadioButton(el);
+        }
     }
 }
