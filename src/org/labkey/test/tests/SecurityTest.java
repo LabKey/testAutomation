@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.reader.Readers;
@@ -28,12 +29,14 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.pages.ConfigureDbLoginPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.UIUserHelper;
 
 import java.io.BufferedReader;
@@ -41,15 +44,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
+import static org.labkey.test.pages.ConfigureDbLoginPage.PasswordStrength;
 
 @Category(BVT.class)
 public class SecurityTest extends BaseWebDriverTest
@@ -121,7 +128,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         if (!isQuickTest())
         {
-            cantReachAdminToolFromUserAccount(false);
+            cantReachAdminToolFromUserAccount();
             passwordStrengthTest();
             dumbsterTest();
             loginSelfRegistrationEnabledTest();
@@ -131,45 +138,39 @@ public class SecurityTest extends BaseWebDriverTest
         passwordParameterTest();
     }
 
-    protected static final String HISTORY_TAB_TITLE = "History:";
-    protected static final String[] unreachableUrlsShortList = {"/admin/showAdmin.view?",
-            "/user/showUsers.view?",
-            "/security/group.view?group=Administrators"};
-
-    protected static final String[] unreachableUrlsExtendedList = {"/security/group.view?group=Developers",
-        "user/showUsers.view?", "security/project.view?returnUrl=%2Fuser%2FshowUsers.view%3F", "admin/createFolder.view?",
-        "/analytics/begin.view?", "/login/configure.view?", "/admin/customizeEmail.view?", "/admin/filesSiteSettings.view?",
-        "/admin/projectSettings.view?", "/flow/flowAdmin.view?", "/admin/reorderFolders.view?", "/admin/customizeSite.view?",
-        "/reports/configureReportsAndScripts.view?", "/audit/showAuditLog.view?", "/search/admin.view?",
-        "/ms1/showAdmin.view?", "/ms2/showMS2Admin.view?", "/experiment-types/begin.view?", "/pipeline-status/showList.view?",
-        "/pipeline/setup.view?", "/ms2/showProteinAdmin.view?", "/admin/actions.view?", "/admin/caches.view?",
-        "/admin/dbChecker.view?", "/query/dataSourceAdmin.view?", "/admin/dumpHeap.view?", "/admin/environmentVariables.view?",
-        "/admin/memTracker.view?", "/admin/queries.view?", "/admin/resetErrorMark.view?", "/admin/showThreads.view?",
-        "/admin-sql/scripts.view?", "/admin/systemProperties.view?", "/admin/emailTest.view?", "/admin/showAllErrors.view?",
-        "/admin/showErrorsSinceMark.view?", "/admin/showPrimaryLog.view?",
-
-        /* Management actions shouldn't be reachable by non-admins */
-        "/admin-missingValues.view", "/admin-manageFolders.view", "/admin-moduleProperties.view", "/admin-concepts.view",
-        "/search-searchSettings.view", "/admin-notifications.view", "/admin-exportFolder.view", "/admin-importFolder.view",
-        "/admin-fileRoots.view", "/admin-folderInformation.view"
-    };
-
     /**
      * verify that a normal user does not get a link to the admin console or see their own history, nor
      * reach an admin-only url directly.
-     *
-     *
-     * @param longForm if and only if longFrom = true, test against the extended list of admin urls.
-     * if longForm = false, test against only a few high priority URLs.
      */
     @LogMethod
-    protected void cantReachAdminToolFromUserAccount(boolean longForm)
+    protected void cantReachAdminToolFromUserAccount()
     {
+        final String historyTabTitle = "History:";
+        final Set<String> unreachableUrls = new HashSet<>(Arrays.asList("/admin/showAdmin.view?", "/user/showUsers.view?",
+                "/security/group.view?group=Administrators", "/security/group.view?group=Developers",
+                "/user/showUsers.view?", "/security/project.view?returnUrl=%2Fuser%2FshowUsers.view%3F", "/admin/createFolder.view?",
+                "/analytics/begin.view?", "/login/configure.view?", "/admin/customizeEmail.view?", "/admin/filesSiteSettings.view?",
+                "/admin/projectSettings.view?", "/flow/flowAdmin.view?", "/admin/reorderFolders.view?", "/admin/customizeSite.view?",
+                "/reports/configureReportsAndScripts.view?", "/audit/showAuditLog.view?", "/search/admin.view?",
+                "/ms1/showAdmin.view?", "/ms2/showMS2Admin.view?", "/experiment-types/begin.view?", "/pipeline-status/showList.view?",
+                "/pipeline/setup.view?", "/ms2/showProteinAdmin.view?", "/admin/actions.view?", "/admin/caches.view?",
+                "/admin/dbChecker.view?", "/query/dataSourceAdmin.view?", "/admin/dumpHeap.view?", "/admin/environmentVariables.view?",
+                "/admin/memTracker.view?", "/admin/queries.view?", "/admin/resetErrorMark.view?", "/admin/showThreads.view?",
+                "/admin-sql/scripts.view?", "/admin/systemProperties.view?", "/admin/emailTest.view?", "/admin/showAllErrors.view?",
+                "/admin/showErrorsSinceMark.view?", "/admin/showPrimaryLog.view?",
+
+        /* Management actions shouldn't be reachable by non-admins */
+                "/admin-missingValues.view", "/admin-manageFolders.view", "/admin-moduleProperties.view", "/admin-concepts.view",
+                "/search-searchSettings.view", "/admin-notifications.view", "/admin-exportFolder.view", "/admin-importFolder.view",
+                "/admin-fileRoots.view", "/admin-folderInformation.view"
+        ));
+
+
         //verify that you can see the text "history" in the appropriate area as admin.  If this fails, the
         //check below is worthless
 
         goToMyAccount();
-        assertTextPresent(HISTORY_TAB_TITLE);
+        assertTextPresent(historyTabTitle);
 
         //log in as normal user
         impersonate(NORMAL_USER);
@@ -178,32 +179,28 @@ public class SecurityTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.id("adminMenuPopupText"));
 
         //can't reach admin urls directly either
-
-        for (String url : unreachableUrlsShortList)
-            assertUrlUnreachableDueToPermissions(url);
-
-        if (longForm)
-        {
-            for (String url : unreachableUrlsExtendedList)
-                assertUrlUnreachableDueToPermissions(url);
-        }
-
-        ///user/showUsers.view?
+        for (String url : unreachableUrls)
+            assertUrlForbidden(url);
 
         //shouldn't be able to view own history either
-        clickButton("Home");
         goToMyAccount();
-        assertTextNotPresent(HISTORY_TAB_TITLE);
+        assertTextNotPresent(historyTabTitle);
 
         stopImpersonating();
     }
 
     @LogMethod
-    public void assertUrlUnreachableDueToPermissions(String url)
+    public void assertUrlForbidden(String url)
     {
         log("Attempting to reach URL user does not have permission for:  " + url);
-        beginAt(url);
-        assertAtUserUserLacksPermissionPage();
+        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(url);
+        if (HttpStatus.SC_FORBIDDEN != httpResponse.getResponseCode() ||
+            !httpResponse.getResponseBody().contains(PERMISSION_ERROR))
+        {
+            // Go to page for better failure screenshot
+            beginAt(url);
+            fail("Url should be forbidden for non-admin: " + url);
+        }
     }
 
     /**
@@ -214,6 +211,8 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     public void passwordResetTest()
     {
+        ConfigureDbLoginPage.beginAt(this).setDbLoginConfig(PasswordStrength.Weak, null);
+
         //get user a password
         String username = NORMAL_USER;
         String password = NORMAL_USER_PASSWORD;
@@ -278,8 +277,6 @@ public class SecurityTest extends BaseWebDriverTest
         stopImpersonating();
     }
 
-    protected enum PasswordAlterType {RESET_PASSWORD, CHANGE_PASSWORD}
-
     /**
      * Preconditions: able to reset user's password at resetUrl, db in weak-password mode
      */
@@ -290,51 +287,19 @@ public class SecurityTest extends BaseWebDriverTest
 
         beginAt(resetUrl);
 
-        String[][] passwords = {{"fooba", null}, {"foobar", "foobar2"}};
-        String[][] messages = {{"Your password must be six non-whitespace characters or more."}, {"Your password entries didn't match."}};
-        attemptSetInvalidPasswords(PasswordAlterType.RESET_PASSWORD, passwords, messages);
+        attemptSetInvalidPassword("fooba", "fooba", "Your password must be six non-whitespace characters or more.");
+        attemptSetInvalidPassword("foobar", "foobar2", "Your password entries didn't match.");
 
         resetPassword(resetUrl, NORMAL_USER, NORMAL_USER_PASSWORD);
     }
 
-    /**RESET_PASSWORD means user or admin initiated password change that
-     * involves visiting a webpage specified in an email to change the password,
-     * without knowing the past password.
-     * CHANGE_PASSWORD means a user went into their account information and initiated the change by
-     * selecting "change password".  This requires the old password to work.
-      */
-
     @LogMethod
-    protected void attemptSetInvalidPasswords(PasswordAlterType changeType, String[][] passwords, String[][] errors)
+    protected void attemptSetInvalidPassword(String password1, String password2, String... errors)
     {
-        //if reset, should already be at reset Url
-        for (int i = 0; i < errors.length; i++)
-        {
-            switch (changeType)
-            {
-                case RESET_PASSWORD:
-                    attemptSetInvalidPassword(changeType, passwords[i], errors[i]);
-            }
-        }
-    }
-
-    @LogMethod
-    protected void attemptSetInvalidPassword(PasswordAlterType changeType, String[] passwords, String... errors)
-    {
-        switch (changeType)
-        {
-            case CHANGE_PASSWORD:
-                throw new IllegalArgumentException("unsupported use of change password type");
-
-            case RESET_PASSWORD:
-                setFormElement(Locator.id("password"), passwords[0]);
-                String password2 = passwords[1];
-                if (password2 == null)
-                    password2 = passwords[0];
-                setFormElement(Locator.id("password2"), password2);
-                clickButton("Set Password");
-                assertTextPresent(errors);
-        }
+        setFormElement(Locator.id("password"), password1);
+        setFormElement(Locator.id("password2"), password2);
+        clickButton("Set Password");
+        assertTextPresent(errors);
     }
 
     /**
@@ -717,7 +682,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         String simplePassword = "3asdfghi"; // Only two character types. 8 characters long.
         String shortPassword = "4asdfg!"; // Only 7 characters long. 3 character types.
-        setDbLoginConfig(PasswordRule.Strong, null);
+        ConfigureDbLoginPage.beginAt(this).setDbLoginConfig(PasswordStrength.Strong, null);
 
         setInitialPassword(NORMAL_USER, simplePassword);
         assertTextPresent("Your password must contain three of the following"); // fail, too simple
@@ -764,7 +729,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertTextNotPresent("Choose a new password.");
 
         stopImpersonating();
-        resetDbLoginConfig();
+        ConfigureDbLoginPage.resetDbLoginConfig(this);
     }
 
     @LogMethod

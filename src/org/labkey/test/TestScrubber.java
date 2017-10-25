@@ -15,6 +15,7 @@
  */
 package org.labkey.test;
 
+import org.labkey.test.pages.ConfigureDbLoginPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
 
@@ -60,7 +61,7 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
+            ConfigureDbLoginPage.resetDbLoginConfig(this);
         }
         catch (RuntimeException e)
         {

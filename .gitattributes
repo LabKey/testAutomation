@@ -558,6 +558,7 @@ src/org/labkey/test/io/Grep.java -text
 src/org/labkey/test/module/ModuleTest.java -text
 src/org/labkey/test/pages/AssayDesignerPage.java -text
 src/org/labkey/test/pages/BaseDesignerPage.java -text
+src/org/labkey/test/pages/ConfigureDbLoginPage.java -text
 src/org/labkey/test/pages/ConfigureReportsAndScriptsPage.java -text
 src/org/labkey/test/pages/DatasetInsertPage.java -text
 src/org/labkey/test/pages/DatasetPropertiesPage.java -text
@@ -767,7 +768,6 @@ src/org/labkey/test/tests/SecurityApiTest.java -text
 src/org/labkey/test/tests/SecurityLDAPTest.java -text
 src/org/labkey/test/tests/SecurityShortTest.java -text
 src/org/labkey/test/tests/SecurityTest.java -text
-src/org/labkey/test/tests/SecurityTestExtended.java -text
 src/org/labkey/test/tests/SharedReportTest.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
 src/org/labkey/test/tests/SiteWideTermsOfUseTest.java -text
