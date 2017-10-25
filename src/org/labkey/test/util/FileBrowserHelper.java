@@ -414,7 +414,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         WebElement button = action.findButton(getDriver());
         if (button.isDisplayed())
         {
-            waitFor(() -> !button.getAttribute("class").contains("disabled"), WAIT_FOR_JAVASCRIPT);
+            waitFor(() -> !button.getAttribute("class").contains("disabled"), "Button not enabled: " + action, WAIT_FOR_JAVASCRIPT);
             clickAndWait(button, action._triggersPageLoad ? WAIT_FOR_PAGE : 0);
         }
         else
