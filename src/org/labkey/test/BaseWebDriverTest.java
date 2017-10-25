@@ -21,6 +21,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assume;
@@ -64,6 +66,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.UnreachableBrowserException;
+import org.openqa.selenium.remote.service.DriverService;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
@@ -2390,7 +2393,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         private static final SingletonWebDriver INSTANCE = new SingletonWebDriver();
 
-        private WebDriver _webDriver;
+        @NotNull
+        private Pair<WebDriver, DriverService> _driverAndService = new ImmutablePair<>(null, null);
         private File _downloadDir;
 
         private SingletonWebDriver()
@@ -2407,7 +2411,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         private WebDriver getWebDriver()
         {
-            return _webDriver;
+            return _driverAndService.getLeft();
+        }
+
+        private DriverService getDriverService()
+        {
+            return _driverAndService.getRight();
         }
 
         private File getDownloadDir()
@@ -2417,10 +2426,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         private void setUp(BaseWebDriverTest test)
         {
-            WebDriver oldWebDriver = _webDriver;
+            WebDriver oldWebDriver = getWebDriver();
             File newDownloadDir = new File(test.getArtifactCollector().ensureDumpDir(test.getClass().getSimpleName()), "downloads");
-            _webDriver = test.createNewWebDriver(_webDriver, test.BROWSER_TYPE, newDownloadDir);
-            if (_webDriver != oldWebDriver) // downloadDir only changes when a new WebDriver is started.
+            _driverAndService = test.createNewWebDriver(_driverAndService, test.BROWSER_TYPE, newDownloadDir);
+            if (getWebDriver() != oldWebDriver) // downloadDir only changes when a new WebDriver is started.
                 _downloadDir = newDownloadDir;
         }
 
@@ -2428,9 +2437,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             try
             {
-                if (closeOldBrowser && _webDriver != null)
+                if (closeOldBrowser && getWebDriver() != null)
                 {
-                    _webDriver.quit();
+                    getWebDriver().quit();
                 }
             }
             catch (UnreachableBrowserException ignore)
@@ -2445,8 +2454,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         private void clear()
         {
+            if (getDriverService() != null && getDriverService().isRunning())
+                getDriverService().stop();
             // Don't clear _downloadDir. Cleanup steps might still need it after tearDown
-            _webDriver = null;
+            _driverAndService = new ImmutablePair<>(null, null);
         }
     }
 }

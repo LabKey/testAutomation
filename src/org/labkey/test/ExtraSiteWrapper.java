@@ -26,7 +26,7 @@ public class ExtraSiteWrapper extends LabKeySiteWrapper implements AutoCloseable
     public ExtraSiteWrapper(BrowserType browserType, File downloadDir)
     {
         super();
-        this.extraDriver = createNewWebDriver(null, browserType, downloadDir);
+        this.extraDriver = createNewWebDriver(browserType, downloadDir).getKey();
     }
 
     @Override

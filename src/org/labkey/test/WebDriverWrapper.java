@@ -18,13 +18,13 @@ package org.labkey.test;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.util.FileUtil;
-import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.Connection;
-import org.labkey.test.components.api.ProjectMenu;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.LabKeyAlert;
@@ -60,6 +60,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -69,6 +70,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.service.DriverService;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -154,9 +156,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return driver;
     }
 
-    protected WebDriver createNewWebDriver(WebDriver oldWebDriver, BrowserType browserType, File downloadDir)
+    protected Pair<WebDriver, DriverService> createNewWebDriver(BrowserType browserType, File downloadDir)
     {
+        return createNewWebDriver(new ImmutablePair<>(null, null), browserType, downloadDir);
+    }
+
+    protected Pair<WebDriver, DriverService> createNewWebDriver(@NotNull Pair<WebDriver, DriverService> oldDriverAndService, BrowserType browserType, File downloadDir)
+    {
+        WebDriver oldWebDriver = oldDriverAndService.getLeft();
         WebDriver newWebDriver = null;
+        DriverService oldDriverService = oldDriverAndService.getRight();
+        DriverService newDriverService = null;
 
         switch (browserType)
         {
@@ -178,6 +188,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 {
                     oldWebDriver.quit();
                     oldWebDriver = null;
+                    if (oldDriverService != null && oldDriverService.isRunning())
+                        oldDriverService.stop();
                 }
                 if (oldWebDriver == null)
                 {
@@ -191,6 +203,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 {
                     oldWebDriver.quit();
                     oldWebDriver = null;
+                    if (oldDriverService != null && oldDriverService.isRunning())
+                        oldDriverService.stop();
                 }
                 if (oldWebDriver == null)
                 {
@@ -218,6 +232,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     prefs.put("credentials_enable_service", false);
                     prefs.put("profile.password_manager_enabled", false);
                     options.setExperimentalOption("prefs", prefs);
+                    options.setExperimentalOption("detach", true); // Leaves browser window open after stopping the driver service
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
                     options.addArguments("disable-xss-auditor");
                     options.addArguments("ignore-certificate-errors");
@@ -225,7 +240,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-                    newWebDriver = new ChromeDriver(capabilities);
+                    newDriverService = ChromeDriverService.createDefaultService();
+                    newWebDriver = new ChromeDriver((ChromeDriverService) newDriverService, capabilities);
                 }
                 break;
             }
@@ -235,6 +251,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 {
                     oldWebDriver.quit();
                     oldWebDriver = null;
+                    if (oldDriverService != null && oldDriverService.isRunning())
+                        oldDriverService.stop();
                 }
                 if (oldWebDriver == null)
                 {
@@ -307,11 +325,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getVersion();
             log("Browser: " + browserName + " " + browserVersion);
-            return newWebDriver;
+            return new ImmutablePair<>(newWebDriver, newDriverService);
         }
         else
         {
-            return oldWebDriver;
+            return oldDriverAndService;
         }
     }
 
@@ -1209,7 +1227,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         TextSearcher.TextHandler handler = (textSource, text) -> {
             if (textSource.contains(text))
-                foundTexts.add(new Pair<>(text, textSource.indexOf(text)));
+                foundTexts.add(new ImmutablePair<>(text, textSource.indexOf(text)));
             return true;
         };
 
