@@ -32,7 +32,8 @@ public class UIUserHelper extends AbstractUserHelper
         super(driverWrapper);
     }
 
-    public CreateUserResponse cloneUser(String userName, String cloneUserName, boolean sendEmail, boolean verifySuccess)
+    @LogMethod
+    public CreateUserResponse cloneUser(@LoggedParam String userName, String cloneUserName, boolean sendEmail, boolean verifySuccess)
     {
         getWrapper().goToSiteUsers();
         getWrapper().clickButton("Add Users");

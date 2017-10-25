@@ -960,7 +960,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     private PasswordRule oldStrength = null;
     private PasswordExpiration oldExpiration = null;
 
-    protected void setDbLoginConfig(PasswordRule strength, PasswordExpiration expiration)
+    @LogMethod
+    protected void setDbLoginConfig(@LoggedParam PasswordRule strength, PasswordExpiration expiration)
     {
         PasswordRule curStrength = null;
         PasswordExpiration curExpiration = null;
