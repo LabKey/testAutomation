@@ -293,10 +293,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         table.goToReport("Create R Report");
         _RReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
         _RReportHelper.saveReport(reportName);
-        DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
 
         log("** Executing background R script");
-        table.goToReport(reportName);
         waitForElement(Locator.lkButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
         waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
