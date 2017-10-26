@@ -125,7 +125,6 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     protected WebElement saveAndVerifyKnitrReport(String reportName, Locator[] reportContains, String[] reportNotContains)
     {
         _rReportHelper.saveReport(reportName);
-        waitAndClickAndWait(Locator.linkContainingText(reportName));
         return assertReportContents(reportContains, reportNotContains);
     }
 

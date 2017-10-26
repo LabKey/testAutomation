@@ -84,9 +84,11 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
 
         clickButton("Save & Close");
         waitForText("Display Name");
+        pushLocation();
 
         String rReportName = TRICKY_CHARACTERS + "new R report";
         new RReportHelper(this).createRReport(rReportName);
+        popLocation();
 
         WebElement el = Locator.css(":root").findElement(getDriver());
 

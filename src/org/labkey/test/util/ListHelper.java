@@ -141,7 +141,7 @@ public class ListHelper extends LabKeySiteWrapper
     public void importDataFromFile(@LoggedParam File inputFile, int wait)
     {
         clickImportData();
-        click(Locator.tagWithClass("span", "labkey-wp-title-text").containing("Upload file"));
+        click(Locator.tagWithClass("h3", "panel-title").containing("Upload file"));
         setFormElement(Locator.name("file"), inputFile);
         clickButton("Submit", wait);
     }
