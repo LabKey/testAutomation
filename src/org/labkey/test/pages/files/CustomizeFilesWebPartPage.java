@@ -3,8 +3,10 @@ package org.labkey.test.pages.files;
 import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  * Created by susanh on 9/20/17.
@@ -34,10 +36,76 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
         return getText(selectedNodeLoc);
     }
 
-    public CustomizeFilesWebPartPage setFileRoot(String menuOption)
+    public CustomizeFilesWebPartPage setFileRoot(String... nodeParts)
     {
-        selectOptionByText(elementCache().fileRootSelect, menuOption);
+        selectFileRoot(true, nodeParts);
+        submit();
+        sleep(3000);
         return this;
+    }
+
+    public CustomizeFilesWebPartPage selectFileRoot(boolean nodeExist, String... nodeParts)
+    {
+        if (isExtTreeNodeSelected(nodeParts[nodeParts.length - 1]))
+            return this;
+
+        String nodeWithParents = "";
+        String separator = "";
+        for (String node : nodeParts)
+        {
+            nodeWithParents += separator + node;
+            separator = ".";
+
+            Locator.XPathLocator loc = Locators.fileRootTreeNode(node);
+
+            if (!nodeExist)
+            {
+                sleep(1000);
+                if (!isElementPresent(loc))
+                    return this;
+            }
+
+            shortWait().until(ExpectedConditions.elementToBeClickable(loc));
+            Locator.XPathLocator selectedNode = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(node);
+
+            if (isElementPresent(selectedNode))
+                continue; // already selected
+
+            log("Selecting node " + nodeWithParents + " ...");
+            waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
+            // select/expand tree node
+            try
+            {
+                scrollIntoView(loc);
+            }
+            catch (StaleElementReferenceException ignore)
+            {
+            }
+
+            click(loc);
+            waitForElement(selectedNode, 2000);
+        }
+
+        if (!nodeExist)
+            throw new AssertionError("Node is present in file root tree but shouldn't be!");
+
+        return this;
+    }
+
+    public CustomizeFilesWebPartPage submit()
+    {
+        clickAndWait(elementCache().submitButton);
+        return new CustomizeFilesWebPartPage(getDriver());
+    }
+
+    public void verifyFileRootNodePresent(String... nodeParts)
+    {
+        selectFileRoot(true, nodeParts);
+    }
+
+    public void verifyFileRootNodeNotPresent(String... nodeParts)
+    {
+        selectFileRoot(false, nodeParts);
     }
 
     protected ElementCache elementCache()
@@ -48,7 +116,14 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         protected WebElement title = new LazyWebElement(Locator.tagWithName("input", "title"), this);
-        protected WebElement fileRootSelect = new LazyWebElement(Locator.tagWithName("select", "fileSet"), this);
+        protected WebElement submitButton = Locator.lkButton("Submit").findWhenNeeded(this);
+    }
 
+    public static class Locators
+    {
+        public static Locator.XPathLocator fileRootTreeNode(String nodeName)
+        {
+            return Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(nodeName);
+        }
     }
 }

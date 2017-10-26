@@ -20,9 +20,11 @@ import com.googlecode.sardine.DavResource;
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
 import org.apache.http.HttpStatus;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
@@ -52,19 +54,28 @@ public class WebDavTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
+    @BeforeClass
+    public static void setupProject()
+    {
+        WebDavTest init = (WebDavTest)getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        _containerHelper.createProject(PROJECT_NAME, null);
+    }
+
     @Test
     public void testWebDav() throws Exception
     {
-        _containerHelper.createProject(getProjectName(), null);
-
         // including context Path
         String baseURL = getBaseURL();
-        String waitForIdle = baseURL + "/search-waitForIdle.view";
         String testDirectory = "/_webdav/" + getProjectName() + "/@files/";
         String testURL = baseURL + testDirectory;
 
         // make sure the indexer isn't really busy
-        beginAt(waitForIdle);
+        waitForIdle();
 
         beginAt(testDirectory + "?listing=html");
         assertTextNotPresent("testfile1");
@@ -83,19 +94,7 @@ public class WebDavTest extends BaseWebDriverTest
 
         // TODO test search
 
-        for (int retry=0 ; retry<3 ; retry++)
-        {
-            try
-            {
-                // give search indexer time to index and release lock
-                sleep(100);
-                sardine.delete(testURL + "testfile1.txt");
-                break;
-            }
-            catch (IOException x)
-            {
-            }
-        }
+        deleteFile(sardine, testURL + "testfile1.txt");
 
         refresh();
         assertTextNotPresent("testfile1.txt");
@@ -103,15 +102,7 @@ public class WebDavTest extends BaseWebDriverTest
         assertEquals(1, names.size());
         assertFalse(names.contains("testfile1.txt"));
 
-        try
-        {
-            sardine.list(testURL + "nonexistent/");
-            fail("Expected 404");
-        }
-        catch (IOException x)
-        {
-            assertTrue(x.toString().contains("404"));
-        }
+        verifyExpected404(sardine, testURL);
     }
 
     /**
@@ -123,6 +114,139 @@ public class WebDavTest extends BaseWebDriverTest
         SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.getBaseURL() + "/_webdav?uf=%uf");
         SimpleHttpResponse response = request.getResponse();
         assertEquals("Wrong response for unparsable parameter", HttpStatus.SC_BAD_REQUEST, response.getResponseCode());
+    }
+
+    @Test
+    public void testWebfiles() throws Exception
+    {
+        setEnableWebfiles(true);
+
+        // including context Path
+        String baseURL = getBaseURL();
+        String testDirectory = "/_webfiles/" + getProjectName() + "/";
+        String testURL = baseURL + testDirectory;
+
+        // make sure the indexer isn't really busy
+        waitForIdle();
+        beginAt(testDirectory + "?listing=html");
+
+        Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        List<String> names = _listNames(sardine, testURL);
+        assertEquals("_webfiles for project should be empty", 1, names.size());
+
+        String projectFileName = "testfile1.txt";
+        log("Verify creating file under project");
+        sardine.put(testURL + projectFileName, TEXT.getBytes(StandardCharsets.UTF_8));
+        refresh();
+        names = _listNames(sardine, testURL);
+        assertEquals("Content for _webfiles is not as expected", 2, names.size());
+        assertTrue(projectFileName + " file is not present in _webfiles", names.contains(projectFileName));
+
+        String conflictFolderName = "childContainerAndDirectory";
+        log("Create a subdirectory: \"" + conflictFolderName + "\" under project (which maps to @files of project)");
+        sardine.createDirectory(testURL + conflictFolderName);
+        String childFileName = "testfile2.txt";
+        log("Create a file: \"" + childFileName + "\" under subdirectory: \"" + conflictFolderName + "\"");
+        sardine.put(testURL + conflictFolderName + "/" + childFileName, TEXT.getBytes(StandardCharsets.UTF_8));
+        log("Verify file under subdirectory");
+        beginAt(testDirectory + conflictFolderName + "?listing=html");
+        assertTextPresent(childFileName);
+
+        log("Create a child container: \"" + conflictFolderName + "\" under project");
+        _containerHelper.createSubfolder(getProjectName(), conflictFolderName);
+
+        log("Verify that subdirectory name that conflicts with child container is decorated correctly for _webfiles");
+        beginAt(testDirectory + "?listing=html");
+        String expectedConflictingDirectoryName = conflictFolderName + " (files)";
+        names = _listNames(sardine, testURL);
+        assertEquals("Content for _webfiles is not as expected", 4, names.size());
+        log(names.toString());
+        assertTrue(projectFileName + " file is not present in _webfiles", names.contains(projectFileName));
+        assertTrue(conflictFolderName + " child container is not present in _webfiles", names.contains(conflictFolderName));
+        assertTrue(conflictFolderName + " directory is not present in _webfiles", names.contains(expectedConflictingDirectoryName));
+
+        log("Verify file and sub directories uploaded to project from _webfiles is present at @files _webdav node");
+        String webDavTestDirectory = "/_webdav/" + getProjectName() + "/@files/";
+        String webDavtestURL = baseURL + webDavTestDirectory;
+        beginAt(webDavTestDirectory + "?listing=html");
+        names = _listNames(sardine,webDavtestURL);
+        assertEquals("Content for _webdav/@files is not as expected", 3, names.size());
+        assertTrue(projectFileName + " file is not present in _webdav/@files", names.contains(projectFileName));
+        assertTrue(conflictFolderName + " directory is not present in _webdav/@files", names.contains(conflictFolderName));
+
+        goToProjectHome();
+        _containerHelper.deleteFolder(getProjectName(), conflictFolderName);
+
+        log("Verify deleting file from _webfiles");
+        beginAt(testDirectory + "?listing=html");
+        deleteFile(sardine, testURL + projectFileName);
+        deleteFile(sardine, testURL + conflictFolderName + "/" + childFileName);
+        deleteFile(sardine, testURL + conflictFolderName);
+        refresh();
+        assertTextNotPresent(projectFileName);
+        names = _listNames(sardine,testURL);
+        assertFalse(names.contains(projectFileName));
+
+        verifyExpected404(sardine, testURL);
+
+        log("Verify _webfiles is not available after disabling it from site settings");
+        setEnableWebfiles(false);
+        verifyExpected404(sardine, testURL, false);
+    }
+
+    private void verifyExpected404(Sardine sardine, String testURL)
+    {
+        verifyExpected404(sardine, testURL, true);
+    }
+
+    private void verifyExpected404(Sardine sardine, String testURL, boolean useExtra)
+    {
+        try
+        {
+            sardine.list(testURL + (useExtra ? "nonexistent/" : ""));
+            fail("Expected 404");
+        }
+        catch (IOException x)
+        {
+            assertTrue(x.toString().contains("404"));
+        }
+    }
+
+    private void deleteFile(Sardine sardine, String fileURL)
+    {
+        for (int retry=0 ; retry<3 ; retry++)
+        {
+            try
+            {
+                // give search indexer time to index and release lock
+                sleep(100);
+                sardine.delete(fileURL);
+                break;
+            }
+            catch (IOException x)
+            {
+            }
+        }
+    }
+
+    private void setEnableWebfiles(boolean enable)
+    {
+        Locator enableWebFilesLoc = Locator.name("webfilesEnabled");
+        goToProjectHome();
+        goToAdminConsole().clickFiles();
+        if (enable)
+            checkCheckbox(enableWebFilesLoc);
+        else
+            uncheckCheckbox(enableWebFilesLoc);
+        clickButton("Save");
+    }
+
+    private void waitForIdle()
+    {
+        // make sure the indexer isn't really busy
+        String baseURL = getBaseURL();
+        String waitForIdle = baseURL + "/search-waitForIdle.view";
+        beginAt(waitForIdle);
     }
 
     private List<String> _listNames(Sardine s, String path) throws IOException
