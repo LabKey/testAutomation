@@ -28,6 +28,7 @@ import org.labkey.remoteapi.query.ExecuteSqlCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 
@@ -177,14 +178,7 @@ public class DataIntegrationHelper
 
     public void sleep(long ms)
     {
-        try
-        {
-            Thread.sleep(ms);
-        }
-        catch (InterruptedException fail)
-        {
-            throw new IllegalStateException(fail);
-        }
+        BaseWebDriverTest.sleep(ms);
     }
 
     public String getEtlLogFile(String jobId) throws CommandException, IOException

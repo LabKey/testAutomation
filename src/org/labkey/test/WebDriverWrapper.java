@@ -388,6 +388,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         catch (InterruptedException e)
         {
+            Thread.currentThread().interrupt();
             throw new IllegalStateException(e);
         }
     }
