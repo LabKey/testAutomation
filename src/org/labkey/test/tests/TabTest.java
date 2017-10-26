@@ -29,6 +29,7 @@ import org.labkey.test.util.PortalHelper;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
@@ -46,9 +47,7 @@ public class TabTest extends SimpleModuleTest
     {
         doTabManagementTests();
         doTestTabbedFolder();
-        // TODO: enable when UX refresh UI supports container tabs
-        // https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=31176
-        //doTestContainerTabConversion();
+        doTestContainerTabConversion();
     }
 
     @LogMethod
@@ -161,15 +160,14 @@ public class TabTest extends SimpleModuleTest
         verifyTabSelected("Tab 1");
 
         // Test Container tabs
-        /* DISABLED until this issue can be addressed: https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=31176
         portalHelper.activateTab("Assay Container");
         assertTextPresent("Assay List");
-        portalHelper.activateTab(STUDY_FOLDER_TAB_LABEL);
+        PortalTab studyContainerTab = portalHelper.activateTab(STUDY_FOLDER_TAB_LABEL);
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));
         assertTextPresent("Manage Study", "Study Container", "Overview", "Specimen Data");
-        clickAndWait(Locator.linkWithText("Specimen Data"));
+        studyContainerTab.goToTabContainer("Specimen Data");
         assertTextPresent("Vial Search", "Specimens");
 
         // Test container tab enhancements: change tab folder's type, revert type, delete tab folder
@@ -270,7 +268,6 @@ public class TabTest extends SimpleModuleTest
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
                 new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
-        */
     }
 
     @LogMethod
@@ -304,14 +301,21 @@ public class TabTest extends SimpleModuleTest
         clickButton("Update Folder");
 
         // Verify that subfolders got moved into tabs
-        assertElementPresent(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
-        assertElementPresent(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
-        openFolderMenu();
-        assertElementNotPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL)));
-        assertElementNotPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL)));
+        PortalTab studyContainerTab = PortalTab.find(STUDY_FOLDER_TAB_LABEL, getDriver());
+        PortalTab assayContainerTab = PortalTab.find(ASSAY_FOLDER_TAB_LABEL, getDriver());
+        studyContainerTab = studyContainerTab.activate();
+        assertTrue(studyContainerTab.isActive());
+        assertFalse(assayContainerTab.isActive());
+        projectMenu().open();
+        assertFalse("container tab subfolders should not be linked in project menu",
+                projectMenu().projectLinkExists(STUDY_FOLDER_TAB_LABEL));
+        assertFalse("container tab subfolders should not be linked in project menu",
+                projectMenu().projectLinkExists(ASSAY_FOLDER_TAB_LABEL));
+
         clickAndWait(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
         assertTextPresent("Study Overview");
-        clickAndWait(Locator.linkWithText("Specimen Data"));
+        studyContainerTab = PortalTab.finder(getDriver()).withTabText(STUDY_FOLDER_TAB_LABEL).findWhenNeeded();
+        studyContainerTab.goToTabContainer("Specimen Data");
         assertTextPresent("Vial Search", "Import Specimens");
         clickAndWait(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
         assertTextPresent("Assay List", EXTRA_ASSAY_WEBPART);
@@ -337,9 +341,9 @@ public class TabTest extends SimpleModuleTest
         assertTextPresent(STUDY_FOLDER_TAB_LABEL, ASSAY_FOLDER_TAB_LABEL);
         clickAndWait(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
         assertTextPresent("Study Overview");
-        clickAndWait(Locator.linkWithText("Specimen Data"));
+        PortalTab.find(STUDY_FOLDER_TAB_LABEL, getDriver()).goToTabContainer("Specimen Data");
         assertTextPresent("Vial Search", "Import Specimens");
-        clickAndWait(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
+        PortalTab.find(ASSAY_FOLDER_TAB_LABEL, getDriver()).activate();
         assertTextPresent("Assay List", EXTRA_ASSAY_WEBPART);
 
         _containerHelper.deleteFolder(getProjectName(), COLLAB_FOLDER);
@@ -348,15 +352,7 @@ public class TabTest extends SimpleModuleTest
     @LogMethod(quiet = true)
     public void goToTabFolderManagement(@LoggedParam String tabText)
     {
-        Locator tabMenuXPath = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']/following-sibling::span//a");
-        waitForElement(tabMenuXPath);
-
-        fireEvent(tabMenuXPath, SeleniumEvent.click);
-        Locator parentLocator = Ext4Helper.Locators.menuItem("Folder");
-        waitForElement(parentLocator, 1000);
-        mouseOver(parentLocator);
-
-        Locator itemLocator = Ext4Helper.Locators.menuItem("Management");
-        waitAndClickAndWait(itemLocator);
+        PortalTab tab = PortalTab.find(tabText, getDriver());
+        tab.getMenu().clickSubMenu(true,"Folder", "Management");
     }
 }

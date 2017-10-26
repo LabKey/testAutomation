@@ -14,7 +14,8 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.labkey.test.components.html.Input.Input;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 
 public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
 {
@@ -27,11 +28,16 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
         _driver = driver;
     }
 
+    static public PortalTabFinder finder(WebDriver driver)
+    {
+        return new PortalTabFinder(driver);
+    }
+
     public static PortalTab find(String tabText, WebDriver driver)
     {
-        return new PortalTab(Locators.container.append(
-                Locators.tabItem.withChild(Locators.tabIdLoc(tabText)))
-                .waitForElement(driver, LabKeySiteWrapper.WAIT_FOR_JAVASCRIPT), driver);
+        return new PortalTab(Locators.container.append(Locators.tabItem.withChild(Locators.tabIdLoc(tabText)))
+                                .refindWhenNeeded(driver).withTimeout(WAIT_FOR_JAVASCRIPT),
+                            driver);
     }
 
     public static List<PortalTab> findTabs(WebDriver driver)
@@ -167,6 +173,17 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
         return this;
     }
 
+    /* Some tabs are also containers; these tabs have a select in them to support navigation among sub-tabs
+    * */
+    public PortalTab goToTabContainer(String subContainer)
+    {
+        String currentTabText = getText(); // use to find the current tab after the page refreshes
+        getWrapper().doAndWaitForPageToLoad(()->
+                getWrapper().selectOptionByText(Locators.subContainerTabSelect, subContainer),
+                WAIT_FOR_PAGE);
+        return PortalTab.find(currentTabText, getDriver());
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -192,9 +209,44 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
 
         static public Locator.XPathLocator container = Locator.tagWithClass("ul", "lk-nav-tabs");
         static public Locator.XPathLocator tabItem = Locator.xpath("//li[@role='presentation']");
+        static public Locator.XPathLocator subContainerTabSelect = Locator.tagWithAttribute("select", "title", "subContainerTabs");
 
         static public Locator.XPathLocator tabList =  LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
                 container.append(tabItem) :                                         //"//ul[contains(@class, 'lk-nav-tabs')]//li[@role='presentation']" :
                 Locator.xpath("//ul[contains(@class, 'tab-nav')]//li");
+    }
+
+    public static class PortalTabFinder extends WebDriverComponentFinder<PortalTab, PortalTab.PortalTabFinder>
+    {
+        private Locator _locator = Locators.container.append(Locators.tabItem);
+
+        public PortalTabFinder(WebDriver driver)
+        {
+            super(driver);
+        }
+
+        public PortalTabFinder withTabText(String text)
+        {
+            _locator = Locators.container.append(Locators.tabItem.withChild(Locators.tabIdLoc(text)));
+            return this;
+        }
+
+        public PortalTabFinder isActiveTab()
+        {
+            _locator = Locators.container.append(Locators.tabItem.withAttribute("class", "active"));
+            return this;
+        }
+
+        @Override
+        protected PortalTab construct(WebElement el, WebDriver driver)
+        {
+            return new PortalTab(el, driver);
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return _locator;
+        }
     }
 }
