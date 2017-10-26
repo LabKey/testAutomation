@@ -247,8 +247,8 @@ public class Runner extends TestSuite
 
             if (_failedTests.size() + _erroredTests.size() < _maxTestFailures || _maxTestFailures <= 0)
             {
-                int failCount = testResult.failureCount();
-                int errorCount = testResult.errorCount();
+                int failCountBeforeRun = testResult.failureCount();
+                int errorCountBeforeRun = testResult.errorCount();
                 final String currentTestName;
                 final Class currentTestClass = getTestClass(test);
                 currentTestName = currentTestClass.getSimpleName();
@@ -264,11 +264,10 @@ public class Runner extends TestSuite
                 if (loggingStub != null)
                     testResult.startTest(loggingStub); // This will allow static test methods to be more visible on TeamCity test results
                 test.run(testResult);
-                failed = testResult.failureCount() > failCount;
-                errored = testResult.errorCount() > errorCount;
+                failed = testResult.failureCount() > failCountBeforeRun;
+                errored = testResult.errorCount() > errorCountBeforeRun;
 
                 boolean testClassError = false;
-                boolean someTestTimedOut = false;
                 Enumeration<TestFailure> errors = testResult.errors();
                 while (errors.hasMoreElements())
                 {
@@ -280,22 +279,7 @@ public class Runner extends TestSuite
                         testClassError = true;
                         Throwable t = testFailure.thrownException();
                         if (t instanceof TestTimedOutException)
-                        {
-                            someTestTimedOut = true;
                             break;
-                        }
-                    }
-                }
-
-                if (someTestTimedOut)
-                {
-                    TestLogger.log("Test class timed out: waiting a bit to let it wrap up");
-                    try
-                    {
-                        Thread.sleep(30000);
-                    }
-                    catch (InterruptedException ignore)
-                    {
                     }
                 }
 
@@ -339,17 +323,6 @@ public class Runner extends TestSuite
             {
                 getRemainingTestsFile().delete();
             }
-        }
-
-        // Pause between tests for long test suites.  Will hopefully increase stability.
-        int ms = Integer.getInteger("pauseBetweenTests.ms", 0);
-        if (ms > 0)
-        {
-            try
-            {
-                Thread.sleep(ms);
-            }
-            catch (InterruptedException ignore) {}
         }
     }
 
