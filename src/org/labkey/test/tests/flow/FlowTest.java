@@ -72,7 +72,7 @@ public class FlowTest extends BaseFlowTest
     private void doInit()
     {
         // R is needed for the positivity report
-        RReportHelper _rReportHelper = new RReportHelper(getCurrentTest());
+        RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
 
         goToFlowDashboard();
