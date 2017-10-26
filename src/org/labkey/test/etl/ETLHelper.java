@@ -551,13 +551,13 @@ public class ETLHelper
                             .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
                             .withPredicate(Locator.xpath("td").withText(COMPLETE))))
                         return true;
-                    else if (_test.isElementPresent(Locator.tag("div").withClass("form-group")      // ux refresh UI
-                            .withPredicate(Locator.xpath("label").withText("Status"))
-                            .withPredicate(Locator.xpath("*").withText("ERROR"))))
+                    else if (_test.isElementPresent(Locator.tag("tr")
+                            .withPredicate(Locator.xpath("td").withClass("lk-form-label").withText("Status:"))
+                            .withPredicate(Locator.xpath("td").withText("ERROR"))))
                         return true;
-                    else if (_test.isElementPresent(Locator.tag("div").withClass("form-group")
-                            .withPredicate(Locator.xpath("label").withText("Status"))
-                            .withPredicate(Locator.xpath("*").withText(COMPLETE))))
+                    else if (_test.isElementPresent(Locator.tag("tr")
+                            .withPredicate(Locator.xpath("td").withClass("lk-form-label").withText("Status:"))
+                            .withPredicate(Locator.xpath("td").withText(COMPLETE))))
                         return true;
                     else
                         _test.refresh();

@@ -128,10 +128,8 @@ public class PipelineAnalysisHelper
         // Go to the run details graph page
         PipelineStatusTable jobStatus = new PipelineStatusTable(_test);
         jobStatus.clickStatusLink(0);
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            _test.assertElementContains(Locator.xpath("//div/label[contains(text(), 'Status')]/../div/p"), "COMPLETE");
-        else
-            _test.assertElementContains(Locator.xpath("//tr/td[contains(text(), 'Status')]/../td[2]"), "COMPLETE");
+
+        _test.assertElementContains(Locator.xpath("//tr/td[contains(text(), 'Status')]/../td[2]"), "COMPLETE");
 
         if (runName != null)
         {

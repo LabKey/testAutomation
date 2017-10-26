@@ -535,7 +535,7 @@ public class UserTest extends BaseWebDriverTest
         clickButton("Submit");
 
         WebElement table = DataRegionTable.Locators.form("SiteUsers").findElement(this.getDriver());
-        final int count = Locator.tagWithClass("p", "form-control-static").withText(TRICKY_CHARACTERS_FOR_PROJECT_NAMES).findElements(table).size();
+        final int count = Locator.tag("td").withText(TRICKY_CHARACTERS_FOR_PROJECT_NAMES).findElements(table).size();
         assertEquals("Didn't find special characters for user first and last name", 2, count);
     }
 
@@ -552,7 +552,7 @@ public class UserTest extends BaseWebDriverTest
         clickButton("Submit");
 
         WebElement table = DataRegionTable.Locators.form("SiteUsers").findElement(this.getDriver());
-        final int count = Locator.tagWithClass("p", "form-control-static").withText(INJECT_CHARS_1).findElements(table).size();
+        final int count = Locator.tag("td").withText(INJECT_CHARS_1).findElements(table).size();
         assertEquals("Didn't find injection string for user first and last name", 2, count);
     }
 

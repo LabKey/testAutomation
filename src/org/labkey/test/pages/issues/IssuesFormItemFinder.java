@@ -46,13 +46,13 @@ public abstract class IssuesFormItemFinder<C> extends org.labkey.test.components
 
     protected Locator.XPathLocator labelLoc()
     {
-        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ? _labelLoc().parent() : _labelLoc();
+        return _labelLoc();
     }
 
     private Locator.XPathLocator _labelLoc()
     {
         Locator.XPathLocator loc = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.tag("td").childTag("label").withClass("control-label") :
+                Locator.tag("td").withClass("lk-form-label") :
                 Locator.tag("td").withAttributeContaining("class", "labkey-form-label");
         if (partialText) // Don't match nested elements (e.g. '?' for help)
         {
@@ -61,6 +61,6 @@ public abstract class IssuesFormItemFinder<C> extends org.labkey.test.components
             return loc.withPredicate("contains(text(), " + xq(labelText) + ")");
         }
         else
-            return loc.withPredicate("text() = " + xq(labelText) + " or text() = " + xq(labelText + " *"));
+            return loc.withPredicate("text() = " + xq(labelText) + " or text() = " + xq(labelText + " *") + " or text() = " + xq(labelText + ":"));
     }
 }

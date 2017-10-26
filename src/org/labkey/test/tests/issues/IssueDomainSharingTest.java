@@ -126,7 +126,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
         final String assignTo = _userHelper.getDisplayNameForEmail(USER);
         final String customValue = "Value for shared domain";
         final String listDef = SHARED_LIST_DEF;
-        final String inheritedField = "inheritedfield";
+        final String inheritedField = "inheritedfield:";
 
         goToProjectHome("Shared");
         _containerHelper.enableModule("Issues");
