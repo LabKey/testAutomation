@@ -407,7 +407,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         };
 
-        /**
+        /*
          * Using Timeout at the class level isn't actually supported by JUnit.
          * We do some extra magic to make sure subsequent test methods don't keep running
          * when the class times out
@@ -425,7 +425,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 return FailOnTimeout.builder()
                         .withTimeout(minutes, TimeUnit.MINUTES)
-                        .withLookingForStuckThread(true)
                         .build(statement);
             }
 
@@ -477,7 +476,29 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         };
 
-        return RuleChain.outerRule(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
+        TestWatcher lock = new TestWatcher()
+        {
+            @Override
+            public Statement apply(Statement base, Description description)
+            {
+                final Statement statement = super.apply(base, description);
+                return new Statement()
+                {
+                    @Override
+                    public void evaluate() throws Throwable
+                    {
+                        synchronized (BaseWebDriverTest.class)
+                        {
+                            statement.evaluate();
+                        }
+                        synchronized (description.getTestClass()) { /* Make sure test methods have finished */ }
+                    }
+                };
+            }
+        };
+
+        return RuleChain.outerRule(lock).around(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
+//        return RuleChain.outerRule(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
     }
 
     @Deprecated
@@ -666,7 +687,28 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         };
 
-        return RuleChain.outerRule(_logger).around(testTimeout()).around(_failWatcher).around(_watcher);
+        TestWatcher _lock = new TestWatcher()
+        {
+            @Override
+            public Statement apply(Statement base, Description description)
+            {
+                final Statement statement = super.apply(base, description);
+                return new Statement()
+                {
+                    @Override
+                    public void evaluate() throws Throwable
+                    {
+                        synchronized (description.getTestClass())
+                        {
+                            statement.evaluate();
+                        }
+                    }
+                };
+            }
+        };
+
+         return RuleChain.outerRule(_lock).around(_logger).around(testTimeout()).around(_failWatcher).around(_watcher);
+//        return RuleChain.outerRule(_logger).around(testTimeout()).around(_failWatcher).around(_watcher);
     }
 
     /**
