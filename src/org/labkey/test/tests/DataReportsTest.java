@@ -311,6 +311,8 @@ public class DataReportsTest extends ReportTest
     public void doRReportsTest()
     {
         clickAndWait(Locator.linkWithText(DATA_SET));
+        pushLocation();
+
         DataRegionTable.DataRegion(getDriver()).find().goToReport("Create R Report");
         setCodeEditorValue("script-report-editor", " ");
 
@@ -331,6 +333,7 @@ public class DataReportsTest extends ReportTest
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
 
         saveReport(R_SCRIPTS[0]);
+        popLocation();
 
         log("Create view");
         DataRegionTable dataSetTable = new DataRegionTable("Dataset", getDriver());
@@ -354,7 +357,6 @@ public class DataReportsTest extends ReportTest
         assertTextBefore(R_SORT1, R_SORT2);
 
         saveReport(R_SCRIPTS[3]);
-
         popLocation();
 
         log("Check saved R script");

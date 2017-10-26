@@ -142,6 +142,8 @@ public class FilterTest extends BaseWebDriverTest
         _listHelper.submitTsvData(testDataFull.toString());
 
         new RReportHelper(this).createRReport(R_VIEW);
+        _listHelper.goToManageLists();
+        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
     }
 
     @LogMethod
