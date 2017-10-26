@@ -80,7 +80,7 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
         goToProjectHome();
 
         portalHelper.clickWebpartMenuItem("Files", true, "Customize");
-        customizePage.verifyFileRootNodeNotPresent("CHILD_CONTAINER"); //child container shouldn't show up as file root options
+        customizePage.verifyFileRootNodeNotPresent(CHILD_CONTAINER); //child container shouldn't show up as file root options
 
         log("Set webpart file root to @wiki/helloWiki");
         customizePage.setFileRoot("@wiki", WIKI_NAME);
