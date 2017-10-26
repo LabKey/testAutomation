@@ -22,6 +22,8 @@ import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
+
 
 public class DataImportPage extends LabKeyPage<DataImportPage.Elements>
 {
@@ -32,8 +34,13 @@ public class DataImportPage extends LabKeyPage<DataImportPage.Elements>
 
     public void insertTsvData(String data)
     {
-        setFormElement(newElementCache().inputTsvField, data);
+        setFormElement(elementCache().inputTsvField, data);
         clickButton("Submit");
+    }
+
+    public File downloadTemplate()
+    {
+        return clickAndWaitForDownload(elementCache().downloadTemplateButton);
     }
 
     @Override
