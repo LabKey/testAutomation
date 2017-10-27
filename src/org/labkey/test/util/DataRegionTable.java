@@ -33,6 +33,7 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.selenium.RefindingWebElement;
+import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -402,7 +403,23 @@ public class DataRegionTable extends DataRegion
     public WebElement link(int row, int col)
     {
         col += hasSelectors() ? 1 : 0;
-        return Locator.xpath("a").findElement(elementCache().getCell(row, col));
+        final WebElement cell = elementCache().getCell(row, col);
+        final WebElement link = Locator.xpath("a").findElement(cell);
+        return new WebElementWrapper()
+        {
+            @Override
+            public WebElement getWrappedElement()
+            {
+                return link;
+            }
+
+            @Override
+            public void click()
+            {
+                getWrapper().scrollIntoView(cell); // clicks sometimes no-op when at the very bottom of the window
+                super.click();
+            }
+        };
     }
 
     public WebElement link(int row, String columnName)
