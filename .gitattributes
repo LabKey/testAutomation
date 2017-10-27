@@ -755,6 +755,7 @@ src/org/labkey/test/tests/RaphaelRendererTest.java -text
 src/org/labkey/test/tests/RemoteConnectionTest.java -text
 src/org/labkey/test/tests/ReportAndDatasetNotificationTest.java -text
 src/org/labkey/test/tests/ReportSecurityTest.java -text
+src/org/labkey/test/tests/ReportSharingTest.java -text
 src/org/labkey/test/tests/ReportTest.java -text
 src/org/labkey/test/tests/ReportThumbnailTest.java -text
 src/org/labkey/test/tests/ResourceEncodingTest.java -text
