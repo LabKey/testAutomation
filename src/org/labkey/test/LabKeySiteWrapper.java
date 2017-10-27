@@ -496,8 +496,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public ShowAdminPage goToAdminConsole()
     {
-        clickAdminMenuItem("Site", "Admin Console");
-        return new ShowAdminPage(getDriver());
+        return ShowAdminPage.beginAt(this);
     }
 
     protected void createDefaultStudy()
