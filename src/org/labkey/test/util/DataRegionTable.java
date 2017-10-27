@@ -52,7 +52,6 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -104,12 +103,6 @@ public class DataRegionTable extends DataRegion
         return new Elements();
     }
 
-    @Deprecated // Inline and remove
-    public Elements elements()
-    {
-        return elementCache();
-    }
-
     protected void clearCache()
     {
         super.clearCache();
@@ -124,7 +117,7 @@ public class DataRegionTable extends DataRegion
 
     protected boolean hasSelectors()
     {
-        return elements().hasSelectors();
+        return elementCache().hasSelectors();
     }
 
     public CustomizeView getCustomizeView()
@@ -221,7 +214,7 @@ public class DataRegionTable extends DataRegion
         {
             DataRegionTable constructed = new DataRegionTable(new RefindingWebElement(el, buildLocator(), getContext()), driver);
             if (!_lazy)
-                constructed.elements(); // Wait for data region to be ready
+                constructed.elementCache();
             return constructed;
         }
     }
@@ -249,7 +242,7 @@ public class DataRegionTable extends DataRegion
 
     public int getColumnCount()
     {
-        return elements().getColumnHeaders().size() - (hasSelectors() ? 1 : 0);
+        return elementCache().getColumnHeaders().size() - (hasSelectors() ? 1 : 0);
     }
 
     public boolean hasSummaryStatisticRow()
@@ -263,7 +256,7 @@ public class DataRegionTable extends DataRegion
      */
     public int getDataRowCount()
     {
-        return elements().getDataRows().size();
+        return elementCache().getDataRows().size();
     }
 
     /**
@@ -276,7 +269,7 @@ public class DataRegionTable extends DataRegion
     {
         String expected = firstRow + " - " + lastRow + " of " + totalRows;
         String fullPaginationText = Locator.css(".labkey-pagination")
-                .findElement(elements().getButtonBar()).getText();
+                .findElement(elementCache().getButtonBar()).getText();
 
         Pattern pattern = Pattern.compile("\\d+ - \\d+ of \\d+");
         Matcher matcher = pattern.matcher(fullPaginationText);
@@ -322,7 +315,7 @@ public class DataRegionTable extends DataRegion
     {
         int rowIndex = getRowIndex(columnIndex, value);
         if (rowIndex < 0)
-            throw new NoSuchElementException("No row where: " + elements().getColumnHeaders().get(columnIndex).getText() + " = " + value);
+            throw new NoSuchElementException("No row where: " + elementCache().getColumnHeaders().get(columnIndex).getText() + " = " + value);
         return rowIndex;
     }
 
@@ -334,7 +327,7 @@ public class DataRegionTable extends DataRegion
     public String getSummaryStatFooterText(int columnIndex)
     {
         columnIndex += hasSelectors() ? 1 : 0;
-        String footerText = elements().getSummaryStatisticCells().get(columnIndex).getText();
+        String footerText = elementCache().getSummaryStatisticCells().get(columnIndex).getText();
         return footerText != null ? footerText.replaceAll("\\?", "") : null;
     }
 
@@ -388,7 +381,7 @@ public class DataRegionTable extends DataRegion
 
     public WebElement detailsLink(int row)
     {
-        return detailsLinkLocator().findElement(elements().getDataRow(row));
+        return detailsLinkLocator().findElement(elementCache().getDataRow(row));
     }
 
     public static Locator.XPathLocator updateLinkLocator()
@@ -403,13 +396,13 @@ public class DataRegionTable extends DataRegion
     @Deprecated
     public WebElement updateLink(int row)
     {
-        return updateLinkLocator().findElement(elements().getDataRow(row));
+        return updateLinkLocator().findElement(elementCache().getDataRow(row));
     }
 
     public WebElement link(int row, int col)
     {
         col += hasSelectors() ? 1 : 0;
-        return Locator.xpath("a").findElement(elements().getCell(row, col));
+        return Locator.xpath("a").findElement(elementCache().getCell(row, col));
     }
 
     public WebElement link(int row, String columnName)
@@ -455,7 +448,7 @@ public class DataRegionTable extends DataRegion
 
         if (_columnLabels.isEmpty())
         {
-            _columnLabels.addAll(getWrapper().getTexts(elements().getColumnHeaders()));
+            _columnLabels.addAll(getWrapper().getTexts(elementCache().getColumnHeaders()));
             if (hasSelectors())
                 _columnLabels.remove(0);
         }
@@ -469,7 +462,7 @@ public class DataRegionTable extends DataRegion
 
         if (_columnNames.isEmpty())
         {
-            List<WebElement> columnHeaders = elements().getColumnHeaders();
+            List<WebElement> columnHeaders = elementCache().getColumnHeaders();
             for (int i = hasSelectors() ? 1 : 0; i < columnHeaders.size(); i++)
             {
                 String columnName = columnHeaders.get(i).getAttribute("column-name");
@@ -607,7 +600,7 @@ public class DataRegionTable extends DataRegion
 
     public WebElement findRow(int index)
     {
-        return elements().getDataRow(index);
+        return elementCache().getDataRow(index);
     }
 
     public int getRowIndex(String pk)
@@ -656,7 +649,7 @@ public class DataRegionTable extends DataRegion
     public WebElement findCell(int row, int column)
     {
         column += hasSelectors() ? 1 : 0;
-        return elements().getCell(row, column);
+        return elementCache().getCell(row, column);
     }
 
     public String getDataAsText(int row, int column)
@@ -710,9 +703,9 @@ public class DataRegionTable extends DataRegion
     //todo: return edit page
     public void clickEditRow(int rowIndex)
     {
-        WebElement updateLink = updateLink(rowIndex);     // see if mousing over the link gets automation past the idea it's not clickable in the new UI
+        WebElement updateLink = updateLink(rowIndex);
         getWrapper().fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
-        getWrapper().clickAndWait(updateLink(rowIndex));
+        getWrapper().clickAndWait(updateLink);
     }
 
     //todo: return edit page
@@ -904,7 +897,7 @@ public class DataRegionTable extends DataRegion
 
     public void openFilterDialog(String columnName)
     {
-        String columnLabel = elements().getColumnHeader(columnName).getText();
+        String columnLabel = elementCache().getColumnHeader(columnName).getText();
         clickColumnMenu(columnName, false, "Filter...");
 
         final Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
@@ -1006,7 +999,7 @@ public class DataRegionTable extends DataRegion
         TestLogger.log(log);
 
         openFilterDialog(columnName);
-        String columnLabel = elements().getColumnHeader(columnName).getText();
+        String columnLabel = elementCache().getColumnHeader(columnName).getText();
 
         WebDriverWrapper.sleep(500);
 
@@ -1067,7 +1060,7 @@ public class DataRegionTable extends DataRegion
 
     public void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
     {
-        final WebElement menu = elements().getColumnHeader(columnName);
+        final WebElement menu = elementCache().getColumnHeader(columnName);
         getWrapper().scrollIntoView(menu);   // some columns will be scrolled out of view;
         new BootstrapMenu(getDriver(), menu)
                 .clickSubMenu(pageLoad, menuItems);
@@ -1075,7 +1068,7 @@ public class DataRegionTable extends DataRegion
 
     public void openSelectionMenu()
     {
-        WebElement firstColumnHeader = elements().getColumnHeaders().get(0);
+        WebElement firstColumnHeader = elementCache().getColumnHeaders().get(0);
         Locator.XPathLocator loc = Locator.tagWithClass("span", "dropdown-toggle");
         loc.findElement(firstColumnHeader).click();
     }
@@ -1096,14 +1089,14 @@ public class DataRegionTable extends DataRegion
 
     public void checkAllOnPage()
     {
-        WebElement toggle = elements().toggleAllOnPage;
+        WebElement toggle = elementCache().toggleAllOnPage;
         if (!toggle.isSelected())
             doAndWaitForUpdate(toggle::click);
     }
 
     public void uncheckAllOnPage()
     {
-        WebElement toggle = elements().toggleAllOnPage;
+        WebElement toggle = elementCache().toggleAllOnPage;
         if (null != doAndWaitForUpdate(toggle::click))
             doAndWaitForUpdate(toggle::click);
     }
@@ -1121,22 +1114,22 @@ public class DataRegionTable extends DataRegion
 
     public void checkCheckboxByPrimaryKey(Object value)
     {
-        elements().getRowCheckbox(value).check();
+        elementCache().getRowCheckbox(value).check();
     }
 
     public void uncheckCheckboxByPrimaryKey(Object value)
     {
-        elements().getRowCheckbox(value).uncheck();
+        elementCache().getRowCheckbox(value).uncheck();
     }
 
     public void checkCheckbox(int index)
     {
-        elements().getRowCheckbox(index).check();
+        elementCache().getRowCheckbox(index).check();
     }
 
     public void uncheckCheckbox(int index)
     {
-        elements().getRowCheckbox(index).uncheck();
+        elementCache().getRowCheckbox(index).uncheck();
     }
 
     public void pageFirst()
@@ -1231,12 +1224,12 @@ public class DataRegionTable extends DataRegion
 
     public void clickExportButton()
     {
-        elements().getExportButton().click();
+        elementCache().getExportButton().click();
     }
 
     public boolean columnHasChartOption(String columnName, String chartType)
     {
-        BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getColumnHeader(columnName));
+        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().getColumnHeader(columnName));
         menu.expand();
         return menu.findVisibleMenuItems()
                 .stream()
@@ -1269,7 +1262,7 @@ public class DataRegionTable extends DataRegion
 
     public void clickDeleteAllButton()
     {
-        elements().getHeaderButton("Delete All Rows").click();
+        elementCache().getHeaderButton("Delete All Rows").click();
         getWrapper().waitAndClick(Locator.linkWithText("Yes"));  //Confirmation popup
         getWrapper().waitAndClick(Locator.linkWithText("Ok"));  //results popup
     }

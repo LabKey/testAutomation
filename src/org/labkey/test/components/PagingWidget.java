@@ -17,7 +17,7 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
     {
         _dataRegionTable = table;
         _el = Locator.xpath("//div[contains(@class,'labkey-pagination')]")
-                .findWhenNeeded(_dataRegionTable.elements().getButtonBar());
+                .findWhenNeeded(_dataRegionTable.elementCache().getButtonBar());
     }
 
     @Override
