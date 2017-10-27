@@ -25,12 +25,12 @@ public abstract class Locators
     public static final Locator signInLink = Locator.tagWithAttributeContaining("a", "href", "login.view");
     public static final Locator.XPathLocator folderTab = Locator.tagWithClass("div", "lk-nav-tabs-ct").append(Locator.tagWithClass("ul", "lk-nav-tabs")).childTag("li");
 
-    public static Locator.CssLocator headerContainer()
+    public static Locator.XPathLocator headerContainer()
     {
-        return Locator.css(".lk-header-ct");
+        return Locator.byClass("lk-header-ct");
     }
 
-    public static Locator.CssLocator floatingHeaderContainer()
+    public static Locator.XPathLocator floatingHeaderContainer()
     {
         return headerContainer().withClass("box-shadow");
     }
@@ -51,7 +51,7 @@ public abstract class Locators
 
     public static Locator footerPanel()
     {
-        return Locator.css(".footer-block");
+        return Locator.byClass("footer-block");
     }
 
     public static Locator.XPathLocator pageSignal(String signalName)

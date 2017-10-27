@@ -16,7 +16,7 @@
 package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -89,8 +89,8 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
             return getDriver().findElement(by);
         }
 
-        public WebElement headerBlock = Locator.css("body > div.labkey-main > header-block").findWhenNeeded(this);
-        public WebElement bodyBlock = Locator.css("body > div.labkey-main > body-block").findWhenNeeded(this);
-        public WebElement footerBlock = Locator.css("body > div.labkey-main > footer-block").findWhenNeeded(this);
+        public WebElement headerBlock = Locators.headerContainer().findWhenNeeded(this);
+        public WebElement bodyBlock = Locators.bodyPanel().findWhenNeeded(this);
+        public WebElement footerBlock = Locators.footerPanel().findWhenNeeded(this);
     }
 }
