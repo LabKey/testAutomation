@@ -548,7 +548,7 @@ public class ScatterPlotTest extends GenericChartsTest
         String formLanguageError = "The saved x measure, " + MEASURE_FORM_LANGUAGE + ", is not available. It may have been renamed or removed.";
         waitForText(formLanguageError);
         clickButton("Edit");
-        final Window errorWindow = Window().withTitle("Error").waitFor(getDriver());
+        final Window errorWindow = Window(getDriver()).withTitle("Error").waitFor();
         assertEquals("Wrong error message", formLanguageError, errorWindow.getBody());
         errorWindow.clickButton("OK", 0);
         chartTypeDialog = new ChartTypeDialog(getDriver());

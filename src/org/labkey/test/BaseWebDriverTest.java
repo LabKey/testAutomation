@@ -1389,9 +1389,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (changed)
         {
             clickButton("Save Changes", 0);
-            Window window = Window().withTitle("Success").waitFor(getDriver());
-            window.clickButton("OK", 0);
-            window.waitForClose();
+            Window window = Window(getDriver()).withTitle("Success").waitFor();
+            window.clickButton("OK", true);
             _ext4Helper.waitForMaskToDisappear();
         }
         else

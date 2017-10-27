@@ -50,6 +50,9 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
         return new WindowFinder(driver);
     }
 
+    /**
+     * @deprecated Use {@link Window#Window(WebDriver)}
+     */
     @Deprecated
     public static WindowFinder Window()
     {
