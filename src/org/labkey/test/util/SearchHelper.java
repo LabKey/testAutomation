@@ -226,16 +226,7 @@ public class SearchHelper
         }
         else // Use header search
         {
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            {
-                new SiteNavBar(_test.getDriver()).search(searchTerm);
-            }
-            else
-            {
-                _test.setFormElement(Locator.id("search-input"), searchTerm);
-                _test.pressEnter(Locator.id("search-input"));
-                _test.waitForElement(Locator.id("query"));
-            }
+            new SiteNavBar(_test.getDriver()).search(searchTerm);
         }
     }
 

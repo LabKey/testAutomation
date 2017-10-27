@@ -60,7 +60,6 @@ import static org.junit.Assert.fail;
 @Category({DailyB.class})
 public class FolderExportTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
     String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Test wiki", "Study Data Tools", "Lists", "~!@#$%^&*()_+query web part", "Report web part", "Workbooks"};
     File dataDir = TestFileUtils.getSampleData("FolderExport");

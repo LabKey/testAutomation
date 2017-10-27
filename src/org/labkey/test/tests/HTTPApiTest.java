@@ -33,7 +33,6 @@ import java.util.List;
 @Category({DailyA.class})
 public class HTTPApiTest extends BaseWebDriverTest
 {
-    private boolean foo = setIsBootstrapWhitelisted(true);
     private static final String LIST_NAME = "Test List";
 
     private static final ListHelper.ListColumn COL1 = new ListHelper.ListColumn("Like", "Like", ListHelper.ListColumnType.String, "What the color is like");

@@ -52,7 +52,6 @@ import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
 @Category({BVT.class, FileBrowser.class})
 public class FileContentUploadTest extends BaseWebDriverTest
 {
-    private boolean foo = setIsBootstrapWhitelisted(true);
     private final SearchHelper _searchHelper = new SearchHelper(this);
 
     private static final String FILE_DESCRIPTION = "FileContentTestFile";

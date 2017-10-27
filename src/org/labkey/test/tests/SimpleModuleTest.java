@@ -76,7 +76,6 @@ import static org.junit.Assert.fail;
 @Category({DailyA.class})
 public class SimpleModuleTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     public static final String FOLDER_TYPE = "My XML-defined Folder Type"; // Folder type defined in customFolder.foldertype.xml
     public static final String TABBED_FOLDER_TYPE = "My XML-defined Tabbed Folder Type";
     public static final String MODULE_NAME = "simpletest";

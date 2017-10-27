@@ -34,7 +34,6 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 @Category(BVT.class)
 public class MicroarrayTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "MicroarrayBVTProject";
     private static final String EXTRACTION_SERVER = "http://www.google.com";
     private static final String ASSAY_NAME = "Agilent mRNA 1-Color Microarray v10.";
@@ -209,9 +208,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         String name = "unneeded view";
         _customizeViewsHelper.saveCustomView(name);
         assertElementNotPresent(Locator.tagWithClass("*", "labkey-error").withPredicate("string-length() > 0"));
-        assertElementPresent(IS_BOOTSTRAP_LAYOUT ?
-                Locator.tagWithClassContaining("div", "lk-region-context-action").withDescendant(Locator.tagWithText("span", name)) :
-                Locator.css(".labkey-dataregion-msg").withText("View: " + name));
+        assertElementPresent(Locator.tagWithClassContaining("div", "lk-region-context-action").withDescendant(Locator.tagWithText("span", name)));
 
         //Issue 16936: Microarray, Viability, Elispot, and other assays fail to find custom run view
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -258,14 +255,7 @@ public class MicroarrayTest extends BaseWebDriverTest
 
     private void goToDashboard()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            navigateToFolder(getProjectName(), PROJECT_NAME);
-        }
-        else
-        {
-            clickAndWait(Locator.linkWithText("Microarray Dashboard"));
-        }
+        clickProject(getProjectName());
         DataRegion(getDriver()).withName("AssayList").waitFor();
     }
 

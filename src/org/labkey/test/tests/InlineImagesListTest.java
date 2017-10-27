@@ -49,7 +49,6 @@ import static org.junit.Assert.assertTrue;
 @Category(DailyB.class)
 public class InlineImagesListTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     protected final static String LIST_NAME = "InlineImagesList";
     protected final static String LIST_KEY_NAME = "Key";
     protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;

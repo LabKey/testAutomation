@@ -36,8 +36,6 @@ import java.util.List;
 @Category({DailyA.class, Wiki.class})
 public class EmbeddedWebPartTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     protected  final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "Embedded web part test";
 
     @Override

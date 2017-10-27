@@ -38,7 +38,6 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class, Wiki.class})
 public class WikiLongTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     PortalHelper portalHelper = new PortalHelper(this);
 
     private static final String PROJECT_NAME = "WikiVerifyProject";

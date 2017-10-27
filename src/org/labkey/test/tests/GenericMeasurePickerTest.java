@@ -45,7 +45,6 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Reports.class, Charting.class})
 public class GenericMeasurePickerTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
     private static final String DATASET = "HIV Test Results";
 

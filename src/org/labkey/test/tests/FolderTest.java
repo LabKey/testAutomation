@@ -43,7 +43,6 @@ import static org.junit.Assert.assertNotNull;
 @Category({DailyB.class})
 public class FolderTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static String secondProject = "FolderTestProject2";
 
     @Override

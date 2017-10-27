@@ -35,7 +35,6 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class, Wiki.class})
 public class TimelineTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     PortalHelper portalHelper = new PortalHelper(this);
     WikiHelper wikiHelper = new WikiHelper(this);
 

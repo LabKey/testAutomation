@@ -37,9 +37,7 @@ public class SearchForm extends Component
     public SearchForm(WebDriver driver, SearchContext parent)
     {
         _driver = new WebDriverWrapperImpl(driver);
-        _componentElement = Locator.xpath(LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                "//*[@class=' lk-search-form']" :
-                "//*[@class='labkey-search-form']").findElement(parent);
+        _componentElement = Locator.byClass("lk-search-form").findElement(parent);
     }
 
     @Override
@@ -74,18 +72,12 @@ public class SearchForm extends Component
 
         private WebElement searchBox()
         {
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-                return Locator.input("q").findElement(getContext());
-            else
-                return Locator.id("query").findElement(getContext());
+            return Locator.input("q").findElement(getContext());
         }
 
         private WebElement searchButton()
         {
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-                return Locator.tagWithClass("a", "search-overlay fa fa-search").findElement(getContext());
-            else
-                return Locator.lkButton("Search").findElement(getContext());
+            return Locator.tagWithClass("a", "search-overlay fa fa-search").findElement(getContext());
         }
 
         private WebElement helpLink()

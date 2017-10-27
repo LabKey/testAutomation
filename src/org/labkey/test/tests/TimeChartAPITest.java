@@ -40,8 +40,6 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class TimeChartAPITest extends TimeChartTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private static final String WIKIPAGE_NAME = "VisualizationGetDataAPITest";
 
     private static final String[] GETDATA_API_TEST_TITLES = {

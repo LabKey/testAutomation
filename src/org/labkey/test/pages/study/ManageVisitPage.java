@@ -109,9 +109,7 @@ public class ManageVisitPage extends LabKeyPage<ManageVisitPage.ElementCache>
 
         WebElement getVisitEditLink(String label)
         {
-            Locator.XPathLocator loc = Locator.xpath("//tr[./td[text() = '" + label + "']]/td/a[text() = 'edit']");
-            if (IS_BOOTSTRAP_LAYOUT)
-                loc = Locator.xpath("//tr[./td[text() = '" + label + "']]/td/a[@data-original-title = 'edit']");
+            Locator.XPathLocator loc = Locator.xpath("//tr[./td[text() = '" + label + "']]/td/a[@data-original-title = 'edit']");
 
             return visitsTableLoc.append(loc).findElement(this);
         }

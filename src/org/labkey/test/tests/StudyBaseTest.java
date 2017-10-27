@@ -70,7 +70,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void setupRequestStatuses()
     {
-        clickTab("Manage");
+        goToManageStudy();
         clickAndWait(Locator.linkWithText("Manage Request Statuses"));
         setFormElement(Locator.name("newLabel"), "New Request");
         clickButton("Save");
@@ -82,23 +82,6 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         setFormElement(Locator.name("newLabel"), "Rejected");
         checkCheckbox(Locator.checkboxByName("newFinalState"));
         uncheckCheckbox(Locator.checkboxByName("newSpecimensLocked"));
-        clickButton("Done");
-    }
-
-    protected void setupSpecimenManagement()
-    {
-        goToManageStudy();
-        clickAndWait(Locator.linkWithText("Manage Request Statuses"));
-        setFormElement(Locator.name("newLabel"), "New Request");
-        clickButton("Save");
-        setFormElement(Locator.name("newLabel"), "Processing");
-        clickButton("Save");
-        setFormElement(Locator.name("newLabel"), "Completed");
-        checkCheckbox(Locator.name("newFinalState"));
-        clickButton("Save");
-        setFormElement(Locator.name("newLabel"), "Rejected");
-        checkCheckbox(Locator.name("newFinalState"));
-        uncheckCheckbox(Locator.name("newSpecimensLocked"));
         clickButton("Done");
     }
 
@@ -278,17 +261,12 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.checkboxByTitle("Pipeline"));
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            clickButton("Update Folder");
-        } else
-        {
-            submit();
-        }
-        new PortalHelper(getDriver()).addWebPart("Data Pipeline");
-        new PortalHelper(getDriver()).addWebPart("Datasets");
-        new PortalHelper(getDriver()).addWebPart("Specimens");
-        new PortalHelper(getDriver()).addWebPart("Views");
+        clickButton("Update Folder");
+        PortalHelper portalHelper = new PortalHelper(getDriver());
+        portalHelper.addWebPart("Data Pipeline");
+        portalHelper.addWebPart("Datasets");
+        portalHelper.addWebPart("Specimens");
+        portalHelper.addWebPart("Views");
         // Set a magic variable to prevent the data region from refreshing out from under us, which causes problems
         // in IE testing
         executeScript("LABKEY.disablePipelineRefresh = true;");
@@ -330,22 +308,10 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     protected void goToManageStudyPage(String projectName, String studyName)
     {
         log("Going to Manage Study Page of: " + studyName);
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            navigateToFolder(projectName, studyName);
-            waitAndClick(Locator.linkWithText("Manage Study"));
-            waitForElement(Locator.tagWithClassContaining("div", "lk-body-title")
-                    .withChild(Locator.tagWithText("h3", "Manage Study")));
-        }
-        else
-        {
-            waitForElement(Locator.id("folderBar"));
-            if (!getText(Locator.id("folderBar")).equals(projectName))
-                clickProject(projectName);
-            clickFolder(studyName);
-            waitAndClick(Locator.linkWithText("Manage Study"));
-            waitForElement(Locator.xpath("id('labkey-nav-trail-current-page')[text()='Manage Study']"));
-        }
+        navigateToFolder(projectName, studyName);
+        waitAndClick(Locator.linkWithText("Manage Study"));
+        waitForElement(Locator.tagWithClassContaining("div", "lk-body-title")
+                .withChild(Locator.tagWithText("h3", "Manage Study")));
     }
 
     protected void goToSpecimenData()

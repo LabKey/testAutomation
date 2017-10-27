@@ -40,7 +40,6 @@ import java.util.List;
 @Category({DailyA.class, Assays.class})
 public class NabMultiVirusPlateTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private static final String PLATE_TEMPLATE_NAME = "NabMultiVirusTest Template";
 
     protected static final String MULTI_VIRUS_ASSAY_NAB = "MultiVirusNab";

@@ -22,8 +22,6 @@ import org.labkey.test.categories.DRT;
 @Category({DRT.class, Base.class})
 public class SecurityShortTest extends SecurityTest
 {
-    private boolean foo = setIsBootstrapWhitelisted(true);
-
     @Override
     protected boolean isQuickTest()
     {

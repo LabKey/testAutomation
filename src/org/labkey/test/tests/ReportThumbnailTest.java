@@ -45,7 +45,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class})
 public class ReportThumbnailTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "ReportThumbnailTest";
     private static final String PROJECT_NAME_ROUNDTRIP = "ReportThumbnailTest_Roundtrip";
     private static final File TEST_STUDY = TestFileUtils.getSampleData("studies/LabkeyDemoStudyWithCharts.folder.zip");

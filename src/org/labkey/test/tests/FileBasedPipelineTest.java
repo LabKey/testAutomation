@@ -44,13 +44,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
 public class FileBasedPipelineTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String PIPELINETEST_MODULE = "pipelinetest";
     private static final File SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/sample.txt");
     private final PipelineAnalysisHelper pipelineAnalysis = new PipelineAnalysisHelper(this);

@@ -40,7 +40,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, DailyB.class, DailyC.class, Git.class, CustomModules.class})
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     @Override
     protected String getProjectName()
     {

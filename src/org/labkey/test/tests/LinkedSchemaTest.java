@@ -36,7 +36,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This test created linked schemas from a source container in a target container.
@@ -86,7 +89,6 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Data.class})
 public class LinkedSchemaTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private SchemaHelper _schemaHelper = new SchemaHelper(this);
     private static final String PROJECT_NAME = LinkedSchemaTest.class.getSimpleName() + "Project";
     private static final String SOURCE_FOLDER = "SourceFolder";

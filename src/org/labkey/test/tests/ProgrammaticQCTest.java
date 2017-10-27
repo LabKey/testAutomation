@@ -26,14 +26,13 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebDriverException;
 
-import java.io.*;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyA.class})
 public class ProgrammaticQCTest extends AbstractQCAssayTest
 {
-    {setIsBootstrapWhitelisted(true);}
     protected final static String TEST_PROGRAMMATIC_QC_PRJ = "Programmatic QC Test";
     protected final static String QC_ASSAY = "QC Assay";
     protected final static String TRANSFORM_ASSAY = "Transform Assay";

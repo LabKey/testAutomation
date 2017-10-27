@@ -164,9 +164,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         _driver.log(new Date().toString());
         _driver.goToSiteAdmins();
-        _driver.clickAndWait(LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?    // navigates to security-group.view?group=Administrators
-                Locator.tag("ol").append(Locator.linkContainingText("Permissions")) :
-                Locator.linkContainingText("Permissions")); // link in
+        _driver.clickAndWait(Locator.tag("ol").append(Locator.linkContainingText("Permissions")));
         _driver._ext4Helper.clickTabContainingText("Permissions");
         _selectPermission(userName, userName, permissionString);
         _driver.log(new Date().toString());

@@ -34,12 +34,11 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class})
 public class MS1Test extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     public static final String PROJ_MAIN = "~~MS1 BVT PROJECT~~"; //use spaces to test for url encoding issues
     public static final String MS1_FOLDER_TYPE = "MS1";
     public static final String X_PROTOCOL = "X Search";

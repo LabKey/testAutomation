@@ -45,7 +45,6 @@ import static org.junit.Assert.fail;
 @Category({DailyA.class})
 public class AssayAPITest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);} // whitelist this test
     protected final static File CREST_FILE =  TestFileUtils.getSampleData("InlineImages/crest.png");
     protected final static File SCREENSHOT_FILE = TestFileUtils.getSampleData("InlineImages/screenshot.png");
     protected final static File FOO_XLS_FILE = TestFileUtils.getSampleData("InlineImages/foo.xls");

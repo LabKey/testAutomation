@@ -42,7 +42,6 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class, Assays.class})
 public class NabHighThroughputAssayTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
     private static final String PLATE_TEMPLATE_NAME = "NabHighThroughputAssayTest Template";
     private static final String CPD_PLATE_TEMPLATE_NAME = "NabHighThroughputAssayTest Template CPD";

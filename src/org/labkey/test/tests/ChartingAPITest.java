@@ -47,13 +47,14 @@ import org.openqa.selenium.interactions.Actions;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({BVT.class, Charting.class})
 public class ChartingAPITest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     @Override
     public BrowserType bestBrowser()
     {

@@ -44,7 +44,6 @@ import static org.junit.Assert.fail;
 @Category({DailyA.class, Data.class})
 public class DataRegionTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String LIST_NAME = "WebColors" + INJECT_CHARS_1;
     private static final ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;
     private static final String LIST_KEY_NAME = "Key";

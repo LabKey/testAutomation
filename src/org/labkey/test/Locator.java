@@ -578,8 +578,7 @@ public abstract class Locator extends By
      */
     public static XPathLocator lkButton()
     {
-        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ? tagWithClass("a", "labkey-button").notHidden() :
-                tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button') or contains(@class, 'labkey-disabled-button')");
+        return tagWithClass("a", "labkey-button").notHidden();
     }
 
     public static XPathLocator enabledLkButton()
@@ -614,9 +613,7 @@ public abstract class Locator extends By
 
     public static XPathLocator lkButtonDisabled(String text)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            return tag("span").withPredicate("normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button'").withText(text);
-        return tag("a").withPredicate("normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button'").withText(text);
+        return tag("span").withPredicate("normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button'").withText(text);
     }
 
     public static XPathLocator lkButtonContainingText(String text)
@@ -834,30 +831,8 @@ public abstract class Locator extends By
     {
         DecimalFormat numFormat = new DecimalFormat("#,###");
 
-        int rowsPerPage = lastRow - firstRow + 1;
-        int pageCount = (int)Math.ceil((double)maxRows / (double)rowsPerPage);
-        int currentPage = (int)Math.ceil((double)lastRow / (double)rowsPerPage);
-
-        boolean hasFirstLink = currentPage > 2;
-        boolean hasPrevLink = currentPage > 1;
-        boolean hasNextLink = currentPage < pageCount;
-        boolean hasLastLink = currentPage < pageCount - 1;
-
-        StringBuilder paginationText = new StringBuilder();
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            paginationText.append(String.format("%s - %s of %s", numFormat.format(firstRow), numFormat.format(lastRow), numFormat.format(maxRows)));
-        else
-        {
-            if (hasFirstLink) paginationText.append("\u00AB First ");
-            if (hasPrevLink) paginationText.append("\u2039 Prev ");
-            paginationText.append(String.format("%s - %s of %s", numFormat.format(firstRow), numFormat.format(lastRow), numFormat.format(maxRows)));
-            if (hasNextLink) paginationText.append(" Next \u203A");
-            if (hasLastLink) paginationText.append(" Last \u00BB");
-        }
-
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            return paginationText().child(Locator.tagWithText("a", paginationText.toString()));
-        return paginationText().withText(paginationText.toString());
+        String paginationText = String.format("%s - %s of %s", numFormat.format(firstRow), numFormat.format(lastRow), numFormat.format(maxRows));
+        return paginationText().child(Locator.tagWithText("a", paginationText));
     }
 
     /**
@@ -870,16 +845,12 @@ public abstract class Locator extends By
 
     public static XPathLocator paginationText()
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            return tagWithClassContaining("div", "paging-widget");
-        return tagWithClass("div", "labkey-pagination");
+        return tagWithClassContaining("div", "paging-widget");
     }
 
     public static XPathLocator pageHeader(String headerText)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            return Locator.tagWithClass("div", "lk-body-title").append(Locator.tagWithText("h3", headerText));
-        return id("labkey-nav-trail-current-page").withText(headerText);
+        return Locators.bodyTitle(headerText);
     }
 
     /**

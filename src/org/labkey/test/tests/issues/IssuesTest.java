@@ -67,7 +67,6 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
 @Category({Issues.class, DailyA.class, Data.class})
 public class IssuesTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String ISSUE_TITLE_0 = "A very serious issue";
     private static final String ISSUE_TITLE_1 = "Even more serious issue";
     private static final String USER1 = "user1_issuetest@issues.test";

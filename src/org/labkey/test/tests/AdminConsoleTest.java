@@ -38,7 +38,6 @@ import static org.junit.Assert.*;
 @Category({DailyA.class})
 public class AdminConsoleTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     protected static final String APP_ADMIN_USER = "app_admin_test_user@adminconsole.test";
     protected static final String APP_ADMIN_USER_PASS = PasswordUtil.getPassword();
 

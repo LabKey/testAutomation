@@ -36,7 +36,6 @@ import static org.junit.Assert.assertNotNull;
 @Category({DailyA.class})
 public class UserPermissionsTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     PortalHelper portalHelper = new PortalHelper(this);
     protected static final String PERM_PROJECT_NAME = "PermissionCheckProject";
     protected static final String DENIED_SUB_FOLDER_NAME = "UnlinkedFolder";

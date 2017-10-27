@@ -25,15 +25,15 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PortalHelper;
+
 import java.util.Arrays;
 import java.util.List;
+
 import static org.junit.Assert.assertTrue;
 
 @Category(DailyB.class)
 public class FileBrowserIconsTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     protected final static String SAMPLE_DATA_LOC =  "/sampledata/fileTypes/";
 
     @Override

@@ -149,9 +149,8 @@ public class DataRegionTable extends DataRegion
     {
         if (!getCustomizeView().isPanelExpanded())
         {
-            String menuButtonText = IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views";
             getWrapper().doAndWaitForPageSignal(() ->
-                            clickHeaderMenu(menuButtonText, false, "Customize Grid"),
+                            getViewsMenu().clickSubMenu(false, "Customize Grid"),
                     DataRegion.PANEL_SHOW_SIGNAL);
         }
         return getCustomizeView();
@@ -277,7 +276,7 @@ public class DataRegionTable extends DataRegion
     {
         String expected = firstRow + " - " + lastRow + " of " + totalRows;
         String fullPaginationText = Locator.css(".labkey-pagination")
-                .findElement(IS_BOOTSTRAP_LAYOUT ? elements().getButtonBar() : this).getText();
+                .findElement(elements().getButtonBar()).getText();
 
         Pattern pattern = Pattern.compile("\\d+ - \\d+ of \\d+");
         Matcher matcher = pattern.matcher(fullPaginationText);
@@ -383,14 +382,8 @@ public class DataRegionTable extends DataRegion
 
     public static Locator.XPathLocator detailsLinkLocator()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            return Locator.tagWithClass("td", "labkey-selectors")
-                    .child("a").withAttribute("data-original-title", "details");
-        }
-
-        return Locator.tagWithClass("td","labkey-details")
-                    .child("a");
+        return Locator.tagWithClass("td", "labkey-selectors")
+                .child("a").withAttribute("data-original-title", "details");
     }
 
     public WebElement detailsLink(int row)
@@ -400,13 +393,8 @@ public class DataRegionTable extends DataRegion
 
     public static Locator.XPathLocator updateLinkLocator()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            return Locator.tagWithClass("td","labkey-selectors")
-                    .child("a").withAttribute("data-original-title", "edit");
-        }
-
-        return Locator.tag("td").withClass("labkey-update").child("a");
+        return Locator.tagWithClass("td","labkey-selectors")
+                .child("a").withAttribute("data-original-title", "edit");
     }
 
     /**
@@ -637,9 +625,7 @@ public class DataRegionTable extends DataRegion
         {
             while (true)
             {
-                String value = IS_BOOTSTRAP_LAYOUT ?
-                        getWrapper().getAttribute(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) +"]//tr[" + (row+1) + "]//input[@name='.select']"), "value"):
-                        getWrapper().getAttribute(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) +"]//tr[" + (row+3) + "]//input[@name='.select']"), "value");
+                String value = getWrapper().getAttribute(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) +"]//tr[" + (row+1) + "]//input[@name='.select']"), "value");
                 _mapRows.put(value, row);
                 if (value.equals(pk))
                     return row;
@@ -724,16 +710,9 @@ public class DataRegionTable extends DataRegion
     //todo: return edit page
     public void clickEditRow(int rowIndex)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            WebElement updateLink = updateLink(rowIndex);     // see if mousing over the link gets automation past the idea it's not clickable in the new UI
-            getWrapper().fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
-            getWrapper().clickAndWait(updateLink(rowIndex));
-        }
-        else
-        {
-            getWrapper().clickAndWait(updateLink(rowIndex));
-        }
+        WebElement updateLink = updateLink(rowIndex);     // see if mousing over the link gets automation past the idea it's not clickable in the new UI
+        getWrapper().fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
+        getWrapper().clickAndWait(updateLink(rowIndex));
     }
 
     //todo: return edit page
@@ -744,16 +723,9 @@ public class DataRegionTable extends DataRegion
 
     public void clickRowDetails(int rowIndex)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            WebElement updateLink = detailsLink(rowIndex);     // see if mousing over the link gets automation past the idea it's not clickable in the new UI
-            getWrapper().fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
-            getWrapper().clickAndWait(detailsLink(rowIndex));
-        }
-        else
-        {
-            getWrapper().clickAndWait(detailsLink(rowIndex));
-        }
+        WebElement updateLink = detailsLink(rowIndex);
+        getWrapper().fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
+        getWrapper().clickAndWait(detailsLink(rowIndex));
     }
 
     public void clickRowDetails(String key)
@@ -916,17 +888,9 @@ public class DataRegionTable extends DataRegion
 
         if (errorExpected)
         {
-            if (IS_BOOTSTRAP_LAYOUT)
-            {
-                getWrapper().assertExt4MsgBox("You must select at least one field to display in the grid.", "OK");
-            }
-            else
-            {
-                Window removeError = new Window("Error", getDriver());
-                assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
-                removeError.clickButton("OK", 0);
-                removeError.waitForClose();
-            }
+            Window removeError = new Window("Selection Required", getDriver());
+            assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
+            removeError.clickButton("OK", true);
         }
     }
 
@@ -1105,20 +1069,14 @@ public class DataRegionTable extends DataRegion
     {
         final WebElement menu = elements().getColumnHeader(columnName);
         getWrapper().scrollIntoView(menu);   // some columns will be scrolled out of view;
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new BootstrapMenu(getDriver(), menu).clickSubMenu(pageLoad,  menuItems);
-        }
-        else
-        {
-            getWrapper()._ext4Helper.clickExt4MenuButton(pageLoad, menu, false, menuItems);
-        }
+        new BootstrapMenu(getDriver(), menu)
+                .clickSubMenu(pageLoad, menuItems);
     }
 
     public void openSelectionMenu()
     {
         WebElement firstColumnHeader = elements().getColumnHeaders().get(0);
-        Locator.XPathLocator loc = IS_BOOTSTRAP_LAYOUT ? Locator.tagWithClass("span", "dropdown-toggle") : Locator.xpath("./div/span");
+        Locator.XPathLocator loc = Locator.tagWithClass("span", "dropdown-toggle");
         loc.findElement(firstColumnHeader).click();
     }
 
@@ -1184,38 +1142,25 @@ public class DataRegionTable extends DataRegion
     public void pageFirst()
     {
         TestLogger.log("Clicking page first on data region '" + getDataRegionName() + "'");
-        if (IS_BOOTSTRAP_LAYOUT)
-            getPagingWidget().clickGoToFirst();
-        else
-            clickDataRegionPageLink("First Page");
+        getPagingWidget().clickGoToFirst();
     }
 
     public void pageLast()
     {
         TestLogger.log("Clicking page last on data region '" + getDataRegionName() + "'");
-        if (IS_BOOTSTRAP_LAYOUT)
-            getPagingWidget().clickGoToLast();
-        else
-            clickDataRegionPageLink("Last Page");
+        getPagingWidget().clickGoToLast();
     }
 
     public void pageNext()
     {
         TestLogger.log("Clicking page next on data region '" + getDataRegionName() + "'");
-        if (IS_BOOTSTRAP_LAYOUT)
-            doAndWaitForUpdate(getPagingWidget()::clickNextPage);
-        else
-            clickDataRegionPageLink("Next Page");
+        doAndWaitForUpdate(getPagingWidget()::clickNextPage);
     }
 
     public void pagePrev()
     {
         TestLogger.log("Clicking page previous on data region '" + getDataRegionName() + "'");
-        if (IS_BOOTSTRAP_LAYOUT)
-            doAndWaitForUpdate(getPagingWidget()::clickPreviousPage);
-        else
-            clickDataRegionPageLink("Previous Page");
-
+        doAndWaitForUpdate(getPagingWidget()::clickPreviousPage);
     }
 
     public void clickDataRegionPageLink(String title)
@@ -1226,15 +1171,8 @@ public class DataRegionTable extends DataRegion
 
     public void showAll()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            openSelectionMenu();
-            Locator.linkContainingText("Show All").waitForElement(getDriver(), 2000).click();
-        }
-        else
-        {
-            clickHeaderMenu("Paging", "Show All");
-        }
+        openSelectionMenu();
+        Locator.linkContainingText("Show All").waitForElement(getDriver(), 2000).click();
     }
 
     public void setPageSize(int size)
@@ -1244,15 +1182,12 @@ public class DataRegionTable extends DataRegion
 
     public void setPageSize(int size, boolean wait)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-            getPagingWidget().setPageSize(size, wait);
-        else
-            clickHeaderMenu("Paging", wait, size + " per page");
+        getPagingWidget().setPageSize(size, wait);
     }
 
     public void setContainerFilter(ContainerFilterType filterType)
     {
-        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views", true, "Folder Filter", filterType.getLabel());
+        getViewsMenu().clickSubMenu(true, "Folder Filter", filterType.getLabel());
     }
 
     /**
@@ -1301,27 +1236,11 @@ public class DataRegionTable extends DataRegion
 
     public boolean columnHasChartOption(String columnName, String chartType)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getColumnHeader(columnName));
-            menu.expand();
-            return menu.findVisibleMenuItems()
-                    .stream()
-                    .anyMatch((m)-> m.getText().equalsIgnoreCase(chartType));
-        }
-        else
-        {
-            WebElement menu = elements().getColumnHeader(columnName);
-            List<String> items = getWrapper().getTexts(getWrapper()._ext4Helper.getMenuItems(menu));
-            for (String item : items)
-            {
-                if (item.toLowerCase().contains(chartType.toLowerCase()))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getColumnHeader(columnName));
+        menu.expand();
+        return menu.findVisibleMenuItems()
+                .stream()
+                .anyMatch((m)-> m.getText().equalsIgnoreCase(chartType));
     }
 
     @Deprecated // use clickInsertNewRow()
@@ -1334,38 +1253,18 @@ public class DataRegionTable extends DataRegion
     *  under an 'insert data' top-level button. This handles either case. */
     public void clickInsertNewRow()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            if (hasHeaderMenu("Insert data"))
-                clickHeaderMenu("Insert data", getInsertNewButtonText());
-            else
-                clickHeaderButton(getInsertNewButtonText());
-        }
+        if (hasHeaderMenu("Insert data"))
+            clickHeaderMenu("Insert data", getInsertNewButtonText());
         else
-        {
-            if (elements().getHeaderButtonOrNull(getInsertNewButtonText()) != null)
-                elements().getHeaderButton(getInsertNewButtonText()).click();
-            else
-                clickHeaderMenu("Insert", getInsertNewButtonText());
-        }
+            clickHeaderButton(getInsertNewButtonText());
     }
 
     public void clickImportBulkData()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            if (hasHeaderMenu("Insert data"))
-                clickHeaderMenu("Insert data", getImportBulkDataText());
-            else
-                clickHeaderButton(getInsertNewButtonText());
-        }
+        if (hasHeaderMenu("Insert data"))
+            clickHeaderMenu("Insert data", getImportBulkDataText());
         else
-        {
-            if (elements().getHeaderButtonOrNull(getImportBulkDataText()) != null)
-                elements().getHeaderButton(getInsertNewButtonText()).click();
-            else
-                clickHeaderMenu("Insert", getImportBulkDataText());
-        }
+            clickHeaderButton(getInsertNewButtonText());
     }
 
     public void clickDeleteAllButton()
@@ -1377,12 +1276,12 @@ public class DataRegionTable extends DataRegion
 
     public static String getInsertNewButtonText()
     {
-        return IS_BOOTSTRAP_LAYOUT ? "Insert new row" : "Insert New Row";
+        return "Insert new row";
     }
 
     public static String getImportBulkDataText()
     {
-        return IS_BOOTSTRAP_LAYOUT ? "Import bulk data" : "Import Bulk Data";
+        return "Import bulk data";
     }
 
     public void clickApplyGridFilter()
@@ -1436,8 +1335,7 @@ public class DataRegionTable extends DataRegion
 
         public static Locator.XPathLocator columnHeader(String regionName, String fieldName)
         {
-            return Locator.tagWithAttribute(IS_BOOTSTRAP_LAYOUT ? "th":"td",
-                    "column-name", regionName + ":" + fieldName);
+            return Locator.tagWithAttribute("th", "column-name", regionName + ":" + fieldName);
         }
 
         public static Locator.XPathLocator floatingHeader()
@@ -1561,9 +1459,8 @@ public class DataRegionTable extends DataRegion
 
         protected List<WebElement> getColumnHeaders()
         {
-            String cssSelector = IS_BOOTSTRAP_LAYOUT ? "th.labkey-column-header" : "td.labkey-column-header";
             if (columnHeaders == null)
-                columnHeaders = ImmutableList.copyOf(Locator.css(cssSelector).findElements(columnHeaderRow));
+                columnHeaders = ImmutableList.copyOf(Locator.css("th.labkey-column-header").findElements(columnHeaderRow));
             return columnHeaders;
         }
 

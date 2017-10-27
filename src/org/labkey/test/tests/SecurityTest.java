@@ -61,7 +61,6 @@ import static org.labkey.test.pages.ConfigureDbLoginPage.PasswordStrength;
 @Category(BVT.class)
 public class SecurityTest extends BaseWebDriverTest
 {
-    private boolean foo = setIsBootstrapWhitelisted(true);
     protected static final String PROJECT_NAME = "SecurityVerifyProject";
     protected static final String ADMIN_USER_TEMPLATE = "_admin.template@security.test";
     protected static final String NORMAL_USER_TEMPLATE = "_user.template@security.test";

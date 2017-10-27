@@ -32,8 +32,6 @@ import java.util.List;
 @Category({DailyA.class})
 public class MenuBarTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private static final String PROJECT_NAME = "MenuBarVerifyProject";
     private static final String WIKI_PAGE_TITLE = "A Wiki Menu" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String WIKI_PAGE_CONTENT = "This is a fancy wiki";

@@ -30,12 +30,11 @@ import org.labkey.test.util.WorkbookHelper.WorkbookFolderType;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class})
 public class WorkbookTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "Workbook Test Project";
     private static final String PROJECT_NAME2 = "Workbook Test Project 2";
     private static final String DEFAULT_WORKBOOK_NAME = "TestWorkbook";

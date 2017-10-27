@@ -1344,15 +1344,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void goToModuleProperties()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-            goToFolderManagement().goToModulePropertiesPane();
-        else
-        {
-            goToFolderManagement();
-            clickAndWait(Locator.linkWithText("Module Properties"));
-            waitForElement(Ext4Helper.Locators.ext4Button("Save Changes"));
-            waitForElementToDisappear(Locator.tag("div").withText("Loading..."));
-        }
+        goToFolderManagement().goToModulePropertiesPane();
     }
 
     protected Ext4FieldRef getModulePropertyFieldRef(ModulePropertyValue property)  //TODO: refactor this into FolderManagementPage.modulePropertyPane
@@ -1416,19 +1408,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void assertNavTrail(String... links)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            String expectedNavTrail = String.join("", links);
-            String navTrail = Locator.tagWithClass("ol", "breadcrumb").findElement(getDriver()).getText();
-            assertEquals("Wrong nav trail", expectedNavTrail, navTrail);
-        }
-        else
-        {
-            String expectedNavTrail = String.join(" >  ", links) + " > ";
-            String navTrail = Locator.id("navTrailAncestors").findElement(getDriver()).getText();
-            assertEquals("Wrong nav trail", expectedNavTrail, navTrail);
-        }
-
+        String expectedNavTrail = String.join("", links);
+        String navTrail = Locator.tagWithClass("ol", "breadcrumb").findElement(getDriver()).getText();
+        assertEquals("Wrong nav trail", expectedNavTrail, navTrail);
     }
 
     public void clickTab(String tabname)
@@ -1439,10 +1421,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void verifyTabSelected(String caption)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-            assertTrue(PortalTab.find(caption, getDriver()).isActive());
-        else
-            assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '" + caption + "']")));
+        assertTrue("Tab not selected: " + caption, PortalTab.find(caption, getDriver()).isActive());
     }
 
     public int getImageWithAltTextCount(String altText)
@@ -1821,19 +1800,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitAndClick(loc);
         // NOTE: consider abstracting this.
         waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
-        waitForElement(IS_BOOTSTRAP_LAYOUT ?
-                Locator.xpath("//div[contains(./@class,'lk-qd-name')]//a[contains(text(), '" + schemaName + "." + queryName + "')]/..") :
-                Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[contains(text(), '" + schemaName + "." + queryName + "')]/.."),
-                30000);
+        waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]//a[contains(text(), '" + schemaName + "." + queryName + "')]/.."), 30000);
     }
 
     public void clickFkExpando(String schemaName, String queryName, String columnName)
     {
         String queryLabel = schemaName + "." + queryName;
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            click(Locator.tagWithClass("img", "lk-qd-expando").withAttribute("lkqdfieldkey", columnName)); // do we really need queryLabel?
-        else
-            click(Locator.xpath("//div/a[text()='" + queryLabel + "']/../../../table/tbody/tr/td/img[(contains(@src, 'plus.gif') or contains(@src, 'minus.gif')) and ../../td[text()='" + columnName + "']]"));
+        click(Locator.tagWithClass("img", "lk-qd-expando").withAttribute("lkqdfieldkey", columnName)); // do we really need queryLabel?
     }
 
     public DataRegionTable viewQueryData(String schemaName, String queryName)
@@ -1844,9 +1817,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public DataRegionTable viewQueryData(String schemaName, String queryName, @Nullable String moduleName)
     {
         selectQuery(schemaName, queryName);
-        Locator loc = IS_BOOTSTRAP_LAYOUT ?
-                Locator.xpath("//div[contains(@class,'lk-qd-name')]//a[contains(text(),'" + schemaName + "." + queryName + "')]") :
-                Locator.xpath("//div[contains(@class,'lk-qd-name')]/a[contains(text(),'" + schemaName + "." + queryName + "')]");
+        Locator loc = Locator.xpath("//div[contains(@class,'lk-qd-name')]//a[contains(text(),'" + schemaName + "." + queryName + "')]");
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
         if (moduleName != null) // 12474
@@ -1888,14 +1859,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForElement(Locator.name("ff_newQueryName"));
         setFormElement(Locator.name("ff_newQueryName"), name);
         clickButton("Create and Edit Source", 0);
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            waitForElement(Locators.bodyTitle("Edit " + name));
-        }
-        else
-        {
-            waitForElement(Locator.id("labkey-nav-trail-current-page").withText("Edit " + name));
-        }
+        waitForElement(Locators.bodyTitle("Edit " + name));
         setCodeEditorValue("queryText", sql);
         if (xml != null)
         {

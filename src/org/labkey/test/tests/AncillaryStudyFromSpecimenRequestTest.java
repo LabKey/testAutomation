@@ -25,7 +25,6 @@ import org.labkey.test.util.ExperimentalFeaturesHelper;
 @Category({DailyC.class})
 public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 {
-    {setIsBootstrapWhitelisted(true);}
     public static final String DOV_DATASET = "DOV-1:";
     protected String ANCILLARY_STUDY_NAME = "Anc Study" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     protected String ANCILLARY_STUDY_DESC = "Study description";
@@ -43,7 +42,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 
     public void doVerifySteps()
     {
-        setupSpecimenManagement();
+        setupRequestStatuses();
         selectSpecimens();
         createRequest();
         createStudy();

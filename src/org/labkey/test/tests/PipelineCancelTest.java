@@ -29,8 +29,6 @@ import java.util.List;
 @Category({DailyB.class})
 public class PipelineCancelTest  extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("pipelineCancel/LabkeyDemoStudy.zip");
     @Override
     protected String getProjectName()

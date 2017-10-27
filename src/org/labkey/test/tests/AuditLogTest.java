@@ -53,10 +53,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, Hosting.class})
 public class AuditLogTest extends BaseWebDriverTest
 {
-    {
-        setIsBootstrapWhitelisted(true);
-    }
-
     public static final String USER_AUDIT_EVENT = "User events";
     public static final String GROUP_AUDIT_EVENT = "Group events";
     public static final String QUERY_UPDATE_EVENT = "Query update events";

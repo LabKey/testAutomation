@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
-import org.labkey.test.components.api.ProjectMenu;
 
 import static org.junit.Assert.*;
 
@@ -146,19 +145,12 @@ public class UIContainerHelper extends AbstractContainerHelper
             fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
 
         // verify that we're not on an error page with a check for a project link:
-        _test.openProjectMenu();
-       assertFalse(projectLinkExists(project));
+        _test.projectMenu().open();
+        assertFalse(projectLinkExists(project));
     }
 
     private boolean projectLinkExists(String project) // use the presence of start-menu links to know
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            return _test.projectMenu().projectLinkExists(project);
-        }
-        else
-        {
-            return _test.isElementPresent(Locator.linkWithText(project));
-        }
+        return _test.projectMenu().projectLinkExists(project);
     }
 }

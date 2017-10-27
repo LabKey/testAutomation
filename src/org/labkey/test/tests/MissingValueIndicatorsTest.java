@@ -45,7 +45,6 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 @Category({DailyB.class, Assays.class})
 public class MissingValueIndicatorsTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     @BeforeClass
     public static void beforeTestClass()
     {

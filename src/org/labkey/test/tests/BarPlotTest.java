@@ -36,8 +36,6 @@ import java.net.URL;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class BarPlotTest extends GenericChartsTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
-
     private final String PREG_TEST_RESULTS = "17a. Preg. test result";
     private final String SKIN = "14. Skin";
     private final String BP_DIASTOLIC = "3. BP diastolic /xxx";

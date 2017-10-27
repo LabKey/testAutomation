@@ -64,10 +64,8 @@ import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
@@ -99,7 +97,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
-    @Deprecated
+    @Deprecated // TODO: Remove after release17.3
     public static boolean IS_BOOTSTRAP_LAYOUT = true;
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
 
@@ -121,7 +119,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
             beginAt(WebTestHelper.buildURL("login", "login"));
-            waitForAnyElement("Should be on login or Home portal", Locator.id("email"), IS_BOOTSTRAP_LAYOUT ? Locators.UX_USER_MENU : Locators.USER_MENU);
+            waitForAnyElement("Should be on login or Home portal", Locator.id("email"), Locators.UX_USER_MENU);
         }
 
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
@@ -141,7 +139,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             // verify we're signed in now
             if (!waitFor(() ->
             {
-                if (isElementPresent(IS_BOOTSTRAP_LAYOUT ? Locators.UX_USER_MENU : Locators.USER_MENU))
+                if (isElementPresent(Locators.UX_USER_MENU))
                     return true;
                 bypassSecondaryAuthentication();
                 return false;
@@ -220,7 +218,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         assertTrue("Not signed in", isSignedIn());
         assertFalse("Impersonating", isImpersonating());
-        assertElementPresent(IS_BOOTSTRAP_LAYOUT ? Locators.UX_USER_MENU : Locators.USER_MENU);
+        assertElementPresent(Locators.UX_USER_MENU);
     }
 
     @LogMethod
@@ -487,7 +485,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             if (isImpersonating())
                 simpleSignOut();
         }
-        Locator projectMenu = IS_BOOTSTRAP_LAYOUT ? ProjectMenu.Locators.menuProjectNav : Locators.projectBar;
+        Locator projectMenu = ProjectMenu.Locators.menuProjectNav;
         if (!isElementPresent(projectMenu))
         {
             goToHome();
@@ -941,17 +939,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected void openMenu(String menuText)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            Locator.menuBarItem(menuText).findElement(getDriver()).click();
-        }
-        else
-        {
-            Locator menuItem = Locator.css("#menubar .labkey-main-menu-item").withText(menuText);
-            String menuId = menuItem.findElement(getDriver()).getAttribute("id");
-            String hoverNavigationPart = "_" + menuId.split("-Header")[0];
-            executeScript("HoverNavigation.Parts[\"" +hoverNavigationPart + "\"].show();");
-        }
+        Locator.menuBarItem(menuText).findElement(getDriver()).click();
     }
 
     @LogMethod(quiet = true)
@@ -1075,26 +1063,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      * @deprecated Use {@link #projectMenu().open()}
      */
     @Deprecated
-    public WebElement openProjectMenu()
+    public void openProjectMenu()
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            projectMenu().open();
-            return null;
-        }
-        else
-        {
-            waitForHoverNavigationReady();
-            return shortWait().until(new ExpectedCondition<WebElement>()
-            {
-                @Override
-                public WebElement apply(@Nullable WebDriver driver)
-                {
-                    click(Locators.projectBar);
-                    return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#projectBar_menu .project-nav")).apply(driver);
-                }
-            });
-        }
+        projectMenu().open();
     }
 
     public void clickProject(String project)
@@ -1104,51 +1075,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void clickProject(String project, boolean assertDestination)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            projectMenu().navigateToProject(project);
-        }
-        else
-        {
-            final WebElement projectMenu = openProjectMenu();
-            WebElement projectLink = Locator.linkWithText(project).waitForElement(projectMenu, WAIT_FOR_JAVASCRIPT);
-            clickAt(projectLink, 1, 1, WAIT_FOR_PAGE); // Don't click hidden portion of long links
-        }
+        projectMenu().navigateToProject(project);
         if (assertDestination)
         {
             acceptTermsOfUse(null, true);
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            {
-                waitFor(()-> getCurrentContainer().equals(project), WAIT_FOR_JAVASCRIPT);
-            }
-            else
-            {
-                waitForElement(Locator.id("folderBar").withText(project));
-            }
+            assertEquals("In wrong project", project, getCurrentContainer());
         }
     }
 
     public WebElement openFolderMenu()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            return projectMenu().expandProjectFully(getCurrentProject());
-        }
-        else
-        {
-            waitForElement(Locators.folderMenu.withText());
-            waitForFolderNavigationReady();
-
-            return shortWait().until(new ExpectedCondition<WebElement>()
-            {
-                @Override
-                public WebElement apply(@Nullable WebDriver driver)
-                {
-                    click(Locators.folderMenu);
-                    return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#folderBar_menu .folder-nav")).apply(driver);
-                }
-            });
-        }
+        return projectMenu().expandProjectFully(getCurrentProject());
     }
 
     /**
@@ -1168,28 +1105,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void clickFolder(String folder)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            projectMenu().navigateToFolder(getCurrentProject(), folder);
-        }
-        else
-        {
-            final WebElement folderMenu = openFolderMenu();
-            expandFolderTree(folder);
-            clickAndWait(Locator.linkWithText(folder).waitForElement(folderMenu, WAIT_FOR_JAVASCRIPT));
-        }
+        projectMenu().navigateToFolder(getCurrentProject(), folder);
     }
 
     public void navigateToFolder(String project, String folderName)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-            projectMenu().navigateToFolder(project, folderName);
-        else
-        {
-            if (!getText(Locator.id("folderBar")).equals(project))
-                clickProject(project);
-            clickFolder(folderName);
-        }
+        projectMenu().navigateToFolder(project, folderName);
     }
 
     public String getCurrentContainer()
@@ -1284,20 +1205,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if (!isImpersonating())
             throw new IllegalStateException("Not currently impersonating");
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            new SiteNavBar(getDriver()).stopImpersonating();
-        }
-        else
-        {
-            clickUserMenuItem("Stop Impersonating");
-        }
+        new SiteNavBar(getDriver()).stopImpersonating();
         assertSignedInNotImpersonating();
         if (goHome)
             goToHome();
-
-        if (isImpersonating())
-            throw new IllegalStateException("Failed to stop impersonating");
     }
 
     public void goToHome()

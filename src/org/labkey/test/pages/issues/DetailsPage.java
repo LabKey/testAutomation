@@ -28,7 +28,6 @@ import org.openqa.selenium.WebElement;
 
 public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
 {
-    private boolean IS_BOOTSTRAP_LAYOUT = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
     public DetailsPage(WebDriver driver)
     {
         super(driver);
@@ -83,28 +82,19 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
 
     public LabKeyPage clickPrint()
     {
-        if (BaseWebDriverTest.IS_BOOTSTRAP_LAYOUT)
-            elementCache().getMoreMenu().clickSubMenu(true, "Print");
-        else
-            clickAndWait(elementCache().printLink);
+        elementCache().getMoreMenu().clickSubMenu(true, "Print");
         return new LabKeyPage(getDriver());
     }
 
     public EmailPrefsPage clickEmailPrefs()
     {
-        if (BaseWebDriverTest.IS_BOOTSTRAP_LAYOUT)
-            elementCache().getMoreMenu().clickSubMenu(true, "Email preferences");
-        else
-            clickAndWait(elementCache().emailPrefsLink);
+        elementCache().getMoreMenu().clickSubMenu(true, "Email preferences");
         return new EmailPrefsPage(getDriver());
     }
 
     public EmailPrefsPage clickCreateRelatedIssue()
     {
-        if (BaseWebDriverTest.IS_BOOTSTRAP_LAYOUT)
-            elementCache().getMoreMenu().clickSubMenu(true, "Create related issue");
-        else
-            clickAndWait(elementCache().emailPrefsLink);
+        elementCache().getMoreMenu().clickSubMenu(true, "Create related issue");
         return new EmailPrefsPage(getDriver());
     }
 
@@ -118,18 +108,10 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
         protected WebElement searchButton = Locator.tagWithAttribute("a", "data-original-title", "Search").findWhenNeeded(this);
         protected WebElement newIssueLink = Locator.lkButton("New Issue").findWhenNeeded(this);
         protected WebElement returnLink = Locator.linkWithText("return to grid").findWhenNeeded(this); //gone in newUI
-        protected WebElement updateLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.lkButton("Update").findWhenNeeded(this)
-                : Locator.linkWithText("update").findWhenNeeded(this);
-        protected WebElement resolveLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.lkButton("Resolve").findWhenNeeded(this)
-                : Locator.linkWithText("resolve").findWhenNeeded(this);
-        protected WebElement closeLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.lkButton("Close").findWhenNeeded(this)
-                : Locator.linkWithText("close").findWhenNeeded(this);
-        protected WebElement reopenLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.lkButton("Reopen").findWhenNeeded(this)
-                : Locator.linkWithText("reopen").findWhenNeeded(this);
+        protected WebElement updateLink = Locator.lkButton("Update").findWhenNeeded(this);
+        protected WebElement resolveLink = Locator.lkButton("Resolve").findWhenNeeded(this);
+        protected WebElement closeLink = Locator.lkButton("Close").findWhenNeeded(this);
+        protected WebElement reopenLink = Locator.lkButton("Reopen").findWhenNeeded(this);
         protected WebElement printLink = Locator.linkWithText("print").findWhenNeeded(this); //in menu in newUI
         protected WebElement emailPrefsLink = Locator.linkWithText("email prefs").findWhenNeeded(this); //in menu in newUI
         protected BootstrapMenu getMoreMenu()

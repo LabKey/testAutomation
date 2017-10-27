@@ -43,7 +43,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class})
 public class SampleSetTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "SampleSetTestProject";
     private static final String FOLDER_NAME = "SampleSetTestFolder";
     private static final String PROJECT_SAMPLE_SET_NAME = "ProjectSampleSet";

@@ -34,7 +34,6 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyC.class, Reports.class})
 public class ParticipantReportTest extends ReportTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String PARTICIPANT_REPORT_NAME = "Test Participant Report";
     private static final String PARTICIPANT_REPORT_DESCRIPTION = "Participant report created by ReportTest";
     private static final String PARTICIPANT_REPORT2_NAME = "Test Participant Report 2";

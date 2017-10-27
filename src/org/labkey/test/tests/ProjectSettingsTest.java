@@ -35,12 +35,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class})
 public class ProjectSettingsTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");
     private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
     private static final String INJECT_CHARS = "<script>alert(\"8(\");</script>";

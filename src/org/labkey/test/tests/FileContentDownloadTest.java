@@ -41,7 +41,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, FileBrowser.class})
 public class FileContentDownloadTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);} // whitelist me
     @BeforeClass
     public static void doSetup() throws Exception
     {

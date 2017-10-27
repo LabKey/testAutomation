@@ -41,7 +41,6 @@ import static org.labkey.test.Locator.NBSP;
 @Category({DailyC.class, Reports.class})
 public class ReportAndDatasetNotificationTest extends StudyBaseTest
 {
-   {setIsBootstrapWhitelisted(true);}
     private final PortalHelper _portalHelper = new PortalHelper(this);
 
     @Override

@@ -31,12 +31,13 @@ import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class, Reports.class})
 public class NonStudyReportsTest extends ReportTest
 {
-    {setIsBootstrapWhitelisted(true);}
     protected final PortalHelper portalHelper = new PortalHelper(this);
     protected static final String ATTACHMENT_USER = "attachment_user1@report.test";
 

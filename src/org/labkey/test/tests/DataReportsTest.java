@@ -40,7 +40,6 @@ import static org.junit.Assert.assertTrue;
 @Category({BVT.class, Reports.class})
 public class DataReportsTest extends ReportTest
 {
-    {setIsBootstrapWhitelisted(true);}
     protected final RReportHelper _rReportHelper = new RReportHelper(this);
 
     protected static final String AUTHOR_REPORT = "Author report";

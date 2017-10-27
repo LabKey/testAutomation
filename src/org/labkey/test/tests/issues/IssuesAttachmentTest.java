@@ -44,7 +44,6 @@ import static org.junit.Assert.assertFalse;
 @Category({DailyC.class})
 public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindowsTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final File FILES_ARCHIVE = TestFileUtils.getSampleData("filenames/illegal_chars.tar.gz");
     private static final File EXTRACTION_DIR = new File(FILES_ARCHIVE.getParentFile(), "extracted");
 

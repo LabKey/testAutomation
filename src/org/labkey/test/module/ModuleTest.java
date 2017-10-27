@@ -27,7 +27,6 @@ import java.util.List;
 @Category({NoSuite.class})
 public class ModuleTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "ModuleVerifyProject";
     private static final String TEST_MODULE_TEMPLATE_FOLDER_NAME = "testmodule";
 

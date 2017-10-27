@@ -15,20 +15,21 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.BeforeClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,7 +38,6 @@ import java.util.List;
 @Category({DailyA.class})
 public class DataViewsReportOrderingTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String ORIGINAL_WEBPART_TITLE = "Data Views";
     private final PortalHelper _portalHelper = new PortalHelper(this);
 

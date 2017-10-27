@@ -37,7 +37,6 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
@@ -48,14 +47,11 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({BVT.class, Flow.class})
 public class FlowTest extends BaseFlowTest
 {
-    {setIsBootstrapWhitelisted(true);}
-    
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
     private static final String FCS_FILE_1 = "L02-060120-QUV-JS";
@@ -510,14 +506,8 @@ public class FlowTest extends BaseFlowTest
         // verify sample set and background values can be displayed in the FCSAnalysis grid
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("29 FCS files"));
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
-                        .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Inline");
-        }else
-        {
-            _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Inline");
-        }
+        new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
+                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Inline");
         waitForElement(Locator.css(".labkey-flow-graph"));
         assertTextNotPresent("Error generating graph");
         assertTextPresent("No graph for:", "(<APC-A>)");
@@ -552,14 +542,8 @@ public class FlowTest extends BaseFlowTest
         String href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
-                        .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Thumbnail");
-        }else
-        {
-            _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
-        }
+        new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
+                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Thumbnail");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
@@ -596,14 +580,8 @@ public class FlowTest extends BaseFlowTest
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
-                        .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Thumbnail");
-        }else
-        {
-            _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
-        }
+        new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
+                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Thumbnail");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
     }
@@ -692,24 +670,11 @@ public class FlowTest extends BaseFlowTest
 
         assertTextPresent("Matched 0 of 59 samples.");
 
-        WebElement matchedFileInput;
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            WebElement container = Locator.tagWithClassContaining("div", "lk-region-ct")
-                    .parent().findElement(getDriver());
-            Locator.css(".labkey-selectors > input[type=checkbox][value]") // Can't use helper. Grid doesn't fire row selection events
-                    .findElement(container).click();
-            matchedFileInput = Locator.xpath("//select[@name='selectedSamples.rows[0.0.1].matchedFile']").findElement(container);
-        }
-        else
-        {
-            DataRegionTable samplesConfirm = new DataRegionTable("SamplesConfirm", getDriver());
-            // select the checkbox at row 1
-            Locator.css(".labkey-selectors > input[type=checkbox][value]") // Can't use helper. Grid doesn't fire row selection events
-                    .findElement(samplesConfirm.getComponentElement())
-                    .click();
-            matchedFileInput = samplesConfirm.findCell(0, "MatchedFile").findElement(By.cssSelector("select"));
-        }
+        WebElement container = Locator.tagWithClassContaining("div", "lk-region-ct")
+                .parent().findElement(getDriver());
+        Locator.css(".labkey-selectors > input[type=checkbox][value]") // Can't use helper. Grid doesn't fire row selection events
+                .findElement(container).click();
+        WebElement matchedFileInput = Locator.xpath("//select[@name='selectedSamples.rows[0.0.1].matchedFile']").findElement(container);
         selectOptionByText(matchedFileInput,"91745.fcs (L02-060120-QUV-JS)");
         mashButton("Next");
         waitForText("Import Analysis: Analysis Engine");
@@ -718,9 +683,7 @@ public class FlowTest extends BaseFlowTest
         clickButton("Next");
         waitForText("Import Analysis: Confirm");
         clickButton("Finish");
-        waitForElement(IS_BOOTSTRAP_LAYOUT ?
-                Locator.tagWithClass("div", "alert alert-warning").containing("Ignoring filter/sort") :
-                Locators.labkeyError.containing("Ignoring filter/sort"), defaultWaitForPage);
+        waitForElement(Locator.tagWithClass("div", "alert alert-warning").containing("Ignoring filter/sort"), defaultWaitForPage);
         DataRegionTable query = new DataRegionTable("query", getDriver());
         List<String> names = query.getColumnDataAsText("Name");
         assertEquals("Wrong name for data row", Arrays.asList("88436.fcs-050112-8ColorQualitative-ET"), names);
@@ -771,14 +734,8 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new BootstrapMenu(getDriver(), Locator.tagWithClass("div", "lk-menu-drop")
-                    .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Edit");
-        }else
-        {
-            _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Edit");
-        }
+        new BootstrapMenu(getDriver(), Locator.tagWithClass("div", "lk-menu-drop")
+                .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Edit");
         setFormElement(Locator.name("filter[2].value"), "100");
         clickButton("Save");
     }
@@ -834,14 +791,8 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new BootstrapMenu(getDriver(), Locator.tagWithClass("div", "lk-menu-drop")
-                        .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Delete");
-        }else
-        {
-            _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Delete");
-        }
+        new BootstrapMenu(getDriver(), Locator.tagWithClass("div", "lk-menu-drop")
+                    .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Delete");
         clickButton("OK");
     }
 
@@ -850,11 +801,7 @@ public class FlowTest extends BaseFlowTest
     {
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         DataRegionTable drt = new DataRegionTable("query", getDriver());
-        String error;
-        if (IS_BOOTSTRAP_LAYOUT)
-            error = Locators.alertWarning.findElement(drt.getComponentElement()).getText();
-        else
-            error = Locators.labkeyError.findElement(drt.getComponentElement()).getText();
+        String error = Locators.alertWarning.findElement(drt.getComponentElement()).getText();
         assertEquals("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.", error);
     }
 

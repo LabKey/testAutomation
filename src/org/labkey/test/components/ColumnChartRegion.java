@@ -41,10 +41,7 @@ public class ColumnChartRegion
         WebElement webElement;
         try
         {
-            if (IS_BOOTSTRAP_LAYOUT)
-                webElement = _dataRegionTable.findElement(By.cssSelector(" div.lk-region-bar"));
-            else
-                webElement = _dataRegionTable.findElement(By.cssSelector(" div.labkey-dataregion-msg-part-plotanalyticsprovider"));
+            webElement = _dataRegionTable.findElement(By.cssSelector(" div.lk-region-bar"));
         }
         catch(org.openqa.selenium.NoSuchElementException nse)
         {

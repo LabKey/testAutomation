@@ -38,7 +38,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class, Data.class})
 public class PivotQueryTest extends ReportTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
 
     @Override
@@ -87,30 +86,12 @@ public class PivotQueryTest extends ReportTest
         Locator.XPathLocator region = Locator.tagWithAttribute("table", "lk-region-name", "query");
 
         log("** Verifying pivot table headers");
-        Locator AnalyteName_header;
-        Locator IL_10_header;
-        Locator Participant_cell;
-        Locator ParticipantCount_cell;
-        Locator ConcInRange_MIN_cell;
-        Locator ConcInRange_CONCAT_cell;
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            AnalyteName_header = region.append("/thead[1]/tr[1]/th[2]");
-            IL_10_header = region.append("/thead[2]/tr[1]/th[2]");
-            Participant_cell = region.append("/tbody[1]/tr[1]/td[1]");
-            ParticipantCount_cell = region.append("/tbody[1]/tr[1]/td[2]");
-            ConcInRange_MIN_cell = region.append("/tbody[1]/tr[1]/td[3]");
-            ConcInRange_CONCAT_cell = region.append("/tbody[1]/tr[1]/td[6]");
-        }
-        else
-        {
-            AnalyteName_header = region.append("/tbody/tr[2]/td[2]");
-            IL_10_header = region.append("/tbody/tr[3]/td[1]");
-            Participant_cell = region.append("/tbody/tr[5]/td[1]");
-            ParticipantCount_cell = region.append("/tbody/tr[5]/td[2]");
-            ConcInRange_MIN_cell = region.append("/tbody/tr[5]/td[3]");
-            ConcInRange_CONCAT_cell = region.append("/tbody/tr[5]/td[6]");
-        }
+        Locator AnalyteName_header = region.append("/thead[1]/tr[1]/th[2]");
+        Locator IL_10_header = region.append("/thead[2]/tr[1]/th[2]");
+        Locator Participant_cell = region.append("/tbody[1]/tr[1]/td[1]");
+        Locator ParticipantCount_cell = region.append("/tbody[1]/tr[1]/td[2]");
+        Locator ConcInRange_MIN_cell = region.append("/tbody[1]/tr[1]/td[3]");
+        Locator ConcInRange_CONCAT_cell = region.append("/tbody[1]/tr[1]/td[6]");
         assertElementContains(AnalyteName_header, "Analyte Name");
         assertElementContains(IL_10_header, "IL-10 (23)");
 

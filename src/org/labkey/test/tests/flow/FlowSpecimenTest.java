@@ -34,7 +34,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, Flow.class})
 public class FlowSpecimenTest extends BaseFlowTest
 {
-    {setIsBootstrapWhitelisted(true);}
     public static final String STUDY_FOLDER = "KoStudy";
 
     public static final String PTID = "P5216";

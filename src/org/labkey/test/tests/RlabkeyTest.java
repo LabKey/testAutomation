@@ -42,8 +42,6 @@ import static org.junit.Assert.fail;
 @Category({DailyB.class})
 public class RlabkeyTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     RReportHelper _rReportHelper = new RReportHelper(this);
     //private static final String PROJECT_NAME = "RlabkeyTest Project\u2603";
     private static final String PROJECT_NAME = "RlabkeyTest Project";

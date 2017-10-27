@@ -182,15 +182,11 @@ public abstract class AbstractAssayHelper
 
     private void clickManageOption(boolean wait, String ... subMenuLabels)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new BootstrapMenu(_test.getDriver(),
-                        Locator.tagWithClass("div", "lk-menu-drop")
-                                .withChild(Locator.linkWithText(MANAGE_LINK_TEXT))
-                                .waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(wait, subMenuLabels);
-        }
-        else
-            _test._ext4Helper.clickExt4MenuButton(wait, Locator.linkWithText(MANAGE_LINK_TEXT), false, subMenuLabels);
+        new BootstrapMenu(_test.getDriver(),
+                    Locator.tagWithClass("div", "lk-menu-drop")
+                            .withChild(Locator.linkWithText(MANAGE_LINK_TEXT))
+                            .waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT))
+                .clickSubMenu(wait, subMenuLabels);
     }
 
     public enum AssayDefaultAreas

@@ -32,17 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: tgaluhn
- * Date: 3/25/2015
- *
  * This should always be a separate class than the main ETLTest, as the test cases here rely on a study import.
  * Having that import as part of the setup for all the ETL tests adds substantial unnecessary overhead time.
- *
  */
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLRemoteSourceTest extends ETLAbstractTest
 {
-    {setIsBootstrapWhitelisted(true);} // whitelist this test
     private static final String TRANSFORM_REMOTE = "{ETLtest}/remote";
     private static final String TRANSFORM_REMOTE_DESC = "Remote Test";
     private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";

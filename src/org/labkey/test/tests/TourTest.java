@@ -32,7 +32,6 @@ import java.util.List;
 @Category({DailyA.class})
 public class TourTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     public static final String SUBFOLDER1 = "test project 1";
     public static final String SUBFOLDER2 = "test project 2";
     public static final String TOUR_NAME = "Test Tour";

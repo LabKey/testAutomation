@@ -38,7 +38,6 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyB.class, ETL.class})
 public class ETLListTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     ETLHelper _etlHelper = new ETLHelper(this, getProjectName());
     private static final String ETL_LIST_MERGE = "{ETLtest}/ListAToListB";
     private static final String ETL_AUTO_INCR_LIST_TRUNCATE = "{ETLtest}/AutoIncrementListAToListB_truncate";

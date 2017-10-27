@@ -17,11 +17,8 @@ package org.labkey.test;
 
 public abstract class Locators
 {
-    public static final Locator.XPathLocator ADMIN_MENU = Locator.xpath("id('adminMenuPopupLink')[@onclick]");
-    public static final Locator.IdLocator USER_MENU = Locator.id("userMenuPopupLink");
     public static final Locator.XPathLocator UX_USER_MENU = Locator.xpath("//ul[@class='navbar-nav-lk' and ./li/a/i[@class='fa fa-user']]");
     public static final Locator.IdLocator DEVELOPER_MENU = Locator.id("devMenuPopupLink");
-    public static final Locator.IdLocator projectBar = Locator.id("projectBar");
     public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
     public static final Locator.XPathLocator labkeyError = Locator.byClass("labkey-error");
     public static final Locator.XPathLocator alertWarning = Locator.byClass("alert").withClass("alert-warning");
@@ -40,9 +37,7 @@ public abstract class Locators
 
     public static Locator.XPathLocator bodyPanel()
     {
-        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.tagWithClass("div", "lk-body-ct") :
-                Locator.id("bodypanel");
+        return Locator.tagWithClass("div", "lk-body-ct");
     }
 
     public static Locator.XPathLocator bodyTitle()

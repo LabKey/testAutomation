@@ -25,9 +25,6 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
 
 /**
- * User: tgaluhn
- * Date: 7/24/2015
- *
  * Split from ETLTest because of the verification of TransformSummary & TransformHistory. This makes the test sensitive to test order,
  * as previous TransformRun rows can interfere with the expected results here. Proper fix would be to delete pipeline jobs between tests,
  * but app bug prevents that from cascading to TransformRun.
@@ -36,7 +33,6 @@ import org.labkey.test.categories.ETL;
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLSimpleTransformTest extends ETLAbstractTest
 {
-    {setIsBootstrapWhitelisted(true);} // whitelist this test
     @Override
     protected boolean isCheckErrorsInPostTest()
     {

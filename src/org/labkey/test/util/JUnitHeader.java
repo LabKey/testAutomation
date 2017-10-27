@@ -24,8 +24,6 @@ import static org.labkey.test.WebTestHelper.logToServer;
 
 public class JUnitHeader extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     @Override
     public List<String> getAssociatedModules()
     {

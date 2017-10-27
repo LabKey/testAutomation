@@ -476,13 +476,6 @@ public class ListHelper extends LabKeySiteWrapper
         waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);
         waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        if (!IS_BOOTSTRAP_LAYOUT)
-        {
-            // TODO: Remove workaround. Project menu is opening after save on TeamCity for some reason
-            mouseOver(Locator.css("body"));
-            waitForElementToDisappear(Locator.id("projectBar_menu").notHidden());
-        }
     }
 
     public void clickDeleteList()

@@ -51,7 +51,6 @@ import static org.junit.Assert.fail;
 @Category({DailyA.class})
 public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
     APIUserHelper _userHelper = new APIUserHelper(this);
 

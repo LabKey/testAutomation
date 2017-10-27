@@ -188,14 +188,9 @@ public class ETLScheduler extends LabKeyPage
 
         public LabKeyPage reset()
         {
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            {
-                new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
-                                .withChild(Locator.lkButton("Reset State...")).findElement(this)).clickSubMenu(true, "Reset");
-            }else
-            {
-                _test._ext4Helper.clickExt4MenuButton(false, elements().resetStateButton, false, "Reset");
-            }
+            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
+                            .withChild(Locator.lkButton("Reset State...")).findElement(this))
+                    .clickSubMenu(true, "Reset");
 
             return new LabKeyPage(_test);
         }
@@ -203,14 +198,9 @@ public class ETLScheduler extends LabKeyPage
         @LogMethod(quiet = true)
         public Confirm truncateAndReset()
         {
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            {
-                new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
-                            .withChild(Locator.lkButton("Reset State...")).findElement(this)).clickSubMenu(false, "Truncate and Reset");
-            }else
-            {
-                _test._ext4Helper.clickExt4MenuButton(false, elements().resetStateButton, false, "Truncate and Reset");
-            }
+            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
+                        .withChild(Locator.lkButton("Reset State...")).findElement(this))
+                    .clickSubMenu(false, "Truncate and Reset");
 
             return new Confirm();
         }

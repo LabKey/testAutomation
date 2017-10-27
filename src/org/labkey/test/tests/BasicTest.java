@@ -33,7 +33,6 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Git;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.WebPart;
-import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.UIContainerHelper;
 import org.openqa.selenium.WebElement;
 
@@ -50,7 +49,6 @@ import static org.junit.Assert.assertTrue;
 @Category({Base.class, DRT.class, BVT.class, DailyA.class, Git.class})
 public class BasicTest extends BaseWebDriverTest
 {
-    private boolean foo = setIsBootstrapWhitelisted(true); // whitelist me
     private static final String PROJECT_NAME = "BasicVerifyProject";
     private static final String FOLDER_NAME = "childfolder";
     private static final String FOLDER_RENAME = "renamedfolder";

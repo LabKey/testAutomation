@@ -47,7 +47,6 @@ import static org.junit.Assert.assertTrue;
 @Category(DailyB.class)
 public class InlineImagesAssayTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     protected final static File XLS_FILE = TestFileUtils.getSampleData("InlineImages/foo.xls");
     protected final static File PNG01_FILE =  TestFileUtils.getSampleData("InlineImages/crest.png");
     protected final static File LRG_PNG_FILE = TestFileUtils.getSampleData("InlineImages/screenshot.png");

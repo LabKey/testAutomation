@@ -58,7 +58,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class, Data.class})
 public class ContainerContextTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String SUB_FOLDER_A = "A";
     private static final String SUB_FOLDER_B = "B";
 

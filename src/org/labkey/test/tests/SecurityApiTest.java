@@ -32,8 +32,6 @@ import java.util.regex.Pattern;
 @Category({DailyB.class})
 public class SecurityApiTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     protected static final String PROJECT_NAME = "Security API Test Project";
     private static final String USER_1 = "testuser1@securityapi.test";
     private static final String USER_2 = "testuser2@securityapi.test";

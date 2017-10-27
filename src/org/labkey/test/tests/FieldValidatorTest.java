@@ -30,7 +30,6 @@ import java.util.List;
 @Category({DailyA.class})
 public class FieldValidatorTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "ValidatorVerifyProject";
     private static final String LIST_NAME = "QCList";
 

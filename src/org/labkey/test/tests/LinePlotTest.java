@@ -25,8 +25,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class LinePlotTest extends GenericChartsTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
-
     protected static final String DEVELOPER_USER = "developer_user1@report.test";
 
     @Override

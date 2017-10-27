@@ -112,10 +112,7 @@ public class IssuesHelper extends WebDriverWrapper
         clickAndWait(Locator.linkWithText("Submit"));
         portalHelper.addWebPart("Search");
 
-        if (IS_BOOTSTRAP_LAYOUT)
-            assertElementPresent(Locator.tagWithText("div", "There are no issues in this list."));
-        else
-            assertTextPresent("Open");
+        assertElementPresent(Locator.tagWithText("div", "There are no issues in this list."));
     }
 
     public void deleteIssueLists(String projectName, LabKeySiteWrapper test)

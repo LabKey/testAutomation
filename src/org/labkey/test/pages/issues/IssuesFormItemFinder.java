@@ -51,9 +51,7 @@ public abstract class IssuesFormItemFinder<C> extends org.labkey.test.components
 
     private Locator.XPathLocator _labelLoc()
     {
-        Locator.XPathLocator loc = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.tag("td").withClass("lk-form-label") :
-                Locator.tag("td").withAttributeContaining("class", "labkey-form-label");
+        Locator.XPathLocator loc = Locator.tag("td").withClass("lk-form-label");
         if (partialText) // Don't match nested elements (e.g. '?' for help)
         {
             if (labelText.isEmpty())

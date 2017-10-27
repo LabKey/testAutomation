@@ -53,7 +53,6 @@ import java.util.Map;
 @Category({DailyC.class, Data.class})
 public class TriggerScriptTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     //List constants
     private static final String TRIGGER_MODULE = "triggerTestModule";
     private static final String SIMPLE_MODULE = "simpletest";

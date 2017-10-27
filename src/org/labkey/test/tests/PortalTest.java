@@ -42,7 +42,6 @@ import static org.junit.Assert.fail;
 @Category({BVT.class})
 public class PortalTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private static final String WIKI_WEBPART_TEXT = "The Wiki web part displays a single wiki page.";
     private static final String MESSAGES_WEBPART_TEXT = "all messages";
     private final PortalHelper portalHelper = new PortalHelper(this);

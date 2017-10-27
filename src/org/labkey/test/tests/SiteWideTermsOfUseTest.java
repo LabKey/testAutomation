@@ -31,7 +31,6 @@ import static org.junit.Assert.assertFalse;
 @Category({DailyB.class})
 public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
 {
-    {setIsBootstrapWhitelisted(true);}
     protected static final String SITE_WIDE_TERMS_TEXT = "Site-wide terms of use text for the win";
     protected static final String NON_PUBLIC_NO_TERMS_PROJECT_NAME = "Non-public No Terms Project";
 

@@ -22,12 +22,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Flow;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class, Flow.class})
 public class FlowAnalysisResolverTest extends BaseFlowTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private final String FCS_FILE = "118795.fcs";
 
     @Before

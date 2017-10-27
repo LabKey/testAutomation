@@ -24,8 +24,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
-
 // TODO: Missing lots of functionality
 public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 {
@@ -42,29 +40,25 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 
     public ShowAdminPage goToServerInformationSection()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-            click(elementCache().sectionServerInfo);
+        elementCache().sectionServerInfo.click();
         return this;
     }
 
     public ShowAdminPage goToAdminConsoleLinksSection()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-            click(elementCache().sectionAdminConsoleLinks);
+        elementCache().sectionAdminConsoleLinks.click();
         return this;
     }
 
     public ShowAdminPage goToModuleInformationSection()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-            click(elementCache().sectionModuleInfo);
+        elementCache().sectionModuleInfo.click();
         return this;
     }
 
     public ShowAdminPage goToActiveUsersSection()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-            click(elementCache().sectionActiveUsers);
+        elementCache().sectionActiveUsers.click();
         return this;
     }
 

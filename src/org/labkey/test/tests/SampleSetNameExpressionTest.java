@@ -31,15 +31,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * User: kevink
- * Date: 12/20/16
- */
 @Category({DailyC.class})
 public class SampleSetNameExpressionTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private static final String PROJECT_NAME = "SampleSetNameExprTest";
 
     @Override

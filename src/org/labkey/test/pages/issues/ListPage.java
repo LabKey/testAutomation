@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages.issues;
 
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -31,7 +30,6 @@ import static org.labkey.test.components.html.Input.Input;
 
 public class ListPage extends LabKeyPage<ListPage.ElementCache>
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
     public ListPage(WebDriver driver)
     {
         super(driver);
@@ -51,13 +49,6 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
     {
         driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "list", Maps.of("issueDefName", issueDefName.toLowerCase())));
         return new ListPage(driver.getDriver());
-    }
-
-    public DetailsPage jumpToIssue(String issueId)
-    {
-        elementCache().issueJumpInput.set(issueId);
-        clickAndWait(elementCache().issueJumpButton);
-        return new DetailsPage(getDriver());
     }
 
     public SearchResultsPage searchIssues(String search)
@@ -99,16 +90,8 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
     {
         WebElement jumpToForm = Locator.tagWithName("form", "jumpToIssue").findWhenNeeded(this);
         WebElement newIssueButton = Locator.lkButton().startsWith("New ").findWhenNeeded(this);
-        Input issueJumpInput = Input(Locator.name("issueId"), getDriver()).findWhenNeeded(jumpToForm);
-        WebElement issueJumpButton = IS_BOOTSTRAP_LAYOUT
-                ? Locator.lkButton("Search").findWhenNeeded(bodyBlock)
-                : Locator.lkButton().startsWith("Jump to ").findWhenNeeded(jumpToForm);
-        Input searchInput = IS_BOOTSTRAP_LAYOUT
-                ? issueJumpInput
-                : Input(Locator.name("q"), getDriver()).findWhenNeeded(bodyBlock);
-        WebElement searchButton = IS_BOOTSTRAP_LAYOUT
-                ? issueJumpButton
-                : Locator.lkButton("Search").findWhenNeeded(bodyBlock);
-        DataRegionTable issuesList = DataRegionTable.findDataRegion(ListPage.this);
+        Input searchInput = Input(Locator.name("issueId"), getDriver()).findWhenNeeded(jumpToForm);
+        WebElement searchButton = Locator.lkButton("Search").findWhenNeeded(bodyBlock);
+        DataRegionTable issuesList = DataRegionTable.DataRegion(getDriver()).findWhenNeeded();
     }
 }

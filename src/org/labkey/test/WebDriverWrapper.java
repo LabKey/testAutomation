@@ -563,15 +563,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void clickAdminMenuItem(String... items)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            new SiteNavBar(getDriver()).clickAdminMenuItem(true, items);
-        }
-        else
-        {
-            longWait().until(ExpectedConditions.elementToBeClickable(Locators.ADMIN_MENU));
-            _ext4Helper.clickExt4MenuButton(true, Locators.ADMIN_MENU, false, items);
-        }
+        new SiteNavBar(getDriver()).clickAdminMenuItem(true, items);
     }
 
     public void clickDevMenuItem(boolean wait, String... items)
@@ -588,16 +580,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void clickUserMenuItem(boolean wait, String... items)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            new SiteNavBar(getDriver()).clickUserMenuItem(wait, items);
-        }
-        else
-        {
-            final WebElement userMenu = waitForElement(Locators.USER_MENU);
-            scrollIntoView(userMenu);
-            _ext4Helper.clickExt4MenuButton(wait,userMenu,false,items);
-        }
+        new SiteNavBar(getDriver()).clickUserMenuItem(wait, items);
     }
 
     @LogMethod(quiet = true)
@@ -638,14 +621,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     // Click on a module listed on the admin menu;
     public void goToModule(String moduleName)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            new SiteNavBar(getDriver()).goToModule(moduleName);
-        }
-        else
-        {
-            clickAdminMenuItem("Go To Module", "More Modules", moduleName);
-        }
+        new SiteNavBar(getDriver()).goToModule(moduleName);
     }
 
     public void goToSchemaBrowser()
@@ -1355,7 +1331,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void assertFilterTextPresent(String column, String type, String value)
     {
         String desc = type + value;
-        String closeParenthesis = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ? ")" : "))";
+        String closeParenthesis = ")";
         if(type.contains("Equals One Of"))
         {
             desc = column + " IS ONE OF (" + value.replace(";", ", ") + closeParenthesis;
@@ -1508,9 +1484,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getTextInNonDataRegionTable(String title, int row, int column)
     {
-        return getTableCellText( LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.xpath("//div/h3/a/span[text()='" + title + "']/../../../../div/table") :
-                Locator.xpath("//table/tbody/tr/th/a/span[text()='" + title + "']/../../../../tr/td/table"), row, column);
+        return getTableCellText(Locator.xpath("//div/h3/a/span[text()='" + title + "']/../../../../div/table"), row, column);
     }
 
     public void assertTableRowInNonDataRegionTable(String title, String textToCheck, int row, int column)

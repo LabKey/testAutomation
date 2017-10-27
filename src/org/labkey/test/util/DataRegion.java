@@ -211,17 +211,9 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public BootstrapMenu openHeaderMenu(String buttonText, String ... subMenuLabels)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            BootstrapMenu headerMenu = elementCache().getHeaderMenu(buttonText);
-            headerMenu.openMenuTo(subMenuLabels);
-            return headerMenu;
-        }
-        else
-        {
-            getWrapper()._ext4Helper.clickExt4MenuButton(false, elementCache().getHeaderButton(buttonText), true, subMenuLabels);
-            return null;
-        }
+        BootstrapMenu headerMenu = elementCache().getHeaderMenu(buttonText);
+        headerMenu.openMenuTo(subMenuLabels);
+        return headerMenu;
     }
 
     public void clickHeaderMenu(String buttonText, String ... subMenuLabels)
@@ -231,14 +223,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public void clickHeaderMenu(String buttonText, boolean wait, String ... subMenuLabels)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            elementCache().getHeaderMenu(buttonText).clickSubMenu(wait,  subMenuLabels);
-        }
-        else
-        {
-            getWrapper()._ext4Helper.clickExt4MenuButton(wait, elementCache().getHeaderButton(buttonText), false, subMenuLabels);
-        }
+        elementCache().getHeaderMenu(buttonText).clickSubMenu(wait,  subMenuLabels);
     }
 
     public boolean hasHeaderMenu(String buttonText)
@@ -256,22 +241,14 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public List<String> getHeaderMenuOptions(String buttonText)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            BootstrapMenu menu = BootstrapMenu.find(getDriver(), elementCache().buttonBar, buttonText);
-            menu.expand();
-            return getWrapper().getTexts(menu.findVisibleMenuItems());
-        }
-        else
-        {
-            List<WebElement> menuItems = getWrapper()._ext4Helper.getMenuItems(elementCache().getHeaderButton(buttonText));
-            return getWrapper().getTexts(menuItems);
-        }
+        BootstrapMenu menu = elementCache().getHeaderMenu(buttonText);
+        menu.expand();
+        return getWrapper().getTexts(menu.findVisibleMenuItems());
     }
 
     public void goToView(String... menuTexts)
     {
-        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views", menuTexts);
+        getViewsMenu().clickSubMenu(true, menuTexts);
     }
 
     public void goToReport(String... menuTexts)
@@ -281,15 +258,8 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public void goToReport(boolean waitForRefresh, String... menuTexts)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            BootstrapMenu menu = getReportMenu();
-            menu.clickSubMenu(waitForRefresh,  menuTexts);
-        }
-        else
-        {
-            throw new NotImplementedException("This is only implemented in the new UI");
-        }
+        BootstrapMenu menu = getReportMenu();
+        menu.clickSubMenu(waitForRefresh,  menuTexts);
     }
 
     @NotNull
@@ -329,7 +299,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
         public WebElement getButtonBar()
         {
-            return IS_BOOTSTRAP_LAYOUT ? UX_ButtonBar : buttonBar;
+            return UX_ButtonBar;
         }
 
         private List<WebElement> allHeaderButtons;
@@ -340,7 +310,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
         {
             if (allHeaderButtons == null)
                 allHeaderButtons = ImmutableList.copyOf(Locator.css("a.labkey-button, a.labkey-menu-button")
-                        .findElements(IS_BOOTSTRAP_LAYOUT? UX_ButtonBar : buttonBar));
+                        .findElements(UX_ButtonBar));
             return allHeaderButtons;
         }
 

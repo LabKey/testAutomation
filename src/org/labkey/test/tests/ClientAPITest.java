@@ -66,7 +66,6 @@ import static org.junit.Assert.fail;
 @Category({BVT.class, Wiki.class})
 public class ClientAPITest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     public WikiHelper _wikiHelper = new WikiHelper(this);
 
     private static final String PROJECT_NAME = "ClientAPITestProject";

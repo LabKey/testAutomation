@@ -457,13 +457,7 @@ public class RReportHelper
     public void createRReport(String name, boolean shareView)
     {
         _test.waitForText(("Reports"));
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            DataRegion(_test.getDriver()).find().goToReport("Create R Report");
-        }else
-        {
-            _test._extHelper.clickMenuButton("Reports", "Create R Report");
-        }
+        DataRegion(_test.getDriver()).find().goToReport("Create R Report");
 
         if (shareView)
             selectOption(RReportHelper.ReportOption.shareReport);

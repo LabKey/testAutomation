@@ -19,8 +19,21 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.security.PrincipalType;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.security.*;
-import org.labkey.remoteapi.query.*;
+import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
+import org.labkey.remoteapi.query.UpdateRowsCommand;
+import org.labkey.remoteapi.security.AddGroupMembersCommand;
+import org.labkey.remoteapi.security.CreateGroupCommand;
+import org.labkey.remoteapi.security.CreateGroupResponse;
+import org.labkey.remoteapi.security.CreateUserCommand;
+import org.labkey.remoteapi.security.CreateUserResponse;
+import org.labkey.remoteapi.security.DeleteGroupCommand;
+import org.labkey.remoteapi.security.RemoveGroupMembersCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -36,8 +49,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test for the Java Client API library. This test is written in
@@ -48,7 +66,6 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class})
 public class JavaClientApiTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     public static final String PROJECT_NAME = "~Java Client Api Verify Project~";
     public static final String LIST_NAME = "People";
     public static final String USER_NAME = "user1@javaclientapi.test";

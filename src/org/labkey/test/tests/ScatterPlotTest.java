@@ -52,8 +52,6 @@ import static org.labkey.test.components.ext4.Window.Window;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class ScatterPlotTest extends GenericChartsTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
-    
     protected static final String DEVELOPER_USER = "developer_user1@report.test";
     public static final String APXHEENT = "APXheent";
     public static final String APXPULSE = "APXpulse";

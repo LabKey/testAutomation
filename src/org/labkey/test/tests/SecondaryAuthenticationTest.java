@@ -41,8 +41,6 @@ import static org.junit.Assert.assertFalse;
 @Category({DailyA.class})
 public class SecondaryAuthenticationTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     @Test
     /* This test assumes that the Duo 2-Factor is Disabled */
     public void testSecondaryAuthentication()

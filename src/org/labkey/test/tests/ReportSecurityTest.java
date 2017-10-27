@@ -27,7 +27,6 @@ import org.labkey.test.util.LogMethod;
 @Category({DailyC.class, Reports.class})
 public class ReportSecurityTest extends ReportTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String TEST_GRID_VIEW = "Test Grid View";
 
     protected static final String TEST_GROUP = "firstGroup";

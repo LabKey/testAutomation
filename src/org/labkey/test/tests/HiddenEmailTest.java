@@ -32,7 +32,6 @@ import java.util.List;
 @Category({DailyB.class})
 public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String TEST_GROUP = "HiddenEmail Test group";
     private static final String ADMIN_USER = "experimental_admin@experimental.test";
     private static final String IMPERSONATED_USER = "experimental_user@experimental.test";

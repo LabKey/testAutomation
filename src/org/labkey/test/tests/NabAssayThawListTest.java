@@ -37,7 +37,6 @@ import java.util.List;
 @Category({DailyA.class, Assays.class})
 public class NabAssayThawListTest extends AbstractQCAssayTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
 
     private final String ASSAY_BACKGROUND_IMPORT_PROJECT = "Background Import Assay Data From List Project";

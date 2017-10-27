@@ -23,6 +23,8 @@ import org.labkey.test.pages.search.SearchResultsPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import static org.labkey.test.WebDriverWrapper.sleep;
+
 /* Wraps the new site/admin nav menus and site search */
 public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 {

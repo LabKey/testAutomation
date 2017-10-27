@@ -38,7 +38,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class})
 public class CustomizeViewTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     public static final String PROJECT_NAME = "CustomizeViewTest";
     public static final String LIST_NAME = "People" + INJECT_CHARS_1;
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;

@@ -48,7 +48,6 @@ import static org.junit.Assert.assertEquals;
 @Category({BVT.class, Data.class})
 public class FilterTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     protected final static String R_VIEW = TRICKY_CHARACTERS + "R report";
     protected final static String FACET_TEST_LIST = "FacetList";
 

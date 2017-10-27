@@ -32,13 +32,11 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Wiki.class})
 public class ButtonCustomizationTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     protected final static String PROJECT_NAME = "ButtonVerifyProject";
     private static final String LIST_NAME = "Cities"; // If changed, update in CUSTOMIZER_FILE as well.
     private static final String METADATA_OVERRIDE_BUTTON = "Metadata Button";

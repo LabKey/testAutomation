@@ -35,7 +35,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class})
 public class TabTest extends SimpleModuleTest
 {
-    {setIsBootstrapWhitelisted(true);}
     @Override
     public BrowserType bestBrowser()
     {

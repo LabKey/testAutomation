@@ -101,10 +101,10 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
     public void remove()
     {
-        if (IS_BOOTSTRAP_LAYOUT) new SiteNavBar(getDriver()).enterPageAdminMode();
+        new SiteNavBar(getDriver()).enterPageAdminMode();
         clickMenuItem(false, "Remove From Page");
         waitForStale();
-        if (IS_BOOTSTRAP_LAYOUT) new SiteNavBar(getDriver()).exitPageAdminMode();
+        new SiteNavBar(getDriver()).exitPageAdminMode();
     }
 
     public void moveUp()
@@ -146,14 +146,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
     public void clickMenuItem(boolean wait, String... items)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            new BootstrapMenu(getDriver(), elementCache().UX_MENU).clickSubMenu(wait, items);
-        }
-        else
-        {
-            getWrapper()._ext4Helper.clickExt4MenuButton(wait, elementCache().moreMenu, false, items);
-        }
+        new BootstrapMenu(getDriver(), elementCache().UX_MENU).clickSubMenu(wait, items);
     }
 
     public BootstrapMenu getTitleMenu()
@@ -206,9 +199,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
     private static Locator.XPathLocator leftTitleLoc()
     {
-        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.xpath("div/div/*").withClass("panel-title") :
-                Locator.xpath("tbody/tr/th").withClass("labkey-wp-title-left");
+        return Locator.xpath("div/div/*").withClass("panel-title");
     }
 
     protected static Locator.XPathLocator webPartLoc(String title)
@@ -218,8 +209,6 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
     protected static Locator.XPathLocator webPartLoc()
     {
-        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.tag("div").withAttribute("name", "webpart") :
-                Locator.tag("table").withAttribute("name", "webpart");
+        return Locator.tag("div").withAttribute("name", "webpart");
     }
 }

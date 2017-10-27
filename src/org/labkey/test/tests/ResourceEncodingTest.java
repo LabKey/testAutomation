@@ -35,13 +35,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This test will only work if you have built with `ant production`
+ * This test will only work for production builds
  */
 @Category({DailyB.class})
 public class ResourceEncodingTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     @Nullable
     @Override
     protected String getProjectName()

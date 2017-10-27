@@ -24,8 +24,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.ColumnChartComponent;
+import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.util.DataRegionTable;
@@ -40,7 +40,6 @@ import java.util.Map;
 @Category({DailyB.class})
 public class ColumnChartTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     public static final String LANGUAGE_COLUMN_NAME = "Language";
     public static final String PTID_COLUMN_NAME = "ParticipantId";
     public static final String PREGNANCY_COLUMN_NAME = "Pregnancy";

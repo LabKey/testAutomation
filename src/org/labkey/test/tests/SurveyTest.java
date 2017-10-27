@@ -33,12 +33,12 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
 public class SurveyTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private final String folderName = "subfolder";
     protected final String pipelineLoc =  "/sampledata/survey";
     private final String projectSurveyDesign = "My Project Survey Design";

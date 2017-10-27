@@ -39,8 +39,6 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class, Reports.class})
 public class KnitrReportTest extends AbstractKnitrReportTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private static final Path rmdDependenciesReport = scriptpadReports.resolve("kable.rmd");
 
     @Nullable

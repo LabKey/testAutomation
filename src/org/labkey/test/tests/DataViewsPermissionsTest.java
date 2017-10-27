@@ -29,7 +29,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyC.class})
 public class DataViewsPermissionsTest extends StudyBaseTest
 {
-   {setIsBootstrapWhitelisted(true);}
     public static final String AUTHOR_USER = "author@dataviews.test";
     public static final String EDITOR_USER = "editor@dataviews.test";
     private final PortalHelper portalHelper = new PortalHelper(this);

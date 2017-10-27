@@ -33,13 +33,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({DailyB.class, FileBrowser.class})
 public class ExpTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private static final String PROJECT_NAME = "ExpVerifyProject";
     private static final String FOLDER_NAME = "verifyfldr";
     private static final String EXPERIMENT_NAME = "Tutorial Examples";

@@ -31,7 +31,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +39,6 @@ import java.util.Map;
 @Category({DailyC.class})
 public class FileAttachmentColumnTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private final String FOLDER_NAME = "TestFolder";
     private final String LIST_NAME = "TestList";
     private final String LIST_KEY = "TestListId";

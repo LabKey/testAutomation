@@ -110,16 +110,12 @@ public class SearchResultsPage extends LabKeyPage
 
         WebElement resultsCount()
         {
-            return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                    Locator.css(".labkey-search-results-counts div").index(0).findElement(this) :
-                    Locator.css("table.labkey-search-results-counts td").index(0).findElement(this);
+            return Locator.css(".labkey-search-results-counts div").index(0).findElement(this);
         }
 
         WebElement pageCount()
         {
-            return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                    Locator.css(".labkey-search-results-counts div").index(1).findElement(this) :
-                    Locator.css("table.labkey-search-results-counts td").index(1).findElement(this);
+            return Locator.css(".labkey-search-results-counts div").index(1).findElement(this);
         }
 
         List<WebElement> searchResultCards()    // Todo: wrap these into a better component type

@@ -277,14 +277,7 @@ public abstract class AbstractContainerHelper
         if (_test.isElementPresent(Ext4Helper.Locators.ext4Button("Finish")))
         {
             _test.clickButton("Finish", _test.defaultWaitForPage);
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            {
-                _test.waitFor(()-> _test.getURL().toString().contains(project + "/" + child), WebDriverWrapper.WAIT_FOR_JAVASCRIPT );
-            }
-            else
-            {
-                _test.waitForElement(Locator.id("folderBar").withText(project));
-            }
+            _test.waitFor(()-> _test.getURL().toString().contains(parent + "/" + child), WebDriverWrapper.WAIT_FOR_JAVASCRIPT );
         }
         else
         {
@@ -311,41 +304,20 @@ public abstract class AbstractContainerHelper
                     _test.assertElementPresent(Locator.folderTab(tabname));
             }
 
-            // verify that there's a link to our new folder:
-            _test.assertElementPresent( LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                    Locators.bodyTitle(child) :
-                    Locator.linkWithText(child));
+            // verify that we're in the new folder:
+            _test.assertElementPresent(Locators.bodyTitle(child));
         }
     }
 
     private CreateSubFolderPage startCreateFolder(String project, String parent, String child)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            if (!parent.equals(project))
-                _test.navigateToFolder(project, parent);
-            else
-                _test.clickProject(project);
-
-            return _test.projectMenu().navigateToCreateSubFolderPage()
-                    .setFolderName(child);
-        }
+        if (!parent.equals(project))
+            _test.navigateToFolder(project, parent);
         else
-        {
             _test.clickProject(project);
-            if (!parent.equals(project))
-            {
-                _test.clickFolder(parent);
-            }
-            _test.openFolderMenu();
-            if (_test.isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child))))
-                throw new IllegalArgumentException("Folder: " + child + " already exists in project: " + project);
-            _test.log("Creating subfolder " + child + " under " + parent);
-            _test.clickAndWait(Locator.xpath("//a[@title='New Subfolder']"));
-            CreateSubFolderPage createSubFolderPage = new CreateSubFolderPage(_test.getDriver());
-            createSubFolderPage.setFolderName(child);
-            return createSubFolderPage;
-        }
+
+        return _test.projectMenu().navigateToCreateSubFolderPage()
+                .setFolderName(child);
     }
 
     public boolean doesFolderExist(String project, String parent, String child)
@@ -356,11 +328,7 @@ public abstract class AbstractContainerHelper
             _test.clickFolder(parent);
         }
         _test.openFolderMenu();
-        if (_test.isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child))))
-        {
-            return true;
-        }
-        return false;
+        return _test.isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child)));
     }
 
     public void deleteFolder(String project, @LoggedParam String folderName)
@@ -383,10 +351,7 @@ public abstract class AbstractContainerHelper
         // confirm delete:
         _test.clickButton("Delete", waitTime);
         // verify that we're not on an error page with a check for a project link:
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            assertTrue("Parent project does not exist after deleting folder", _test.projectMenu().projectLinkExists(project));
-        else
-            _test.assertElementPresent(Locators.folderMenu.withText(project));
+        assertTrue("Parent project does not exist after deleting folder", _test.projectMenu().projectLinkExists(project));
         _test.openFolderMenu();
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
     }
@@ -409,14 +374,6 @@ public abstract class AbstractContainerHelper
         _test.clickButton("Save");
         _createdFolders.remove(new WebTestHelper.FolderIdentifier(project, folderName));
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            //assertTrue("Wrong project after folder rename.", project, ex Locators.folderMenu.findElement(_test.getDriver()).getText());
-        }
-        else
-        {
-            assertEquals("Wrong project after folder rename.", project, Locators.folderMenu.findElement(_test.getDriver()).getText());
-        }
         assertEquals("Wrong container path after rename.", expectedContainerPath, _test.getCurrentContainerPath());
         _test.openFolderMenu();
         _test.waitForElement(Locator.linkWithText(newFolderName));

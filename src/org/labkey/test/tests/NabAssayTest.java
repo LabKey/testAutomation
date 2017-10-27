@@ -50,7 +50,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, Assays.class})
 public class NabAssayTest extends AbstractQCAssayTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private final static String TEST_ASSAY_PRJ_NAB = "Nab Test Verify Project";            //project for nab test
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
     private final static String TEST_ASSAY_FLDR_NAB_RENAME = "Rename" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;

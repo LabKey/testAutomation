@@ -34,7 +34,6 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyC.class})
 public class DiscussionLinkTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     public static final String WIKI_NAME = "Link test";
 
     @BeforeClass

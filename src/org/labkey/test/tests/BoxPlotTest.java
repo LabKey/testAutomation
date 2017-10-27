@@ -20,12 +20,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
-import org.labkey.test.components.LookAndFeelBoxPlot;
-import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.components.LookAndFeelBoxPlot;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
@@ -34,8 +32,6 @@ import java.util.List;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class BoxPlotTest extends GenericChartsTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
-
     @LogMethod
     protected void testPlots()
     {

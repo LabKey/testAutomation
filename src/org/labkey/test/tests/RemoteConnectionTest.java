@@ -25,13 +25,12 @@ import org.labkey.test.util.RemoteConnectionHelper;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
 public class RemoteConnectionTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private static final String PROJECT_NAME = "RemoteConnectionsTestProject";
     private static final String WACKY_NAME = "$?\\/.\"";
     private static final String EMPTY_NAME = "";

@@ -50,8 +50,6 @@ import java.util.List;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class TimeChartImportTest extends StudyBaseTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private static final File MULTI_FOLDER_ZIP = TestFileUtils.getSampleData("studies/TimeChartTesting.folder.zip");
     private static final String EXPORT_TEST_FOLDER = "exportTestFolder";
     private static ArrayList<TimeChartInfo> EXPORTED_CHARTS;

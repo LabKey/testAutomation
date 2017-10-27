@@ -30,12 +30,12 @@ import org.labkey.test.util.TextSearcher;
 import java.io.File;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Assays.class})
 public class ViabilityTest extends AbstractViabilityTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String ASSAY_NAME = "Guava Assay";
     private static final String STUDY2_NAME = "Study2 Folder";
     private static final String SAVE_AND_FINISH = "Save and Finish";

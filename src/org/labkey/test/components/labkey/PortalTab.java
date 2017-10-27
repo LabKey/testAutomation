@@ -211,9 +211,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
         static public Locator.XPathLocator tabItem = Locator.xpath("//li[@role='presentation']");
         static public Locator.XPathLocator subContainerTabSelect = Locator.tagWithAttribute("select", "title", "subContainerTabs");
 
-        static public Locator.XPathLocator tabList =  LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                container.append(tabItem) :                                         //"//ul[contains(@class, 'lk-nav-tabs')]//li[@role='presentation']" :
-                Locator.xpath("//ul[contains(@class, 'tab-nav')]//li");
+        static public Locator.XPathLocator tabList = container.append(tabItem);
     }
 
     public static class PortalTabFinder extends WebDriverComponentFinder<PortalTab, PortalTab.PortalTabFinder>

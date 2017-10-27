@@ -50,17 +50,11 @@ public class SideWebPart extends WebPart
 
     private static Locator.XPathLocator locator()
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            return webPartLoc();
-        else
-            return Locator.tagWithClass("*", "labkey-side-panel").child(webPartLoc());
+        return webPartLoc();
     }
 
     private static Locator.XPathLocator locator(String title)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            return webPartLoc(title);
-        else
-            return Locator.tagWithClass("*", "labkey-side-panel").child(webPartLoc(title));
+        return webPartLoc(title);
     }
 }

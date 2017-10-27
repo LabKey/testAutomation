@@ -31,10 +31,12 @@ import org.labkey.test.util.LogMethod;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This test tests uploading a FlowJo workspace that has results calculated in it, but no associated FCS files.
@@ -48,8 +50,6 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Flow.class})
 public class FlowJoQueryTest extends BaseFlowTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     @Test
     public void _doTestSteps()
     {
@@ -89,13 +89,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 run"));
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new DataRegionTable("query", getDriver()).clickHeaderMenu("Query", "PassFail");
-        }else
-        {
-            _extHelper.clickMenuButton("Query", "PassFail");
-        }
+        new DataRegionTable("query", getDriver()).clickHeaderMenu("Query", "PassFail");
 
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
@@ -144,23 +138,11 @@ public class FlowJoQueryTest extends BaseFlowTest
         waitForPipeline(getContainerPath());
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("LabKeyAnalysis"));
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new DataRegionTable("query", getDriver()).clickHeaderMenu("Query", "Comparison");
-        }else
-        {
-            _extHelper.clickMenuButton("Query", "Comparison");
-        }
+        new DataRegionTable("query", getDriver()).clickHeaderMenu("Query", "Comparison");
         // Custom queries are filtered by analysis folder (Issue 18332)
         assertTextPresent("No data to show");
 
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new DataRegionTable("query", getDriver()).clickHeaderMenu("Analysis Folder", "All Analysis Folders");
-        }else
-        {
-            _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Analysis Folder"), false, "All Analysis Folders");
-        }
+        new DataRegionTable("query", getDriver()).clickHeaderMenu("Analysis Folder", "All Analysis Folders");
         assertTextNotPresent("No data to show");
         DataRegionTable region = new DataRegionTable("query", this);
         region.setFilter("AbsDifference", "Is Greater Than or Equal To", "2", longWaitForPage);

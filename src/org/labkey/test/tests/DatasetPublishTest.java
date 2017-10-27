@@ -33,7 +33,6 @@ import java.util.List;
 @Category({DailyA.class})
 public class DatasetPublishTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String SUBFOLDER_NAME = "TargetDatasets";
 
     @Override

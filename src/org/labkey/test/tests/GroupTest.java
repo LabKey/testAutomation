@@ -44,7 +44,6 @@ import static org.junit.Assert.assertTrue;
 @Category(BVT.class)
 public class GroupTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     protected static final String SIMPLE_GROUP = "group1";
     protected static final String COMPOUND_GROUP = "group2";
     protected static final String BAD_GROUP = "group3";

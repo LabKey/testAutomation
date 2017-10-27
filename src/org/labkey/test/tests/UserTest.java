@@ -37,7 +37,6 @@ import org.labkey.test.util.UIUserHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -52,7 +51,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class})
 public class UserTest extends BaseWebDriverTest
 {
-    private boolean foo = setIsBootstrapWhitelisted(true);
     private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile"};
     private static final String TEST_PASSWORD = "0asdfgh!";
 

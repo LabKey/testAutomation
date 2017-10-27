@@ -52,12 +52,8 @@ public class InsertPage extends LabKeyPage
 
     protected class Elements
     {
-        public Locator.XPathLocator title = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locators.bodyTitle() :
-                Locator.tagWithId("span", "labkey-nav-trail-current-page");
-        public Locator.XPathLocator body = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locators.bodyPanel() :
-                Locator.tagWithClass("table", "labkey-proj");
+        public Locator.XPathLocator title = Locators.bodyTitle();
+        public Locator.XPathLocator body = Locators.bodyPanel();
         public Locator.XPathLocator submit = body.append(Locator.lkButton("Submit"));
         public Locator.XPathLocator cancel = body.append(Locator.lkButton("Cancel"));
     }

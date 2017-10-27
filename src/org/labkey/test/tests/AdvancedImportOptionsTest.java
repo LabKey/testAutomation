@@ -44,7 +44,6 @@ import static org.junit.Assert.assertTrue;
 @Category(DailyB.class)
 public class AdvancedImportOptionsTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String LIMITED_USER = "limited@advancedimport.test";
 
     private static final String IMPORT_STUDY_FILE = "/sampledata/AdvancedImportOptions/AdvancedImportStudyProject01.folder.zip";

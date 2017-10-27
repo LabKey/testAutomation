@@ -43,8 +43,6 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class TimeChartDateBasedTest extends TimeChartTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private static final String REPORT_NAME_1 = "TimeChartTest Report";
     private static final String REPORT_NAME_2 = "TimeChartTest 2Report";
     private static final String REPORT_NAME_3 = "TimeChartTest Multi-Measure Report";

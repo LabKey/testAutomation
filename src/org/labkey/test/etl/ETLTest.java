@@ -43,7 +43,6 @@ import static org.labkey.test.etl.ETLHelper.ETL_SOURCE;
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLTest extends ETLAbstractTest
 {
-    {setIsBootstrapWhitelisted(true);} // whitelist this test
     @Nullable
     @Override
     protected String getProjectName()

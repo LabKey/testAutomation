@@ -42,7 +42,6 @@ import static org.junit.Assert.assertEquals;
 @Category({Issues.class, DailyA.class})
 public class IssuesAdminTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String USER = "admin_user@issuesadmin.test";
     private static final String DEFAULT_NAME = "issues";
     private static final String LIST_NAME = "otherIssues";

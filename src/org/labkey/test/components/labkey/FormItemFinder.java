@@ -75,7 +75,7 @@ public abstract class FormItemFinder<C> extends Component.ComponentFinder<Search
     @Override
     protected Locator locator()
     {
-        Locator.XPathLocator itemTd = labelLoc().followingSibling(LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ? "div" : "td").position(1);
+        Locator.XPathLocator itemTd = labelLoc().followingSibling("div").position(1);
         if (name != null && !name.isEmpty())
             return itemTd.child(Locator.tagWithName(itemTag(), name));
         else
@@ -84,9 +84,7 @@ public abstract class FormItemFinder<C> extends Component.ComponentFinder<Search
 
     protected Locator.XPathLocator labelLoc()
     {
-        Locator.XPathLocator loc = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.tagWithClass("label", "control-label") :
-                Locator.tag("td").withAttributeContaining("class", "labkey-form-label"); // Includes 'labkey-form-label-nowrap'
+        Locator.XPathLocator loc = Locator.tagWithClass("label", "control-label");
         if (partialText) // Don't match nested elements (e.g. '?' for help)
         {
             if (labelText.isEmpty())

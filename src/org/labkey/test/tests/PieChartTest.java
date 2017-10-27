@@ -34,8 +34,6 @@ import java.net.URL;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class PieChartTest extends GenericChartsTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
-
     // TODO add test case for view base filters and user filters applied on create chart
 
     private final String PIE_CHART_SAVE_NAME = "Simple Pie Chart Test";

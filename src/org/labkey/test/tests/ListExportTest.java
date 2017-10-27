@@ -30,8 +30,6 @@ import java.util.List;
 @Category({DailyB.class})
 public class ListExportTest extends AbstractExportTest
 {
-    {setIsBootstrapWhitelisted(true);}
-
     private static final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/ListDemo.lists.zip");
     private static final String LIST_NAME = "NIMHDemographics";
 

@@ -47,7 +47,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, Assays.class})
 public class ModuleAssayTest extends AbstractAssayTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private final static String PROJECT_NAME = "ModuleAssayTest";
     private static final String MODULE_NAME = "miniassay";
     private static final String ASSAY_NAME = "My Simple Assay";

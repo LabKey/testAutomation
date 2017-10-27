@@ -37,7 +37,6 @@ import java.util.List;
 @Category({BVT.class, Wiki.class})
 public class WikiTest extends BaseWebDriverTest
 {
-    private boolean foo = setIsBootstrapWhitelisted(true);
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES +  "WikiVerifyProject";
 
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";

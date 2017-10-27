@@ -65,7 +65,6 @@ import static org.labkey.test.util.ListHelper.ListColumnType;
 @Category({DailyA.class, Data.class})
 public class ListTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_OTHER = "OtherListVerifyProject";
     protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
@@ -396,15 +395,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            table = new DataRegionTable("query", getDriver());
-            table.clickInsertNewRow();
-        }
-        else
-        {
-            _extHelper.clickInsertNewRow();
-        }
+        table.clickInsertNewRow();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
@@ -424,15 +415,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickButton("Cancel");
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            table = new DataRegionTable("query", getDriver());
-            table.clickInsertNewRow();
-        }
-        else
-        {
-            _extHelper.clickInsertNewRow();
-        }
+        table.clickInsertNewRow();
         assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
         clickButton("Cancel");
 
@@ -451,14 +434,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from update view.
         clickButton("Cancel");
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            table = new DataRegionTable("query", getDriver());
-            table.clickInsertNewRow();
-        }else
-        {
-            _extHelper.clickInsertNewRow();
-        }
+        table.clickInsertNewRow();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
 
@@ -477,15 +453,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickButton("Cancel");
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            table = new DataRegionTable("query", getDriver());
-            table.clickInsertNewRow();
-        }
-        else
-        {
-            _extHelper.clickInsertNewRow();
-        }
+        table.clickInsertNewRow();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
     }

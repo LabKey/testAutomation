@@ -75,12 +75,8 @@ public abstract class AbstractUserHelper
             getWrapper().clickAndWait(users.detailsLink(userRow));
 
             getWrapper().clickButton("Edit");
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-                assertEquals("Editing details for wrong user.",     //todo: put ID on breadcrumbs container
-                        email, Locator.tagWithClass("ol", "breadcrumb").parent().childTag("h3").findElement(getWrapper().getDriver()).getText());
-            else
-                assertEquals("Editing details for wrong user.",
-                    email, Locator.id("labkey-nav-trail-current-page").findElement(getWrapper().getDriver()).getText());
+            assertEquals("Editing details for wrong user.",
+                    email, Locator.tagWithClass("ol", "breadcrumb").parent().childTag("h3").findElement(getWrapper().getDriver()).getText());
             getWrapper().setFormElement(Locator.name("quf_DisplayName"), newDisplayName);
             getWrapper().clickButton("Submit");
             usersAndDisplayNames.put(email, newDisplayName);

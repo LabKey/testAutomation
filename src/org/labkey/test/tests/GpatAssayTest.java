@@ -32,7 +32,6 @@ import java.util.List;
 @Category({Assays.class, DailyB.class})
 public class GpatAssayTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String GPAT_ASSAY_XLS = "trial01.xls";
     private static final String GPAT_ASSAY_XLSX = "trial01a.xlsx";
     private static final String GPAT_ASSAY_TSV = "trial02.tsv";
@@ -237,8 +236,6 @@ public class GpatAssayTest extends BaseWebDriverTest
     @Deprecated
     public String getPropertyXPath(String propertyHeading)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-            return "//h3[text() = '" + propertyHeading + "']/../..";
-        return "//td[text() = '" + propertyHeading + "']/../..";
+        return "//h3[text() = '" + propertyHeading + "']/../..";
     }
 }
