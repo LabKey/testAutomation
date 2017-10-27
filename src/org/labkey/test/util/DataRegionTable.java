@@ -1394,18 +1394,22 @@ public class DataRegionTable extends DataRegion
     {
         public static Locator.XPathLocator dataRegion()
         {
-            if (IS_BOOTSTRAP_LAYOUT)
-                return form().withAttributeMatchingOtherElementAttribute("lk-region-form", Locator.xpath(".//table"), "lk-region-name");
-            else
-                return table();
+            return form();
         }
 
         public static Locator.XPathLocator dataRegion(String regionName)
         {
-            if (IS_BOOTSTRAP_LAYOUT)
-                return form(regionName).withDescendant(table(regionName));
-            else
-                return table(regionName);
+            return form(regionName);
+        }
+
+        public static Locator.XPathLocator dataRegionTable()
+        {
+            return form().withAttributeMatchingOtherElementAttribute("lk-region-form", Locator.xpath(".//table"), "lk-region-name");
+        }
+
+        public static Locator.XPathLocator dataRegionTable(String regionName)
+        {
+            return form(regionName).withDescendant(table(regionName));
         }
 
         public static Locator.XPathLocator table()
