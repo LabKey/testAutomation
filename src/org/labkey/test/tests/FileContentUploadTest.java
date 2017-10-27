@@ -39,11 +39,15 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.components.ext4.Window.Window;
@@ -59,6 +63,8 @@ public class FileContentUploadTest extends BaseWebDriverTest
     private static final String CUSTOM_PROPERTY = "customProperty";
     protected static final String TEST_USER = "user_filecontent@filecontentupload.test";
     private static final String TEST_GROUP = "FileContentTestGroup";
+
+    private static final String subfolderName = "Subfolder1";
 
     // Lookup list info
     private static final String LIST_NAME = "LookupList";
@@ -103,6 +109,10 @@ public class FileContentUploadTest extends BaseWebDriverTest
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER);
         permissionsHelper.setPermissions(TEST_GROUP, "Editor");
+
+        _containerHelper.createSubfolder(getProjectName(), subfolderName);
+        clickFolder(subfolderName);
+        portalHelper.addWebPart("Files");
     }
 
     @Test
@@ -173,6 +183,49 @@ public class FileContentUploadTest extends BaseWebDriverTest
         assertTextNotPresent(TEST_USER);  // User opted out of notifications
     }
 
+    @Test
+    public void testAbsoluteFilePath()
+    {
+        log("Check Absolute File Path in File Browser");
+
+        final String ABSOLUTE_FILE_PATH_BUTTON_ID = "10";
+
+        goToProjectHome();
+        clickFolder(subfolderName);
+        final File testFile = TestFileUtils.getSampleData("security/InlineFile2.html");
+        final String filename = testFile.getName();
+        _fileBrowserHelper.uploadFile(testFile, FILE_DESCRIPTION, Collections.emptyList(), false);
+
+        _fileBrowserHelper.goToAdminMenu();
+        _fileBrowserHelper.goToConfigureButtonsTab();
+        _fileBrowserHelper.unhideGridColumn(ABSOLUTE_FILE_PATH_BUTTON_ID);
+        click(Ext4Helper.Locators.ext4Button("submit"));
+
+        String atFilesPath = getCurrentContainerPath() + "/@files";
+        assertTextPresent(atFilesPath + "/" + filename);
+
+        try
+        {
+            log("Check Absolute File Path in WebDav");
+            String nodeId = "/_webdav" + getCurrentContainerPath() + "/@files/";
+            URL webdavURL = new URL(WebTestHelper.getBaseURL() + "/_webdav" + getCurrentContainerPath());
+            goToURL(webdavURL, 1000);
+            waitForText("WebDav URL");
+
+            /* --- This sometimes works in Firefox, but not Chrome in which the click does not happen (expect with breakpoints in IntelliJ)
+            Locator.XPathLocator folderTreeNode = Locator.tag("tr").attributeEndsWith("data-recordid", nodeId);
+            waitForElement(folderTreeNode);
+            click(folderTreeNode);
+            waitForText("Absolute Path", atFilesPath);
+            */
+        }
+        catch (MalformedURLException e)
+        {
+            fail(e.getMessage());
+        }
+
+    }
+
     @LogMethod(quiet = true)
     private void sendFileDigest()
     {
@@ -236,6 +289,6 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @Override
     public BrowserType bestBrowser()
     {
-        return BrowserType.CHROME;
+        return BrowserType.FIREFOX;
     }
 }

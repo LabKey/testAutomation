@@ -285,6 +285,26 @@ public class FileBrowserHelper extends WebDriverWrapper
         click(Locator.xpath("//tr[@data-recordid='" + buttonId + "']").append(checkboxXpath));
     }
 
+    public void unhideGridColumn(String columnId)
+    {
+        String checkboxXpath = "//*[contains(@class, 'x4-grid-checkcolumn')]";
+        String checkboxSelectedXpath = "/td//*[contains(@class, 'x4-grid-checkcolumn-checked')]";               // first column is Hidden checkbox
+        Locator toolbarShownLocator = Locator.xpath("//tr[@data-recordid='" + columnId + "']").append(checkboxSelectedXpath);
+
+        assertElementPresent(toolbarShownLocator);
+        click(Locator.xpath("//tr[@data-recordid='" + columnId + "']").append(checkboxXpath));
+    }
+
+    public void hideGridColumn(String columnId)
+    {
+        String checkboxXpath = "//*[contains(@class, 'x4-grid-checkcolumn')]";
+        String checkboxSelectedXpath = "/td//*[contains(@class, 'x4-grid-checkcolumn-checked')]";
+        Locator toolbarShownLocator = Locator.xpath("//tr[@data-recordid='" + columnId + "']").append(checkboxSelectedXpath);
+
+        assertElementNotPresent(toolbarShownLocator);
+        click(Locator.xpath("//tr[@data-recordid='" + columnId + "']").append(checkboxXpath));
+    }
+
     public void goToConfigureButtonsTab()
     {
         if (Window(getDriver()).withTitle("Manage File Browser Configuration").findOrNull() == null)
