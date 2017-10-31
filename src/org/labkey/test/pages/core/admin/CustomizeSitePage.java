@@ -263,7 +263,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
 
     public enum ReportingLevel
     {
-        OFF, LOW, MEDIUM, HIGH
+        NONE, LOW, MEDIUM, HIGH
     }
 
     public enum CSRFCheck
