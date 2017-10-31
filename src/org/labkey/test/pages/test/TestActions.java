@@ -16,6 +16,7 @@
 package org.labkey.test.pages.test;
 
 import org.apache.http.HttpStatus;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -96,30 +97,49 @@ public class TestActions extends LabKeyPage
      */
     public enum ExceptionActions
     {
-        configurationException,
-        illegalState,
-        multiException,
+        configurationException("org.labkey.api.util.ConfigurationException"),
+        illegalState("java.lang.IllegalStateException"),
+        multiException(null),
         notFound(HttpStatus.SC_NOT_FOUND),
-        npe,
-        npeother,
+        npe("java.lang.NullPointerException"),
+        npeother("java.lang.NullPointerException"),
         unauthorized(HttpStatus.SC_FORBIDDEN);
 
+        final String exceptionClass;
         final int response;
 
-        ExceptionActions()
+        ExceptionActions(String exceptionClass)
         {
-            response = HttpStatus.SC_INTERNAL_SERVER_ERROR;
+            this.response = HttpStatus.SC_INTERNAL_SERVER_ERROR;
+            this.exceptionClass = exceptionClass;
         }
 
         ExceptionActions(int response)
         {
             this.response = response;
+            this.exceptionClass = null;
         }
 
         public void triggerException(String message)
         {
-            SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("test", toString(), message == null ? Collections.emptyMap() : Maps.of("message", message)));
+            SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(getUrl(message));
             assertEquals(httpResponse.getResponseMessage(), response, httpResponse.getResponseCode());
+        }
+
+        public void beginAt(WebDriverWrapper driverWrapper)
+        {
+            driverWrapper.beginAt(getUrl(null));
+        }
+
+        public String getExceptionClass()
+        {
+            return exceptionClass;
+        }
+
+        @NotNull
+        private String getUrl(String message)
+        {
+            return WebTestHelper.buildURL("test", toString(), message == null ? Collections.emptyMap() : Maps.of("message", message));
         }
 
         public void triggerException()
