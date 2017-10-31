@@ -269,7 +269,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     }
 
     @Override
-    protected String getServerErrors()
+    public String getServerErrors()
     {
         String serverErrors = super.getServerErrors();
         if (serverErrors.contains("agreeToTerms.view?")) // Site terms not accepted. Let postamble do error checking
