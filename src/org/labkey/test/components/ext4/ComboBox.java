@@ -33,6 +33,8 @@ import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.Ext4Helper.Locators.comboListItem;
+import static org.labkey.test.util.Ext4Helper.Locators.comboListItemDisabled;
+import static org.labkey.test.util.Ext4Helper.Locators.comboListItemEnabled;
 import static org.labkey.test.util.Ext4Helper.TextMatchTechnique.EXACT;
 import static org.labkey.test.util.Ext4Helper.getCssPrefix;
 
@@ -213,6 +215,20 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     {
         openComboList();
         return getDriverWrapper().getTexts(comboListItem().findElements(getDriver()));
+    }
+
+    @LogMethod(quiet=true)
+    public List<String> getComboBoxEnabledOptions()
+    {
+        openComboList();
+        return getDriverWrapper().getTexts(comboListItemEnabled().findElements(getDriver()));
+    }
+
+    @LogMethod(quiet=true)
+    public List<String> getComboBoxDisabledOptions()
+    {
+        openComboList();
+        return getDriverWrapper().getTexts(comboListItemDisabled().findElements(getDriver()));
     }
 
     @Override
