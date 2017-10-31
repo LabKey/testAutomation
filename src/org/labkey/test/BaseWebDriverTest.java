@@ -1780,10 +1780,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             log("Selecting schema " + schemaWithParents + " in the schema browser...");
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
             // select/expand tree node
-            try{
+            try
+            {
                 scrollIntoView(loc);
             }
-            catch (StaleElementReferenceException ignore) {}
+            catch (StaleElementReferenceException ignore)
+            {
+                log(ignore.getMessage());
+            }
             doAndWaitForPageSignal(() -> click(loc), "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
             fireEvent(loc, SeleniumEvent.mouseout);

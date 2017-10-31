@@ -80,6 +80,7 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
             }
             catch (StaleElementReferenceException ignore)
             {
+                log(ignore.getMessage());
             }
 
             click(loc);
