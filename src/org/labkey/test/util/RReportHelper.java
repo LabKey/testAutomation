@@ -358,19 +358,20 @@ public class RReportHelper
         return TestFileUtils.getProcessOutput(getRScriptExecutable(), FileUtil.getAbsoluteCaseSensitiveFile(script).getAbsolutePath());
     }
 
-    public void saveReport(String name, int wait)
+    public void saveReport(String name, boolean isSaveAs, int wait)
     {
-        WebElement saveButton = Ext4Helper.Locators.ext4Button("Save").findElement(_test.getDriver());
+        WebElement saveButton = Ext4Helper.Locators.ext4Button(isSaveAs ? "Save As" : "Save").findElement(_test.getDriver());
         _test.scrollIntoView(saveButton, true);
         _test.clickAndWait(saveButton, wait);
         if (null != name)
         {
-            Locator locator = Ext4Helper.Locators.window("Save Report").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+            String windowTitle = isSaveAs ? "Save Report As" : "Save Report";
+            Locator locator = Ext4Helper.Locators.window(windowTitle).append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
             _test.waitForElement(locator);
             if (_test.isElementPresent(locator))
             {
                 _test.setFormElement(locator, name);
-                Window window = new Window("Save Report", _test.getWrappedDriver());
+                Window window = new Window(windowTitle, _test.getWrappedDriver());
                 window.clickButton("OK");
             }
         }
@@ -378,7 +379,12 @@ public class RReportHelper
 
     public void saveReport(String name)
     {
-        saveReport(name,0);
+        saveReport(name, false, 0);
+    }
+
+    public void saveAsReport(String name)
+    {
+        saveReport(name, true, 0);
     }
 
     public void selectOption(ReportOption option)

@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -7,17 +8,20 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
-import org.labkey.test.components.ext4.Window;
+import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Reports;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.RReportHelper;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Category({InDevelopment.class})
+@Category({DailyC.class, Reports.class})
 public class ReportSharingTest extends BaseWebDriverTest
 {
+    RReportHelper _rReportHelper = new RReportHelper(this);
+
     private static final String USER_NON_EDITOR = "labkey_non_editor@reportsharing.test";
     private static final String USER_EDITOR = "labkey_user@reportsharing.test";
     private static final String USER_DEV = "labkey_dev@reportsharing.test";
@@ -25,21 +29,20 @@ public class ReportSharingTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _userHelper.deleteUsers(true,USER_DEV,USER_EDITOR,USER_NON_EDITOR);
         _containerHelper.deleteProject(getProjectName(),afterTest);
+        _userHelper.deleteUsers(false, USER_DEV,USER_EDITOR,USER_NON_EDITOR);
     }
 
     @BeforeClass
     public static void setupProject()
     {
         ReportSharingTest init = (ReportSharingTest) getCurrentTest();
-
         init.doSetup();
-
     }
 
     private void doSetup()
     {
+        _rReportHelper.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);
 
@@ -53,14 +56,12 @@ public class ReportSharingTest extends BaseWebDriverTest
         apiPermissionsHelper.setUserPermissions(USER_EDITOR,"Reader");
         apiPermissionsHelper.setUserPermissions(USER_NON_EDITOR,"Submitter");
         apiPermissionsHelper.addUserToSiteGroup(USER_DEV, "Site Administrators");
-
     }
 
     @Before
     public void preTest() throws Exception
     {
         goToProjectHome();
-
     }
 
     @Test
@@ -68,80 +69,70 @@ public class ReportSharingTest extends BaseWebDriverTest
     {
         // go to core.Containers view
         goToSchemaBrowser();
-        DataRegionTable table = viewQueryData("core","Containers");
+        viewQueryData("core","Containers");
 
         //create R report
-        table.goToReport("Create R Report");
-        findButton("Save").click();
-        _extHelper.waitForExtDialog("Save Report", WAIT_FOR_JAVASCRIPT);
-
-        final Window saveWindow = Window.Window(getDriver()).withTitle("Save Report").waitFor();
         String REPORT_NAME = "shared report";
-        setFormElement(Locator.xpath("//input[contains(@class, 'x4-form-field')]").findElement(saveWindow), REPORT_NAME);
-        saveWindow.clickButton("OK");
+        _rReportHelper.createRReport(REPORT_NAME);
 
-        // open new report from view
-        goToSchemaBrowser();
-        table = viewQueryData("core","Containers");
-        table.goToReport(REPORT_NAME);
+        // open new report from view and share it
+        goToContainersReport(REPORT_NAME);
+        shareReportAndConfirm(USER_DEV, null);
 
-        // click share button, add recipient to list and submit
-        click(Locator.byClass("fa-share"));
-        setFormElement(Locator.textarea("recipientList"),USER_DEV);
-        clickAndWait(Locator.linkContainingText("Submit"));
-
-        // confirm recipient has been added as a specific user
-        assertChecked(Locator.tagWithText("td",USER_DEV).followingSibling("td").childTag("input"));
-        clickAndWait(Locator.linkContainingText("Save"));
-
-        //confirm recipient can Save As
+        // impersonate user and go to report
         impersonate(USER_DEV);
         goToProjectHome();
-        goToSchemaBrowser();
-        table = viewQueryData("core","Containers");
-        table.goToReport(REPORT_NAME);
-        click(Locator.linkContainingText("Source"));
-        scrollIntoView(Locator.linkContainingText("Save As"));
-        click(Locator.linkContainingText("Save As"));
-        _extHelper.waitForExtDialog("Save Report As", WAIT_FOR_JAVASCRIPT);
-        final Window saveAsWindow = Window.Window(getDriver()).withTitle("Save Report As").waitFor();
+        goToContainersReport(REPORT_NAME);
+
+        //confirm recipient can Save As
+        _rReportHelper.clickSourceTab();
         String REPORT_NAME_SAVED_AS = "shared report saved";
-        setFormElement(Locator.xpath("//input[contains(@class, 'x4-form-field')]").findElement(saveAsWindow), REPORT_NAME_SAVED_AS);
-        saveAsWindow.clickButton("OK");
+        _rReportHelper.saveAsReport(REPORT_NAME_SAVED_AS);
 
         //confirm recipient can share report saved from shared
-        goToSchemaBrowser();
-        table = viewQueryData("core","Containers");
-        table.goToReport(REPORT_NAME_SAVED_AS);
-        click(Locator.byClass("fa-share"));
-        setFormElement(Locator.textarea("recipientList"),USER_EDITOR);
-        clickAndWait(Locator.linkContainingText("Submit"));
-
-        //confirm recipient is included in Users list and checked
-        assertChecked(Locator.tagWithText("td",USER_EDITOR).followingSibling("td").childTag("input"));
+        goToContainersReport(REPORT_NAME_SAVED_AS);
+        shareReportAndConfirm(USER_EDITOR, null);
     }
 
     @Test
     public void testSharingWithNonEditor() throws Exception
     {
+        // go to core.Containers view
+        goToSchemaBrowser();
+        viewQueryData("core","Containers");
+
+        //create R report
+        String REPORT_NAME_FOR_FAIL_SHARE = "shared report fail";
+        _rReportHelper.createRReport(REPORT_NAME_FOR_FAIL_SHARE);
+
+        // open new report from view and attempt to share it
+        goToContainersReport(REPORT_NAME_FOR_FAIL_SHARE);
+        shareReportAndConfirm(USER_NON_EDITOR, "User does not have permissions to this container: labkey_non_editor@reportsharing.test");
+    }
+
+    private void goToContainersReport(String reportName)
+    {
         goToSchemaBrowser();
         DataRegionTable table = viewQueryData("core","Containers");
-        table.goToReport("Create R Report");
-        findButton("Save").click();
-        _extHelper.waitForExtDialog("Save Report", WAIT_FOR_JAVASCRIPT);
+        table.goToReport(reportName);
+    }
 
-        final Window saveWindow = Window.Window(getDriver()).withTitle("Save Report").waitFor();
-        String REPORT_NAME_FOR_FAIL_SHARE = "shared report fail";
-        setFormElement(Locator.xpath("//input[contains(@class, 'x4-form-field')]").findElement(saveWindow), REPORT_NAME_FOR_FAIL_SHARE);
-        saveWindow.clickButton("OK");
+    private void shareReportAndConfirm(String recipient, @Nullable String expectedErrorMsg)
+    {
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        table.clickHeaderButton("Share report");
+        setFormElement(Locator.textarea("recipientList"), recipient);
+        clickButton("Submit");
 
-        goToSchemaBrowser();
-        table = viewQueryData("core","Containers");
-        table.goToReport(REPORT_NAME_FOR_FAIL_SHARE);
-        click(Locator.byClass("fa-share"));
-        setFormElement(Locator.textarea("recipientList"),USER_NON_EDITOR);
-        clickAndWait(Locator.linkContainingText("Submit"));
-        assertTextPresent("User does not have permissions to this container: labkey_non_editor@reportsharing.test");
+        if (expectedErrorMsg != null)
+        {
+            assertTextPresent(expectedErrorMsg);
+        }
+        else
+        {
+            //confirm recipient is included in Users list and checked
+            assertChecked(Locator.tagWithText("td", recipient).followingSibling("td").childTag("input"));
+        }
     }
 
     @Override
