@@ -842,7 +842,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         log("No new errors found.");
     }
 
-    protected String getServerErrors()
+    public String getServerErrors()
     {
         SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "showErrorsSinceMark"), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         assertEquals("Failed to fetch server errors: " + httpResponse.getResponseMessage(), HttpStatus.SC_OK, httpResponse.getResponseCode());
