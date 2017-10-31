@@ -476,6 +476,7 @@ public class ListHelper extends LabKeySiteWrapper
         waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);
         waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        mouseOut(); // After clicking save, sometimes the page scrolls so that the project menu is under the mouse
     }
 
     public void clickDeleteList()
