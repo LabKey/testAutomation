@@ -931,6 +931,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         log("Got to the QC page.");
         DilutionAssayHelper detailHelper = new DilutionAssayHelper(this);
+        waitForText("View QC");
         detailHelper.clickDetailsLink("View QC", "Review/QC Data");
         RunQCPage runQCPage = new RunQCPage(getDriver());
 
