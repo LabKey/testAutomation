@@ -121,45 +121,54 @@ public class NabAssayTest extends AbstractQCAssayTest
             "            \n" +
             "            for (var j = 0; j < runs.length; j += 1)\n" +
             "            {\n" +
-            "                if (runs[j].cutoffs[0] != 50) throw 'GetNabRuns failure 1';\n" +
-            "                var sampleIds = [];\n" +
-            "                var samples = runs[j].samples;\n" +
-            "                for (var k = 0; k < samples.length; k += 1)\n" +
-            "                {\n" +
-            "                    sampleIds[k] = samples[k].objectId;\n" +
-            "                }\n" +
-            "                var studyRunsConfig = {\n" +
-            "                    objectIds : sampleIds,\n" +
-            "                    containerPath : '" + STUDY_FOLDER + "',\n" +
-            "                    success : function(runs)\n" +
+            "                if (runs[j].cutoffs[0] != 50) \n" +
+            "                    fail('GetNabRuns failure 1');\n" +
+            "                else {\n" +
+            "                    var sampleIds = [];\n" +
+            "                    var samples = runs[j].samples;\n" +
+            "                    for (var k = 0; k < samples.length; k += 1)\n" +
             "                    {\n" +
-            "                        if (runs.length == 0) return;\n" +
-            "                        if (runs[0].cutoffs[0] != 50) throw 'GetStudyNabRuns failure 1';\n" +
-            "                        var studyRunsGraphConfig = {\n" +
-            "                            objectIds : sampleIds,\n" +
-            "                            containerPath : '" + STUDY_FOLDER + "',\n" +
-            "                            success : function(graph)\n" +
-            "                            {\n" +
-            "                               if (graph.length == 0) return;\n" +
-            "                               if (graph.url.indexOf('" + STUDY_FOLDER_ENCODED + "') < 0) throw 'GetStudyGraphURL failure';\n" +
-            "                               var node = document.createElement('div');\n" +
-            "                               var textnode = document.createTextNode('Success!');\n" +
-            "                               node.appendChild(textnode);\n" +
-            "                               document.getElementById(config.renderTo).appendChild(node);\n" +
-            "                            },\n" +
-            "                            failure : function() {throw 'GetStudyGraphURL failure';}\n" +
-            "                        }\n" +
-            "                        var nabStudyGraphURl = LABKEY.Assay.getStudyNabGraphURL(studyRunsGraphConfig);\n" +
-            "                    },\n" +
-            "                    failure : function() {throw 'GetStudyNabRuns failure 2';}\n" +
+            "                        sampleIds[k] = samples[k].objectId;\n" +
+            "                    }\n" +
+            "                    var studyRunsConfig = {\n" +
+            "                        objectIds : sampleIds,\n" +
+            "                        containerPath : '" + STUDY_FOLDER + "',\n" +
+            "                        success : function(runs)\n" +
+            "                        {\n" +
+            "                            if (runs.length == 0) return;\n" +
+            "                            if (runs[0].cutoffs[0] != 50) " +
+            "                               fail('GetStudyNabRuns failure 1');\n" +
+            "                            else {" +
+            "                                var studyRunsGraphConfig = {\n" +
+            "                                    objectIds : sampleIds,\n" +
+            "                                    containerPath : '" + STUDY_FOLDER + "',\n" +
+            "                                    success : function(graph)\n" +
+            "                                    {\n" +
+            "                                       if (graph.length == 0) return;\n" +
+            "                                       if (graph.url.indexOf('" + STUDY_FOLDER_ENCODED + "') < 0) throw 'GetStudyGraphURL failure';\n" +
+            "                                       var node = document.createElement('div');\n" +
+            "                                       var textnode = document.createTextNode('Success!');\n" +
+            "                                       node.appendChild(textnode);\n" +
+            "                                       document.getElementById(config.renderTo).appendChild(node);\n" +
+            "                                    },\n" +
+            "                                    failure : function() {fail('GetStudyGraphURL failure');}\n" +
+            "                                }\n" +
+            "                                var nabStudyGraphURl = LABKEY.Assay.getStudyNabGraphURL(studyRunsGraphConfig);\n" +
+            "                            }\n" +
+            "                        },\n" +
+            "                        failure : function() {fail('GetStudyNabRuns failure 2');}\n" +
+            "                    }\n" +
+            "                    var nabStudyRuns = LABKEY.Assay.getStudyNabRuns(studyRunsConfig);\n" +
             "                }\n" +
-            "                var nabStudyRuns = LABKEY.Assay.getStudyNabRuns(studyRunsConfig);\n" +
             "            }\n" +
             "        },\n" +
-            "        failure : function() {throw 'GetNabRuns failure 2';}\n" +
+            "        failure : function() {fail('GetNabRuns failure 2');}\n" +
             "    };\n" +
             "    var nabRuns = LABKEY.Assay.getNAbRuns(runsConfig);\n" +
-            "}\n" +
+            "};\n" +
+            "function fail(message) {\n" +
+            "    document.getElementById(config.renderTo).appendChild(document.createTextNode('Failure: ' + message));\n" +
+            "};\n" +
             "runNabAssayTest({renderTo : '" + TEST_DIV_ID + "'});\n" +
             "</script>\n" +
             "<div id=\"" + TEST_DIV_ID + "\"></div>";
