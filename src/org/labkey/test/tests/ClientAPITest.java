@@ -38,6 +38,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -451,18 +453,14 @@ public class ClientAPITest extends BaseWebDriverTest
         checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "General"));
         clickButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(getDriver());
+        assayDesigner
+                .setName(TEST_ASSAY)
+                .setDescription(TEST_ASSAY_DESC);
+        assayDesigner.runFields()
+                .addField(new FieldDefinition("RunDate").setLabel("Run Date").setType(FieldDefinition.ColumnType.DateTime));
+        assayDesigner.saveAndClose();
 
-        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY);
-        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_DESC);
-        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
-
-        _listHelper.addField("Run Fields", "RunDate", "Run Date", ListHelper.ListColumnType.DateTime);
-
-        sleep(1000);
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
-        
         setSourceFromFile("assayTest.js");
 
         assertTextPresent(
