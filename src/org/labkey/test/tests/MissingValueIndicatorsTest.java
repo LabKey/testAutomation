@@ -33,10 +33,12 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -280,6 +282,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assertNoLabKeyErrors();
         assertMvIndicatorPresent();
         assertTextPresent("Ted", "Alice", "Bob", "Q", "N", "male", "female", "17");
+        //testMvFiltering(); TODO: Uncomment once Issue # 31995 is fixed
     }
 
     private void validateTwoColumnData(String dataRegionName, String columnName)
@@ -296,6 +299,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         click(Locator.xpath("//img[@class='labkey-mv-indicator']/../../a"));
         assertTextPresent("'25'");
         dataRegion.clearAllFilters(columnName);
+        //testMvFiltering(); TODO: Uncomment once Issue # 31995 is fixed
     }
 
     @Test
@@ -447,6 +451,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickTab("Clinical and Assay Data");
         waitAndClickAndWait(Locator.linkWithText("MVAssay"));
         assertMvIndicatorPresent();
+        //testMvFiltering(); TODO: Uncomment once Issue # 31995 is fixed
     }
 
     private void assertMvIndicatorPresent()
@@ -455,6 +460,50 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         Locator loc = Locator.xpath("//img[@class='labkey-mv-indicator']");
         waitForElement(loc);
         assertElementPresent(Locator.xpath("//img[@class='labkey-mv-indicator']"));
+    }
+
+    private void testMvFiltering()
+    {
+        log("Testing if missing value filtering works as expected");
+        String mviFilter = "Has a missing value indicator";
+        String noMviFilter = "Does not have a missing value indicator";
+        List<String> columns = DataRegion(getDriver()).find().getColumnNames();
+        for(String colName: columns){
+            DataRegion(getDriver()).find().openFilterDialog(colName);
+            if(isTextPresent("Choose Filters"))
+            {
+                _extHelper.clickExtTab("Choose Filters");
+            }
+            WebElement comboArrow = Locator.css(".x-form-arrow-trigger")
+                    .findElement( Locator.tagWithClass("div", "x-form-item").withPredicate(Locator.xpath("./label").withText("Filter Type:")).findElement(getDriver()));
+            comboArrow.click();
+            List<WebElement> elements = getDriver().findElements(By.xpath("//div[@class='x-combo-list-item']"));
+
+            List<String> options = new ArrayList<>();
+
+            for (WebElement el : elements)
+            {
+                options.add(el.getText());
+            }
+
+            if(options.contains(mviFilter) || options.contains(noMviFilter))
+            {
+                comboArrow.click();
+                clickButton("CANCEL", 0);
+                DataRegion(getDriver()).find().setFilter(colName, mviFilter);
+                assertTextNotPresent("Ignoring filter/sort on column ", "because it does not exist.");
+                DataRegion(getDriver()).find().clearFilter(colName);
+                DataRegion(getDriver()).find().setFilter(colName, noMviFilter);
+                assertTextNotPresent("Ignoring filter/sort on column ", "because it does not exist.");
+                DataRegion(getDriver()).find().clearFilter(colName);
+            }
+            else{
+                log("No Mvi Filter in the column");
+                comboArrow.click();
+                clickButton("CANCEL", 0);
+            }
+        }
+
     }
 
     @LogMethod
