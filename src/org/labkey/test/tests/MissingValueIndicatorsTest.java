@@ -282,7 +282,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assertNoLabKeyErrors();
         assertMvIndicatorPresent();
         assertTextPresent("Ted", "Alice", "Bob", "Q", "N", "male", "female", "17");
-        //testMvFiltering(); TODO: Uncomment once Issue # 31995 is fixed
+        testMvFiltering();
     }
 
     private void validateTwoColumnData(String dataRegionName, String columnName)
@@ -299,7 +299,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         click(Locator.xpath("//img[@class='labkey-mv-indicator']/../../a"));
         assertTextPresent("'25'");
         dataRegion.clearAllFilters(columnName);
-        //testMvFiltering(); TODO: Uncomment once Issue # 31995 is fixed
+        testMvFiltering();
     }
 
     @Test
