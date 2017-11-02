@@ -763,16 +763,6 @@ public class Ext4Helper
             return Locator.tagWithClass("*", _cssPrefix + "boundlist-selected").notHidden();
         }
 
-        public static Locator.XPathLocator comboListItemEnabled()
-        {
-            return Locator.tagWithClass("*", _cssPrefix + "boundlist-item").notHidden().append("/div[not(contains(@class, '-disabled-combo-item'))]");
-        }
-
-        public static Locator.XPathLocator comboListItemDisabled()
-        {
-            return Locator.tagWithClass("*", _cssPrefix + "boundlist-item").notHidden().append("/div[contains(@class, 'disabled-combo-item')]");
-        }
-
         public static Locator.XPathLocator checkbox(WebDriverWrapper test, String label)
         {
             Locator.XPathLocator l = Locator.xpath("//input[contains(@class,'" + _cssPrefix + "form-checkbox')][../label[text()='" + label + "']]");
