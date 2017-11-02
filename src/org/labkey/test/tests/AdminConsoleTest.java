@@ -100,7 +100,9 @@ public class AdminConsoleTest extends BaseWebDriverTest
     @Test
     public void testAppAdminRole()
     {
-       // log out as siteAdmin, log in as appAdmin
+        Locator siteAdminLoc = Locator.pageHeader("Site Administration");
+        
+        // log out as siteAdmin, log in as appAdmin
         signOut();
         signIn(APP_ADMIN_USER, APP_ADMIN_USER_PASS);
         clickButton("Submit");
@@ -155,40 +157,38 @@ public class AdminConsoleTest extends BaseWebDriverTest
         }
 
         //analytics settings
-        URL url = getURL(); // will capture with redirect url
         goToAdminConsole().clickAnalyticsSettings();
         assertElementNotPresent(Locator.button("submit"));
         clickButton("done");
-        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
-        url = getURL(); // will capture without redirect url
+        assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
 
         //authentication
         goToAdminConsole().clickAuthentication();
         assertElementNotPresent("expect 'enable' links to be disabled for appAdmin", Locator.linkWithText("enable"));
         assertElementNotPresent("expect 'configure' links to be disabled for appAdmin", Locator.linkWithText("configure"));
         clickButton("Done");
-        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
+        assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
 
         //email customization
         goToAdminConsole().clickEmailCustomization();
         clickButton("Cancel");
-        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
+        assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
 
         //site settings
         goToAdminConsole().clickSiteSettings();
         clickButton("Done");
-        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
+        assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
 
         //system maintenance
         goToAdminConsole().clickSystemMaintenance();
         clickButton("Done");
-        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
+        assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
 
         // views and scripting
         goToAdminConsole().clickViewsAndScripting();
         assertNull(Locator.buttonContainingText("Edit").findElementOrNull(getDriver()));
         clickButton("Done");
-        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
+        assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
     }
 
     public List<String> getAssociatedModules()

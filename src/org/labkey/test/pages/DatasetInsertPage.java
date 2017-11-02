@@ -26,7 +26,7 @@ public class DatasetInsertPage extends InsertPage
 {
     public DatasetInsertPage(WebDriver driver, String datasetName)
     {
-        super(driver, "Insert new entry: " + datasetName);
+        super(driver, "Insert " + datasetName);
     }
 
     public DatasetInsertPage(WebDriver driver)
