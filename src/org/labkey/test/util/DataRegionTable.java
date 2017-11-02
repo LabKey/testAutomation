@@ -898,7 +898,7 @@ public class DataRegionTable extends DataRegion
 
         if (errorExpected)
         {
-            Window removeError = new Window("Selection Required", getDriver());
+            Window removeError = new Window("Error", getDriver());
             assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
             removeError.clickButton("OK", true);
         }
