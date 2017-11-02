@@ -17,7 +17,6 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.BodyWebPart;
@@ -32,9 +31,6 @@ import org.openqa.selenium.internal.WrapsDriver;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.fail;
-import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
 
 /**
  * TODO: Move appropriate functionality into {@link org.labkey.test.pages.PortalBodyPanel} and {@link org.labkey.test.components.WebPart}
@@ -285,10 +281,9 @@ public class PortalHelper extends WebDriverWrapper
     {
         boolean wasInAdminModeAlready = enterAdminMode();
         waitForElement(Locator.xpath("//option").withText(webPartName));
-        Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
-        selectOptionByText(form.append("//select"), webPartName);
-        sleep(250); // todo; better wait for 'add' button to be interactive
-        clickAndWait(form.append(Locator.lkButton("Add")));
+        WebElement form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]").findElement(getDriver());
+        selectOptionByText(Locator.tag("select").findElement(form), webPartName);
+        doAndWaitForPageToLoad(form::submit);
         if (!wasInAdminModeAlready)
             exitAdminMode();
     }
