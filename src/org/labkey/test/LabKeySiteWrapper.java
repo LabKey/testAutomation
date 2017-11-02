@@ -1078,7 +1078,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (assertDestination)
         {
             acceptTermsOfUse(null, true);
-            assertEquals("In wrong project", project, getCurrentContainer());
+            assertEquals("In wrong project", project.toLowerCase(), getCurrentContainer().toLowerCase());
         }
     }
 
