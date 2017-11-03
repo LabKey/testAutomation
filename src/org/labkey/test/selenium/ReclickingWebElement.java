@@ -22,6 +22,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.internal.WrapsElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -71,6 +72,7 @@ public class ReclickingWebElement extends WebElementDecorator
         WebDriverUtils.ScrollUtil scrollUtil = new WebDriverUtils.ScrollUtil(getDriver());
         if (clickBlocked)
         {
+            new Actions(getDriver()).moveByOffset(-9999,-9999).build().perform(); // try to dismiss tooltips and such
             revealed = scrollUtil.scrollUnderFloatingHeader(el);
         }
         if (!revealed)
