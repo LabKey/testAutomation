@@ -391,6 +391,7 @@ public class ModuleAssayTest extends AbstractAssayTest
             String uploadedFile = uploadedFiles[i];
             File file = new File(dataRoot, uploadedFile);
             assertTrue(file.exists());
+            log("Uploading file: " + uploadedFile);
             setFormElement(Locator.id("upload-run-field-file"), file);
             int count = 5;
             do
