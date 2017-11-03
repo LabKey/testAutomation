@@ -377,6 +377,22 @@ public class ETLHelper
         insertQueryRow(id, name, runId, "source", subFolder);
     }
 
+    void insertTarget2Row(String rowId, String id, String name , String runId)
+    {
+        String query = "target2";
+        _test.log("inserting target2 row " + name);
+        _test.waitAndClickAndWait(Locator.linkWithText(StringUtils.capitalize(query)));
+        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRow();
+        _test.waitForElement(Locator.name("quf_rowid"));
+        _test.setFormElement(Locator.name("quf_rowid"), rowId);
+        _test.setFormElement(Locator.name("quf_id"), id);
+        _test.setFormElement(Locator.name("quf_name"), name);
+        _test.setFormElement(Locator.name("quf_ditransformrunid"), runId);
+
+        _test.clickButton("Submit");
+        _test.log("returning to project home or folder");
+    }
+
     void insertSourceRow(String id, String name, String runId)
     {
         insertQueryRow(id, name, runId, "source");
