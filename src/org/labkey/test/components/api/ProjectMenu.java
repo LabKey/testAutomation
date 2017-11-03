@@ -26,7 +26,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -64,6 +63,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     {
         if (!isOpen())
         {
+            getWrapper().executeScript("window.scrollTo(0,0);");
             if (getWrapper().isElementPresent(Locator.css("li.dropdown.open > .lk-custom-dropdown-menu")))
                 getWrapper().mouseOver(elementCache().menuToggle); // Just need to hover if another menu is already open
             else
