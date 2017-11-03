@@ -78,6 +78,7 @@ modules/ETLtest/resources/ETLs/SimpleETLbadConfigXML.xml -text svneol=unset#appl
 modules/ETLtest/resources/ETLs/SimpleETLqueryDoesNotExist.xml -text svneol=unset#application/xml
 modules/ETLtest/resources/ETLs/SleepTask.xml -text
 modules/ETLtest/resources/ETLs/SleepTaskAllowDoubleQueue.xml -text
+modules/ETLtest/resources/ETLs/SourceToTarget2.xml -text
 modules/ETLtest/resources/ETLs/TaskRefTask.xml -text
 modules/ETLtest/resources/ETLs/append.xml -text svneol=unset#application/xml
 modules/ETLtest/resources/ETLs/appendAndTaskRefTask.xml -text
@@ -96,6 +97,7 @@ modules/ETLtest/resources/ETLs/constantsStepOverride.xml -text svneol=unset#appl
 modules/ETLtest/resources/ETLs/merge.xml -text
 modules/ETLtest/resources/ETLs/mergeManyColumns.xml -text
 modules/ETLtest/resources/ETLs/mergeWithAlternateKey.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/multipleAppendsWithSleepTransactSource.xml -text
 modules/ETLtest/resources/ETLs/multipleTransactions.xml -text svneol=unset#application/xml
 modules/ETLtest/resources/ETLs/projects1.xml -text
 modules/ETLtest/resources/ETLs/projects2.xml -text

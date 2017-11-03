@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml" transactSourceSchema="etltest">
+<name>Multiple Appends With Sleep Transact Source</name>
+<description>append rows from source to target and 180column source to 180column target</description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="source" />
+        <destination schemaName="etltest" queryName="target" />
+    </transform>
+    <transform id="step2 - sleep" type="TaskRefTransformStep">
+        <taskref ref="org.labkey.di.steps.TestTaskRefTask">
+            <settings>
+                <setting name="setting1" value="anything"/>
+                <setting name="sleep" value="10"/>
+            </settings>
+        </taskref>
+    </transform>
+    <transform id="step3" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to 180 column target</description>
+        <source schemaName="etltest" queryName="x180column_source" />
+        <destination schemaName="etltest" queryName="x180column_target" />
+    </transform>
+</transforms>
+<!--<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified">-->
+    <!--&lt;!&ndash;<deletedRowsSource schemaName="etltest" queryName="delete" deletedSourceKeyColumnName="id" timestampColumnName="rowversion" targetKeyColumnName="id"/>&ndash;&gt;-->
+<!--</incrementalFilter>-->
+    <schedule>
+        <poll interval="15s" />
+    </schedule>
+</etl>

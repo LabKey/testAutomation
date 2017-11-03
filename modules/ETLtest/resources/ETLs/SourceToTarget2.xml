@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml" transactDestinationSchema="etltest">
+<name>Source to target2</name>
+<description>append rows from source to target </description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="source" />
+        <destination schemaName="etltest" queryName="target" />
+    </transform>
+    <transform id="step2" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target2</description>
+        <source schemaName="etltest" queryName="source" />
+        <destination schemaName="etltest" queryName="target2" />
+    </transform>
+</transforms>
+<!--<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified">-->
+    <!--&lt;!&ndash;<deletedRowsSource schemaName="etltest" queryName="delete" deletedSourceKeyColumnName="id" timestampColumnName="rowversion" targetKeyColumnName="id"/>&ndash;&gt;-->
+<!--</incrementalFilter>-->
+    <schedule>
+        <poll interval="15s" />
+    </schedule>
+</etl>
