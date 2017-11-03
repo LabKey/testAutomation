@@ -87,7 +87,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     {
         String reportSource = readReport(reportSourcePath);
 
-        clickProject(getProjectName());
+        goToProjectHome();
         goToManageViews();
 
         BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"R Report");
@@ -96,9 +96,9 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         return reportSource;
     }
 
-    protected WebElement createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
+    protected WebElement createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains, boolean useRmarkdownV2)
     {
-        return createAndVerifyKnitrReport(reportSourcePath, knitrOption, reportContains, reportNotContains, false, reportSourcePath.getFileName() + " Report");
+        return createAndVerifyKnitrReport(reportSourcePath, knitrOption, reportContains, reportNotContains, useRmarkdownV2, reportSourcePath.getFileName() + " Report");
     }
 
     protected WebElement createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains, boolean useRmarkdownV2, String reportName)
@@ -176,7 +176,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
                                       "begin.rcode",                     // knitr commands shouldn't be visible
                                       "opts_chunk"};                     // Un-echoed R code
 
-        createAndVerifyKnitrReport(rhtmlReport, RReportHelper.ReportOption.knitrHtml, reportContains, reportNotContains);
+        createAndVerifyKnitrReport(rhtmlReport, RReportHelper.ReportOption.knitrHtml, reportContains, reportNotContains, false);
     }
 
     @Override
@@ -214,6 +214,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         // If the dependencies did not load correctly then the test will fail with an
         // UnhandledAlertException when trying to view this report in the report designer
         //
+        setPandocEnabled(true);
         clickProject(getProjectName());
         _ext4Helper.waitForMaskToDisappear();
         waitAndClickAndWait(Locator.linkWithText("kable"));

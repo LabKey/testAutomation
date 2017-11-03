@@ -83,7 +83,7 @@ public class KnitrReportTest extends AbstractKnitrReportTest
                                       //"propto",           // MathJax source
                                       "data_means"};      // Non-echoed R code
 
-        createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains);
+        createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true);
         assertEquals("Knitr report failed to display plot", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(plotLocator.findElement(getDriver()).getAttribute("src")).getResponseCode());
     }
 
@@ -176,6 +176,8 @@ public class KnitrReportTest extends AbstractKnitrReportTest
 
     private void verifyAdhocReportDependencies(String viewName, String dependencies)
     {
+        setPandocEnabled(true);
+
         // just do a sanity check of the report's contents.  If the dependencies aren't loaded then we'll throw an alert
         Locator[] reportContains = {Locator.id("mtcars_table_wrapper"), Locator.css("h1").withText("jQuery DataTables")};
         String[] reportNotContains = {"```", "{r",};
@@ -189,8 +191,6 @@ public class KnitrReportTest extends AbstractKnitrReportTest
             assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
         }
         resumeJsErrorChecker();
-
-        _rReportHelper.clickSourceTab();
 
         // now set the dependencies
         _rReportHelper.clickSourceTab();
