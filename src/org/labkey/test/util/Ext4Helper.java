@@ -852,7 +852,7 @@ public class Ext4Helper
 
         public static Locator.XPathLocator mask()
         {
-            return Locator.byClass(_cssPrefix + "mask").withoutPredicate("contains(@style, 'display: none')");
+            return Locator.tag("div").withClass(_cssPrefix + "mask").notHidden();
         }
 
         public static Locator.XPathLocator folderManagementTreeSelectedNode(String nodeText)
