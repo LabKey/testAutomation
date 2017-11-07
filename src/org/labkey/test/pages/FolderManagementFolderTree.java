@@ -18,6 +18,7 @@ package org.labkey.test.pages;
 import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.Window;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -58,7 +59,7 @@ public class FolderManagementFolderTree
                         "        pathArray = pathArray.slice(1);\n" +
                         "    if (pathArray[pathArray.length-1] == \"\")\n" +
                         "        pathArray = pathArray.slice(0, pathArray.length-1);\n" +
-                        "    var el = Ext4.DomQuery.selectNode(\"div[class*='\"+markerCls+\"']\");\n" +
+                        "    var el = Ext4.DomQuery.selectNode(\"div.\"+markerCls);\n" +
                         "    if (el) {\n" +
                         "        var tree = Ext4.getCmp(el.id);\n" +
                         "        if (tree) {\n" +
@@ -73,11 +74,7 @@ public class FolderManagementFolderTree
                         "                node = root.findChild('containerPath', _path, true);\n" +
                         "                if (node) {\n" +
                         "                    if (i==(pathArray.length-1)) {\n" +
-                        "                        var e = {};\n" +
-                        "                        if (keepExisting) {\n" +
-                        "                            e.ctrlKey = true;\n" +
-                        "                        }\n" +
-                        "                        tree.getSelectionModel().select(node, e, keepExisting);\n" +
+                        "                        tree.getSelectionModel().select(node, keepExisting);\n" +
                         "                    }\n" +
                         "                }\n" +
                         "                else {\n" +
@@ -183,35 +180,21 @@ public class FolderManagementFolderTree
         }
     }
 
-    private void dragAndDrop(Locator el, int xOffset, int yOffset)
-    {
-        WebElement fromEl = el.findElement(_test.getDriver());
-        Actions builder = new Actions(_test.getDriver());
-        builder.clickAndHold(fromEl).build().perform();
-        _test.sleep(1000); //TODO: Figure out what to wait for
-        builder.moveByOffset(xOffset, yOffset).build().perform();
-        _test.sleep(1000); //TODO: Figure out what to wait for
-        builder.release().build().perform();
-    }
-
     private void dragAndDrop(Locator from, Locator to, BaseWebDriverTest.Position pos, String hoverText)
     {
         WebElement fromEl = from.findElement(_test.getDriver());
         WebElement toEl = to.findElement(_test.getDriver());
-        int fromElY = fromEl.getLocation().getY();
-        int toElY = toEl.getLocation().getY();
         int offset = 0;
-        int tries = 0;
-        if(fromElY - toElY > 0) offset = -1;
-        if(fromElY - toElY < 0) offset = 1;
         int y;
         switch (pos)
         {
             case top:
-                y = 1;
+                y = 5;
+                offset = -1;
                 break;
             case bottom:
-                y = toEl.getSize().getHeight() - 1;
+                y = toEl.getSize().getHeight() - 5;
+                offset = 1;
                 break;
             case middle:
                 y = toEl.getSize().getHeight() / 2;
@@ -222,28 +205,29 @@ public class FolderManagementFolderTree
 
         Actions builder = new Actions(_test.getDriver());
         builder.clickAndHold(fromEl).build().perform();
-        _test.sleep(1000); //TODO: Figure out what to wait for
-        builder.moveToElement(toEl, toEl.getSize().getWidth()/2, y).build().perform();
-        while(! _test.isElementPresent(Locator.tagContainingText("div", hoverText)) && tries < 50)
-        {
-            builder.moveByOffset(0, offset).build().perform();
-            _test.sleep(250);
-            tries++;
-        }
+        _test.waitForElement(Locator.byClass("x4-grid-dd-wrap"));
+        builder.moveToElement(toEl, toEl.getSize().getWidth()/2, y)
+                .moveByOffset(1, offset) // A little extra move helps trigger the correct hover target
+                .build().perform();
+        _test.waitForElement(Locator.tagContainingText("div", hoverText));
         builder.release().build().perform();
     }
 
-    public void reorderFolder(String folder, String targetFolder, String hoverText, Reorder order, boolean successExpected)
+    public void reorderFolder(String folder, String targetFolder, Reorder order, boolean successExpected)
     {
         _test.log("Reorder folder: '" + folder + "' " + toString() + " '" + targetFolder + "'");
         _test.waitForElement(Locator.xpath("//tr/td/div/span[text()='" + folder +"']/../img[contains(@class,'x4-tree-icon-parent')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.sleep(1000); //TODO: Figure out what to wait for
-        dragAndDrop(Locator.xpath("//tr/td/div/span[text()='"+ folder + "']/../img[contains(@class,'x4-tree-icon-parent')]"),Locator.xpath("//tr/td/div/span[text()='"+ targetFolder + "']/../img[contains(@class,'x4-tree-icon-parent')]"), order == Reorder.preceding ? BaseWebDriverTest.Position.top : BaseWebDriverTest.Position.bottom, hoverText);
+        _test._ext4Helper.waitForMaskToDisappear();
+        dragAndDrop(Locator.xpath("//tr/td/div/span[text()='"+ folder + "']/../img[contains(@class,'x4-tree-icon-parent')]"),
+                Locator.xpath("//tr/td/div/span[text()='"+ targetFolder + "']/../img[contains(@class,'x4-tree-icon-parent')]"),
+                order == Reorder.preceding ? BaseWebDriverTest.Position.top : BaseWebDriverTest.Position.bottom, "Change Display Order");
 
         if(successExpected)
         {
-            _test._extHelper.waitForExtDialog("Change Display Order");
-            _test.clickButton("Yes", 0);
+            Window.Window(_test.getDriver()).withTitle("Change Display Order").waitFor()
+                    .clickButton("Yes", true);
+            _test._ext4Helper.waitForMaskToDisappear();
         }
         _test.sleep(500);
         //TODO: else {confirm failure}

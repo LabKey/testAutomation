@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.FolderManagementFolderTree;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.admin.ReorderFoldersPage;
@@ -38,7 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class})
 public class FolderTest extends BaseWebDriverTest
@@ -121,7 +122,7 @@ public class FolderTest extends BaseWebDriverTest
         folderManagement.expandFolderNode("A");
         folderManagement.expandFolderNode("AB");
 
-        folderManagement.reorderFolder("ABB", "ABA","Change Display Order", FolderManagementFolderTree.Reorder.preceding, true);
+        folderManagement.reorderFolder("ABB", "ABA", FolderManagementFolderTree.Reorder.preceding, true);
         refresh();
         folderManagement.expandNavFolders("A", "AB");
         assertTextBefore("ABB", "ABA");
@@ -150,13 +151,14 @@ public class FolderTest extends BaseWebDriverTest
         folderManagement.selectFolderManagementTreeItem(getProjectName() + "/A/AA", false);
         folderManagement.selectFolderManagementTreeItem(getProjectName() + "/B/BA", true);
         folderManagement.moveFolder("AA", "C", "Move Folder", "Move Folder", false, true);
-        _ext4Helper.waitForMaskToDisappear(); // shouldn't be a confirmation dialog.
+        Window window = Window.Window(getDriver()).waitFor();
+        assertEquals("Wrong warning when attempting to move non-siblings", "When selecting multiple folders please only select folders that are directly under the same parent folder.", window.getBody());
+        window.clickButton("OK", true);
+        _ext4Helper.waitForMaskToDisappear();
 
         log("Move multiple folders");
-        folderManagement.deselectFolder(getProjectName());
-        folderManagement.deselectFolder("AA");
-        sleep(500); // wait for failed move ghost to disappear.
         folderManagement.expandFolderNode("A");
+        folderManagement.expandFolderNode("B");
         folderManagement.selectFolderManagementTreeItem(getProjectName() + "/B/BA", false);
         folderManagement.selectFolderManagementTreeItem(getProjectName() + "/B/BB", true);
         folderManagement.selectFolderManagementTreeItem(getProjectName() + "/B/BC", true);
