@@ -16,7 +16,6 @@
 package org.labkey.test.etl;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -80,13 +79,6 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
         deleteRemoteConnection();
         _etlHelper.cleanupTestTables();
         goToProjectHome();
-    }
-
-    @After
-    public void postTest()
-    {
-        if (!_testFailed)
-            resetErrors();
     }
 
     private void createRemoteConnection()

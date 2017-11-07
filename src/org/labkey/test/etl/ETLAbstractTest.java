@@ -18,7 +18,6 @@ package org.labkey.test.etl;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.After;
 import org.junit.Before;
 import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.CommandException;
@@ -94,11 +93,13 @@ public abstract class ETLAbstractTest extends BaseWebDriverTest
         return false;
     }
 
-    @After
-    public void postTest()
+    @Override
+    public void checkErrors()
     {
-        if (isCheckErrorsInPostTest() && !_testFailed)
+        if (isCheckErrorsInPostTest())
             checkExpectedErrors(_etlHelper.getExpectedErrorCount());
+        else
+            super.checkErrors();
     }
 
     @NotNull
