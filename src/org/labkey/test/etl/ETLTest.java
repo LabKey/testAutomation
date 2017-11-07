@@ -549,14 +549,14 @@ public class ETLTest extends ETLAbstractTest
     @Test
     public void testWrappingTransactionOnSource() throws Exception
     {
-        final String sourceName = "nameFromSource";
-        final String firstSourceName = "nameFromSource";
+        final String firstSourceName = "nameFromSourceFirst";
+        final String secondSourceName = "nameFromSourceSecond";
         log("Inserting the row in target2");
-        _etlHelper.insertTarget2Row("10","10",sourceName,"47");
+        _etlHelper.insertTarget2Row("10","10",secondSourceName,"47");
 
         log("Inserting the row in source");
         _etlHelper.insertSourceRow("1", firstSourceName, "48");
-        _etlHelper.insertSourceRow("10", sourceName, "47");
+        _etlHelper.insertSourceRow("10", secondSourceName, "47");
         _etlHelper.runETL_API("SourceToTarget2");
 
         _etlHelper.assertNotInTarget2(firstSourceName);
@@ -565,26 +565,28 @@ public class ETLTest extends ETLAbstractTest
     @Test
     public void testETLTransactWithSleep() throws Exception
     {
-        _etlHelper.do180columnSetup();
+        if (WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.PostgreSQL))
+        {
+            _etlHelper.do180columnSetup();
 
-        Map<Integer, String> rowMap = new HashMap<>();
-        rowMap.put(5, "12345");
-        _etlHelper.insert180columnsRow(rowMap);
+            Map<Integer, String> rowMap = new HashMap<>();
+            rowMap.put(5, "12345");
+            _etlHelper.insert180columnsRow(rowMap);
 
-        String sourceName="nameFromSourceWithSleep";
-        _etlHelper.insertSourceRow("10", sourceName, "47");
+            String sourceName = "nameFromSourceWithSleep";
+            _etlHelper.insertSourceRow("10", sourceName, "47");
 
-        _etlHelper.runETL_API("multipleAppendsWithSleepTransactSource",false);
-        sleep(1000);
+            _etlHelper.runETL_API("multipleAppendsWithSleepTransactSource", false);
+            sleep(1000);
 
-        rowMap.clear();
-        rowMap.put(6,"9898");
-        _etlHelper.insert180columnsRow(rowMap);
-        _etlHelper.waitForStatus("multipleAppendsWithSleepTransactSource","COMPLETE",20000);
+            rowMap.clear();
+            rowMap.put(6, "9898");
+            _etlHelper.insert180columnsRow(rowMap);
+            _etlHelper.waitForStatus("multipleAppendsWithSleepTransactSource", "COMPLETE", 20000);
 
-        _etlHelper.assertIn180columnTarget("12345");
-        _etlHelper.assertNotIn180columnTarget("9898");
-
+            _etlHelper.assertIn180columnTarget("12345");
+            _etlHelper.assertNotIn180columnTarget("9898");
+        }
 
     }
 }
