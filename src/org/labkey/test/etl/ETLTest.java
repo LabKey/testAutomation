@@ -547,26 +547,28 @@ public class ETLTest extends ETLAbstractTest
     }
 
     @Test
-    public void testWrappingTransactionOnSource() throws Exception
+    public void testWrappingTransactionOnDestination() throws Exception
     {
         final String firstSourceName = "nameFromSourceFirst";
         final String secondSourceName = "nameFromSourceSecond";
         log("Inserting the row in target2");
-        _etlHelper.insertTarget2Row("10","10",secondSourceName,"47");
+        _etlHelper.insertTarget2Row("10","10","targetName","47");
 
         log("Inserting the row in source");
         _etlHelper.insertSourceRow("1", firstSourceName, "48");
         _etlHelper.insertSourceRow("10", secondSourceName, "47");
         _etlHelper.runETL_API("SourceToTarget2");
+        log("Incrementing the counter to match the errors in the log file 2+1");
+        _etlHelper.incrementExpectedErrorCount();
+        _etlHelper.incrementExpectedErrorCount(false);
 
         _etlHelper.assertNotInTarget2(firstSourceName);
+        _etlHelper.assertInTarget2("targetName");
     }
 
     @Test
     public void testETLTransactWithSleep() throws Exception
     {
-        if (WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.PostgreSQL))
-        {
             _etlHelper.do180columnSetup();
 
             Map<Integer, String> rowMap = new HashMap<>();
@@ -576,17 +578,27 @@ public class ETLTest extends ETLAbstractTest
             String sourceName = "nameFromSourceWithSleep";
             _etlHelper.insertSourceRow("10", sourceName, "47");
 
-            _etlHelper.runETL_API("multipleAppendsWithSleepTransactSource", false);
-            sleep(1000);
+            try
+            {
+                _etlHelper.runETL_API("multipleAppendsWithSleepTransactSource", false);
+                sleep(1000);
+                rowMap.clear();
+                rowMap.put(6, "9898");
+                _etlHelper.insert180columnsRow(rowMap);
+                _etlHelper.waitForStatus("multipleAppendsWithSleepTransactSource", "COMPLETE", 20000);
+                _etlHelper.assertIn180columnTarget("12345");
+                _etlHelper.assertNotIn180columnTarget("9898");
+            }
+            catch(CommandException e)
+            {
+                if (WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer))
+                {
+                    _etlHelper.incrementExpectedErrorCount(false);
+                    assertEquals("Excepted error not found","Transacting the source scope is only available on Postgres data sources.",e.getMessage());
+                }
+            }
 
-            rowMap.clear();
-            rowMap.put(6, "9898");
-            _etlHelper.insert180columnsRow(rowMap);
-            _etlHelper.waitForStatus("multipleAppendsWithSleepTransactSource", "COMPLETE", 20000);
 
-            _etlHelper.assertIn180columnTarget("12345");
-            _etlHelper.assertNotIn180columnTarget("9898");
-        }
 
     }
 }
