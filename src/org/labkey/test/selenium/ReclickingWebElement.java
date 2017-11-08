@@ -77,7 +77,6 @@ public class ReclickingWebElement extends WebElementDecorator
         }
         if (!revealed)
         {
-            scrollUtil.scrollIntoView(el);
             if (clickBlocked)
                 WebDriverWrapper.sleep(2500); // Wait for a mask to disappear
             new WebDriverWait(getDriver(), 10).until(ExpectedConditions.elementToBeClickable(el));
