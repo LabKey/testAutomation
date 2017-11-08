@@ -119,7 +119,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
             expandFolderTreeNode(folderTreeNode);
         }
 
-        return folderLink;
+        return getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(folderLink));
     }
 
     private WebElement expandAllUnder(WebElement parent)
