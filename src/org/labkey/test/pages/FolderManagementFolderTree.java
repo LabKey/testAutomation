@@ -203,13 +203,24 @@ public class FolderManagementFolderTree
                 throw new IllegalArgumentException("Unexpected position: " + pos.toString());
         }
 
+        Locator.XPathLocator dragBubble = Locator.byClass("x4-grid-dd-wrap");
+        /* For reference, this is the HTML for the drag bubble. Saving here because it's a pain to retrieve.
+         * This particular instance was for a legal folder reorder. Will probably vary other drop targets and validity states
+        <div style="right: auto; left: 122px; top: 542.7px; z-index: 19010;" class="x4-component x4-layer x4-component-default x4-border-box x4-dd-drag-proxy x4-dd-drag-current x4-tree-drop-ok-above" id="treepanel-1010-body-drag-status-proxy">
+          <div class="x4-dd-drop-icon"></div>
+          <div id="treepanel-1010-body-drag-status-proxy-ghost" class="x4-dd-drag-ghost">
+            <div style="margin: 0px; float: none;" class="x4-grid-dd-wrap" id="ext4-ext-gen1053">Change Display Order</div>
+          </div>
+        </div>
+        */
+
         Actions builder = new Actions(_test.getDriver());
         builder.clickAndHold(fromEl).build().perform();
-        _test.waitForElement(Locator.byClass("x4-grid-dd-wrap"));
+        _test.waitForElement(dragBubble);
         builder.moveToElement(toEl, toEl.getSize().getWidth()/2, y)
                 .moveByOffset(1, offset) // A little extra move helps trigger the correct hover target
                 .build().perform();
-        _test.waitForElement(Locator.tagContainingText("div", hoverText));
+        _test.waitForElement(dragBubble.containing(hoverText));
         builder.release().build().perform();
     }
 
