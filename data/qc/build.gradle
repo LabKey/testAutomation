@@ -11,8 +11,6 @@ sourceSets {
     java {
       srcDirs = ['src']
     }
-
-    output.classesDir = "${project.buildDir}/classes"
   }
 }
 
