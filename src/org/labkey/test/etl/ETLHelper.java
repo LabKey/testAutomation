@@ -54,6 +54,7 @@ public class ETLHelper
     private static final String ETL_TARGET_2 = "target2";
     private static final String ETL_DELETE = "delete";
     private static final String TRANSFER = "transfer";
+    public static final String ERROR = "ERROR";
     public static final String COMPLETE = "COMPLETE";
     private static final String DATAINTEGRATION_MODULE = "DataIntegration";
     private static final String DATAINTEGRATION_SCHEMA = "dataintegration";
@@ -511,14 +512,10 @@ public class ETLHelper
 
     private void _runETL(String transformId, boolean hasWork, boolean hasCheckerError, boolean expectExecutionError)
     {
-        runETLNoNav(transformId, hasWork, hasCheckerError);
+        runETLNoNav(transformId, hasWork, hasCheckerError, true);
 
-        if (!expectExecutionError)
-        {
-            _test.assertElementNotPresent(Locator.tag("tr")
-                    .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
-                    .withPredicate(Locator.xpath("td").withText("ERROR")));
-        }
+        assertEquals("Wrong job status", expectExecutionError ? ERROR : COMPLETE, getEtlStatus());
+
         _test.log("returning to project home");
         _test.goToProjectHome();
     }
@@ -558,28 +555,21 @@ public class ETLHelper
 
     void waitForEtl()
     {
-        _test.waitFor(() -> {
-                    if (_test.isElementPresent(Locator.tag("tr")
-                            .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
-                            .withPredicate(Locator.xpath("td").withText("ERROR"))))
+        BaseWebDriverTest.waitFor(() -> {
+                    String status = getEtlStatus();
+                    if (ERROR.equals(status) || COMPLETE.equals(status))
                         return true;
-                    else if (_test.isElementPresent(Locator.tag("tr")
-                            .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
-                            .withPredicate(Locator.xpath("td").withText(COMPLETE))))
-                        return true;
-                    else if (_test.isElementPresent(Locator.tag("tr")
-                            .withPredicate(Locator.xpath("td").withClass("lk-form-label").withText("Status:"))
-                            .withPredicate(Locator.xpath("td").withText("ERROR"))))
-                        return true;
-                    else if (_test.isElementPresent(Locator.tag("tr")
-                            .withPredicate(Locator.xpath("td").withClass("lk-form-label").withText("Status:"))
-                            .withPredicate(Locator.xpath("td").withText(COMPLETE))))
-                        return true;
-                    else
-                        _test.refresh();
+                    _test.refresh();
                     return false;
                 },
                 "ETL did not finish", BaseWebDriverTest.WAIT_FOR_PAGE);
+    }
+
+    private String getEtlStatus()
+    {
+        return DataRegionTable.Locators.form("StatusFiles").append(
+                Locator.byClass("lk-form-label").withText("Status:"))
+                .followingSibling("td").findElement(_test.getDriver()).getText();
     }
 
     private Locator.XPathLocator findTransformConfigCell(String transformId, boolean isLink)
