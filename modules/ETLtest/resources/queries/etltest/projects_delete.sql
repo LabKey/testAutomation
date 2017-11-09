@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-select
-2 as project,
-TIMESTAMPADD(SQL_TSI_MINUTE, 1, now()) as modified,
-1 as rowversion
+SELECT
+  2 AS project,
+  'account 2' AS account, -- base table column
+  'inves 2' AS inves, -- base table column
+  'inves2 2' AS inves2, -- base table column
+  'outside_email 2' AS outside_email, -- extensible table column
+  'outside_inst 2' AS outside_inst, -- extensible table column
+  'outside_phone 2' AS outside_phone, -- extensible table column
+  now() as modified

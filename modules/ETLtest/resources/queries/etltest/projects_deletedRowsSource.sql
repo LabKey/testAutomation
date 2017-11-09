@@ -14,8 +14,5 @@
  * limitations under the License.
  */
 select
-project,
-shortname,
-dpt_code,
-now() as modified,
-from lists.project2
+1 as project,
+now() as modified

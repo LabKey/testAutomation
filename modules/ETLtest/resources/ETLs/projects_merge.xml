@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <etl xmlns="http://labkey.org/etl/xml">
-    <name>Extended Table Test1</name>
-    <description>Truncate and load rows from source to target</description>
+    <name>Extended Table Test2 (merge)</name>
+    <description>Merge rows from source to target</description>
     <transforms>
         <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
             <description>Copy to target</description>
-            <source schemaName="etltest" queryName="projects1" />
-            <destination schemaName="ehr" queryName="project" targetOption="truncate">
+            <source schemaName="etltest" queryName="projects_merge" />
+            <destination schemaName="ehr" queryName="project" targetOption="merge">
                 <alternateKeys>
                     <column name="project"/>
                 </alternateKeys>

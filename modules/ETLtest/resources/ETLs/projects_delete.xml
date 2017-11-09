@@ -5,7 +5,7 @@
     <transforms>
         <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
             <description>Copy to target</description>
-            <source schemaName="etltest" queryName="projects2" />
+            <source schemaName="etltest" queryName="projects_delete" />
             <destination schemaName="ehr" queryName="project" targetOption="merge">
                 <alternateKeys>
                     <column name="project"/>
@@ -14,7 +14,8 @@
         </transform>
     </transforms>
     <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified">
-        <deletedRowsSource schemaName="etltest" queryName="deleteProject" deletedSourceKeyColumnName="project" timestampColumnName="modified" targetKeyColumnName="project"/>
+        <deletedRowsSource schemaName="etltest" queryName="projects_deletedRowsSource"
+                           deletedSourceKeyColumnName="project" timestampColumnName="modified" targetKeyColumnName="project"/>
     </incrementalFilter>
     <schedule>
         <poll interval="15s" />
