@@ -17,6 +17,7 @@ package org.labkey.test.etl;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -581,13 +582,6 @@ public class ETLTest extends ETLAbstractTest
             try
             {
                 _etlHelper.runETL_API("multipleAppendsWithSleepTransactSource", false);
-                sleep(1000);
-                rowMap.clear();
-                rowMap.put(6, "9898");
-                _etlHelper.insert180columnsRow(rowMap);
-                _etlHelper.waitForStatus("multipleAppendsWithSleepTransactSource", "COMPLETE", 20000);
-                _etlHelper.assertIn180columnTarget("12345");
-                _etlHelper.assertNotIn180columnTarget("9898");
             }
             catch(CommandException e)
             {
@@ -595,9 +589,18 @@ public class ETLTest extends ETLAbstractTest
                 {
                     _etlHelper.incrementExpectedErrorCount(false);
                     assertEquals("Excepted error not found","Transacting the source scope is only available on Postgres data sources.",e.getMessage());
+                    return;
                 }
+                else
+                    throw e;
             }
-
+            sleep(1000);
+            rowMap.clear();
+            rowMap.put(6, "9898");
+            _etlHelper.insert180columnsRow(rowMap);
+            _etlHelper.waitForStatus("multipleAppendsWithSleepTransactSource", "COMPLETE", 20000);
+            _etlHelper.assertIn180columnTarget("12345");
+            _etlHelper.assertNotIn180columnTarget("9898");
 
 
     }
