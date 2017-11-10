@@ -1790,7 +1790,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             doAndWaitForPageSignal(() -> click(loc), "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
-            fireEvent(loc, SeleniumEvent.mouseout);
+            mouseOut(); // Dismiss tooltip
             waitForElementToDisappear(Locator.tagWithClass("div", "x4-tip").notHidden());
         }
     }
