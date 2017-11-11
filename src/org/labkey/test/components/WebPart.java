@@ -16,7 +16,6 @@
 package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
@@ -31,16 +30,12 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
 
-import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
-
 /**
  * Base class for Portal WebParts (can be moved, renamed, and removed)
  */
-public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriverComponent<EC> implements WebDriverWrapper.PageLoadListener
+public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPanel<EC> implements WebDriverWrapper.PageLoadListener
 {
     private final WebDriverWrapper _wDriver;
-    private final WebElement _componentElement;
-    protected String _title;
 
     public WebPart(WebDriver driver, WebElement componentElement)
     {
@@ -49,9 +44,9 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
     public WebPart(WebDriverWrapper driverWrapper, WebElement componentElement)
     {
-        _componentElement = new RefindingWebElement(componentElement, driverWrapper.getDriver())
-                .withRefindListener(e -> clearCache());
+        super(new RefindingWebElement(componentElement, driverWrapper.getDriver()), driverWrapper.getDriver());
         _wDriver = driverWrapper;
+        ((RefindingWebElement) getComponentElement()).withRefindListener(e -> clearCache());
 
         driverWrapper.addPageLoadListener(this);
     }
@@ -68,17 +63,6 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
         _title = null;
     }
 
-    @Override
-    public WebElement getComponentElement()
-    {
-        return _componentElement;
-    }
-
-    protected WebDriver getDriver()
-    {
-        return getWrapper().getDriver();
-    }
-
     protected WebDriverWrapper getWrapper()
     {
         return _wDriver;
@@ -90,13 +74,6 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
     {
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Arrays.asList(getComponentElement())));
         clearCache();
-    }
-
-    public String getTitle()
-    {
-        if (_title == null)
-            _title = elementCache().webPartTitle.getAttribute("title");
-        return _title;
     }
 
     public void remove()
@@ -124,7 +101,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
         clickMenuItem(false, down ? "Move Down" : "Move Up");
 
-        getWrapper().waitFor(() -> getWebPartIndex() == expectedIndex,
+        WebDriverWrapper.waitFor(() -> getWebPartIndex() == expectedIndex,
                 "Move WebPart failed", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
@@ -165,23 +142,20 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
     }
 
     @Deprecated // Use elementCache()
-    protected ElementCache elements()
+    protected EC elements()
     {
         return elementCache();
     }
 
-    @SuppressWarnings("unchecked")
     protected EC newElementCache()
     {
-        return (EC)new ElementCache();
+        return (EC) new ElementCache();
     }
 
-    public class ElementCache extends Component.ElementCache
+    public class ElementCache extends WebPartPanel.ElementCache
     {
-        public WebElement webPartTitle = new LazyWebElement(leftTitleLoc(), this);
         public WebElement UX_MENU = new LazyWebElement(
                 Locator.xpath("//span[contains(@class,'dropdown') and ./a[@data-toggle='dropdown']]"), this);
-        public WebElement moreMenu = new LazyWebElement(Locator.css("span[title=More]"), webPartTitle);
     }
 
     /**
@@ -190,25 +164,5 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
     @Deprecated
     public class Elements extends ElementCache
     {
-    }
-
-    private static Locator.XPathLocator leftTitleLoc(String title)
-    {
-        return leftTitleLoc().withAttribute("title", title);
-    }
-
-    private static Locator.XPathLocator leftTitleLoc()
-    {
-        return Locator.xpath("div/div/*").withClass("panel-title");
-    }
-
-    protected static Locator.XPathLocator webPartLoc(String title)
-    {
-        return webPartLoc().withDescendant(leftTitleLoc(title));
-    }
-
-    protected static Locator.XPathLocator webPartLoc()
-    {
-        return Locator.tag("div").withAttribute("name", "webpart");
     }
 }

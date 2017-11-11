@@ -182,7 +182,7 @@ public class PropertiesEditor extends WebPartPanel
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends WebPartPanel.ElementCache
     {
         protected WebElement addFieldButton = new WebElementWrapper()
         {

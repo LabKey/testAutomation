@@ -16,14 +16,16 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class WebPartPanel extends WebDriverComponent
+public class WebPartPanel<EC extends WebPartPanel.ElementCache> extends WebDriverComponent<EC>
 {
     private WebElement _componentElement;
     private WebDriver _driver;
+    protected String _title;
 
     protected WebPartPanel(WebElement componentElement, WebDriver driver)
     {
@@ -31,16 +33,9 @@ public class WebPartPanel extends WebDriverComponent
         _driver = driver;
     }
 
-    public static WebPartFinder WebPart(WebDriver driver)
+    public static WebPartFinder<WebPartPanel, ?> WebPart(WebDriver driver)
     {
-        return new WebPartFinder(driver)
-        {
-            @Override
-            protected WebDriverComponent construct(WebElement el, WebDriver driver)
-            {
-                return new WebPartPanel(el, driver);
-            }
-        };
+        return new WebPartFinderImpl(driver);
     }
 
     @Override
@@ -53,6 +48,13 @@ public class WebPartPanel extends WebDriverComponent
     public WebElement getComponentElement()
     {
         return _componentElement;
+    }
+
+    public String getTitle()
+    {
+        if (_title == null)
+            _title = elementCache().webPartTitle.getAttribute("title");
+        return _title;
     }
 
     public static abstract class WebPartFinder<C extends WebPartPanel, F extends WebPartFinder<C, F>> extends WebDriverComponentFinder<C, F>
@@ -89,5 +91,49 @@ public class WebPartPanel extends WebDriverComponent
             else
                 return PortalHelper.Locators.webPart(_title);
         }
+    }
+
+    private static final class WebPartFinderImpl extends WebPartFinder<WebPartPanel, WebPartFinderImpl>
+    {
+        protected WebPartFinderImpl(WebDriver driver)
+        {
+            super(driver);
+        }
+
+        @Override
+        protected WebPartPanel construct(WebElement el, WebDriver driver)
+        {
+            return new WebPartPanel(el, driver);
+        }
+    }
+
+    protected EC newElementCache()
+    {
+        return (EC) new ElementCache();
+    }
+
+    public class ElementCache extends Component.ElementCache
+    {
+        public WebElement webPartTitle = new LazyWebElement(leftTitleLoc(), this);
+    }
+
+    protected static Locator.XPathLocator leftTitleLoc(String title)
+    {
+        return leftTitleLoc().withAttribute("title", title);
+    }
+
+    protected static Locator.XPathLocator leftTitleLoc()
+    {
+        return Locator.xpath("div/div/*").withClass("panel-title");
+    }
+
+    protected static Locator.XPathLocator webPartLoc(String title)
+    {
+        return webPartLoc().withDescendant(leftTitleLoc(title));
+    }
+
+    protected static Locator.XPathLocator webPartLoc()
+    {
+        return Locator.tag("div").withAttribute("name", "webpart");
     }
 }
