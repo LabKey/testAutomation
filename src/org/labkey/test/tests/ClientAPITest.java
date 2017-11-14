@@ -481,7 +481,7 @@ public class ClientAPITest extends BaseWebDriverTest
         clickButton("Create Study");
         // next page
         clickButton("Create Study");
-        clickAndWait(Locator.linkWithText("Edit Definition"));
+        clickAndWait(Locator.linkWithText("Edit Additional Properties"));
         waitForText(10000, "No fields have been defined.");
 
         clickButton("Add Field", 0);
