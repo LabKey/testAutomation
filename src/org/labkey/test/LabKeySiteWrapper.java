@@ -666,7 +666,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     assertElementPresent(Locator.id("rootPath"));
                     clickAndWait(Locator.lkButton("Next"));
                     // admin-installComplete
-                    clickAndWait(Locator.linkContainingText("Go directly to the server's Home page"));
+                    clickAndWait(Locator.linkContainingText("Go to the server's Home page"));
                     assertEquals("Landed on wrong project after bootstrapping", "home", getCurrentProject().toLowerCase());
                 }
                 else
