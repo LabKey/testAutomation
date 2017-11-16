@@ -715,7 +715,19 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod(quiet = true)
     public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
     {
-        getSomeEditorByTitle(areaTitle).addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
+        addField(areaTitle, name, label, type, null);
+    }
+
+    @LogMethod(quiet = true)
+    public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type, FieldDefinition.FieldValidator validator)
+    {
+        addField(areaTitle, name, label, type, validator, false);
+    }
+
+    @LogMethod(quiet = true)
+    public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type, FieldDefinition.FieldValidator validator, boolean required)
+    {
+        getSomeEditorByTitle(areaTitle).addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()).setValidator(validator).setRequired(required));
     }
 
     public void addLookupField(String areaTitle, int index, String name, String label, LookupInfo type)
