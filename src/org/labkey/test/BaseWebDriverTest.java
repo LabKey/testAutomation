@@ -2051,9 +2051,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         final List<String> statusValues = waitForPipelineJobsToFinish(finishedJobsExpected, Duration.ofMillis(timeoutMilliseconds));
 
         if (expectError)
-            assertTrue("Did not find expected error.", statusValues.contains("ERROR"));
+            assertTrue("Did not find expected pipeline error.", statusValues.contains("ERROR"));
         else
-            assertFalse("Found unexpected error.", statusValues.contains("ERROR"));
+            assertFalse("Found unexpected pipeline error.", statusValues.contains("ERROR"));
 
         if (description != null)
         {
