@@ -63,12 +63,6 @@ public class ETLTestB extends ETLAbstractTest
         return true;
     }
 
-    @Override
-    protected boolean isCheckErrorsInPostTest()
-    {
-        return true;
-    }
-
     private void tryAndRetry(String transformId, String expectedError, boolean normalErrorCount)
     {
         _etlHelper.runETLNoNav(transformId, true, false);

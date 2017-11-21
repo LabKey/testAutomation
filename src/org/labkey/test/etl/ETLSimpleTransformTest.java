@@ -33,12 +33,6 @@ import org.labkey.test.categories.ETL;
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLSimpleTransformTest extends ETLAbstractTest
 {
-    @Override
-    protected boolean isCheckErrorsInPostTest()
-    {
-        return true;
-    }
-
     @Nullable
     @Override
     protected String getProjectName()

@@ -17,7 +17,6 @@ package org.labkey.test.etl;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -60,12 +59,6 @@ public class ETLTest extends ETLAbstractTest
 
     @Override
     protected boolean isResetInPreTest()
-    {
-        return true;
-    }
-
-    @Override
-    protected boolean isCheckErrorsInPostTest()
     {
         return true;
     }

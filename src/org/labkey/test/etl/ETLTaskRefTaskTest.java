@@ -70,12 +70,6 @@ public class ETLTaskRefTaskTest extends ETLAbstractTest
         _etlHelper.resetCounts();
     }
 
-    @Override
-    protected boolean isCheckErrorsInPostTest()
-    {
-        return true;
-    }
-
     @Test
     public void testTaskRefTask() throws Exception
     {

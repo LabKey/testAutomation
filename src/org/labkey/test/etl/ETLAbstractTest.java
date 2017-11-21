@@ -81,22 +81,15 @@ public abstract class ETLAbstractTest extends BaseWebDriverTest
     {
         if (isResetInPreTest())
         {
-            _etlHelper.resetCounts();
-            resetErrors();
             _etlHelper.cleanupTestTables();
             goToProjectHome();
         }
     }
 
-    protected boolean isCheckErrorsInPostTest()
-    {
-        return false;
-    }
-
     @Override
     public void checkErrors()
     {
-        if (isCheckErrorsInPostTest())
+        if (_etlHelper.getExpectedErrorCount() > 0)
             checkExpectedErrors(_etlHelper.getExpectedErrorCount());
         else
             super.checkErrors();
