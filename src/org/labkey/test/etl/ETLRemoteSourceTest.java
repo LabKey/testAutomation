@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
@@ -43,7 +44,6 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
     private static final String TRANSFORM_REMOTE_BAD_DEST = "{ETLtest}/remoteInvalidDestinationSchemaName";
     private static final String TRANSFORM_REMOTE_NOTRUNC = "{ETLtest}/remote_noTruncate";
     private static final File TRANSFORM_REMOTE_STUDY = TestFileUtils.getSampleData( "dataintegration/ETLTestStudy.zip");
-
 
     @Nullable
     @Override
@@ -76,15 +76,15 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
     @Before
     public void preTest() throws Exception
     {
+        goToProjectHome();
         deleteRemoteConnection();
         _etlHelper.cleanupTestTables();
-        goToProjectHome();
     }
 
     private void createRemoteConnection()
     {
         RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
-        rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, getBaseURL(), getProjectName());
+        rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, WebTestHelper.getBaseURL(), getProjectName());
     }
 
     private void deleteRemoteConnection()
@@ -111,6 +111,7 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
         }
 
         _etlHelper.runETL_JobError(TRANSFORM_REMOTE);
+        _etlHelper.incrementExpectedErrorCount();
         _etlHelper.checkRun(true /*expect error*/);
 
         createRemoteConnection();
@@ -136,6 +137,7 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
         errors.add("ERROR: The remote connection EtlTest_RemoteConnection has not yet been setup in the remote connection manager.  You may configure a new remote connection through the schema browser.");
         errors.add("ERROR: Error running executeCopy");
         _etlHelper.runETLandCheckErrors(TRANSFORM_REMOTE, true, false, errors);
+        _etlHelper.incrementExpectedErrorCount();
         errors.clear();
 
         // create our remote connection
@@ -143,6 +145,7 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
         errors.add("ERROR: Target schema not found: study_buddy");
         errors.add("Error running executeCopy");
         _etlHelper.runETLandCheckErrors(TRANSFORM_REMOTE_BAD_DEST, true, false, errors);
+        _etlHelper.incrementExpectedErrorCount();
         errors.clear();
 
         //remote etl constraint violation
@@ -155,6 +158,7 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
         errors.add("ERROR: Error running executeCopy");
         errors.add("org.labkey.api.pipeline.PipelineJobException: Error running executeCopy");
         _etlHelper.runETLandCheckErrors(TRANSFORM_REMOTE_NOTRUNC, true, false, errors);
+        _etlHelper.incrementExpectedErrorCount();
         errors.clear();
     }
 }
