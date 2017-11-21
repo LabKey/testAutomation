@@ -200,7 +200,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         if(null != batchProperties)
         {
-            batchProperties.keySet().forEach((proertyName)->setFormElement(Locator.input(proertyName), batchProperties.get(proertyName)));
+            batchProperties.keySet().forEach((propertyName)->setFormElement(Locator.input(propertyName), batchProperties.get(propertyName)));
         }
 
         clickAndWait(Locator.lkButton("Next"));
@@ -282,7 +282,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         DataRegionTable drt = new DataRegionTable("Data", getDriver());
 
         columns.forEach((s)->{
-            log("Gettting the data for column '" + s + "'.");
+            log("Getting the data for column '" + s + "'.");
             columnValues.put(s, drt.getColumnDataAsText(s));
         });
 
@@ -306,7 +306,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         for(String columnName : expectedColumns.keySet())
         {
-            log("Gettting the data for column '" + columnName + "'.");
+            log("Getting the data for column '" + columnName + "'.");
             List<String> currentColumn = drt.getColumnDataAsText(columnName);
             if(!currentColumn.equals(expectedColumns.get(columnName)))
             {
@@ -413,7 +413,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         clickAndWait(Locator.lkButton("Import Folder"));
         waitForPipelineJobsToFinish(1);
 
-        log("Validate that the dat has been imported as expected.");
+        log("Validate that the data has been imported as expected.");
         goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_01);
         clickAndWait(Locator.linkWithText(SIMPLE_ASSAY_FOR_EXPORT));
         waitForElement(Locator.linkWithText(RUN01_NAME));
@@ -521,7 +521,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         clickAndWait(Locator.lkButton("Import Folder"));
         waitForPipelineJobsToFinish(1);
 
-        log("Validate that the dat has been imported as expected.");
+        log("Validate that the data has been imported as expected.");
         goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_02);
         clickAndWait(Locator.linkWithText(SIMPLE_ASSAY_FOR_EXPORT));
         waitForElement(Locator.linkWithText(RUN01_NAME));
