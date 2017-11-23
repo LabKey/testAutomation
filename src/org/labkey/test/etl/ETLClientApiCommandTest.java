@@ -186,9 +186,6 @@ public class ETLClientApiCommandTest extends ETLAbstractTest
         utcc.setVerboseLogging(true);
         utcr = (UpdateTransformConfigurationResponse) invokeCommand(utcc, cn);
         verifyUpdateTransformConfigurationResponse(utcr, utcc);
-
-        // be sure to check for all expected errors here so that the test won't fail on exit
-        checkExpectedErrors(_etlHelper.getExpectedErrorCount());
     }
 
     private CommandResponse invokeCommand(BaseTransformCommand cmd, Connection cn)
