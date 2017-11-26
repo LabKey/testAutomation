@@ -68,6 +68,7 @@ public class DataRegionTest extends BaseWebDriverTest
                     new Pair<>("Regression #25337", "test25337"),
                     new Pair<>("Change Page Offset", "testPageOffset"),
                     new Pair<>("Keep Removable Filters", "testRemovableFilters"),
+                    new Pair<>("Hide Paging Count", "testHidePagingCount"),
                     new Pair<>("Show All Rows", "testShowAllTotalRows")
                     );
 
