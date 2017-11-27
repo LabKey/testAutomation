@@ -21,4 +21,4 @@ SELECT
   'outside_email 2' AS outside_email, -- extensible table column
   'outside_inst 2' AS outside_inst, -- extensible table column
   'outside_phone 2' AS outside_phone, -- extensible table column
-  now() as modified
+  TIMESTAMPADD(SQL_TSI_MINUTE, -1, now()) AS modified
