@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.ext4;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -41,6 +42,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     private WebElement _formItem;
     private WebDriverWrapper _driverWrapper;
     private ComboListMatcher _matcher;
+    private Boolean _isMultiSelect;
 
     private ComboBox(WebElement formItem, WebDriver driver)
     {
@@ -71,9 +73,15 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         Locator.XPathLocator getLocator(Locator.XPathLocator comboListItem, String itemText);
     }
 
-    public ComboBox setMatcher(ComboListMatcher matcher)
+    public ComboBox setMatcher(@NotNull ComboListMatcher matcher)
     {
         _matcher = matcher;
+        return this;
+    }
+
+    public ComboBox setMultiSelect(@NotNull Boolean multiSelect)
+    {
+        _isMultiSelect = multiSelect;
         return this;
     }
 
@@ -88,7 +96,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     {
         openComboList();
 
-        boolean multiSelect = isOpenComboBoxMultiSelect();
+        boolean multiSelect = isMultiSelect();
 
         try
         {
@@ -111,7 +119,10 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
             selectItemFromOpenComboList(selections[0], matchTechnique);
         }
 
-        closeComboList();
+        if (multiSelect)
+            closeComboList(); // Need to close multi-select manually
+        else
+            waitForClosed();
     }
 
     public void openComboList()
@@ -120,7 +131,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
 
         try
         {
-            waitFor(() -> getComponentElement().getAttribute("class").contains("pickerfield-open"), 1000);
+            waitFor(() -> getComponentElement().getAttribute("class").contains("pickerfield-open"), "Combo list didn't open", 1000);
             getDriverWrapper().waitForElement(comboListItem());
         }
         catch (TimeoutException | NoSuchElementException retry)
@@ -162,9 +173,11 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         selectItemFromOpenComboList(driverWrapper, itemText, matchTechnique,false);
     }
 
-    private boolean isOpenComboBoxMultiSelect()
+    private boolean isMultiSelect()
     {
-        return isOpenComboBoxMultiSelect(getDriver());
+        if (_isMultiSelect == null)
+            _isMultiSelect = isOpenComboBoxMultiSelect(getDriver());
+        return _isMultiSelect;
     }
 
     private static boolean isOpenComboBoxMultiSelect(WebDriver driver)
@@ -174,11 +187,14 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
 
     public void closeComboList()
     {
-        // close combo manually if it is a multi-select combo-box
-        if (isOpenComboBoxMultiSelect())
-            elementCache().arrowTrigger.click();
+        elementCache().arrowTrigger.click();
 
         // menu should disappear
+        waitForClosed();
+    }
+
+    private void waitForClosed()
+    {
         getDriverWrapper().waitForElementToDisappear(comboListItem());
     }
 
@@ -191,7 +207,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
             for (WebElement element : comboListItem().findElements(getDriver()))
             {
                 boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
-                if (isOpenComboBoxMultiSelect() && elementAlreadySelected)
+                if (isMultiSelect() && elementAlreadySelected)
                     element.click();
             }
         }
@@ -200,7 +216,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
             for (WebElement element : comboListItem().findElements(getDriver()))
             {
                 boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
-                if (isOpenComboBoxMultiSelect() && elementAlreadySelected)
+                if (isMultiSelect() && elementAlreadySelected)
                     element.click();
             }
         }
