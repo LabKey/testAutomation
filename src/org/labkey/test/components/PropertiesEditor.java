@@ -503,6 +503,7 @@ public class PropertiesEditor extends WebPartPanel
             }
 
             public final Input propertyFormat = Input(Locator.id("propertyFormat"), getDriver()).findWhenNeeded(this);
+            public final WebElement addConditionalFormat = Locator.lkButton("Add Conditional Format").findWhenNeeded(this);
             // TODO: Add conditional format stuff
         }
 
@@ -531,7 +532,7 @@ public class PropertiesEditor extends WebPartPanel
             public final Checkbox measure = Checkbox(Locator.tagWithName("input", "measure")).findWhenNeeded(this);
             public final Checkbox dimension = Checkbox(Locator.tagWithName("input", "dimension")).findWhenNeeded(this);
             public final Checkbox recommendedVariable = Checkbox(Locator.tagWithName("input", "recommendedVariable")).findWhenNeeded(this);
-            public final EnumSelect<ScaleType> defaultScale = EnumSelect(Locator.tagWithName("select", "gwt-ListBox"), ScaleType.class).findWhenNeeded(this);
+            public final EnumSelect<ScaleType> defaultScale = EnumSelect(Locator.tagWithClass("select", "gwt-ListBox"), ScaleType.class).findWhenNeeded(this);
         }
 
         public class AdvancedTabPane extends FieldTabPane
