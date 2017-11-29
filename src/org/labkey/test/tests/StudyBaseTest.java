@@ -21,22 +21,20 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 import org.labkey.api.data.PHI;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -224,18 +222,19 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
             for (String uncheckObject : uncheckObjects)
                 uncheckCheckbox(Locator.checkboxByNameAndValue("types", uncheckObject));
         }
-        checkRadioButton(Locator.radioButtonByNameAndValue("location", zipFile ? "1" : "0"));  // zip file vs. individual files
+        checkRadioButton(Locator.tagWithClass("table", "export-location").index(zipFile ? 1 : 0));
         if(!exportPhi)
         {
-            checkCheckbox(Locator.name("removePhi"));
-            setFormElementJS(Locator.input("exportPhiLevel"), exportPhiLevel.name());
+            new Checkbox(Locator.tagContainingText("label", "Exclude Columns At This PHI Level And Higher:").precedingSibling("input").findElement(getDriver())).check();
+
+            setFormElementJS(Locator.tagWithClass("input", "export-phi-level"), exportPhiLevel.name());
         }
         if(useAlternateIDs)
-            checkCheckbox(Locator.name("alternateIds"));
+            new Checkbox(Locator.tagWithClass("input", "alternate-ids").findElement(getDriver())).check();
         if(useAlternateDates)
-            checkCheckbox(Locator.name("shiftDates"));
+            new Checkbox(Locator.tagWithClass("input", "shift-dates").findElement(getDriver())).check();
         if(maskClinic)
-            checkCheckbox(Locator.name("maskClinic"));
+            new Checkbox(Locator.tagContainingText("label", "Mask Clinic Names").precedingSibling("input").findElement(getDriver())).check();
         clickButton("Export");
     }
 

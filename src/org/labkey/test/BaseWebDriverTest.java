@@ -1310,15 +1310,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (folderName != null)
             clickFolder(folderName);
         goToFolderManagement().goToExportPane();
-        waitForElement(Locator.name("location"));
+        waitForElement(Locator.tagWithClass("table", "export-location"));
 
         if (exportSecurityGroups)
-            checkCheckbox(waitForElement(Locator.checkboxByNameAndValue("types", "Project-level groups and members")));
+            new Checkbox(Locator.tagWithText("label", "Project-level groups and members").precedingSibling("input").findElement(getDriver())).check();
+
         if (exportRoleAssignments)
-            checkCheckbox(waitForElement(Locator.checkboxByNameAndValue("types", "Role assignments for users and groups")));
+            new Checkbox(Locator.tagWithText("label", "Role assignments for users and groups").precedingSibling("input").findElement(getDriver())).check();
         if (includeSubfolders)
-            checkCheckbox(waitForElement(Locator.name("includeSubfolders")));
-        checkRadioButton(Locator.name("location").index(locationIndex)); // first locator with this name is "Pipeline root export directory, as individual files
+            new Checkbox(Locator.tagContainingText("label", "Include Subfolders").precedingSibling("input").findElement(getDriver())).check();
+        checkRadioButton(Locator.tagWithClass("table", "export-location").index(locationIndex)); // first locator with this name is "Pipeline root export directory, as individual files
     }
 
     @LogMethod
