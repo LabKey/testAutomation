@@ -166,7 +166,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         waitForElement(Locator.css("svg").containing("My APX Query"));
         _ext4Helper.clickParticipantFilterGridRowText("999320016", 0);
         waitForElement(Locator.css("svg").containing("4 wk Post-V#2/V#3")); // last visit from ptid 999320016
-        assertTextPresent("2. Body Temp: ", 6); // point hover text label
+        assertTextPresent("2. Body Temp: ", 18); // point hover text label
         clickButton("View Data", 0);
         waitForElement(Locator.paginationText(9));
         assertTextNotPresent("801.0", "G1: 6wk/G2: 2wk"); // sequenceNum filtered out by default view filter
