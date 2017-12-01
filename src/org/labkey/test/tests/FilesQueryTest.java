@@ -100,8 +100,8 @@ public class FilesQueryTest extends BaseWebDriverTest
         verifyFileRecordsGrid(false, subFileFolder, " ", "/");
         verifyFileRecordsGrid(false, testFile2.getName(), customPropValue2, "/" + subFileFolder);
         String updatedCustomPropValue = "UpdatedCustomPropValue";
-        verifyUpdatingCustomFileProps(testFile1.getName(), updatedCustomPropValue, false);
-        DataRegionTable table = new DataRegionTable("qwp2", this);
+        verifyUpdatingCustomFileProps(testFile1.getName(), updatedCustomPropValue);
+        DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver()).find();
         Assert.assertEquals("Insert data button should be available", false, table.hasHeaderMenu("Insert data"));
         // update custom prop
 
@@ -111,7 +111,7 @@ public class FilesQueryTest extends BaseWebDriverTest
         verifyFileRecordsGrid(true, subFileFolder, " ", "/");
         verifyFileRecordsGrid(true, testFile2.getName(), customPropValue2, "/" + subFileFolder);
         updatedCustomPropValue = "UpdatedCustomPropValue2";
-        verifyUpdatingCustomFileProps(testFile1.getName(), updatedCustomPropValue, true);
+        verifyUpdatingCustomFileProps(testFile1.getName(), updatedCustomPropValue);
         Assert.assertEquals("Insert data button should be available", true, table.hasHeaderMenu("Insert data"));
         stopImpersonating();
     }
@@ -134,9 +134,8 @@ public class FilesQueryTest extends BaseWebDriverTest
 
         log("Verify inserted file record");
         goToProjectHome();
-        DataRegionTable table = new DataRegionTable("qwp2", this);
-        List<String> filenames = table.getColumnDataAsText("Name");
-        int rowIndexInserted = filenames.indexOf(fileInsertedName);
+        DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver()).find();
+        int rowIndexInserted = table.getRowIndex("Name", fileInsertedName);
         List<String> results = table.getRowDataAsText(rowIndexInserted,"Custom Prop", "Relative Folder");
         Assert.assertEquals("CustomProp is not as expected", "InsertedCustomProp", results.get(0));
         Assert.assertEquals("Relative Folder is not as expected", "/datasets", results.get(1));
@@ -161,7 +160,7 @@ public class FilesQueryTest extends BaseWebDriverTest
 
     private void insertFileRecord(String absoluteFilePath, String customProp)
     {
-        DataRegionTable table = new DataRegionTable("qwp2", this);
+        DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver()).find();
         table.clickInsertNewRow();
         setFormElement(Locator.name("quf_CustomProp"), customProp);
         setFormElement(Locator.name("quf_AbsoluteFilePath"), absoluteFilePath);
@@ -170,9 +169,8 @@ public class FilesQueryTest extends BaseWebDriverTest
 
     private void verifyFileRecordsGrid(boolean canSeeAbsolutePath, String filename, String customPropValue, String relativeFolder)
     {
-        DataRegionTable table = new DataRegionTable("qwp2", this);
-        List<String> filenames = table.getColumnDataAsText("Name");
-        int rowIndex = filenames.indexOf(filename);
+        DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver()).find();
+        int rowIndex = table.getRowIndex("Name", filename);
         List<String> results = table.getRowDataAsText(rowIndex, "File Exists", "Custom Prop", "Relative Folder");
         Assert.assertEquals("File should exist", "true", results.get(0));
         Assert.assertEquals("CustomProp is not as expected", customPropValue, results.get(1));
@@ -189,17 +187,16 @@ public class FilesQueryTest extends BaseWebDriverTest
         }
     }
 
-    private void verifyUpdatingCustomFileProps(String filename, String updatedCustomPropValue, boolean canInsert)
+    private void verifyUpdatingCustomFileProps(String filename, String updatedCustomPropValue)
     {
-        DataRegionTable table = new DataRegionTable("qwp2", this);
-        List<String> filenames = table.getColumnDataAsText("Name");
-        int rowIndex = filenames.indexOf(filename);
+        DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver()).find();
+        int rowIndex = table.getRowIndex("Name", filename);
         table.clickEditRow(rowIndex);
         setFormElement(Locator.name("quf_CustomProp"), updatedCustomPropValue);
         clickButton("Submit");
 
         List<String> results = table.getRowDataAsText(rowIndex, "Custom Prop");
-        Assert.assertEquals("Absolute File Path is not as expected", updatedCustomPropValue, results.get(0));
+        Assert.assertEquals("Custom Prop is not as expected", updatedCustomPropValue, results.get(0));
     }
 
     private void uploadFile(File testFile, String customPropValue, String fileDescription)
