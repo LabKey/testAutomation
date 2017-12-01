@@ -269,15 +269,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _listHelper.uploadData(COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
         clickProject(getProjectName());
         // Setup custom file properties
-        _fileBrowserHelper.goToAdminMenu();
-        // Setup custom file actions
-
-        Window window = Window(getDriver()).withTitle("Manage File Browser Configuration").waitFor();
-        Ext4Checkbox().locatedBy(Locator.id("importAction-inputEl")).find(window).check();
-
-        waitAndClick(Ext4Helper.Locators.ext4Tab("File Properties"));
-        RadioButton().withLabel("Use Custom File Properties").find(window).check();
-        window.clickButton("edit properties");
+        _fileBrowserHelper.goToEditProperties();
 
         waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("ff_name0"), CUSTOM_PROPERTY);

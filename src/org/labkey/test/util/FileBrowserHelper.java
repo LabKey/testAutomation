@@ -320,6 +320,17 @@ public class FileBrowserHelper extends WebDriverWrapper
         Window(getDriver()).withTitle("Manage File Browser Configuration").waitFor();
     }
 
+    public void goToEditProperties()
+    {
+        goToAdminMenu();
+        Window window = Window.Window(getDriver()).withTitle("Manage File Browser Configuration").waitFor();
+        Ext4Checkbox().locatedBy(Locator.id("importAction-inputEl")).find(window).check();
+
+        waitAndClick(Ext4Helper.Locators.ext4Tab("File Properties"));
+        RadioButton().withLabel("Use Custom File Properties").find(window).check();
+        window.clickButton("edit properties");
+    }
+
     public void selectImportDataAction(@LoggedParam String actionName)
     {
         doAndWaitForPageSignal(() -> clickFileBrowserButton(BrowserAction.IMPORT_DATA), IMPORT_SIGNAL_NAME);
