@@ -131,7 +131,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
 
         try
         {
-            waitFor(() -> getComponentElement().getAttribute("class").contains("pickerfield-open"), "Combo list didn't open", 1000);
+            waitFor(() -> getComponentElement().getAttribute("class").contains("pickerfield-open"), 1000);
             getDriverWrapper().waitForElement(comboListItem());
         }
         catch (TimeoutException | NoSuchElementException retry)
