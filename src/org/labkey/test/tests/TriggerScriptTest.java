@@ -604,10 +604,11 @@ public class TriggerScriptTest extends BaseWebDriverTest
         log("** " + testName + " " + step + " Event");
 
         //Check previous step prepared row for delete
+        pushLocation();
         assertElementPresent(Locator.tagWithText("td", "BeforeDelete"));
         deleteSingleRowViaUI(flagField, step, dataRegionName);
         assertTextPresent(BEFORE_DELETE_ERROR);
-        clickButton("Back");
+        popLocation();
         //Verify validation error prevented delete
         assertElementPresent(Locator.tagWithText("td", "BeforeDelete"));
 
@@ -630,9 +631,10 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Check AfterDelete Event
         step = "AfterDelete";
         log("** " + testName + " " + step + " Event");
+        pushLocation();
         deleteSingleRowViaUI(updateField, BEFORE_UPDATE_COMPANY, dataRegionName);
         assertTextPresent(AFTER_DELETE_ERROR);
-        clickButton("Back");
+        popLocation();
         //Verify validation error prevented delete
         assertElementPresent(Locator.tagWithText("td", "BeforeUpdate"));
     }
