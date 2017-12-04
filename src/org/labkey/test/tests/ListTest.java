@@ -31,6 +31,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -1024,11 +1025,11 @@ public class ListTest extends BaseWebDriverTest
         clickAdminMenuItem("Folder", "Management");
         click(Locator.linkContainingText("Export"));
         // select 'remove all columns tagged as protected'
-        checkCheckbox(Locator.checkboxByName("removePhi").waitForElement(getDriver(), 2000));
-        setFormElementJS(Locator.input("exportPhiLevel"), "Limited");
+        new Checkbox(Locator.tagContainingText("label", "Exclude Columns At This PHI Level And Higher:").precedingSibling("input").findElement(getDriver())).check();
+        setFormElementJS(Locator.tagWithClass("input", "export-phi-level"), "Limited");
 
         // click 'export', capture the zip archive download
-        File projectZipArchive = clickAndWaitForDownload(Locator.buttonContainingText("Export").waitForElement(getDriver(), 2000));
+        File projectZipArchive = clickAndWaitForDownload(findButton("Export"));
 
         assertFalse("Restricted PHI column attachment should not be included in export",
                 TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_DATA_FILE.getName()));

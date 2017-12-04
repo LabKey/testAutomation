@@ -1340,7 +1340,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected File exportFolderToBrowserAsZip()
     {
         prepareForFolderExport(null, false, false, false, 2);
-        return clickAndWaitForDownload(Locator.extButton("Export"));
+        return clickAndWaitForDownload(findButton("Export"));
     }
 
     protected void goToModuleProperties()

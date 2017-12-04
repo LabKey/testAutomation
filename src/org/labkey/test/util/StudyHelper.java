@@ -248,18 +248,18 @@ public class StudyHelper
         _test.clickTab("Manage");
         _test.clickButton("Export Study");
 
-        _test.waitForElement(Locator.checkboxByNameAndValue("types", "Study"));
+        _test.waitForElement(Locator.tagWithClass("table", "export-location"));
         List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
         // NOTE: these have moved to the folder archive export: "Queries", "Custom Views", "Reports", "Lists"
         List<String> missingObjects = new ArrayList<>();
         for (String obj : studyObjects)
         {
-            if (!_test.isElementPresent(Locator.checkboxByNameAndValue("types", obj)))
+            if (!_test.isElementPresent(Locator.tagWithText("label", obj).precedingSibling("input")))
                 missingObjects.add(obj);
         }
         assertTrue("Missing study objects: " + String.join(", ", missingObjects), missingObjects.isEmpty());
 
-        _test.checkRadioButton(Locator.radioButtonByNameAndValue("location", zipFile ? "1" : "0"));  // zip file vs. individual files
+        _test.checkRadioButton(Locator.tagWithClass("table", "export-location").index(zipFile ? 1 : 0)); // zip file vs. individual files
         _test.clickButton("Export");
     }
 

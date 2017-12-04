@@ -226,7 +226,6 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         if(!exportPhi)
         {
             new Checkbox(Locator.tagContainingText("label", "Exclude Columns At This PHI Level And Higher:").precedingSibling("input").findElement(getDriver())).check();
-
             setFormElementJS(Locator.tagWithClass("input", "export-phi-level"), exportPhiLevel.name());
         }
         if(useAlternateIDs)

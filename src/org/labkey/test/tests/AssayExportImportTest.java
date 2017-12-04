@@ -10,6 +10,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ArtifactCollector;
@@ -399,9 +400,9 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_01);
 
         goToFolderManagement().goToPane("tabexport");
-        click(Locator.checkboxByNameAndValue("types", "Experiments and runs"));
-        click(Locator.checkboxByNameAndValue("types", "Files"));
-        File exportedFolderFile = doAndWaitForDownload(()->click(Locator.button("Export")));
+        new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input").findElement(getDriver())).check();
+        new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
+        File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
         log("Create a simple Assay project as the import target.");
         _containerHelper.createProject(ASSAY_PROJECT_FOR_IMPORT_01, "Assay");
@@ -507,9 +508,9 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_02);
 
         goToFolderManagement().goToPane("tabexport");
-        click(Locator.checkboxByNameAndValue("types", "Experiments and runs"));
-        click(Locator.checkboxByNameAndValue("types", "Files"));
-        File exportedFolderFile = doAndWaitForDownload(()->click(Locator.button("Export")));
+        new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input").findElement(getDriver())).check();
+        new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
+        File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
         log("Create a simple Assay project as the import target.");
         _containerHelper.createProject(ASSAY_PROJECT_FOR_IMPORT_02, "Assay");
