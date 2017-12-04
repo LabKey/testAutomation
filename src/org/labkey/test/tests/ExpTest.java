@@ -121,7 +121,9 @@ public class ExpTest extends BaseWebDriverTest
         // Check that it contains the date format we expect
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         waitForText(WAIT_FOR_JAVASCRIPT, dateFormat.format(new Date()));
-        assertTextPresent("file:/", 10);
+        // records for generated files experiment.xar.log and experiment.xar.xml may have been created when exp schema is created (exp.files auto creates data records for all files)
+        int textCount = countText("file:/");
+        assertTrue("Exp.data records are not as expected", textCount == 5*2 || textCount == 7*2);
 
         // Edit the metadata to use a special date format
         _ext4Helper.clickExt4Tab("Source");
@@ -178,7 +180,9 @@ public class ExpTest extends BaseWebDriverTest
         _customizeViewsHelper.addColumn("WrappedRowId/Created", "Wrapped Row Id editedCreated");
         _customizeViewsHelper.applyCustomView();
         // Verify that it was joined and formatted correctly
-        assertTextPresent(dateFormat.format(new Date()), 5);
+        textCount = countText(dateFormat.format(new Date()));
+        // records for generated files experiment.xar.log and experiment.xar.xml may have been created automatically
+        assertTrue("Number of records is not as expected", textCount == 5 || textCount == 7);
 
         // Since this metadata is shared, clear it out 
         clickAndWait(Locator.linkWithText("exp Schema"));
