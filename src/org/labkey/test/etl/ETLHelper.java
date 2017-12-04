@@ -514,7 +514,8 @@ public class ETLHelper
     {
         runETLNoNav(transformId, hasWork, hasCheckerError, true);
 
-        assertEquals("Wrong job status", expectExecutionError ? ERROR : COMPLETE, getEtlStatus());
+        if (hasWork)
+            assertEquals("Wrong job status", expectExecutionError ? ERROR : COMPLETE, getEtlStatus());
 
         _test.log("returning to project home");
         _test.goToProjectHome();
