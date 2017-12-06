@@ -195,7 +195,7 @@ public abstract class TestFileUtils
         }
 
         assertNotNull("Sample data not found: " + relativePath + "\n" +
-                "Run `gradlew :server:test:writeSampleDataFile` once to locate all sampledata" + "\n" +
+                "Run `./gradlew :server:test:build :server:test:writeSampleDataFile` once to locate all sampledata" + "\n" +
                 "Currently known sample data locations: " + String.join("\n", sampledataDirs), foundFile);
         return foundFile;
     }
