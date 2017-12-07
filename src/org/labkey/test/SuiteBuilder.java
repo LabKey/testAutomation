@@ -85,6 +85,9 @@ public class SuiteBuilder
 
         for (Class test : tests)
         {
+            if (Modifier.isAbstract(test.getModifiers()))
+                continue; // Don't try to run abstract test classes, even if they have a @Category annotation
+
             for (Class category : ((Category)test.getAnnotation(Category.class)).value())
             {
                 addTestToSuite(test, category.getSimpleName());
