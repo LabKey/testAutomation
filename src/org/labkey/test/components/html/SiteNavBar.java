@@ -232,13 +232,15 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
         public void impersonate(String fakeUser)
         {
-            clickSubMenu(false, "Impersonate", "User");
-            ImpersonateUserWindow window = new ImpersonateUserWindow(getDriver());
+            ImpersonateUserWindow window;
             try {
+                clickSubMenu(false, "Impersonate", "User");
+                window = new ImpersonateUserWindow(getDriver());
                 window.getComponentElement().isDisplayed(); // force it to resolve
             }catch (NoSuchElementException notfound)
             {
                 clickSubMenu(false, "Impersonate", "User");
+                window = new ImpersonateUserWindow(getDriver());
             }
             window.selectUser(fakeUser);
             window.clickImpersonate();
@@ -254,8 +256,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         public void impersonateRoles(String oneRole, String... roles)
         {
             ImpersonateRoleWindow window;
-            try
-            {
+            try {
                 clickSubMenu(false, "Impersonate", "Roles");
                 window = new ImpersonateRoleWindow(getDriver());
                 window.getComponentElement().isDisplayed(); // force it to find/resolve
@@ -272,10 +273,10 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
         public void impersonateGroup(String group, boolean isSiteGroup)
         {
-            clickSubMenu(false, "Impersonate", "Group");
             ImpersonateGroupWindow window;
 
             try{
+                clickSubMenu(false, "Impersonate", "Group");
                 window = new ImpersonateGroupWindow(getDriver());
                 window.getComponentElement().isDisplayed(); // force it to resolve
             }catch (NoSuchElementException retry)
