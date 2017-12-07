@@ -19,11 +19,17 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.internal.ImpersonateGroupWindow;
+import org.labkey.test.components.internal.ImpersonateRoleWindow;
+import org.labkey.test.components.internal.ImpersonateUserWindow;
 import org.labkey.test.pages.search.SearchResultsPage;
+import org.labkey.test.util.AbstractUserHelper;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.WebDriverWrapper.sleep;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /* Wraps the new site/admin nav menus and site search */
 public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
@@ -65,6 +71,8 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     {
         if (!isInPageAdminMode())
             adminMenu().clickSubMenu(true, "Page Admin Mode");
+
+        assertTrue("Failed to enter page admin mode", isInPageAdminMode());
     }
 
     public void exitPageAdminMode()
@@ -72,17 +80,17 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         if (isInPageAdminMode())
         {
             getWrapper().clickAndWait(Locators.exitAdminBtn.refindWhenNeeded(getDriver()));
-            WebDriverWrapper.waitFor(()-> !isInPageAdminMode(), "Failed to exit page admin mode", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            assertFalse("Failed to exit page admin mode", isInPageAdminMode());
         }
     }
 
     public void stopImpersonating()
     {
-        if (getWrapper().isImpersonating())
-        {
-            getWrapper().clickAndWait(Locators.stopImpersonatingBtn.findElement(getDriver()));
-            WebDriverWrapper.waitFor(() -> !getWrapper().isImpersonating(), "Failed to stop impersonating", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        }
+        if (!getWrapper().isImpersonating())
+            throw new IllegalStateException("Not currently impersonating");
+
+        getWrapper().clickAndWait(Locators.stopImpersonatingBtn.findElement(getDriver()));
+        getWrapper().assertSignedInNotImpersonating();
     }
 
     public boolean isInPageAdminMode()
@@ -120,7 +128,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         return elementCache().adminMenu;
     }
 
-    public BootstrapMenu userMenu()
+    public UserMenu userMenu()
     {
         return elementCache().userMenu;
     }
@@ -158,8 +166,8 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
                 .findWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public WebElement searchSubmitInput = Locator.xpath("//div[@id='global-search']//a[@class='btn-search fa fa-search']")
                 .findWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public final AdminMenu adminMenu = (AdminMenu) new AdminMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
-        public final UserMenu userMenu = (UserMenu) new UserMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
+        public final AdminMenu adminMenu = new AdminMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
+        public final UserMenu userMenu = new UserMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
     }
 
     public class AdminMenu extends BootstrapMenu
@@ -190,6 +198,12 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             }
             getWrapper().clickAndWait(moduleLinkElement);
         }
+
+        @Override
+        public AdminMenu withExpandRetries(int retries)
+        {
+            return (AdminMenu) super.withExpandRetries(retries);
+        }
     }
 
     protected class AdminMenuFinder extends SimpleComponentFinder<AdminMenu>
@@ -214,6 +228,74 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         protected UserMenu(WebDriver driver, WebElement componentElement)
         {
             super(driver, componentElement);
+        }
+
+        public void impersonate(String fakeUser)
+        {
+            clickSubMenu(false, "Impersonate", "User");
+            ImpersonateUserWindow window = new ImpersonateUserWindow(getDriver());
+            try {
+                window.getComponentElement().isDisplayed(); // force it to resolve
+            }catch (NoSuchElementException notfound)
+            {
+                clickSubMenu(false, "Impersonate", "User");
+            }
+            window.selectUser(fakeUser);
+            window.clickImpersonate();
+
+            AbstractUserHelper.saveCurrentDisplayName(getWrapper());
+
+            if (getWrapper().isElementPresent(Locator.lkButton("Home")))
+            {
+                getWrapper().clickAndWait(Locator.lkButton("Home"));
+            }
+        }
+
+        public void impersonateRoles(String oneRole, String... roles)
+        {
+            ImpersonateRoleWindow window;
+            try
+            {
+                clickSubMenu(false, "Impersonate", "Roles");
+                window = new ImpersonateRoleWindow(getDriver());
+                window.getComponentElement().isDisplayed(); // force it to find/resolve
+            } catch (NoSuchElementException notFound)
+            {
+                clickSubMenu(false, "Impersonate", "Roles");
+                window = new ImpersonateRoleWindow(getDriver());
+            }
+
+            window.selectRoles(oneRole);
+            window.selectRoles(roles);
+            window.clickImpersonate();
+        }
+
+        public void impersonateGroup(String group, boolean isSiteGroup)
+        {
+            clickSubMenu(false, "Impersonate", "Group");
+            ImpersonateGroupWindow window;
+
+            try{
+                window = new ImpersonateGroupWindow(getDriver());
+                window.getComponentElement().isDisplayed(); // force it to resolve
+            }catch (NoSuchElementException retry)
+            {
+                clickSubMenu(false, "Impersonate", "Group");
+                window = new ImpersonateGroupWindow(getDriver());
+            }
+
+            if (isSiteGroup)
+                window.selectSiteGroup(group);
+            else
+                window.selectGroup(group);
+
+            window.clickImpersonate();
+        }
+
+        @Override
+        public UserMenu withExpandRetries(int retries)
+        {
+            return (UserMenu) super.withExpandRetries(retries);
         }
     }
 

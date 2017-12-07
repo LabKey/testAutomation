@@ -38,7 +38,12 @@ public abstract class AbstractUserHelper
 
     public void saveCurrentDisplayName()
     {
-        usersAndDisplayNames.put(getWrapper().getCurrentUser(), getWrapper().getCurrentUserName());
+        saveCurrentDisplayName(getWrapper());
+    }
+
+    public static void saveCurrentDisplayName(WebDriverWrapper wrapper)
+    {
+        usersAndDisplayNames.put(wrapper.getCurrentUser(), wrapper.getCurrentUserName());
     }
 
     // assumes there are not collisions in the database causing unique numbers to be appended

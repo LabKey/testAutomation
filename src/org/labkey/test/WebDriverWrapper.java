@@ -981,6 +981,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (Boolean)executeScript("return LABKEY.impersonatingUser != undefined;");
     }
 
+    public void assertSignedInNotImpersonating()
+    {
+        assertTrue("Not signed in", isSignedIn());
+        assertFalse("Impersonating", isImpersonating());
+        assertElementPresent(Locators.UX_USER_MENU);
+    }
+
     public boolean isOnServerErrorPage()
     {
         return isElementPresent(Locator.css("body > table.server-error"));

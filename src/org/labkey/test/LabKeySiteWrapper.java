@@ -214,13 +214,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    public void assertSignedInNotImpersonating()
-    {
-        assertTrue("Not signed in", isSignedIn());
-        assertFalse("Impersonating", isImpersonating());
-        assertElementPresent(Locators.UX_USER_MENU);
-    }
-
     @LogMethod
     public void ensureSignedInAsPrimaryTestUser()
     {
@@ -1140,14 +1133,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
-        clickUserMenuItem(false, "Impersonate", "Group");
-        final ImpersonateGroupWindow window = new ImpersonateGroupWindow(getDriver());
-        if (isSiteGroup)
-            window.selectSiteGroup(group);
-        else
-            window.selectGroup(group);
-
-        window.clickImpersonate();
+        navBar().userMenu().impersonateGroup(group, isSiteGroup);
     }
 
     public void impersonateRole(String role)
@@ -1157,26 +1143,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void impersonateRoles(String oneRole, String... roles)
     {
-        clickUserMenuItem(false, "Impersonate", "Roles");
-        final ImpersonateRoleWindow window = new ImpersonateRoleWindow(getDriver());
-        window.selectRoles(oneRole);
-        window.selectRoles(roles);
-        window.clickImpersonate();
+        navBar().userMenu().impersonateRoles(oneRole, roles);
     }
 
     public void impersonate(String fakeUser)
     {
-        clickUserMenuItem(false, "Impersonate", "User");
-        final ImpersonateUserWindow window = new ImpersonateUserWindow(getDriver());
-        window.selectUser(fakeUser);
-        window.clickImpersonate();
-
-        _userHelper.saveCurrentDisplayName();
-
-        if (isElementPresent(Locator.lkButton("Home")))
-        {
-            clickAndWait(Locator.lkButton("Home"));
-        }
+        navBar().userMenu().impersonate(fakeUser);
     }
 
     @Deprecated
@@ -1202,10 +1174,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      */
     public void stopImpersonating(Boolean goHome)
     {
-        if (!isImpersonating())
-            throw new IllegalStateException("Not currently impersonating");
-        new SiteNavBar(getDriver()).stopImpersonating();
-        assertSignedInNotImpersonating();
+        navBar().stopImpersonating();
         if (goHome)
             goToHome();
     }
