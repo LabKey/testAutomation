@@ -190,7 +190,7 @@ public class FilterTest extends BaseWebDriverTest
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Is Blank");
-        clickButton("CLEAR FILTER");
+        clickButton("Clear Filter");
         //the change above would result in filters being dropped.
         verifyColumnValues(region, "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
@@ -203,7 +203,7 @@ public class FilterTest extends BaseWebDriverTest
         setFormElement(Locator.name("value_1"), "Light;Robust");
 
         _extHelper.clickExtTab("Choose Values"); //we should get no alerts
-        clickButton("CLEAR FILTER");
+        clickButton("Clear Filter");
         region.setFacetedFilter("Color", "Light", "Robust");
         verifyColumnValues(region, "Color", "Light", "Robust");
         verifyColumnValues(region, "year", "1980", "1970");
@@ -349,7 +349,7 @@ public class FilterTest extends BaseWebDriverTest
     {
         dataRegion.openFilterDialog(column);
         verifyOptionsInFilterDialog(options);
-        _extHelper.clickExtButton("CANCEL", 0);
+        _extHelper.clickExtButton("Cancel", 0);
     }
 
     private void verifyColumnValues(DataRegionTable dataRegion, String columnName, String... expectedValues)
@@ -400,7 +400,7 @@ public class FilterTest extends BaseWebDriverTest
         assertElementPresent(Locator.extButton("OK"));
         assertTextPresent(expectedError);
 
-        clickButton("CANCEL", 0);
+        clickButton("Cancel", 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
     }
@@ -515,7 +515,7 @@ public class FilterTest extends BaseWebDriverTest
     {
         DataRegionTable region = new DataRegionTable(TABLE_NAME, this);
         region.openFilterDialog(_listCol4.getName());
-        clickButton("CANCEL", 0);
+        clickButton("Cancel", 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent("Show Rows Where");
     }
@@ -599,7 +599,7 @@ public class FilterTest extends BaseWebDriverTest
             else
                 assertEquals("No Other Filter", getFormElement(Locator.name("filterType_2")));
 
-            clickButtonContainingText("CANCEL", 0);
+            clickButtonContainingText("Cancel", 0);
         }
 
         DataRegionTable table = new DataRegionTable(TABLE_NAME, this.getDriver());

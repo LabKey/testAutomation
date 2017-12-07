@@ -782,7 +782,7 @@ public class ListTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x-combo-list-item') and text()='Starts With']"));
         assertElementPresent(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x-combo-list-item') and text()='Is Blank']"));
         click(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
-        _extHelper.clickExtButton("Show Rows Where " + _listCol4.getLabel(), "CANCEL", 0);
+        _extHelper.clickExtButton("Show Rows Where " + _listCol4.getLabel(), "Cancel", 0);
 
         log("Test that filters don't affect multiple web parts");
         assertTextPresent(TEST_DATA[1][0], 2);

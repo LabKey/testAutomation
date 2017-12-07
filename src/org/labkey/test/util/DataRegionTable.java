@@ -1072,7 +1072,7 @@ public class DataRegionTable extends DataRegion
     {
         TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnName);
         openFilterDialog(columnName);
-        doAndWaitForUpdate(() -> getWrapper().clickButton("CLEAR ALL FILTERS"));
+        doAndWaitForUpdate(() -> getWrapper().clickButton("Clear All Filters"));
     }
 
     public void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)

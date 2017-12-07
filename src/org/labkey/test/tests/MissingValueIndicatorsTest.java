@@ -489,7 +489,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
             if(options.contains(mviFilter) || options.contains(noMviFilter))
             {
                 comboArrow.click();
-                clickButton("CANCEL", 0);
+                clickButton("Cancel", 0);
                 DataRegion(getDriver()).find().setFilter(colName, mviFilter);
                 assertTextNotPresent("Ignoring filter/sort on column ", "because it does not exist.");
                 DataRegion(getDriver()).find().clearFilter(colName);
@@ -500,7 +500,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
             else{
                 log("No Mvi Filter in the column");
                 comboArrow.click();
-                clickButton("CANCEL", 0);
+                clickButton("Cancel", 0);
             }
         }
 

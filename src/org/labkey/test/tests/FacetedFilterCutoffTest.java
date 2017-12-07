@@ -80,13 +80,13 @@ public class FacetedFilterCutoffTest extends BaseWebDriverTest
         listDataRegion.openFilterDialog(AT_CUTOFF);
         assertElementNotVisible(advancedFilteringLoc);
         assertElementVisible(factedFilterLoc);
-        click(Locator.button("CANCEL"));
+        click(Locator.button("Cancel"));
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         listDataRegion.openFilterDialog(OVER_CUTOFF);
         assertElementVisible(advancedFilteringLoc);
         assertElementNotVisible(factedFilterLoc);
-        click(Locator.button("CANCEL"));
+        click(Locator.button("Cancel"));
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
@@ -103,7 +103,7 @@ public class FacetedFilterCutoffTest extends BaseWebDriverTest
         listDataRegion.openFilterDialog(OVER_CUTOFF);
         assertElementVisible(factedFilterLoc);
         assertElementNotVisible(advancedFilteringLoc);
-        click(Locator.button("CANCEL"));
+        click(Locator.button("Cancel"));
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
