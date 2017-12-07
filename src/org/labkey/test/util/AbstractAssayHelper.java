@@ -182,10 +182,8 @@ public abstract class AbstractAssayHelper
 
     private void clickManageOption(boolean wait, String ... subMenuLabels)
     {
-        new BootstrapMenu(_test.getDriver(),
-                    Locator.tagWithClass("div", "lk-menu-drop")
-                            .withChild(Locator.linkWithText(MANAGE_LINK_TEXT))
-                            .waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT))
+        BootstrapMenu.finder(_test.getDriver()).timeout(WAIT_FOR_JAVASCRIPT)
+                .withButtonText(MANAGE_LINK_TEXT).find().withExpandRetries(1)
                 .clickSubMenu(wait, subMenuLabels);
     }
 
