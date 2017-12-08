@@ -10,7 +10,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -24,7 +23,6 @@ public class MultiplePKUploadAssayTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        super.doCleanup(afterTest);
         _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
