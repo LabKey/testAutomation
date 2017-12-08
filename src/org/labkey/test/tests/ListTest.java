@@ -1025,7 +1025,8 @@ public class ListTest extends BaseWebDriverTest
         clickAdminMenuItem("Folder", "Management");
         click(Locator.linkContainingText("Export"));
         // select 'remove all columns tagged as protected'
-        new Checkbox(Locator.tagContainingText("label", "Exclude Columns At This PHI Level And Higher:").precedingSibling("input").findElement(getDriver())).check();
+        new Checkbox(Locator.tagContainingText("label", "Exclude Columns At This PHI Level And Higher:")
+                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
         setFormElementJS(Locator.tagWithClass("input", "export-phi-level"), "Limited");
 
         // click 'export', capture the zip archive download
