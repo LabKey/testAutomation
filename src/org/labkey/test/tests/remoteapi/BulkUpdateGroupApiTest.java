@@ -507,12 +507,13 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     @Test
     public void testSessionKey()
     {
-        log("Get session API key and use it in a command.");
+        log("Get session key and use it in a command.");
         goToAdminConsole().clickSiteSettings();
         checkCheckbox(Locator.checkboxById("allowSessionKeys"));
         clickButton("Save");
-        clickUserMenuItem("API Key");
-        waitForText("This API key can be used");
+        clickUserMenuItem("API Keys");
+        waitForText("API keys are used to authorize");
+        clickButton("Generate Session API Key", "session|");
         String apiKey = Locator.inputById("session-token").findElement(getDriver()).getAttribute("value");
         Connection cn = new Connection(getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
 
