@@ -532,6 +532,7 @@ public class ParticipantReportTest extends ReportTest
     @LogMethod
     private void doParticipantListFilterTest()
     {
+        collapseReportFilterWindow(); // it is blocking the project menu
         navigateToFolder(getProjectName(), getFolderName());
         clickTab("Mice");
         waitForText("Found 25 enrolled mice of 138."); // Not in any cohort deselected initially
