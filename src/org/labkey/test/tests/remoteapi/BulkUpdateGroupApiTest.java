@@ -508,9 +508,10 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     public void testSessionKey()
     {
         log("Get session key and use it in a command.");
-        goToAdminConsole().clickSiteSettings();
-        checkCheckbox(Locator.checkboxById("allowSessionKeys"));
-        clickButton("Save");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowSessionKeys(true)
+                .save();
         clickUserMenuItem("API Keys");
         waitForText("API keys are used to authorize");
         clickButton("Generate session API key", "session|");
