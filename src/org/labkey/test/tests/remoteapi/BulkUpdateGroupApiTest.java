@@ -514,7 +514,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
                 .save();
         clickUserMenuItem("API Keys");
         waitForText("API keys are used to authorize");
-        clickButton("Generate session API key", "session|");
+        clickButton("Generate session key", "session|");
         String apiKey = Locator.inputById("session-token").findElement(getDriver()).getAttribute("value");
         Connection cn = new Connection(getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
 
