@@ -69,8 +69,7 @@ public class DataViewsTest extends ParticipantListTest
         waitForSpecimenImport();
         setupDatasetCategories();
         log("Create report for data view webpart test.");
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Views"));
+        goToManageViews();
         new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("*","lk-menu-drop")
                 .withPredicate(Locator.xpath("//a/span[contains(text(),'Add Report')]"))
                 .findElement(getDriver())).clickSubMenu(true, "R Report");
@@ -205,8 +204,6 @@ public class DataViewsTest extends ParticipantListTest
         log("Testing status settings for datasets");
         clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         waitForText(CATEGORIES[3]);
-        if (!IS_BOOTSTRAP_LAYOUT)
-            assertTextPresent("Data Views", "Name", "Type", "Access");
 
         openCustomizePanel(RENAMED_WEBPART_TITLE);
         _ext4Helper.checkCheckbox("Status");
@@ -229,9 +226,6 @@ public class DataViewsTest extends ParticipantListTest
             beginAt(Locator.linkWithText(entry[0]).findElement(getDriver()).getAttribute("href"), WAIT_FOR_JAVASCRIPT);
 
             refresh();
-            if (!IS_BOOTSTRAP_LAYOUT)
-                waitForElement(Locator.xpath("//table[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"),
-                    WAIT_FOR_PAGE);
             clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         }
     }
@@ -303,7 +297,6 @@ public class DataViewsTest extends ParticipantListTest
     public void refreshDateTest()
     {
         log("Verify refresh date");
-        String refreshDate = "2012-03-01";
         clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         waitForText(CATEGORIES[3]);
         // Refresh date not present when not set.
@@ -313,22 +306,20 @@ public class DataViewsTest extends ParticipantListTest
         openCustomizePanel(RENAMED_WEBPART_TITLE);
         _ext4Helper.checkCheckbox("Modified");
         _ext4Helper.checkCheckbox("Data Cut Date");
-        WebElement manageButton = findButton("Manage Categories");
         clickButton("Save", 0);
-        //shortWait().until(ExpectedConditions.stalenessOf(manageButton)); // TODO
         waitForText("Data Cut Date", "Modified");
         enableEditMode();
         openEditPanel(EDITED_DATASET);
         _extHelper.waitForExtDialog(EDITED_DATASET);
-        setFormElement(Locator.name("refreshDate"), refreshDate);
+        setFormElement(Locator.name("refreshDate"), REFRESH_DATE);
         clickButton("Save", 0);
-        waitForText(refreshDate, 1, WAIT_FOR_JAVASCRIPT);
+        waitForText(REFRESH_DATE, 1, WAIT_FOR_JAVASCRIPT);
         // check hover box
         mouseOver(Locator.linkWithText(EDITED_DATASET));
         waitForText("Data Cut Date");
-        assertTextPresent("2012-03-01");
+        assertTextPresent(REFRESH_DATE);
         clickAndWait(Locator.linkWithText(EDITED_DATASET));
-        assertTextPresent("2012-03-01");
+        assertTextPresent(REFRESH_DATE);
     }
 
     private static final String CATEGORY_LIST =
@@ -605,12 +596,6 @@ public class DataViewsTest extends ParticipantListTest
         setFormElement(subCategoryField, subCategoryName);
         fireEvent(subCategoryField, SeleniumEvent.blur);
         waitForElement(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(subCategoryName));
-    }
-
-    @LogMethod
-    public void categoryReorderTest()
-    {
-        throw new IllegalStateException("Not yet implemented");
     }
 
     private void openEditPanel(String itemName)
