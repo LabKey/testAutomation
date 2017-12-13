@@ -147,6 +147,7 @@ public class BasicTest extends BaseWebDriverTest
         }
         else
         {
+            warningLoc.findElements(getDriver()).forEach((e)->log(e.getText()));
             assertTextNotPresent("WARNING:"); // In case the page format changes. Update test if this fails
         }
     }
