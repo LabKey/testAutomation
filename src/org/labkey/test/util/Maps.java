@@ -16,9 +16,9 @@
 
 package org.labkey.test.util;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Maps
 {
@@ -34,7 +34,7 @@ public class Maps
 
     public static <K, V> Map<K, V> of(K k1, V v1, K k2, V v2)
     {
-        HashMap<K, V> map = new HashMap<>();
+        Map<K, V> map = new LinkedHashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
         return Collections.unmodifiableMap(map);
@@ -42,7 +42,7 @@ public class Maps
 
     public static <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3)
     {
-        HashMap<K, V> map = new HashMap<>();
+        Map<K, V> map = new LinkedHashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
         map.put(k3, v3);
@@ -51,7 +51,7 @@ public class Maps
 
     public static <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4)
     {
-        HashMap<K, V> map = new HashMap<>();
+        Map<K, V> map = new LinkedHashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
         map.put(k3, v3);
@@ -61,7 +61,7 @@ public class Maps
 
     public static <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5)
     {
-        HashMap<K, V> map = new HashMap<>();
+        Map<K, V> map = new LinkedHashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
         map.put(k3, v3);
