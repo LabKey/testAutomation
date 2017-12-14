@@ -144,8 +144,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         _listHelper.addField("Data Fields", "Animal", "Animal", ListHelper.ListColumnType.String);
 
         sleep(1000);
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
+        clickButton("Save & Close");
     }
 
     private void uploadQCRuns()
@@ -178,8 +177,6 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     private void uploadTransformRuns()
     {
         log("uploading transform runs");
-        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
-        clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TRANSFORM_ASSAY));
 
         clickButton("Import Data");
@@ -210,8 +207,6 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     private void uploadTransformQCRuns()
     {
         log("uploading transform & QC runs");
-        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
-        clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TRANSFORM_QC_ASSAY));
 
         clickButton("Import Data");
