@@ -18,8 +18,13 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
+import org.labkey.test.WebDriverWrapper;
 
-import static org.junit.Assert.*;
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 public class UIContainerHelper extends AbstractContainerHelper
 {
@@ -42,9 +47,6 @@ public class UIContainerHelper extends AbstractContainerHelper
     {
         _test.log("Creating project with name " + projectName);
         _test.ensureAdminMode();
-        if (projectLinkExists(projectName))
-            fail("Cannot create project; A link with text " + projectName + " already exists.  " +
-                    "This project may already exist, or its name appears elsewhere in the UI.");
         _test.goToCreateProject();
         _test.waitForElement(Locator.name("name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.name("name"), projectName);
@@ -58,6 +60,10 @@ public class UIContainerHelper extends AbstractContainerHelper
         }
 
         _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Next"));
+
+        List<String> errors = _test.getTexts(Locators.labkeyError.findElements(_test.getDriver()));
+        if (!errors.isEmpty())
+            fail("Unexpected error(s) during project creation: " + errors);
 
         //second page of the wizard
         _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Next"));
@@ -81,7 +87,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         _test.log("Wait extra long for folder to finish deleting.");
         while (!projectLinkExists(projectName) && System.currentTimeMillis() - startTime < LabKeySiteWrapper.WAIT_FOR_JAVASCRIPT)
         {
-            _test.sleep(5000);
+            WebDriverWrapper.sleep(5000);
             _test.refresh();
         }
     }
@@ -97,7 +103,7 @@ public class UIContainerHelper extends AbstractContainerHelper
     @Override
     protected void doDeleteProject(String project, boolean failIfNotFound, int wait)
     {
-        _test.openProjectMenu();
+        _test.projectMenu().open();
 
         if (!projectLinkExists(project))
         {
@@ -119,7 +125,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         _test.clickButton("Delete");
 
         // in case there are sub-folders
-        if (_test.isButtonPresent("Delete All Folders"))
+        if (_test.isElementPresent(Locator.lkButton("Delete All Folders")))
         {
             _test.clickButton("Delete All Folders");
         }
@@ -134,7 +140,7 @@ public class UIContainerHelper extends AbstractContainerHelper
             _test.log("Wait extra long for folder to finish deleting.");
             while (projectLinkExists(project) && System.currentTimeMillis() - startTime < wait)
             {
-                _test.sleep(5000);
+                WebDriverWrapper.sleep(5000);
                 _test.refresh();
             }
         }
