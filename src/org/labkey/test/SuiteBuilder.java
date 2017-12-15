@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +123,14 @@ public class SuiteBuilder
 
     public TestSet getTestSet(String suiteName)
     {
-        return new TestSet(_suites.get(suiteName),suiteName);
+        boolean optional = false;
+        if (suiteName.startsWith("?"))
+        {
+            optional = true;
+            suiteName = suiteName.substring(1);
+        }
+        Set<Class> tests = _suites.getOrDefault(suiteName, optional ? Collections.emptySet() : null);
+        return new TestSet(tests, suiteName);
     }
 
     public Set<String> getSuites()
