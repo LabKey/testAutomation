@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LogMethod;
@@ -40,14 +39,14 @@ import static org.labkey.test.util.Ext4Helper.getCssPrefix;
 public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
 {
     private WebElement _formItem;
-    private WebDriverWrapper _driverWrapper;
+    private WebDriver _driver;
     private ComboListMatcher _matcher;
     private Boolean _isMultiSelect;
 
     private ComboBox(WebElement formItem, WebDriver driver)
     {
         _formItem = formItem;
-        _driverWrapper = new WebDriverWrapperImpl(driver);
+        _driver = driver;
         _matcher = EXACT;
     }
 
@@ -60,12 +59,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     @Override
     protected WebDriver getDriver()
     {
-        return _driverWrapper.getDriver();
-    }
-
-    public WebDriverWrapper getDriverWrapper()
-    {
-        return _driverWrapper;
+        return _driver;
     }
 
     public interface ComboListMatcher
@@ -132,19 +126,19 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         try
         {
             waitFor(() -> getComponentElement().getAttribute("class").contains("pickerfield-open"), 1000);
-            getDriverWrapper().waitForElement(comboListItem());
+            getWrapper().waitForElement(comboListItem());
         }
         catch (TimeoutException | NoSuchElementException retry)
         {
             elementCache().arrowTrigger.click(); // try again if combo-box doesn't open
         }
 
-        getDriverWrapper().waitForElement(comboListItem());
+        getWrapper().waitForElement(comboListItem());
     }
 
     public void selectItemFromOpenComboList(String itemText, ComboListMatcher matchTechnique, boolean clickAt)
     {
-        selectItemFromOpenComboList(getDriverWrapper(), itemText, matchTechnique, clickAt);
+        selectItemFromOpenComboList(getWrapper(), itemText, matchTechnique, clickAt);
     }
 
     public static void selectItemFromOpenComboList(WebDriverWrapper driverWrapper, String itemText, ComboListMatcher matchTechnique, boolean clickAt)
@@ -195,7 +189,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
 
     private void waitForClosed()
     {
-        getDriverWrapper().waitForElementToDisappear(comboListItem());
+        getWrapper().waitForElementToDisappear(comboListItem());
     }
 
     public void clearComboBox()
@@ -228,21 +222,21 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     public List<String> getComboBoxOptions()
     {
         openComboList();
-        return getDriverWrapper().getTexts(comboListItem().findElements(getDriver()));
+        return getWrapper().getTexts(comboListItem().findElements(getDriver()));
     }
 
     @LogMethod(quiet=true)
     public List<String> getComboBoxEnabledOptions()
     {
         openComboList();
-        return getDriverWrapper().getTexts(comboListItem().append("/div[not(contains(@class, '-disabled-combo-item'))]").findElements(getDriver()));
+        return getWrapper().getTexts(comboListItem().append("/div[not(contains(@class, '-disabled-combo-item'))]").findElements(getDriver()));
     }
 
     @LogMethod(quiet=true)
     public List<String> getComboBoxDisabledOptions()
     {
         openComboList();
-        return getDriverWrapper().getTexts(comboListItem().append("/div[contains(@class, 'disabled-combo-item')]").findElements(getDriver()));
+        return getWrapper().getTexts(comboListItem().append("/div[contains(@class, 'disabled-combo-item')]").findElements(getDriver()));
     }
 
     @Override
