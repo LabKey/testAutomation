@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.security.PrincipalType;
+import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.XmlBeansUtil;
 import org.labkey.folder.xml.FolderDocument;
 import org.labkey.security.xml.GroupsType;
@@ -425,17 +425,9 @@ public class FolderExportTest extends BaseWebDriverTest
 
     private String getExpectedXML(String fileName)
     {
-        String xml = null;
         File file = new File(dataDir, fileName);
-        try
-        {
-            xml = FileUtils.readFileToString(file);
-            xml = xml.replaceAll("USER_NAME", PasswordUtil.getUsername());
-        }
-        catch (IOException e)
-        {
-            fail("Unable to read XML file in " + file);
-        }
+        String xml = PageFlowUtil.getFileContentsAsString(file);
+        xml = xml.replaceAll("USER_NAME", PasswordUtil.getUsername());
         return xml;
     }
 
