@@ -108,9 +108,11 @@ public class NabAssayTest extends AbstractQCAssayTest
     private static final String STUDY_FOLDER = TEST_ASSAY_PRJ_NAB + "/Study 1";
     private static final String STUDY_FOLDER_ENCODED = "Nab%20Test%20Verify%20Project/Study%201";
     private static final String TEST_DIV_ID = "testDiv";
-    private static String NABJS_WIKI = "<script type=\"text/javascript\">" +
+    private static String NABJS_WIKI =
+            "<div id=\"" + TEST_DIV_ID + "\"></div>\n" +
+            "<script type=\"text/javascript\">\n" +
             "var runOnce = false;\n" +
-            "function runNabAssayTest(config)\n" +
+            "function runNabAssayTest()\n" +
             "{\n" +
             "    if (runOnce) return;\n" +
             "    runOnce = true;\n" +
@@ -149,7 +151,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             "                                       var node = document.createElement('div');\n" +
             "                                       var textnode = document.createTextNode('Success!');\n" +
             "                                       node.appendChild(textnode);\n" +
-            "                                       document.getElementById(config.renderTo).appendChild(node);\n" +
+            "                                       document.getElementById('" + TEST_DIV_ID + "').appendChild(node);\n" +
             "                                    },\n" +
             "                                    failure : function() {fail('GetStudyGraphURL failure');}\n" +
             "                                }\n" +
@@ -167,11 +169,10 @@ public class NabAssayTest extends AbstractQCAssayTest
             "    var nabRuns = LABKEY.Assay.getNAbRuns(runsConfig);\n" +
             "};\n" +
             "function fail(message) {\n" +
-            "    document.getElementById(config.renderTo).appendChild(document.createTextNode('Failure: ' + message));\n" +
+            "    document.getElementById('" + TEST_DIV_ID + "').appendChild(document.createTextNode('Failure: ' + message));\n" +
             "};\n" +
-            "runNabAssayTest({renderTo : '" + TEST_DIV_ID + "'});\n" +
-            "</script>\n" +
-            "<div id=\"" + TEST_DIV_ID + "\"></div>";
+            "runNabAssayTest();\n" +
+            "</script>\n";
 
     @Override
     public List<String> getAssociatedModules()
@@ -614,16 +615,12 @@ public class NabAssayTest extends AbstractQCAssayTest
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
-        wikiHelper.setWikiBody(NABJS_WIKI);
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(new File(TestFileUtils.getLabKeyRoot(), "server/test/data/api/napApiTest.html")));
         wikiHelper.saveWikiPage();
         waitForWikiDivPopulation(TEST_DIV_ID, 30);
         waitForElements(Locator.id(TEST_DIV_ID).child(Locator.tagWithText("div", "Success!")), 2);
 
         portalHelper.removeWebPart(WIKIPAGE_NAME);
-
-        APITestHelper apiTester = new APITestHelper(this);
-        apiTester.setTestFiles(new File(TestFileUtils.getLabKeyRoot(), "server/test/data/api/nab-api.xml"));
-        apiTester.setIgnoredElements(getIgnoredElements());
     }
 
     protected Pattern[] getIgnoredElements()

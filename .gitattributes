@@ -40,6 +40,7 @@ data/api/groupSecurityTest.html -text
 data/api/http-api.xml -text
 data/api/jsReportTest.html -text
 data/api/maxRows.js -text
+data/api/napApiTest.html -text
 data/api/queryRegressionTest.js -text
 data/api/queryTest.js -text
 data/api/rlabkey-api.xml -text
