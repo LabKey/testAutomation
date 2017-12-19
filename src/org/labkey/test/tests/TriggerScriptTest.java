@@ -32,6 +32,7 @@ import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
@@ -559,7 +560,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         String updateField = COUNTRY_FIELD; //Field updated by trigger script
         String testName = INDIVIDUAL_TEST;
 
-        if (toLower)
+        if (toLower && WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
         {
             // This is a compromise to get around casing problems for Dataset v DataClass domain columns
             flagField = flagField.toLowerCase();
