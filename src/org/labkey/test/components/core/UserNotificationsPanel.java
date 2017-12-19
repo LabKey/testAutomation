@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.core;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -24,7 +25,6 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
