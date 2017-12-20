@@ -676,6 +676,7 @@ src/org/labkey/test/tests/AdvancedImportOptionsTest.java -text
 src/org/labkey/test/tests/AffymetrixAssayTest.java -text
 src/org/labkey/test/tests/AliquotTest.java -text
 src/org/labkey/test/tests/AncillaryStudyFromSpecimenRequestTest.java -text
+src/org/labkey/test/tests/ApiKeyTest.java -text
 src/org/labkey/test/tests/AssayExportImportTest.java -text
 src/org/labkey/test/tests/AssayResultsExportTest.java -text
 src/org/labkey/test/tests/AuditLogTest.java -text
