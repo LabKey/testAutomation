@@ -77,6 +77,9 @@ public class AuditLogTest extends BaseWebDriverTest
 
     private static final String AUDIT_SECURITY_GROUP = "Testers";
 
+    private static final String PROJECT_ADMIN_ROLE = "Project Administrator";
+    private static final String AUTHOR_ROLE = "Author";
+
     private static final String AUDIT_TEST_PROJECT = "AuditVerifyTest";
     private static final String AUDIT_DETAILED_TEST_PROJECT = "AuditDetailedLogTest";
     private static final String AUDIT_TEST_SUBFOLDER = "AuditVerifyTest_Subfolder";
@@ -260,6 +263,11 @@ public class AuditLogTest extends BaseWebDriverTest
         _userHelper.createUser(AUDIT_TEST_USER);
         impersonate(AUDIT_TEST_USER);
         stopImpersonating();
+        impersonateRoles(PROJECT_ADMIN_ROLE, AUTHOR_ROLE);
+        stopImpersonating();
+        String adminGroup = "Administrator";
+        impersonateGroup(adminGroup, true);
+        stopImpersonating();
         signOut();
         signInShouldFail(AUDIT_TEST_USER, "asdf"); // Bad login.  Existing User
         signInShouldFail(AUDIT_TEST_USER + "fail", "asdf"); // Bad login.  Non-existent User
@@ -272,6 +280,10 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add(AUDIT_TEST_USER + " was impersonated by " + getCurrentUser());
         expectedLogValues.add(AUDIT_TEST_USER + " was no longer impersonated by " + getCurrentUser());
         expectedLogValues.add(getCurrentUser() + " stopped impersonating " + AUDIT_TEST_USER);
+        expectedLogValues.add(getCurrentUser() + " impersonated roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+        expectedLogValues.add(getCurrentUser() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+        expectedLogValues.add(getCurrentUser() + " impersonated group: " + adminGroup);
+        expectedLogValues.add(getCurrentUser() + " stopped impersonating group: " + adminGroup);
         expectedLogValues.add(getCurrentUser() + " logged out.");
         expectedLogValues.add(AUDIT_TEST_USER + " failed to login: incorrect password");
         expectedLogValues.add(getCurrentUser() + " logged in successfully via Database authentication.");
@@ -280,7 +292,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         for (String msg : expectedLogValues)
         {
-            verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, msg, 10);
+            verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, msg, 20);
         }
 
         // Check the file after the UI check, if the UI tests passed then we should have confidence that the entry is in the file.

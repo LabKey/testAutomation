@@ -938,7 +938,12 @@ public class DataRegionTable extends DataRegion
 
     public void setFilter(String columnName, String filterType, @Nullable String filter, int waitMillis)
     {
-        setUpFilter(columnName, filterType, filter);
+        setFilter(columnName, filterType, filter, waitMillis, false);
+    }
+
+    public void setFilter(String columnName, String filterType, @Nullable String filter, int waitMillis, boolean isPHILoggingColumn)
+    {
+        setUpFilter(columnName, filterType, filter, isPHILoggingColumn);
         doAndWaitForUpdate(() -> getWrapper().clickButton("OK", waitMillis));
     }
 
@@ -956,10 +961,20 @@ public class DataRegionTable extends DataRegion
 
     public void setUpFilter(String columnName, String filterType, String filter)
     {
-        setUpFilter(columnName, filterType, filter, null, null);
+        setUpFilter(columnName, filterType, filter, false);
+    }
+
+    public void setUpFilter(String columnName, String filterType, String filter, boolean isPHILoggingColumn)
+    {
+        setUpFilter(columnName, filterType, filter, null, null, isPHILoggingColumn);
     }
 
     public void setUpFilter(String columnName, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable  String filter2)
+    {
+        setUpFilter(columnName, filter1Type, filter1, filter2Type, filter2, false);
+    }
+
+    public void setUpFilter(String columnName, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable  String filter2, boolean isPHILoggingColumn)
     {
         String log = "Setting filter in " + getDataRegionName() + " for " + columnName + " to " + filter1Type.toLowerCase() + (filter1 != null ? " " + filter1 : "");
         if (filter2Type != null)
@@ -973,6 +988,10 @@ public class DataRegionTable extends DataRegion
         if (getWrapper().isElementPresent(Locator.css("span.x-tab-strip-text").withText("Choose Values")))
         {
             TestLogger.log("Switching to advanced filter UI");
+
+            if (isPHILoggingColumn)
+                closePhiLoggingColumnMsg();
+
             getWrapper()._extHelper.clickExtTab("Choose Filters");
             getWrapper().waitForElement(Locator.xpath("//span[" + Locator.NOT_HIDDEN + " and text()='Filter Type:']"), WAIT_FOR_JAVASCRIPT);
         }
@@ -994,6 +1013,14 @@ public class DataRegionTable extends DataRegion
                 getWrapper().setFormElement(Locator.id("value_2"), filter2);
             }
         }
+    }
+
+    private void closePhiLoggingColumnMsg()
+    {
+        Window confirmWindow = Window.Window(getDriver()).withTitle("Error").waitFor();
+        getWrapper().waitForText("Cannot choose values from a column that requires logging.");
+        confirmWindow.clickButton("OK", 0);
+        getWrapper()._ext4Helper.waitForMaskToDisappear();
     }
 
     public void setUpFacetedFilter(String columnName, String... values)
@@ -1070,8 +1097,20 @@ public class DataRegionTable extends DataRegion
 
     public void clearAllFilters(String columnName)
     {
+        clearAllFilters(columnName, false);
+    }
+
+    public void clearAllFilters(String columnName, boolean isPHILoggingColumn)
+    {
         TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnName);
         openFilterDialog(columnName);
+        if (isPHILoggingColumn)
+        {
+            if (getWrapper().isElementPresent(Locator.css("span.x-tab-strip-text").withText("Choose Values")))
+            {
+                closePhiLoggingColumnMsg();
+            }
+        }
         doAndWaitForUpdate(() -> getWrapper().clickButton("Clear All Filters"));
     }
 
