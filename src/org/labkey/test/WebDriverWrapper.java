@@ -566,13 +566,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         new SiteNavBar(getDriver()).clickAdminMenuItem(true, items);
     }
 
-    public void clickDevMenuItem(boolean wait, String... items)
-    {
-        final WebElement devMenu = waitForElement(Locators.DEVELOPER_MENU);
-        scrollIntoView(devMenu);
-        _ext4Helper.clickExt4MenuButton(wait, devMenu, false, items);
-    }
-
     public void clickUserMenuItem(String... items)
     {
         clickUserMenuItem(true, items);
@@ -985,7 +978,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         assertTrue("Not signed in", isSignedIn());
         assertFalse("Impersonating", isImpersonating());
-        assertElementPresent(Locators.UX_USER_MENU);
+        assertElementPresent(SiteNavBar.Locators.userMenu);
     }
 
     public boolean isOnServerErrorPage()

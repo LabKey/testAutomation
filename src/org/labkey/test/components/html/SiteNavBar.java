@@ -212,7 +212,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
         public AdminMenuFinder(WebDriver driver)
         {
-            super(Locators.adminMenuToggle.parent());
+            super(Locators.adminMenu);
             _driver = driver;
         }
 
@@ -306,7 +306,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
         public UserMenuFinder(WebDriver driver)
         {
-            super(Locators.userMenuToggle.parent());
+            super(Locators.userMenu);
             _driver = driver;
         }
 
@@ -317,13 +317,13 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         }
     }
 
-    private static class Locators
+    public static class Locators
     {
-        public static Locator.XPathLocator exitAdminBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Exit Admin Mode']");
-        public static Locator.XPathLocator stopImpersonatingBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Stop impersonating']");
-        public static Locator.XPathLocator searchMenuToggle = Locator.xpath("//li/a[@id='global-search-trigger']");
-        public static Locator.XPathLocator searchInput = Locator.tagWithClass("input", "search-box").withAttribute("name", "q");
-        public static Locator.XPathLocator userMenuToggle = Locator.xpath("//li/a[@class='dropdown-toggle' and ./i[@class='fa fa-user']]");
-        public static Locator.XPathLocator adminMenuToggle = Locator.xpath("//li/a[@class='dropdown-toggle' and ./i[@class='fa fa-cog']]");
+        private static Locator.XPathLocator exitAdminBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Exit Admin Mode']");
+        private static Locator.XPathLocator stopImpersonatingBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Stop impersonating']");
+        private static Locator.XPathLocator searchMenuToggle = Locator.xpath("//li/a[@id='global-search-trigger']");
+        private static Locator.XPathLocator searchInput = Locator.tagWithClass("input", "search-box").withAttribute("name", "q");
+        public static Locator.XPathLocator userMenu = Locator.id("headerUserDropdown");
+        public static Locator.XPathLocator adminMenu = Locator.id("headerAdminDropdown");
     }
 }

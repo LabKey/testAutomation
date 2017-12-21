@@ -47,9 +47,6 @@ import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.api.ProjectMenu;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
-import org.labkey.test.components.internal.ImpersonateGroupWindow;
-import org.labkey.test.components.internal.ImpersonateRoleWindow;
-import org.labkey.test.components.internal.ImpersonateUserWindow;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
@@ -119,7 +116,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
             beginAt(WebTestHelper.buildURL("login", "login"));
-            waitForAnyElement("Should be on login or Home portal", Locator.id("email"), Locators.UX_USER_MENU);
+            waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu);
         }
 
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
@@ -139,7 +136,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             // verify we're signed in now
             if (!waitFor(() ->
             {
-                if (isElementPresent(Locators.UX_USER_MENU))
+                if (isElementPresent(SiteNavBar.Locators.userMenu))
                     return true;
                 bypassSecondaryAuthentication();
                 return false;
@@ -929,9 +926,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         clickUserMenuItem("My Account");
     }
 
-    protected void openMenu(String menuText)
+    protected WebElement openMenu(String menuText)
     {
-        Locator.menuBarItem(menuText).findElement(getDriver()).click();
+        WebElement menu = Locator.menuBarItem(menuText).findElement(getDriver());
+        menu.click();
+        return menu;
     }
 
     @LogMethod(quiet = true)

@@ -17,8 +17,6 @@ package org.labkey.test;
 
 public abstract class Locators
 {
-    public static final Locator.XPathLocator UX_USER_MENU = Locator.xpath("//ul[@class='navbar-nav-lk' and ./li/a/i[@class='fa fa-user']]");
-    public static final Locator.IdLocator DEVELOPER_MENU = Locator.id("devMenuPopupLink");
     public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
     public static final Locator.XPathLocator labkeyError = Locator.byClass("labkey-error");
     public static final Locator.XPathLocator alertWarning = Locator.byClass("alert").withClass("alert-warning");
