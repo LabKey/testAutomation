@@ -20,6 +20,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -126,6 +127,18 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
     public CustomizeSitePage setSslPort(String value)
     {
         elementCache().sslPort.set(value);
+        return this;
+    }
+
+    public CustomizeSitePage setAllowApiKeys(boolean enable)
+    {
+        elementCache().allowApiKeys.set(enable);
+        return this;
+    }
+
+    public CustomizeSitePage setApiKeyExpiration(KeyExpirationOptions seconds)
+    {
+        elementCache().apiKeyExpirationSeconds.selectOption(seconds);
         return this;
     }
 
@@ -236,6 +249,10 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         // Security
         protected final Checkbox sslRequired = Checkbox(Locator.id("sslRequired")).findWhenNeeded(this);
         protected final Input sslPort = Input(Locator.id("sslPort"), getDriver()).findWhenNeeded(this);
+
+        // API Keys
+        protected final Checkbox allowApiKeys = Checkbox(Locator.id("allowApiKeys")).findWhenNeeded(this);
+        protected final OptionSelect<KeyExpirationOptions> apiKeyExpirationSeconds = OptionSelect.finder(Locator.id("apiKeyExpirationSeconds"), KeyExpirationOptions.class).findWhenNeeded(this);
         protected final Checkbox allowSessionKeys = Checkbox(Locator.id("allowSessionKeys")).findWhenNeeded(this);
 
         // Pipeline Settings
@@ -274,5 +291,35 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
     public enum XFrameOptions
     {
         SAMEORIGIN, ALLOW
+    }
+
+    private static final int SECONDS_PER_DAY = 60*60*24;
+    public enum KeyExpirationOptions implements OptionSelect.SelectOption
+    {
+        UNLIMITED(-1),
+        ONE_WEEK(7*SECONDS_PER_DAY),
+        ONE_MONTH(30*SECONDS_PER_DAY),
+        THREE_MONTHS(90*SECONDS_PER_DAY),
+        ONE_YEAR(365*SECONDS_PER_DAY);
+
+        private final int seconds;
+
+        KeyExpirationOptions(int seconds)
+        {
+            this.seconds = seconds;
+        }
+
+        @Override
+        public String toString()
+        {
+            return getValue();
+        }
+
+
+        @Override
+        public String getValue()
+        {
+            return String.valueOf(seconds);
+        }
     }
 }
