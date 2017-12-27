@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends ChartWizardDialog <EC>
 {
     public ChartTypeDialog(WebDriver driver)
@@ -408,7 +410,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
 
     public ChartTypeDialog selectStudyQuery(String queryName)
     {
-        getWrapper().waitForElementToDisappear(elementCache().queryColumnsPanelMask);
+        getWrapper().waitForElementToDisappear(elementCache().queryColumnsPanelMask, 2 * WAIT_FOR_JAVASCRIPT);
         getWrapper().click(elementCache().studyQueryCombo.append("//div[contains(@class,'arrow')]"));
         getWrapper().waitAndClick(Ext4Helper.Locators.comboListItem().withText(queryName));
         return this;
