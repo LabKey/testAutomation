@@ -74,7 +74,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         setPipelineRoot(dir.getAbsolutePath());
 
         //make sure it was set
-        assertTextPresent("The pipeline root was set to '" + dir.getAbsolutePath() + "'");
+        assertTextPresent("The pipeline root was set to '" + dir.getAbsolutePath());
     }
 
     /**
