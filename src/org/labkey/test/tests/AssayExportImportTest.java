@@ -5,6 +5,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -19,11 +21,11 @@ import org.labkey.test.util.Maps;
 import org.labkey.test.util.PerlHelper;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.io.File;
 import java.util.Map;
 
 @Category({DailyB.class})
@@ -33,6 +35,9 @@ public class AssayExportImportTest extends BaseWebDriverTest
     private final String ASSAY_PROJECT_FOR_IMPORT_01 = "Assay_Project_For_Import_ByFilesWebPart";
     private final String ASSAY_PROJECT_FOR_EXPORT_02 = "Assay_Project_For_Export_ByFile";
     private final String ASSAY_PROJECT_FOR_IMPORT_02 = "Assay_Project_For_Import_ByFile";
+    private final String ASSAY_PROJECT_FOR_EXPORT_03 = "Assay_Project_For_Export_ByApi";
+    private final String ASSAY_PROJECT_FOR_IMPORT_03 = "Assay_Project_For_Import_ByApi";
+
     private final String SIMPLE_ASSAY_FOR_EXPORT = "AssayForExport";
 
     private final String SAMPLE_DATA_LOCATION = "/sampledata/AssayImportExport";
@@ -71,6 +76,8 @@ public class AssayExportImportTest extends BaseWebDriverTest
         _containerHelper.deleteProject(ASSAY_PROJECT_FOR_IMPORT_01, afterTest);
         _containerHelper.deleteProject(ASSAY_PROJECT_FOR_EXPORT_02, afterTest);
         _containerHelper.deleteProject(ASSAY_PROJECT_FOR_IMPORT_02, afterTest);
+        _containerHelper.deleteProject(ASSAY_PROJECT_FOR_EXPORT_03, afterTest);
+        _containerHelper.deleteProject(ASSAY_PROJECT_FOR_IMPORT_03, afterTest);
     }
 
     @BeforeClass
@@ -531,5 +538,92 @@ public class AssayExportImportTest extends BaseWebDriverTest
         pass = compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_02, SIMPLE_ASSAY_FOR_EXPORT, RUN03_NAME, run03ColumnData) && pass;
 
         Assert.assertTrue("The imported columns were not as expected. See log for details.", pass);
+    }
+
+    private void createGeneralAssayWithoutTransform(String assayName)
+    {
+        log("Create an Assay with no transform, no run properties.");
+
+        clickAndWait(Locator.lkButton("New Assay Design"));
+        click(Locator.radioButtonById("providerName_General"));
+        clickAndWait(Locator.lkButton("Next"));
+
+        AssayDesignerPage assayDesignerPage = new AssayDesignerPage(getDriver());
+        assayDesignerPage.waitForReady();
+
+        assayDesignerPage.setName(assayName);
+
+        assayDesignerPage.dataFields().findElement(Locator.lkButton("Infer Fields from File")).click();
+        waitForElement(Locator.tagWithName("input", "uploadFormElement"));
+
+        setFormElement(Locator.tagWithName("input", "uploadFormElement").findElement(getDriver()),
+                new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE));
+
+        click(Locator.lkButton("Submit"));
+        waitForElementToDisappear(Locator.lkButton("Submit"));
+
+        log("Remove the batch fields we don't care about.");
+        assayDesignerPage.batchFields().selectField("ParticipantVisitResolver").markForDeletion();
+        assayDesignerPage.batchFields().selectField("TargetStudy").markForDeletion();
+
+        assayDesignerPage.saveAndClose();
+    }
+
+    @Test
+    public void testExportImportWithClientAPI()
+    {
+        String runName = "api run";
+        log("Create an Assay project with no transform, no run properties.");
+        _containerHelper.createProject(ASSAY_PROJECT_FOR_EXPORT_03, "Assay");
+        goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_03);
+        createGeneralAssayWithoutTransform(SIMPLE_ASSAY_FOR_EXPORT);
+        SelectRowsResponse response = executeSelectRowCommand("assay", "AssayList", ContainerFilter.Current, "/" + ASSAY_PROJECT_FOR_EXPORT_03, null);
+
+        log("Import a run with a JavaScript API call");
+        List<String> runColumns = Arrays.asList("participantid", "Date", "M1", "M2", "M3");
+        executeScript(
+            "LABKEY.Assay.importRun({" +
+                    "assayId: " + response.getRows().get(0).get("RowId") + "," +
+                    "name: \"" + runName + "\"," +
+                    "dataRows: [{" +
+                        "ParticipantId: 10," +
+                        "Date: \"2017-01-01\"," +
+                        "M1: 42," +
+                        "M2: 43," +
+                        "M3: 666," +
+                    "}]" +
+            "});"
+        );
+
+        Map<String, List<String>> runColumnData = getRunColumnData(ASSAY_PROJECT_FOR_EXPORT_03, SIMPLE_ASSAY_FOR_EXPORT, runName, runColumns);
+
+
+        log("Now export the run.");
+
+        goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_03);
+
+        goToFolderManagement().goToPane("tabexport");
+        new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input").findElement(getDriver())).check();
+        new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
+        File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
+
+        log("Create a simple Assay project as the import target.");
+        _containerHelper.createProject(ASSAY_PROJECT_FOR_IMPORT_03, "Assay");
+        goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_03);
+
+        log("Import the folder.");
+        goToFolderManagement().goToPane("tabimport");
+        setFormElement(Locator.input("folderZip"), exportedFolderFile);
+        clickAndWait(Locator.lkButton("Import Folder"));
+        waitForPipelineJobsToFinish(1);
+
+        log("Validate that the data has been imported as expected.");
+        goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_03);
+        clickAndWait(Locator.linkWithText(SIMPLE_ASSAY_FOR_EXPORT));
+        waitForElement(Locator.linkWithText(runName));
+
+        Assert.assertTrue("The imported columns were not as expected. See log for details.",
+                compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_03, SIMPLE_ASSAY_FOR_EXPORT, runName, runColumnData));
+
     }
 }
