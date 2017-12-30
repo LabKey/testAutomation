@@ -297,6 +297,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
     public enum KeyExpirationOptions implements OptionSelect.SelectOption
     {
         UNLIMITED(-1),
+        TEN_SECONDS(10),
         ONE_WEEK(7*SECONDS_PER_DAY),
         ONE_MONTH(30*SECONDS_PER_DAY),
         THREE_MONTHS(90*SECONDS_PER_DAY),
