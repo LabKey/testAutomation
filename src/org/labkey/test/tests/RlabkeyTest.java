@@ -155,7 +155,7 @@ public class RlabkeyTest extends BaseWebDriverTest
                     sb.append(testScript);
                     String verify = test.getResponse().trim().replaceAll("%projectName%", getProjectName());
 
-                    log("exceute test: " + test.getName());
+                    log("execute test: " + test.getName());
                     TestLogger.increaseIndent();
                     final boolean success = _rReportHelper.executeScript(sb.toString(), verify);
                     TestLogger.decreaseIndent();
