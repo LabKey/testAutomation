@@ -35,8 +35,8 @@ import java.io.Writer;
 // the times using this automated test are a bit different, so should be used in comparison with other runs of the automated test
 //
 // todo: more accurate timing is likely possible by using the goToURL() method to directly make the get requests for the study folder url (instead of simulating user clicks),
-// but for some reason calls to goToURL timed out eventhough the page appeared to load ok in the browser.
-// Another alternative may be to issue curl statments to invoke and time the get requests.
+// but for some reason calls to goToURL timed out even though the page appeared to load ok in the browser.
+// Another alternative may be to issue curl statements to invoke and time the get requests.
 
 // as of 3/30/16 the times recorded in teamcity-info.xml using this test are:
 //<build>
