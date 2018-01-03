@@ -138,16 +138,6 @@ public class ApiKeyTest extends BaseWebDriverTest
         verifyAPIKeysTablePermissionWithRemoteAPI(adminApiKey);
         verifyAPIKeysTableColumnsWithRemoteAPI(adminApiKey);
 
-        log("Verify API key expiration with keys that expires after 10 seconds");
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.TEN_SECONDS)
-                .save();
-        String shortLivedApiKey = generateAPIKey(_generatedApiKeys);
-        verifyValidAPIKey(shortLivedApiKey);
-        sleep(11000); // wait for api key to expire
-        verifyInvalidAPIKey(shortLivedApiKey, false);
-
         log("Verify revoked/deleted api keys");
         verifyValidAPIKey(adminApiKey);
         deleteAPIKeys(_generatedApiKeys);
