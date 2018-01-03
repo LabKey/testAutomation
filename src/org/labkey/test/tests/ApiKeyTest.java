@@ -7,11 +7,11 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.collections.CaseInsensitiveHashSet;
 import org.labkey.remoteapi.ApiKeyCredentialsProvider;
+import org.labkey.remoteapi.BasicAuthCredentialsProvider;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
-import org.labkey.remoteapi.query.GetQueriesCommand;
-import org.labkey.remoteapi.query.GetQueriesResponse;
 import org.labkey.remoteapi.query.GetQueryDetailsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsResponse;
 import org.labkey.remoteapi.query.GetSchemasCommand;
@@ -45,6 +45,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 {
     private static final String APIKEYS_TABLE = "APIKeys";
     private static final String CRYPT_COLUMN = "crypt";
+    private static final String API_USERNAME = "apikey";
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -85,7 +86,12 @@ public class ApiKeyTest extends BaseWebDriverTest
 
     private void verifyValidAPIKey(String apiKey) throws IOException
     {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
+        verifyValidAPIKey(apiKey, false);
+    }
+
+    private void verifyValidAPIKey(String apiKey, boolean basicAuth) throws IOException
+    {
+        Connection cn = new Connection(WebTestHelper.getBaseURL(), basicAuth ? new BasicAuthCredentialsProvider(API_USERNAME, apiKey) : new ApiKeyCredentialsProvider(apiKey));
         try
         {
             GetSchemasCommand cmd = new GetSchemasCommand();
@@ -131,45 +137,34 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
                 .save();
 
-        log("Verify API key for admin");
-        String adminApiKey = generateAPIKey(_generatedApiKeys);
-        verifyValidAPIKey(adminApiKey);
-        log("Verify " + APIKEYS_TABLE + " table and columns for admin using api key");
-        verifyAPIKeysTablePermissionWithRemoteAPI(adminApiKey);
-        verifyAPIKeysTableColumnsWithRemoteAPI(adminApiKey);
+        String apiKey = generateAPIKey(_generatedApiKeys);
+        log("Verify active API key via api authentication");
+        verifyValidAPIKey(apiKey);
+        log("Verify active API key via basic authentication");
+        verifyValidAPIKey(apiKey, true);
+        log("Verify existing active API key with disabled api key setting");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowApiKeys(false)
+                .save();
+        verifyValidAPIKey(apiKey);
 
-        log("Verify revoked/deleted api keys");
-        verifyValidAPIKey(adminApiKey);
+        // skip testing api key expiration since it's already covered in unit test and 10 seconds expiration option is dev mode only
+
+        log("Verify revoked/deleted api key");
+        verifyValidAPIKey(apiKey);
         deleteAPIKeys(_generatedApiKeys);
-        verifyInvalidAPIKey(adminApiKey, false);
-
-        log("Verify " + APIKEYS_TABLE + " table not accessible for non admin");
-        goToProjectHome();
-        impersonateRoles("Reader");
-        beginAt(getProjectName() + "/query-begin.view?#sbh-ssp-core");
-        waitForElement(Locator.tagWithClass("span", "labkey-link").withText("Containers"));
-        assertElementNotPresent(Locator.tagWithClass("span", "labkey-link").withText(APIKEYS_TABLE));
-        stopImpersonating();
+        verifyInvalidAPIKey(apiKey, false);
     }
 
-    private void deleteAPIKeys(List<Map<String, Object>> _generatedApiKeys) throws IOException
+    @Test
+    public void testAPIKeysPermissions() throws IOException
     {
+        log("Verify " + APIKEYS_TABLE + " table is accessible for admin");
+        verifyAPIKeysTablePresence(true);
+
+        log("Verify " + CRYPT_COLUMN + " column is not accessible");
         Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        DeleteRowsCommand cmddel = new DeleteRowsCommand("core", APIKEYS_TABLE);
-        cmddel.setRows(_generatedApiKeys);
-        try
-        {
-            cmddel.execute(cn, getProjectName());
-        }
-        catch (CommandException e)
-        {
-            throw new RuntimeException("Response: " + e.getStatusCode(), e);
-        }
-    }
-
-    private void verifyAPIKeysTableColumnsWithRemoteAPI(String apiKey) throws IOException
-    {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
         GetQueryDetailsCommand cmdqd = new GetQueryDetailsCommand("core", APIKEYS_TABLE);
         try
         {
@@ -182,17 +177,51 @@ public class ApiKeyTest extends BaseWebDriverTest
         {
             throw new RuntimeException("Response: " + e.getStatusCode(), e);
         }
-    }
 
-    private void verifyAPIKeysTablePermissionWithRemoteAPI(String apiKey) throws IOException
-    {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
-        GetQueriesCommand cmdq = new GetQueriesCommand("core");
+        log("Verify " + APIKEYS_TABLE + " table is not accessible for non admin");
+        goToProjectHome();
+        impersonateRoles("Reader");
+        verifyAPIKeysTablePresence(false);
+        stopImpersonating();
+
+        log("Verify generating API keys would fail when setting is disabled");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowApiKeys(false)
+                .save();
+        PostCommand generateAPIKeyCommand = new PostCommand("security", "createApiKey");
+        JSONObject params = new JSONObject();
+        params.put("type", "apikey");
+        generateAPIKeyCommand.setJsonObject(params);
         try
         {
-            GetQueriesResponse respq = cmdq.execute(cn, getProjectName());
-            List<String> queryNames = respq.getQueryNames();
-            assertTrue(APIKEYS_TABLE + " table should be available for admin user", queryNames.stream().anyMatch(APIKEYS_TABLE::equalsIgnoreCase));
+            generateAPIKeyCommand.execute(cn, getCurrentContainerPath());
+            fail("Shouldn't be able to generate api key when setting is disabled");
+        }
+        catch (CommandException e)
+        {
+            log(e.getMessage());
+            assertEquals("Wrong response for invalid api generation action", HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getStatusCode());
+            log("Success: command failed as expected.");
+        }
+    }
+
+    private void verifyAPIKeysTablePresence(boolean isAdmin)
+    {
+        beginAt(getProjectName() + "/query-begin.view?#sbh-ssp-core");
+        waitForElement(Locator.tagWithClass("span", "labkey-link").withText("Containers"));
+        Locator apiTableLoc = Locator.tagWithClass("span", "labkey-link").withText(APIKEYS_TABLE);
+        assertEquals(isAdmin, isElementPresent(apiTableLoc));
+    }
+
+    private void deleteAPIKeys(List<Map<String, Object>> _generatedApiKeys) throws IOException
+    {
+        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        DeleteRowsCommand cmddel = new DeleteRowsCommand("core", APIKEYS_TABLE);
+        cmddel.setRows(_generatedApiKeys);
+        try
+        {
+            cmddel.execute(cn, getProjectName());
         }
         catch (CommandException e)
         {
