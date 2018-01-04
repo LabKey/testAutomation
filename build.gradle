@@ -8,7 +8,6 @@ if (project.hasProperty("teamcity"))
             java {
                 srcDirs = ['src/org/labkey/test/debug']
             }
-            output.classesDir = "${project.buildDir}/classes"
         }
     }
 
