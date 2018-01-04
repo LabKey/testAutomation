@@ -201,7 +201,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         catch (CommandException e)
         {
             log(e.getMessage());
-            assertEquals("Wrong response for invalid api generation action", HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getStatusCode());
+            assertEquals("Wrong response for invalid api generation action", HttpStatus.SC_NOT_FOUND, e.getStatusCode());
             log("Success: command failed as expected.");
         }
     }
