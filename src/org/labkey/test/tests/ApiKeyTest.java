@@ -25,6 +25,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
@@ -79,9 +80,12 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         verifyValidAPIKey(apiKey);
 
-        // Logout and using session key, which should fail
         signOut();
-        verifyInvalidAPIKey(apiKey, true);
+        log("Verify that logging out invalidates session keys");
+        verifyInvalidAPIKey(apiKey);
+        simpleSignIn();
+        log("Verify that session keys remain invalid after logging back in");
+        verifyInvalidAPIKey(apiKey);
     }
 
     private void verifyValidAPIKey(String apiKey) throws IOException
@@ -107,8 +111,9 @@ public class ApiKeyTest extends BaseWebDriverTest
         }
     }
 
-    private void verifyInvalidAPIKey(String apiKey, boolean isSessionKey) throws IOException
+    private void verifyInvalidAPIKey(String apiKey) throws IOException
     {
+        boolean isSessionKey = !apiKey.startsWith(API_USERNAME);
         Connection cn = new Connection(WebTestHelper.getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
         try
         {
@@ -152,9 +157,8 @@ public class ApiKeyTest extends BaseWebDriverTest
         // skip testing api key expiration since it's already covered in unit test and 10 seconds expiration option is dev mode only
 
         log("Verify revoked/deleted api key");
-        verifyValidAPIKey(apiKey);
         deleteAPIKeys(_generatedApiKeys);
-        verifyInvalidAPIKey(apiKey, false);
+        verifyInvalidAPIKey(apiKey);
     }
 
     @Test
@@ -178,25 +182,53 @@ public class ApiKeyTest extends BaseWebDriverTest
             throw new RuntimeException("Response: " + e.getStatusCode(), e);
         }
 
-        log("Verify " + APIKEYS_TABLE + " table is not accessible for non admin");
+        log("Verify " + APIKEYS_TABLE + " table is not accessible for non site-admin");
         goToProjectHome();
-        impersonateRoles("Reader");
+        impersonateRoles("Project Administrator");
         verifyAPIKeysTablePresence(false);
-        stopImpersonating();
+    }
 
+    @Test
+    public void testApiKeyDisabled() throws IOException
+    {
         log("Verify generating API keys would fail when setting is disabled");
         goToAdminConsole()
                 .clickSiteSettings()
                 .setAllowApiKeys(false)
+                .setAllowSessionKeys(true)
                 .save();
+        Connection cn = createDefaultConnection(false);
         PostCommand generateAPIKeyCommand = new PostCommand("security", "createApiKey");
-        JSONObject params = new JSONObject();
-        params.put("type", "apikey");
-        generateAPIKeyCommand.setJsonObject(params);
+        generateAPIKeyCommand.setParameters(new HashMap<>(Maps.of("type", "apikey")));
         try
         {
-            generateAPIKeyCommand.execute(cn, getCurrentContainerPath());
+            generateAPIKeyCommand.execute(cn, "/");
             fail("Shouldn't be able to generate api key when setting is disabled");
+        }
+        catch (CommandException e)
+        {
+            log(e.getMessage());
+            assertEquals("Wrong response for invalid api generation action", HttpStatus.SC_NOT_FOUND, e.getStatusCode());
+            log("Success: command failed as expected.");
+        }
+    }
+
+    @Test
+    public void testSessionKeyDisabled() throws IOException
+    {
+        log("Verify generating API keys would fail when setting is disabled");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowApiKeys(true)
+                .setAllowSessionKeys(false)
+                .save();
+        Connection cn = createDefaultConnection(false);
+        PostCommand generateAPIKeyCommand = new PostCommand("security", "createApiKey");
+        generateAPIKeyCommand.setParameters(new HashMap<>(Maps.of("type", "session")));
+        try
+        {
+            generateAPIKeyCommand.execute(cn, "/");
+            fail("Shouldn't be able to generate session key when setting is disabled");
         }
         catch (CommandException e)
         {
@@ -256,7 +288,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         cmd.setColumns(Arrays.asList("RowId"));
         cmd.setSorts(Arrays.asList(new Sort("RowId", Sort.Direction.DESCENDING)));
 
-        SelectRowsResponse response = null;
+        SelectRowsResponse response;
         try
         {
             response = cmd.execute(cn, "/");
