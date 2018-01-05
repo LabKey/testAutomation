@@ -148,7 +148,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
     }
 
-    @Test @Ignore // Mask base StudyTest test method
+    @Override @Ignore // Mask base StudyTest test method
     public void testSteps(){}
 
     @Override

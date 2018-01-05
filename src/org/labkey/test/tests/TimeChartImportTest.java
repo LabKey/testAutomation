@@ -69,7 +69,7 @@ public class TimeChartImportTest extends StudyBaseTest
         initTest.populateChartConfigs();
     }
 
-    @Test @Ignore
+    @Override @Ignore
     public void testSteps(){}
 
     @Override
