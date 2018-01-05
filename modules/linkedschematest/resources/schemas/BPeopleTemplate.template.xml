@@ -14,6 +14,11 @@
 
             <dat:table tableName="LinkedSchemaTestPeople" tableDbType="NOT_IN_DB">
                 <dat:tableUrl>/linkedschematest/other.view</dat:tableUrl>
+                <dat:javaCustomizer class="org.labkey.linkedschematest.TestTableCustomizer">
+                    <dat:properties>
+                        <dat:property name="testPropName">true</dat:property>
+                    </dat:properties>
+                </dat:javaCustomizer>
                 <dat:filters ref="b-filter"/>
                 <dat:columns>
                     <dat:column columnName="Name">

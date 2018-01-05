@@ -25,7 +25,7 @@ import org.labkey.api.data.TableInfo;
 import org.labkey.api.query.QueryDefinition;
 import org.labkey.api.query.QueryService;
 import org.labkey.api.query.UserSchema;
-import org.labkey.data.xml.CustomizerType;
+import org.labkey.data.xml.SchemaCustomizerType;
 import org.labkey.data.xml.queryCustomView.FilterType;
 import org.labkey.data.xml.queryCustomView.LocalOrRefFiltersType;
 import org.labkey.data.xml.queryCustomView.NamedFiltersType;
@@ -51,7 +51,7 @@ public class TestLinkedSchemaCustomizer implements LinkedSchemaCustomizer
     public TestLinkedSchemaCustomizer() {  }
 
     @Override
-    public void configure(CustomizerType schemaCustomizer)
+    public void configure(SchemaCustomizerType schemaCustomizer)
     {
         LOG.debug("configure");
         XmlObject[] families = schemaCustomizer.selectChildren(null, "family");

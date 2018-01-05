@@ -148,6 +148,7 @@ modules/linkedschematest/resources/queries/lists/LinkedSchemaTestQuery.query.xml
 modules/linkedschematest/resources/queries/lists/LinkedSchemaTestQuery.sql -text
 modules/linkedschematest/resources/schemas/BPeopleTemplate.template.xml -text
 modules/linkedschematest/src/org/labkey/linkedschematest/TestLinkedSchemaCustomizer.java -text
+modules/linkedschematest/src/org/labkey/linkedschematest/TestTableCustomizer.java -text
 modules/miniassay/module.properties -text
 modules/miniassay/resources/assay/simple/config.xml -text
 modules/miniassay/resources/assay/simple/domains/result.xml -text

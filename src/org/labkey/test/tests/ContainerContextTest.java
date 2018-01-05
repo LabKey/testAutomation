@@ -397,7 +397,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
                 "  <table tableName=\"EmissionTest\" tableDbType=\"TABLE\" useColumnOrder=\"true\">\n" +
                 "    <tableTitle>Custom Query</tableTitle>\n" +
-                "    <!--<javaCustomizer>org.labkey.ldk.query.BuiltInColumnsCustomizer</javaCustomizer>-->\n" +
+                "    <!--<javaCustomizer class=\"org.labkey.ldk.query.BuiltInColumnsCustomizer\" />-->\n" +
                 "    <titleColumn>rowid</titleColumn>\n" +
                 "    <updateUrl>/query/updateQueryRow.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}</updateUrl>\n" +
                 "    <tableUrl>/query/XXX.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}</tableUrl>\n" +
