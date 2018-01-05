@@ -468,13 +468,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void ensureAdminMode()
     {
-        if (!isUserSystemAdmin())
-        {
-            if (!onLabKeyPage())
-                goToHome();
-            if (isImpersonating())
-                simpleSignOut();
-        }
+        if (!onLabKeyPage())
+            goToHome();
+        if (!isSignedIn())
+            simpleSignIn();
+        else if (!isUserSystemAdmin() && isImpersonating())
+            simpleSignOut();
         Locator projectMenu = ProjectMenu.Locators.menuProjectNav;
         if (!isElementPresent(projectMenu))
         {
