@@ -22,7 +22,6 @@ import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
 import static org.labkey.test.util.Ext4Helper.Locators.ext4Button;
 
 public class BaseManageVaccineDesignPage extends LabKeyPage

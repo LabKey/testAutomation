@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
 import static org.labkey.test.WebTestHelper.buildURL;
 
 public class IssuesHelper extends WebDriverWrapper

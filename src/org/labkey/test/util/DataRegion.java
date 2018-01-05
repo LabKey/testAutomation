@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
@@ -37,7 +36,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
 import static org.labkey.test.Locators.pageSignal;
 
 public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCache> implements WebDriverWrapper.PageLoadListener

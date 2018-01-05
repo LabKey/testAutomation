@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public abstract class AbstractAssayHelper

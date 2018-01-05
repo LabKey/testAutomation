@@ -24,8 +24,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
-
 public class ManageVisitPage extends LabKeyPage<ManageVisitPage.ElementCache>
 {
     // TODO refactor more of the Manage Visit page usages and page components

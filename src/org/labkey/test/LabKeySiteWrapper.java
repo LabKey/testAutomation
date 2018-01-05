@@ -94,8 +94,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
-    @Deprecated // TODO: Remove after release17.3
-    public static boolean IS_BOOTSTRAP_LAYOUT = true;
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
 
     public boolean isGuestModeTest()

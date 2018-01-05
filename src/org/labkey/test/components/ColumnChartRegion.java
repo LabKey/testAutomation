@@ -23,8 +23,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
-
 public class ColumnChartRegion
 {
     WebDriverWrapper _driver;
