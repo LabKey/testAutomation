@@ -395,7 +395,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (resetUrl != null)
             beginAt(resetUrl);
 
-        assertTextPresent(username, "Choose a password you'll use to access this server", "six non-whitespace characters or more, cannot match email address");
+        assertTextPresent(username, "Your email address has been verified! Create an account password below.", "six non-whitespace characters or more, cannot match email address");
 
         setFormElement(Locator.id("password"), newPassword);
         setFormElement(Locator.id("password2"), newPassword);

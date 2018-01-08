@@ -757,7 +757,7 @@ public class SecurityTest extends BaseWebDriverTest
         setFormElement(Locator.id("email"), selfRegUserEmail);
         setFormElement(Locator.id("emailConfirmation"), selfRegUserEmail);
         clickButton("Register", 0);
-        waitForText("We have sent a registration email to " + selfRegUserEmail);
+        waitForElement(Locator.id("registration-content").containing("A verification email has been sent to " + selfRegUserEmail));
 
         // cleanup: sign admin back in
         signIn();
