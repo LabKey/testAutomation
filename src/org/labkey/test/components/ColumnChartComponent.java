@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components;
 
+import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -44,7 +45,7 @@ public class ColumnChartComponent
 
         _title = _footer = _type = "";
         _numberOfDataPoints = -1;
-        _svgReference = webelement.findElement(By.cssSelector(" svg"));
+        _svgReference = Locator.css("svg").waitForElement(_divReference, 10000);
 
         axisCount = _svgReference.findElements(By.cssSelector(" g.axis")).size();
 
