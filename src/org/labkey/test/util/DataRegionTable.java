@@ -840,12 +840,12 @@ public class DataRegionTable extends DataRegion
         clickColumnMenu(columnName, false, chartType);
         cssPlotLocator.index(initialNumOfPlots).waitForElement(this, 60000);
 
-        return new ColumnChartRegion(getWrapper(), this);
+        return new ColumnChartRegion(this);
     }
 
     public ColumnChartRegion getColumnPlotRegion()
     {
-        return new ColumnChartRegion(getWrapper(), this);
+        return new ColumnChartRegion(this);
     }
 
     public void setSort(String columnName, SortDirection direction)

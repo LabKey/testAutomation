@@ -18,34 +18,40 @@ package org.labkey.test.components;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class ColumnChartRegion
+public class ColumnChartRegion extends WebDriverComponent
 {
-    WebDriverWrapper _driver;
-    DataRegionTable _dataRegionTable;
+    private final DataRegionTable _dataRegionTable;
 
-    public ColumnChartRegion(WebDriverWrapper driver, DataRegionTable dataRegionTable)
+    public ColumnChartRegion(DataRegionTable dataRegionTable)
     {
-        _driver = driver;
         _dataRegionTable = dataRegionTable;
+    }
+
+    @Override
+    protected WebDriver getDriver()
+    {
+        return _dataRegionTable.getDriver();
+    }
+
+    @Override
+    protected WebDriverWrapper getWrapper()
+    {
+        return _dataRegionTable.getWrapper();
     }
 
     public WebElement getComponentElement()
     {
-        WebElement webElement;
-        try
-        {
-            webElement = _dataRegionTable.findElement(By.cssSelector(" div.lk-region-bar"));
-        }
-        catch(org.openqa.selenium.NoSuchElementException nse)
-        {
-            _driver.log("*** Couldn't find the column plot region. ***");
-            webElement = null;
-        }
+        WebElement webElement = Locator.css("div.lk-region-bar").findElementOrNull(_dataRegionTable);
+        if (webElement == null)
+            TestLogger.log("*** Couldn't find the column plot region. ***");
+
         return webElement;
     }
 
@@ -57,7 +63,7 @@ public class ColumnChartRegion
     // Use getPlots to get the list of plot element, then pass one of those to this function.
     public ColumnChartComponent getColumnPlotWrapper(WebElement plotElement)
     {
-        return new ColumnChartComponent(_driver, plotElement);
+        return new ColumnChartComponent(getWrapper(), plotElement);
     }
 
     public boolean isRegionVisible()
