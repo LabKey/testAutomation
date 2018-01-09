@@ -24,6 +24,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
@@ -114,9 +116,13 @@ public class MenuBarTest extends BaseWebDriverTest
         createDefaultStudy();
         clickProject(getProjectName());
 
-        openMenu("Studies");
-        waitForElement(Locator.linkWithText("StudyFolder Study"), WAIT_FOR_JAVASCRIPT);
-
+        Locator.XPathLocator studyLink = Locator.linkWithText("StudyFolder Study");
+        assertElementNotPresent(studyLink);
+        WebElement menu = openMenu("Studies");
+        waitForElement(studyLink, WAIT_FOR_JAVASCRIPT);
+        menu.click(); // Close manually
+        mouseOut(); // Menu intermittently reopens during admin menu interaction
+        shortWait().until(ExpectedConditions.invisibilityOfElementLocated(studyLink));
 
         // Custom Menu
         log("Test Custom Menu WebPart");
