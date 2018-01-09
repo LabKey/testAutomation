@@ -19,9 +19,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class FolderManagementPage extends LabKeyPage<FolderManagementPage.ElementCache>
 {
@@ -41,100 +45,100 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return new FolderManagementPage(driver.getDriver());
     }
 
-    @Override
-    protected void waitForPage()
+    public FolderManagementPage goToFolderTreeTab()
     {
-        waitFor(()-> Locators.folderTreeTab.findElementOrNull(getDriver()) != null, WAIT_FOR_PAGE);
-    }
-
-    public FolderManagementPage goToFolderTreePane()
-    {
-        scrollIntoView(elementCache().folderTreeTabLink);
-        elementCache().folderTreeTabLink.click();
-        waitFor(() -> getURL().toString().endsWith("?tabId=folderTree")
-                        && elementCache().isTabActive(Locators.folderTreeTab),
-                "Could not navigate to Folder Tree pane", 4000);
+        selectTab("folderTree");
         return this;
     }
 
-    public FileRootsManagementPage goToFilesPane()
+    public FileRootsManagementPage goToFilesTab()
     {
-        scrollIntoView(elementCache().filesTabLink);
-        elementCache().filesTabLink.click();
-        waitFor(() -> getURL().toString().endsWith("?tabId=files")
-                        && elementCache().isTabActive(Locators.filesTab),
-                "Could not navigate to Files pane", 4000);
+        selectTab("files");
         return new FileRootsManagementPage(getDriver());
     }
 
-    public FolderTypePage goToFolderTypePane()
+    /**
+     * @deprecated Renamed {@link #goToFilesTab()}
+     */
+    @Deprecated
+    public FileRootsManagementPage goToFilesPane()
     {
-        elementCache().folderTypeTabLink.click();
-        waitFor(()-> getURL().toString().endsWith("?tabId=folderType")
-                && elementCache().isTabActive(Locators.folderTypeTab), 4000);
+        return goToFilesTab();
+    }
+
+    public FolderTypePage goToFolderTypeTab()
+    {
+        selectTab("folderType");
         return new FolderTypePage(getDriver());
     }
 
-    public FolderManagementPage goToMissingValuesPane()
+    public FolderManagementPage goToMissingValuesTab()
     {
-        elementCache().missingValuesLink.click();
-        waitFor(()-> getURL().toString().endsWith("?tabId=mvIndicators")
-                && elementCache().isTabActive(Locators.missingValuesTab), 4000 );
+        selectTab("mvIndicators");
         return this;
     }
 
-    public FolderManagementPage goToModulePropertiesPane()
+    public FolderManagementPage goToModulePropertiesTab()
     {
-        elementCache().modulePropertiesTabLink.click();
-        waitFor(()-> getURL().toString().endsWith("?tabId=props")
-                && elementCache().isTabActive(Locators.modulePropertiesTab), 4000);
+        selectTab("props");
         return this;
     }
 
     public void assertModuleEnabled(String moduleName)
     {
-        goToFolderTypePane();
+        goToFolderTypeTab();
         assertElementPresent(Locator.xpath("//input[@type='checkbox' and @checked and @disabled and @title='" + moduleName + "']"));
     }
 
-    public FolderManagementPage goToExportPane()
+    public FolderManagementPage goToExportTab()
     {
-        elementCache().exportTabLink.click();
-        waitFor(()-> getURL().toString().endsWith("?tabId=export")
-                && elementCache().isTabActive(Locators.exportTab), 4000);
+        selectTab("export");
         return this;
     }
 
-    /* activates the 'import' pane */
-    public FolderManagementPage goToImportPane()
+    public FolderManagementPage goToImportTab()
     {
-        elementCache().importTabLink.click();
-        waitFor(()-> getURL().toString().endsWith("?tabId=import")
-                && elementCache().isTabActive(Locators.importTab), 4000);
+        selectTab("import");
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #selectTab(String)} or {@link #selectTab(Class)}
+     */
+    @Deprecated
     public void goToPane(String tabId)
     {
-        Locator.IdLocator tabLoc = Locator.id(tabId);
-        tabLoc.childTag("a").findElement(getDriver()).click();
-        waitFor(()-> getURL().toString().endsWith("?tabId=" + tabId)
-                && elementCache().isTabActive(tabLoc), 4000);
+        if (tabId.startsWith("tab"))
+            tabId = tabId.substring(3);
+        selectTab(tabId);
     }
 
 // Wave of the future:
 
-    public <T extends FolderManagementTab> T goToPane(Class<T> tabClass) throws InstantiationException, IllegalAccessException
+    public <T extends FolderManagementTab> T selectTab(Class<T> tabClass) throws InstantiationException, IllegalAccessException
     {
         T tab = tabClass.newInstance();
         tab.setDriver(getDriver());
         String tabId = tab.getTabId();
 
-        Locator.IdLocator tabLoc = Locator.id(tabId);
-        tabLoc.childTag("a").findElement(getDriver()).click();
-        waitFor(()-> getURL().toString().endsWith("?tabId=" + tabId)
-                && elementCache().isTabActive(tabLoc), 4000);
+        selectTab(tabId);
         return tab;
+    }
+
+    public void selectTab(String tabId)
+    {
+        if (!tabId.equals(getCurrentTabIdFromUrl()))
+            clickAndWait(elementCache().findTabLink(tabId));
+        assertEquals("On wrong folder management tab", tabId, getCurrentTabIdFromUrl());
+    }
+
+    /**
+     * This isn't totally cosmetic. Url parameter is mostly cosmetic.
+     *
+     */
+    private String getCurrentTabIdFromUrl()
+    {
+        return getUrlParam("tabId");
     }
 
     public ReorderFoldersPage clickChangeDisplayOrder()
@@ -150,48 +154,39 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        // TODO: Add other elements that are on the page
-        WebElement folderTreeTabLink = Locators.folderTreeTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement folderTypeTabLink = Locators.folderTypeTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement filesTabLink = Locators.filesTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement missingValuesLink = Locators.missingValuesTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement modulePropertiesTabLink = Locators.modulePropertiesTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement exportTabLink = Locators.exportTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement importTabLink = Locators.importTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement saveButton = new LazyWebElement(Locator.lkButton("Save"),this);
+        private final Map<String, WebElement> tabs = new HashMap<>();
+        private final Map<String, WebElement> tabLinks = new HashMap<>();
 
-
-        public boolean isTabActive(Locator loc)
+        public ElementCache()
         {
-            WebElement tab = loc.findElementOrNull(this);
-            return tab != null && tab.getAttribute("class").equalsIgnoreCase("labkey-tab-active");
+            findTab("folderTree");
+        }
+
+        public WebElement findTab(String tabId)
+        {
+            if (!tabs.containsKey(tabId))
+                tabs.put(tabId, Locators.folderManagementTab(tabId).waitForElement(this, WAIT_FOR_JAVASCRIPT));
+            return tabs.get(tabId);
+        }
+
+        public WebElement findTabLink(String tabId)
+        {
+            if (!tabLinks.containsKey(tabId))
+                tabLinks.put(tabId, Locators.folderManagementTabLink(tabId).findElement(this));
+            return tabLinks.get(tabId);
         }
     }
 
-    public static class Locators
+    private static class Locators
     {
-        public static Locator.XPathLocator folderTreeTab = Locator.id("tabfolderTree");
-        public static Locator.XPathLocator folderTreeTabLink = folderTreeTab.child("a");
+        private static Locator.XPathLocator folderManagementTab(String tabId)
+        {
+            return Locator.id("tab" + tabId);
+        }
 
-        public static Locator.XPathLocator folderTypeTab = Locator.id("tabfolderType");
-        public static Locator.XPathLocator folderTypeTabLink = folderTypeTab.child("a");
-
-        public static Locator.XPathLocator filesTab = Locator.id("tabfiles");
-        public static Locator.XPathLocator filesTabLink = filesTab.child("a");
-
-        public static Locator.XPathLocator missingValuesTab = Locator.id("tabmvIndicators");
-        public static Locator.XPathLocator missingValuesTabLink = missingValuesTab.child("a");
-
-        public static Locator.XPathLocator modulePropertiesTab = Locator.id("tabprops");
-        public static Locator.XPathLocator modulePropertiesTabLink = modulePropertiesTab.child("a");
-
-        public static Locator.XPathLocator conceptsTab = Locator.id("tabconcepts");
-        public static Locator.XPathLocator conceptsTabLink = conceptsTab.child("a");
-
-        public static Locator.XPathLocator exportTab = Locator.id("tabexport");
-        public static Locator.XPathLocator exportTabLink = exportTab.child("a");
-
-        public static Locator.XPathLocator importTab = Locator.id("tabimport");
-        public static Locator.XPathLocator importTabLink = importTab.child("a");
+        private static Locator.XPathLocator folderManagementTabLink(String tabId)
+        {
+            return folderManagementTab(tabId).childTag("a");
+        }
     }
 }

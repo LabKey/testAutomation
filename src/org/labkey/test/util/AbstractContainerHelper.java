@@ -22,13 +22,11 @@ import org.labkey.remoteapi.admin.GetModulesCommand;
 import org.labkey.remoteapi.admin.GetModulesResponse;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.api.ProjectMenu;
 import org.labkey.test.pages.admin.CreateSubFolderPage;
 import org.labkey.test.pages.admin.SetFolderPermissionsPage;
 import org.openqa.selenium.NoSuchElementException;
@@ -118,7 +116,7 @@ public abstract class AbstractContainerHelper
     @LogMethod(quiet = true)
     public void setFolderType(@LoggedParam String folderType)
     {
-        _test.goToFolderManagement().goToFolderTypePane();
+        _test.goToFolderManagement().goToFolderTypeTab();
         _test.click(Locator.radioButtonByNameAndValue("folderType", folderType));
         _test.clickButton("Update Folder");
     }
@@ -178,7 +176,7 @@ public abstract class AbstractContainerHelper
         if (getActiveModules().containsAll(moduleNames))
             return;
 
-        _test.goToFolderManagement().goToFolderTypePane();
+        _test.goToFolderManagement().goToFolderTypeTab();
         for (String moduleName : moduleNames)
         {
             try
@@ -292,7 +290,7 @@ public abstract class AbstractContainerHelper
 
         if (null != folderType && !folderType.equals("None")) // Added in the wizard for custom folders
         {
-            _test.goToFolderManagement().goToFolderTypePane();
+            _test.goToFolderManagement().goToFolderTypeTab();
 
             for (String tabname : tabsToAdd)
                 _test.checkCheckbox(Locator.checkboxByTitle(tabname));

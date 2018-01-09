@@ -1309,7 +1309,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         if (folderName != null)
             clickFolder(folderName);
-        goToFolderManagement().goToExportPane();
+        goToFolderManagement().goToExportTab();
         waitForElement(Locator.tagWithClass("table", "export-location"));
 
         if (exportSecurityGroups)
@@ -1345,7 +1345,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void goToModuleProperties()
     {
-        goToFolderManagement().goToModulePropertiesPane();
+        goToFolderManagement().goToModulePropertiesTab();
     }
 
     protected Ext4FieldRef getModulePropertyFieldRef(ModulePropertyValue property)  //TODO: refactor this into FolderManagementPage.modulePropertyPane
@@ -1685,7 +1685,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void importFolderFromZip(File folderFile, boolean validateQueries, int completedJobs, boolean expectErrors, int wait)
     {
-        goToFolderManagement().goToImportPane();
+        goToFolderManagement().goToImportTab();
         waitForElement(Locator.name("folderZip"));
         setFormElement(Locator.name("folderZip"), folderFile);
         if (!validateQueries)

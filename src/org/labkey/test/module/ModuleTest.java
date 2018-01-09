@@ -40,8 +40,7 @@ public class ModuleTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         log("Test module created from moduleTemplate");
-        goToFolderManagement()
-                .goToFolderTypePane()
+        goToFolderManagement().goToFolderTypeTab()
                 .enableModule(TEST_MODULE_TEMPLATE_FOLDER_NAME)
                 .save();
         clickTab(TEST_MODULE_TEMPLATE_FOLDER_NAME);

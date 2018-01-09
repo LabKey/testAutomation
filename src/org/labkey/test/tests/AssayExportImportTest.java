@@ -406,7 +406,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_01);
 
-        goToFolderManagement().goToPane("tabexport");
+        goToFolderManagement().goToExportTab();
         new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input").findElement(getDriver())).check();
         new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
@@ -416,7 +416,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_01);
 
         log("Import the folder.");
-        goToFolderManagement().goToPane("tabimport");
+        goToFolderManagement().goToImportTab();
         setFormElement(Locator.input("folderZip"), exportedFolderFile);
         clickAndWait(Locator.lkButton("Import Folder"));
         waitForPipelineJobsToFinish(1);
@@ -514,7 +514,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_02);
 
-        goToFolderManagement().goToPane("tabexport");
+        goToFolderManagement().goToExportTab();
         new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input").findElement(getDriver())).check();
         new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
@@ -524,7 +524,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_02);
 
         log("Import the folder.");
-        goToFolderManagement().goToPane("tabimport");
+        goToFolderManagement().goToImportTab();
         setFormElement(Locator.input("folderZip"), exportedFolderFile);
         clickAndWait(Locator.lkButton("Import Folder"));
         waitForPipelineJobsToFinish(1);

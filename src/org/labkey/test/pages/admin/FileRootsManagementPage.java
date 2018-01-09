@@ -18,10 +18,8 @@ package org.labkey.test.pages.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Checkbox;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
-/**
- * Created by susanh on 9/20/17.
- */
 public class FileRootsManagementPage extends FolderManagementPage
 {
     public FileRootsManagementPage(WebDriver driver)
@@ -29,14 +27,9 @@ public class FileRootsManagementPage extends FolderManagementPage
         super(driver);
     }
 
-
     public FileRootsManagementPage setCloudStoreEnabled(String name, Boolean enabled)
     {
-        Checkbox box = new Checkbox(Locators.cloudStoreCheckBox(name).findElement(getDriver()));
-        if (enabled)
-            box.check();
-        else
-            box.uncheck();
+        elementCache().findCloudStoreCheckbox(name).set(enabled);
         return this;
     }
 
@@ -48,18 +41,28 @@ public class FileRootsManagementPage extends FolderManagementPage
 
     public String getRootPath()
     {
-        return getFormElement(Locators.rootPath);
+        return getFormElement(elementCache().rootPath);
     }
 
-    public static class Locators
+    @Override
+    protected ElementCache newElementCache()
     {
-        public static Locator rootPath = Locator.id("rootPath");
+        return new ElementCache();
+    }
 
-        public static Locator cloudStoreCheckBox(String name)
+    @Override
+    protected ElementCache elementCache()
+    {
+        return (ElementCache) super.elementCache();
+    }
+
+    protected class ElementCache extends FolderManagementPage.ElementCache
+    {
+        WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
+        WebElement rootPath = Locator.id("rootPath").findWhenNeeded(this);
+        Checkbox findCloudStoreCheckbox(String name)
         {
-            return Locator.tagWithAttribute("input", "value", name);
+            return new Checkbox(Locator.tagWithAttribute("input", "value", name).findElement(this));
         }
     }
-
-
 }

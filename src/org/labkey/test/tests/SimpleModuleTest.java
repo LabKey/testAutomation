@@ -1186,8 +1186,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     protected void assertModuleEnabledByDefault(String moduleName)
     {
         log("Ensuring that that '" + moduleName + "' module is enabled");
-        goToFolderManagement()
-                .goToFolderTypePane()
+        goToFolderManagement().goToFolderTypeTab()
                 .assertModuleEnabled(moduleName);
     }
 
