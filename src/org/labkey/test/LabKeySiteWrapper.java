@@ -370,6 +370,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         setFormElement(Locator.id("password2"), password);
 
         clickButton("Set Password");
+        WebTestHelper.saveSession(user, getDriver());
     }
 
     protected String getPasswordResetUrl(String username)
