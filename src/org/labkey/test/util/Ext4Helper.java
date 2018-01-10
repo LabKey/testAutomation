@@ -31,6 +31,7 @@ import org.openqa.selenium.WebElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -586,6 +587,20 @@ public class Ext4Helper
     }
 
     public <Type extends Ext4CmpRef> List<Type> componentQuery(String componentSelector, String parentId, Class<Type> clazz)
+    {
+        for (int i = 0; i <= 4; i++)
+        {
+            List<Type> cmps = _componentQuery(componentSelector, parentId, clazz);
+            if (cmps != null && !cmps.isEmpty())
+                return cmps;
+
+            _test.sleep(500);
+        }
+
+        return Collections.emptyList();
+    }
+
+    private <Type extends Ext4CmpRef> List<Type> _componentQuery(String componentSelector, String parentId, Class<Type> clazz)
     {
         componentSelector = componentSelector.replaceAll("'", "\"");  //escape single quotes
         String script =
