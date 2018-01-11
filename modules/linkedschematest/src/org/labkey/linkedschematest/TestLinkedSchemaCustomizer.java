@@ -125,7 +125,7 @@ public class TestLinkedSchemaCustomizer implements LinkedSchemaCustomizer
     {
         LOG.debug("customizeParameters");
         if (table.getColumn("Family") != null || table.getColumn("Subjectid") != null)
-            return Collections.<QueryService.ParameterDecl>singletonList(new QueryService.ParameterDeclaration(PARAM_FAMILY, JdbcType.VARCHAR));
+            return Collections.singletonList(new QueryService.ParameterDeclaration(PARAM_FAMILY, JdbcType.VARCHAR));
 
         return Collections.emptyList();
     }
@@ -135,7 +135,7 @@ public class TestLinkedSchemaCustomizer implements LinkedSchemaCustomizer
     {
         LOG.debug("customizeParamValues");
         if (table.getColumn("Family") != null || table.getColumn("SubjectId") != null)
-            return Collections.<String, Object>singletonMap(PARAM_FAMILY, _family);
+            return Collections.singletonMap(PARAM_FAMILY, _family);
 
         return Collections.emptyMap();
     }
