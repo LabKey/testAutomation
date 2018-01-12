@@ -409,34 +409,45 @@ public class AuditLogTest extends BaseWebDriverTest
     @Test
     public void testDetailedQueryUpdateAuditLog() throws IOException, CommandException
     {
-        _containerHelper.createProject(AUDIT_DETAILED_TEST_PROJECT, "Custom");
-        _containerHelper.enableModule("simpletest");
-        goToProjectHome();
+        // This test class is run as part of the Distribution Suites. The distributions are production build and have
+        // a minimal feature set and some may not include the "simpletest" module. If it is not there make this a no-op test.
+        if(_containerHelper.getAllModules().contains("simpletest"))
+        {
+            _containerHelper.createProject(AUDIT_DETAILED_TEST_PROJECT, "Custom");
+            _containerHelper.enableModule("simpletest");
+            goToProjectHome();
 
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+            Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
-        // create manufacturer (which has summary audit log level)
-        InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
-        Map<String, Object> rowMap = new HashMap<>();
-        rowMap.put("name", "Kia");
-        insertCmd.addRow(rowMap);
-        SaveRowsResponse resp1 = insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+            // create manufacturer (which has summary audit log level)
+            InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
+            Map<String, Object> rowMap = new HashMap<>();
+            rowMap.put("name", "Kia");
+            insertCmd.addRow(rowMap);
+            SaveRowsResponse resp1 = insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
 
-        Map<String, String> auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Manufacturers");
-        assertEquals("Did not find expected audit log for summary log level", "1 row(s) were inserted.", auditLog.get("Comment"));
+            Map<String, String> auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Manufacturers");
+            assertEquals("Did not find expected audit log for summary log level", "1 row(s) were inserted.", auditLog.get("Comment"));
 
-        //then create model (which has detailed audit log level)
-        InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
-        rowMap = new HashMap<>();
-        rowMap.put("manufacturerId", resp1.getRows().get(0).get("rowid"));
-        rowMap.put("name", "Soul");
-        insertCmd2.addRow(rowMap);
-        insertCmd2.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+            //then create model (which has detailed audit log level)
+            InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
+            rowMap = new HashMap<>();
+            rowMap.put("manufacturerId", resp1.getRows().get(0).get("rowid"));
+            rowMap.put("name", "Soul");
+            insertCmd2.addRow(rowMap);
+            insertCmd2.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
 
-        refresh();
-        auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Models");
-        assertEquals("Did not find expected audit log for detailed log level", "A row was inserted.", auditLog.get("Comment"));
-        _containerHelper.deleteProject(AUDIT_DETAILED_TEST_PROJECT, false);
+            refresh();
+            auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Models");
+            assertEquals("Did not find expected audit log for detailed log level", "A row was inserted.", auditLog.get("Comment"));
+            _containerHelper.deleteProject(AUDIT_DETAILED_TEST_PROJECT, false);
+        }
+        else
+        {
+            // Would like to mark the test are ignore, but unfortunately that can only be done by annotation and once in
+            // the test it can't be marked as ignore.
+            log("The 'simpletest' module was not present, nothing was tested.");
+        }
     }
 
     private void createList(String containerPath, String listName, @Nullable String tsvData, ListHelper.ListColumn... listColumns)
