@@ -85,8 +85,7 @@ par(op); #Restore graphics parameters
 
 ## Inline code
 
-Inline R code is also supported, e.g. the value of `x` is `r x`, and 2 &times; &pi;
-= `r 2*pi`.
+Inline R code is also supported, e.g. the value of `x` is `r x`, and 2 x pi = `r round(2*pi, 3)`.
 
 ## Math
 

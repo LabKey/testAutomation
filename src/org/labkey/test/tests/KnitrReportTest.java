@@ -68,13 +68,12 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     @Test
     public void testKnitrMarkupFormat() throws Exception
     {
-        Locator.CssLocator plotLocator = Locator.css("img[alt='plot of chunk graphics']");
+        Locator.XPathLocator plotLocator = Locator.xpath("//div[@class='labkey-knitr']//img");
         Locator[] reportContains = {Locator.tag("h1").withText("A Minimal Example for Markdown"),
                                     Locator.tag("h2").withText("R code chunks"),
                                     Locator.tagWithClass("code", "r").containing("set.seed(123)"),       // Echoed R code
-                                    //Locator.css("p").withText("Inline R code is also supported, e.g. the value of x is 2, and 2 \u00D7 \u03C0 = 6.2832."),
-                                    //Locator.css(".MathJax, .mathjax")
-                                    Locator.tag("sup").withText("write^") //should contain the hat markdown v2 closing tag
+                                    Locator.css("p").containing("2 x pi = 6.283"),
+                                    Locator.tag("sup").withText("write") //should contain the hat markdown v2 closing tag
         };
         String[] reportNotContains = {"```",              // Markdown for R code chunks
                                       "## R code chunks", // Uninterpreted Markdown

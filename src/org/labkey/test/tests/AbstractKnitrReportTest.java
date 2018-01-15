@@ -196,6 +196,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         Locator[] reportContains = {Locator.css("h1").withText("A Minimal Example for Markdown"),
                 Locator.tag("h2").withText("R code chunks"),
                 Locator.tag("code").containing("set.seed(123)"),       // Echoed R code
+                Locator.css("p").containing("2 x pi = 6.283"),
                 Locator.tag("sup").withText("write") //should not contain the hat markdown v2 closing tag
         };
 
