@@ -78,7 +78,8 @@ public class RlabkeyTest extends BaseWebDriverTest
         portalHelper.addWebPart("Lists");
        
         log("Import Lists");
-        File listArchive = new File(TestFileUtils.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip");
+        File libPath = new File(System.getenv("R_LIBS_USER"));
+        File listArchive = new File(libPath, "/listArchive.zip");
 
         if (!listArchive.exists())
             fail("Unable to locate the list archive: " + listArchive.getName());
@@ -139,7 +140,7 @@ public class RlabkeyTest extends BaseWebDriverTest
                 table.goToReport("Create R Report");
 
                 // we want to load the Rlabkey package from the override location
-                File libPath = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/rlabkey");
+                File libPath = new File(System.getenv("R_LIBS_USER"));
                 String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
 
                 for (APITestHelper.ApiTestCase test : tests)
@@ -151,7 +152,7 @@ public class RlabkeyTest extends BaseWebDriverTest
                             .replaceAll("%baseUrl%", WebTestHelper.getBaseURL())
                             .replaceAll("%projectName%", getProjectName());
                     if (WebTestHelper.getBaseURL().startsWith("https")) // Allow self-signed certificate
-                        testScript = testScript.replace("library(Rlabkey)", "library(Rlabkey)\nlabkey.setCurlOptions(ssl.verifypeer=FALSE)");
+                        testScript = testScript.replace("library(Rlabkey)", "library(Rlabkey)\nlabkey.acceptSelfSignedCerts()");
                     sb.append(testScript);
                     String verify = test.getResponse().trim().replaceAll("%projectName%", getProjectName());
 

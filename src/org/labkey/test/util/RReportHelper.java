@@ -158,7 +158,7 @@ public class RReportHelper
 
     /**
      * Installs the latest version of the Rlabkey package that is either built or checked into the ../remoteapi/r/latest
-     * directory. In order to install any dependent packages: (RCurl, rjson), an installation from the CRAN repository
+     * directory. In order to install any dependent packages: (httr, rjson), an installation from the CRAN repository
      * is performed first, then if the local flag has been set, the local package is installed over the top.
      */
     @LogMethod
