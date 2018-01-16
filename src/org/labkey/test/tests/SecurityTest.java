@@ -734,7 +734,8 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     public void loginSelfRegistrationEnabledTest()
     {
-        // prep: ensure that user does not currently exist in labkey and  self register is enabled
+        // prep: ensure that user does not currently exist in labkey and self register is enabled
+        // Cleanup left after the addition of captcha support to ensure no lingering accounts will cause problems
         String selfRegUserEmail = "selfreg@test.labkey.local";
         _userHelper.deleteUsers(false, selfRegUserEmail);
 
@@ -757,7 +758,8 @@ public class SecurityTest extends BaseWebDriverTest
         setFormElement(Locator.id("email"), selfRegUserEmail);
         setFormElement(Locator.id("emailConfirmation"), selfRegUserEmail);
         clickButton("Register", 0);
-        waitForElement(Locator.id("registration-content").containing("A verification email has been sent to " + selfRegUserEmail));
+        // Can't bypass the captcha and can't parse it from here, so just validation we get the expected error
+        waitForElement(Locator.id("errors").containing("Verification text does not match"));
 
         // cleanup: sign admin back in
         signIn();
