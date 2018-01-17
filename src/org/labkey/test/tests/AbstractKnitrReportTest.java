@@ -109,25 +109,12 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
 
         // Regression test: Issue #18602
         _rReportHelper.clickReportTab();
-        assertReportContents(reportContains, reportNotContains);
+        _rReportHelper.assertKnitrReportContents(reportContains, reportNotContains);
 
         _rReportHelper.clickSourceTab();
 
         int expectedLineCount = reportSource.split("\n").length;
-        Locator lastLineLoc = Locator.css(".CodeMirror-code > div:last-of-type .CodeMirror-linenumber");
-        WebElement lastLine = lastLineLoc.findElement(getDriver());
-        int lineCount = Integer.parseInt(lastLine.getText());
-
-        if (lineCount < expectedLineCount)
-        {
-            WebElement codeEditorDiv = Locator.css(".CodeMirror-scroll").findElement(getDriver());
-            executeScript("arguments[0].scrollTop = arguments[0].scrollHeight;", codeEditorDiv);
-            shortWait().until(ExpectedConditions.stalenessOf(lastLine));
-            lastLine = lastLineLoc.findElement(getDriver());
-            lineCount = Integer.parseInt(lastLine.getText());
-        }
-
-        assertEquals("Incorrect number of lines present in code editor.", expectedLineCount, lineCount);
+        assertTrue("Incorrect number of lines present in code editor.", _rReportHelper.isReportSourceLineCountMatch(expectedLineCount));
 
         return saveAndVerifyKnitrReport(reportName, reportContains, reportNotContains);
     }
@@ -140,26 +127,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     protected WebElement saveAndVerifyKnitrReport(String reportName, Locator[] reportContains, String[] reportNotContains)
     {
         _rReportHelper.saveReport(reportName);
-        return assertReportContents(reportContains, reportNotContains);
-    }
-
-    protected WebElement assertReportContents(Locator[] reportContains, String[] reportNotContains)
-    {
-        WebElement reportDiv = waitForElement(Locator.css("div.reportView > div.labkey-knitr"), BaseWebDriverTest.WAIT_FOR_PAGE);
-
-        for (Locator contains : reportContains)
-        {
-            contains.waitForElement(reportDiv, BaseWebDriverTest.WAIT_FOR_PAGE);
-        }
-
-        String reportText = reportDiv.getText();
-
-        for (String text : reportNotContains)
-        {
-            assertFalse("Report contained undesired text : " + text, reportText.contains(text));
-        }
-
-        return reportDiv;
+        return _rReportHelper.assertKnitrReportContents(reportContains, reportNotContains);
     }
 
     protected void htmlFormat()

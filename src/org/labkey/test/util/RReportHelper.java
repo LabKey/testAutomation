@@ -26,6 +26,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
@@ -365,15 +367,31 @@ public class RReportHelper
         _test.clickAndWait(saveButton, wait);
         if (null != name)
         {
-            String windowTitle = isSaveAs ? "Save Report As" : "Save Report";
-            Locator locator = Ext4Helper.Locators.window(windowTitle).append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
-            _test.waitForElement(locator);
-            if (_test.isElementPresent(locator))
-            {
-                _test.setFormElement(locator, name);
-                Window window = new Window(windowTitle, _test.getWrappedDriver());
+            saveReportWithName(name, isSaveAs);
+        }
+    }
+
+    /**
+     * Precondition: on save popup window
+     */
+    public void saveReportWithName(String name, boolean isSaveAs)
+    {
+        saveReportWithName(name, isSaveAs, false);
+    }
+
+    public void saveReportWithName(String name, boolean isSaveAs, boolean isExternal)
+    {
+        String windowTitle = isExternal ? "Create New Report" : isSaveAs ? "Save Report As" : "Save Report";
+        Locator locator = Ext4Helper.Locators.window(windowTitle).append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+        _test.waitForElement(locator);
+        if (_test.isElementPresent(locator))
+        {
+            _test.setFormElement(locator, name);
+            Window window = new Window(windowTitle, _test.getWrappedDriver());
+            if (isExternal)
+                window.clickButton("OK", 0);
+            else
                 window.clickButton("OK");
-            }
         }
     }
 
@@ -470,4 +488,52 @@ public class RReportHelper
 
         saveReport(name);
     }
+
+    /**
+     * pre-conditions: at report's Report tab
+     */
+    public WebElement assertKnitrReportContents(Locator[] reportContains, String[] reportNotContains)
+    {
+        WebElement reportDiv = _test.waitForElement(Locator.css("div.reportView > div.labkey-knitr"), BaseWebDriverTest.WAIT_FOR_PAGE);
+
+        for (Locator contains : reportContains)
+        {
+            contains.waitForElement(reportDiv, BaseWebDriverTest.WAIT_FOR_PAGE);
+        }
+
+        if (reportNotContains != null)
+        {
+            String reportText = reportDiv.getText();
+
+            for (String text : reportNotContains)
+            {
+                assertFalse("Report contained undesired text : " + text, reportText.contains(text));
+            }
+        }
+
+
+        return reportDiv;
+    }
+
+    /**
+     * pre-conditions: at report's Source tab
+     */
+    public boolean isReportSourceLineCountMatch(int expectedLineCount)
+    {
+        Locator lastLineLoc = Locator.css(".CodeMirror-code > div:last-of-type .CodeMirror-linenumber");
+        WebElement lastLine = lastLineLoc.findElement(_test.getDriver());
+        int lineCount = Integer.parseInt(lastLine.getText());
+
+        if (lineCount < expectedLineCount)
+        {
+            WebElement codeEditorDiv = Locator.css(".CodeMirror-scroll").findElement(_test.getDriver());
+            _test.executeScript("arguments[0].scrollTop = arguments[0].scrollHeight;", codeEditorDiv);
+            _test.shortWait().until(ExpectedConditions.stalenessOf(lastLine));
+            lastLine = lastLineLoc.findElement(_test.getDriver());
+            lineCount = Integer.parseInt(lastLine.getText());
+        }
+
+        return lineCount == expectedLineCount;
+    }
+
 }
