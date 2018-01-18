@@ -17,7 +17,6 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 
 import java.io.File;
@@ -42,7 +41,7 @@ public class PerlHelper
 
         ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
-        if (scripts.isEnginePresent("Perl"))
+        if (scripts.isEnginePresentForLanguage("Perl"))
             return;
 
         _test.log("Try configuring Perl");

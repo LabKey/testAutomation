@@ -17,7 +17,6 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 
@@ -45,7 +44,7 @@ public class QCAssayScriptHelper
 
         ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
-        if (!scripts.isEnginePresent(engineLanguage))
+        if (!scripts.isEnginePresentForLanguage(engineLanguage))
         {
             String javaHome = System.getProperty("java.home");
             File javaExe = new File(javaHome + "/bin/java.exe");
@@ -76,7 +75,7 @@ public class QCAssayScriptHelper
 
         ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
-        if (scripts.isEnginePresent(engineLanguage))
+        if (scripts.isEnginePresentForLanguage(engineLanguage))
         {
             scripts.deleteEngine(engineName);
         }

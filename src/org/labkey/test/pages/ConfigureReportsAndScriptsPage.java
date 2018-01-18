@@ -16,11 +16,13 @@
 package org.labkey.test.pages;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -48,9 +50,14 @@ public class ConfigureReportsAndScriptsPage
         _test.waitForElement(Locators.enginesGridRowForName(DEFAULT_ENGINE));
     }
 
-    public boolean isEnginePresent(String language)
+    public boolean isEnginePresentForLanguage(String language)
     {
         return _test.isElementPresent(Locators.enginesGridRowForLanguage(language));
+    }
+
+    public boolean isEnginePresent(String engineName)
+    {
+        return _test.isElementPresent(Locators.enginesGridRowForName(engineName));
     }
 
     public void addEngine(@LoggedParam EngineType type, EngineConfig config)
@@ -76,29 +83,62 @@ public class ConfigureReportsAndScriptsPage
         _test.waitForElement(Locators.enginesGridRowForLanguage(language));
     }
 
-    @LogMethod(quiet = true)
-    public void deleteEngine(@LoggedParam String engineName)
+    public void deleteEngine(String engineName)
     {
-        Locator engine = Locators.enginesGridRowForName(engineName);
-        _test.click(engine);
+        WebElement engineRow = selectEngineNamed(engineName);
 
-        _test.clickButton("Delete", 0);
+        deleteSelectedEngine(engineRow);
+    }
 
-        _test._extHelper.waitForExtDialog("Delete Engine Configuration", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    @LogMethod
+    public void deleteEnginesForLanguage(@LoggedParam String engineLanguage)
+    {
+        WebElement engineRow = selectFirstEngineForLanguage(engineLanguage);
 
-        _test.clickButton("Yes", 0);
-        _test.waitForElementToDisappear(engine, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        while (engineRow != null)
+        {
+            deleteSelectedEngine(engineRow);
+            engineRow = selectFirstEngineForLanguage(engineLanguage);
+        }
     }
 
     @LogMethod(quiet = true)
     public void editEngine(@LoggedParam String engineName)
     {
-        Locator engine = Locators.enginesGridRowForName(engineName);
-        _test.click(engine);
+        selectEngineNamed(engineName);
 
         _test.clickButton("Edit", 0);
 
         _test.waitForElement(Locators.editEngineWindow);
+    }
+
+    private void deleteSelectedEngine(WebElement selectedEngineRow)
+    {
+        _test.clickButton("Delete", 0);
+
+        _test._extHelper.waitForExtDialog("Delete Engine Configuration", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        String confirmationMessage = Locator.byClass("ext-mb-text").findElement(_test.getDriver()).getText();
+
+        TestLogger.log("Deleting: " + confirmationMessage.substring(confirmationMessage.indexOf(":") + 1));
+
+        _test.clickButton("Yes", 0);
+        _test.shortWait().until(ExpectedConditions.stalenessOf(selectedEngineRow));
+    }
+
+    private WebElement selectEngineNamed(String engineName)
+    {
+        WebElement engineRow = Locators.enginesGridRowForName(engineName).findElement(_test.getDriver());
+        engineRow.click();
+        return engineRow;
+    }
+
+    @Nullable
+    private WebElement selectFirstEngineForLanguage(String engineLanguage)
+    {
+        WebElement engineRow = Locators.enginesGridRowForLanguage(engineLanguage).findElementOrNull(_test.getDriver());
+        if (engineRow != null)
+            engineRow.click();
+        return engineRow;
     }
 
     public enum EngineType
@@ -163,9 +203,10 @@ public class ConfigureReportsAndScriptsPage
             return _name;
         }
 
-        public void setName(String name)
+        public EngineConfig setName(String name)
         {
             _name = name;
+            return this;
         }
 
         public String getLanguageName()
@@ -173,9 +214,10 @@ public class ConfigureReportsAndScriptsPage
             return _language;
         }
 
-        public void setLanguage(String language)
+        public EngineConfig setLanguage(String language)
         {
             _language = language;
+            return this;
         }
 
         public String getLanguageVersion()
@@ -183,9 +225,10 @@ public class ConfigureReportsAndScriptsPage
             return _version;
         }
 
-        public void setVersion(String version)
+        public EngineConfig setVersion(String version)
         {
             _version = version;
+            return this;
         }
 
         public String getExtensions()
@@ -193,9 +236,10 @@ public class ConfigureReportsAndScriptsPage
             return _extensions;
         }
 
-        public void setExtensions(String extensions)
+        public EngineConfig setExtensions(String extensions)
         {
             _extensions = extensions;
+            return this;
         }
 
         public File getPath()
@@ -203,9 +247,10 @@ public class ConfigureReportsAndScriptsPage
             return _path;
         }
 
-        public void setPath(File path)
+        public EngineConfig setPath(File path)
         {
             _path = path;
+            return this;
         }
 
         public String getCommand()
@@ -213,9 +258,10 @@ public class ConfigureReportsAndScriptsPage
             return _command;
         }
 
-        public void setCommand(String command)
+        public EngineConfig setCommand(String command)
         {
             _command = command;
+            return this;
         }
 
         public String getOutputFileName()
@@ -223,9 +269,10 @@ public class ConfigureReportsAndScriptsPage
             return _outputFileName;
         }
 
-        public void setOutputFileName(String outputFileName)
+        public EngineConfig setOutputFileName(String outputFileName)
         {
             _outputFileName = outputFileName;
+            return this;
         }
     }
 

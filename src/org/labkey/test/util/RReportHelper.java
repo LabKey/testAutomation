@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.util.FileUtil;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
@@ -203,22 +202,24 @@ public class RReportHelper
 
         String localEngineName = "R Scripting Engine";
         String dockerEngineName = "R Docker Scripting Engine";
-        _test.log("Try configuring R");
         String rVersion = null;
-        if (_test.isElementPresent(ConfigureReportsAndScriptsPage.Locators.enginesGridRowForName(dockerEngineName)))
+        if (scripts.isEnginePresent(dockerEngineName))
         {
             scripts.editEngine(dockerEngineName);
             if (useDocker)
             {
+                TestLogger.log("Enable existing " + dockerEngineName);
                 _test.checkCheckbox(Locator.id("editEngine_enabled"));
                 rVersion = "RDocker";
             }
             else
             {
+                TestLogger.log("Disable existing " + dockerEngineName);
                 _test.uncheckCheckbox(Locator.id("editEngine_enabled"));
             }
 
             _test.clickButton("Submit", 0);
+            _test.waitForElementToDisappear(ConfigureReportsAndScriptsPage.Locators.editEngineWindow);
         }
         else if (useDocker)
         {
@@ -228,17 +229,18 @@ public class RReportHelper
 
         if (!useDocker)
         {
-            if (scripts.isEnginePresent("R"))
+            if (scripts.isEnginePresent(localEngineName))
             {
                 if (!TestProperties.isTestRunningOnTeamCity())
                 {
                     scripts.editEngine(localEngineName);
                     rExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath")));
+                    TestLogger.log(localEngineName + " is already configured using: " + rExecutable.getAbsolutePath());
                     rVersion = getRVersion(rExecutable);
                     _test.clickButton("Cancel", 0);
                     return rVersion;
                 }
-                else if (_test.isElementPresent(ConfigureReportsAndScriptsPage.Locators.enginesGridRowForName(localEngineName)))// Reset R scripting engine on TeamCity
+                else if (scripts.isEnginePresent(localEngineName)) // Reset R scripting engine on TeamCity
                 {
                     scripts.deleteEngine(localEngineName);
                 }
@@ -263,7 +265,7 @@ public class RReportHelper
         ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
         String defaultScriptName = "R Scripting Engine";
-        assertTrue("R Engine not setup", scripts.isEnginePresent("R"));
+        assertTrue("R Engine not setup", scripts.isEnginePresentForLanguage("R"));
 
         scripts.editEngine(defaultScriptName);
 
