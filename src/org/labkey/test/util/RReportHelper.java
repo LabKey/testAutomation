@@ -238,8 +238,10 @@ public class RReportHelper
                     _test.clickButton("Cancel", 0);
                     return rVersion;
                 }
-                else // Reset R scripting engine on TeamCity
+                else if (scripts.isEnginePresent(localEngineName))// Reset R scripting engine on TeamCity
+                {
                     scripts.deleteEngine(localEngineName);
+                }
             }
 
             rVersion = getRVersion(getRExecutable());
