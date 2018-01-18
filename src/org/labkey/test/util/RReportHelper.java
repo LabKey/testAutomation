@@ -238,7 +238,7 @@ public class RReportHelper
                     _test.clickButton("Cancel", 0);
                     return rVersion;
                 }
-                else if (scripts.isEnginePresent(localEngineName))// Reset R scripting engine on TeamCity
+                else if (_test.isElementPresent(ConfigureReportsAndScriptsPage.Locators.enginesGridRowForName(localEngineName)))// Reset R scripting engine on TeamCity
                 {
                     scripts.deleteEngine(localEngineName);
                 }
