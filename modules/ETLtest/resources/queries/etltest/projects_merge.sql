@@ -21,7 +21,7 @@ SELECT
   'outside_email 1' AS outside_email, -- empty extensible value -> non-empty extensible value
   NULL AS outside_inst, -- non-empty extensible value -> empty extensible value
   'outside_phone 1 changed' AS outside_phone, -- non-empty extensible value -> different non-empty extensible value
-  now() as modified
+  CAST('01/02/1995' as TIMESTAMP) as modified
 
 UNION SELECT
   2 AS project,
@@ -31,4 +31,4 @@ UNION SELECT
   'outside_email 2' AS outside_email, -- extensible table column
   'outside_inst 2' AS outside_inst, -- extensible table column
   'outside_phone 2' AS outside_phone, -- extensible table column
-  now() as modified
+  CAST('01/02/1995' as TIMESTAMP) as modified

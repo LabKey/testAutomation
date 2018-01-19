@@ -21,7 +21,7 @@ SELECT
   NULL AS outside_email, -- extensible table column
   'outside_inst 1' AS outside_inst, -- extensible table column
   'outside_phone 1' AS outside_phone, -- extensible table column
-  TIMESTAMPADD(SQL_TSI_MINUTE, -1, now()) as modified
+  CAST('01/01/1995' as TIMESTAMP) as modified
 
 UNION SELECT
   2 AS project,
@@ -31,4 +31,4 @@ UNION SELECT
   'outside_email 2' AS outside_email, -- extensible table column
   'outside_inst 2' AS outside_inst, -- extensible table column
   'outside_phone 2' AS outside_phone, -- extensible table column
-  TIMESTAMPADD(SQL_TSI_MINUTE, -1, now()) as modified
+  CAST('01/01/1995' as TIMESTAMP) as modified

@@ -15,4 +15,4 @@
  */
 select
 1 as project,
-now() as modified
+  CAST('01/04/1995' as TIMESTAMP) as modified
