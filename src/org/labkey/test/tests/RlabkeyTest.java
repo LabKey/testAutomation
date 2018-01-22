@@ -78,8 +78,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         portalHelper.addWebPart("Lists");
        
         log("Import Lists");
-        File libPath = new File(System.getenv("R_LIBS_USER"));
-        File listArchive = new File(libPath, "/listArchive.zip");
+        File listArchive = new File(_rReportHelper.getRLibraryPath(), "/listArchive.zip");
 
         if (!listArchive.exists())
             fail("Unable to locate the list archive: " + listArchive.getName());
@@ -140,7 +139,7 @@ public class RlabkeyTest extends BaseWebDriverTest
                 table.goToReport("Create R Report");
 
                 // we want to load the Rlabkey package from the override location
-                File libPath = new File(System.getenv("R_LIBS_USER"));
+                File libPath = _rReportHelper.getRLibraryPath();
                 String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
 
                 for (APITestHelper.ApiTestCase test : tests)

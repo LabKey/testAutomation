@@ -75,6 +75,16 @@ public class RReportHelper
     private static final String INSTALL_RLABKEY = "install.packages(\"Rlabkey\", repos=\"http://cran.r-project.org\")";
     private static final String INSTALL_LOCAL_RLABKEY = "install.packages(\"%s\", repos=NULL)";
 
+    public File getRLibraryPath()
+    {
+        String libPath = System.getenv("R_LIBS_USER");
+        if (libPath != null)
+            return new File(libPath);
+
+        // default to sampledata/rlabkey path
+        return new File(TestFileUtils.getLabKeyRoot(), "/sampledata/rlabkey");
+    }
+
     /**
      * Execute an R script and verify the specified text is present.
      * @return - true if the test result was present
