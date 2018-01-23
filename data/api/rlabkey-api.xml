@@ -253,6 +253,59 @@
             ]]>
         </response>
     </test>
+    <test name="insert row failure 1" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                ## insert, update and delete functions
+                newrow <- data.frame(
+                    DisplayFld="Inserted via Rlabkey"
+                    , TextFld="how its done"
+                    , IntFld= ""
+                    , DoubleFld = 12.345
+                    , DateTimeFld = "03/01/2010"
+                    , BooleanFld= FALSE
+                    , LongTextFld = "Four score and seven years ago"
+                    , RequiredText = "I"
+                    , Category = "LOOKUP2")
+
+                labkey.insertRows("%baseUrl%", folderPath="/%projectName%",schemaName="lists", queryName="AllTypes", toInsert=newrow)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Status code = 400, Error message = Data does not contain required field: RequiredInt
+            ]]>
+        </response>
+    </test>
+    <test name="insert row failure 2" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                ## insert, update and delete functions
+                newrow <- data.frame(
+                    DisplayFld="Inserted via Rlabkey"
+                    , TextFld="how its done"
+                    , IntFld= "string"
+                    , DoubleFld = 12.345
+                    , DateTimeFld = "03/01/2010"
+                    , BooleanFld= FALSE
+                    , LongTextFld = "Four score and seven years ago"
+                    , RequiredText = "I"
+                    , RequiredInt = 0
+                    , Category = "LOOKUP2")
+
+                labkey.insertRows("%baseUrl%", folderPath="/%projectName%",schemaName="lists", queryName="AllTypes", toInsert=newrow)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Status code = 400, Error message = Could not convert 'string' for field IntFld, should be of type Integer
+            ]]>
+        </response>
+    </test>
     <test name="insert row" type="post">
         <url>
             <![CDATA[

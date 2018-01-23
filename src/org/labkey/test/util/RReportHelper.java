@@ -107,7 +107,6 @@ public class RReportHelper
         _test.setCodeEditorValue("script-report-editor", script);
         _test._ext4Helper.clickTabContainingText("Report");
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 5);
-        _test.waitForElement(Locator.xpath("//table[@class='labkey-output']"), _test.getDefaultWaitForPage());
 
         Locator l = Locator.xpath("//div[@class='reportView']//pre");
         _test.waitForElement(l);
