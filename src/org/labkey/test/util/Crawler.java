@@ -189,6 +189,7 @@ public class Crawler
                 new ControllerActionId("su2c", "begin"),
                 new ControllerActionId("trialshare", "begin"),
                 new ControllerActionId("ehr_compliancedb", "requirementDetails"),
+                new ControllerActionId("onprc_billingpublic", "begin"),
                 new ControllerActionId("hdrl", "begin")
         );
 
