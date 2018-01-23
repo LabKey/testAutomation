@@ -104,13 +104,13 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
         pass = validateCount("span.fa-file-text-o", 8) & pass;
 
         log("Validate number of code icons is correct.");
-        pass = validateCount("span.fa-file-code-o", 3) & pass;
+        pass = validateCount("span.fa-file-code-o", 3) & pass;  // Shouldn't this be 4 include XML?
 
         log("Validate number of rtf\\word icons is correct.");
         pass = validateCount("span.fa-file-word-o", 5) & pass;
 
         log("Validate number of image icons is correct.");
-        pass = validateCount("span.fa-file-image-o", 5) & pass;
+        pass = validateCount("span.fa-file-image-o", 6) & pass;
 
         log("Validate number of archive icons is correct.");
         pass = validateCount("span.fa-file-archive-o", 3) & pass;
@@ -131,7 +131,6 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
         pass = validateCount("span.fa-file-powerpoint-o", 2) & pass;
 
         assertTrue("Count(s) for icons were not as expected. Review log to find the counts that were wrong.", pass);
-
     }
 
     private boolean validateCount(String cssIcon, int expCount)
