@@ -104,7 +104,7 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
         pass = validateCount("span.fa-file-text-o", 8) & pass;
 
         log("Validate number of code icons is correct.");
-        pass = validateCount("span.fa-file-code-o", 3) & pass;  // Shouldn't this be 4 include XML?
+        pass = validateCount("span.fa-file-code-o", 4) & pass;
 
         log("Validate number of rtf\\word icons is correct.");
         pass = validateCount("span.fa-file-word-o", 5) & pass;
