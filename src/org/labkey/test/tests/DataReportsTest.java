@@ -472,7 +472,7 @@ public class DataReportsTest extends ReportTest
     public void testRReportShowSource()
     {
         final String reportName = "Source Tab Test";
-        final String R_SCRIPT = "write.table(labkey.data, file = \"${tsvout:tsvfile}\", sep = \"\\t\", qmethod = \"double\", col.names=NA)";
+        final String R_SCRIPT = "#${tsvout:tsvfile}\nwrite.table(labkey.data, file = \"tsvfile\", sep = \"\\t\", qmethod = \"double\", col.names=NA)";
         final String DATA_SET_APX1 = "APX-1: Abbreviated Physical Exam";
 
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
