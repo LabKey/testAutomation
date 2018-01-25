@@ -1279,11 +1279,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return WebTestHelper.getBaseURL();
     }
 
-    public String getProjectUrl()
-    {
-        return "/project/" + EscapeUtil.encode(getProjectName()) + "/begin.view?";
-    }
-
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();
