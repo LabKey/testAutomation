@@ -812,9 +812,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Testing module-based reports...");
         clickAndWait(Locator.linkWithText(LIST_NAME));
-        table.goToReport( "Super Cool R Report");
+        table.goToReport( SUPER_COOL_R_REPORT);
         waitForText(WAIT_FOR_JAVASCRIPT, "Console output");
-        assertTextPresent("\"name\"", "\"age\"", "\"crazy\"");
+        assertTextNotPresent("Error executing command");
+        log("Verify comment based output file substitution syntax");
+        assertElementPresent(Locator.xpath("//img[starts-with(@id,'resultImage')]"));
+        click(Locator.tagWithAttributeContaining("img", "src", "minus.gif"));
+        log("Verify comment based output regex substitution syntax");
+        assertElementPresent(Locator.tagWithText("a", "Text output file (click to download)"));
+        log("Verify comment based input file substitution syntax");
+        assertTextPresent("Adam", "Britt", "Dave");
 
         doTestReportThumbnails();
         doTestReportIcon();
