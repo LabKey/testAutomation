@@ -660,7 +660,7 @@ public class AuditLogTest extends BaseWebDriverTest
         field01ExpectedColumns = Maps.of("action", "Modified");
         field01ExpectedComment = Maps.of("Label", FIELD01_LABEL + " -> " + FIELD01_UPDATED_LABEL,
                 "Description", FIELD01_DESCRIPTION + " -> " + FIELD01_UPDATED_DESCRIPTION,
-                "PHI", "Not PHI -> Restricted",
+                "PHI", "Not PHI -> Restricted PHI",
                 "Required", "false -> true");
         pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD01_NAME, field01ExpectedColumns, field01ExpectedComment);
 

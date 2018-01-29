@@ -720,18 +720,20 @@ public class PropertiesEditor extends WebPartPanel
 
     public enum PhiSelectType
     {
-        NotPHI("Not PHI", org.labkey.api.data.PHI.NotPHI.ordinal()),
-        Limited("Limited PHI", org.labkey.api.data.PHI.Limited.ordinal()),
-        PHI("Full PHI", org.labkey.api.data.PHI.PHI.ordinal()),
-        Restricted("Restricted", org.labkey.api.data.PHI.Restricted.ordinal());
+        NotPHI("Not PHI", org.labkey.api.data.PHI.NotPHI.ordinal(), null),
+        Limited("Limited PHI", org.labkey.api.data.PHI.Limited.ordinal(), "Limited PHI Reader"),
+        PHI("Full PHI", org.labkey.api.data.PHI.PHI.ordinal(), "Full PHI Reader"),
+        Restricted("Restricted PHI", org.labkey.api.data.PHI.Restricted.ordinal(), "Restricted PHI Reader");
 
         String _text;
         int _rank;
+        private String _roleName;
 
-        PhiSelectType(String text, int rank)
+        PhiSelectType(String text, int rank, String roleName)
         {
             _text = text;
             _rank = rank;
+            _roleName = roleName;
         }
 
         public String getValue()
@@ -747,6 +749,11 @@ public class PropertiesEditor extends WebPartPanel
         public int getRank()
         {
             return _rank;
+        }
+
+        public String getRoleName()
+        {
+            return _roleName;
         }
     }
 }

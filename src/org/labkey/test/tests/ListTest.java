@@ -32,6 +32,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -148,6 +149,8 @@ public class ListTest extends BaseWebDriverTest
     private final File TSV_SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
 
+    protected ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("list");
@@ -170,9 +173,11 @@ public class ListTest extends BaseWebDriverTest
     {
         log("Setup project and list module");
         _containerHelper.createProject(PROJECT_VERIFY, null);
+        _permissionsHelper.setUserPermissions(getCurrentUser(), "Restricted PHI Reader");
 
         log("Create second project");
         _containerHelper.createProject(PROJECT_OTHER, null);
+        _permissionsHelper.setUserPermissions(getCurrentUser(), "Restricted PHI Reader");
         goToProjectHome();
     }
 
@@ -1025,9 +1030,8 @@ public class ListTest extends BaseWebDriverTest
         clickAdminMenuItem("Folder", "Management");
         click(Locator.linkContainingText("Export"));
         // select 'remove all columns tagged as protected'
-        new Checkbox(Locator.tagContainingText("label", "Exclude Columns At This PHI Level And Higher:")
-                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
-        setFormElementJS(Locator.tagWithClass("input", "export-phi-level"), "Limited");
+        new Checkbox(Locator.tagContainingText("label", "Include PHI Columns:")
+                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).uncheck();
 
         // click 'export', capture the zip archive download
         File projectZipArchive = clickAndWaitForDownload(findButton("Export"));
