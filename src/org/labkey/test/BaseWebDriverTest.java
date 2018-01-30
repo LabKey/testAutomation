@@ -113,6 +113,8 @@ import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.WebTestHelper.logToServer;
+import static org.labkey.test.components.PropertiesEditor.PhiSelectType;
+import static org.labkey.test.components.PropertiesEditor.PhiSelectType.NotPHI;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
 
@@ -1602,6 +1604,35 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         else
             checkCheckbox(Locator.name("quf_enrolled"));
         clickButton("Submit");
+    }
+
+    public void setExportPhi(PhiSelectType exportPhiLevel)
+    {
+        if(NotPHI != exportPhiLevel)
+        {
+            new Checkbox(Locator.tagContainingText("label", "Include PHI Columns:").precedingSibling("input").findElement(getDriver())).check();
+            switch(exportPhiLevel)
+            {
+                case Limited:
+                    selectPhiCombo("Limited PHI");
+                    break;
+                case PHI:
+                    selectPhiCombo("Full and Limited PHI");
+                    break;
+                case Restricted:
+                    selectPhiCombo("Restricted, Full and Limited PHI");
+                    break;
+            }
+        }
+        else
+        {
+            new Checkbox(Locator.tagContainingText("label", "Include PHI Columns:").precedingSibling("input").findElement(getDriver())).uncheck();
+        }
+    }
+
+    private void selectPhiCombo(String label)
+    {
+        _ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithInputNamed("exportPhiLevel"), Ext4Helper.TextMatchTechnique.EXACT, label);
     }
 
     public void goToProjectHome()

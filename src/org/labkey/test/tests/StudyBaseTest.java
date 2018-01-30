@@ -25,6 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.PropertiesEditor.PhiSelectType;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.util.APITestHelper;
@@ -202,12 +203,12 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         exportStudy(zipFile, true, null);
     }
 
-    protected void exportStudy(boolean zipFile, boolean exportPhi, PHI exportPhiLevel)
+    protected void exportStudy(boolean zipFile, boolean exportPhi, PhiSelectType exportPhiLevel)
     {
         exportStudy(zipFile, exportPhi, exportPhiLevel, false, false, false, Collections.emptySet());
     }
 
-    @LogMethod protected void exportStudy(boolean zipFile, boolean exportPhi, PHI exportPhiLevel,
+    @LogMethod protected void exportStudy(boolean zipFile, boolean exportPhi, PhiSelectType exportPhiLevel,
                                           boolean useAlternateIDs, boolean useAlternateDates, boolean maskClinic,
                                           @Nullable Set<String> uncheckObjects)
     {
@@ -225,8 +226,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         checkRadioButton(Locator.tagWithClass("table", "export-location").index(zipFile ? 1 : 0));
         if(!exportPhi)
         {
-            new Checkbox(Locator.tagContainingText("label", "Exclude Columns At This PHI Level And Higher:").precedingSibling("input").findElement(getDriver())).check();
-            setFormElementJS(Locator.tagWithClass("input", "export-phi-level"), exportPhiLevel.name());
+            setExportPhi(exportPhiLevel);   // exportPhiLevel is level to include
         }
         if(useAlternateIDs)
             new Checkbox(Locator.tagWithClass("input", "alternate-ids").findElement(getDriver())).check();
