@@ -15,6 +15,8 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -51,10 +53,7 @@ public class TestLogger
 
     private static String getIndentString()
     {
-        String indentStr = "";
-        for (int i = 0; i < currentIndent && i < MAX_INDENT; i++)
-            indentStr += " ";
-        return indentStr;
+        return StringUtils.repeat(' ', Math.min(currentIndent, MAX_INDENT));
     }
 
     public static void debug(String msg)
