@@ -20,6 +20,7 @@ import com.google.common.base.Predicate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -895,18 +896,29 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void waitForPendingRequests(int msWait)
     {
         Connection connection = createDefaultConnection(true);
+        MutableLong pendingRequestCount = new MutableLong(-1);
         waitFor(() -> {
-            Command getPendingRequestCount = new Command("admin", "getPendingRequestCount");
-            try
-            {
-                CommandResponse response = getPendingRequestCount.execute(connection, null);
-                return (Long)response.getProperty("pendingRequestCount") == 0;
-            }
-            catch (IOException | CommandException e)
-            {
-                return false;
-            }
+            pendingRequestCount.setValue(getPendingRequestCount(connection));
+            return pendingRequestCount.getValue() == 0;
         }, msWait);
+        if (pendingRequestCount.getValue() > 0)
+            TestLogger.log(pendingRequestCount.getValue() + " requests still pending after " + msWait + "ms");
+        if (pendingRequestCount.getValue() < 0)
+            TestLogger.log("Unable to fetch pending request count" + msWait + "ms");
+    }
+
+    private long getPendingRequestCount(Connection connection)
+    {
+        Command getPendingRequestCount = new Command("admin", "getPendingRequestCount");
+        try
+        {
+            CommandResponse response = getPendingRequestCount.execute(connection, null);
+            return (Long)response.getProperty("pendingRequestCount");
+        }
+        catch (IOException | CommandException e)
+        {
+            return -1;
+        }
     }
 
     private void cleanup(boolean afterTest)
