@@ -25,40 +25,57 @@ public class TextSearcher
 {
     private Function<String, String> sourceTransformer;
     private Function<String, String> searchTransformer;
-    private Supplier<String> sourceGetter;
+    private Supplier<String> sourceSupplier;
 
-    private TextSearcher()
+    public TextSearcher(final Supplier<String> sourceSupplier)
     {
         this.sourceTransformer = TextTransformers.IDENTITY;
-        this.searchTransformer = TextTransformers.ENCODER;
+        this.searchTransformer = TextTransformers.IDENTITY;
+        this.sourceSupplier = sourceSupplier;
     }
 
-    public TextSearcher(final Supplier<String> sourceGetter)
+    public TextSearcher(String source)
     {
-        this();
-        this.sourceGetter = sourceGetter;
+        this(() -> source);
     }
 
     public TextSearcher(final WebDriverWrapper test)
     {
         this(test::getHtmlSource);
+        this.searchTransformer = TextTransformers.ENCODER;
     }
 
     public final TextSearcher setSourceTransformer(Function<String, String> sourceTransformer)
     {
-        this.sourceTransformer = sourceTransformer;
+        if (sourceTransformer == null)
+            this.sourceTransformer = TextTransformers.IDENTITY;
+        else
+            this.sourceTransformer = sourceTransformer;
         return this;
+    }
+
+    public final TextSearcher clearSourceTransformer()
+    {
+        return setSourceTransformer(null);
     }
 
     public final TextSearcher setSearchTransformer(Function<String, String> searchTransformer)
     {
-        this.searchTransformer = searchTransformer;
+        if (searchTransformer == null)
+            this.searchTransformer = TextTransformers.IDENTITY;
+        else
+            this.searchTransformer = searchTransformer;
         return this;
     }
 
-    public final TextSearcher setSourceGetter(Supplier<String> sourceGetter)
+    public final TextSearcher clearSearchTransformer()
     {
-        this.sourceGetter = sourceGetter;
+        return setSearchTransformer(null);
+    }
+
+    public final TextSearcher setSourceSupplier(Supplier<String> sourceSupplier)
+    {
+        this.sourceSupplier = sourceSupplier;
         return this;
     }
 
@@ -67,7 +84,7 @@ public class TextSearcher
         if (null == texts || 0 == texts.length)
             return;
 
-        String transformedSource = sourceTransformer.apply(sourceGetter.get());
+        String transformedSource = sourceTransformer.apply(sourceSupplier.get());
 
         for (String text : texts)
         {
