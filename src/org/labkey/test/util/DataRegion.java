@@ -344,7 +344,6 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
             {
                 String title = "Grid Views".equals(text) ? "Grid views" : text;
                 headerButtons.put(text, Locator.findAnyElementOrNull(
-                        "Button with title or text: " + text,
                         buttonBar,
                         Locator.lkButton().withAttribute("title", title),
                         Locator.lkButton(text),

@@ -124,6 +124,32 @@ public abstract class Locator extends By
         }
     }
 
+    protected static class ImmutableLocator extends WrappedLocator
+    {
+        protected ImmutableLocator(Locator wrappedLocator)
+        {
+            super(wrappedLocator);
+        }
+
+        @Override
+        public Locator containing(String contains)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Locator withText(String text)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Locator index(Integer index)
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     /**
      * Wait for a single element located by any one of the provided Locators
      * Note: Not redundant with {@link #waitForElements(FluentWait, Locator...)}.
@@ -137,14 +163,7 @@ public abstract class Locator extends By
             @Override
             public WebElement apply(SearchContext context)
             {
-                for (Locator loc : locators)
-                {
-                    List<WebElement> els;
-                    els = loc.findElements(context);
-                    if (els.size() > 0)
-                        return els.get(0);
-                }
-                return null;
+                return findAnyElementOrNull(context, locators);
             }
 
             @Override
@@ -200,18 +219,14 @@ public abstract class Locator extends By
 
     public static WebElement findAnyElement(String description, SearchContext context, final Locator... locators)
     {
-        List<WebElement> els;
-        for (Locator loc : locators)
-        {
-            els = loc.findElements(context);
-            if (!els.isEmpty())
-                return els.get(0);
-        }
-        throw new NoSuchElementException(description + " not found");
+        WebElement el = findAnyElementOrNull(context, locators);
+        if (el == null)
+            throw new NoSuchElementException(description + " not found");
+        return el;
     }
 
     @Nullable
-    public static WebElement findAnyElementOrNull(String description, SearchContext context, final Locator... locators)
+    public static WebElement findAnyElementOrNull(SearchContext context, final Locator... locators)
     {
         List<WebElement> els;
         for (Locator loc : locators)
@@ -234,7 +249,14 @@ public abstract class Locator extends By
      */
     public abstract Locator index(Integer index);
 
+    public final Locator immutable()
+    {
+        return new ImmutableLocator(this);
+    }
+
     public abstract String toString();
+
+    protected abstract By getBy();
 
     public Locator describedAs(String description)
     {
@@ -283,8 +305,6 @@ public abstract class Locator extends By
         return wrappedContext.getValue();
     }
 
-    protected abstract By getBy();
-
     public LazyWebElement findWhenNeeded(SearchContext context)
     {
         return new LazyWebElement(this, context);
@@ -321,7 +341,7 @@ public abstract class Locator extends By
         {
             if (elements.size() > 10)
                 TestLogger.log(String.format("WARNING: Consider using XPath to find element(s) with text content to avoid time-consuming calls to WebElement.getText().\n" +
-                        "Found %d WebElements with this Locator:\n%s", elements.size(), getLoggableDescription()));
+                        "Found %d WebElements with this Locator: %s", elements.size(), getLoggableDescription()));
 
             Iterator<WebElement> it = elements.iterator();
             WebElement el;
@@ -638,7 +658,10 @@ public abstract class Locator extends By
 
     public static XPathLocator menuBarItem(String text)
     {
-        return tagWithClass("div", "navbar-header").append(tagWithClass("li", "dropdown hidden-xs")).append(tagWithText("a", text));
+        return tagWithClass("div", "navbar-header")
+                .childTag("ul")
+                .childTag("li").withClass("dropdown")
+                .childTag("a").withText(text);
     }
 
     public static XPathLocator linkWithTitle(String title)

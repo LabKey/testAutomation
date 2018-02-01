@@ -23,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.labkey.api.util.FileUtil;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -1411,7 +1412,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return count;
     }
 
-    public int countText(TextSearcher searcher, String text)
+    public static int countText(TextSearcher searcher, String text)
     {
         final List<Integer> foundIndices = new ArrayList<>();
 
@@ -1434,10 +1435,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return foundIndices.size();
     }
 
-    public void assertTextNotPresent(TextSearcher searcher, String... texts)
+    public static void assertTextNotPresent(TextSearcher searcher, String... texts)
     {
         // Number of characters on either side of found text to include in error message
         final int RANGE = 20;
+        List<String> errors = new ArrayList<>();
 
         TextSearcher.TextHandler handler = new TextSearcher.TextHandler()
         {
@@ -1453,7 +1455,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     String prefix = htmlSource.substring(prefixStart, position);
                     String suffix = htmlSource.substring(position + text.length(), suffixEnd);
 
-                    fail("Text '" + text + "' was present: " + prefix + "[" + text + "]" + suffix);
+                    errors.add("Text '" + text + "' was present: " + prefix + "[" + text + "]" + suffix);
                 }
 
                 return true;
@@ -1461,6 +1463,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         };
 
         searcher.searchForTexts(handler, texts);
+        Assert.assertTrue(String.join("\n", errors), errors.isEmpty());
     }
 
     public void assertTextNotPresent(String... texts)
@@ -2541,7 +2544,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public WebElement findButton(String text, int index)
     {
-        Locator.XPathLocator[] locators = {
+        Locator.XPathLocator locators = Locator.XPathLocator.union(
                 // check for normal labkey button:
                 Locator.lkButton(text).index(index),
                 // check for Ext 4 button:
@@ -2552,11 +2555,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 Locator.button(text).index(index),
                 // check for bootstrap button
                 Locator.bootstrapButton(text).index(index)
-        };
+        );
 
         try
         {
-            return waitForAnyElement(locators);
+            return waitForElement(locators);
         }
         catch (NoSuchElementException notFound)
         {
@@ -2566,7 +2569,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public WebElement findButton(String text)
     {
-        Locator.XPathLocator[] locators = {
+        Locator.XPathLocator locators = Locator.XPathLocator.union(
                 // normal labkey nav button:
                 Locator.lkButton(text),
                 // Ext 4 button:
@@ -2579,11 +2582,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 Locator.gwtButton(text),
                 // bootstrap button
                 Locator.bootstrapButton(text)
-        };
+        );
 
         try
         {
-            return waitForAnyElement(locators);
+            return waitForElement(locators);
         }
         catch (NoSuchElementException tryCaps)
         {
@@ -2602,9 +2605,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     protected WebElement findButtonContainingText(String text)
     {
-        Locator.XPathLocator[] locators = {
+        Locator.XPathLocator locators = Locator.XPathLocator.union(
                 // normal labkey button:
-                Locator.lkButtonContainingText(text),
+                Locator.lkButton().containing(text),
                 // Ext 4 button:
                 Ext4Helper.Locators.ext4ButtonContainingText(text),
                 // Ext 3 button:
@@ -2613,15 +2616,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 Locator.buttonContainingText(text),
                 // check for bootstrap button
                 Locator.bootstrapButton().containing(text)
-        };
+        );
 
         try
         {
-            return waitForAnyElement(locators);
+            return waitForElement(locators);
         }
         catch (NoSuchElementException notFound)
         {
-            throw new NoSuchElementException("No button found containing test " + text, notFound);
+            throw new NoSuchElementException("No button found containing text " + text, notFound);
         }
     }
 
