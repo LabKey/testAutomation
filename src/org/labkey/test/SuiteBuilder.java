@@ -39,8 +39,9 @@ import java.util.Set;
 
 public class SuiteBuilder
 {
-    private static SuiteBuilder _instance = null;
-    private static Map<String, Set<Class>> _suites;
+    private static SuiteBuilder _instance;
+
+    private final Map<String, Set<Class>> _suites;
 
     private SuiteBuilder()
     {
