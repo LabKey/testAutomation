@@ -531,6 +531,7 @@ src/org/labkey/test/components/labkey/LabKeyAlert.java -text
 src/org/labkey/test/components/labkey/PortalTab.java -text
 src/org/labkey/test/components/labkey/ReadOnlyFormItem.java -text
 src/org/labkey/test/components/list/ManageListsGrid.java -text
+src/org/labkey/test/components/pipeline/PipelineTriggerWizard.java -text
 src/org/labkey/test/components/search/SearchBodyWebPart.java -text
 src/org/labkey/test/components/search/SearchForm.java -text
 src/org/labkey/test/components/search/SearchSideWebPart.java -text
