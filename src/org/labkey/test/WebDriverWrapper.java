@@ -1531,9 +1531,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     // Searches only the displayed text in the body of the page, not the HTML source.
     public void assertTextPresentInThisOrder(String... texts)
     {
-        TextSearcher searcher = new TextSearcher(() -> getBodyText());
-        searcher.setSearchTransformer(TextSearcher.TextTransformers.IDENTITY);
-        searcher.setSourceTransformer(TextSearcher.TextTransformers.IDENTITY);
+        TextSearcher searcher = new TextSearcher(this::getBodyText);
         assertTextPresentInThisOrder(searcher, texts);
     }
 

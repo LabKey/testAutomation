@@ -335,7 +335,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         String errorText = waitForElement(Locator.id("errors").withText()).getText();
         assertElementPresent(Locator.tagWithName("form", "login"));
 
-        List<String> missingErrors = getMissingTexts(new TextSearcher(() -> errorText).setSourceTransformer(text -> text), expectedMessages);
+        List<String> missingErrors = getMissingTexts(new TextSearcher(errorText), expectedMessages);
         assertTrue(String.format("Wrong errors.\nExpected: ['%s']\nActual: '%s'", String.join("',\n'", expectedMessages), errorText), missingErrors.isEmpty());
     }
 

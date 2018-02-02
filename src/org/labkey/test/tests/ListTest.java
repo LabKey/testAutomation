@@ -507,8 +507,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test Export");
 
         File tableFile = new DataRegionExportHelper(new DataRegionTable("query", getDriver())).exportText();
-        String tsv = TestFileUtils.getFileContents(tableFile);
-        TextSearcher tsvSearcher = new TextSearcher(() -> tsv).setSearchTransformer(t -> t);
+        TextSearcher tsvSearcher = new TextSearcher(tableFile);
 
         assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
         assertTextNotPresent(tsvSearcher, TEST_DATA[0][0], _listCol4.getLabel());
@@ -608,7 +607,7 @@ public class ListTest extends BaseWebDriverTest
 
         DataRegionExportHelper helper = new DataRegionExportHelper(list);
         File expFile = helper.exportText(ColumnHeaderType.FieldKey, DataRegionExportHelper.TextSeparator.COMMA);
-        TextSearcher srch = new TextSearcher(() -> TestFileUtils.getFileContents(expFile)).setSearchTransformer(t -> t);
+        TextSearcher srch = new TextSearcher(expFile);
         assertTextPresent(srch, LIST_KEY_NAME2 + '/' + _listCol1.getName(),
                 LIST_KEY_NAME2 + '/' + _listCol2.getName(),
                 LIST_KEY_NAME2 + '/' + _listCol4.getName(),

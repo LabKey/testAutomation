@@ -228,7 +228,7 @@ public class MS1Test extends BaseWebDriverTest
 
         DataRegionTable list = new DataRegionTable("query", this);
         File expFile = new DataRegionExportHelper(list).exportText(DataRegionExportHelper.TextSeparator.TAB);
-        TextSearcher tsvSearcher = new TextSearcher(() -> TestFileUtils.getFileContents(expFile)).setSearchTransformer(t -> t);
+        TextSearcher tsvSearcher = new TextSearcher(expFile);
 
         assertTextPresent(tsvSearcher, "K.GAGAFGYFEVTHDITR.Y");
 
@@ -377,7 +377,7 @@ public class MS1Test extends BaseWebDriverTest
         DataRegionExportHelper exportHelper = new DataRegionExportHelper(new DataRegionTable("fv", this));
         File exportFile = exportHelper.exportText(DataRegionExportHelper.TextSeparator.TAB);
         String fileContents = TestFileUtils.getFileContents(exportFile);
-        TextSearcher tsvSearcher = new TextSearcher(() -> fileContents).setSearchTransformer(t -> t);
+        TextSearcher tsvSearcher = new TextSearcher(fileContents);
         assertTextPresent(tsvSearcher, "Scan", "1948", "1585");
 
         //ensure filtering and sorting are still in effect
