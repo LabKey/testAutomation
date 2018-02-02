@@ -16,8 +16,10 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
 
+import java.io.File;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -39,10 +41,17 @@ public class TextSearcher
         this(() -> source);
     }
 
+    public TextSearcher(File source)
+    {
+        this(()-> TestFileUtils.getFileContents(source));
+        if (source.getName().endsWith(".htm") || source.getName().endsWith(".html"))
+            this.searchTransformer = TextTransformers.ENCODE_HTML;
+    }
+
     public TextSearcher(final WebDriverWrapper test)
     {
         this(test::getHtmlSource);
-        this.searchTransformer = TextTransformers.ENCODER;
+        this.searchTransformer = TextTransformers.ENCODE_HTML;
     }
 
     public final TextSearcher setSourceTransformer(Function<String, String> sourceTransformer)
@@ -104,7 +113,7 @@ public class TextSearcher
 
     public static abstract class TextTransformers
     {
-        public static final Function<String, String> ENCODER = BaseWebDriverTest::encodeText;
+        public static final Function<String, String> ENCODE_HTML = BaseWebDriverTest::encodeText;
         public static final Function<String, String> IDENTITY = text -> text;
 
         //Inserts spaces between camel-cased words
@@ -118,7 +127,7 @@ public class TextSearcher
                     sb.append(" ");
                 sb.append(text.charAt(i));
             }
-            return ENCODER.apply(sb.toString());
+            return ENCODE_HTML.apply(sb.toString());
         };
     }
 }
