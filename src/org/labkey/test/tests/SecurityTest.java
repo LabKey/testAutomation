@@ -498,7 +498,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         goToSiteUsers();
 
-        Locator userAccessLink = Locator.xpath("//td[text()='" + userName + "']/..//td/a[contains(@href,'userAccess.view')]");
+        Locator userAccessLink = Locator.xpath("//td[text()='" + userName + "']/..").append(Locator.linkWithText("permissions"));
         boolean isPresent = isElementPresent(userAccessLink);
 
         // If user is not found, filter (in case the user is on the next page)
