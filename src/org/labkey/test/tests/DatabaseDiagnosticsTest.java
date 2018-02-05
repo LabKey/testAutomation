@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.CustomModules;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.DailyB;
@@ -40,7 +41,7 @@ import java.util.TreeMap;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, DailyB.class, DailyC.class, Git.class, CustomModules.class})
+@Category({BVT.class, DailyA.class, DailyB.class, DailyC.class, Git.class, CustomModules.class})
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
     @Override
