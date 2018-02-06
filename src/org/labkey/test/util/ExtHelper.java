@@ -440,6 +440,7 @@ public class ExtHelper
         WebElement comboArrow = Locator.css(".x-form-arrow-trigger").findElement(comboEl);
         _test.click(comboArrow);
         Locator.XPathLocator comboListItem = Locators.comboListItem().withText(selection);
+        _test.scrollIntoView(comboListItem);
         _test.waitAndClick(comboListItem);
         if (_test.isElementPresent(comboListItem))
         {
