@@ -940,7 +940,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return getDisplayName();
     }
 
-    // Return display name that's currently shown in the header
+    // Return display name for the current logged in user (or impersonated user)
     public String getDisplayName()
     {
         return (String)executeScript("return LABKEY.user.displayName");
