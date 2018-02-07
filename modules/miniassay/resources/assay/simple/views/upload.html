@@ -40,6 +40,7 @@
   <tr>
     <td>
       <form id='upload-run-form' enctype='multipart/form-data' method='POST'>
+        <input type="hidden" name="X-LABKEY-CSRF" id="X-LABKEY-CSRF">
         <div id='upload-run-button'></div>
       </form>
     </td>
@@ -56,6 +57,7 @@
 
 <script type="text/javascript">
   LABKEY.requiresScript("FileUploadField.js");
+  document.getElementById("X-LABKEY-CSRF").value = LABKEY.CSRF;
 </script>
 <script type="text/javascript">
 function setDirty(dirty) {
