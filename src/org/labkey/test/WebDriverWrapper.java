@@ -87,6 +87,7 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2771,7 +2772,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         fireEvent(el, SeleniumEvent.focus);
-        if (StringUtils.isEmpty(text))
+        if ("date".equalsIgnoreCase(el.getAttribute("type")))
+        {
+            setFormDateElement(el, text);
+        }
+        else if (StringUtils.isEmpty(text))
         {
             el.clear();
         }
@@ -2788,6 +2793,28 @@ public abstract class WebDriverWrapper implements WrapsDriver
         String elementClass = el.getAttribute("class");
         if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
             fireEvent(el, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
+    }
+
+    public void setFormDateElement(WebElement el, String text)
+    {
+        String inputFormat = "yyyy-MM-dd";
+        String formFormat = "MMddyyyy";
+        SimpleDateFormat inputFormatter = new SimpleDateFormat(inputFormat);
+        SimpleDateFormat formFormatter = new SimpleDateFormat(formFormat);
+        String formDate;
+
+        try
+        {
+            Date date = inputFormatter.parse(text);
+            formDate = formFormatter.format(date);
+        }
+        catch (ParseException e)
+        {
+            throw new IllegalArgumentException("Unable to parse date " + text + ". Format should be " + inputFormat);
+        }
+
+        executeScript("arguments[0].value = ''", el);
+        el.sendKeys(formDate);
     }
 
     /**
