@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import com.google.common.base.Function;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,6 +29,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.SummaryStatisticsHelper;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

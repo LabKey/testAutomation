@@ -16,7 +16,6 @@
 
 package org.labkey.test.util;
 
-import com.google.common.base.Function;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
@@ -42,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
