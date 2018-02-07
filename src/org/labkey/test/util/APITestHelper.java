@@ -166,9 +166,7 @@ public class APITestHelper
                 break;
         }
 
-        org.openqa.selenium.Cookie csrf = WebTestHelper.getCookies(username).get("X-LABKEY-CSRF");
-        if (csrf != null)
-            method.setHeader(csrf.getName(), csrf.getValue());
+        injectCookies(username, method);
 
         try (CloseableHttpClient client = (CloseableHttpClient) WebTestHelper.getHttpClient(username, password))
         {
@@ -191,6 +189,18 @@ public class APITestHelper
             if (response != null)
                 EntityUtils.consumeQuietly(response.getEntity());
         }
+    }
+
+    public static void injectCookies(HttpUriRequest method)
+    {
+        injectCookies(PasswordUtil.getUsername(), method);
+    }
+
+    public static void injectCookies(@NotNull String username, HttpUriRequest method)
+    {
+        org.openqa.selenium.Cookie csrf = WebTestHelper.getCookies(username).get("X-LABKEY-CSRF");
+        if (csrf != null)
+            method.setHeader(csrf.getName(), csrf.getValue());
     }
 
     private void sendRequest(String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch)

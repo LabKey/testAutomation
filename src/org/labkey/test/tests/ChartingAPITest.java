@@ -37,6 +37,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Charting;
+import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -217,6 +218,7 @@ public class ChartingAPITest extends BaseWebDriverTest
         try (CloseableHttpClient httpClient = (CloseableHttpClient)WebTestHelper.getHttpClient())
         {
             method = new HttpPost(url);
+            APITestHelper.injectCookies(method);
             List<NameValuePair> args = new ArrayList<>();
             args.add(new BasicNameValuePair("svg", svgText));
             method.setEntity(new UrlEncodedFormEntity(args));
