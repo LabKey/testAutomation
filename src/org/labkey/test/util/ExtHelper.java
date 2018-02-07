@@ -439,13 +439,14 @@ public class ExtHelper
     {
         WebElement comboArrow = Locator.css(".x-form-arrow-trigger").findElement(comboEl);
         _test.click(comboArrow);
-        Locator.XPathLocator comboListItem = Locators.comboListItem().withText(selection);
+        Locator.XPathLocator comboListItemLoc = Locators.comboListItem().withText(selection);
+        WebElement comboListItem = comboListItemLoc.findWhenNeeded(comboEl).withTimeout(WAIT_FOR_JAVASCRIPT);
         _test.scrollIntoView(comboListItem);
-        _test.waitAndClick(comboListItem);
-        if (_test.isElementPresent(comboListItem))
+        _test.waitAndClick(comboListItemLoc);
+        if (_test.isElementPresent(comboListItemLoc))
         {
             _test.click(comboArrow);
-            _test.waitForElementToDisappear(comboListItem, WAIT_FOR_JAVASCRIPT);
+            _test.waitForElementToDisappear(comboListItemLoc, WAIT_FOR_JAVASCRIPT);
         }
     }
 
