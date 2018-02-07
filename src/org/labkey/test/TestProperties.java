@@ -103,6 +103,11 @@ public abstract class TestProperties
         return "false".equals(System.getProperty("viewCheck", "true"));
     }
 
+    public static boolean isConfigureSecurity()
+    {
+        return "true".equals(System.getProperty("configureSecurity", "false"));
+    }
+
     public static boolean isSystemMaintenanceDisabled()
     {
         return "never".equals(System.getProperty("systemMaintenance"));
