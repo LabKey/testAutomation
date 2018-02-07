@@ -440,7 +440,7 @@ public class ExtHelper
         WebElement comboArrow = Locator.css(".x-form-arrow-trigger").findElement(comboEl);
         _test.click(comboArrow);
         Locator.XPathLocator comboListItemLoc = Locators.comboListItem().withText(selection);
-        WebElement comboListItem = comboListItemLoc.findWhenNeeded(comboEl).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement comboListItem = comboListItemLoc.findWhenNeeded(_test.getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         _test.scrollIntoView(comboListItem);
         _test.waitAndClick(comboListItemLoc);
         if (_test.isElementPresent(comboListItemLoc))
