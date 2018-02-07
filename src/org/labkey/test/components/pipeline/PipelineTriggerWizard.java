@@ -141,12 +141,9 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public PipelineTriggerWizard addCustomParamter(String key, String value, @NotNull Integer index)
     {
-        if (StringUtils.isEmpty(key))
-            throw new IllegalArgumentException("Key cannot be blank.");
-
         elementCache().addCustomParam.click();
-        Input keyInput = new Input(Locator.tagWithAttribute("input", "placeholder", "Name").findElements(this).get(index), getDriver());
-        Input valueInput = new Input(Locator.tagWithAttribute("input", "placeholder", "Value").findElements(this).get(index), getDriver());
+        Input keyInput = new Input(Locator.tagWithAttribute("input", "name", "customParamKey").findElements(this).get(index), getDriver());
+        Input valueInput = new Input(Locator.tagWithAttribute("input", "name", "customParamValue").findElements(this).get(index), getDriver());
 
         keyInput.setValue(key);
         valueInput.setValue(value);
@@ -156,11 +153,7 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public PipelineTriggerWizard removeCustomParameter(@NotNull Integer index)
     {
-        WebElement deleteIcon = Locator.tagWithAttribute("input", "placeholder", "Name")
-                .parent()
-                .followingSibling("div")
-                .child("a")
-                .withClass("removeParamTrigger")
+        WebElement deleteIcon =  Locator.id("extraParams").append(Locator.byClass("removeParamTrigger"))
                 .findElements(this).get(index);
 
         deleteIcon.click();
@@ -170,13 +163,13 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
     public void saveConfiguration()
     {
         goToConfiguration();
-        elementCache().saveButton.click();
+        getWrapper().clickAndWait(elementCache().saveButton);
     }
 
     public void cancelEditing()
     {
         goToConfiguration();
-        elementCache().cancelButton.click();
+        getWrapper().clickAndWait(elementCache().cancelButton);
     }
 
     protected ElementCache newElementCache()
