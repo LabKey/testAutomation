@@ -17,12 +17,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -45,6 +40,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.SimpleHttpResponse;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -305,7 +301,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 //        updateViaFormNoPerms(PROJECT_NAME, pk1, "Haha!", 3);
 
         log("** Trying to delete via form from a different container");
-        deleteViaFormNoPerms(PROJECT_NAME, new int[] { pk1 });
+        deleteFromWrongContainer(PROJECT_NAME, new int[] { pk1 });
 
         log("** Delete via form");
         deleteViaForm(containerPath, new int[] { pk1, pk2});
@@ -535,7 +531,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         });
     }
 
-    public void deleteViaFormNoPerms(String containerPath, int[] pk)
+    public void deleteFromWrongContainer(String containerPath, int[] pk)
     {
         // POST directly to the delete URL since ExternalSchemaTables don't allow container filtering
         // and rows in sub-folders won't be available for deleting via the user interface.
@@ -548,31 +544,12 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             deleteUrl.append("&.select=").append(aPk);
         log("** Deleting via http POST to form action: " + deleteUrl);
 
-        HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpPost method = new HttpPost(deleteUrl.toString());
-        HttpResponse response = null;
+        SimpleHttpResponse response = WebTestHelper.getHttpResponse(deleteUrl.toString(), "POST");
+        int status = response.getResponseCode();
+        String responseBody = response.getResponseBody();
 
-        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
-        {
-            response = client.execute(method, context);
-            int status = response.getStatusLine().getStatusCode();
-
-            assertTrue("Expected success, actual: " + status, (HttpStatus.SC_OK == status));
-
-            String responseBody = WebTestHelper.getHttpResponseBody(response);
-            assertTrue("Expected error message not present", responseBody.contains("The row is from the wrong container."));
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-        finally
-        {
-            if (null != response)
-            {
-                EntityUtils.consumeQuietly(response.getEntity()); // close connection
-            }
-        }
+        assertEquals("Wrong response code. Response: " + responseBody, HttpStatus.SC_OK, status);
+        assertTrue("Expected error message not present (row in wrong container). Response: " + responseBody, responseBody.contains("The row is from the wrong container."));
     }
 
     public void deleteViaForm(String containerPath, int[] pk)
