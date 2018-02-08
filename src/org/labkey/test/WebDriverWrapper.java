@@ -2763,7 +2763,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setFormElement(WebElement el, String text)
     {
-        boolean isFileInput = "file".equals(el.getAttribute("type"));
+        String inputType = el.getAttribute("type");
+
+        boolean isFileInput = "file".equals(inputType);
         if (isFileInput)
         {
             log("DEPRECATED: Use File object to set file input");
@@ -2772,9 +2774,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         fireEvent(el, SeleniumEvent.focus);
-        if ("date".equalsIgnoreCase(el.getAttribute("type")))
+        if (isHtml5InputTypeSupported(inputType))
         {
-            setFormDateElement(el, text);
+            setHtml5Input(el, inputType, text);
+            return;
         }
         else if (StringUtils.isEmpty(text))
         {
@@ -2795,7 +2798,40 @@ public abstract class WebDriverWrapper implements WrapsDriver
             fireEvent(el, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
     }
 
-    public void setFormDateElement(WebElement el, String text)
+    private static final List<String> html5InputTypes = Arrays.asList("color", "date", "datetime-local", "email", "month", "number", "range", "search", "tel", "time", "url", "week");
+    private final Map<String, Boolean> html5InputSupport = new HashMap<>(); // Don't make static. Different tests may run on different browsers
+    private boolean isHtml5InputTypeSupported(String inputType)
+    {
+        if (!html5InputTypes.contains(inputType))
+        {
+            return false;
+        }
+        if (!html5InputSupport.containsKey(inputType))
+        {
+            html5InputSupport.put(inputType,
+                    (Boolean) executeScript(
+                            "var i = document.createElement('input');" +
+                                    "i.setAttribute('type', arguments[0]);" +
+                                    "return i.type !== arguments[0];"
+                            , inputType));
+        }
+        return html5InputSupport.get(inputType);
+    }
+
+    private void setHtml5Input(WebElement el, String inputType, String value)
+    {
+        switch (inputType)
+        {
+            case "date":
+                setHtml5DateInput(el, value);
+                break;
+            default:
+                log(String.format("WARNING: No special handling defined for HTML5 input type = '%s'. Setting value via JavaScript", inputType));
+                setFormElementJS(el, value);
+        }
+    }
+
+    private void setHtml5DateInput(WebElement el, String text)
     {
         String inputFormat = "yyyy-MM-dd";
         String formFormat = "MMddyyyy";
@@ -2835,10 +2871,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
             try
             {
                 selectOptionByText(el,text);
+                log("WARNING: Use selectOptionByText(..) instead of setFormElement(..) for select inputs");
             }
             catch (NoSuchElementException x)
             {
                 selectOptionByValue(el,text);
+                log("WARNING: Use selectOptionByValue(..) instead of setFormElement(..) for select inputs");
             }
         }
         else
