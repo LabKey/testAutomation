@@ -2800,7 +2800,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private static final List<String> html5InputTypes = Arrays.asList("color", "date", "datetime-local", "email", "month", "number", "range", "search", "tel", "time", "url", "week");
     private final Map<String, Boolean> html5InputSupport = new HashMap<>(); // Don't make static. Different tests may run on different browsers
-    private boolean isHtml5InputTypeSupported(String inputType)
+    protected final boolean isHtml5InputTypeSupported(String inputType)
     {
         if (!html5InputTypes.contains(inputType))
         {
@@ -2812,7 +2812,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     (Boolean) executeScript(
                             "var i = document.createElement('input');" +
                                     "i.setAttribute('type', arguments[0]);" +
-                                    "return i.type !== arguments[0];"
+                                    "return i.type === arguments[0];"
                             , inputType));
         }
         return html5InputSupport.get(inputType);
