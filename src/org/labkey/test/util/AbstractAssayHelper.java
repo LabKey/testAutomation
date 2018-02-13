@@ -179,7 +179,7 @@ public abstract class AbstractAssayHelper
         clickManageOption(true, "Set default values", defaults.getMenuText(assayName));
     }
 
-    private void clickManageOption(boolean wait, String ... subMenuLabels)
+    public void clickManageOption(boolean wait, String ... subMenuLabels)
     {
         BootstrapMenu.finder(_test.getDriver()).timeout(WAIT_FOR_JAVASCRIPT)
                 .withButtonText(MANAGE_LINK_TEXT).find().withExpandRetries(1)
