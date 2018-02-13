@@ -190,15 +190,25 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTrue("default selection should be 'Markdown'", select.getFirstSelectedOption().getText().equals("Markdown"));
         assertElementPresent(Locator.tagWithClassContaining("li", "nav-item")
             .withChild(Locator.tagWithClass("a", "nav-link").withText("Source")));
-        assertElementPresent(Locator.tagWithClassContaining("li", "nav-item")
-                .withChild(Locator.tagWithClass("a", "nav-link").withText("Preview")));
+        Locator previewPaneTab = Locator.tagWithClassContaining("li", "nav-item")
+                .withChild(Locator.tagWithClass("a", "nav-link").withText("Preview"));
+        assertElementPresent(previewPaneTab);
         setFormElement(Locator.name("title"), "Markdown is a thing now");
         setFormElement(Locator.id("body"), "# Holy Header, Batman!\n" +
                 "**bold as bold can possibly be**\n" +
                 "\n" +
                 "```var foo = bar.fooValue;```\n" +
                 "\n" +
-                "##List of things I don't like");
+                "## List of things I don't like \n" +
+                "+ hair clogs\n" +
+                "+ stinky feet\n" +
+                "+ internet trolls");
+        // now look at the preview pane
+        previewPaneTab.findWhenNeeded(getDriver()).click();
+        waitForElement(Locator.tagWithText("h2", "List of things I don't like"), 2000);
+        assertElementPresent(Locator.tagWithText("li", "hair clogs"));
+        assertElementPresent(Locator.tagWithText("li", "stinky feet"));
+        assertElementPresent(Locator.tagWithText("li", "internet trolls"));
         clickButton("Submit", 0);
         Window confirmWindow = Window.Window(getDriver()).withTitle("Confirm message formatting").find();
         confirmWindow.clickButton("Yes");
