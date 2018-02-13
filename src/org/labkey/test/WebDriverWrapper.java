@@ -2765,37 +2765,42 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         String inputType = el.getAttribute("type");
 
-        boolean isFileInput = "file".equals(inputType);
-        if (isFileInput)
+        if ("file".equals(inputType))
         {
-            log("DEPRECATED: Use File object to set file input");
+            log("WARNING: Please use File object to set file input");
             setFormElement(el, new File(text));
             return;
         }
 
-        fireEvent(el, SeleniumEvent.focus);
         if (isHtml5InputTypeSupported(inputType))
         {
             setHtml5Input(el, inputType, text);
-            return;
-        }
-        else if (StringUtils.isEmpty(text))
-        {
-            el.clear();
-        }
-        else if (!el.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
-        {
-            el.clear();
-            el.sendKeys(text);
         }
         else
         {
-            setFormElementJS(el, text);
+            setInput(el, text);
+        }
+    }
+
+    private void setInput(WebElement input, String text)
+    {
+        if (StringUtils.isEmpty(text))
+        {
+            input.clear();
+        }
+        else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
+        {
+            input.clear();
+            input.sendKeys(text);
+        }
+        else
+        {
+            setFormElementJS(input, text);
         }
 
-        String elementClass = el.getAttribute("class");
+        String elementClass = input.getAttribute("class");
         if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
-            fireEvent(el, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
+            fireEvent(input, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
     }
 
     private static final List<String> html5InputTypes = Arrays.asList("color", "date", "datetime-local", "email", "month", "number", "range", "search", "tel", "time", "url", "week");
@@ -2818,37 +2823,45 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return html5InputSupport.get(inputType);
     }
 
-    private void setHtml5Input(WebElement el, String inputType, String value)
+    private void setHtml5Input(WebElement input, String inputType, String value)
     {
         switch (inputType)
         {
             case "date":
-                setHtml5DateInput(el, value);
+                setHtml5DateInput(input, value);
+                break;
+            case "password":
+            case "search":
+                setInput(input, value); // These don't require special handling, don't output warning
                 break;
             default:
-                log(String.format("WARNING: No special handling defined for HTML5 input type = '%s'. Setting value via JavaScript", inputType));
-                setFormElementJS(el, value);
+                log(String.format("WARNING: No special handling defined for HTML5 input type = '%s'.", inputType));
+                setInput(input, value);
         }
     }
 
     private void setHtml5DateInput(WebElement el, String text)
     {
         String inputFormat = "yyyy-MM-dd";
-        String formFormat = "MMddyyyy";
         SimpleDateFormat inputFormatter = new SimpleDateFormat(inputFormat);
-        SimpleDateFormat formFormatter = new SimpleDateFormat(formFormat);
-        String formDate;
 
         try
         {
-            Date date = inputFormatter.parse(text);
-            formDate = formFormatter.format(date);
+            setHtml5DateInput(el, inputFormatter.parse(text));
         }
         catch (ParseException e)
         {
             throw new IllegalArgumentException("Unable to parse date " + text + ". Format should be " + inputFormat);
         }
+    }
 
+    private void setHtml5DateInput(WebElement el, Date date)
+    {
+        String formFormat = "MMddyyyy";
+        SimpleDateFormat formFormatter = new SimpleDateFormat(formFormat);
+        String formDate = formFormatter.format(date);
+
+        fireEvent(el, SeleniumEvent.focus);
         executeScript("arguments[0].value = ''", el);
         el.sendKeys(formDate);
     }
