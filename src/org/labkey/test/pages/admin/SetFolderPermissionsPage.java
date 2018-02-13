@@ -58,6 +58,12 @@ public class SetFolderPermissionsPage extends LabKeyPage
         return this;
     }
 
+    public PermissionsPage clickFinishAndConfigurePermissions()
+    {
+        clickButton("Finish And Configure Permissions");
+        return new PermissionsPage(getDriver());
+    }
+
     @Override
     protected Elements newElementCache()
     {

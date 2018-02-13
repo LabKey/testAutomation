@@ -21,6 +21,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.pages.admin.PermissionsPage;
+import org.labkey.test.pages.admin.SetFolderPermissionsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -78,9 +80,9 @@ public class ReportSecurityTest extends ReportTest
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
 
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions(TEST_GROUP, "Reader");
-        clickButton("Save and Finish");
+        PermissionsPage permissionsPage = navBar().goToPermissionsPage();
+        permissionsPage.setPermissions(TEST_GROUP, "Reader");
+        permissionsPage.clickSaveAndFinish();
 
         // give the test group read access to only the DEM-1 dataset
         clickFolder("My Study");

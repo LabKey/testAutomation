@@ -28,12 +28,16 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.util.Arrays;
@@ -42,6 +46,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.NBSP;
+import static org.labkey.test.Locator.name;
 
 @Category({DailyA.class})
 public class MessagesLongTest extends BaseWebDriverTest
@@ -103,12 +108,13 @@ public class MessagesLongTest extends BaseWebDriverTest
     protected void permissionCheck(String permission, boolean readAbility)
     {
         clickProject(PROJECT_NAME);
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.removePermission("Users","Reader");
-        _permissionsHelper.removePermission("Users","Author");
-        _permissionsHelper.removePermission("Users","Editor");
-        _permissionsHelper.setPermissions("Users", permission);
-        _permissionsHelper.exitPermissionsUI();
+        PermissionsPage permissionsPage = navBar().goToPermissionsPage()
+            .removePermission("Users", "Reader")
+            .removePermission("Users","Reader")
+            .removePermission("Users","Author")
+            .removePermission("Users","Editor")
+            .setPermissions("Users", permission);
+        permissionsPage.clickSaveAndFinish();
         impersonate(USER1);
         clickProject(PROJECT_NAME);
         if (readAbility)
@@ -136,11 +142,12 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Open new project, add group, alter permissions");
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
-        _permissionsHelper.createPermissionsGroup("Administrators");
-        _permissionsHelper.setPermissions("Administrators", "Project Administrator");
-        _permissionsHelper.createPermissionsGroup("testers1");
-        _permissionsHelper.assertPermissionSetting("testers1", "No Permissions");
-        _permissionsHelper.exitPermissionsUI();
+        navBar().goToPermissionsPage()
+            .createPermissionsGroup("Administrators")
+            .setPermissions("Administrators", "Project Administrator")
+            .createPermissionsGroup("testers1")
+            .assertPermissionSetting("testers1", "No Permissions")
+            .clickSaveAndFinish();
         _containerHelper.enableModule(PROJECT_NAME, "Dumbster");
 
         enableEmailRecorder();
@@ -176,6 +183,27 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent(EXPIRES1, "<b>first message testing</b>");
         clickButton("Delete Message");
         clickButton("Delete");
+
+        log("Create message using markdown");
+        clickButton( "New");
+        Select select = new Select(Locator.name("rendererType").findElement(getDriver()));
+        assertTrue("default selection should be 'Markdown'", select.getFirstSelectedOption().getText().equals("Markdown"));
+        assertElementPresent(Locator.tagWithClassContaining("li", "nav-item")
+            .withChild(Locator.tagWithClass("a", "nav-link").withText("Source")));
+        assertElementPresent(Locator.tagWithClassContaining("li", "nav-item")
+                .withChild(Locator.tagWithClass("a", "nav-link").withText("Preview")));
+        setFormElement(Locator.name("title"), "Markdown is a thing now");
+        setFormElement(Locator.id("body"), "# Holy Header, Batman!\n" +
+                "**bold as bold can possibly be**\n" +
+                "\n" +
+                "```var foo = bar.fooValue;```\n" +
+                "\n" +
+                "##List of things I don't like");
+        clickButton("Submit", 0);
+        Window confirmWindow = Window.Window(getDriver()).withTitle("Confirm message formatting").find();
+        confirmWindow.clickButton("Yes");
+        assertElementPresent(Locator.tagWithText("h1", "Holy Header, Batman!"));
+        assertElementPresent(Locator.tagWithText("strong", "bold as bold can possibly be"));
 
         log("Check that message with unicode character works");
         clickButton("New");
@@ -403,10 +431,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         // USER1 is now a reader
         log("Test member list");
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.removePermission("Users", "Editor");
-        _permissionsHelper.setPermissions("Users", "Reader");
-        _permissionsHelper.exitPermissionsUI();
+        navBar().goToPermissionsPage()
+            .removePermission("Users", "Editor")
+            .setPermissions("Users", "Reader")
+            .clickSaveAndFinish();
 
         // USER2 is a nobody
         goToSiteUsers();
@@ -553,10 +581,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         _messageUserId = _userHelper.createUser(USER).getUserId().toString();
         goToHome();
         goToProjectHome();
-        _permissionsHelper.createPermissionsGroup(GROUP);
-        _permissionsHelper.setPermissions(GROUP, "Editor");
-//        add
-        _permissionsHelper.addUserToProjGroup(USER, getProjectName(), GROUP);
+        navBar().goToPermissionsPage()
+            .createPermissionsGroup(GROUP)
+            .setPermissions(GROUP, "Editor")
+            .addUserToProjGroup(USER, getProjectName(), GROUP);
         goToProjectHome();
 
         log("Check that Plain Text message works and is added everywhere");

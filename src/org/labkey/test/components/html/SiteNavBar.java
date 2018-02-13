@@ -22,6 +22,8 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.internal.ImpersonateGroupWindow;
 import org.labkey.test.components.internal.ImpersonateRoleWindow;
 import org.labkey.test.components.internal.ImpersonateUserWindow;
+import org.labkey.test.pages.admin.FolderManagementPage;
+import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.AbstractUserHelper;
 import org.openqa.selenium.NoSuchElementException;
@@ -55,6 +57,18 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     public void clickAdminMenuItem(boolean wait, String ... subMenuLabels)
     {
         adminMenu().clickSubMenu(wait, subMenuLabels);
+    }
+
+    public PermissionsPage goToPermissionsPage()
+    {
+        adminMenu().clickSubMenu(true,"Folder", "Permissions");
+        return new PermissionsPage(getDriver());
+    }
+
+    public FolderManagementPage goToFolderManagement()
+    {
+        adminMenu().clickSubMenu(true, "Folder", "Management");
+        return new FolderManagementPage(getDriver());
     }
 
     public void goToModule(String moduleName)
