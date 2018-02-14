@@ -355,10 +355,11 @@ public class Runner extends TestSuite
 
     private static Map<Class, List<String>> specifiedTestMethods = new HashMap<>();
     // Set up only the requested tests
-    private static List<Class> getTestClasses(TestSet testSet, List<String> testNames)
+    private static List<Class> getTestClasses(List<String> testNames)
     {
         Map<String, Class> nameMap = new HashMap<>();
-        for (Class testClass : testSet.getTestList())
+        TestSet allTests = _suites.getAllTests();
+        for (Class testClass : allTests.getTestList())
         {
             String simpleName = testClass.getSimpleName().toLowerCase();
             nameMap.put(simpleName, testClass);
@@ -393,14 +394,14 @@ public class Runner extends TestSuite
             Class testClass = nameMap.get(testClassName.toLowerCase());
             if (testClass == null)
             {
-                System.err.println("Couldn't find test '" + testClassName + "' in suite '" + testSet.name() + "'.  Valid tests are:");
+                System.err.println("Couldn't find test '" + testClassName + "'.  Valid tests are:");
 
-                List<String> sortedTests = testSet.getTestNames();
+                List<String> sortedTests = allTests.getTestNames();
                 Collections.sort(sortedTests);
 
                 for (String c : sortedTests)
                     System.err.println("    " + c);
-                throw new IllegalArgumentException("Couldn't find test '" + testClassName + "' in suite '" + testSet.name() + "'. Check log for details.");
+                throw new IllegalArgumentException("Couldn't find test '" + testClassName + "'. Check log for details.");
             }
             testClasses.add(testClass);
             if (testMethods != null)
@@ -743,23 +744,22 @@ public class Runner extends TestSuite
         }
         catch (Exception e)
         {
+            List<String> sortedSuites = new ArrayList<>(_suites.getSuites());
+            Collections.sort(sortedSuites);
+
             System.err.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
-            for (String suite : _suites.getSuites())
+            for (String suite : sortedSuites)
                 System.err.println("   " + suite);
             throw new IllegalArgumentException("Couldn't find suite '" + suiteName + "'. Check log for details.");
         }
     }
 
-    protected static List<String> getTestNames()
+    protected static List<String> getTestNames(String namesProperty)
     {
-        String testNames = System.getProperty("test");
-        List<String> tests = new ArrayList<>();
-        if (testNames != null && testNames.length() > 0)
-        {
-            String[] testNameArray = testNames.split(",");
-            tests.addAll(Arrays.asList(testNameArray));
-        }
-        return tests;
+        String testNames = StringUtils.trimToNull(namesProperty);
+        return testNames == null
+                ? new ArrayList<>()
+                : new ArrayList<>(Arrays.asList(testNames.split("\\s*,\\s*")));
     }
 
     /** Entry point for Ant JUnit runner. */
@@ -768,7 +768,7 @@ public class Runner extends TestSuite
         try
         {
             final String allTestsSuite = org.labkey.test.categories.Test.class.getSimpleName();
-            List<String> testNames = getTestNames();
+            List<String> testNames = getTestNames(System.getProperty("test"));
             TestSet set;
             final String suiteProperty = System.getProperty("suite");
             if (testNames.isEmpty())
@@ -815,15 +815,23 @@ public class Runner extends TestSuite
         boolean testRecentlyFailed = "true".equals(System.getProperty("testRecentlyFailed"));
         boolean testNewAndModified = "true".equals(System.getProperty("testNewAndModified"));
         String recentlyFailedTestsFile = System.getProperty("teamcity.tests.recentlyFailedTests.file");
+        List<String> additionalTestNames = getTestNames(System.getProperty("addToSuite"));
+        String removeFromSuite = System.getProperty("removeFromSuite");
+        List<String> excludedTestNames = getTestNames(removeFromSuite);
+
+        if (StringUtils.trimToEmpty(removeFromSuite).contains("."))
+        {
+            throw new IllegalArgumentException("It looks like you are trying to prevent an individual test method from executing. That is not currently supported. removeFromSuite=" + removeFromSuite);
+        }
 
         if (cleanOnly && skipClean)
         {
-            throw new RuntimeException("Invalid parameters: cannot specify both 'cleanOnly=true' and 'clean=false'.");
+            throw new IllegalArgumentException("Invalid parameters: cannot specify both 'cleanOnly=true' and 'clean=false'.");
         }
 
         if (!skipLeakCheck && disableAssertions)
         {
-            throw new RuntimeException("Invalid parameters: 'memCheck = true' and 'disableAssertions = true'.  Unable to do leak check with assertions disabled.");
+            throw new IllegalArgumentException("Invalid parameters: 'memCheck = true' and 'disableAssertions = true'.  Unable to do leak check with assertions disabled.");
         }
 
         if (Continue.class.getSimpleName().equalsIgnoreCase(set.getSuite()))
@@ -840,6 +848,14 @@ public class Runner extends TestSuite
         }
         else if (testNames.isEmpty())
         {
+            if (!additionalTestNames.isEmpty())
+            {
+                set.addTests(getTestClasses(additionalTestNames));
+            }
+            if (!excludedTestNames.isEmpty())
+            {
+                set.removeTests(getTestClasses(excludedTestNames));
+            }
             if (shuffleTests)
             {
                 set.randomizeTests();
@@ -863,7 +879,7 @@ public class Runner extends TestSuite
 
         set.prioritizeTest(DatabaseDiagnosticsTest.class, set.getTestList().size() - 1); // Always end with DatabaseDiagnosticsTest (if present)
 
-        List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(set, testNames);
+        List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(testNames);
 
         TestSuite suite = getSuite(testClasses, cleanOnly);
 
@@ -882,6 +898,10 @@ public class Runner extends TestSuite
                 Class testClass = getTestClass(test);
                 _remainingTests.add(testClass);
                 System.out.println("  " + testClass.getSimpleName());
+                for (String testMethod : specifiedTestMethods.getOrDefault(testClass, Collections.emptyList()))
+                {
+                    System.out.println("    ." + testMethod);
+                }
             }
             _testCount = _remainingTests.size();
             writeRemainingTests();

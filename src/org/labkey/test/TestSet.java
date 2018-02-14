@@ -17,6 +17,7 @@
 package org.labkey.test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -32,13 +33,18 @@ public class TestSet
         if (tests == null)
             throw new IllegalArgumentException(suite + " is not a valid test suite");
 
-        _tests = new ArrayList(tests);
+        _tests = new ArrayList<>(tests);
         _suite = suite;
+    }
+
+    public TestSet(Set<Class> tests)
+    {
+        this(tests, "Custom");
     }
 
     TestSet()
     {
-        this(new HashSet<>(), "Custom");
+        this(new HashSet<>());
     }
 
     void setTests(List<Class> tests)
@@ -48,12 +54,26 @@ public class TestSet
 
     void addTests(TestSet tests)
     {
-        _tests.addAll(tests.getTestList());
+        addTests(tests.getTestList());
+    }
+
+    void addTests(Collection<Class> tests)
+    {
+        for (Class test : tests)
+        {
+            if (!_tests.contains(test))
+                _tests.add(test);
+        }
     }
 
     void removeTests(TestSet tests)
     {
-        _tests.removeAll(tests.getTestList());
+        removeTests(tests.getTestList());
+    }
+
+    void removeTests(Collection<Class> tests)
+    {
+        _tests.removeAll(tests);
     }
 
     public String name()

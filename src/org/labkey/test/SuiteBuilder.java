@@ -61,12 +61,10 @@ public class SuiteBuilder
 
     private void loadSuites()
     {
-        List<String> testPackages = new ArrayList<>(Arrays.asList(System.getProperty("test.packages", "org.labkey.test").split("[^0-9A-Za-z\\._]+")));
-        List<String> extraTestPackages = Arrays.asList(System.getProperty("extra.test.packages", "").split("[^0-9A-Za-z\\._]+"));
+        List<String> testPackages = new ArrayList<>(Arrays.asList(System.getProperty("test.packages", "org.labkey.test").split("[^0-9A-Za-z._]+")));
+        List<String> extraTestPackages = Arrays.asList(System.getProperty("extra.test.packages", "").split("[^0-9A-Za-z._]+"));
         testPackages.addAll(extraTestPackages);
         testPackages.removeAll(Arrays.asList("", null));
-
-        Set<Class<?>> tests = new HashSet<>();
 
         FilterBuilder filterBuilder = new FilterBuilder();
         Collection<URL> packageUrls = new HashSet<>();
@@ -79,7 +77,7 @@ public class SuiteBuilder
                 .filterInputsBy(filterBuilder)
                 .setUrls(packageUrls)
                 .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
-        tests.addAll(reflections.getTypesAnnotatedWith(Category.class));
+        Set<Class<?>> tests = new HashSet<>(reflections.getTypesAnnotatedWith(Category.class));
 
         tests.removeIf(clz -> Modifier.isAbstract(clz.getModifiers()));
         _suites.put(Continue.class.getSimpleName(), new HashSet<>()); // Not actually a suite, used to continue interrupted suite
@@ -120,6 +118,11 @@ public class SuiteBuilder
             _suites.put(suiteName, new HashSet<>());
 
         _suites.get(suiteName).add(test);
+    }
+
+    public TestSet getAllTests()
+    {
+        return new TestSet(new HashSet<>(_suites.get(Test.class.getSimpleName())), "All");
     }
 
     public TestSet getTestSet(String suiteName)
