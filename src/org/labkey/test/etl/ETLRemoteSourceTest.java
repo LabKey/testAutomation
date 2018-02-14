@@ -124,7 +124,10 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
         // note we do expect an error in the pipeline log from the above failure
         _etlHelper.checkRun(true /*expect error*/);
         _etlHelper.addTransformResult(TRANSFORM_REMOTE, "1", "COMPLETE", "3");
-        _etlHelper.assertInDatasetTarget1("Subject 1", "Subject 2", "Subject 3");
+        log("Verify basic remote source transform worked");
+        _etlHelper.assertInDatasetTarget1("Subject 1", "Subject 2");
+        log("Verify named parameter override worked");
+        _etlHelper.assertInDatasetTarget1("etlOverride");
         _etlHelper.verifyTransformSummary();
         _etlHelper.verifyTransformHistory(TRANSFORM_REMOTE, TRANSFORM_REMOTE_DESC);
     }

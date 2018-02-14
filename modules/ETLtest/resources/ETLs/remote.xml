@@ -5,7 +5,7 @@
 <transforms>
     <transform type="RemoteQueryTransformStep" id="step1">
         <description>Copy to target</description>
-        <source remoteSource="EtlTest_RemoteConnection" schemaName="study" queryName="etl source" >
+        <source remoteSource="EtlTest_RemoteConnection" schemaName="study" queryName="parameterized" >
             <sourceColumns>
                 <column>ParticipantId</column>
                 <column>date</column>
@@ -19,4 +19,7 @@
     <schedule>
         <poll interval="15s" />
     </schedule>
+    <parameters>
+        <parameter name="myParam" value="etlOverride" type="VARCHAR"/>
+    </parameters>
 </etl>
