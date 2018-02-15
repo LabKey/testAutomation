@@ -18,6 +18,7 @@ package org.labkey.test.pages.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -36,6 +37,12 @@ public class SetFolderPermissionsPage extends LabKeyPage
                 WAIT_FOR_JAVASCRIPT);
     }
 
+    public SetInitialFolderSettingsPage clickNext()
+    {
+        doAndWaitForPageToLoad(() -> newElementCache().nextButton.click());
+        return new SetInitialFolderSettingsPage(getDriver());
+    }
+
     public void clickFinish()
     {
         doAndWaitForPageToLoad(() -> newElementCache().finishButton.click());
@@ -50,10 +57,38 @@ public class SetFolderPermissionsPage extends LabKeyPage
         return this;
     }
 
+    /* this option occurs if the folder is also a project container/ we are creating a project */
+    public SetFolderPermissionsPage setCopyFromExistingProject(String projectToCopy)
+    {
+        RadioButton radio = new RadioButton(Locator.xpath("//td[./label[text()='Copy From Existing Project']]/input")
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
+        radio.set(true);
+
+        waitFor(() ->
+                { // Workaround: erratic combo-box behavior
+                    try{_ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), projectToCopy);}
+                    catch (NoSuchElementException recheck) {return false;}
+
+                    if (!getFormElement(Locator.css("#targetProject input")).equals(projectToCopy))
+                    {
+                        click(Locator.xpath("//table[@id='targetProject']"));
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                },
+                "Failed to select project", WAIT_FOR_JAVASCRIPT);
+
+        return this;
+    }
+
     public SetFolderPermissionsPage setMyUserOnly()
     {
         RadioButton radio = new RadioButton(
-            Locator.xpath("//td[./label[text()='My User Only']]/input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
+            Locator.xpath("//td[./label[text()='My User Only']]/input")
+                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
         radio.set(true);
         return this;
     }
@@ -73,9 +108,8 @@ public class SetFolderPermissionsPage extends LabKeyPage
     private class Elements extends LabKeyPage.ElementCache
     {
         final WebElement finishButton = Locator.lkButton("Finish").findWhenNeeded(this).withTimeout(4000);
+        final WebElement nextButton = Locator.lkButton("Next").findWhenNeeded(this).withTimeout(4000);
 
-        // TODO: Set security configuration to "My User Only"
-        // TODO: "Finish and Configure Permissions"
 
         // See AbstractContainerHelper.createSubfolder for what it supports and replace it
     }

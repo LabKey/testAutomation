@@ -18,6 +18,7 @@ package org.labkey.test.components.api;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.pages.admin.CreateProjectPage;
 import org.labkey.test.pages.admin.CreateSubFolderPage;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
@@ -183,6 +184,13 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         open();
         getWrapper().clickAndWait(elementCache().newSubFolderButton);
         return new CreateSubFolderPage(getDriver());
+    }
+
+    public CreateProjectPage navigateToCreateProjectPage()
+    {
+        open();
+        getWrapper().clickAndWait(elementCache().newProjectButton);
+        return new CreateProjectPage(getDriver());
     }
 
     @Override

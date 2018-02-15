@@ -306,41 +306,16 @@ public class GroupTest extends BaseWebDriverTest
         String projectName = getProject2Name();
 
         ensureAdminMode();
-        log("Creating project with name " + projectName);
-        goToCreateProject();
-        waitForElement(Locator.name("name"));
-        setFormElement(Locator.name("name"), projectName);
-
-        click(Locator.xpath("//td[./label[text()='Custom']]/input"));
-
-        clickButton("Next", defaultWaitForPage);
-
-        //second page of the wizard
-        waitAndClick(Locator.xpath("//td[./label[text()='Copy From Existing Project']]/input"));
-        waitFor(() ->
-                { // Workaround: erratic combo-box behavior
-                    try{_ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());}
-                    catch (NoSuchElementException recheck) {return false;}
-
-                    if (!getFormElement(Locator.css("#targetProject input")).equals(getProjectName()))
-                    {
-                        click(Locator.xpath("//table[@id='targetProject']"));
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                },
-                "Failed to select project", WAIT_FOR_JAVASCRIPT);
-
-        clickButton("Next", defaultWaitForPage);
-
-        //third page of wizard
-        clickButton("Finish", defaultWaitForPage);
+        navBar()
+                .goToCreateProjectPage()
+                .setProjectName(projectName)
+                .setFolderType("Custom")
+                .clickNext()
+                .setCopyFromExistingProject(getProjectName())
+                .clickNext()
+                .clickFinish();
 
         assertUserCanSeeProject(TEST_USERS_FOR_GROUP[1], getProject2Name());
-
         _containerHelper.addCreatedProject(projectName);
     }
 
@@ -354,8 +329,7 @@ public class GroupTest extends BaseWebDriverTest
     protected void assertUserCanSeeProject(String user, String project)
     {
         impersonate(user);
-        openProjectMenu();
-        assertElementPresent(Locator.linkWithText(project));
+        assertTrue(projectMenu().projectLinkExists(project));
         stopImpersonating();
     }
 

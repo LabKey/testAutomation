@@ -22,6 +22,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.internal.ImpersonateGroupWindow;
 import org.labkey.test.components.internal.ImpersonateRoleWindow;
 import org.labkey.test.components.internal.ImpersonateUserWindow;
+import org.labkey.test.pages.admin.CreateProjectPage;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.search.SearchResultsPage;
@@ -69,6 +70,12 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     {
         adminMenu().clickSubMenu(true, "Folder", "Management");
         return new FolderManagementPage(getDriver());
+    }
+
+    public CreateProjectPage goToCreateProjectPage()
+    {
+        adminMenu().clickSubMenu(true, "Site", "Create Project");
+        return new CreateProjectPage(getDriver());
     }
 
     public void goToModule(String moduleName)
