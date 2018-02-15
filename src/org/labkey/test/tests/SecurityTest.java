@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.reader.Readers;
@@ -32,6 +33,7 @@ import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.ConfigureDbLoginPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
@@ -100,6 +102,11 @@ public class SecurityTest extends BaseWebDriverTest
         _containerHelper.deleteProject(getProjectName(), afterTest);
 
         _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER);
+
+        // Make sure the feature is turned off.
+        Connection cn = createDefaultConnection(false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
+
     }
 
     @Test
@@ -114,6 +121,7 @@ public class SecurityTest extends BaseWebDriverTest
         {
             impersonationTest();
             guestTest();
+            disableGuestAccountTest();
             addRemoveSiteAdminTest();
         }
 
@@ -431,6 +439,27 @@ public class SecurityTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         assertElementPresent(Locator.lkButton("New"));
         stopImpersonating();
+    }
+
+    @LogMethod
+    protected void disableGuestAccountTest()
+    {
+        Connection cn = createDefaultConnection(false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", true);
+
+        goToHome();
+        signOut();
+
+        // Validate that the user is shown a login screen.
+        if(!isElementPresent(Locator.tagWithName("form", "login")))
+        {
+            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
+            Assert.fail("Should have seen the sign-in screen, it wasn't there.");
+        }
+
+        signIn();
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
+
     }
 
     @LogMethod
