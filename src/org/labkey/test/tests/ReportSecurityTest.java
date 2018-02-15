@@ -22,7 +22,6 @@ import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.admin.PermissionsPage;
-import org.labkey.test.pages.admin.SetFolderPermissionsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -70,21 +69,22 @@ public class ReportSecurityTest extends ReportTest
         navigateToFolder(getProjectName(), "My Study");
 
         // create a test group and give it container read perms
-        _permissionsHelper.enterPermissionsUI();
+        PermissionsPage permissionsPage = navBar().goToPermissionsPage();
 
-        _permissionsHelper.createPermissionsGroup(TEST_GROUP);
+        permissionsPage.createPermissionsGroup(TEST_GROUP);
 
         // add user to the first test group
-        _permissionsHelper.clickManageGroup(TEST_GROUP);
+        permissionsPage.clickManageGroup(TEST_GROUP);
         setFormElement(Locator.name("names"), TEST_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
 
-        PermissionsPage permissionsPage = navBar().goToPermissionsPage();
+        navBar().goToPermissionsPage();
         permissionsPage.setPermissions(TEST_GROUP, "Reader");
         permissionsPage.clickSaveAndFinish();
 
         // give the test group read access to only the DEM-1 dataset
+        goToProjectHome();
         clickFolder("My Study");
         enterStudySecurity();
 
