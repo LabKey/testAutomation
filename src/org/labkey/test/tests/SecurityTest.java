@@ -41,6 +41,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.UIUserHelper;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -254,7 +255,7 @@ public class SecurityTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            if ("Invalid request. email and/or password are not allowed on the URL.".equalsIgnoreCase(e.getMessage()))
+            if (HttpServletResponse.SC_BAD_REQUEST == e.getStatusCode())
                 rejectedProperly = true;
         }
         catch (IOException e)
