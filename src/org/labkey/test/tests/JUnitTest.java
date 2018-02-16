@@ -55,7 +55,7 @@ public class JUnitTest extends TestSuite
 {
     private static final DecimalFormat commaf0 = new DecimalFormat("#,##0");
 
-    public JUnitTest() throws Exception
+    public JUnitTest()
     {
     }
 
@@ -103,6 +103,13 @@ public class JUnitTest extends TestSuite
         protected String getProjectName() {return null;}
         protected void doCleanup(boolean afterTest) throws TestTimeoutException
         { }
+
+        @Override
+        public void checkErrors()
+        {
+            // Skip error check. JUnitHeader and JUnitFooter will deal with server-side errors
+        }
+
         public List<String> getAssociatedModules() { return null; }
 
         @Override public BrowserType bestBrowser() {return BrowserType.CHROME;}
@@ -215,7 +222,7 @@ public class JUnitTest extends TestSuite
             _remoteClass = remoteClass;
             _timeout = timeout;
 
-            /** Configure to use cookies so that we remember our session ID */
+            /* Configure to use cookies so that we remember our session ID */
             context.setAttribute(HttpClientContext.COOKIE_STORE, new BasicCookieStore());
         }
 
