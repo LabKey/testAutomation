@@ -103,7 +103,7 @@ public class TourEditor extends LabKeyPage
     //index is 1 based
     public void setStep(int index, String step)
     {
-        setFormElement(Locators.getStepTextArea(index), step);
+        _extHelper.setCodeMirrorValue("tour-step" + index, step);
     }
 
     public enum TourMode
@@ -126,6 +126,5 @@ public class TourEditor extends LabKeyPage
         public static Locator descriptionTextArea = Locator.xpath("//textarea[@id='tour-description']");
         public static Locator titleTextArea = Locator.xpath("//input[@id='tour-title']");
         public static Locator getSelectorTextArea(int index) {return Locator.xpath("//input[@id='tour-selector"+index+"']");}
-        public static Locator getStepTextArea(int index) {return Locator.xpath("//textarea[@id='tour-step"+index+"']/../div//textarea");}
     }
 }
