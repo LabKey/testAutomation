@@ -25,6 +25,7 @@ import org.labkey.test.components.internal.ImpersonateUserWindow;
 import org.labkey.test.pages.admin.CreateProjectPage;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.admin.PermissionsPage;
+import org.labkey.test.pages.files.FileContentPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.AbstractUserHelper;
 import org.openqa.selenium.NoSuchElementException;
@@ -76,6 +77,12 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     {
         adminMenu().clickSubMenu(true, "Site", "Create Project");
         return new CreateProjectPage(getDriver());
+    }
+
+    public FileContentPage goToFileContentPage()
+    {
+        goToModule("FileContent");
+        return new FileContentPage(getDriver());
     }
 
     public void goToModule(String moduleName)

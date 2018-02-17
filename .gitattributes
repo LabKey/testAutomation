@@ -613,9 +613,11 @@ src/org/labkey/test/pages/core/admin/FileTransferConfigurationPage.java -text
 src/org/labkey/test/pages/core/admin/LookAndFeelSettingsPage.java -text
 src/org/labkey/test/pages/core/admin/ProjectSettingsPage.java -text
 src/org/labkey/test/pages/core/admin/ShowAdminPage.java -text
+src/org/labkey/test/pages/core/admin/ShowAuditLogPage.java -text
 src/org/labkey/test/pages/core/admin/logger/ManagerPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
 src/org/labkey/test/pages/files/CustomizeFilesWebPartPage.java -text
+src/org/labkey/test/pages/files/FileContentPage.java -text
 src/org/labkey/test/pages/flow/reports/BeginPage.java -text
 src/org/labkey/test/pages/flow/reports/PositivityReportEditorPage.java -text
 src/org/labkey/test/pages/flow/reports/QCReportEditorPage.java -text

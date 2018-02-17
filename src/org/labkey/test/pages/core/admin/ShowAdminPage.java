@@ -74,10 +74,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().analyticsSettingsLink);
     }
 
-    public void clickAuditLog()
+    public ShowAuditLogPage clickAuditLog()
     {
         goToAdminConsoleLinksSection();
         clickAndWait(elementCache().auditLogLink);
+        return new ShowAuditLogPage(getDriver());
     }
 
     public void clickAuthentication()
