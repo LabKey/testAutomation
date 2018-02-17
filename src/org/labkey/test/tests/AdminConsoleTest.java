@@ -136,7 +136,6 @@ public class AdminConsoleTest extends BaseWebDriverTest
                 "running threads",
                 "site validation",
                 "system properties",
-                "test email configuration",
                 "view all site errors",
                 "view all site errors since reset",
                 "view primary site log file");
