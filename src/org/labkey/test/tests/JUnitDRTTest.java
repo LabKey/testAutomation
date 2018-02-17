@@ -16,9 +16,6 @@
 package org.labkey.test.tests;
 
 import junit.framework.TestSuite;
-import org.junit.experimental.categories.Category;
-import org.labkey.test.categories.Base;
-import org.labkey.test.categories.DRT;
 
 import java.util.Map;
 
@@ -26,17 +23,17 @@ import java.util.Map;
  * Created by matthew on 9/11/15.
  */
 
-@Category({DRT.class, Base.class})
+//@Category({DRT.class, Base.class})
 public class JUnitDRTTest
 {
     public static boolean accept(Map<String, Object> test)
     {
-        return "DRT".equals(JUnitTest.getWhen(test));
+        return JUnitTest.getCategories(test).contains("DRT");
     }
 
     public static TestSuite suite() throws Exception
     {
-        return JUnitTest._suite(JUnitDRTTest::accept,0,false);
+        return JUnitTest._suite(JUnitDRTTest::accept);
     }
 }
 

@@ -44,10 +44,9 @@ import org.labkey.test.categories.Continue;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.tests.BasicTest;
 import org.labkey.test.tests.DatabaseDiagnosticsTest;
+import org.labkey.test.tests.JUnitTest;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DevModeOnlyTest;
-import org.labkey.test.util.JUnitFooter;
-import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.NonWindowsTest;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
@@ -424,11 +423,10 @@ public class Runner extends TestSuite
 
     private static void addTests(TestSuite suite, Set<Class> testClasses)
     {
+        boolean foundServerSideTest = false;
         for (Class testClass : testClasses)
         {
             Test test = null;
-            boolean illegalTest = false;
-            Boolean isServerSideTest = false;
             try
             {
                 Method suiteMethod = testClass.getMethod("suite");
@@ -453,30 +451,30 @@ public class Runner extends TestSuite
                 {
                     if (interfaces.contains(PostgresOnlyTest.class) && !("postgres".equals(databaseType) || "pg".equals(databaseType)))
                     {
-                        illegalTest = true;
                         System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
+                        continue;
                     }
                     else if (interfaces.contains(SqlserverOnlyTest.class) && !("sqlserver".equals(databaseType) || "mssql".equals(databaseType)))
                     {
-                        illegalTest = true;
                         System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
+                        continue;
                     }
                 }
 
                 if(interfaces.contains(DevModeOnlyTest.class) && !"true".equals(System.getProperty("devMode")))
                 {
-                    illegalTest = true;
                     System.out.println("** Skipping " + testClass.getSimpleName() + ": server must be in dev mode");
+                    continue;
                 }
                 else if(interfaces.contains(WindowsOnlyTest.class) && !osName.toLowerCase().contains("windows"))
                 {
-                    illegalTest = true;
                     System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + osName);
+                    continue;
                 }
                 else if(interfaces.contains(NonWindowsTest.class) && osName.toLowerCase().contains("windows"))
                 {
-                    illegalTest = true;
                     System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + osName);
+                    continue;
                 }
                 test = new JUnit4TestAdapter(testClass);
 
@@ -546,22 +544,35 @@ public class Runner extends TestSuite
                         throw new IllegalArgumentException("Couldn't find test(s) [" + String.join(", ", unfoundTests) + "] in class '" + testClass.getSimpleName() + "'. Check log for details.");
                     }
                 }
-            }
-            else isServerSideTest = true;
 
-            if (isServerSideTest && !"CONTINUE".equals(System.getProperty("suite")))
-            {
-                // Clear errors and enable dumbster before JUnitTest runs.
-                suite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
-            }
-            if(!illegalTest)
                 suite.addTest(test);
-
-            if (isServerSideTest && !"CONTINUE".equals(System.getProperty("suite")))
-            {
-                // Check for leaks and errors after JUnitTest runs
-                suite.addTest(new JUnit4TestAdapter(JUnitFooter.class));
             }
+            else if (test.countTestCases() > 0)
+            {
+                suite.addTest(test);
+                foundServerSideTest = true;
+            }
+        }
+
+        if (!foundServerSideTest)
+        {
+            // Automatically run server-side tests based on 'suite' parameter
+            // if standard JUnitTest isn't already included
+            List<String> specifiedSuites = getSpecifiedSuites();
+            Set<String> requestedSuites = new HashSet<>();
+            Set<String> excludedSuites = new HashSet<>();
+            for (String specifiedSuite : specifiedSuites)
+            {
+                if (specifiedSuite.startsWith("-"))
+                    excludedSuites.add(specifiedSuite.substring(1));
+                else if (specifiedSuite.startsWith("?"))
+                    requestedSuites.add(specifiedSuite.substring(1));
+                else
+                    requestedSuites.add(specifiedSuite);
+            }
+            TestSuite dynamicSuite = JUnitTest.dynamicSuite(requestedSuites, excludedSuites);
+            if (dynamicSuite.countTestCases() > 0)
+                suite.addTest(dynamicSuite);
         }
     }
 
@@ -702,10 +713,8 @@ public class Runner extends TestSuite
         return result.toString();
     }
 
-    private static TestSet getCompositeTestSet(String suites)
+    private static TestSet getCompositeTestSet(List<String> suitesColl)
     {
-        suites = StringUtils.trimToEmpty(suites);
-        List<String> suitesColl = new ArrayList<>(Arrays.asList(suites.split("\\s*,\\s*")));
         if (suitesColl.isEmpty())
             _suites.getTestSet(DEFAULT_SUITE);
         if (suitesColl.size() == 1)
@@ -754,6 +763,12 @@ public class Runner extends TestSuite
         }
     }
 
+    protected static List<String> getSpecifiedSuites()
+    {
+        String suites = StringUtils.trimToEmpty(System.getProperty("suite"));
+        return new ArrayList<>(Arrays.asList(suites.split("\\s*,\\s*")));
+    }
+
     protected static List<String> getTestNames(String namesProperty)
     {
         String testNames = StringUtils.trimToNull(namesProperty);
@@ -770,15 +785,15 @@ public class Runner extends TestSuite
             final String allTestsSuite = org.labkey.test.categories.Test.class.getSimpleName();
             List<String> testNames = getTestNames(System.getProperty("test"));
             TestSet set;
-            final String suiteProperty = System.getProperty("suite");
+            final List<String> specifiedSuites = getSpecifiedSuites();
             if (testNames.isEmpty())
             {
-                set = getCompositeTestSet(suiteProperty);
+                set = getCompositeTestSet(specifiedSuites);
             }
             else
             {
-                System.out.println("Custom test list specified. Ignoring specified suite(s): " + suiteProperty);
-                set = getCompositeTestSet(allTestsSuite);
+                System.out.println("Custom test list specified. Ignoring specified suite(s): " + specifiedSuites);
+                set = getCompositeTestSet(Collections.singletonList(allTestsSuite));
             }
 
             if (set.getSuite().equalsIgnoreCase(allTestsSuite) && testNames.isEmpty())

@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import junit.framework.AssertionFailedError;
+import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.commons.lang3.StringUtils;
@@ -39,10 +40,13 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.External;
 import org.labkey.test.categories.UnitTests;
+import org.labkey.test.util.JUnitFooter;
+import org.labkey.test.util.JUnitHeader;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -64,11 +68,7 @@ public class JUnitTest extends TestSuite
         return JUnitTest._suite((p) -> true, 0, false);
     }
 
-    /**
-     * @deprecated Use {@link #getCategories(Map)}
-     */
-    @Deprecated
-    public static String getWhen(Map<String,Object> test)
+    private static String getWhen(Map<String,Object> test)
     {
         Object when = test.get("when");
         if (!(when instanceof String) || StringUtils.isBlank((String)when))
@@ -78,13 +78,15 @@ public class JUnitTest extends TestSuite
 
     public static Set<String> getCategories(Map<String,Object> test)
     {
-        Set<String> suiteNames = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
-        suiteNames.add(getWhen(test));
+        Set<String> testCategories = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+        testCategories.add(getWhen(test));
+        if (testCategories.contains("DRT"))
+            testCategories.add("Base"); // Replicate behavior of JUnitDRTTest until we have a better solution
         Object module = test.get("module");
         if (module instanceof String && !StringUtils.isBlank((String)module))
-            suiteNames.add((String)module);
+            testCategories.add((String)module);
 
-        return suiteNames;
+        return testCategories;
     }
 
     // used when writing JUnitTest class name to the remainingTests.txt log file
@@ -103,13 +105,6 @@ public class JUnitTest extends TestSuite
         protected String getProjectName() {return null;}
         protected void doCleanup(boolean afterTest) throws TestTimeoutException
         { }
-
-        @Override
-        public void checkErrors()
-        {
-            // Skip error check. JUnitHeader and JUnitFooter will deal with server-side errors
-        }
-
         public List<String> getAssociatedModules() { return null; }
 
         @Override public BrowserType bestBrowser() {return BrowserType.CHROME;}
@@ -126,7 +121,39 @@ public class JUnitTest extends TestSuite
         helper.unfail();
     }
 
-    public static TestSuite _suite(Predicate<Map<String,Object>> accept, int attempt, boolean performedUpgrade) throws Exception
+    public static TestSuite dynamicSuite(Collection<String> categories, Collection<String> excludedCategories)
+    {
+        try
+        {
+            return _suite(testProps -> {
+                Set<String> testCategories = getCategories(testProps);
+                for (String excludedCategory : excludedCategories)
+                {
+                    if (testCategories.contains(excludedCategory))
+                        return false;
+                }
+                for (String suite : categories)
+                {
+                    if (testCategories.contains(suite))
+                        return true;
+                }
+                return false;
+            });
+        }
+        catch (Exception e)
+        {
+            log("Unable to fetch Remote JUnit tests");
+            e.printStackTrace();
+            return new TestSuite();
+        }
+    }
+
+    public static TestSuite _suite(Predicate<Map<String,Object>> accept) throws Exception
+    {
+        return _suite(accept, 0, false);
+    }
+
+    private static TestSuite _suite(Predicate<Map<String,Object>> accept, int attempt, boolean performedUpgrade) throws Exception
     {
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
@@ -174,6 +201,7 @@ public class JUnitTest extends TestSuite
                     throw new AssertionFailedError("Can't parse or cast json response: " + responseBody);
 
                 Map<String, List<Map<String, Object>>> obj = (Map<String, List<Map<String, Object>>>)json;
+                boolean addedHeader = false;
                 for (Map.Entry<String, List<Map<String, Object>>> entry : obj.entrySet())
                 {
                     String suiteName = entry.getKey();
@@ -187,10 +215,20 @@ public class JUnitTest extends TestSuite
                         if (accept.test(testClass))
                             testsuite.addTest(new RemoteTest(className, timeout));
                     }
+                    if (!addedHeader && testsuite.countTestCases() > 0)
+                    {
+                        remotesuite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
+                        addedHeader = true;
+                    }
                     remotesuite.addTest(testsuite);
                 }
+                if (addedHeader)
+                {
+                    remotesuite.addTest(new JUnit4TestAdapter(JUnitFooter.class));
+                    // Exclude header and footer from count
+                    log("Remote JUnitTest: found " + (remotesuite.countTestCases() - 2) + " tests.");
+                }
 
-                log("Remote JUnitTest: found " + remotesuite.countTestCases() + " tests.");
                 return remotesuite;
             }
             else
