@@ -73,18 +73,7 @@ public class JSONHelper
             fail("Unable to parse response:\n"+actual);
         }
 
-        if (compareElement(expectedJSON, actualJSON))
-        {
-            TestLogger.log("matched json");
-        }
-        else
-        {
-            TestLogger.log("Expected:\n" + expected + "\n");
-            TestLogger.log("Actual:\n" + actual + "\n");
-
-            String diff = Diff.diff(prettyJSON(expectedJSON), prettyJSON(actualJSON));
-            fail(msg + "\n" + diff + "\n");
-        }
+        assertEquals(msg, expectedJSON, actualJSON);
     }
 
     public void assertEquals(String msg, JSONObject expected, JSONObject actual)
@@ -95,10 +84,13 @@ public class JSONHelper
         }
         else
         {
-            TestLogger.log("Expected:\n" + expected.toJSONString() + "\n");
-            TestLogger.log("Actual:\n" + actual.toJSONString() + "\n");
+            String expectedString = prettyJSON(expected);
+            String actualString = prettyJSON(actual);
 
-            String diff = Diff.diff(prettyJSON(expected), prettyJSON(actual));
+            TestLogger.log("Expected:\n" + expectedString + "\n");
+            TestLogger.log("Actual:\n" + actualString + "\n");
+
+            String diff = Diff.diff(expectedString, actualString);
             fail(msg + "\n" + diff + "\n");
         }
     }
