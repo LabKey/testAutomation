@@ -82,7 +82,7 @@ public class JSONHelper
             TestLogger.log("Expected:\n" + expected + "\n");
             TestLogger.log("Actual:\n" + actual + "\n");
 
-            String diff = Diff.diff(expected, actual);
+            String diff = Diff.diff(prettyJSON(expectedJSON), prettyJSON(actualJSON));
             fail(msg + "\n" + diff + "\n");
         }
     }
@@ -98,27 +98,27 @@ public class JSONHelper
             TestLogger.log("Expected:\n" + expected.toJSONString() + "\n");
             TestLogger.log("Actual:\n" + actual.toJSONString() + "\n");
 
-            String diff = Diff.diff(expected.toString(), actual.toString());
+            String diff = Diff.diff(prettyJSON(expected), prettyJSON(actual));
             fail(msg + "\n" + diff + "\n");
         }
     }
 
+    private String prettyJSON(JSONObject o)
+    {
+        return new org.json.JSONObject(o).toString(2);
+    }
+
     public boolean compareMap(Map map1, Map map2)
     {
-/*
-        if (map1.size() != map2.size())
-        {
-            logInfo("Comparison of maps failed: sizes are different: " + map1.size() + " and: " + map2.size());
-            return false;
-        }
-*/
-
         for (Object key : map1.keySet())
         {
             if (map2.containsKey(key))
             {
                 if (!skipElement(String.valueOf(key)) && !compareElement(map1.get(key), map2.get(key)))
+                {
+                    log("Error found in: " + String.valueOf(key), true);
                     return false;
+                }
             }
             else
             {
