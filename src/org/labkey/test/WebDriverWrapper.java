@@ -428,7 +428,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         //We can't seem to get response codes via javascript, so we rely on default titles for error pages
         String title = getDriver().getTitle();
-        if (!title.toLowerCase().contains("error"))
+        if ((!title.toLowerCase().contains("error")) && (!title.toLowerCase().contains("not found")))
             return 200;
 
         Matcher m = LABKEY_ERROR_TITLE_PATTERN.matcher(title);
