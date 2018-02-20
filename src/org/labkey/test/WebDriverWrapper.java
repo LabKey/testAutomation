@@ -421,24 +421,25 @@ public abstract class WebDriverWrapper implements WrapsDriver
         TestLogger.log(str);
     }
 
-    private static final Pattern LABKEY_ERROR_TITLE_PATTERN = Pattern.compile("\\d\\d\\d\\D.*Error.*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern LABKEY_ERROR_TITLE_PATTERN = Pattern.compile("(\\d\\d\\d)\\D.*Error.*", Pattern.CASE_INSENSITIVE);
     private static final Pattern TOMCAT_ERROR_PATTERN = Pattern.compile("HTTP Status\\s*(\\d\\d\\d)\\D");
 
     public int getResponseCode()
     {
         //We can't seem to get response codes via javascript, so we rely on default titles for error pages
         String title = getDriver().getTitle();
-        if ((!title.toLowerCase().contains("error")) && (!title.toLowerCase().contains("not found")))
-            return 200;
 
         Matcher m = LABKEY_ERROR_TITLE_PATTERN.matcher(title);
-        if (m.matches())
-            return Integer.parseInt(title.substring(0, 3));
+        if (m.find())
+            return Integer.parseInt(m.group(1));
 
-        //Now check the Tomcat page. This is going to be unreliable over time
+        //Now check the Tomcat page. This is going to be unreliable over time (known to work for Tomcat 7.0 - 9.0)
         m = TOMCAT_ERROR_PATTERN.matcher(getDriver().getPageSource());
         if (m.find())
             return Integer.parseInt(m.group(1));
+
+        if ((!title.toLowerCase().contains("error")) && (!title.toLowerCase().contains("not found")))
+            log("WARNING: Page appears to be an error page but title doesn't match any know pattern: \"" + title + "\"");
 
         return 200;
     }
