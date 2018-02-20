@@ -28,6 +28,7 @@ import org.labkey.test.WebDriverWrapper;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -134,7 +135,7 @@ public class APIUserHelper extends AbstractUserHelper
     protected void _deleteUsers(boolean failIfNotFound, String... userEmails)
     {
         Map<String, Integer> userIds = getUserIds(Arrays.asList(userEmails), true);
-        for (String userEmail : userEmails)
+        for (String userEmail : new HashSet<>(Arrays.asList(userEmails)))
         {
             Integer userId = userIds.get(userEmail);
             if (failIfNotFound)
