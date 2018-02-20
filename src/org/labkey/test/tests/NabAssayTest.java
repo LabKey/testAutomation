@@ -30,7 +30,6 @@ import org.labkey.test.components.PlateGrid;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
-import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
@@ -519,7 +518,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         // no permission to details page for "ptid 1 C"; it wasn't copied to the study
         beginAt(ptid1c_detailsURL);
-        assertEquals(getResponseCode(), 403);
+        assertEquals(403, getResponseCode());
 
         clickAndWait(Locator.lkButton("Home"));
         stopImpersonating();
