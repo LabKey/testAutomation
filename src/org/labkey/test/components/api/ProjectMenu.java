@@ -99,6 +99,8 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
             navigateToProject(folder);
             return;
         }
+        if (projectName.equals("home"))
+            projectName = "Home";
         open();
         getWrapper().clickAndWait(expandToFolder(projectName, folder));
     }
