@@ -24,10 +24,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.pages.files.WebFilesPage;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
@@ -130,7 +130,7 @@ public class WebDavTest extends BaseWebDriverTest
 
         // make sure the indexer isn't really busy
         waitForIdle();
-        beginAt(testDirectory + "?listing=html");
+        WebFilesPage.beginAt(this, getProjectName());
 
         Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
         List<String> names = _listNames(sardine, testURL);
@@ -233,14 +233,11 @@ public class WebDavTest extends BaseWebDriverTest
 
     private void setEnableWebfiles(boolean enable)
     {
-        Locator enableWebFilesLoc = Locator.name("webfilesEnabled");
         goToProjectHome();
-        goToAdminConsole().clickFiles();
-        if (enable)
-            checkCheckbox(enableWebFilesLoc);
-        else
-            uncheckCheckbox(enableWebFilesLoc);
-        clickButton("Save");
+        goToAdminConsole()
+            .clickFiles()
+            .setEnableWebFiles(enable)
+            .save();
     }
 
     private void waitForIdle()

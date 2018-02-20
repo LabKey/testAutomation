@@ -18,6 +18,7 @@ package org.labkey.test.pages.core.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -61,6 +62,12 @@ public class ConfigureFileSystemAccessPage extends LabKeyPage<ConfigureFileSyste
         return elementCache().siteLevelFileRoot.get();
     }
 
+    public ConfigureFileSystemAccessPage setEnableWebFiles(boolean set)
+    {
+        new Checkbox(elementCache().enableWebFilesCheckbox).set(set);
+        return this;
+    }
+
     public ConfigureFileSystemAccessPage setHomeDirectoryFileRoot(String value)
     {
         elementCache().homeDirectoryFileRoot.set(value);
@@ -85,6 +92,8 @@ public class ConfigureFileSystemAccessPage extends LabKeyPage<ConfigureFileSyste
         protected final Input siteLevelFileRoot = Input.Input(Locator.name("rootPath"), getDriver()).findWhenNeeded(this);
         protected final Input homeDirectoryFileRoot = Input.Input(Locator.name("userRootPath"), getDriver()).findWhenNeeded(this);
 
+        public WebElement enableWebFilesCheckbox = Locator.input("webfilesEnabled")
+                .findWhenNeeded(this).withTimeout(4000);
         // TODO need to add an element and support methods for the summary grid.
     }
 
