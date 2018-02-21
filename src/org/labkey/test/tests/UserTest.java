@@ -29,6 +29,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
@@ -371,39 +372,60 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testRequiredFields()
     {
-        ensureRequiredFieldsSet();
-
-        _userHelper.createUserAndNotify(BLANK_USER);
-        setInitialPassword(BLANK_USER, TEST_PASSWORD);
-
-        goToSiteUsers();
-        clickButton("Change User Properties");
-
-        for (String field : REQUIRED_FIELDS)
-            checkRequiredField(field, true);
-
-        clickButton("Save");
-        clickButton("Change User Properties", defaultWaitForPage);
-
-        for (String field : REQUIRED_FIELDS)
+        try
         {
-            verifyFieldChecked(field);
-            checkRequiredField(field, false);
+            ensureRequiredFieldsSet();
+
+            _userHelper.createUserAndNotify(BLANK_USER);
+            setInitialPassword(BLANK_USER, TEST_PASSWORD);
+
+            goToSiteUsers();
+            clickButton("Change User Properties");
+
+            for (String field : REQUIRED_FIELDS)
+                checkRequiredField(field, true);
+
+            clickButton("Save");
+            clickButton("Change User Properties", defaultWaitForPage);
+
+            for (String field : REQUIRED_FIELDS)
+            {
+                verifyFieldChecked(field);
+                checkRequiredField(field, false);
+            }
+            clickButton("Save", 0);
+            clickButton("Change User Properties", defaultWaitForPage);
+
+            checkRequiredField("FirstName", true);
+            clickButton("Save");
+
+            signOut();
+            attemptSignIn(BLANK_USER, TEST_PASSWORD);
+            waitForElement(Locator.name("quf_FirstName"));
+
+            clickButton("Submit");
+            assertTextPresent("This field is required");
+            setFormElement(Locator.name("quf_FirstName"), "*");
+            clickButton("Submit");
+
+        }finally
+        {
+            // now sign out, and sign in as a user with sufficient privilege to un-set those required fields
+            signOut();
+            signIn();
+
+            // go to Users page, mark 'required fields' as no longer required so other tests aren't affected
+            PropertiesEditor propertiesEditor = ShowUsersPage.beginAt(this, "")
+                .clickChangeUserProperties();
+            for (String field : REQUIRED_FIELDS)
+            {
+                propertiesEditor
+                 .selectField(field).properties()
+                    .selectValidatorsTab()
+                    .required.set(false);
+            }
+            clickButton("Save");
         }
-        clickButton("Save", 0);
-        clickButton("Change User Properties", defaultWaitForPage);
-
-        checkRequiredField("FirstName", true);
-        clickButton("Save");
-
-        signOut();
-        attemptSignIn(BLANK_USER, TEST_PASSWORD);
-        waitForElement(Locator.name("quf_FirstName"));
-
-        clickButton("Submit");
-        assertTextPresent("This field is required");
-        setFormElement(Locator.name("quf_FirstName"), "*");
-        clickButton("Submit");
     }
 
     /**

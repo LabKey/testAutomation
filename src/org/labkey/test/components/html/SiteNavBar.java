@@ -27,6 +27,7 @@ import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.files.FileContentPage;
 import org.labkey.test.pages.search.SearchResultsPage;
+import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.AbstractUserHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -77,6 +78,12 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     {
         adminMenu().clickSubMenu(true, "Site", "Create Project");
         return new CreateProjectPage(getDriver());
+    }
+
+    public ShowUsersPage goToSiteUsersPage()
+    {
+        adminMenu().clickSubMenu(true, "Site", "Site Users");
+        return new ShowUsersPage(getDriver());
     }
 
     public FileContentPage goToFileContentPage()
