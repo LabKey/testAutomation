@@ -99,7 +99,7 @@ public class DumbsterController extends SpringActionController
 
             WriteableAppProps props = AppProps.getWriteableInstance();
             props.setMailRecorderEnabled(form.isRecord());
-            props.save();
+            props.save(getUser());
             return null;
         }
     }
