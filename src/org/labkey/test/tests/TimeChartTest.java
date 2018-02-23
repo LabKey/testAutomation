@@ -79,6 +79,7 @@ public abstract class TimeChartTest extends ReportTest
             _containerHelper.createProject(getProjectName(), null);
 
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null);
+        waitForText("Import Study");
         importStudyFromZip(STUDY_ZIP);
     }
 
