@@ -15,7 +15,9 @@
  */
 package org.labkey.test;
 
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.ConfigureDbLoginPage;
+import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
 
@@ -84,5 +86,23 @@ public class TestScrubber extends ExtraSiteWrapper
         {
             log("Failed to disable login attempt limit after test");
         }
+
+        try
+        {
+            disableFileUploadSetting();
+        }
+        catch (RuntimeException e)
+        {
+            log("Failed to re-enable file Upload after test");
+        }
+    }
+
+    private void disableFileUploadSetting()
+    {
+        ConfigureFileSystemAccessPage.beginAt(this);
+        Checkbox disableCheckBox = new Checkbox(Locator.input("fileUploadDisabled")
+            .findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT));
+        if (disableCheckBox.isChecked())
+            disableCheckBox.uncheck();
     }
 }
