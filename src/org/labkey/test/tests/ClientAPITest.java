@@ -582,6 +582,9 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void emailApiTest()
     {
+        String[] emails = Arrays.copyOf(EMAIL_RECIPIENTS, EMAIL_RECIPIENTS.length + 1);
+        emails[emails.length-1] = "user4@clientapi.test";
+
         clickProject(PROJECT_NAME);
         enableEmailRecorder();
 
@@ -592,10 +595,10 @@ public class ClientAPITest extends BaseWebDriverTest
         assertFalse("api requires message body", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, EMAIL_RECIPIENTS, null, null));
 
         assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_2, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, null));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_3, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, emails, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_2, emails, EMAIL_BODY_PLAIN, null));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_3, emails, null, EMAIL_BODY_HTML));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), null, emails, null, EMAIL_BODY_HTML));
 
         assertFalse("principalId only allowed from a server side script", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"-1", "-2"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
 
