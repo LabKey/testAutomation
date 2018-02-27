@@ -47,6 +47,7 @@ public class APIUserHelper extends AbstractUserHelper
     {
         CreateUserCommand command = new CreateUserCommand(userName);
         command.setSendEmail(sendEmail);
+        command.setParameters(new HashMap<>(Maps.of("skipFirstLogin", true)));
         Connection connection = getWrapper().createDefaultConnection(false);
         try
         {
