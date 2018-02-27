@@ -35,6 +35,7 @@ import org.json.simple.JSONValue;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Runner;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
@@ -140,11 +141,13 @@ public class JUnitTest extends TestSuite
                 return false;
             });
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
             log("Unable to fetch Remote JUnit tests");
-            e.printStackTrace();
-            return new TestSuite();
+            t.printStackTrace();
+            TestSuite testSuite = new TestSuite();
+            testSuite.addTest(new Runner.ErrorTest(JUnitTest.class.getSimpleName(), t));
+            return testSuite;
         }
     }
 

@@ -577,11 +577,11 @@ public class Runner extends TestSuite
     }
 
     // for error reporting
-    private static class ErrorTest extends TestCase
+    public static class ErrorTest extends TestCase
     {
         Throwable t;
 
-        ErrorTest(String name, Throwable t)
+        public ErrorTest(String name, Throwable t)
         {
             super(name);
             this.t = t;
