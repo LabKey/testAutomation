@@ -99,10 +99,13 @@ public class TestScrubber extends ExtraSiteWrapper
 
     private void disableFileUploadSetting()
     {
-        ConfigureFileSystemAccessPage.beginAt(this);
+        ConfigureFileSystemAccessPage fsaPage = ConfigureFileSystemAccessPage.beginAt(this);
         Checkbox disableCheckBox = new Checkbox(Locator.input("fileUploadDisabled")
             .findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT));
         if (disableCheckBox.isChecked())
+        {
             disableCheckBox.uncheck();
+            fsaPage.save();
+        }
     }
 }
