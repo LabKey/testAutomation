@@ -1567,44 +1567,36 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 return "waiting for browser to navigate";
             }
         });
-        executeAsyncScript("" +
-                "try " +
-                "{" +
-                "  jQuery.onReady(callback);" +
-                "}" +
-                "catch(e)" +
-                "{" +
-                "  callback();" +
-                "}");
-        executeAsyncScript("" +
-                "try " +
-                "{" +
-                "  Ext.onReady(callback);" +
-                "}" +
-                "catch(e)" +
-                "{" +
-                "  callback();" +
-                "}");
-        executeAsyncScript("" +
-                "try " +
-                "{" +
-                "  Ext4.onReady(callback);" +
-                "}" +
-                "catch(e)" +
-                "{" +
-                "  callback();" +
-                "}");
-        executeAsyncScript("" +
-                "try " +
-                "{" +
-                "  LABKEY.Utils.onReady(callback);" +
-                "}" +
-                "catch(e)" +
-                "{" +
-                "  callback();" +
-                "}");
+        waitForOnReady("jQuery");
+        waitForOnReady("Ext");
+        waitForOnReady("Ext4");
+        waitForOnReady("LABKEY.Utils");
         mouseOut();
         _testTimeout = false;
+    }
+
+    /**
+     * Wait for JavaScript API's onReady
+     * @param apiName Will return when {apiName}.onReady calls the callback
+     */
+    private void waitForOnReady(String apiName)
+    {
+        try
+        {
+            executeAsyncScript("" +
+                    "try " +
+                    "{" +
+                    apiName + ".onReady(callback);" +
+                    "}" +
+                    "catch(e)" +
+                    "{" +
+                    "  callback();" +
+                    "}");
+        }
+        catch (TimeoutException e)
+        {
+            throw new RuntimeException("Timed out waiting for " + apiName + ".onReady(). Check server log for JavaScript errors.", e);
+        }
     }
 
     public long doAndWaitForPageToLoad(Runnable func)
