@@ -1,6 +1,5 @@
 package org.labkey.test.components.pipeline;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
@@ -15,9 +14,9 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
     final WebElement _el;
     final WebDriver _driver;
 
-    public PipelineTriggerWizard(WebElement element, WebDriver driver)
+    public PipelineTriggerWizard(WebDriver driver)
     {
-        _el = element;
+        _el = Locator.tagWithId("form", "pipelineForm").findWhenNeeded(driver);
         _driver = driver;
     }
 
