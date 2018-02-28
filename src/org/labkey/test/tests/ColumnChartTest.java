@@ -24,6 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.ColumnChartComponent;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.CustomizeView;
@@ -37,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Category({DailyB.class})
+@Category({DailyB.class, Hosting.class})
 public class ColumnChartTest extends BaseWebDriverTest
 {
     public static final String LANGUAGE_COLUMN_NAME = "Language";

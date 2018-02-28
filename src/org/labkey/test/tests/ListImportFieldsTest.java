@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.categories.Hosting;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -37,7 +38,7 @@ import java.util.Map;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, Data.class})
+@Category({DailyA.class, Data.class, Hosting.class})
 public class ListImportFieldsTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "List Import Fields Test";

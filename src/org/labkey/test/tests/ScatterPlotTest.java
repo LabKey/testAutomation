@@ -22,6 +22,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Hosting;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartTypeDialog;
@@ -49,7 +50,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 import static org.labkey.test.components.ext4.Window.Window;
 
-@Category({DailyC.class, Reports.class, Charting.class})
+@Category({DailyC.class, Reports.class, Charting.class, Hosting.class})
 public class ScatterPlotTest extends GenericChartsTest
 {
     protected static final String DEVELOPER_USER = "developer_user1@report.test";

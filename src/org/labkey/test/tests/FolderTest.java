@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.FolderManagementFolderTree;
 import org.labkey.test.pages.admin.FolderManagementPage;
@@ -41,7 +42,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyB.class})
+@Category({DailyB.class, Hosting.class})
 public class FolderTest extends BaseWebDriverTest
 {
     private static String secondProject = "FolderTestProject2";

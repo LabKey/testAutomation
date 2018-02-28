@@ -20,6 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Hosting;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartTypeDialog;
@@ -33,7 +34,7 @@ import org.labkey.test.util.LogMethod;
 
 import java.net.URL;
 
-@Category({DailyC.class, Reports.class, Charting.class})
+@Category({DailyC.class, Reports.class, Charting.class, Hosting.class})
 public class BarPlotTest extends GenericChartsTest
 {
     private final String PREG_TEST_RESULTS = "17a. Preg. test result";

@@ -31,6 +31,7 @@ import org.labkey.test.categories.Base;
 import org.labkey.test.categories.DRT;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Git;
+import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.WebPart;
 import org.labkey.test.util.UIContainerHelper;
@@ -46,7 +47,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({Base.class, DRT.class, BVT.class, DailyA.class, Git.class})
+@Category({Base.class, DRT.class, BVT.class, DailyA.class, Git.class, Hosting.class})
 public class BasicTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "BasicVerifyProject";
