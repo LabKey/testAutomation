@@ -20,6 +20,12 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         _driver = driver;
     }
 
+    @Deprecated
+    public PipelineTriggerWizard(WebElement element, WebDriver driver)
+    {
+        this(driver);
+    }
+
     @Override
     public WebElement getComponentElement()
     {
