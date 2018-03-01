@@ -1,0 +1,50 @@
+import org.labkey.gradle.task.ModuleDistribution
+import org.labkey.gradle.util.BuildUtils
+import org.labkey.gradle.util.GroupNames
+import org.labkey.gradle.plugin.Distribution
+
+apply plugin: 'org.labkey.distribution'
+
+dist.description = "Distribution that includes all modules, for use in the continuous integration LabKey Server instance"
+
+project.task(
+        "distribution",
+        group: GroupNames.DISTRIBUTION,
+        description: "Make a LabKey modules distribution for 'test'",
+        type: ModuleDistribution,
+        {ModuleDistribution dist ->
+            dist.subDirName = "test"
+            dist.includeTarGZArchive=true
+            dist.extraFileIdentifier='-test'
+            dist.versionPrefix='Test'
+        }
+)
+
+if (project.hasProperty('inheritedDistPath'))
+{
+    String inheritedDistPath = project.property('inheritedDistPath')
+    project.logger.info("inheriting from distribution ${inheritedDistPath}")
+    Distribution.inheritDependencies(project, inheritedDistPath)
+    BuildUtils.addModuleDistributionDependencies(project, [":server:modules:dumbster"])
+    def split = inheritedDistPath.split(":")
+    String inheritedDistName = split[split.length - 1]
+    tasks.distribution.subDirName = "test/" + inheritedDistName
+    tasks.distribution.versionPrefix = "Test_" + inheritedDistName
+}
+else
+{
+    List pathList = []
+    project.rootProject.allprojects.each {
+        Project otherProject ->
+            if (otherProject != project && otherProject.getPlugins().findPlugin(Distribution.class) == null)
+            {
+                project.evaluationDependsOn(otherProject.path)
+                if (otherProject.plugins.hasPlugin('org.labkey.module') || 
+                    otherProject.plugins.hasPlugin('org.labkey.fileModule') ||
+                    otherProject.plugins.hasPlugin('org.labkey.javaModule'))
+                    pathList += otherProject.path
+            }
+    }
+    BuildUtils.addModuleDistributionDependencies(project, pathList)
+}
+
