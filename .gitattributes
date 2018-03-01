@@ -55,7 +55,7 @@ data/api/webdavTest.js -text
 data/api/workbookAPITest.html -text
 data/filenames/README -text
 data/filenames/illegal_chars.tar.gz -text
-distribution/build.gradle -text
+distributions/teamcity/build.gradle -text
 /gradle.properties -text
 modules/ETLtest/module.properties -text
 modules/ETLtest/resources/ETLs/AutoIncrementListAToListB_truncate.xml -text
