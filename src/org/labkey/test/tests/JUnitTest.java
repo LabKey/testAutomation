@@ -156,21 +156,19 @@ public class JUnitTest extends TestSuite
         return _suite(accept, 0, false);
     }
 
-    private static TestSuite _suite(Predicate<Map<String,Object>> accept, int attempt, boolean performedUpgrade) throws Exception
+    private static TestSuite _suite(Predicate<Map<String,Object>> accept, final int attempt, final boolean performedUpgrade) throws Exception
     {
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
         try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
         {
-            String url = WebTestHelper.getBaseURL() + "/junit/testlist.view?";
+            final String url = WebTestHelper.getBaseURL() + "/junit/testlist.view?";
             HttpGet method = new HttpGet(url);
             response = client.execute(method, context);
             int status = response.getStatusLine().getStatusCode();
             if (status == HttpStatus.SC_OK)
             {
-                TestSuite remotesuite = new JUnitTest();
-
-                String responseBody = WebTestHelper.getHttpResponseBody(response);
+                final String responseBody = WebTestHelper.getHttpResponseBody(response);
                 if (responseBody.isEmpty())
                     throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
@@ -195,14 +193,31 @@ public class JUnitTest extends TestSuite
                             throw new AssertionFailedError("Failed to update or bootstrap on second attempt: " + responseBody);
 
                         // perform upgrade then try to fetch the list again
-                        upgradeHelper();
-                        return _suite(accept, attempt + 1, true);
+                        Throwable upgradeError = null;
+                        try
+                        {
+                            upgradeHelper();
+                        }
+                        catch (Throwable t)
+                        {
+                            upgradeError = t;
+                        }
+                        TestSuite testSuite = _suite(accept, attempt + 1, true);
+
+                        if (upgradeError != null)
+                        {
+                            // Remember and log errors from bootstrap and upgrade but don't fail out immediately
+                            testSuite.addTest(new Runner.ErrorTest(responseBody.contains("first time logging in") ? "ServerBootstrap" : "ServerUpgrade", upgradeError));
+                        }
+
+                        return testSuite;
                     }
                 }
 
                 if (json == null || !(json instanceof Map))
                     throw new AssertionFailedError("Can't parse or cast json response: " + responseBody);
 
+                TestSuite remotesuite = new JUnitTest();
                 Map<String, List<Map<String, Object>>> obj = (Map<String, List<Map<String, Object>>>)json;
                 boolean addedHeader = false;
                 for (Map.Entry<String, List<Map<String, Object>>> entry : obj.entrySet())
