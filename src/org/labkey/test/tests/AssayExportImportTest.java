@@ -339,7 +339,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
     @Test
     public void validateImportingFileUsingFilesWebPart()
     {
-        final String OPERATOR_EMAIL_01 = "john.doe@AssayExportImportTest.com";
+        final String OPERATOR_EMAIL_01 = "john.doe@AssayExportImport.test";
         final String INSTRUMENT_NAME_01 = "ABC Reader";
         final String INSTRUMENT_SETTING_01 = "456";
         final String COMMENT_BASIC_01 = "This is a comment for run where the data was imported by the FileWeb Part. This is for run: ";
@@ -436,7 +436,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
     @Test
     public void validateImportingFileUsingRunProperties()
     {
-        final String OPERATOR_EMAIL_02 = "jane.doe@AssayExportImportTest.com";
+        final String OPERATOR_EMAIL_02 = "jane.doe@AssayExportImport.test";
         final String INSTRUMENT_NAME_02 = "XYZ Reader";
         final String INSTRUMENT_SETTING_02 = "890";
         final String COMMENT_BASIC_02 = "This is a comment for run where the data was imported in the Run Details. This is for run: ";
