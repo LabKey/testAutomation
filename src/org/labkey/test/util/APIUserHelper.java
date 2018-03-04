@@ -47,7 +47,11 @@ public class APIUserHelper extends AbstractUserHelper
     {
         CreateUserCommand command = new CreateUserCommand(userName);
         command.setSendEmail(sendEmail);
-        command.setParameters(new HashMap<>(Maps.of("skipFirstLogin", true)));
+        if (!sendEmail)
+        {
+            // Make sure new account notification still works without this flag
+            command.setParameters(new HashMap<>(Maps.of("skipFirstLogin", true)));
+        }
         Connection connection = getWrapper().createDefaultConnection(false);
         try
         {
