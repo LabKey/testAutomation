@@ -438,7 +438,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (m.find())
             return Integer.parseInt(m.group(1));
 
-        if ((!title.toLowerCase().contains("error")) && (!title.toLowerCase().contains("not found")))
+        if (title.toLowerCase().contains("error") || title.toLowerCase().contains("not found"))
             log("WARNING: Page appears to be an error page but title doesn't match any know pattern: \"" + title + "\"");
 
         return 200;
