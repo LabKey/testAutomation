@@ -24,6 +24,7 @@ if (project.hasProperty('inheritedDistPath'))
 {
     String inheritedDistPath = project.property('inheritedDistPath')
     project.logger.info("inheriting from distribution ${inheritedDistPath}")
+    project.evaluationDependsOn(inheritedDistPath)
     Distribution.inheritDependencies(project, inheritedDistPath)
     BuildUtils.addModuleDistributionDependencies(project, [":server:modules:dumbster"])
     def split = inheritedDistPath.split(":")
