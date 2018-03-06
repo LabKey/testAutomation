@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserCommand;
@@ -43,15 +44,23 @@ public class APIUserHelper extends AbstractUserHelper
     }
 
     @Override
-    public CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess)
+    public CreateUserResponse createUser(final String userName, final boolean sendEmail, final boolean verifySuccess)
     {
-        CreateUserCommand command = new CreateUserCommand(userName);
-        command.setSendEmail(sendEmail);
-        if (!sendEmail)
+        CreateUserCommand command = new CreateUserCommand(userName)
         {
-            // Make sure new account notification still works without this flag
-            command.setParameters(new HashMap<>(Maps.of("skipFirstLogin", true)));
-        }
+            @Override
+            public JSONObject getJsonObject()
+            {
+                JSONObject jsonObject = super.getJsonObject();
+                if (!sendEmail)
+                {
+                    // Make sure new account notification still works without this flag
+                    jsonObject.put("skipFirstLogin", true);
+                }
+                return jsonObject;
+            }
+        };
+        command.setSendEmail(sendEmail);
         Connection connection = getWrapper().createDefaultConnection(false);
         try
         {
