@@ -70,6 +70,11 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
+    public String getBaseServerUrl()
+    {
+        return elementCache().baseServerUrl.get();
+    }
+
     public CustomizeSitePage setContainerRelativeUrl(boolean enable)
     {
         elementCache().containerRelativeUrl.set(enable);
