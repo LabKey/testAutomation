@@ -18,6 +18,7 @@ package org.labkey.test;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
@@ -1806,7 +1807,26 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     final File[] files = downloadDir.listFiles(tempFilesFilter);
                     return files != null && files.length == 0;
                 },
-                "Temp files remain after download: " + downloadDir.toString(), WAIT_FOR_JAVASCRIPT);
+                "Temp files remain in download dir: " + downloadDir.toString(), WAIT_FOR_JAVASCRIPT);
+
+        MutableInt downloadSize = new MutableInt(-1);
+        MutableInt stabilityDuration = new MutableInt(0);
+        waitFor(() -> {
+                    int previousSize = downloadSize.getValue();
+                    downloadSize.setValue(0);
+                    final File[] files = downloadDir.listFiles(newFileFilter);
+
+                    for (File file : files)
+                        downloadSize.add(file.length());
+
+                    if (downloadSize.getValue() == previousSize)
+                        stabilityDuration.increment();
+                    else
+                        stabilityDuration.setValue(0);
+
+                    return stabilityDuration.getValue() > 5;
+                },
+                "File(s) didn't finish downloading to " + downloadDir.toString(), WAIT_FOR_JAVASCRIPT);
 
         File[] newFiles = downloadDir.listFiles(newFileFilter);
 
