@@ -55,7 +55,6 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
-import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
@@ -505,32 +504,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 //        return RuleChain.outerRule(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
     }
 
-    @Deprecated
-    protected boolean setIsBootstrapWhitelisted(boolean addMeToWhitelist)
-    {
-        return true;
-    }
-
-    private static boolean securityConfigured = false;
-    private void configureSecurity()
-    {
-        if (!securityConfigured && TestProperties.isConfigureSecurity())
-        {
-            goToAdminConsole()
-                    .clickSiteSettings()
-                    .setCSRFCheck(CustomizeSitePage.CSRFCheck.POST)
-                    .save();
-            securityConfigured = true;
-        }
-    }
-
     private void doPreamble()
     {
         signIn();
 
         // Start logging JS errors.
         resumeJsErrorChecker();
-        configureSecurity();
 
         resetErrors();
         assertModulesAvailable(getAssociatedModules());
