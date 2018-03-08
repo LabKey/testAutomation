@@ -168,15 +168,10 @@ public class FileBrowserHelper extends WebDriverWrapper
         final Checkbox checkbox = Ext4Checkbox().locatedBy(Locators.gridRowCheckbox(fileName)).find(getDriver());
 
         // Check the box if it is not checked and should be or if if it is checked and it should not be.
-        if((!checkbox.isChecked()) && (checkTheBox))
+        if (checkbox.isChecked() != checkTheBox)
         {
             scrollIntoView(checkbox.getComponentElement());
-            doAndWaitForPageSignal(checkbox::check, IMPORT_SIGNAL_NAME);
-        }
-        else if((checkbox.isChecked()) && (!checkTheBox))
-        {
-            scrollIntoView(checkbox.getComponentElement());
-            doAndWaitForPageSignal(checkbox::uncheck, IMPORT_SIGNAL_NAME);
+            doAndWaitForPageSignal(() -> checkbox.set(checkTheBox), IMPORT_SIGNAL_NAME);
         }
     }
 
