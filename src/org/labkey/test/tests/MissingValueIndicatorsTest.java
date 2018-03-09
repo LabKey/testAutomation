@@ -451,7 +451,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickTab("Clinical and Assay Data");
         waitAndClickAndWait(Locator.linkWithText("MVAssay"));
         assertMvIndicatorPresent();
-        testMvFiltering(); //TODO: Uncomment once Issue # 31995 is fixed
+        testMvFiltering();
     }
 
     private void assertMvIndicatorPresent()
