@@ -492,6 +492,12 @@ public class DataRegionTable extends DataRegion
         return ImmutableList.copyOf(_columnNames);
     }
 
+    public String getColumnTitle(String columnName)
+    {
+        WebElement columnHeader = elementCache().getColumnHeader(columnName);
+        return columnHeader.getAttribute("title");
+    }
+
     @NotNull
     public List<String> getColumnDataAsText(int col)
     {
