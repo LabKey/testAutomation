@@ -129,7 +129,7 @@ import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBO
 public abstract class WebDriverWrapper implements WrapsDriver
 {
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
-    public final static int WAIT_FOR_PAGE = 30000;
+    public final static int WAIT_FOR_PAGE = 60000;
 
     protected boolean _testTimeout = false;
 
