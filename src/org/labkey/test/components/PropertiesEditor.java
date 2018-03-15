@@ -31,6 +31,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.labkey.test.util.ExtHelper;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -607,7 +608,7 @@ public class PropertiesEditor extends WebPartPanel
                 getWrapper().waitAndClick(500 * attempt, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
                 log(".. selected");
             }
-            catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
+            catch (NoSuchElementException | StaleElementReferenceException retry) // Workaround: sometimes fails on slower machines
             {
                 // Stop after 4 attempts
                 if (attempt >= 4)
