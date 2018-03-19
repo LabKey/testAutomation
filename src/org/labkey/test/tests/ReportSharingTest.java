@@ -122,7 +122,7 @@ public class ReportSharingTest extends BaseWebDriverTest
 
         // open new report from view and attempt to share it
         goToContainersReport(REPORT_NAME_FOR_FAIL_SHARE);
-        shareReportAndConfirm(USER_NON_EDITOR, "User does not have permissions to this container: labkey_non_editor@reportsharing.test");
+        shareReportAndConfirm(USER_NON_EDITOR, "User does not have permissions to this folder: labkey_non_editor@reportsharing.test");
     }
 
     private void goToContainersReport(String reportName)
