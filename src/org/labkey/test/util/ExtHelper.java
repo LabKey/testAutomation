@@ -438,7 +438,7 @@ public class ExtHelper
     public void selectComboBoxItem(WebElement comboEl, @LoggedParam String selection)
     {
         WebElement comboArrow = Locator.css(".x-form-arrow-trigger").findElement(comboEl);
-        _test.click(comboArrow);
+        comboArrow.click();
         Locator.XPathLocator comboListItemLoc = Locators.comboListItem().withText(selection);
         WebElement comboListItem = comboListItemLoc.findWhenNeeded(_test.getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         _test.scrollIntoView(comboListItem);
