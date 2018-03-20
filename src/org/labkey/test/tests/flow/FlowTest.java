@@ -30,6 +30,7 @@ import org.labkey.test.components.flow.FlowReportsWebpart;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.flow.reports.QCReportEditorPage;
 import org.labkey.test.pages.flow.reports.ReportEditorPage;
+import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserHelper;
@@ -228,6 +229,11 @@ public class FlowTest extends BaseFlowTest
 
         clickButton("edit");
         confirmKeywordValue(newNameTestDup, "original");
+
+        String flow_keyword_events = "Flow events";
+        AuditLogTest.verifyAuditEvent(this, flow_keyword_events, "File", "91747.fcs", 10);
+        AuditLogTest.verifyAuditEvent(this, flow_keyword_events, "OldValue", "Well_002", 10);
+        AuditLogTest.verifyAuditEvent(this, flow_keyword_events, "NewValue", "FlowTest Keyword Tube Name", 10);
 
     }
 
