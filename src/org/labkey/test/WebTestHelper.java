@@ -169,12 +169,15 @@ public class WebTestHelper
 
     public static String stripContextPath(String url)
     {
-        String root = getContextPath() + "/";
-        int rootLoc = url.indexOf(root);
-        int endOfAction = url.indexOf("?");
-        if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
-            url = url.substring(rootLoc + root.length());
-        else if (url.indexOf("/") == 0)
+        if (!getContextPath().isEmpty())
+        {
+            String root = getContextPath() + "/";
+            int rootLoc = url.indexOf(root);
+            int endOfAction = url.indexOf("?");
+            if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
+                url = url.substring(rootLoc + root.length());
+        }
+        if (url.indexOf("/") == 0)
             url = url.substring(1);
         return url;
     }

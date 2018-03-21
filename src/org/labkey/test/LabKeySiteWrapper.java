@@ -934,7 +934,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public boolean disableMiniProfiler()
     {
         boolean restoreMiniProfiler = isMiniProfilerEnabled();
-        setMiniProfilerEnabled(false);
+        if (restoreMiniProfiler)
+            setMiniProfilerEnabled(false);
         return restoreMiniProfiler;
     }
 
@@ -953,9 +954,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 return (Boolean)data.get("enabled");
             }
         }
-        catch (IOException | CommandException e)
+        catch (IOException e)
         {
             throw new RuntimeException("Failed to get mini-profiler enabled state", e);
+        }
+        catch (CommandException e)
+        {
+            TestLogger.log("Unable to get miniProfiler state. Ignoring: " + e.getStatusCode());
         }
 
         return false;
