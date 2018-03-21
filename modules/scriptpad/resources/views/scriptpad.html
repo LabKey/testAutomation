@@ -9,6 +9,7 @@
 </div>
 
 <script type="text/javascript">
+LABKEY.requiresExt4ClientAPI(function() {
     function preparePage()
     {
         document.getElementById('divOutput').innerHTML = "";
@@ -335,4 +336,5 @@
             });
         });
     }, this);
+})
 </script>
