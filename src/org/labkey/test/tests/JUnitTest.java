@@ -164,7 +164,21 @@ public class JUnitTest extends TestSuite
         {
             final String url = WebTestHelper.getBaseURL() + "/junit/testlist.view?";
             HttpGet method = new HttpGet(url);
-            response = client.execute(method, context);
+            try
+            {
+                response = client.execute(method, context);
+            }
+            catch (IOException ex)
+            {
+                if (attempt < 3 && !performedUpgrade)
+                    return _suite(accept, attempt + 1, performedUpgrade);
+                else
+                {
+                    TestSuite failsuite = new JUnitTest();
+                    failsuite.addTest(new Runner.ErrorTest("FetchTestList", ex));
+                    return failsuite;
+                }
+            }
             int status = response.getStatusLine().getStatusCode();
             if (status == HttpStatus.SC_OK)
             {
