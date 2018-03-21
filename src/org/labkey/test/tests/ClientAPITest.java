@@ -40,6 +40,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -48,6 +49,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.JavascriptExecutor;
@@ -72,11 +74,16 @@ import static org.junit.Assert.fail;
 public class ClientAPITest extends BaseWebDriverTest
 {
     public WikiHelper _wikiHelper = new WikiHelper(this);
+    public StudyHelper _studyHelper = new StudyHelper(this);
 
     private static final String PROJECT_NAME = "ClientAPITestProject";
     private static final String OTHER_PROJECT = "OtherClientAPITestProject"; // for cross-project query test
     protected static final String FOLDER_NAME = "api folder";
     private static final String SUBFOLDER_NAME = "subfolder";
+    private static final String TIME_STUDY_FOLDER = "timeStudyFolder";
+    private static final String TIME_STUDY_NAME = "timeStudyName";
+    private static final String VISIT_STUDY_FOLDER = "visitStudyFolder";
+    private static final String VISIT_STUDY_NAME = "visitStudyName";
     public final static String LIST_NAME = "People";
     private final static String QUERY_LIST_NAME = "NewPeople";
     private final static String TEST_XLS_DATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/dataLoading/excel/ClientAPITestList.xls";
@@ -169,8 +176,12 @@ public class ClientAPITest extends BaseWebDriverTest
         init.enableEmailRecorder();
 
         init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
+        init._containerHelper.createSubfolder(PROJECT_NAME, TIME_STUDY_FOLDER);
+        init._containerHelper.createSubfolder(PROJECT_NAME, VISIT_STUDY_FOLDER);
 
         init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null);
+
+        init.createStudies();
 
         init.clickFolder(FOLDER_NAME);
 
@@ -305,6 +316,25 @@ public class ClientAPITest extends BaseWebDriverTest
         new UIUserHelper(this).cloneUser(AUTOCOMPLETE_USER, PasswordUtil.getUsername());
     }
 
+    private void createStudies()
+    {
+        // create time-based study
+        projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
+        navBar().goToModule("Study");
+        CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
+        createStudyPage.setLabel(TIME_STUDY_NAME)
+                .setTimepointType(StudyHelper.TimepointType.DATE)
+                .createStudy();
+
+        // create a visit-based study in a different container
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        navBar().goToModule("Study");
+        CreateStudyPage createVisitStudyPage = _studyHelper.startCreateStudy();
+        createVisitStudyPage.setLabel(VISIT_STUDY_NAME)
+                .setTimepointType(StudyHelper.TimepointType.VISIT)
+                .createStudy();
+    }
+
     protected String waitForDivPopulation()
     {
         return waitForWikiDivPopulation(TEST_DIV_NAME, 30);
@@ -318,6 +348,311 @@ public class ClientAPITest extends BaseWebDriverTest
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
         _wikiHelper.setWikiBody("placeholder text");
         _wikiHelper.saveWikiPage();
+    }
+
+    @Test
+    public void createStudyDatasetVisitWithWithTimeKeyField()
+    {
+        // this test case attempts to create a time-keyed dataset in a visit-based study folder, which should
+        // fail on create.
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "ThisShouldBlowUp";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                "       fields: [{\n" +
+                "           name: \"intFieldOne\",\n" +
+                "           rangeURI: \"int\"\n" +
+                "       },{\n" +
+                "           name: \"stringFieldOne\",\n" +
+                "           rangeURI: \"string\"\n" +
+                "       },{\n" +
+                "           name: \"labName\",\n" +
+                "           rangeURI: \"string\"\n" +
+                "       },{\n" +
+                "           name : \"labLocation\",\n" +
+                "           rangeURI : \"string\"\n" +
+                "       }]\n" +
+                "   },\n" +
+                "   options : {\n" +
+                "       //datasetId : 81005,\n" +
+                "       //categoryId : 3,\n" +
+                "       keyPropertyName : 'intFieldOne',\n" +
+                "       useTimeKeyField : true,\n" +
+                "       demographics : true\n" +
+                "   },\n" +
+                "   success: callback," +
+                "   failure: callback"+
+                "});\n";
+        checkErrors();
+        try
+        {
+            Map<String, Object> createResult = (Map<String, Object>) executeAsyncScript(create);
+            List<Map<String, Object>> fields = (List<Map<String, Object>>)createResult.get("fields");
+            fail("Should not have successfully created the domain");
+        }catch(AssertionError expected)
+        {
+            log("success: " + expected.getMessage());
+            resetErrors();
+        }
+    }
+
+    @Test
+    public void createStudyDatasetDateWithoutTimeKeyField()
+    {
+        projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
+        String dataSetName = "ThisShouldBlowUp";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetDate\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '" + dataSetName + "',\n" +
+                "       fields: [{\n" +
+                "           name: \"intFieldOne\",\n" +
+                "           rangeURI: \"int\"\n" +
+                "       },{\n" +
+                "           name: \"intFieldTwo\",\n" +
+                "           rangeURI: \"int\"\n" +
+                "       },{\n" +
+                "           name: \"stringFieldOne\",\n" +
+                "           rangeURI: \"string\"\n" +
+                "       },{\n" +
+                "           name: \"labName\",\n" +
+                "           rangeURI: \"string\"\n" +
+                "       },{\n" +
+                "           name : \"labLocation\",\n" +
+                "           rangeURI : \"string\"\n" +
+                "       }]\n" +
+                "   },\n" +
+                "   options : {\n" +
+                "       keyPropertyName : 'intFieldOne',\n" +
+                "       useTimeKeyField : false\n" +
+                "   },\n" +
+                "   success: callback," +
+                "   failure: callback" +
+                "});\n";
+        checkErrors();
+        try
+        {
+            Map<String, Object> createResult = (Map<String, Object>) executeAsyncScript(create);
+            fail("Should not have created this domain");
+        }catch(AssertionError expected)
+        {
+            log("success." + expected.getMessage());
+            resetErrors();
+        }
+    }
+
+    @Test
+    public void createVisitBasedDomain()
+    {
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "MyVisitBasedDataSet";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                "       fields: [{\n" +
+                "           name: \"intFieldOne\",\n" +
+                "           rangeURI: \"int\"\n" +
+                "       },{\n" +
+                "           name: \"stringFieldOne\",\n" +
+                "           rangeURI: \"string\"\n" +
+                "       },{\n" +
+                "           name: \"labName\",\n" +
+                "           rangeURI: \"string\"\n" +
+                "       },{\n" +
+                "           name : \"labLocation\",\n" +
+                "           rangeURI : \"string\"\n" +
+                "       }]\n" +
+                "   },\n" +
+                "   options : {\n" +
+                "       //datasetId : 81005,\n" +
+                "       //categoryId : 3,\n" +
+                "       keyPropertyName : 'intFieldOne',\n" +
+                "       useTimeKeyField : false,\n" +
+                "       demographics : true\n" +
+                "   },\n" +
+                "   success: callback," +
+                "   failure: callback"+
+                "});\n";
+
+        Map<String, Object> createResult = (Map<String,Object>)executeAsyncScript(create);
+        List<Map<String, Object>> fields = (List<Map<String, Object>>)createResult.get("fields");
+        assertTrue(fields.size() == 4);
+        assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldOne")));
+        assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("stringFieldOne")));
+        assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("labName")));
+        assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("labLocation")));
+
+        String updateDomain = "// fetch the original domain definition\n" +
+                "LABKEY.Domain.get({\n" +
+                "    schemaName: \"study\",\n" +
+                "    queryName: '"+dataSetName+"',\n" +
+                "    success: function(domain) {\n" +
+                "        if (domain) {\n" +
+                "            domain.fields.push({\n" +
+                "                name: \"extraCustomStringField\",\n" +
+                "                rangeURI: \"string\"\n" +
+                "            });\n" +
+                "\n" +
+                "            // add a field and save the modification to the domain\n" +
+                "            LABKEY.Domain.save({\n" +
+                "                schemaName: \"study\",\n" +
+                "                queryName: '"+dataSetName+"',\n" +
+                "                domainDesign: domain,\n" +
+                "                success: function(saveResult) {\n" +
+                "\n" +
+                "                    // return the modified domain\n" +
+                "                    LABKEY.Domain.get({\n" +
+                "                        schemaName: \"study\",\n" +
+                "                        queryName: '"+dataSetName+"',\n" +
+                "                        success: callback,\n" +
+                "                        failure: callback\n" +
+                "                    });\n" +
+                "                },\n" +
+                "                failure: callback\n" +
+                "            });\n" +
+                "        }\n" +
+                "        else {\n" +
+                "            callback({\n" +
+                "                success: false,\n" +
+                "                error: \"Domain not available.\"\n" +
+                "            });\n" +
+                "        }\n" +
+                "    },\n" +
+                "    failure: callback\n" +
+                "});";
+
+        Map<String, Object> updateResult = (Map<String, Object>)executeAsyncScript(updateDomain);
+        List<Map<String, Object>> updatedFields = (List<Map<String, Object>>) updateResult.get("fields");
+        assertTrue(updatedFields.size() == 5);
+        assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("intFieldOne")));
+        assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("stringFieldOne")));
+        assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("labName")));
+        assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("labLocation")));
+        assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("extraCustomStringField")
+                && a.get("rangeURI").toString().endsWith("string")));
+
+        // now delete it
+        String deleteScript = "LABKEY.Domain.drop({\n" +
+                "   schemaName : \"study\",\n" +
+                "   queryName : '"+dataSetName+"',\n" +
+                "   success: callback," +
+                "   failure: callback"+
+                "});\n";
+        Map<String, Object> deleteResult = (Map<String,Object>)executeAsyncScript(deleteScript);
+        assertEquals("true", deleteResult.get("success").toString());
+        assertEquals("Domain deleted", deleteResult.get("message").toString());
+    }
+
+    @Test
+    public void createTimeBasedDomain()
+    {
+        projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
+        String dataSetName = "MyTestTimeBasedDataset";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetDate\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                "       fields: [{\n" +
+                "           name: \"intFieldOne\",\n" +
+                "           rangeURI: \"int\"\n" +
+                "       },{\n" +
+                "           name: \"intFieldTwo\",\n" +
+                "           rangeURI: \"int\"\n" +
+                "       },{\n" +
+                "           name: \"stringFieldOne\",\n" +
+                "           rangeURI: \"string\"\n" +
+                "       },{\n" +
+                "           name: \"labName\",\n" +
+                "           rangeURI: \"string\"\n" +
+                "       },{\n" +
+                "           name : \"labLocation\",\n" +
+                "           rangeURI : \"string\"\n" +
+                "       }]\n" +
+                "   },\n" +
+                "   options : {\n" +
+                "       keyPropertyName : 'intFieldOne',\n" +
+                "   },\n" +
+                "   success: callback," +
+                "   failure: callback"+
+                "});\n";
+
+        Map<String, Object> createResult = (Map<String,Object>)executeAsyncScript(create);
+        List<Map<String, Object>> fields = (List<Map<String, Object>>)createResult.get("fields");
+        assertEquals(5, fields.size());
+        assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldOne")
+                    && a.get("rangeURI").toString().endsWith("int")));
+        assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldTwo")));
+        assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("stringFieldOne")
+                    && a.get("rangeURI").toString().endsWith("string")));
+        assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("labName")));
+        assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("labLocation")));
+
+        // edit domain && validate edits
+        projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
+        String updateDomain = "// fetch the original domain definition\n" +
+                "LABKEY.Domain.get({\n" +
+                "    schemaName: \"study\",\n" +
+                "    queryName: '"+dataSetName+"',\n" +
+                "    success: function(domain) {\n" +
+                "        if (domain) {\n" +
+                "            domain.fields.push({\n" +
+                "                name: \"extraCustomStringField\",\n" +
+                "                rangeURI: \"string\"\n" +
+                "            });\n" +
+                "\n" +
+                "            // add a field and save the modification to the domain\n" +
+                "            LABKEY.Domain.save({\n" +
+                "                schemaName: \"study\",\n" +
+                "                queryName: '"+dataSetName+"',\n" +
+                "                domainDesign: domain,\n" +
+                "                success: function(saveResult) {\n" +
+                "\n" +
+                "                    // return the modified domain\n" +
+                "                    LABKEY.Domain.get({\n" +
+                "                        schemaName: \"study\",\n" +
+                "                        queryName: '"+dataSetName+"',\n" +
+                "                        success: callback,\n" +
+                "                        failure: callback\n" +
+                "                    });\n" +
+                "                },\n" +
+                "                failure: callback\n" +
+                "            });\n" +
+                "        }\n" +
+                "        else {\n" +
+                "            callback({\n" +
+                "                success: false,\n" +
+                "                error: \"Domain not available.\"\n" +
+                "            });\n" +
+                "        }\n" +
+                "    },\n" +
+                "    failure: callback\n" +
+                "});";
+        Map<String, Object> updateResult = (Map<String, Object>)executeAsyncScript(updateDomain);
+        List<Map<String, Object>> updatedFields = (List<Map<String, Object>>)updateResult.get("fields");
+        assertEquals(6, updatedFields.size());
+        assertTrue(updatedFields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldOne")
+                && a.get("rangeURI").toString().endsWith("int")));
+        assertTrue(updatedFields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldTwo")));
+        assertTrue(updatedFields.stream().anyMatch(a-> a.get("name").toString().equals("stringFieldOne")
+                && a.get("rangeURI").toString().endsWith("string")));
+        assertTrue(updatedFields.stream().anyMatch(a-> a.get("name").toString().equals("labName")));
+        assertTrue(updatedFields.stream().anyMatch(a-> a.get("name").toString().equals("labLocation")));
+        assertTrue(updatedFields.stream().anyMatch(a-> a.get("name").toString().equals("extraCustomStringField")
+                && a.get("rangeURI").toString().endsWith("string")));
+
+        // now delete the domain
+        String deleteScript = "LABKEY.Domain.drop({\n" +
+                "   schemaName:'study',\n" +
+                "   queryName:'"+dataSetName+"',\n" +
+                "   success: callback," +
+                "   failure: callback"+
+                "});\n";
+        Map<String, Object> deleteResult = (Map<String,Object>)executeAsyncScript(deleteScript);
+        assertEquals("true", deleteResult.get("success").toString());
+        assertEquals("Domain deleted", deleteResult.get("message").toString());
     }
 
     @Test
