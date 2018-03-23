@@ -376,8 +376,6 @@ public class ClientAPITest extends BaseWebDriverTest
                 "       }]\n" +
                 "   },\n" +
                 "   options : {\n" +
-                "       //datasetId : 81005,\n" +
-                "       //categoryId : 3,\n" +
                 "       keyPropertyName : 'intFieldOne',\n" +
                 "       useTimeKeyField : true,\n" +
                 "       demographics : true\n" +
@@ -388,10 +386,10 @@ public class ClientAPITest extends BaseWebDriverTest
         checkErrors();
         try
         {
-            Map<String, Object> createResult = (Map<String, Object>) executeAsyncScript(create);
-            List<Map<String, Object>> fields = (List<Map<String, Object>>)createResult.get("fields");
+            executeAsyncScript(create);
             fail("Should not have successfully created the domain");
-        }catch(AssertionError expected)
+        }
+        catch(AssertionError expected)
         {
             log("success: " + expected.getMessage());
             resetErrors();
@@ -434,9 +432,10 @@ public class ClientAPITest extends BaseWebDriverTest
         checkErrors();
         try
         {
-            Map<String, Object> createResult = (Map<String, Object>) executeAsyncScript(create);
+            executeAsyncScript(create);
             fail("Should not have created this domain");
-        }catch(AssertionError expected)
+        }
+        catch(AssertionError expected)
         {
             log("success." + expected.getMessage());
             resetErrors();
@@ -467,8 +466,6 @@ public class ClientAPITest extends BaseWebDriverTest
                 "       }]\n" +
                 "   },\n" +
                 "   options : {\n" +
-                "       //datasetId : 81005,\n" +
-                "       //categoryId : 3,\n" +
                 "       keyPropertyName : 'intFieldOne',\n" +
                 "       useTimeKeyField : false,\n" +
                 "       demographics : true\n" +
