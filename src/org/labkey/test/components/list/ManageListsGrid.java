@@ -54,4 +54,16 @@ public class ManageListsGrid extends DataRegionTable
         });
         return new LabKeyPage(getDriver());
     }
+
+    public LabKeyPage viewListDesign(String listName)
+    {
+        getWrapper().clickAndWait(link(getRowIndex("Name", listName), 0));
+        return null;
+    }
+
+    public LabKeyPage viewListHistory(String listName)
+    {
+        getWrapper().clickAndWait(link(getRowIndex("Name", listName), 1));
+        return null;
+    }
 }
