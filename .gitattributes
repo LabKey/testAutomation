@@ -451,7 +451,6 @@ src/org/labkey/test/categories/NLPCuration.java -text
 src/org/labkey/test/categories/NoSuite.java -text
 src/org/labkey/test/categories/OConnor.java -text
 src/org/labkey/test/categories/ONPRC.java -text
-src/org/labkey/test/categories/OldUX.java -text
 src/org/labkey/test/categories/Perf.java -text
 src/org/labkey/test/categories/Reports.java -text
 src/org/labkey/test/categories/Search.java -text
