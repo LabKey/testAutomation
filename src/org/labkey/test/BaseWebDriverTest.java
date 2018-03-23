@@ -1858,7 +1858,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         String href = getAttribute(loc, "href");
         if (moduleName != null) // 12474
             assertTextPresent("Defined in " + moduleName + " module");
-        log("Navigating to " + href);
+        if (!href.contains("executeQuery.view"))
+            log("DEBUG: viewQueryData(" + schemaName + "." + queryName + ") doesn't use executeQuery");
         beginAt(href);
         return new DataRegionTable("query", this);
     }
