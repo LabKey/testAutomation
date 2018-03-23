@@ -539,10 +539,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     void verifyLinkedSchema()
     {
         goToSchemaBrowser();
-        selectQuery(A_PEOPLE_SCHEMA_NAME, LIST_NAME);
-        waitAndClick(Locator.linkWithText("view data"));
-
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = viewQueryData(A_PEOPLE_SCHEMA_NAME, LIST_NAME);
         log("** Check template filter is applied");
         assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, A_PEOPLE_METADATA_TITLE));
@@ -587,9 +584,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         waitForText("Adam");
 
         goToSchemaBrowser();
-        selectQuery(A_PEOPLE_SCHEMA_NAME, QUERY_NAME);
-        waitAndClick(Locator.linkWithText("view data"));
-        table = new DataRegionTable("query", this);
+        table = viewQueryData(A_PEOPLE_SCHEMA_NAME, QUERY_NAME);
 
         log("** Verify query metadata overrides are correctly applied");
         assertHrefContains(table, "A_People db_metadata Query P", "a_db_metadata.view");
@@ -621,10 +616,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     void verifyLinkedSchemaUsingTemplate()
     {
         goToSchemaBrowser();
-        selectQuery(B_PEOPLE_SCHEMA_NAME, LIST_NAME);
-        waitAndClick(Locator.linkWithText("view data"));
-
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = viewQueryData(B_PEOPLE_SCHEMA_NAME, LIST_NAME);
         assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         // Check Name column is renamed and 'Britt' is the only value
         assertEquals("Expected to filter table to only Britt", "Britt", table.getDataAsText(0, B_PEOPLE_TEMPLATE_METADATA_TITLE));
@@ -676,18 +668,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         selectQuery(schemaName, tableName);
     }
 
-    protected void changeListName(String oldName, String newName)
-    {
-        goToSchemaBrowserTable("lists", oldName);
-        waitAndClick(Locator.linkWithText("edit definition"));
-
-        _listHelper.clickEditDesign();
-        waitForElement(Locator.xpath("//input[@name='ff_name']"));
-        setFormElement(Locator.xpath("//input[@name='ff_name']"), newName);
-
-        _listHelper.clickSave();
-    }
-
     protected void assertHrefContains(DataRegionTable table, String columnTitle, String expected)
     {
         assertTrue("Expected column '" + columnTitle + "' to be in table, was not found.", table.getColumnIndex(columnTitle) != -1);
@@ -716,7 +696,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         }
 
         clickFolder("TargetFolder");
-
     }
 
     protected void assertColumnsNotPresent(String sourceFolder, String schemaName, String tableName, String... columnNames)
@@ -752,8 +731,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         clickFolder(sourceFolder);
 
-        goToSchemaBrowserTable("lists", tableName);
-        waitAndClick(Locator.linkWithText("edit definition"));
+        goToManageLists().getGrid()
+                .viewListDesign(tableName);
 
         _listHelper.clickEditDesign();
         _listHelper.setColumnType(index, info);
