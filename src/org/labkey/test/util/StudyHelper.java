@@ -16,6 +16,10 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -27,6 +31,7 @@ import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.pages.study.ManageVisitPage;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +47,25 @@ public class StudyHelper
     public StudyHelper(BaseWebDriverTest test)
     {
         _test = test;
+    }
+
+    public boolean doesStudyExist(String containerPath)
+    {
+        Connection connection = _test.createDefaultConnection(true);
+        SelectRowsCommand command = new SelectRowsCommand("study", "Datasets");
+        try
+        {
+            SelectRowsResponse response = command.execute(connection, containerPath);
+            return true;
+        }
+        catch (CommandException e)
+        {
+            return false;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public CreateStudyPage startCreateStudy()
