@@ -114,6 +114,12 @@ public class APIContainerHelper extends AbstractContainerHelper
         deleteContainer("/" + projectName, failIfNotFound, wait);
     }
 
+    @Override
+    public void deleteFolder(String project, String folderName, int waitTime)
+    {
+        deleteContainer(project + "/" + folderName, true, waitTime);
+    }
+
     public void deleteWorkbook(String parent, int rowId, boolean failIfNotFound, int wait) throws TestTimeoutException
     {
         String path = parent + "/" + rowId;

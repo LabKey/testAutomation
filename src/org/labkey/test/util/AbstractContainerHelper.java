@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -318,6 +319,16 @@ public abstract class AbstractContainerHelper
                 .setFolderName(child);
     }
 
+    public boolean doesContainerExist(String containerPath)
+    {
+        int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("project", containerPath, "begin")).getResponseCode();
+        return response != HttpStatus.SC_NOT_FOUND;
+    }
+
+    /**
+     * @deprecated Use precise container path: {@link #doesContainerExist(String)}
+     */
+    @Deprecated
     public boolean doesFolderExist(String project, String parent, String child)
     {
         _test.clickProject(project);
