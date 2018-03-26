@@ -43,14 +43,9 @@ public class APIContainerHelper extends AbstractContainerHelper
     }
 
     @Override
-    public void doCreateProject(String projectName, String folderType)
+    protected void doCreateProject(String projectName, String folderType)
     {
-        doCreateFolder(projectName, "", folderType);
-    }
-
-    public final void createSubfolder(String parentPath, String folderName, String folderType)
-    {
-       doCreateFolder(folderName, parentPath, folderType);
+        doCreateFolder("", projectName, folderType);
     }
 
     public CreateContainerResponse createWorkbook(String parentPath, String title, String folderType)
@@ -59,7 +54,8 @@ public class APIContainerHelper extends AbstractContainerHelper
         return doCreateContainer(parentPath, null, title, folderType, true);
     }
 
-    public void doCreateFolder(String folderName, String path, String folderType)
+    @Override
+    protected void doCreateFolder(String path, String folderName, String folderType)
     {
         _test.log("Creating project via API with name: " + folderName);
         doCreateContainer(path, folderName, null, folderType, false);

@@ -23,7 +23,6 @@ import org.labkey.test.WebDriverWrapper;
 
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 public class UIContainerHelper extends AbstractContainerHelper
@@ -35,7 +34,7 @@ public class UIContainerHelper extends AbstractContainerHelper
 
     @Override
     @LogMethod
-    public void createSubfolder(String parentPath, String child, String foldertype)
+    public void doCreateFolder(String child, String parentPath, String foldertype)
     {
         String[] ancestors = parentPath.split("/");
         createSubfolder(ancestors[0], ancestors[ancestors.length - 1], child, foldertype, null);
@@ -92,13 +91,6 @@ public class UIContainerHelper extends AbstractContainerHelper
         }
     }
 
-    @Override //TODO :  this will be necessary for full interconversion between UIcontainer and APIContainer,
-    //but at the moment it's unnecessary, and complicated because the two don't have the same capabilities.
-    protected void doCreateFolder(String projectName, String path, String folderType)
-    {
-        throw new UnsupportedOperationException("Use APIContainerHelper to create a sub-folder.");
-    }
-
     @LogMethod
     @Override
     protected void doDeleteProject(String project, boolean failIfNotFound, int wait)
@@ -135,7 +127,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         _test.log("Starting delete of project '" + project + "'...");
         _test.clickButton("Delete", wait);
 
-        if (projectLinkExists( project))
+        if (projectLinkExists(project))
         {
             _test.log("Wait extra long for folder to finish deleting.");
             while (projectLinkExists(project) && System.currentTimeMillis() - startTime < wait)
@@ -149,10 +141,7 @@ public class UIContainerHelper extends AbstractContainerHelper
             _test.log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
         else
             fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
-
-        // verify that we're not on an error page with a check for a project link:
-        _test.projectMenu().open();
-        assertFalse(projectLinkExists(project));
+        _test.projectMenu().close();
     }
 
     private boolean projectLinkExists(String project) // use the presence of start-menu links to know

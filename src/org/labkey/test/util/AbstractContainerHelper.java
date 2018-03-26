@@ -80,14 +80,19 @@ public abstract class AbstractContainerHelper
         _createdProjects.add(projectName);
     }
 
-    public void createSubfolder(String parentPath, String folderName)
+    public final void createSubfolder(String parentPath, String folderName)
     {
         createSubfolder(parentPath, folderName, "None");
     }
 
-    public abstract void createSubfolder(String parentPath, String folderName, String folderType);
+    @LogMethod
+    public final void createSubfolder(String parentPath, String folderName, String folderType)
+    {
+        doCreateFolder(parentPath, folderName, folderType);
+    }
+
     protected abstract void doCreateProject(String projectName, String folderType);
-    protected abstract void doCreateFolder(String projectName, String path, String folderType);
+    protected abstract void doCreateFolder(String parentPath, String folderName, String folderType);
 
     // Projects might be created by other means
     public void addCreatedProject(String projectName)
