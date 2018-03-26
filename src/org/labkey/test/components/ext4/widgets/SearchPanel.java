@@ -101,7 +101,7 @@ public class SearchPanel extends WebDriverComponent<SearchPanel.ElementCache>
     {
         elementCache().findFacetedRow(fieldLabel)
                 .value()
-                .selectComboBoxItem(LEADING_NBSP, values);
+                .selectComboBoxItem(values);
     }
 
     // NOTE: only using this for dates at the moment, though the code is more general
@@ -195,7 +195,7 @@ public class SearchPanel extends WebDriverComponent<SearchPanel.ElementCache>
     protected class SearchPanelFacetedRow extends SearchPanelRow
     {
         private final ComboBox valueCombo = ComboBox(getDriver())
-                .locatedBy(Locator.css(".search-panel-row-value")).findWhenNeeded(this);
+                .locatedBy(Locator.css(".search-panel-row-value")).findWhenNeeded(this).setMatcher(LEADING_NBSP);
 
         protected SearchPanelFacetedRow(String rowLabel)
         {
