@@ -26,7 +26,6 @@ import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
 
-import java.util.Date;
 import java.util.List;
 
 public class PermissionsEditor
@@ -88,36 +87,30 @@ public class PermissionsEditor
     @LogMethod
     public void setPermissions(@LoggedParam String groupName, @LoggedParam String... permissionStrings)
     {
-        _test.log(new Date().toString());
         for(String permissionString : permissionStrings)
         {
             _setPermissions(groupName, permissionString, "pGroup");
         }
-        _test.log(new Date().toString());
         savePermissions();
     }
 
     @LogMethod
     public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String... permissionStrings)
     {
-        _test.log(new Date().toString());
         for(String permissionString : permissionStrings)
         {
             _setPermissions(groupName, permissionString, "pSite");
         }
-        _test.log(new Date().toString());
         savePermissions();
     }
 
     @LogMethod
     public void setUserPermissions(@LoggedParam String userName, @LoggedParam String... permissionsStrings)
     {
-        _test.log(new Date().toString());
         for(String permissionString : permissionsStrings)
         {
             _setPermissions(userName, permissionString, "pUser");
         }
-        _test.log(new Date().toString());
         savePermissions();
     }
 
