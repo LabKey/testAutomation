@@ -231,16 +231,6 @@ public class DataRegionTable extends DataRegion
         return DataRegion(test.getDriver()).find(new RefindingWebElement(PortalHelper.Locators.webPart(webPartTitle), test.getDriver()));
     }
 
-    /**
-     * @deprecated Use {@link #getDataRegionName()}
-     * Rename to better match terminology in DataRegion.js
-     */
-    @Deprecated
-    public String getTableName()
-    {
-        return getDataRegionName();
-    }
-
     public int getColumnCount()
     {
         return elementCache().getColumnHeaders().size() - (hasSelectors() ? 1 : 0);
@@ -1298,12 +1288,6 @@ public class DataRegionTable extends DataRegion
                 .anyMatch((m)-> m.getText().equalsIgnoreCase(chartType));
     }
 
-    @Deprecated // use clickInsertNewRow()
-    public void clickInsertNewRowDropdown()
-    {
-        clickInsertNewRow();
-    }
-
     /* sometimes 'insert new row' is a top-level button, other times it's a dropdown
     *  under an 'insert data' top-level button. This handles either case. */
     public void clickInsertNewRow()
@@ -1311,7 +1295,7 @@ public class DataRegionTable extends DataRegion
         if (hasHeaderMenu("Insert data"))
             clickHeaderMenu("Insert data", getInsertNewButtonText());
         else
-            clickHeaderButton(getInsertNewButtonText());
+            clickHeaderButtonAndWait(getInsertNewButtonText());
     }
 
     public void clickImportBulkData()
@@ -1319,7 +1303,7 @@ public class DataRegionTable extends DataRegion
         if (hasHeaderMenu("Insert data"))
             clickHeaderMenu("Insert data", getImportBulkDataText());
         else
-            clickHeaderButton(getInsertNewButtonText());
+            clickHeaderButtonAndWait(getImportBulkDataText());
     }
 
     public void clickDeleteAllButton()
