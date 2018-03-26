@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.components.html.Checkbox.Checkbox;
@@ -125,12 +124,10 @@ public class PipelineFolder
 
     public void clean()
     {
-        try
+        if (_test._containerHelper.doesContainerExist(_test.getProjectName() + "/" + _folderName))
         {
             _test._containerHelper.deleteFolder(_test.getProjectName(), _folderName);
         }
-        catch (WebDriverException ignored)
-        {}
     }
 
     public static class MailSettings
