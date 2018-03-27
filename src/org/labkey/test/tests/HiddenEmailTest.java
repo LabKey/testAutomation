@@ -22,7 +22,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -30,7 +29,7 @@ import org.labkey.test.util.PortalHelper;
 import java.util.List;
 
 @Category({DailyB.class})
-public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTest
+public class HiddenEmailTest extends BaseWebDriverTest
 {
     private static final String TEST_GROUP = "HiddenEmail Test group";
     private static final String ADMIN_USER = "experimental_admin@experimental.test";
