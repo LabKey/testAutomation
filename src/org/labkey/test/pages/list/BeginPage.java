@@ -21,6 +21,8 @@ import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 
+import java.io.File;
+
 public class BeginPage extends LabKeyPage<BeginPage.ElementCache>
 {
     public BeginPage(WebDriver driver)
@@ -37,6 +39,14 @@ public class BeginPage extends LabKeyPage<BeginPage.ElementCache>
     {
         driver.beginAt(WebTestHelper.buildURL("list", containerPath, "begin"));
         return new BeginPage(driver.getDriver());
+    }
+
+    public BeginPage importListArchive(File listArchive)
+    {
+        return getGrid()
+                .clickImportArchive()
+                .setZipFile(listArchive)
+                .clickImport();
     }
 
     public ManageListsGrid getGrid()

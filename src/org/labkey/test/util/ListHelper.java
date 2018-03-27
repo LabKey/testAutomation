@@ -432,27 +432,13 @@ public class ListHelper extends LabKeySiteWrapper
             portalHelper.addWebPart("Lists");
         }
 
-        waitAndClickAndWait(Locator.linkWithText("manage lists"));
-
-        log("Import List Archive");
-        clickButton("Import List Archive");
-        waitForElement(Locator.xpath("//input[@name='listZip']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.name("listZip"), inputFile);
-        clickButton("Import List Archive");
-        assertElementNotPresent(Locator.tagWithClass("div", "labkey-error"));
+        goToManageLists().importListArchive(inputFile);
+        assertElementNotPresent(Locators.labkeyError);
     }
 
     public void clickImportData()
     {
-        if(isElementPresent(Locator.lkButton("Import Data")))
-            waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Import Data"), BaseWebDriverTest.WAIT_FOR_PAGE);
-        else
-        {
-            log("Was not able to find the 'Import Data' button on the menu, trying the 'Insert/Import Data' menu item.");
-            DataRegionTable list = DataRegionTable.DataRegion(getDriver()).find();
-            list.clickImportBulkData();
-        }
+        DataRegionTable.DataRegion(getDriver()).find().clickImportBulkData();
         waitForElement(Locator.id("tsv3"));
     }
 
