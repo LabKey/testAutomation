@@ -97,11 +97,11 @@ public class SearchPanel extends WebDriverComponent<SearchPanel.ElementCache>
                 .set(value);
     }
 
-    public void selectValues(String fieldLabel, String... values)
+    public void selectValues(String fieldLabel, boolean keepExisting, String... values)
     {
         elementCache().findFacetedRow(fieldLabel)
                 .value()
-                .selectComboBoxItem(values);
+                .selectComboBoxItem(keepExisting, values);
     }
 
     // NOTE: only using this for dates at the moment, though the code is more general

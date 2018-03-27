@@ -90,7 +90,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     @LogMethod(quiet = true)
     public void selectComboBoxItem(boolean keepExisting, @LoggedParam String... selections)
     {
-        selectComboBoxItem(true, false, selections);
+        selectComboBoxItem(keepExisting, false, selections);
     }
 
     @LogMethod(quiet = true)
