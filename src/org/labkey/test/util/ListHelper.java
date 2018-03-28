@@ -438,7 +438,17 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void clickImportData()
     {
-        DataRegionTable.DataRegion(getDriver()).find().clickImportBulkData();
+        if(isElementPresent(Locator.lkButton("Import Data")))
+        {
+            // Probably at list-editListDefinition after creating a list
+            waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Import Data"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        }
+        else
+        {
+            // Importing from list data region
+            DataRegionTable list = DataRegionTable.DataRegion(getDriver()).find();
+            list.clickImportBulkData();
+        }
         waitForElement(Locator.id("tsv3"));
     }
 
