@@ -42,6 +42,8 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class RReportHelper
 {
+    public static final String RDOCKER = "RDocker";
+
     public enum ReportOption {
         shareReport("Make this report available to all users", null, true),
         showSourceTab("Show source tab to all users", null, true),
@@ -219,7 +221,7 @@ public class RReportHelper
             {
                 TestLogger.log("Enable existing " + dockerEngineName);
                 _test.checkCheckbox(Locator.id("editEngine_enabled"));
-                rVersion = "RDocker";
+                rVersion = RDOCKER;
             }
             else
             {
@@ -233,7 +235,7 @@ public class RReportHelper
         else if (useDocker)
         {
             scripts.addEngine(ConfigureReportsAndScriptsPage.EngineType.R_DOCKER, new HashMap<>());
-            rVersion = "RDocker";
+            rVersion = RDOCKER;
         }
 
         if (!useDocker)
