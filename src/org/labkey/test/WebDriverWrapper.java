@@ -237,12 +237,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     prefs.put("profile.password_manager_enabled", false);
                     options.setExperimentalOption("prefs", prefs);
                     options.setExperimentalOption("detach", true); // Leaves browser window open after stopping the driver service
-                    options.setExperimentalOption("excludeSwitches",
-                            Collections.singletonList("enable-automation"));  // Removes the "Chrome is being controlled by automated test software". banner.
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
                     options.addArguments("disable-xss-auditor");
                     options.addArguments("ignore-certificate-errors");
-                    options.addArguments("disable-extensions"); // Should avoid the "Disable Developer Extensions" dialog.
+                    options.addArguments("disable-infobars");
 
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, options);
@@ -668,6 +666,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (!isElementPresent(Locator.tag("a").withClass("x4-tab-active").withText("Site Groups")))
             clickAdminMenuItem("Site", "Site Groups");
+    }
+
+    public void goToSitePermissions()
+    {
+        if (!isElementPresent(Locator.tag("a").withClass("x4-tab-active").withText("Site Permissions")))
+            clickAdminMenuItem("Site", "Site Permissions");
     }
 
     public void goToSiteDevelopers()
