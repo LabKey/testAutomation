@@ -16,7 +16,6 @@
 package org.labkey.test.components.ext4;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
@@ -170,11 +169,26 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     {
         WebElement listItem = matchTechnique.getLocator(comboListItem(), itemText).waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        if (!isMultiSelect() || toggle || !listItem.getAttribute("class").contains("selected"))
+        boolean initiallySelected = isOptionSelected(listItem);
+        if (!isMultiSelect() || toggle || !initiallySelected)
         {
-            getWrapper().scrollIntoView(listItem); // Workaround: Auto-scrolling in chrome isn't working well
-            listItem.click();
+            clickOption(listItem);
         }
+    }
+
+    private void clickOption(WebElement listItem)
+    {
+        boolean initiallySelected = isOptionSelected(listItem);
+        // getWrapper().scrollIntoView(listItem); // Workaround: Auto-scrolling in chrome isn't working well
+        listItem.click();
+        if (isMultiSelect())
+            if (!waitFor(() -> isOptionSelected(listItem) == !initiallySelected, 1000))
+                listItem.click(); // retry
+    }
+
+    private boolean isOptionSelected(WebElement comboListItem)
+    {
+        return comboListItem.getAttribute("class").contains("selected");
     }
 
     private void selectItemFromOpenComboList(String itemText)
@@ -236,18 +250,14 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         {
             for (WebElement element : comboListItemSelected().findElements(getDriver()))
             {
-                element.click();
-                if (!waitFor(() -> !element.getAttribute("class").contains("selected"), 1000))
-                    Assert.fail("Failed to deselect item from combo-box: " + element.getText());
+                clickOption(element);
             }
         }
         catch (StaleElementReferenceException retry) // Combo-box might still be loading previous selection (no good way to detect)
         {
             for (WebElement element : comboListItemSelected().findElements(getDriver()))
             {
-                element.click();
-                if (!waitFor(() -> !element.getAttribute("class").contains("selected"), 1000))
-                    Assert.fail("Failed to deselect item from combo-box: " + element.getText());
+                clickOption(element);
             }
         }
     }
