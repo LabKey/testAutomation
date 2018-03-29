@@ -50,14 +50,12 @@ public class APIContainerHelper extends AbstractContainerHelper
 
     public CreateContainerResponse createWorkbook(String parentPath, String title, String folderType)
     {
-        _test.log("Creating workbook via API");
         return doCreateContainer(parentPath, null, title, folderType, true);
     }
 
     @Override
     protected void doCreateFolder(String path, String folderName, String folderType)
     {
-        _test.log("Creating project via API with name: " + folderName);
         doCreateContainer(path, folderName, null, folderType, false);
 
         String[] splitPath = path.split("/");
@@ -84,6 +82,13 @@ public class APIContainerHelper extends AbstractContainerHelper
 
         command.setFolderType(folderType);
         parentPath = (parentPath.startsWith("/") ? "" : "/") + parentPath;
+
+        if (isWorkbook)
+            _test.log("Creating new workbook via API in container: " + parentPath);
+        else if (parentPath.equals("/"))
+            _test.log("Creating project via API: " + name);
+        else
+            _test.log("Creating new folder via API: " + parentPath + "/" + name);
 
         try
         {
