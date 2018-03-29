@@ -34,6 +34,7 @@ import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.reports.ManageViewsPage;
+import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
@@ -699,9 +700,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new ManageViewsPage(getDriver());
     }
 
-    public void goToManageStudy()
+    public ManageStudyPage goToManageStudy()
     {
         clickAdminMenuItem("Manage Study");
+        return new ManageStudyPage(getDriver());
     }
 
     public void goToManageAssays()

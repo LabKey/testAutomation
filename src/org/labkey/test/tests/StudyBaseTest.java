@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
-import org.labkey.api.data.PHI;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -318,31 +317,13 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         waitForElement(Locator.css(".specimenSearchLoaded"));
     }
 
-    //must be in folder whose designation you wish to change.
-    protected void setStudyITNFolderType()
-    {
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Folder Type"));
-        checkCheckbox(Locator.radioButtonByNameAndValue("folderType", "Study (ITN)"));
-        clickButton("Update Folder");
-    }
-
+    /**
+     * @deprecated Inline
+     */
+    @Deprecated
     protected void enterStudySecurity()
     {
-        _permissionsHelper.enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Study Security");
-        clickButton("Study Security", defaultWaitForPage);
-    }
-
-    // TODO Dan Duffek: The following function are in here temporarily. They have been added as part of the goal of removing the SimpleApiTest.java module
-    protected void ensureConfigured()
-    {
-
-    }
-
-    protected void cleanUp()
-    {
-
+        _studyHelper.enterStudySecurity();
     }
 
     protected Pattern[] getIgnoredElements()
@@ -361,11 +342,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     @Test
     public void testSteps() throws Exception
     {
-        ensureConfigured();
         runUITests();
         runApiTests();
-        cleanUp();
     }
-
-    // TODO Dan Duffek: End of the inserted functions.
 }

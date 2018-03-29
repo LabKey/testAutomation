@@ -29,6 +29,7 @@ import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.pages.ManageDatasetsPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.pages.study.ManageVisitPage;
+import org.labkey.test.pages.study.StudySecurityPage;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +73,12 @@ public class StudyHelper
     {
         _test.clickAndWait(Locator.lkButton("Create Study"));
         return new CreateStudyPage(_test);
+    }
+
+    public StudySecurityPage enterStudySecurity()
+    {
+        return _test.goToManageStudy()
+                .manageSecurity();
     }
 
     @LogMethod

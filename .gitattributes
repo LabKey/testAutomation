@@ -653,8 +653,10 @@ src/org/labkey/test/pages/study/CreateDatasetPage.java -text
 src/org/labkey/test/pages/study/CreateStudyPage.java -text
 src/org/labkey/test/pages/study/DeleteMultipleVisitsPage.java -text
 src/org/labkey/test/pages/study/ManageParticipantGroupsPage.java -text
+src/org/labkey/test/pages/study/ManageStudyPage.java -text
 src/org/labkey/test/pages/study/ManageVisitPage.java -text
 src/org/labkey/test/pages/study/OverviewPage.java -text
+src/org/labkey/test/pages/study/StudySecurityPage.java -text
 src/org/labkey/test/pages/test/TestActions.java -text
 src/org/labkey/test/pages/user/ShowUsersPage.java -text
 src/org/labkey/test/pages/wiki/EditPage.java -text
