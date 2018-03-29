@@ -149,6 +149,11 @@ public abstract class TestProperties
         return System.getProperty(key);
     }
 
+    public static boolean isChromeDriverLoggingEnabled()
+    {
+        return "true".equals(System.getProperty("enable.chromedriver.logging"));
+    }
+
     public static String ensureChromedriverExeProperty()
     {
         final String key = CHROME_DRIVER_EXE_PROPERTY;

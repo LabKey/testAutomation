@@ -121,6 +121,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.TestProperties.isChromeDriverLoggingEnabled;
 import static org.labkey.test.TestProperties.isScriptCheckEnabled;
 import static org.labkey.test.WebTestHelper.getBaseURL;
 import static org.labkey.test.WebTestHelper.stripContextPath;
@@ -214,18 +215,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 if (oldWebDriver == null)
                 {
                     TestProperties.ensureChromedriverExeProperty();
-                    if (downloadDir.getParentFile().exists() || downloadDir.getParentFile().mkdirs())
-                    {
-                        String logFileName = new SimpleDateFormat("'chromedriver_'HHmmss'.log'").format(new Date());
-                        final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
-                        log("Saving chromedriver log to: " + logPath);
-                        System.setProperty(CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
-                        System.setProperty(CHROME_DRIVER_LOG_PROPERTY, logPath);
-                    }
-                    else
-                    {
-                        log("Failed to create directory for chromedriver log: " + downloadDir.getParentFile().getAbsolutePath());
-                    }
+                    if (isChromeDriverLoggingEnabled())
+                        enableChromeDriverLogging(downloadDir);
                     ChromeOptions options = new ChromeOptions();
                     Dictionary<String, Object> prefs = new Hashtable<>();
 
@@ -335,6 +326,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
         else
         {
             return oldDriverAndService;
+        }
+    }
+
+    private void enableChromeDriverLogging(File downloadDir)
+    {
+        if (downloadDir.getParentFile().exists() || downloadDir.getParentFile().mkdirs())
+        {
+            String logFileName = new SimpleDateFormat("'chromedriver_'HHmmss'.log'").format(new Date());
+            final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
+            log("Saving chromedriver log to: " + logPath);
+            System.setProperty(CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
+            System.setProperty(CHROME_DRIVER_LOG_PROPERTY, logPath);
+        }
+        else
+        {
+            log("Failed to create directory for chromedriver log: " + downloadDir.getParentFile().getAbsolutePath());
         }
     }
 
