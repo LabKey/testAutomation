@@ -965,7 +965,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @LogMethod
-    public void checkLeaksAndErrors()
+    private void checkLeaksAndErrors()
     {
         if ( isGuestModeTest() )
             return;
@@ -974,7 +974,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _checkedLeaksAndErrors = true;
     }
 
-    public void checkLeaks()
+    protected void checkLeaks()
     {
         if (!isLocalServer())
             return;
