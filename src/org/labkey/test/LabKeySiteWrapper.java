@@ -209,6 +209,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
+    public Map<String, Object> signOutJavaScript()
+    {
+        String logout = "LABKEY.Ajax.request({\n" +
+                "url:LABKEY.ActionURL.buildURL('login','logoutAPI.api'),\n" +
+                "method:'POST',\n" +
+                "success:callback,\n" +
+                "failure:callback,})";
+        return (Map<String, Object>)executeAsyncScript(logout);
+    }
+
     @LogMethod
     public void ensureSignedInAsPrimaryTestUser()
     {
