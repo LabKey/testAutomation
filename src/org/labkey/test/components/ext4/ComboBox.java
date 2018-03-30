@@ -156,7 +156,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         getWrapper().waitForElement(comboListItem());
         // Ext4 combo boxes may have a loading mask
         getWrapper().waitForElementToDisappear(
-                Locator.byClass(getCssPrefix() + "boundlist")
+                Locator.byClass(getCssPrefix() + "boundlist").notHidden()
                         .followingSibling("div").withClass(getCssPrefix() + "mask").notHidden());
     }
 
