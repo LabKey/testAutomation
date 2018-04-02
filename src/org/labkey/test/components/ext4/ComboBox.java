@@ -80,13 +80,11 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         return this;
     }
 
-    @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String... selections)
     {
         selectComboBoxItem(false, false, selections);
     }
 
-    @LogMethod(quiet = true)
     public void selectComboBoxItem(boolean keepExisting, @LoggedParam String... selections)
     {
         selectComboBoxItem(keepExisting, false, selections);
@@ -179,7 +177,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     private void clickOption(WebElement listItem)
     {
         boolean initiallySelected = isOptionSelected(listItem);
-        // getWrapper().scrollIntoView(listItem); // Workaround: Auto-scrolling in chrome isn't working well
+        getWrapper().scrollIntoView(listItem); // Workaround: Auto-scrolling isn't working well
         listItem.click();
         if (isMultiSelect())
             if (!waitFor(() -> isOptionSelected(listItem) == !initiallySelected, 1000))
@@ -218,7 +216,8 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
 
     public void closeComboList()
     {
-        elementCache().arrowTrigger.click();
+        if (isOpen())
+            elementCache().arrowTrigger.click();
 
         // menu should disappear
         waitForClosed();
