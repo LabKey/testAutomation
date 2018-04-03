@@ -182,6 +182,6 @@ public class BasicTest extends BaseWebDriverTest
 
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("core", "login", "admin");
+        return Arrays.asList("core");
     }
 }
