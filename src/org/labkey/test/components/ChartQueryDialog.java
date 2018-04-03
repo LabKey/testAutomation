@@ -15,9 +15,11 @@
  */
 package org.labkey.test.components;
 
-import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.ComboBox;
+import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.components.ext4.ComboBox.ComboBox;
 
@@ -31,24 +33,30 @@ public class ChartQueryDialog extends ChartWizardDialog<ChartQueryDialog.Element
     public ChartQueryDialog selectSchema(String schemaName)
     {
         elementCache().schemaCombo.selectComboBoxItem(schemaName);
+        WebDriverWrapper.waitFor(() -> elementCache().queryCombo.isEnabled() && elementCache().queryCombo.getValue().isEmpty(), "Query combo not enabled after selecting a schema", 5000);
         return this;
     }
 
     public ChartQueryDialog selectQuery(String queryName)
     {
         elementCache().queryCombo.selectComboBoxItem(queryName);
+        WebDriverWrapper.waitFor(this::isOkButtonEnabled, "'OK' button not enabled after selecting a query", 5000);
         return this;
+    }
+
+    private boolean isOkButtonEnabled()
+    {
+        return !elementCache().okButton.getAttribute("class").contains("disabled");
     }
 
     public void clickCancel()
     {
-        clickButton("Cancel", 0);
-        waitForClose();
+        getWrapper().clickAndWait(elementCache().cancelButton);
     }
 
     public ChartTypeDialog clickOk()
     {
-        clickButton("OK", 0);
+        elementCache().okButton.click();
         waitForClose();
         return new ChartTypeDialog(getWrapper().getDriver());
     }
@@ -63,5 +71,7 @@ public class ChartQueryDialog extends ChartWizardDialog<ChartQueryDialog.Element
     {
         protected ComboBox schemaCombo = ComboBox(getDriver()).withLabel("Schema:").findWhenNeeded(this);
         protected ComboBox queryCombo = ComboBox(getDriver()).withLabel("Query:").findWhenNeeded(this);
+        protected final WebElement cancelButton = Ext4Helper.Locators.ext4Button("Cancel").findWhenNeeded(this);
+        protected final WebElement okButton = Ext4Helper.Locators.ext4Button("OK").findWhenNeeded(this);
     }
 }
