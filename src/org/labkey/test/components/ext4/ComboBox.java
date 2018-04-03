@@ -160,7 +160,8 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
 
     private boolean isOpen()
     {
-        return getComponentElement().getAttribute("class").contains("pickerfield-open");
+        return getComponentElement().getAttribute("class").contains("pickerfield-open") ||
+                Locator.byClass(getCssPrefix() + "pickerfield-open").findElementOrNull(getComponentElement()) != null;
     }
 
     private void selectItemFromOpenComboList(String itemText, boolean toggle, ComboListMatcher matchTechnique)
@@ -282,6 +283,16 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         return getWrapper().getTexts(comboListItem().append("/div[contains(@class, 'disabled-combo-item')]").findElements(getDriver()));
     }
 
+    public String getValue()
+    {
+        return getWrapper().getFormElement(elementCache().inputEl);
+    }
+
+    public boolean isEnabled()
+    {
+        return elementCache().inputEl.isEnabled();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -291,6 +302,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     protected class ElementCache extends Component.ElementCache
     {
         protected WebElement arrowTrigger = Locator.xpath("//div[contains(@class,'arrow')]").findWhenNeeded(this);
+        protected final WebElement inputEl = Locator.tag("input").attributeEndsWith("id", "-inputEl").findWhenNeeded(this);
     }
 
     public static ComboBoxFinder ComboBox(WebDriver driver)
