@@ -30,6 +30,8 @@ import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.query.GetQueryDetailsCommand;
+import org.labkey.remoteapi.query.GetQueryDetailsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -38,11 +40,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
-import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -58,8 +58,8 @@ import org.openqa.selenium.TimeoutException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1092,7 +1092,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void usernameAutocompleteValuesTest()
     {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = getConnection(true);
         verifyAutocompletionResponse(cn, "security", "completeUser", false, true);
         verifyAutocompletionResponse(cn, "security", "completeUserRead", false, true);
         verifyAutocompletionResponse(cn, "announcements", "completeUser", false, true);
@@ -1127,6 +1127,11 @@ public class ClientAPITest extends BaseWebDriverTest
         {
             throw new RuntimeException("Stop Impersonating error", e);
         }
+    }
+
+    private Connection getConnection(boolean validPassword)
+    {
+        return new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), validPassword ? PasswordUtil.getPassword() : "bad connection password");
     }
 
     @LogMethod
@@ -1172,7 +1177,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         // 30509: For 401 and 404, respond with same ContentType as request
         log("Testing response content type for 404");
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = getConnection(true);
         Command command = new Command("bam", "boozled");
 
         Map<String, Object> expectedProps = new HashMap<>();
@@ -1185,7 +1190,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         // An API location/command that requires permissions
         log("Testing response content type for 401");
-        cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), "bad connection password");
+        cn = getConnection(false);
         command = new Command("core", "getExtContainerAdminTree.api");
 
         expectedProps = new HashMap<>();
@@ -1252,6 +1257,26 @@ public class ClientAPITest extends BaseWebDriverTest
         {
             throw new RuntimeException("runCommand currently expects the command to fail. Valid responses not yet supported.");
         }
+    }
+
+    @Test
+    public void suggestedColumnsInQueryDetailsTest() throws Exception
+    {
+        final String PATH = getProjectName() + "/" + FOLDER_NAME;
+        final String SCHEMA = "vehicle";
+        final String QUERY = "UserDefinedEmissions";
+        beginAt(PATH);
+        _containerHelper.enableModules(Collections.singletonList("simpletest"));
+        Connection cn = getConnection(true);
+
+        log("Verify default behavior to include suggested columns in details of user defined queries.");
+        List<GetQueryDetailsResponse.Column> columns = new GetQueryDetailsCommand(SCHEMA, QUERY).execute(cn, PATH).getColumns();
+        assertTrue("Sugggested column 'Container' for user defined query was missing in response.",
+                columns.stream().anyMatch(col -> col.getName().equalsIgnoreCase("Container")));
+        log("Verify optional behavior to exclude suggested columns from details of user defined queries.");
+        columns = new GetQueryDetailsCommand(SCHEMA, QUERY, false).execute(cn, PATH).getColumns();
+        assertTrue("Sugggested column 'Container' for user defined query was included in response.",
+                columns.stream().noneMatch(col -> col.getName().equalsIgnoreCase("Container")));
     }
 
     @Override
