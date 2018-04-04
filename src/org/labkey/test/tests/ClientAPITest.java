@@ -939,23 +939,23 @@ public class ClientAPITest extends BaseWebDriverTest
 
         assertFalse("principalId only allowed from a server side script", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"-1", "-2"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
 
-        final String FILTER_USER_SUBJECT = "User Should Be Removed";
-        APIUserHelper apiUserHelper = new APIUserHelper(this);
-        apiUserHelper.deleteUser("user5@clientapi.test");
-        apiUserHelper.createUserAndNotify("user5@clientapi.test");  // This will create a user but will not log them in.
-
-        // Create two users and show them as having logged in once.
-        apiUserHelper.createUser(SKIP_EMAIL_RECIPIENTS[0], false, false);
-        apiUserHelper.createUser(SKIP_EMAIL_RECIPIENTS[1], false, false);
-
-        assertTrue("A user who has never signed in should be filtered out of the recipient list.", executeEmailScript(PasswordUtil.getUsername(), FILTER_USER_SUBJECT, new String[]{SKIP_EMAIL_RECIPIENTS[0], "user5@clientapi.test", SKIP_EMAIL_RECIPIENTS[1]}, null, EMAIL_BODY_HTML));
-
-        // The next test will cause server errors, so check first if there are any
-        if(getServerErrors().length() > 0)
-            fail("There are server errors, failing the test. Errors: '" + getServerErrors() + "'.");
-        assertFalse("If the recipient list only contains users who have been filtered out, we should fail.", executeEmailScript(PasswordUtil.getUsername(), "User Should Be Removed Part 2", new String[]{"user5@clientapi.test"}, null, EMAIL_BODY_HTML));
-        assertTrue("We should have recorded a server side error if no recipients are present.", getServerErrors().contains("Error sending email: No recipient addresses"));
-        resetErrors();
+//        final String FILTER_USER_SUBJECT = "User Should Be Removed";
+//        APIUserHelper apiUserHelper = new APIUserHelper(this);
+//        apiUserHelper.deleteUser("user5@clientapi.test");
+//        apiUserHelper.createUserAndNotify("user5@clientapi.test");  // This will create a user but will not log them in.
+//
+//        // Create two users and show them as having logged in once.
+//        apiUserHelper.createUser(SKIP_EMAIL_RECIPIENTS[0], false, false);
+//        apiUserHelper.createUser(SKIP_EMAIL_RECIPIENTS[1], false, false);
+//
+//        assertTrue("A user who has never signed in should be filtered out of the recipient list.", executeEmailScript(PasswordUtil.getUsername(), FILTER_USER_SUBJECT, new String[]{SKIP_EMAIL_RECIPIENTS[0], "user5@clientapi.test", SKIP_EMAIL_RECIPIENTS[1]}, null, EMAIL_BODY_HTML));
+//
+//        // The next test will cause server errors, so check first if there are any
+//        if(getServerErrors().length() > 0)
+//            fail("There are server errors, failing the test. Errors: '" + getServerErrors() + "'.");
+//        assertFalse("If the recipient list only contains users who have been filtered out, we should fail.", executeEmailScript(PasswordUtil.getUsername(), "User Should Be Removed Part 2", new String[]{"user5@clientapi.test"}, null, EMAIL_BODY_HTML));
+//        assertTrue("We should have recorded a server side error if no recipients are present.", getServerErrors().contains("Error sending email: No recipient addresses"));
+//        resetErrors();
 
         signOut();
         assertFalse("api requires user in system for guests", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
@@ -970,14 +970,14 @@ public class ClientAPITest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(EMAIL_SUBJECT_2));
         assertElementPresent(Locator.linkWithText(EMAIL_SUBJECT_3));
 
-        EmailRecordTable mailTable = new EmailRecordTable(this);
-        EmailRecordTable.EmailMessage emailMessage = mailTable.getMessage(FILTER_USER_SUBJECT);
-        List<String> recipients = new ArrayList<String>(Arrays.asList(emailMessage.getTo()));
-        assertEquals("The number of recipients was not as expected.", 2, recipients.size());
-        assertTrue("Recipient list did not contain address '" + SKIP_EMAIL_RECIPIENTS[0] + "'.", recipients.contains(SKIP_EMAIL_RECIPIENTS[0]));
-        assertTrue("Recipient list did not contain address '" + SKIP_EMAIL_RECIPIENTS[1] + "'.", recipients.contains(SKIP_EMAIL_RECIPIENTS[1]));
-
-        assertEquals("Number of notification emails", 8, Locator.linkWithText("View headers").findElements(getDriver()).size());
+//        EmailRecordTable mailTable = new EmailRecordTable(this);
+//        EmailRecordTable.EmailMessage emailMessage = mailTable.getMessage(FILTER_USER_SUBJECT);
+//        List<String> recipients = new ArrayList<String>(Arrays.asList(emailMessage.getTo()));
+//        assertEquals("The number of recipients was not as expected.", 2, recipients.size());
+//        assertTrue("Recipient list did not contain address '" + SKIP_EMAIL_RECIPIENTS[0] + "'.", recipients.contains(SKIP_EMAIL_RECIPIENTS[0]));
+//        assertTrue("Recipient list did not contain address '" + SKIP_EMAIL_RECIPIENTS[1] + "'.", recipients.contains(SKIP_EMAIL_RECIPIENTS[1]));
+//
+//        assertEquals("Number of notification emails", 8, Locator.linkWithText("View headers").findElements(getDriver()).size());
     }
 
     private Boolean executeEmailScript(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody)
