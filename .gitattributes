@@ -247,6 +247,7 @@ modules/simpletest/resources/queries/study/verifyAssay.js -text
 modules/simpletest/resources/queries/vehicle/ParamParamVehicles.sql -text
 modules/simpletest/resources/queries/vehicle/ParameterizedVehicles.sql -text
 modules/simpletest/resources/queries/vehicle/Toyotas.sql -text
+modules/simpletest/resources/queries/vehicle/UserDefinedEmissions.sql -text
 modules/simpletest/resources/queries/vehicle/Vehicles/.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/AlternateImportTemplate.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/EditableFileBasedView.qview.xml -text
