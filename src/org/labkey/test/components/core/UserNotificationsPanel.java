@@ -20,8 +20,10 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.pages.core.UserNotificationsPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -149,16 +151,24 @@ public class UserNotificationsPanel extends WebDriverComponent<UserNotifications
         return null;
     }
 
+    public UserNotificationsPage viewAll()
+    {
+        getWrapper().clickAndWait(elementCache().viewAll);
+        return new UserNotificationsPage(getDriver());
+    }
+
+    public UserNotificationsPanel clearAll()
+    {
+        elementCache().clearAll.click();
+        clearElementCache();
+        WebDriverWrapper.waitFor(() -> elementCache().noNotifications.isDisplayed(), "'Clear All' notifications didn't", 1000);
+        return this;
+    }
+
     @Override
     public WebElement getComponentElement()
     {
         return _notificationPanel;
-    }
-
-    @Deprecated
-    public Elements elements()
-    {
-        return elementCache();
     }
 
     @Override
@@ -170,9 +180,9 @@ public class UserNotificationsPanel extends WebDriverComponent<UserNotifications
     public class Elements extends Component.ElementCache
     {
         private final WebElement notificationArea = new LazyWebElement(Locator.css("div.labkey-notification-area"), this);
-        public final WebElement clearAll = new LazyWebElement(Locator.css("div.labkey-notification-clear-all"), this);
-        public final WebElement noNotifications = new LazyWebElement(Locator.css("div.labkey-notification-none"), this);
-        public final WebElement viewAll = new LazyWebElement(Locator.css("div.labkey-notification-footer"), this);
+        private final WebElement clearAll = new LazyWebElement(Locator.css("div.labkey-notification-clear-all"), this);
+        private final WebElement noNotifications = new LazyWebElement(Locator.css("div.labkey-notification-none"), this);
+        private final WebElement viewAll = new LazyWebElement(Locator.css("div.labkey-notification-footer"), this);
         protected List<WebElement> findNotificationsOfType(String notificationType)
         {
             return Locator.id("notificationtype-" + notificationType).child(visibleNotification).findElements(this);
