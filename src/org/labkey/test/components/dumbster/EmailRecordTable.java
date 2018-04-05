@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.dumbster;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -24,6 +25,7 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,12 +35,13 @@ public class EmailRecordTable extends Table
 {
     private static final String RECORDER_CHECKBOX_NAME = "emailRecordOn";
     private static final String _regionName = "EmailRecord";
+    private static final Locator gridLocator = Locator.xpath("//table[@lk-region-name='"+ _regionName +"']");
     private static final int _headerRows = 2;
     private static final int _footerRows = 1;
 
     public EmailRecordTable(WebDriver driver)
     {
-        super(driver, new RefindingWebElement(emailLocator(), driver).withTimeout(WAIT_FOR_JAVASCRIPT));
+        super(driver, new RefindingWebElement(gridLocator, driver).withTimeout(WAIT_FOR_JAVASCRIPT));
         ((RefindingWebElement) getComponentElement()).withRefindListener(el -> clearElementCache());
     }
 
@@ -52,6 +55,19 @@ public class EmailRecordTable extends Table
     {
         getComponentElement().isDisplayed();
         return super.elementCache();
+    }
+
+    @Override
+    public int getColumnIndex(String headerLabel)
+    {
+        try
+        {
+            return EmailColumn.valueOf(headerLabel).getIndex();
+        }
+        catch (IllegalArgumentException fallback)
+        {
+            return super.getColumnIndex(headerLabel, _headerRows);
+        }
     }
 
     public int getEmailCount()
@@ -85,70 +101,42 @@ public class EmailRecordTable extends Table
         getWrapper().click(Locator.linkWithText(subject).index(index));
     }
 
-    public void clickSubjectTo(String subject, List<String> recipient)
-    {
-        int index;
-        int rows = getRowCount();
-
-        if (rows > 0)
-        {
-            for (int i = 0; i < rows; i++)
-            {
-                int colTo = getColumnIndex("To");
-                int colMsg = getColumnIndex("Message");
-                String to = getDataAsText(i, colTo);
-                if(recipient.contains(to))
-                {
-                    if(getDataAsText(i, colMsg).contains(subject)){clickSubjectAtIndex(subject, i); return;}
-                }
-            }
-            getWrapper().log("unable to find message with subject " + subject + "addressed to recipient " + recipient);
-            return;
-        }
-        getWrapper().log("no rows in mail record table");
-    }
-
     public void clickMessage(EmailMessage message)
     {
-        clickSubject(message.getSubject());
+        Locator.tag("a").findElement(getDataAsElement(message.getRowIndex(), EmailColumn.Message.getIndex())).click();
+        parseMessageCell(message); // Get body from expanded row
     }
 
-    public EmailMessage getMessage(String subjectPart)
+    public EmailMessage getMessageWithSubjectContaining(String subjectPart)
     {
         return getMessageRegEx(".*" + Pattern.quote(subjectPart) + ".*");
     }
 
+    public EmailMessage getMessage(String subject)
+    {
+        return getMessage(actualSubject -> actualSubject.equals(subject));
+    }
+
     public EmailMessage getMessageRegEx(String regExp)
+    {
+        return getMessage(subject -> subject.matches(regExp));
+    }
+
+    private EmailMessage getMessage(Predicate<String> subjectFilter)
     {
         int rows = getRowCount() - _footerRows;
 
         if (rows > 0)
         {
-            int colTo      = getColumnIndex("To", _headerRows);
-            int colFrom    = getColumnIndex("From", _headerRows);
-            int colMessage = getColumnIndex("Message", _headerRows);
+            int colMessage = getColumnIndex("Message");
             for (int i = _headerRows + 1; i <= rows; i++)
             {
                 String message = getDataAsText(i, colMessage);
                 String[] lines = trimAll(StringUtils.split(message, "\n"));
-                String subjectLine = lines[0];
-                if (subjectLine.matches(regExp))
+                String subjectLine = lines.length > 0 ? lines[0] : "";
+                if (subjectFilter.test(subjectLine))
                 {
-                    EmailMessage em = new EmailMessage();
-                    em.setFrom(trimAll(StringUtils.split(getDataAsText(i, colFrom), ',')));
-                    String[] to = trimAll(StringUtils.split(getDataAsText(i, colTo), ','));
-                    for (int j = 0; j < to.length; j++)
-                    {
-                        // Extract email from : "Display <display@labkey.test>"
-                        Pattern pattern = Pattern.compile(".*<(.+)>");
-                        Matcher matcher = pattern.matcher(to[j]);
-                        if (matcher.find())
-                            to[j] = matcher.group(1);
-                    }
-                    em.setTo(to);
-                    em.setSubject(subjectLine);
-                    em.setBody(StringUtils.join(lines, "\n", 1, lines.length));
-                    return em;
+                    return getEmailAtTableIndex(i);
                 }
             }
         }
@@ -179,17 +167,13 @@ public class EmailRecordTable extends Table
         return colsWithString;
     }
 
-    public EmailMessage getEmailAtTableIndex(int Index)
+    public EmailMessage getEmailAtTableIndex(int index)
     {
-        int colTo      = getColumnIndex("To", _headerRows);
-        int colFrom    = getColumnIndex("From", _headerRows);
-        int colMessage = getColumnIndex("Message", _headerRows);
-        String message = getDataAsText(Index, colMessage);
-        String[] lines = trimAll(StringUtils.split(message, "\n"));
-        String subjectLine = lines[0];
-        EmailMessage em = new EmailMessage();
-        em.setFrom(trimAll(StringUtils.split(getDataAsText(Index, colFrom), ',')));
-        String[] to = trimAll(StringUtils.split(getDataAsText(Index, colTo), ','));
+        int colTo      = getColumnIndex("To");
+        int colFrom    = getColumnIndex("From");
+        EmailMessage em = new EmailMessage(index);
+        em.setFrom(getDataAsText(index, colFrom));
+        String[] to = trimAll(StringUtils.split(getDataAsText(index, colTo), ','));
         for (int j = 0; j < to.length; j++)
         {
             // Extract email from : "Display <display@labkey.test>"
@@ -199,9 +183,31 @@ public class EmailRecordTable extends Table
                 to[j] = matcher.group(1);
         }
         em.setTo(to);
-        em.setSubject(subjectLine);
-        em.setBody(StringUtils.join(lines, "\n", 1, lines.length));
+        parseMessageCell(em);
+        parseViewCell(em);
         return em;
+    }
+
+    private void parseMessageCell(EmailMessage emailMessage)
+    {
+        int colMessage = getColumnIndex("Message");
+        String message = getDataAsText(emailMessage.getRowIndex(), colMessage);
+        String[] lines = trimAll(StringUtils.split(message, "\n"));
+        String subjectLine = lines.length > 0 ? lines[0] : "";
+        emailMessage.setSubject(subjectLine);
+        emailMessage.setBody(StringUtils.join(lines, "\n", 1, lines.length));
+    }
+
+    private void parseViewCell(EmailMessage emailMessage)
+    {
+        String html = getDataAsText(emailMessage.getRowIndex(), EmailColumn.View_HTML.getIndex()).trim();
+        String text = getDataAsText(emailMessage.getRowIndex(), EmailColumn.View_Text.getIndex()).trim();
+        List<String> views = new ArrayList<>();
+        if (!html.isEmpty())
+            views.add(html);
+        if (!text.isEmpty())
+            views.add(text);
+        emailMessage.setViews(views);
     }
 
     public List<String> getColumnDataAsText(String column)
@@ -216,17 +222,29 @@ public class EmailRecordTable extends Table
 
     public static class EmailMessage
     {
-        private String[] _from;
+        private final int rowIndex;
+        private String _from;
         private String[] _to;
         private String _subject;
         private String _body;
+        private List<String> views;
 
-        public String[] getFrom()
+        private EmailMessage(int rowIndex)
+        {
+            this.rowIndex = rowIndex;
+        }
+
+        private int getRowIndex()
+        {
+            return rowIndex;
+        }
+
+        public String getFrom()
         {
             return _from;
         }
 
-        public void setFrom(String[] from)
+        private void setFrom(String from)
         {
             _from = from;
         }
@@ -236,7 +254,7 @@ public class EmailRecordTable extends Table
             return _to;
         }
 
-        public void setTo(String[] to)
+        private void setTo(String[] to)
         {
             _to = to;
         }
@@ -246,7 +264,7 @@ public class EmailRecordTable extends Table
             return _subject;
         }
 
-        public void setSubject(String subject)
+        private void setSubject(String subject)
         {
             _subject = subject;
         }
@@ -256,14 +274,44 @@ public class EmailRecordTable extends Table
             return _body;
         }
 
-        public void setBody(String body)
+        private void setBody(String body)
         {
             _body = body;
         }
+
+        public List<String> getViews()
+        {
+            return views;
+        }
+
+        private void setViews(List<String> views)
+        {
+            this.views = ImmutableList.copyOf(views);
+        }
     }
 
-    private static Locator emailLocator()
+    private enum EmailColumn
     {
-        return Locator.xpath("//table[@lk-region-name='"+ _regionName +"']");
+        To(1),
+        From(2),
+        Time(3),
+        Date(3),
+        DateTime(3),
+        Message(4),
+        Headers(5),
+        View_HTML(6),
+        View_Text(7);
+
+        private final int index;
+
+        EmailColumn(int index)
+        {
+            this.index = index;
+        }
+
+        public int getIndex()
+        {
+            return index;
+        }
     }
 }

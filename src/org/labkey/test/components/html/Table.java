@@ -87,7 +87,7 @@ public class Table extends WebDriverComponent<Table.Elements>
         return columnHeaders;
     }
 
-    public List<WebElement> getColumnHeaderElements(int headerRow)
+    private List<WebElement> getColumnHeaderElements(int headerRow)
     {
         return getComponentElement().findElements(By.xpath("./tbody/tr["+ headerRow +"]/*[(name()='TH' or name()='TD' or name()='th' or name()='td')]"));
     }
@@ -102,7 +102,7 @@ public class Table extends WebDriverComponent<Table.Elements>
         return getComponentElement().findElements(By.xpath(".//tr/th"));
     }
 
-    public int getColumnIndex(String headerLabel, int headerIndex)
+    protected int getColumnIndex(String headerLabel, int headerIndex)
     {
         //List is zero based, locators that are going to depend on this are 1
         return getColumnHeaders(headerIndex).indexOf(headerLabel) + 1;
@@ -136,32 +136,9 @@ public class Table extends WebDriverComponent<Table.Elements>
         return getColumnAsText(columnName).get(row);
     }
 
-    public String getDataAsText(String pk, String columnName)
-    {
-        int row = getRowIndex(pk);
-        if (row == -1)
-            return null;
-        int col = getColumnIndex(columnName);
-        if (col == -1)
-            return null;
-        return getDataAsText(row, col);
-    }
-
-
     private WebElement _getDataAsElement(int row, int column)
     {
         return getComponentElement().findElement(By.xpath("./tbody/tr[" +row+ "]/td[" +column+ "]"));
-    }
-
-    public WebElement getDataAsElement(String pk, String columnName)
-    {
-        int row = getRowIndex(pk);
-        if (row == -1)
-            return null;
-        int col = getColumnIndex(columnName);
-        if (col == -1)
-            return null;
-        return _getDataAsElement(row, col);
     }
 
     public WebElement getDataAsElement(int row, int column)
@@ -197,15 +174,8 @@ public class Table extends WebDriverComponent<Table.Elements>
 
     public List<String> getRowAsText(int row)
     {
-        final int colCount = getColumnCount(row);
-        List<String> rowText = new ArrayList<>();
-
-        for (int col = 1; col <= colCount; col++)
-        {
-            rowText.add(getDataAsText(row, col));
-        }
-
-        return rowText;
+        List<WebElement> cells = Locator.xpath("./td").findElements(elementCache().getRows().get(row));
+        return getWrapper().getTexts(cells);
     }
 
     public List<WebElement> getColumnAsElement(String name, int columnIndex)
@@ -239,16 +209,6 @@ public class Table extends WebDriverComponent<Table.Elements>
         return columnElements;
     }
 
-    /** Find the row number for the given primary key. */
-    public int getRowIndex(String pk)
-    {
-        for(int i = 0; i < getRowCount(); i++)
-        {
-            if(getRowAsText(i).contains(pk)){return i;}
-        }
-        return -1;
-    }
-
     public int getRowIndex(String columnLabel, String value, int headerIndex)
     {
         return getRowIndex(getColumnIndex(columnLabel, headerIndex), value);
@@ -268,32 +228,6 @@ public class Table extends WebDriverComponent<Table.Elements>
                 return i;
         }
         return -1;
-    }
-
-    public int getHeaderRowCount(String columnHeaderClass)
-    {
-        //return 2 + (_floatingHeaders ? 2 : 0);
-        return getComponentElement().findElements(Locator.xpath("./tr[@class='"+columnHeaderClass+"']")).size();
-    }
-
-    public int getHeaderRowCount(int headerRowIndex)
-    {
-        return getComponentElement().findElements(Locator.xpath("./tr[" + headerRowIndex + "]")).size();
-    }
-
-    public int getHeaderRowCount()
-    {
-        return getHeaderRowCount(1);
-    }
-
-    public int getColumnCount(String columnHeaderClass)
-    {
-        return getComponentElement().findElements(Locator.xpath("./tbody/tr/td")).size();
-    }
-
-    public int getColumnCount(int columnIndex)
-    {
-        return getComponentElement().findElements(Locator.xpath("./tbody/tr["+ columnIndex +"]/td")).size();
     }
 
     protected static String[] trimAll(String[] strings)

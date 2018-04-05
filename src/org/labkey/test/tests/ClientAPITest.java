@@ -40,14 +40,17 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.UIUserHelper;
@@ -69,6 +72,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.WebTestHelper.getHttpResponse;
 
 @Category({BVT.class, Wiki.class})
 public class ClientAPITest extends BaseWebDriverTest
@@ -159,8 +163,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _userHelper.deleteUsers(false, EMAIL_RECIPIENTS);
-        _userHelper.deleteUsers(false, SKIP_EMAIL_RECIPIENTS);
+        _userHelper.deleteUsers(false, EMAIL_API_USERS);
         _userHelper.deleteUser(AUTOCOMPLETE_USER);
         _containerHelper.deleteProject(PROJECT_NAME, afterTest);
         _containerHelper.deleteProject(OTHER_PROJECT, afterTest);
@@ -209,17 +212,9 @@ public class ClientAPITest extends BaseWebDriverTest
     @Override
     protected void checkLinks()
     {
-        clearWiki();
+        //delete the test page so the crawler doesn't refetch a test and cause errors
+        getHttpResponse(WebTestHelper.buildURL("wiki", getProjectName() + "/" + FOLDER_NAME, "delete", Maps.of("name", WIKIPAGE_NAME)), "POST");
         super.checkLinks();
-    }
-
-    private void clearWiki()
-    {
-        //clear the test page so the crawler doesn't refetch a test and cause errors
-        beginAt(WebTestHelper.buildURL("wiki", getProjectName() + "/" + FOLDER_NAME, "edit", Maps.of("name", WIKIPAGE_NAME)));
-
-        _wikiHelper.setWikiBody("<p>" + "Test Complete." + "</p>");
-        _wikiHelper.saveWikiPage();
     }
 
     public static String getListData(String listKeyName, ListHelper.ListColumn[] listColumns, String[][] listData)
@@ -311,8 +306,9 @@ public class ClientAPITest extends BaseWebDriverTest
     private void createUsers()
     {
         // create the users for emailApiTest
-        for (String user : EMAIL_RECIPIENTS)
-            _userHelper.createUser(user);
+        _userHelper.createUser(EMAIL_SENDER);
+        _userHelper.createUser(EMAIL_RECIPIENT1);
+        _userHelper.createUser(EMAIL_RECIPIENT2);
         new UIUserHelper(this).cloneUser(AUTOCOMPLETE_USER, PasswordUtil.getUsername());
     }
 
@@ -824,7 +820,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         _listHelper.setColumnName(0, "customfield1");
         _listHelper.setColumnLabel(0, "Custom Field 1");
-        
+
         clickButton("Add Field", 0);
 
         _listHelper.setColumnName(1, "color");
@@ -907,91 +903,137 @@ public class ClientAPITest extends BaseWebDriverTest
         assertEquals("Wrong number of results", 5, testResults.length);
     }
 
-    private static final String EMAIL_SUBJECT = "Testing the email API";
-    private static final String EMAIL_SUBJECT_1 = "Testing the email API (all params)";
-    private static final String EMAIL_SUBJECT_2 = "Testing the email API (plain txt body)";
-    private static final String EMAIL_SUBJECT_3 = "Testing the email API (html txt body)";
-    private static final String EMAIL_BODY_PLAIN = "This is a test message.";
-    private static final String EMAIL_BODY_HTML = "<h2>This is a test message.<\\\\/h2>";
-    private static final String[] EMAIL_RECIPIENTS = {"user1@clientapi.test", "user2@clientapi.test", "user3@clientapi.test"};
-    private static final String[] SKIP_EMAIL_RECIPIENTS = {"user6@clientapi.test", "user7@clientapi.test"};
+    private static final String EMAIL_SENDER = "sender@clientapi.test";
+    private static final String EMAIL_RECIPIENT1 = "recipient1@clientapi.test";
+    private static final String EMAIL_RECIPIENT2 = "recipient2@clientapi.test";
+    private static final String EMAIL_NO_LOGIN = "no_login@clientapi.test";
+    private static final String[] EMAIL_API_USERS = {EMAIL_SENDER, EMAIL_RECIPIENT1, EMAIL_RECIPIENT2, EMAIL_NO_LOGIN};
 
     @Test
     public void emailApiTest()
     {
-        String[] emails = Arrays.copyOf(EMAIL_RECIPIENTS, EMAIL_RECIPIENTS.length + 1);
-        emails[emails.length-1] = "user4@clientapi.test";
+        final String EMAIL_SUBJECT_ERROR = "Testing the email API (should error)";
+        final String EMAIL_SUBJECT_NON_USER = "Testing the email API (to non-user)";
+        final String EMAIL_SUBJECT_ALL = "Testing the email API (all params)";
+        final String EMAIL_SUBJECT_PLAIN = "Testing the email API (plain txt body)";
+        final String EMAIL_SUBJECT_HTML = "Testing the email API (html txt body)";
+        final String EMAIL_SUBJECT_FROM_NEW_USER = "Testing the email API (sent from never logged in user)";
+        final String EMAIL_BODY_PLAIN = "This is a test message.";
+        final String EMAIL_BODY_HTML = "<h2>" + EMAIL_BODY_PLAIN + "</h2>";
+        final String[] EMAIL_RECIPIENTS = {EMAIL_RECIPIENT1, EMAIL_RECIPIENT2};
 
-        clickProject(PROJECT_NAME);
+        final ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+
         enableEmailRecorder();
 
-        assertFalse("api requires sender", executeEmailScript("", EMAIL_SUBJECT, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        // TODO: Increase permission level to App Admin after Issue 33831 has been resolved
+        apiPermissionsHelper.addMemberToRole(EMAIL_SENDER, "Reader", PermissionsHelper.MemberType.user, "Home");
 
-        assertFalse("api requires recipients", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[0], EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        goToHome();
 
-        assertFalse("api requires message body", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, EMAIL_RECIPIENTS, null, null));
+        impersonate(EMAIL_SENDER);
+        {
+            assertEquals("sendMessage API without correct role", "The current user does not have permission to use the SendMessage API.", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_ALL, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        }
+        stopImpersonating();
 
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, emails, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_2, emails, EMAIL_BODY_PLAIN, null));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_3, emails, null, EMAIL_BODY_HTML));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), null, emails, null, EMAIL_BODY_HTML));
+        apiPermissionsHelper.addMemberToRole(EMAIL_SENDER, "Use SendMessage API", PermissionsHelper.MemberType.user, "/");
 
-        assertFalse("principalId only allowed from a server side script", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"-1", "-2"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        impersonate(EMAIL_SENDER);
+        final String NON_USER_EMAIL = "non_user@clientapi.test";
+        {
+            assertEquals("sendMessage API with no sender", "Invalid email format.", executeEmailScript("", EMAIL_SUBJECT_ERROR, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+            assertEquals("sendMessage API with no recipients", "No message recipients supplied.", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_ERROR, new String[0], EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+            assertEquals("sendMessage API with no message body", "No message contents supplied.", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_ERROR, EMAIL_RECIPIENTS, null, null));
+            assertEquals("sendMessage API to non-user", "The email address '" + NON_USER_EMAIL + "' is not associated with a user account, and the current user does not have permission to send to it.", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_ERROR, new String[]{NON_USER_EMAIL}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+            assertEquals("sendMessage API using principal ids instead of emails", "Use of principalId is allowed only for server side scripts", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_ERROR, new String[]{"-1", "-2"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+            assertEquals("sendMessage API from non-user", "The email address '" + NON_USER_EMAIL + "' is not associated with a user account, and the current user does not have permission to send to it.",
+                    executeEmailScript(NON_USER_EMAIL, EMAIL_SUBJECT_ERROR, new String[]{EMAIL_RECIPIENT1}, null, EMAIL_BODY_HTML));
 
-//        final String FILTER_USER_SUBJECT = "User Should Be Removed";
-//        APIUserHelper apiUserHelper = new APIUserHelper(this);
-//        apiUserHelper.deleteUser("user5@clientapi.test");
-//        apiUserHelper.createUserAndNotify("user5@clientapi.test");  // This will create a user but will not log them in.
-//
-//        // Create two users and show them as having logged in once.
-//        apiUserHelper.createUser(SKIP_EMAIL_RECIPIENTS[0], false, false);
-//        apiUserHelper.createUser(SKIP_EMAIL_RECIPIENTS[1], false, false);
-//
-//        assertTrue("A user who has never signed in should be filtered out of the recipient list.", executeEmailScript(PasswordUtil.getUsername(), FILTER_USER_SUBJECT, new String[]{SKIP_EMAIL_RECIPIENTS[0], "user5@clientapi.test", SKIP_EMAIL_RECIPIENTS[1]}, null, EMAIL_BODY_HTML));
-//
-//        // The next test will cause server errors, so check first if there are any
-//        if(getServerErrors().length() > 0)
-//            fail("There are server errors, failing the test. Errors: '" + getServerErrors() + "'.");
-//        assertFalse("If the recipient list only contains users who have been filtered out, we should fail.", executeEmailScript(PasswordUtil.getUsername(), "User Should Be Removed Part 2", new String[]{"user5@clientapi.test"}, null, EMAIL_BODY_HTML));
-//        assertTrue("We should have recorded a server side error if no recipients are present.", getServerErrors().contains("Error sending email: No recipient addresses"));
-//        resetErrors();
+            assertEquals("sendMessage API with all fields", "success", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_ALL, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+            assertEquals("sendMessage API without HTML body", "success", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_PLAIN, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, null));
+            assertEquals("sendMessage API without plain text body", "success", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_HTML, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML));
+            assertEquals("sendMessage API without subject", "success", executeEmailScript(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML));
+        }
+        stopImpersonating();
+
+        assertEquals("sendMessage API to non-user as site admin", "success", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_NON_USER, new String[]{NON_USER_EMAIL}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+
+        goToModule("Dumbster");
+        EmailRecordTable mailTable = new EmailRecordTable(this);
+        assertTextNotPresent(EMAIL_SUBJECT_ERROR);
+        EmailRecordTable.EmailMessage emailMessage;
+        emailMessage = mailTable.getMessage(EMAIL_SUBJECT_ALL);
+        assertEquals("Wrong views available for: " + EMAIL_SUBJECT_ALL, Arrays.asList("HTML", "Text"), emailMessage.getViews());
+        emailMessage = mailTable.getMessage(EMAIL_SUBJECT_PLAIN);
+        assertEquals("Wrong views available for: " + EMAIL_SUBJECT_PLAIN, Arrays.asList("Text"), emailMessage.getViews());
+        emailMessage = mailTable.getMessage(EMAIL_SUBJECT_HTML);
+        assertEquals("Wrong views available for: " + EMAIL_SUBJECT_HTML, Arrays.asList("HTML"), emailMessage.getViews());
+        emailMessage = mailTable.getMessage("");
+        assertEquals("Wrong recipients for email with blank subject", Arrays.asList(EMAIL_RECIPIENTS), Arrays.asList(emailMessage.getTo()));
+        emailMessage = mailTable.getMessage(EMAIL_SUBJECT_NON_USER);
+        assertEquals("Wrong recipient for: " + EMAIL_SUBJECT_NON_USER, Arrays.asList(NON_USER_EMAIL), Arrays.asList(emailMessage.getTo()));
+        assertEquals("Wrong email count", 5, mailTable.getEmailCount());
+
+
+        log("Verify behavior for ");
+        final String FILTER_USER_SUBJECT = "Should exclude never-logged-in recipient: " + EMAIL_NO_LOGIN;
+        _userHelper.createUserAndNotify(EMAIL_NO_LOGIN);  // This will create a user but will not log them in.
+
+        enableEmailRecorder(); // Clear previously verified emails and new user notifications
+
+        impersonate(EMAIL_SENDER);
+        {
+            assertEquals("A user who has never signed in should be filtered out of the recipient list.", "success",
+                    executeEmailScript(PasswordUtil.getUsername(), FILTER_USER_SUBJECT, new String[]{EMAIL_RECIPIENT1, EMAIL_NO_LOGIN, EMAIL_RECIPIENT2}, null, EMAIL_BODY_HTML));
+        }
+        stopImpersonating();
+
+        // The next test will cause server errors, so check first if there are any
+        checkErrors();
+
+        impersonate(EMAIL_SENDER);
+        {
+            assertEquals("If the recipient list only contains users who have been filtered out, we should fail.", "Error sending email: No recipient addresses",
+                    executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_ERROR, new String[]{EMAIL_NO_LOGIN}, null, EMAIL_BODY_HTML));
+            assertEquals("Attempting to send from a user that hasn't logged in.", "success",
+                    executeEmailScript(EMAIL_NO_LOGIN, EMAIL_SUBJECT_FROM_NEW_USER, new String[]{EMAIL_RECIPIENT1}, null, EMAIL_BODY_HTML));
+        }
+        stopImpersonating();
+        assertTrue("We should have recorded a server side error if no recipients are present.", getServerErrors().contains("Error sending email: No recipient addresses"));
+        checkExpectedErrors(1);
 
         signOut();
-        assertFalse("api requires user in system for guests", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        assertEquals("api requires user in system for guests", "The current user does not have permission to use the SendMessage API.", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_ERROR, new String[]{EMAIL_RECIPIENTS[1]}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
         signIn();
-
-        clickProject(PROJECT_NAME);
 
         goToModule("Dumbster");
 
-        assertElementPresent(Locator.linkWithText(EMAIL_SUBJECT));
-        assertElementPresent(Locator.linkWithText(EMAIL_SUBJECT_1));
-        assertElementPresent(Locator.linkWithText(EMAIL_SUBJECT_2));
-        assertElementPresent(Locator.linkWithText(EMAIL_SUBJECT_3));
+        assertTextNotPresent(EMAIL_SUBJECT_ERROR);
 
-//        EmailRecordTable mailTable = new EmailRecordTable(this);
-//        EmailRecordTable.EmailMessage emailMessage = mailTable.getMessage(FILTER_USER_SUBJECT);
-//        List<String> recipients = new ArrayList<String>(Arrays.asList(emailMessage.getTo()));
-//        assertEquals("The number of recipients was not as expected.", 2, recipients.size());
-//        assertTrue("Recipient list did not contain address '" + SKIP_EMAIL_RECIPIENTS[0] + "'.", recipients.contains(SKIP_EMAIL_RECIPIENTS[0]));
-//        assertTrue("Recipient list did not contain address '" + SKIP_EMAIL_RECIPIENTS[1] + "'.", recipients.contains(SKIP_EMAIL_RECIPIENTS[1]));
-//
-//        assertEquals("Number of notification emails", 8, Locator.linkWithText("View headers").findElements(getDriver()).size());
+        mailTable = new EmailRecordTable(this);
+        emailMessage = mailTable.getMessage(FILTER_USER_SUBJECT);
+        assertEquals(FILTER_USER_SUBJECT, Arrays.asList(EMAIL_RECIPIENT1, EMAIL_RECIPIENT2), Arrays.asList(emailMessage.getTo()));
+        emailMessage = mailTable.getMessage(EMAIL_SUBJECT_FROM_NEW_USER);
+        assertEquals(EMAIL_SUBJECT_FROM_NEW_USER, Arrays.asList(EMAIL_NO_LOGIN), Arrays.asList(emailMessage.getFrom()));
+
+        assertEquals("Number of notification emails", 2, mailTable.getEmailCount());
     }
 
-    private Boolean executeEmailScript(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody)
+    private String executeEmailScript(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody)
     {
         final String emailScriptTemplate =
                 "var callback = arguments[arguments.length - 1];" +
                 "function errorHandler(errorInfo, options, responseObj)\n" +
                 "{\n" +
-                "   callback(false);\n" +
+                "   console.log(errorInfo);" +
+                "   callback(errorInfo.exception);\n" +
                 "}\n" +
                 "\n" +
                 "function onSuccess(result)\n" +
                 "{\n" +
-                "   callback(true);\n" +
+                "   console.log(result);" +
+                "   callback('success');\n" +
                 "}\n" +
                 "LABKEY.Message.sendMessage({\n" +
                 "   msgFrom: '%s',\n" +
@@ -1039,7 +1081,7 @@ public class ClientAPITest extends BaseWebDriverTest
         String emailScript = String.format(emailScriptTemplate, from, StringUtils.trimToEmpty(subject), recipientStr.toString(),
                 contentStr.toString());
 
-        return (Boolean)((JavascriptExecutor) getDriver()).executeAsyncScript(emailScript);
+        return (String)((JavascriptExecutor) getDriver()).executeAsyncScript(emailScript);
     }
 
     @Test

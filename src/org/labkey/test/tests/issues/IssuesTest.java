@@ -33,7 +33,6 @@ import org.labkey.test.categories.Issues;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.issues.AdminPage;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsPage;
@@ -394,7 +393,7 @@ public class IssuesTest extends BaseWebDriverTest
     public void testEmailTemplate()
     {
         // CustomizeEmailAction
-        new SiteNavBar(getDriver()).goToModule("Issues");
+        goToModule("Issues");
         clickButton("Admin");
         clickButton("Customize Email Template");
         String subject = getFormElement(Locator.name("emailSubject"));
@@ -410,7 +409,7 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.goToAdmin();
         _issuesHelper.setIssueAssignmentList(null);
         clickButton("Save");
-        new SiteNavBar(getDriver()).goToModule("Issues");
+        goToModule("Issues");
 
         // EmailPrefsAction
         EmailPrefsPage emailPrefsPage = new ListPage(getDriver()).clickEmailPreferences();
@@ -444,11 +443,11 @@ public class IssuesTest extends BaseWebDriverTest
         assertTitleContains(ISSUE.get("title"));
 
         //("Dumbster");
-        new SiteNavBar(getDriver()).goToModule("Dumbster");
+        goToModule("Dumbster");
         pushLocation();
 
         EmailRecordTable emailTable = new EmailRecordTable(this);
-        EmailMessage message = emailTable.getMessage(ISSUE.get("title") + ",\" has been opened and assigned to " + _userHelper.getDisplayNameForEmail(USER1));
+        EmailMessage message = emailTable.getMessageWithSubjectContaining(ISSUE.get("title") + ",\" has been opened and assigned to " + _userHelper.getDisplayNameForEmail(USER1));
 
         // Presumed to get the first message
         List<String> recipients = emailTable.getColumnDataAsText("To");
@@ -658,13 +657,13 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.createNewIssuesList("issues", _containerHelper);
 
         goToProjectHome();
-        new SiteNavBar(getDriver()).goToModule("Issues");
+        goToModule("Issues");
 
         // create a new issue to be moved
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitle));
 
         // move the created issue
-        new SiteNavBar(getDriver()).goToModule("Issues");
+        goToModule("Issues");
         clickAndWait(Locator.linkWithText(issueTitle));
         BootstrapMenu.find(getDriver(), "More")
                 .clickSubMenu(false, "Move");
@@ -679,7 +678,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // perform multi-issue move
         returnToProject();
-        new SiteNavBar(getDriver()).goToModule("Issues");
+        goToModule("Issues");
 
         String issueTitleA = "Multi-Issue Move A";
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleA));
@@ -689,7 +688,7 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleB));
         String issueIdB = getIssueId();
 
-        new SiteNavBar(getDriver()).goToModule("Issues");
+        goToModule("Issues");
 
         DataRegionTable issuesTable = new DataRegionTable(ISSUE_LIST_REGION_NAME, getDriver());
         issuesTable.checkCheckboxByPrimaryKey(issueIdA);
@@ -761,7 +760,7 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.goToAdmin();
         _issuesHelper.setIssueAssignmentList(null);
         clickButton("Save");
-        new SiteNavBar(getDriver()).goToModule("Issues");
+        goToModule("Issues");
 
         // check for no default
         clickButton("New Issue");

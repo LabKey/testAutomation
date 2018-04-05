@@ -320,11 +320,11 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
         String ownerEmail = PasswordUtil.getUsername();
         EmailRecordTable emailTable = new EmailRecordTable(_test);
-        EmailRecordTable.EmailMessage message = emailTable.getMessage(description);
+        EmailRecordTable.EmailMessage message = emailTable.getMessageWithSubjectContaining(description);
         assertNotNull("No email message found for " + description, message);
         emailTable.clickMessage(message);
         // Refetch message after expanding to get entire message text
-        message = emailTable.getMessage(description);
+        message = emailTable.getMessageWithSubjectContaining(description);
         validateTrue("The test " + description + " does not have expected status " + status,
                 message.getBody().contains("Status: " + status));
         List<String> recipients = Arrays.asList(message.getTo());
@@ -385,7 +385,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _test.clickButton("Send");
         _test.popLocation();
 
-        EmailRecordTable.EmailMessage message = emailTable.getMessage(sampleExp);
+        EmailRecordTable.EmailMessage message = emailTable.getMessageWithSubjectContaining(sampleExp);
         assertNotNull("Escalation message not sent", message);
         assertEquals("Escalation not sent to " + escalateEmail, escalateEmail, message.getTo()[0]);
     }
