@@ -78,6 +78,12 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
     }
 
+    public void dismiss()
+    {
+        Locator.tagWithClass("button", "close").findElement(getComponentElement()).click();
+        getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
+    }
+
     public void dismiss(String buttonText)
     {
         Locators.dismissButton(buttonText).findElement(getComponentElement()).click();
