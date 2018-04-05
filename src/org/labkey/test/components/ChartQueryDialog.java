@@ -40,7 +40,11 @@ public class ChartQueryDialog extends ChartWizardDialog<ChartQueryDialog.Element
     public ChartQueryDialog selectQuery(String queryName)
     {
         elementCache().queryCombo.selectComboBoxItem(queryName);
-        WebDriverWrapper.waitFor(this::isOkButtonEnabled, "'OK' button not enabled after selecting a query", 5000);
+        if (!WebDriverWrapper.waitFor(this::isOkButtonEnabled, 500))
+        {
+            elementCache().queryCombo.selectComboBoxItem(queryName); // Retry
+            WebDriverWrapper.waitFor(this::isOkButtonEnabled, "'OK' button not enabled after selecting a query", 1000);
+        }
         return this;
     }
 
