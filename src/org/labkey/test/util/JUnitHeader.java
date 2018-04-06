@@ -15,6 +15,8 @@
  */
 package org.labkey.test.util;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
 
@@ -36,23 +38,42 @@ public class JUnitHeader extends BaseWebDriverTest
         return null;
     }
 
-    @Test
-    public void beforeJUnit() throws Exception
+    @BeforeClass
+    public static void beforeClass()
     {
-        log("** This should precede JUnitTest.");
-        log("** It will enable the dumbster and clean up any errors caused by the previous test");
+        TestLogger.log("Preparing server to execute server-side tests");
+    }
 
+    @Test
+    public void configureR()
+    {
         RReportHelper reportHelper = new RReportHelper(this);
         reportHelper.ensureRConfig(); // reportTest.js (via RhinoService) executes an R script
+    }
 
+    @Test
+    public void configurePipeline()
+    {
         PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
         pipelineToolsHelper.setToolsDirToTestDefault(); // Point to extra tools if present (currently only sequeneanalysis tools)
+    }
 
+    @Test
+    public void cleanTestContainer()
+    {
         if (_containerHelper.doesContainerExist("Shared/_junit"))
             _containerHelper.deleteFolder("Shared", "_junit");
+    }
 
-        startSystemMaintenance();
+    @Test
+    public void startSystemMaintenance()
+    {
+        super.startSystemMaintenance();
+    }
 
+    @AfterClass
+    public static void logStart() throws Exception
+    {
         logToServer("=== Starting Server-side JUnit Tests ===");
     }
 
