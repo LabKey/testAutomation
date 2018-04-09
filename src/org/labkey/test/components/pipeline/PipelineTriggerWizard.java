@@ -201,7 +201,7 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         Input moveInput =  new Input(Locator.tagWithName("input", "move").findWhenNeeded(this), getDriver());
         Input copyInput =  new Input(Locator.tagWithName("input", "copyTo").findWhenNeeded(this), getDriver());
         Input paramFunctionInput =  new Input(Locator.tagWithName("textarea", "parameterFunction").findWhenNeeded(this), getDriver());
-        WebElement addCustomParam = Locator.linkWithText("Add custom parameter").findWhenNeeded(this);
+        WebElement addCustomParam = Locator.linkContainingText("add custom parameter").findWhenNeeded(this);
 
         //navgiation elements
         WebElement detailsLink = Locator.linkWithHref("#details").findWhenNeeded(this);
