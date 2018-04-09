@@ -124,6 +124,9 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite dynamicSuite(Collection<String> categories, Collection<String> excludedCategories)
     {
+        if (categories.isEmpty())
+            return new TestSuite();
+
         try
         {
             return _suite(testProps -> {
