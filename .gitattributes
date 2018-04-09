@@ -437,6 +437,7 @@ src/org/labkey/test/categories/DailyC.java -text
 src/org/labkey/test/categories/Data.java -text
 src/org/labkey/test/categories/Disabled.java -text
 src/org/labkey/test/categories/ETL.java -text
+src/org/labkey/test/categories/Empty.java -text
 src/org/labkey/test/categories/External.java -text
 src/org/labkey/test/categories/FileBrowser.java -text
 src/org/labkey/test/categories/Flow.java -text

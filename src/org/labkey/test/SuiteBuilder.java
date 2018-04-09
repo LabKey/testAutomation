@@ -18,6 +18,8 @@ package org.labkey.test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.categories.Continue;
+import org.labkey.test.categories.Disabled;
+import org.labkey.test.categories.Empty;
 import org.labkey.test.categories.Test;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -80,15 +82,22 @@ public class SuiteBuilder
         Set<Class<?>> tests = new HashSet<>(reflections.getTypesAnnotatedWith(Category.class));
 
         tests.removeIf(clz -> Modifier.isAbstract(clz.getModifiers()));
-        _suites.put(Continue.class.getSimpleName(), new HashSet<>()); // Not actually a suite, used to continue interrupted suite
+        _suites.put(Continue.class.getSimpleName(), Collections.emptySet()); // Not actually a suite, used to continue interrupted suite
         _suites.put(Test.class.getSimpleName(), new HashSet<>()); // Without this, Runner will crash if 'test.packages' property is misconfigured
+        _suites.put(Empty.class.getSimpleName(), Collections.emptySet());
 
         for (Class test : tests)
         {
             if (Modifier.isAbstract(test.getModifiers()))
                 continue; // Don't try to run abstract test classes, even if they have a @Category annotation
 
-            for (Class category : ((Category)test.getAnnotation(Category.class)).value())
+            List<Class<?>> categoriesFromAnnotation = Arrays.asList(((Category) test.getAnnotation(Category.class)).value());
+            if (categoriesFromAnnotation.contains(Disabled.class))
+            {
+                // Remove disabled tests from all other suites
+                categoriesFromAnnotation = Collections.singletonList(Disabled.class);
+            }
+            for (Class category : categoriesFromAnnotation)
             {
                 addTestToSuite(test, category.getSimpleName());
                 Class supercategory = category.getSuperclass();
@@ -106,7 +115,12 @@ public class SuiteBuilder
             int testsPkgIndex = packageNameParts.indexOf("tests");
             for (int i = testsPkgIndex + 1; testsPkgIndex > -1 && i < packageNameParts.size(); i++)
             {
-                addTestToSuite(test, packageNameParts.get(i));
+                String suiteName = packageNameParts.get(i);
+                if (categoriesFromAnnotation.contains(Disabled.class))
+                {
+                    suiteName = suiteName + "_disabled";
+                }
+                addTestToSuite(test, suiteName);
             }
             addTestToSuite(test, Test.class.getSimpleName()); // Make sure test is in the master "Test" suite
         }
@@ -134,7 +148,16 @@ public class SuiteBuilder
             suiteName = suiteName.substring(1);
         }
         Set<Class> tests = _suites.getOrDefault(suiteName, optional ? Collections.emptySet() : null);
+
+        if (tests == null)
+            throw new IllegalArgumentException(suiteName + " is not a valid test suite");
+
         return new TestSet(tests, suiteName);
+    }
+
+    public TestSet getEmptyTestSet()
+    {
+        return getTestSet(Empty.class.getSimpleName());
     }
 
     public Set<String> getSuites()

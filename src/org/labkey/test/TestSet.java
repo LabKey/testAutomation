@@ -16,6 +16,8 @@
 
 package org.labkey.test;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,11 +30,8 @@ public class TestSet
     private String _suite;
     private List<Class> _tests;
 
-    TestSet(Set<Class> tests, String suite)
+    TestSet(@NotNull Set<Class> tests, @NotNull String suite)
     {
-        if (tests == null)
-            throw new IllegalArgumentException(suite + " is not a valid test suite");
-
         _tests = new ArrayList<>(tests);
         _suite = suite;
     }
