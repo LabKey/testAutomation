@@ -25,24 +25,24 @@ import junit.framework.TestListener;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.runner.BaseTestRunner;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.junit.Ignore;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
-import org.labkey.api.collections.ArrayListMap;
 import org.labkey.api.reader.Readers;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.junit.runner.WebTestProperties;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.aspects.TestPerfAspect;
 import org.labkey.test.categories.Continue;
+import org.labkey.test.categories.Empty;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.tests.BasicTest;
 import org.labkey.test.tests.DatabaseDiagnosticsTest;
@@ -54,7 +54,6 @@ import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WindowsOnlyTest;
-import org.openqa.selenium.Keys;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -62,7 +61,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -79,13 +77,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.WebTestHelper.logToServer;
 
 public class Runner extends TestSuite
 {
     private static final int DEFAULT_MAX_TEST_FAILURES = 10;
-    private static final String DEFAULT_SUITE = org.labkey.test.categories.DRT.class.getSimpleName();
     private static SuiteBuilder _suites = SuiteBuilder.getInstance();
     private static Map<Test, Long> _testStats = new LinkedHashMap<>();
     private static int _testCount;
@@ -570,9 +568,9 @@ public class Runner extends TestSuite
             Set<String> excludedSuites = new HashSet<>();
             for (String specifiedSuite : specifiedSuites)
             {
-                if (specifiedSuite.startsWith("-"))
+                if (specifiedSuite.startsWith("-") && specifiedSuite.length() > 1)
                     excludedSuites.add(specifiedSuite.substring(1));
-                else if (specifiedSuite.startsWith("?"))
+                else if (specifiedSuite.startsWith("?") && specifiedSuite.length() > 1)
                     requestedSuites.add(specifiedSuite.substring(1));
                 else
                     requestedSuites.add(specifiedSuite);
@@ -723,7 +721,7 @@ public class Runner extends TestSuite
     private static TestSet getCompositeTestSet(List<String> suitesColl)
     {
         if (suitesColl.isEmpty())
-            _suites.getTestSet(DEFAULT_SUITE);
+            return _suites.getEmptyTestSet();
         if (suitesColl.size() == 1)
             return getSuite(suitesColl.get(0));
 
@@ -773,7 +771,10 @@ public class Runner extends TestSuite
     protected static List<String> getSpecifiedSuites()
     {
         String suites = StringUtils.trimToEmpty(System.getProperty("suite"));
-        return new ArrayList<>(Arrays.asList(suites.split("\\s*,\\s*")));
+        Set<String> suiteNames = Collections.newSetFromMap(new CaseInsensitiveMap<>());
+        suiteNames.addAll(Arrays.asList(suites.split("\\s*,\\s*")));
+        suiteNames.removeAll(Arrays.asList("Test", ""));
+        return new ArrayList<>(suiteNames);
     }
 
     protected static List<String> getTestNames(String namesProperty)
@@ -792,84 +793,27 @@ public class Runner extends TestSuite
             final String allTestsSuite = org.labkey.test.categories.Test.class.getSimpleName();
             List<String> testNames = getTestNames(System.getProperty("test"));
             TestSet set;
-            final List<String> specifiedSuites = getSpecifiedSuites();
             if (testNames.isEmpty())
             {
+                final List<String> specifiedSuites = getSpecifiedSuites();
                 set = getCompositeTestSet(specifiedSuites);
             }
             else
             {
-                System.out.println("Custom test list specified. Ignoring specified suite(s): " + specifiedSuites);
+                System.out.println("Custom test list specified. Ignoring specified suite(s).");
                 set = getCompositeTestSet(Collections.singletonList(allTestsSuite));
             }
 
-            if (set.getSuite().equalsIgnoreCase(allTestsSuite) && testNames.isEmpty())
+            if ((set.getSuite().equalsIgnoreCase(allTestsSuite) || set.getSuite().equalsIgnoreCase(Empty.class.getSimpleName())) && testNames.isEmpty())
             {
-                String fileName = System.getProperty("dumpTsv", "");
-                Map<String, Map<String, Object>> testMap = new TreeMap<>();
+                String fileName = System.getProperty("dumpTsv", "").trim();
 
-                List<String> suites = new ArrayList<>(SuiteBuilder.getInstance().getSuites());
-                Collections.sort(suites);
-                List<String> ignoreSuiteList = Arrays.asList("Daily", "Weekly", "Test");
-
-                for (String suite : suites)
-                {
-                    TestSet testSet = SuiteBuilder.getInstance().getTestSet(suite);
-
-                    if (!testSet.getTestNames().isEmpty() && !ignoreSuiteList.contains(suite))
-                    {
-                        for (Class test : testSet.getTestList())
-                        {
-                            if (!testMap.containsKey(test.getSimpleName()))
-                            {
-                                testMap.put(test.getSimpleName(), new HashMap<>());
-                            }
-                            Map<String, Object> testAttributes= testMap.get(test.getSimpleName());
-                            StringBuilder suitesNames = new StringBuilder(testAttributes.get("suite")==null? "" : testAttributes.get("suite").toString());
-                            String suiteDelim = suitesNames.toString().length() > 0 ? "," : "";
-                            suitesNames.append(suiteDelim + suite);
-                            testAttributes.put("suite", suitesNames);
-                            testAttributes.put("simpleName", test.getSimpleName());
-                            Annotation[] annotations = test.getAnnotations();
-                            for (int i=0; i<annotations.length; i++)
-                            {
-                                if (annotations[i].annotationType().getSimpleName().equals("ClassTimeout"))
-                                    testAttributes.put("timeout", ((BaseWebDriverTest.ClassTimeout)annotations[i]).minutes());
-                            }
-                            StringBuilder categories =new StringBuilder("");
-                            for (Class category : ((Category)test.getAnnotation(Category.class)).value())
-                            {
-                                String categoryDelim = categories.length() > 0 ? "," : "";
-                                categories.append(categoryDelim + category.getSimpleName());
-                            }
-                            testAttributes.put("categories", categories);
-                            testMap.put(test.getSimpleName(), testAttributes);
-                        }
-                    }
-                }
                 if (!fileName.isEmpty())
                 {
-                    File dumpFile = new File(fileName);
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(dumpFile));
-                    try
-                    {
-                        writer.write("suite\tclass\tcategories\ttimeout\n");
-                        for (String testName : testMap.keySet())
-                        {
-                            Map<String, Object> testInfo = testMap.get(testName);
-                            StringBuilder line = new StringBuilder(testInfo.get("suite").toString() + "\t");
-                            line.append(testInfo.get("simpleName") + "\t");
-                            line.append(testInfo.get("categories") + "\t");
-                            line.append(testInfo.get("timeout") + "\t");
-                            writer.write(line + "\n");
-                        }
-                        writer.flush();
-                    }
-                    catch (IOException ioe){ ioe.printStackTrace();}
-                    finally{ writer.close();}   // make sure to release the writer and file locks
-                    //logToServer("dump file written to:" + dumpFile.getAbsolutePath());
+                    dumpTsv(fileName);
+                    return new TestSuite();
                 }
-                else
+                else if (!TestProperties.isTestRunningOnTeamCity())
                 {
                     TestHelper.ResultPair pair = TestHelper.run();
                     if (pair != null)
@@ -892,6 +836,62 @@ public class Runner extends TestSuite
             System.err.print(BaseTestRunner.getFilteredTrace(e));
             throw e;
         }
+    }
+
+    private static void dumpTsv(String fileName)
+    {
+        Map<String, List<String>> testsSuites = new TreeMap<>();
+        Map<String, Integer> testsTimeouts = new TreeMap<>();
+
+        Set<String> suites = _suites.getSuites();
+        suites.removeAll(Arrays.asList("Daily", "Weekly", "Test")); // Ignore suites that don't get run regularly
+        Set<String> nightlySuites = Collections.newSetFromMap(new CaseInsensitiveMap<>());
+        nightlySuites.addAll(Arrays.asList("BVT", "DailyA", "DailyB", "DailyC", "Git", "CustomModules", "EHR"));
+
+        for (String suite : suites)
+        {
+            TestSet testSet = _suites.getTestSet(suite);
+
+            for (Class test : testSet.getTestList())
+            {
+                String testName = test.getSimpleName();
+                if (!testsSuites.containsKey(testName))
+                {
+                    testsSuites.put(testName, new ArrayList<>());
+                    testsTimeouts.put(testName, getTestTimeout(test));
+                }
+                testsSuites.get(testName).add(suite);
+            }
+        }
+        File dumpFile = new File(fileName);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(dumpFile)))
+        {
+            writer.write("Test\tNightly Suites\tSuites\tTimeout\n");
+            for (String testName : testsSuites.keySet())
+            {
+                String line = testName + "\t" +
+                        String.join(", ", testsSuites.get(testName).stream().filter(nightlySuites::contains).collect(Collectors.toList())) + "\t" +
+                        String.join(", ", testsSuites.get(testName)) + "\t" +
+                        testsTimeouts.get(testName) + "\n";
+                writer.write(line);
+            }
+            writer.flush();
+        }
+        catch (IOException ioe)
+        {
+            throw new RuntimeException("Unable to dump test list", ioe);
+        }
+
+        System.out.println("Test list dumped to: " + dumpFile.getAbsolutePath());
+    }
+
+    private static int getTestTimeout(Class testClass)
+    {
+        BaseWebDriverTest.ClassTimeout timeout = (BaseWebDriverTest.ClassTimeout) testClass.getAnnotation(BaseWebDriverTest.ClassTimeout.class);
+        if (timeout != null)
+            return timeout.minutes();
+        return -1;
     }
 
     public static TestSuite suite(List<String> testNames, TestSet set) throws Exception
