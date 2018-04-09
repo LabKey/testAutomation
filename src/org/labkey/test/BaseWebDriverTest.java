@@ -127,17 +127,17 @@ import static org.labkey.test.components.html.RadioButton.RadioButton;
  * The name of the method is not important. The JUnit runner finds the method solely based on the BeforeClass annotation
  *
  * @BeforeClass
- * public static void doSetup() throws Exception
+ * public static void setupProject() throws Exception
  * {
  *     MyTestClass initTest = (MyTestClass)getCurrentTest();
- *     initTest.setupProject(); // Perform shared setup steps here
+ *     initTest.doSetup(); // Perform shared setup steps here
  * }
  *
- * org.junit.AfterClass is also supported, but should not be used to perform any destructive cleanup as it is executed
- * before the base test class can perform its final checks -- link check, leak check, etc.
+ * @{link org.junit.AfterClass} is also supported, but should not be used to perform any destructive cleanup or
+ * navigation as it is executed before the base test class can perform its final checks -- link check, leak check, etc.
  * The doCleanup method should be overridden for initial and final project cleanup
  */
-@BaseWebDriverTest.ClassTimeout(minutes = BaseWebDriverTest.DEFAULT_CLASS_TIMEOUT)
+@BaseWebDriverTest.ClassTimeout()
 public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cleanable, WebTest
 {
     private static BaseWebDriverTest currentTest;
@@ -164,7 +164,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public UIPermissionsHelper _permissionsHelper = new UIPermissionsHelper(this);
 
     public static final int MAX_WAIT_SECONDS = 10 * 60;
-    public static final int DEFAULT_CLASS_TIMEOUT = 25;
 
     public static final double DELTA = 10E-10;
 
@@ -424,7 +423,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (timeout != null)
                     minutes = timeout.minutes();
                 else
-                    minutes = DEFAULT_CLASS_TIMEOUT;
+                    minutes = ClassTimeout.DEFAULT;
 
                 return FailOnTimeout.builder()
                         .withTimeout(minutes, TimeUnit.MINUTES)
@@ -2429,7 +2428,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @Inherited
     public @interface ClassTimeout
     {
-        int minutes();
+        int DEFAULT = 25;
+        int minutes() default DEFAULT;
     }
 
     private static final class SingletonWebDriver
