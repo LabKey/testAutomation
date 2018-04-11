@@ -546,6 +546,7 @@ public class DataViewsTest extends ParticipantListTest
 
         // specify a custom height
         setFormElement(Locator.name("height"), String.valueOf(NEW_CUSTOM_HEIGHT));
+        fireEvent(Locator.name("height"), SeleniumEvent.blur);
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
 
