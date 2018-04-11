@@ -28,16 +28,6 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
 {
     public abstract WebElement getComponentElement();
 
-    public WebElement findElement(Locator locator)
-    {
-        return locator.findElement(this);
-    }
-
-    public List<WebElement> findElements(Locator locator)
-    {
-        return locator.findElements(this);
-    }
-
     @Override
     public WebElement findElement(By by)
     {
