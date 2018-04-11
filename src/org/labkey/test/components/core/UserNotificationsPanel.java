@@ -25,6 +25,8 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.pages.core.UserNotificationsPage;
 import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -160,8 +162,17 @@ public class UserNotificationsPanel extends WebDriverComponent<UserNotifications
     public UserNotificationsPanel clearAll()
     {
         elementCache().clearAll.click();
-        clearElementCache();
-        WebDriverWrapper.waitFor(() -> elementCache().noNotifications.isDisplayed(), "'Clear All' notifications didn't", 1000);
+        WebDriverWrapper.waitFor(() -> {
+            try
+            {
+                return elementCache().noNotifications.isDisplayed();
+            }
+            catch (StaleElementReferenceException | NoSuchElementException refresh)
+            {
+                clearElementCache();
+                return false;
+            }
+        }, "\"No new notifications\" message not visible after clearing notifications", 1000);
         return this;
     }
 
