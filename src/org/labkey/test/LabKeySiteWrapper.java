@@ -72,6 +72,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -844,6 +846,35 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "showErrorsSinceMark"), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         assertEquals("Failed to fetch server errors: " + httpResponse.getResponseMessage(), HttpStatus.SC_OK, httpResponse.getResponseCode());
         return httpResponse.getResponseBody();
+    }
+
+    @LogMethod
+    public void checkExpectedErrors(@LoggedParam int expectedErrors)
+    {
+        int count = getServerErrorCount();
+
+        if (expectedErrors != count)
+        {
+            beginAt(buildURL("admin", "showErrorsSinceMark"));
+            resetErrors();
+            assertEquals("Expected error count does not match actual count for this run.", expectedErrors, count);
+        }
+
+        // Clear expected errors to prevent the test from failing.
+        resetErrors();
+    }
+
+    protected int getServerErrorCount()
+    {
+        String text = getServerErrors();
+        Pattern errorPattern = Pattern.compile("^ERROR", Pattern.MULTILINE);
+        Matcher errorMatcher = errorPattern.matcher(text);
+        int count = 0;
+        while (errorMatcher.matches())
+        {
+            count++;
+        }
+        return count;
     }
 
     public void resetErrors()

@@ -91,8 +91,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -111,7 +109,6 @@ import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.TestProperties.isViewCheckSkipped;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
-import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.components.PropertiesEditor.PhiSelectType;
@@ -1033,29 +1030,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         else
             log("Found " + leakCount + " in-use objects.  This is within the expected number of " + MAX_LEAK_LIMIT + ".");
-    }
-
-    @LogMethod
-    public void checkExpectedErrors(@LoggedParam int expectedErrors)
-    {
-        String text = getServerErrors();
-        Pattern errorPattern = Pattern.compile("^ERROR", Pattern.MULTILINE);
-        Matcher errorMatcher = errorPattern.matcher(text);
-        int count = 0;
-        while (errorMatcher.find())
-        {
-            count++;
-        }
-
-        if (expectedErrors != count)
-        {
-            beginAt(buildURL("admin", "showErrorsSinceMark"));
-            resetErrors();
-            assertEquals("Expected error count does not match actual count for this run.", expectedErrors, count);
-        }
-
-        // Clear expected errors to prevent the test from failing.
-        resetErrors();
     }
 
     @LogMethod
