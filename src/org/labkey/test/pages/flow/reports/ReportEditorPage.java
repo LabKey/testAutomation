@@ -69,7 +69,7 @@ public abstract class ReportEditorPage<Page extends ReportEditorPage> extends La
 
     public Page addKeywordFilter(String property, String value)
     {
-        elementCache().addKeyworkFilter.click();
+        elementCache().addKeywordFilter.click();
         final List<WebElement> filterRows = elementCache().findFilterRows(FilterType.Keyword);
         WebElement newFilter = filterRows.get(filterRows.size() - 1);
         final WebElement propertyCombo = Locator.tag("input").attributeEndsWith("name", ".property").parent().findElement(newFilter);
@@ -180,7 +180,7 @@ public abstract class ReportEditorPage<Page extends ReportEditorPage> extends La
         final Input name = Input(Locator.name("reportName"), getDriver()).findWhenNeeded(this);
         final Input description = Input(Locator.name("reportDescription"), getDriver()).findWhenNeeded(this);
         final WebElement subsetPickerTrigger = getSubsetInput().followingSibling("img").withClass("x-form-trigger").findWhenNeeded(this);
-        final WebElement addKeyworkFilter = Locator.linkWithText("Add Keyword Filter").findWhenNeeded(this);
+        final WebElement addKeywordFilter = Locator.linkWithText("Add Keyword Filter").findWhenNeeded(this);
         final WebElement addSampleFilter = Locator.linkWithText("Add Sample Filter").findWhenNeeded(this);
         final WebElement addStatisticFilter = Locator.linkWithText("Add Statistic Filter").findWhenNeeded(this);
         final WebElement addFieldFilter = Locator.linkWithText("Add Field Filter").findWhenNeeded(this);
