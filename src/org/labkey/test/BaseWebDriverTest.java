@@ -1391,8 +1391,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void clickTab(String tabname)
     {
+        tabname = tabname.trim();
+        if (tabname.equals("+") || tabname.equals("add"))
+            throw new IllegalArgumentException("Use PortalHelper.addTab");
+
         log("Selecting tab " + tabname);
-        clickAndWait(Locator.folderTab(tabname).waitForElement(shortWait()));
+        WebElement tab = Locator.folderTab(tabname).waitForElement(shortWait());
+        mouseOver(tab);
+        clickAndWait(tab);
     }
 
     public void verifyTabSelected(String caption)
