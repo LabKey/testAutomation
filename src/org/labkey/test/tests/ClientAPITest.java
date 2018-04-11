@@ -1313,11 +1313,11 @@ public class ClientAPITest extends BaseWebDriverTest
 
         log("Verify default behavior to include suggested columns in details of user defined queries.");
         List<GetQueryDetailsResponse.Column> columns = new GetQueryDetailsCommand(SCHEMA, QUERY).execute(cn, PATH).getColumns();
-        assertTrue("Sugggested column 'Container' for user defined query was missing in response.",
+        assertTrue("Suggested column 'Container' for user defined query was missing in response.",
                 columns.stream().anyMatch(col -> col.getName().equalsIgnoreCase("Container")));
         log("Verify optional behavior to exclude suggested columns from details of user defined queries.");
         columns = new GetQueryDetailsCommand(SCHEMA, QUERY, false).execute(cn, PATH).getColumns();
-        assertTrue("Sugggested column 'Container' for user defined query was included in response.",
+        assertTrue("Suggested column 'Container' for user defined query was included in response.",
                 columns.stream().noneMatch(col -> col.getName().equalsIgnoreCase("Container")));
     }
 
