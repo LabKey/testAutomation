@@ -870,7 +870,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         Pattern errorPattern = Pattern.compile("^ERROR", Pattern.MULTILINE);
         Matcher errorMatcher = errorPattern.matcher(text);
         int count = 0;
-        while (errorMatcher.matches())
+        while (errorMatcher.find())
         {
             count++;
         }
