@@ -70,7 +70,8 @@ public class DataRegionTest extends BaseWebDriverTest
                     new Pair<>("Keep Removable Filters", "testRemovableFilters"),
                     new Pair<>("Hide Paging Count", "testHidePagingCount"),
                     new Pair<>("Show All Rows", "testShowAllTotalRows"),
-                    new Pair<>("Use getBaseFilters", "testGetBaseFilters")
+                    new Pair<>("Use getBaseFilters", "testGetBaseFilters"),
+                    new Pair<>("Filter on \"Sort\" column", "testFilterOnSortColumn")
                     );
 
     private static final Pair<String, String> QWP_SCHEMA_LISTING = new Pair<>("List out all queries in schema", "testSchemaOnly");
