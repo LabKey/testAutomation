@@ -64,7 +64,7 @@ public class DumbsterController extends SpringActionController
     @RequiresPermission(ReadPermission.class)
     public class BeginAction extends SimpleViewAction
     {
-        public ModelAndView getView(Object o, BindException errors) throws Exception
+        public ModelAndView getView(Object o, BindException errors)
         {
             if (getUser().hasRootAdminPermission())
                 return new MailWebPart();
@@ -81,7 +81,7 @@ public class DumbsterController extends SpringActionController
     @RequiresPermission(AdminPermission.class)
     public class SetRecordEmailAction extends ApiAction<RecordEmailForm>
     {
-        public ApiResponse execute(RecordEmailForm form, BindException errors) throws Exception
+        public ApiResponse execute(RecordEmailForm form, BindException errors)
         {
             if (!getUser().hasRootAdminPermission())
                 throw new UnauthorizedException();
