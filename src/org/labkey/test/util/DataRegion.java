@@ -327,11 +327,17 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
             return allHeaderButtons;
         }
 
+        private final Map<String, String> alternateButtonTexts = Maps.of("Export", "Export / Sign Data");
         protected WebElement getHeaderButton(String text)
         {
             WebElement button = getHeaderButtonOrNull(text);
             if (button == null)
-                throw new NoSuchElementException("No header button: " + text);
+            {
+                if (alternateButtonTexts.containsKey(text))
+                    button = getHeaderButtonOrNull(alternateButtonTexts.get(text));
+                if (button == null)
+                    throw new NoSuchElementException("No header button: " + text);
+            }
             return button;
         }
 
@@ -352,7 +358,6 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
             return headerButtons.get(text);
         }
 
-        // Only works with new UX
         protected BootstrapMenu getHeaderMenu(String text)
         {
             if (headerMenus == null)
