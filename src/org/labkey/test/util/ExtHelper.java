@@ -24,11 +24,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
-import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
+import static org.junit.Assert.fail;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
 import static org.labkey.test.Locator.NOT_HIDDEN;
-
-import static org.junit.Assert.*;
 
 public class ExtHelper
 {
@@ -155,42 +154,12 @@ public class ExtHelper
 
     public void setCodeMirrorValue(String id, String value)
     {
-        String script =
-                "setCodeMirrorValue = function(id, value) {\n" +
-                "    try {\n" +
-                "        if (LABKEY.CodeMirror && LABKEY.CodeMirror[id]) {\n" +
-                "            var eal = LABKEY.CodeMirror[id];\n" +
-                "            eal.setValue(value);\n" +
-                "        }\n" +
-                "        else {\n" +
-                "            throw 'Unable to find code mirror instance.';\n" +
-                "        }\n" +
-                "    } catch (e) {\n" +
-                "        throw 'setCodeMirrorValue() threw an exception: ' + e.message;\n" +
-                "    }\n" +
-                "};\n" +
-                "setCodeMirrorValue(arguments[0], arguments[1]);";
-        _test.executeScript(script, id, value);
+        new CodeMirrorHelper(_test).setCodeMirrorValue(id, value);
     }
 
     public String getCodeMirrorValue(String id)
     {
-        String script =
-                "var getCodeMirrorValue = function(id) {\n" +
-                "    try {\n" +
-                "        if (LABKEY.CodeMirror && LABKEY.CodeMirror[id]) {\n" +
-                "            var eal = LABKEY.CodeMirror[id];\n" +
-                "            return eal.getValue();\n" +
-                "        }\n" +
-                "        else {\n" +
-                "            throw 'Unable to find code mirror instance.';\n" +
-                "        }\n" +
-                "    } catch (e) {\n" +
-                "        throw 'getCodeMirrorValue() threw an exception: ' + e.message;\n" +
-                "    }\n" +
-                "};\n" +
-                "return getCodeMirrorValue(arguments[0]);";
-        return (String)_test.executeScript(script, id);
+        return new CodeMirrorHelper(_test).getCodeMirrorValue(id);
     }
 
     /**

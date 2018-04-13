@@ -531,8 +531,9 @@ public class RReportHelper
     }
 
     /**
-     * pre-conditions: at report's Source tab
+     * @deprecated Remove once RStudio branch is merged (May 2018)
      */
+    @Deprecated
     public boolean isReportSourceLineCountMatch(int expectedLineCount)
     {
         Locator lastLineLoc = Locator.css(".CodeMirror-code > div:last-of-type .CodeMirror-linenumber");

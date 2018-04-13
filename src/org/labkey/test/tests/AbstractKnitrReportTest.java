@@ -20,11 +20,11 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -114,7 +113,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         _rReportHelper.clickSourceTab();
 
         int expectedLineCount = reportSource.split("\n").length;
-        assertTrue("Incorrect number of lines present in code editor.", _rReportHelper.isReportSourceLineCountMatch(expectedLineCount));
+        assertEquals("Incorrect number of lines present in code editor.", expectedLineCount, new CodeMirrorHelper(this).getLineCount());
 
         return saveAndVerifyKnitrReport(reportName, reportContains, reportNotContains);
     }
