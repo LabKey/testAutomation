@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -840,13 +841,14 @@ public class Runner extends TestSuite
 
     private static void dumpTsv(String fileName)
     {
-        Map<String, List<String>> testsSuites = new TreeMap<>();
-        Map<String, Integer> testsTimeouts = new TreeMap<>();
+        Map<String, Set<String>> testsSuites = new TreeMap<>();
+        Map<String, Class> testsClasses = new HashMap<>();
 
-        Set<String> suites = _suites.getSuites();
-        suites.removeAll(Arrays.asList("Daily", "Weekly", "Test")); // Ignore suites that don't get run regularly
-        Set<String> nightlySuites = Collections.newSetFromMap(new CaseInsensitiveMap<>());
-        nightlySuites.addAll(Arrays.asList("BVT", "DailyA", "DailyB", "DailyC", "Git", "CustomModules", "EHR"));
+        List<String> nonSuites = Arrays.asList("daily", "weekly", "test", "continue", "empty");
+        Collection<String> suites = _suites.getSuites().stream()
+                .filter(s -> !nonSuites.contains(s.toLowerCase())) // Ignore non-suites and suites that don't get run regularly
+                .sorted(Comparator.comparingInt((String s) -> _suites.getTestSet(s).getTestList().size()).reversed())
+                .collect(Collectors.toList());
 
         for (String suite : suites)
         {
@@ -857,23 +859,34 @@ public class Runner extends TestSuite
                 String testName = test.getSimpleName();
                 if (!testsSuites.containsKey(testName))
                 {
-                    testsSuites.put(testName, new ArrayList<>());
-                    testsTimeouts.put(testName, getTestTimeout(test));
+                    testsSuites.put(testName, Collections.newSetFromMap(new CaseInsensitiveMap<>()));
+                    testsClasses.put(testName, test);
                 }
                 testsSuites.get(testName).add(suite);
             }
         }
+
+        Set<String> nightlySuites = Collections.newSetFromMap(new CaseInsensitiveMap<>());
+        nightlySuites.addAll(Arrays.asList("BVT", "DailyA", "DailyB", "DailyC", "Git", "CustomModules", "EHR"));
         File dumpFile = new File(fileName);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(dumpFile)))
         {
-            writer.write("Test\tNightly Suites\tSuites\tTimeout\n");
+            List<Class> checkedInterfaces = Arrays.asList(PostgresOnlyTest.class, SqlserverOnlyTest.class, WindowsOnlyTest.class, NonWindowsTest.class, DevModeOnlyTest.class);
+            writer.write(String.format("Test\tNightly Suites\tSuites\tTimeout\tpackage\t%s\t%s\n",
+                    String.join("\t", checkedInterfaces.stream().map(Class::getSimpleName).collect(Collectors.toList())),
+                    String.join("\t", suites)));
             for (String testName : testsSuites.keySet())
             {
-                String line = testName + "\t" +
-                        String.join(", ", testsSuites.get(testName).stream().filter(nightlySuites::contains).collect(Collectors.toList())) + "\t" +
-                        String.join(", ", testsSuites.get(testName)) + "\t" +
-                        testsTimeouts.get(testName) + "\n";
+                Class testClass = testsClasses.get(testName);
+                String line = testName + "\t" + // Test
+                        String.join(", ", testsSuites.get(testName).stream().filter(nightlySuites::contains).collect(Collectors.toList())) + "\t" + // Nightly Suites
+                        String.join(", ", testsSuites.get(testName)) + "\t" + // Suites
+                        getTestTimeout(testClass) + "\t" + // Timeout
+                        testClass.getPackage().getName() + "\t" + // Package
+                        String.join("\t", checkedInterfaces.stream().map(i -> i.isAssignableFrom(testClass) ? "Y" : "").collect(Collectors.toList())) + "\t" + // Interfaces
+                        String.join("\t", suites.stream().map(s -> testsSuites.get(testName).contains(s) ? "Y" : "").collect(Collectors.toList())) + "\t" + // Suites
+                        "\n";
                 writer.write(line);
             }
             writer.flush();
