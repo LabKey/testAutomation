@@ -2,6 +2,7 @@ package org.labkey.test.components.pipeline;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -184,6 +185,13 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     protected class ElementCache extends WebDriverComponent.ElementCache
     {
+        public ElementCache()
+        {
+            if (getWrapper().getUrlParameters().containsKey("rowId"))
+                // Wait for initial value to populate
+                WebDriverWrapper.waitFor(() -> nameInput.get().isEmpty(), 1000);
+        }
+
         //details page elements
         Input nameInput = new Input(Locator.tagWithName("input", "name").findWhenNeeded(this), getDriver());
         Input descriptionInput =  new Input(Locator.tagWithName("textarea", "description").findWhenNeeded(this), getDriver());
