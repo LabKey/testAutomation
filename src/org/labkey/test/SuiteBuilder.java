@@ -86,10 +86,19 @@ public class SuiteBuilder
         _suites.put(Test.class.getSimpleName(), new HashSet<>()); // Without this, Runner will crash if 'test.packages' property is misconfigured
         _suites.put(Empty.class.getSimpleName(), Collections.emptySet());
 
+        Map<String, Class> testClasses = new CaseInsensitiveHashMap<>();
         for (Class test : tests)
         {
             if (Modifier.isAbstract(test.getModifiers()))
                 continue; // Don't try to run abstract test classes, even if they have a @Category annotation
+
+            {
+                // Ensure that test class names are unique
+                String simpleName = test.getSimpleName();
+                if (testClasses.containsKey(simpleName))
+                    throw new IllegalStateException("Found two tests with the same class name, please rename one of them: " + testClasses.get(simpleName).getName() + " & " + test.getName());
+                testClasses.put(simpleName, test);
+            }
 
             List<Class<?>> categoriesFromAnnotation = Arrays.asList(((Category) test.getAnnotation(Category.class)).value());
             if (categoriesFromAnnotation.contains(Disabled.class))
