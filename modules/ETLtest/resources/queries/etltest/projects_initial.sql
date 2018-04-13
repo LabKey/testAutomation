@@ -16,8 +16,8 @@
 SELECT
   1 AS project,
   NULL AS account, -- base table column
-  'inves 1' AS inves, -- base table column
-  'inves2 1' AS inves2, -- base table column
+  10 AS inves, -- base table column
+  11 AS inves2, -- base table column
   NULL AS outside_email, -- extensible table column
   'outside_inst 1' AS outside_inst, -- extensible table column
   'outside_phone 1' AS outside_phone, -- extensible table column
@@ -26,8 +26,8 @@ SELECT
 UNION SELECT
   2 AS project,
   'account 2' AS account, -- base table column
-  'inves 2' AS inves, -- base table column
-  'inves2 2' AS inves2, -- base table column
+  20 AS inves, -- base table column
+  21 AS inves2, -- base table column
   'outside_email 2' AS outside_email, -- extensible table column
   'outside_inst 2' AS outside_inst, -- extensible table column
   'outside_phone 2' AS outside_phone, -- extensible table column

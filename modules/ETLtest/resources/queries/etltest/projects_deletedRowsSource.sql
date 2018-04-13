@@ -13,6 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-select
-1 as project,
+SELECT
+  1 as project,
   CAST('01/04/1995' as TIMESTAMP) as modified

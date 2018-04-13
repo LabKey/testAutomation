@@ -17,7 +17,7 @@ SELECT
   1 AS project,
   'account 1' AS account, -- empty base value -> non-empty base value
   NULL AS inves, -- non-empty base value -> empty base value
-  'inves2 1 changed' AS inves2, -- non-empty base value -> different non-empty base value
+  12 AS inves2, -- non-empty base value -> different non-empty base value
   'outside_email 1' AS outside_email, -- empty extensible value -> non-empty extensible value
   NULL AS outside_inst, -- non-empty extensible value -> empty extensible value
   'outside_phone 1 changed' AS outside_phone, -- non-empty extensible value -> different non-empty extensible value
@@ -26,8 +26,8 @@ SELECT
 UNION SELECT
   2 AS project,
   'account 2' AS account, -- base table column
-  'inves 2' AS inves, -- base table column
-  'inves2 2' AS inves2, -- base table column
+  20 AS inves, -- base table column
+  21 AS inves2, -- base table column
   'outside_email 2' AS outside_email, -- extensible table column
   'outside_inst 2' AS outside_inst, -- extensible table column
   'outside_phone 2' AS outside_phone, -- extensible table column
