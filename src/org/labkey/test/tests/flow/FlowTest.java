@@ -154,7 +154,7 @@ public class FlowTest extends BaseFlowTest
         clickButton("edit");
         confirmKeywordValue("TUBE NAME", "FlowTest Keyword Tube Name");
 
-        click(Locator.tagWithClassContaining("i", "add-new-keyword"));
+        click(Locator.tagWithClassContaining("a", "add-new-keyword"));
 
         Locator locNewName = Locator.xpath("//td/input[@type='text' and @value='']");
         String newKeywordName = "new keyword name for 91747";
@@ -178,7 +178,7 @@ public class FlowTest extends BaseFlowTest
         result.checkCheckbox(result.getRowIndex("Name", filename2));
         editKeywordsButton = result.getHeaderButton("Edit Keywords");
         editKeywordsButton.click();
-        click(Locator.tagWithClassContaining("i", "add-new-keyword"));
+        click(Locator.linkWithText("Create a new keyword"));
         locNewValue = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']/../../td/input[@name='ff_keywordValue']");
         setFormElement(locNewValue, newKeywordValue);
         clickButton("update");
@@ -201,7 +201,7 @@ public class FlowTest extends BaseFlowTest
         Locator locNewNameTestValue = Locator.xpath("//td/input[@type='hidden' and @value='New Name Test' and @name='ff_keywordName']/../../td/input[@name='ff_keywordValue']");
         setFormElement(locNewNameTestValue, "original");
 
-        click(Locator.tagWithClassContaining("i", "add-new-keyword"));
+        click(Locator.linkWithText("Create a new keyword"));
         locNewValue = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']/../../td/input[@name='ff_keywordValue']");
         setFormElement(locNewValue, newKeywordValue);
         locNewName = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']");
