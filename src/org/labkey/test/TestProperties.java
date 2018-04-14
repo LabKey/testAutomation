@@ -39,10 +39,10 @@ public abstract class TestProperties
             properties.putAll(System.getProperties());
             System.setProperties(properties);
         }
-        catch (IOException ignore)
+        catch (IOException ioe)
         {
             TestLogger.log("Failed to load test.properties file. Running with hard-coded defaults");
-            ignore.printStackTrace(System.out);
+            ioe.printStackTrace(System.out);
         }
     }
 

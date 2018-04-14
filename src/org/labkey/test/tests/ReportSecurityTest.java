@@ -23,6 +23,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 
 @Category({DailyC.class, Reports.class})
@@ -104,6 +105,9 @@ public class ReportSecurityTest extends ReportTest
     @LogMethod
     protected void doReportSecurity()
     {
+        // Turn on experimental feature that adds back the "Create Chart View (deprecated)" menu item. See #33938.
+        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "ExperimentalDeprecatedChartView");
+
         // create charts
         navigateToFolder(getProjectName(), getFolderName());
 
@@ -148,6 +152,9 @@ public class ReportSecurityTest extends ReportTest
         setFormElement(Locator.name("label"), TEST_GRID_VIEW);
         selectOptionByText(Locator.id("datasetSelection"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create View");
+
+        // Re-hide "Create Chart View (deprecated)" menu item
+        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "ExperimentalDeprecatedChartView");
 
         // test security
         navigateToFolder(getProjectName(), "My Study");

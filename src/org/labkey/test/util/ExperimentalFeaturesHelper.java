@@ -59,6 +59,5 @@ public class ExperimentalFeaturesHelper
         {
             throw new RuntimeException("Error setting experimental feature '" + feature + "': " + e.getStatusCode(), e);
         }
-
     }
 }
