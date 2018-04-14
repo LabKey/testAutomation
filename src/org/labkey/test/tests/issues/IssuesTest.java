@@ -118,7 +118,7 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void doSetup() throws Exception
+    public static void doSetup()
     {
         IssuesTest initTest = (IssuesTest)getCurrentTest();
         initTest.doInit();
