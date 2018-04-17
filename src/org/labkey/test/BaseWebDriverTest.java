@@ -2058,6 +2058,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForPipelineJobsToComplete(finishedJobsExpected, description, expectError, MAX_WAIT_SECONDS * 1000);
     }
 
+    /**
+     * Wait for all in-progress pipeline jobs to finish, then assert the quantity and lack of or presence of an error
+     * @param finishedJobsExpected Exact number of jobs to expect
+     * @param description "Description" field for at least one of the finished jobs (Not currently a strict check)
+     * @param expectError If true, at least one job must have an ERROR state; otherwise all must be COMPLETE
+     * @param timeoutMilliseconds Maximum time to wait for pipeline jobs to finish (default 10 minutes)
+     */
     @LogMethod
     public void waitForPipelineJobsToComplete(@LoggedParam final int finishedJobsExpected, @LoggedParam final String description, final boolean expectError, int timeoutMilliseconds)
     {
@@ -2084,7 +2091,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return waitForPipelineJobsToFinish(jobsExpected, Duration.ofSeconds(MAX_WAIT_SECONDS));
     }
 
-    // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
+    /**
+     * Wait until pipeline UI shows that all jobs have finished then assert the quantity
+     * @param jobsExpected Exact number of jobs to expect
+     * @param timeout {@link Duration} to wait for pipeline jobs to finish (default 10 minutes)
+     * @return {@link List} of status values for all pipeline jobs
+     */
     @LogMethod
     public List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected, @LoggedParam Duration timeout)
     {
@@ -2101,6 +2113,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return statusValues;
     }
 
+    /**
+     * Wait until pipeline UI shows that all jobs have finished
+     * If the timeout is exceeded and one of the pipeline jobs is in a "WAIT" state, we show the pipeline status grid
+     * filtered to ALL_FOLDERS and exclude and finished or waiting jobs to get more informative failure information
+     * @param timeoutMilliseconds Maximum time to wait for pipeline jobs to finish (default 10 minutes)
+     * @return {@link List} of status values for all pipeline jobs
+     */
     @LogMethod
     public List<String> waitForRunningPipelineJobs(long timeoutMilliseconds)
     {
