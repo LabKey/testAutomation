@@ -79,6 +79,12 @@ public class ConfigureFileSystemAccessPage extends LabKeyPage<ConfigureFileSyste
         return elementCache().homeDirectoryFileRoot.get();
     }
 
+    public MapNetworkDrivePage clickMapNetworkDrive()
+    {
+        clickAndWait(elementCache().configureNetworkDrive);
+        return new MapNetworkDrivePage(getDriver());
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -88,6 +94,7 @@ public class ConfigureFileSystemAccessPage extends LabKeyPage<ConfigureFileSyste
     {
         protected final WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
         protected final WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
+        protected final WebElement configureNetworkDrive = Locator.linkContainingText("Configure").findWhenNeeded(this);
 
         protected final Input siteLevelFileRoot = Input.Input(Locator.name("rootPath"), getDriver()).findWhenNeeded(this);
         protected final Input homeDirectoryFileRoot = Input.Input(Locator.name("userRootPath"), getDriver()).findWhenNeeded(this);

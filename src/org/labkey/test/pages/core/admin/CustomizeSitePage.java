@@ -159,24 +159,6 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
-    public CustomizeSitePage setNetworkDriveLetter(String value)
-    {
-        elementCache().networkDriveLetter.set(value);
-        return this;
-    }
-
-    public CustomizeSitePage setNetworkDrivePath(String value)
-    {
-        elementCache().networkDrivePath.set(value);
-        return this;
-    }
-
-    public CustomizeSitePage setNetworkDriveUser(String value)
-    {
-        elementCache().networkDriveUser.set(value);
-        return this;
-    }
-
     public CustomizeSitePage setShowRibbonMessage(boolean enable)
     {
         elementCache().showRibbonMessage.set(enable);
@@ -262,13 +244,6 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
 
         // Pipeline Settings
         protected final Input pipelineToolsDirectory = Input(Locator.id("pipelineToolsDirectory"), getDriver()).findWhenNeeded(this);
-
-        // Map Network Drive
-        protected final Input networkDriveLetter = Input(Locator.id("networkDriveLetter"), getDriver()).findWhenNeeded(this);
-        protected final Input networkDrivePath = Input(Locator.id("networkDrivePath"), getDriver()).findWhenNeeded(this);
-        protected final Input networkDriveUser = Input(Locator.id("networkDriveUser"), getDriver()).findWhenNeeded(this);
-        protected final Input networkDrivePassword = Input(Locator.id("networkDrivePassword"), getDriver()).findWhenNeeded(this);
-        protected final WebElement testNetworkDrive = Locator.linkWithText("Test network drive settings").findWhenNeeded(this);
 
         // Ribbon Bar
         protected final Checkbox showRibbonMessage = Checkbox(Locator.id("showRibbonMessage")).findWhenNeeded(this);
