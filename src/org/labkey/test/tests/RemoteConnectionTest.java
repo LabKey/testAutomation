@@ -85,7 +85,7 @@ public class RemoteConnectionTest extends BaseWebDriverTest
 
         // leave name field blank
         rconnHelper.createConnection(EMPTY_NAME, EMPTY_NAME, EMPTY_NAME, EMPTY_NAME, EMPTY_NAME,
-                "Connection name may not be blank");
+                "All fields must be filled in");
         assertEquals(0, rconnHelper.getNumConnections());
 
         // leave other fields blank
@@ -125,7 +125,7 @@ public class RemoteConnectionTest extends BaseWebDriverTest
                 "There is already a remote connection with the name '" + CONNECTION_VALID + "'.");
 
         // edit for real to correct server and test that conn is successful
-        rconnHelper.editConnection(CONNECTION_VALID, CONNECTION_EDIT, getBaseURL(), null, null, null);
+        rconnHelper.editConnection(CONNECTION_VALID, CONNECTION_EDIT, getBaseURL(), null, null, PasswordUtil.getPassword());
         // make sure the rename happend and we have the same number of connections
         assertEquals(3, rconnHelper.getNumConnections());
         // make sure rename happened
