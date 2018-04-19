@@ -183,6 +183,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     public boolean fileIsPresent(String nodeIdEndsWith)
     {
+        waitForFileGridReady();
         Locator targetFile = Locators.gridRowWithNodeId(nodeIdEndsWith);
         return isElementPresent(targetFile);
     }
