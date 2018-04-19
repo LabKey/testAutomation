@@ -133,6 +133,11 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         return this;
     }
 
+    public boolean isMoveEnabled()
+    {
+        return elementCache().moveInput.getComponentElement().getAttribute("disabled") == null;
+    }
+
     public PipelineTriggerWizard setCopy(String value)
     {
         elementCache().copyInput.set(value);
