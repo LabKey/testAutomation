@@ -2133,6 +2133,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             refresh();
             statusValues = getPipelineStatusValues();
         }
+        log("Final: [" + StringUtils.join(statusValues,",") + "]");
 
         boolean waitingJobs = statusValues.stream().anyMatch(status -> status.contains("WAIT"));
         if (waitingJobs)
