@@ -83,17 +83,17 @@ public class FlowTest extends BaseFlowTest
     @Test
     public void _doTestSteps()
     {
-        analysisFilterTest();
-        testChartMeasurePicker();
-        configureSampleSetAndMetadata();
-        sampleSetAndMetadataTest();
-        customGraphQuery();
-        positivityReportTest();
-        qcReportTest();
-        copyAnalysisScriptTest();
-        removeAnalysisFilter();
-        verifyDiscoverableFCSFiles();
-        verifyExperimentRunGraphLinks();
+//        analysisFilterTest();
+//        testChartMeasurePicker();
+//        configureSampleSetAndMetadata();
+//        sampleSetAndMetadataTest();
+//        customGraphQuery();
+//        positivityReportTest();
+//        qcReportTest();
+//        copyAnalysisScriptTest();
+//        removeAnalysisFilter();
+//        verifyDiscoverableFCSFiles();
+//        verifyExperimentRunGraphLinks();
         testBulkKeywordEdit();
     }
 
