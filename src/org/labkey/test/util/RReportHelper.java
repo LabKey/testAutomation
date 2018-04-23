@@ -23,6 +23,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
+import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
+import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -30,7 +32,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -234,7 +235,7 @@ public class RReportHelper
         }
         else if (useDocker)
         {
-            scripts.addEngine(ConfigureReportsAndScriptsPage.EngineType.R_DOCKER, new HashMap<>());
+            scripts.addEngineWithDefaults(EngineType.R_DOCKER);
             rVersion = RDOCKER;
         }
 
@@ -251,7 +252,7 @@ public class RReportHelper
                     _test.clickButton("Cancel", 0);
                     return rVersion;
                 }
-                else if (scripts.isEnginePresent(localEngineName)) // Reset R scripting engine on TeamCity
+                else // Reset R scripting engine on TeamCity
                 {
                     scripts.deleteEngine(localEngineName);
                 }
@@ -259,9 +260,9 @@ public class RReportHelper
 
             rVersion = getRVersion(getRExecutable());
 
-            ConfigureReportsAndScriptsPage.EngineConfig config = new ConfigureReportsAndScriptsPage.EngineConfig(getRExecutable());
+            EngineConfig config = new EngineConfig(getRExecutable());
             config.setVersion(rVersion);
-            scripts.addEngine(ConfigureReportsAndScriptsPage.EngineType.R, config);
+            scripts.addEngine(EngineType.R, config);
         }
         return rVersion;
     }

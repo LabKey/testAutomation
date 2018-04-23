@@ -60,15 +60,25 @@ public class ConfigureReportsAndScriptsPage
         return _test.isElementPresent(Locators.enginesGridRowForName(engineName));
     }
 
-    public void addEngine(@LoggedParam EngineType type, EngineConfig config)
+    @LogMethod
+    public void addEngineWithDefaults(@LoggedParam EngineType type)
     {
-        addEngine(type, config.getConfigMap());
+        addEngine(type, new EngineConfig(null));
     }
 
     @LogMethod
-    public void addEngine(@LoggedParam EngineType type, Map<Locator, String> configMap)
+    public void addEngine(@LoggedParam EngineType type, EngineConfig config)
     {
-        _test._extHelper.clickExtMenuButton(false, Locator.id("btn_addEngine"), "New " + type + " Engine");
+        Map<Locator, String> configMap = config.getConfigMap();
+
+        String menuText = "New " + type + " Engine";
+        _test._extHelper.clickExtMenuButton(false, Locator.id("btn_addEngine"), menuText);
+        WebElement menuItem = Locator.menuItem(menuText).findElementOrNull(_test.getDriver());
+        if (menuItem != null)
+        {
+            _test.mouseOver(menuItem);
+            menuItem.click(); // Retry for unresponsive button
+        }
         WebElement window = _test.waitForElement(Locators.editEngineWindow);
 
         for (Map.Entry<Locator, String> entry : configMap.entrySet())
