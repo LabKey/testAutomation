@@ -1,0 +1,1 @@
+SELECT * FROM etlTest.source ORDER BY rowId;

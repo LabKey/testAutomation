@@ -123,6 +123,7 @@ modules/ETLtest/resources/queries/etltest/projects_delete.sql -text
 modules/ETLtest/resources/queries/etltest/projects_deletedRowsSource.sql -text
 modules/ETLtest/resources/queries/etltest/projects_initial.sql -text
 modules/ETLtest/resources/queries/etltest/projects_merge.sql -text
+modules/ETLtest/resources/queries/etltest/source_ordered.sql -text
 modules/ETLtest/resources/queries/study/parameterized.sql -text
 modules/ETLtest/resources/schemas/dbscripts/postgresql/etltest-0.00-16.30.sql -text
 modules/ETLtest/resources/schemas/dbscripts/sqlserver/etltest-0.00-16.30.sql -text

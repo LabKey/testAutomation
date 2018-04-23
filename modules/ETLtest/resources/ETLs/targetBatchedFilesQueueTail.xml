@@ -5,7 +5,7 @@
 <transforms>
     <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
         <description>Copy to target</description>
-        <source schemaName="etltest" queryName="source" />
+        <source schemaName="etltest" queryName="source_ordered" />
         <destination type="file" dir="etlOut" fileBaseName="report-${TransformRunId}" fileExtension="testIn.tsv" rowDelimiter="\r" quote="'" columnDelimiter=","  batchSize="2"/>
     </transform>
     <transform id="QueueTail" type="TaskrefTransformStep">
