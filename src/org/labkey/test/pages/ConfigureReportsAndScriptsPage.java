@@ -195,7 +195,7 @@ public class ConfigureReportsAndScriptsPage
             addToConfigMap(Locator.id("editEngine_languageName"), getLanguageName());
             addToConfigMap(Locator.id("editEngine_languageVersion"), getLanguageVersion());
             addToConfigMap(Locator.id("editEngine_extensions"), getExtensions());
-            addToConfigMap(Locator.id("editEngine_exePath"), getPath().getAbsolutePath());
+            addToConfigMap(Locator.id("editEngine_exePath"), getPath() != null ? getPath().getAbsolutePath() : null);
             addToConfigMap(Locator.id("editEngine_exeCommand"), getCommand());
             addToConfigMap(Locator.id("editEngine_outputFileName"), getOutputFileName());
 
