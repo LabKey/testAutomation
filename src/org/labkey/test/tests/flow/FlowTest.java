@@ -83,17 +83,17 @@ public class FlowTest extends BaseFlowTest
     @Test
     public void _doTestSteps()
     {
-//        analysisFilterTest();
-//        testChartMeasurePicker();
-//        configureSampleSetAndMetadata();
-//        sampleSetAndMetadataTest();
-//        customGraphQuery();
-//        positivityReportTest();
-//        qcReportTest();
-//        copyAnalysisScriptTest();
-//        removeAnalysisFilter();
-//        verifyDiscoverableFCSFiles();
-//        verifyExperimentRunGraphLinks();
+        analysisFilterTest();
+        testChartMeasurePicker();
+        configureSampleSetAndMetadata();
+        sampleSetAndMetadataTest();
+        customGraphQuery();
+        positivityReportTest();
+        qcReportTest();
+        copyAnalysisScriptTest();
+        removeAnalysisFilter();
+        verifyDiscoverableFCSFiles();
+        verifyExperimentRunGraphLinks();
         testBulkKeywordEdit();
     }
 
@@ -710,7 +710,7 @@ public class FlowTest extends BaseFlowTest
             pushLocation();
             clickAndWait(graphLinkLoc.index(i));
             assertTextPresent("Click on a node in the graph below for details.");
-            assertTextNotPresent("Error");
+            assertTextNotPresent("Unable to display graph", "Error running dot");
             popLocation();
         }
     }
