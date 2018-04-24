@@ -27,7 +27,7 @@ import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
 import org.labkey.test.util.WorkbookHelper.WorkbookFolderType;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -50,7 +50,7 @@ public class WorkbookTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("workbook");
+        return Collections.emptyList();
     }
 
     @Override
