@@ -16,6 +16,7 @@ bin/windows/geckodriver.exe -text
 bin/windows/i386/IEDriverServer.exe -text
 bin/windows/i386/VERSION -text
 /build.gradle -text
+chromeextensions/README.txt -text
 data/api/EmbeddedQueryWebPart.html -text
 data/api/LuminexGuideSet.html -text
 data/api/assayTest.js -text
