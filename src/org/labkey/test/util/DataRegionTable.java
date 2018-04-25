@@ -54,6 +54,7 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 
 /**
  * Component wrapper class for interacting with a LabKey Data Region (see clientapi/dom/DataRegion.js)
@@ -847,10 +848,7 @@ public class DataRegionTable extends DataRegion
     public void setSort(String columnName, SortDirection direction)
     {
         getWrapper().log("Setting sort in " + getDataRegionName() + " for " + columnName + " to " + direction.toString());
-        if (isAsync())
-            doAndWaitForUpdate(() -> clickColumnMenu(columnName, false, "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending")));
-        else
-            clickColumnMenu(columnName, true, "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending"));
+        doAndWaitForUpdate(() -> clickColumnMenu(columnName, !isAsync(), "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending")));
     }
 
     public void setSummaryStatistic(String columnName, String stat, @Nullable String expectedValue)
@@ -902,10 +900,7 @@ public class DataRegionTable extends DataRegion
 
     public void clearSort(String columnName)
     {
-        if (isAsync())
-            doAndWaitForUpdate(() -> clickColumnMenu(columnName, false, "Clear Sort"));
-        else
-            clickColumnMenu(columnName, true, "Clear Sort");
+        doAndWaitForUpdate(() -> clickColumnMenu(columnName, !isAsync(), "Clear Sort"));
     }
 
     public void openFilterDialog(String columnName)
@@ -924,12 +919,12 @@ public class DataRegionTable extends DataRegion
 
     public void setFilter(String columnName, String filterType)
     {
-        setFilter(columnName, filterType, null, BaseWebDriverTest.WAIT_FOR_PAGE);
+        setFilter(columnName, filterType, null, isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     public void setFilter(String columnName, String filterType, @Nullable String filter)
     {
-        setFilter(columnName, filterType, filter, BaseWebDriverTest.WAIT_FOR_PAGE);
+        setFilter(columnName, filterType, filter, isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     public void setFilter(String columnName, String filterType, @Nullable String filter, int waitMillis)
@@ -946,13 +941,13 @@ public class DataRegionTable extends DataRegion
     public void setFilter(String columnName, String filterType, @Nullable String filter, @Nullable String filter2Type, @Nullable String filter2)
     {
         setUpFilter(columnName, filterType, filter, filter2Type, filter2);
-        doAndWaitForUpdate(() -> getWrapper().clickButton("OK", BaseWebDriverTest.WAIT_FOR_PAGE));
+        doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE));
     }
 
     public void setFacetedFilter(String columnName, String... values)
     {
         setUpFacetedFilter(columnName, values);
-        doAndWaitForUpdate(() -> getWrapper().clickButton("OK"));
+        doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE));
     }
 
     public void setUpFilter(String columnName, String filterType, String filter)
@@ -1068,20 +1063,13 @@ public class DataRegionTable extends DataRegion
 
     public void clearFilter(String columnName)
     {
-        clearFilter(columnName, BaseWebDriverTest.WAIT_FOR_PAGE);
+        clearFilter(columnName, isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     public void clearFilter(String columnName, int waitMillis)
     {
         TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnName);
-
-        Runnable clickClearFilter = () -> clickColumnMenu(columnName, false, "Clear Filter");
-
-        if (waitMillis == 0)
-            doAndWaitForUpdate(clickClearFilter);
-        else
-            getWrapper().doAndWaitForPageToLoad(clickClearFilter, waitMillis);
-
+        doAndWaitForUpdate(() -> clickColumnMenu(columnName, waitMillis > 0, "Clear Filter"));
     }
 
     public void clearAllFilters()
@@ -1107,7 +1095,7 @@ public class DataRegionTable extends DataRegion
                 closePhiLoggingColumnMsg();
             }
         }
-        doAndWaitForUpdate(() -> getWrapper().clickButton("Clear All Filters"));
+        doAndWaitForUpdate(() -> getWrapper().clickButton("Clear All Filters", isAsync() ? 0 : WAIT_FOR_PAGE));
     }
 
     public void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
