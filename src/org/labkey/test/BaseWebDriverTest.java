@@ -848,7 +848,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         checkViews();
 
-        if (!isPerfTest || isTestRunningOnTeamCity())
+        if (!isPerfTest && isTestRunningOnTeamCity())
             checkActionCoverage();
 
         checkLinks();
