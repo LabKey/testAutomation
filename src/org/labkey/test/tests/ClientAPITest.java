@@ -926,11 +926,9 @@ public class ClientAPITest extends BaseWebDriverTest
 
         enableEmailRecorder();
 
-        // TODO: Increase permission level to App Admin after Issue 33831 has been resolved
-        apiPermissionsHelper.addMemberToRole(EMAIL_SENDER, "Reader", PermissionsHelper.MemberType.user, "Home");
+        apiPermissionsHelper.addMemberToRole(EMAIL_SENDER, "Application Admin", PermissionsHelper.MemberType.user, "/");
 
         goToHome();
-
         impersonate(EMAIL_SENDER);
         {
             assertEquals("sendMessage API without correct role", "The current user does not have permission to use the SendMessage API.", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_ALL, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
