@@ -407,7 +407,8 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_01);
 
         goToFolderManagement().goToExportTab();
-        new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input").findElement(getDriver())).check();
+        new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input")
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
         new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
