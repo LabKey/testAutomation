@@ -397,7 +397,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     doTearDown();
                     if (!isTestCleanupSkipped())
                     {
-                        try (TestScrubber scrubber = new TestScrubber(BrowserType.FIREFOX, getDownloadDir()))
+                        try (TestScrubber scrubber = new TestScrubber(TestProperties.isTestRunningOnTeamCity() ? BrowserType.FIREFOX : getCurrentTest().getBrowserType(), getDownloadDir()))
                         {
                             scrubber.cleanSiteSettings();
                         }
@@ -1800,7 +1800,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 log(ignore.getMessage());
             }
-            doAndWaitForPageSignal(() -> click(loc), "queryTreeSelectionChange");
+            doAndWaitForPageSignal(() -> {
+                click(loc);
+                mouseOut();
+                }, "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
             mouseOut(); // Dismiss tooltip
             waitForElementToDisappear(Locator.tagWithClass("div", "x4-tip").notHidden(), WAIT_FOR_PAGE);
