@@ -419,7 +419,7 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
         click(Locator.linkWithText("Analyze some runs"));
-        final Locator.NameLocator ff_targetExperimentId = Locator.name("ff_targetExperimentId");
+        final Locator ff_targetExperimentId = Locator.name("ff_targetExperimentId");
         waitForElement(ff_targetExperimentId);
         doAndWaitForPageToLoad(() -> selectOptionByText(ff_targetExperimentId, "<create new>"));
         assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));

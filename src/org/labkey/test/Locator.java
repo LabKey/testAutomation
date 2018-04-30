@@ -490,9 +490,9 @@ public abstract class Locator extends By
         return new IdLocator(id);
     }
 
-    public static NameLocator name(String name)
+    public static XPathLocator name(String name)
     {
-        return new NameLocator(name);
+        return tag("*").withAttribute("name", name);
     }
 
     public static CssLocator css(String selector)
@@ -1422,45 +1422,6 @@ public abstract class Locator extends By
         public String toString()
         {
             return _id == null ? super.toString() : "id=" + _id;
-        }
-    }
-
-    public static class NameLocator extends Locator
-    {
-        protected NameLocator(String loc)
-        {
-            super(loc);
-        }
-
-        private NameLocator(String loc, Integer index, String contains, String text)
-        {
-            super(loc, index, contains, text);
-        }
-
-        public Locator containing(String contains)
-        {
-            return new NameLocator(getLoc(), _index, contains, _text);
-        }
-
-        public Locator withText(String text)
-        {
-            return new NameLocator(getLoc(), _index, _contains, text);
-        }
-
-        public Locator index(Integer index)
-        {
-            return new NameLocator(getLoc(), index, _contains, _text);
-        }
-
-        @Override
-        public String toString()
-        {
-            return "name=" + getLoc() + (_index != null ? " index=" + _index : "");
-        }
-
-        protected By getBy()
-        {
-            return By.name(getLoc());
         }
     }
 
