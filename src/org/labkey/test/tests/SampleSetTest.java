@@ -49,6 +49,8 @@ public class SampleSetTest extends BaseWebDriverTest
     private static final String FOLDER_SAMPLE_SET_NAME = "FolderSampleSet";
     private static final String FOLDER_CHILDREN_SAMPLE_SET_NAME = "FolderChildrenSampleSet";
     private static final String FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME = "FolderGrandchildrenSampleSet";
+    private static final String CASE_INSENSITIVE_SAMPLESET = "CaseInsensitiveSampleSet";
+    private static final String LOWER_CASE_SAMPLESET = "caseinsensitivesampleset";
 
     protected static final String PIPELINE_PATH = "/sampledata/xarfiles/expVerify";
     private static final String AMBIGUOUS_CHILD_SAMPLE_SET_TSV = "Name\tParent\tOtherProp\n" +
@@ -326,6 +328,31 @@ public class SampleSetTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("ProjectS1"));
         assertElementPresent(Locator.linkWithText("SampleSetBVT13"));
         assertElementPresent(Locator.linkWithText("SampleSetBVTChildA"));
+
+        // make sure we are case-sensitive when creating samplesets -- regression coverage for issue 33743
+        clickProject(PROJECT_NAME);
+        clickButton("Import Sample Set");
+        setFormElement(Locator.id("name"), CASE_INSENSITIVE_SAMPLESET);
+        checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
+        waitForFormElementToEqual(Locator.id("idCol1"), "0"); // "KeyCol"
+        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
+        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
+        clickButton("Submit");
+
+        clickProject(PROJECT_NAME);
+        clickButton("Import Sample Set");
+        setFormElement(Locator.id("name"), LOWER_CASE_SAMPLESET);
+        checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
+        waitForFormElementToEqual(Locator.id("idCol1"), "0"); // "KeyCol"
+        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
+        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
+        clickButton("Submit");
+        waitForElement(Locator.tagWithClass("div", "labkey-error").containing("A sample set with that name already exists."));
+        clickProject(PROJECT_NAME);
+        assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLESET));
+        assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLESET));
     }
 
     final File experimentFilePath = new File(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");
