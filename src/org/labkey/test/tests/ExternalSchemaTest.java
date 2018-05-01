@@ -521,12 +521,12 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         log("** Deleting via form: pks=" + join(",", pk) + "...");
         beginAt("/query/" + containerPath + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
 
-
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
         for (int aPk : pk)
-            checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
+            drt.checkCheckboxByPrimaryKey(aPk);
         doAndWaitForPageToLoad(() ->
         {
-            new DataRegionTable("query", getDriver()).clickHeaderButton("Delete");
+            drt.clickHeaderButton("Delete");
             assertAlert("Are you sure you want to delete the selected row" + (pk.length == 1 ? "?" : "s?"));
         });
     }
