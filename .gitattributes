@@ -94,6 +94,7 @@ modules/ETLtest/resources/ETLs/badTableName.xml -text
 modules/ETLtest/resources/ETLs/constantsGlobalOverride.xml -text
 modules/ETLtest/resources/ETLs/constantsNoMatchingSourceColumn.xml -text
 modules/ETLtest/resources/ETLs/constantsStepOverride.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/failJobValidation.xml -text
 modules/ETLtest/resources/ETLs/merge.xml -text
 modules/ETLtest/resources/ETLs/mergeManyColumns.xml -text
 modules/ETLtest/resources/ETLs/mergeWithAlternateKey.xml -text svneol=unset#application/xml

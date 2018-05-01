@@ -15,6 +15,7 @@
  */
 package org.labkey.test.etl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Split test cases from ETLTest as that class was timing out on completing all tests.
@@ -292,5 +294,29 @@ public class ETLTestB extends ETLAbstractTest
         _etlHelper.runETL(APPEND);
         _etlHelper.assertNotInTarget1(PREFIX + "4");
         _etlHelper.assertInTarget1(PREFIX + "3");
+    }
+
+    /**
+     * Verify that the job time validation of all ETL steps happens before queuing the job.
+     */
+    @Test
+    public void testPreflightChecks() throws Exception
+    {
+        final String failJobValidation = "failJobValidation";
+        try
+        {
+            _etlHelper.runETL_API(failJobValidation, false);
+        }
+        catch (CommandException ex)
+        {
+         // this is supposed to happen
+        }
+        String transformRunLog = _diHelper.getTransformRunFieldByTransformId(_etlHelper.ensureFullIdString(failJobValidation), "transformRunLog");
+        // String "doesNotExist" comes from validating a step with a well formed, but non-existing, transformId. "malformed" is from a badly formed
+        // tranformId; ModuleResourceCache would have thrown an IllegalStateException, which should be caught and reported here.
+        final String doesNotExist = "doesNotExist";
+        assertTrue("Transform run log did not contain expected string '" + doesNotExist + "': " + transformRunLog, StringUtils.contains(transformRunLog, doesNotExist));
+        final String malformed = "***malformed***";
+        assertTrue("Transform run log did not contain expected string '" + malformed + "': " + transformRunLog, StringUtils.contains(transformRunLog, malformed));
     }
 }
