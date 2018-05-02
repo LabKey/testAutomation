@@ -314,6 +314,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     {
         WebDriver _driver;
         String _idPrefix = "combobox";
+        String _inputName = null;
 
         public ComboBoxFinder(WebDriver driver)
         {
@@ -327,10 +328,19 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
             return this;
         }
 
+        public ComboBoxFinder withInputNamed(String inputName)
+        {
+            _inputName = inputName;
+            return this;
+        }
+
         @Override
         protected Locator.XPathLocator itemLoc()
         {
-            return Locator.tagWithClass("td", getCssPrefix() + "form-item-body").attributeStartsWith("id", _idPrefix);
+            Locator.XPathLocator loc = Locator.tagWithClass("td", getCssPrefix() + "form-item-body").attributeStartsWith("id", _idPrefix);
+            if (_inputName != null)
+                loc = loc.withDescendant(Locator.input(_inputName));
+            return loc;
         }
 
         @Override

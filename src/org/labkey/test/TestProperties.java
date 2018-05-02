@@ -113,6 +113,16 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("enable.heap.dump"));
     }
 
+    public static boolean isCloudPipelineEnabled()
+    {
+        return "true".equals(System.getProperty("use.cloud.pipeline"));
+    }
+
+    public static String getCloudPipelineBucketName()
+    {
+        return System.getProperty("cloud.pipeline.bucket");
+    }
+
     public static String ensureGeckodriverExeProperty()
     {
         final String key = GECKO_DRIVER_EXE_PROPERTY;

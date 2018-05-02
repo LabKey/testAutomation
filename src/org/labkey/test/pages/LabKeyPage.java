@@ -37,6 +37,8 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
     private WrapsDriver _wrapsDriver;
     private EC _elementCache;
 
+    protected LabKeyPage() { }
+
     public LabKeyPage(WrapsDriver test)
     {
         if (test instanceof BaseWebDriverTest)

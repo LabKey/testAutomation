@@ -320,7 +320,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         goToAdminMenu();
         Window window = Window.Window(getDriver()).withTitle("Manage File Browser Configuration").waitFor();
-        Ext4Checkbox().locatedBy(Locator.id("importAction-inputEl")).find(window).check();
+        Ext4Checkbox().locatedBy(Locator.id("importAction-inputEl")).waitFor(window).check();
 
         waitAndClick(Ext4Helper.Locators.ext4Tab("File Properties"));
         RadioButton().withLabel("Use Custom File Properties").find(window).check();

@@ -596,6 +596,7 @@ src/org/labkey/test/pages/admin/FileRootsManagementPage.java -text
 src/org/labkey/test/pages/admin/FolderManagementPage.java -text
 src/org/labkey/test/pages/admin/FolderManagementTab.java -text
 src/org/labkey/test/pages/admin/FolderTypePage.java -text
+src/org/labkey/test/pages/admin/ImportFolderPage.java -text
 src/org/labkey/test/pages/admin/PermissionsPage.java -text
 src/org/labkey/test/pages/admin/ReorderFoldersPage.java -text
 src/org/labkey/test/pages/admin/SetFolderPermissionsPage.java -text
@@ -868,6 +869,7 @@ src/org/labkey/test/util/BoxPlotReportHelper.java -text
 src/org/labkey/test/util/ChartHelper.java -text
 src/org/labkey/test/util/CodeMirrorHelper.java -text
 src/org/labkey/test/util/ComponentQuery.java -text
+src/org/labkey/test/util/ConfiguresSite.java -text
 src/org/labkey/test/util/Crawler.java -text
 src/org/labkey/test/util/DataIntegrationHelper.java -text
 src/org/labkey/test/util/DataRegion.java -text
@@ -876,6 +878,7 @@ src/org/labkey/test/util/DataRegionExportHelper.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
 src/org/labkey/test/util/DatasetDesignerPage.java -text
 src/org/labkey/test/util/DebugUtils.java -text
+src/org/labkey/test/util/DefaultSiteConfigurer.java -text
 src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text
 src/org/labkey/test/util/DilutionAssayHelper.java -text
@@ -915,6 +918,7 @@ src/org/labkey/test/util/PythonHelper.java -text
 src/org/labkey/test/util/QCAssayScriptHelper.java -text
 src/org/labkey/test/util/RReportHelper.java -text
 src/org/labkey/test/util/ReadOnlyTest.java -text
+src/org/labkey/test/util/ReflectionUtils.java -text
 src/org/labkey/test/util/RelativeUrl.java -text
 src/org/labkey/test/util/RemoteConnectionHelper.java -text
 src/org/labkey/test/util/ReportDataRegion.java -text

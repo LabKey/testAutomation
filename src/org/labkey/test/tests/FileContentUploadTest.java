@@ -48,16 +48,12 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
-import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
 
 @Category({BVT.class, FileBrowser.class})
 public class FileContentUploadTest extends BaseWebDriverTest
 {
-    private final SearchHelper _searchHelper = new SearchHelper(this);
-
     private static final String FILE_DESCRIPTION = "FileContentTestFile";
     private static final String CUSTOM_PROPERTY_VALUE = "ExtendedProperty";
     private static final String CUSTOM_PROPERTY = "customProperty";
@@ -101,8 +97,6 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
     private void doSetupSteps()
     {
-        _searchHelper.initialize();
-
         _containerHelper.createProject(getProjectName(), null);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Files");
@@ -115,9 +109,17 @@ public class FileContentUploadTest extends BaseWebDriverTest
         portalHelper.addWebPart("Files");
     }
 
+    protected SearchHelper getSearchHelper()
+    {
+        return new SearchHelper(this);
+    }
+
     @Test
     public void testFileBrowser()
     {
+        SearchHelper _searchHelper = getSearchHelper();
+        _searchHelper.initialize();
+
         setupNotifications();
         setupCustomFileProperties();
         goToProjectHome();

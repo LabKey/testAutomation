@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
@@ -35,17 +34,24 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class SearchHelper
 {
-    protected BaseWebDriverTest _test;
+    private final BaseWebDriverTest _test;
+    private final int maxTries;
 
     private static Map<String, SearchItem> _searchQueue = new HashMap<>();
-    public SearchHelper(BaseWebDriverTest test)
+
+    public SearchHelper(BaseWebDriverTest test, int maxTries)
     {
         _test = test;
+        this.maxTries = maxTries;
+    }
+
+    public SearchHelper(BaseWebDriverTest test)
+    {
+        this(test, 8);
     }
     private static final Locator noResultsLocator = Locator.css(".labkey-search-results-counts").withText("Found 0 results");
     private static final String unsearchableValue = "UNSEARCHABLE";
@@ -84,7 +90,6 @@ public class SearchHelper
         // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retry below.
         waitForIndexer();
 
-        final int maxTries = 8;
         for (int i = 1; i <= maxTries; i++)
         {
             _test.log("Verify search results, attempt " + i);

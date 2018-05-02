@@ -96,10 +96,9 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return this;
     }
 
-    public FolderManagementPage goToImportTab()
+    public ImportFolderPage goToImportTab()
     {
-        selectTab("import");
-        return this;
+        return selectTab(ImportFolderPage.class);
     }
 
     /**
@@ -115,9 +114,17 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
 // Wave of the future:
 
-    public <T extends FolderManagementTab> T selectTab(Class<T> tabClass) throws InstantiationException, IllegalAccessException
+    public <T extends FolderManagementTab> T selectTab(Class<T> tabClass)
     {
-        T tab = tabClass.newInstance();
+        T tab;
+        try
+        {
+            tab = tabClass.newInstance();
+        }
+        catch (InstantiationException | IllegalAccessException e)
+        {
+            throw new RuntimeException("Unable to instantiate page class: " + tabClass.getName(), e);
+        }
         tab.setDriver(getDriver());
         String tabId = tab.getTabId();
 

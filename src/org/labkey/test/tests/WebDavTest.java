@@ -45,15 +45,17 @@ import static org.junit.Assert.fail;
 @Category(BVT.class)
 public class WebDavTest extends BaseWebDriverTest
 {
-    final String PROJECT_NAME="WebDavTest";
-    final String TEXT = "Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal.\n"+
+    private static final String TEXT = "Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal.\n"+
     "Now we are engaged in a great civil war, testing whether that nation, or any nation, so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.\n"+
     "But, in a larger sense, we can not dedicate, we can not consecrate, we can not hallow this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced. It is rather for us to be here dedicated to the great task remaining before us-that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion-that we here highly resolve that these dead shall not have died in vain-that this nation, under God, shall have a new birth of freedom-and that government of the people, by the people, for the people, shall not perish from the earth.";
+
+    private final String baseWebDavUrl = WebTestHelper.getBaseURL() + "/_webdav/" + getProjectName().replace(" ", "%20") + "/" + getWebDavDir();
+    private final String baseWebFilesUrl = WebTestHelper.getBaseURL() + "/_webfiles/" + getProjectName().replace(" ", "%20") + "/";
 
     @Override
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return "WebDavTest Project";
     }
 
     @BeforeClass
@@ -65,21 +67,23 @@ public class WebDavTest extends BaseWebDriverTest
 
     private void doSetup()
     {
-        _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.createProject(getProjectName(), null);
+    }
+
+    protected String getWebDavDir()
+    {
+        return "@files/";
     }
 
     @Test
     public void testWebDav() throws Exception
     {
-        // including context Path
-        String baseURL = getBaseURL();
-        String testDirectory = "/_webdav/" + getProjectName() + "/@files/";
-        String testURL = baseURL + testDirectory;
+        final String testURL = baseWebDavUrl;
 
         // make sure the indexer isn't really busy
         waitForIdle();
 
-        beginAt(testDirectory + "?listing=html");
+        beginAt(testURL + "?listing=html");
         assertTextNotPresent("testfile1");
 
         Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
@@ -113,7 +117,7 @@ public class WebDavTest extends BaseWebDriverTest
     @Test
     public void testBadUrlResponse() throws Exception
     {
-        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.getBaseURL() + "/_webdav?uf=%uf");
+        SimpleHttpRequest request = new SimpleHttpRequest(baseWebDavUrl + "?uf=%uf");
         SimpleHttpResponse response = request.getResponse();
         assertEquals("Wrong response for unparsable parameter", HttpStatus.SC_BAD_REQUEST, response.getResponseCode());
     }
@@ -123,10 +127,7 @@ public class WebDavTest extends BaseWebDriverTest
     {
         setEnableWebfiles(true);
 
-        // including context Path
-        String baseURL = getBaseURL();
-        String testDirectory = "/_webfiles/" + getProjectName() + "/";
-        String testURL = baseURL + testDirectory;
+        String testURL = baseWebFilesUrl;
 
         // make sure the indexer isn't really busy
         waitForIdle();
@@ -151,14 +152,14 @@ public class WebDavTest extends BaseWebDriverTest
         log("Create a file: \"" + childFileName + "\" under subdirectory: \"" + conflictFolderName + "\"");
         sardine.put(testURL + conflictFolderName + "/" + childFileName, TEXT.getBytes(StandardCharsets.UTF_8));
         log("Verify file under subdirectory");
-        beginAt(testDirectory + conflictFolderName + "?listing=html");
+        beginAt(testURL + conflictFolderName + "?listing=html");
         assertTextPresent(childFileName);
 
         log("Create a child container: \"" + conflictFolderName + "\" under project");
         _containerHelper.createSubfolder(getProjectName(), conflictFolderName);
 
         log("Verify that subdirectory name that conflicts with child container is decorated correctly for _webfiles");
-        beginAt(testDirectory + "?listing=html");
+        beginAt(testURL + "?listing=html");
         String expectedConflictingDirectoryName = conflictFolderName + " (files)";
         names = _listNames(sardine, testURL);
         assertEquals("Content for _webfiles is not as expected", 4, names.size());
@@ -168,10 +169,8 @@ public class WebDavTest extends BaseWebDriverTest
         assertTrue(conflictFolderName + " directory is not present in _webfiles", names.contains(expectedConflictingDirectoryName));
 
         log("Verify file and sub directories uploaded to project from _webfiles is present at @files _webdav node");
-        String webDavTestDirectory = "/_webdav/" + getProjectName() + "/@files/";
-        String webDavtestURL = baseURL + webDavTestDirectory;
-        beginAt(webDavTestDirectory + "?listing=html");
-        names = _listNames(sardine,webDavtestURL);
+        beginAt(baseWebDavUrl + "?listing=html");
+        names = _listNames(sardine, baseWebDavUrl);
         assertEquals("Content for _webdav/@files is not as expected", 3, names.size());
         assertTrue(projectFileName + " file is not present in _webdav/@files", names.contains(projectFileName));
         assertTrue(conflictFolderName + " directory is not present in _webdav/@files", names.contains(conflictFolderName));
@@ -180,7 +179,7 @@ public class WebDavTest extends BaseWebDriverTest
         _containerHelper.deleteFolder(getProjectName(), conflictFolderName);
 
         log("Verify deleting file from _webfiles");
-        beginAt(testDirectory + "?listing=html");
+        beginAt(baseWebDavUrl + "?listing=html");
         deleteFile(sardine, testURL + projectFileName);
         deleteFile(sardine, testURL + conflictFolderName + "/" + childFileName);
         deleteFile(sardine, testURL + conflictFolderName);
@@ -250,6 +249,7 @@ public class WebDavTest extends BaseWebDriverTest
 
     private List<String> _listNames(Sardine s, String path) throws IOException
     {
+        log("Fetching file list: " + path);
         ArrayList<String> names = new ArrayList<>();
         for (DavResource r : s.list(path))
         {
