@@ -364,6 +364,7 @@ modules/simpletest/resources/views/other.html -text
 modules/simpletest/resources/views/parameterizedQWP.html -text
 modules/simpletest/resources/views/vehicle.html -text
 modules/simpletest/resources/views/webpart.html -text
+modules/simpletest/resources/views/workbookTest.html -text
 modules/simpletest/resources/web/simpletest/alert.png -text
 modules/simpletest/resources/web/simpletest/testfile.js -text
 modules/simpletest/resources/web/simpletest/testfile2.js -text

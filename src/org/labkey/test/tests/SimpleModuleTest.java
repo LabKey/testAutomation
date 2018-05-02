@@ -178,6 +178,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestImportTemplates();
         doTestDatasetsAndFileBasedQueries();
         doTestViewEditing();
+        doTestRowLevelContainerPath();
     }
 
     @LogMethod
@@ -936,6 +937,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertEquals("Expected vehicles.container to return the value: " + entityId, entityId, vehicleRow.get("value"));
         assertEquals("Expected vehicles.container to return the displayValue: " + getProjectName(), getProjectName(), vehicleRow.get("displayValue"));
 
+    }
+
+    @LogMethod
+    private void doTestRowLevelContainerPath()
+    {
+        beginAt("/simpletest/" + getProjectName() + "/workbookTest.view");
+
+        clickButton("RunContainerPathTest", 0);
+
+        waitForText("Container path tests complete: 8 passing tests.");
     }
 
     @LogMethod

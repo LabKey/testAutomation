@@ -1,0 +1,302 @@
+The client API should allow an array of rows targeting both the parent container and workbooks in a single request.  If the row manually provides 'container', and if this container is a workbook child of the
+target folder, that should be respected.  The same is true for both updateRows and deleteRows.  Because lists and simple tables have slightly different codepaths, test both here.
+
+
+<br><br>
+
+<div id='testButtonDiv'></div><br>
+<div id='containerPathDiv'></div><br>
+
+<script type='text/javascript'>
+
+    function testContainerPath() {
+        var folderContainerId = LABKEY.Security.currentContainer.type === 'workbook' ? LABKEY.Security.currentContainer.parentId : LABKEY.Security.currentContainer.id;
+        var workbook1;
+        var workbook2;
+        var subfolder1;
+        var listName = 'TestList';
+        var successful = 0;
+
+        var multiInsert = new LABKEY.MultiRequest();
+        var multiSelect = new LABKEY.MultiRequest();
+        var multiUpdate = new LABKEY.MultiRequest();
+        var multiDelete = new LABKEY.MultiRequest();
+
+        function failure(errorInfo, response) {
+            alert('Container path complete - Failure: ' + errorInfo.exception);
+        }
+
+        var multi = new LABKEY.MultiRequest();
+        multi.add(LABKEY.Security.createContainer, {
+            containerPath: folderContainerId,
+            title: 'API Test Workbook',
+            description: 'Workbook created by JS API 1',
+            isWorkbook: true,
+            scope: this,
+            failure: failure,
+            success: function (response) {
+                workbook1 = response.id;
+            }
+        });
+
+        multi.add(LABKEY.Security.createContainer, {
+            containerPath: folderContainerId,
+            title: 'API Test Workbook',
+            description: 'Workbook created by JS API 2',
+            isWorkbook: true,
+            scope: this,
+            failure: failure,
+            success: function (response) {
+                workbook2 = response.id;
+            }
+        });
+
+        multi.add(LABKEY.Security.createContainer, {
+            containerPath: folderContainerId,
+            name: 'API_Test_Folder',
+            title: 'API Test Folder',
+            description: 'Folder created by JS API',
+            isWorkbook: false,
+            scope: this,
+            failure: failure,
+            success: function (response) {
+                subfolder1 = response.id;
+            }
+        });
+
+        multi.add(LABKEY.Domain.create, {
+            containerPath: folderContainerId,
+            kind: 'IntList',
+            domainDesign: {
+                name: listName,
+                description: 'integer key list',
+                fields: [{
+                    name: 'id', rangeURI: 'int'
+                }, {
+                    name: 'field1',
+                    rangeURI: 'string'
+                }, {
+                    name: 'field2',
+                    rangeURI: 'string'
+                }]
+            },
+            options: {
+                keyName: 'id'
+            }
+        });
+
+        multi.send(doTests, this);
+
+        function getVerifySelect(response, pkField, expectedFieldName, containerField) {
+            var pks = [];
+            var expectedRows = response.rows.length;
+            for (var i=0;i<response.rows.length;i++) {
+                var r = response.rows[i];
+                if (r[pkField]){
+                    pks.push(r[pkField]);
+                }
+            }
+
+            if (pks.length === 0){
+                alert('ERROR: no PKs found');
+            }
+
+            return {
+                containerPath: folderContainerId,
+                schemaName: response.schemaName,
+                queryName: response.queryName,
+                scope: this,
+                failure: failure,
+                filterArray: [LABKEY.Filter.create(pkField, pks.join(';'), LABKEY.Filter.Types.IN)],
+                columns: expectedFieldName + ',' + containerField,
+                success: function(results){
+                    if (results.rows.length != expectedRows){
+                        alert('Insufficient rows, found ' + results.rows.length + ', expected: ' + expectedRows);
+                    }
+
+                    for (var i=0;i<results.rows.length;i++){
+                        var r = results.rows[i];
+                        if (!r[containerField] || !r[expectedFieldName]){
+                            alert('Unable to find expected or container fields: ' + r[containerField] + '/' + r[expectedFieldName]);
+                            console.log(r);
+                        }
+
+                        if (r[containerField] !== r[expectedFieldName]){
+                            alert('Row lacks correct container, expected ' + r[expectedFieldName] + ', but found ' + r[containerField]);
+                        }
+                    }
+
+                    successful++;
+
+                    doTestUpdate(results, pks, pkField, containerField, expectedFieldName);
+                }
+            }
+        }
+
+        function doTestUpdate(response, pks, pkField, containerField, expectedFieldName){
+            var rows = [];
+            for (var i = 0; i < response.rows.length; i++) {
+                var r = {};
+                r[pkField] = pks[i];
+                r[expectedFieldName] = 'updated';
+                r[containerField] = response.rows[i][containerField];
+                rows.push(r);
+            }
+
+            multiUpdate.add(LABKEY.Query.updateRows, {
+                containerPath: folderContainerId,
+                schemaName: response.schemaName,
+                queryName: response.queryName,
+                scope: this,
+                failure: failure,
+                rows: rows,
+                success: function (results) {
+                    if (results.rows.length !== pks.length){
+                        alert('Insufficient rows, found ' + results.rows.length + ', expected: ' + pks.length);
+                    }
+
+                    for (var i = 0; i < results.rows.length; i++) {
+                        var r = results.rows[i];
+                        //on the returned rows, LK isnt consistent about field name case
+                        var val = r[expectedFieldName] || r[expectedFieldName.toLowerCase()];
+                        if ('updated' !== val) {
+                            console.log(r);
+                            alert('Row was not updated.  value was: ' + val);
+                        }
+                    }
+
+                    successful++;
+
+                    doTestDelete(results, rows, pkField, containerField, expectedFieldName);
+                }
+            });
+        }
+
+        function doTestDelete(response, origRows, pkField, containerField, expectedFieldName){
+            var rows = [];
+            for (var i = 0; i < origRows.length; i++) {
+                var r = {};
+                r[pkField] = origRows[i][pkField];
+                r[containerField] = origRows[i][containerField];
+                rows.push(r);
+            }
+
+            multiDelete.add(LABKEY.Query.deleteRows, {
+                containerPath: folderContainerId,
+                schemaName: response.schemaName,
+                queryName: response.queryName,
+                scope: this,
+                failure: failure,
+                rows: rows,
+                success: function (results) {
+                    if (results.rowsAffected !== origRows.length){
+                        alert('Insufficient rows, found ' + results.rowsAffected + ', expected: ' + origRows.length);
+                    }
+
+                    successful++;
+                }
+            });
+        }
+
+        function doTests() {
+            //expect failure because container doesnt exist
+            multiInsert.add(LABKEY.Query.insertRows, {
+                containerPath: folderContainerId,
+                schemaName: 'lists',
+                queryName: listName,
+                scope: this,
+                rows: [{
+                    field1: workbook1,
+                    container: workbook1 + 'x'
+                }],
+                failure: function (response) {
+                    if (response.exception !== 'Unknown container: ' + workbook1 + 'x'){
+                        alert('Incorrect error');
+                    }
+
+                    successful++;
+                },
+                success: function (response) {
+                    alert('ERROR: This should have failed because the container doesnt exist');
+                }
+            });
+
+            //expect failure because container isnt a child workbook
+            multiInsert.add(LABKEY.Query.insertRows, {
+                containerPath: folderContainerId,
+                schemaName: 'lists',
+                queryName: listName,
+                scope: this,
+                rows: [{
+                    field1: subfolder1,
+                    container: subfolder1
+                }],
+                failure: function (response) {
+                    if (response.exception !== 'Row is not from the correct container: ' + subfolder1){
+                        alert('Incorrect error');
+                    }
+
+                    successful++;
+                },
+                success: function (response) {
+                    alert('ERROR: This should have failed because it is not from the correct container');
+                }
+            });
+
+            //insert into list to exercise ListTable
+            multiInsert.add(LABKEY.Query.insertRows, {
+                containerPath: folderContainerId,
+                schemaName: 'lists',
+                queryName: listName,
+                scope: this,
+                failure: failure,
+                rows: [{
+                    field1: folderContainerId,
+                    container: null
+                },{
+                    field1: workbook1,
+                    container: workbook1
+                },{
+                    field1: workbook2,
+                    container: workbook2
+                }],
+                success: function (response) {
+                    multiSelect.add(LABKEY.Query.selectRows, getVerifySelect(response, 'id', 'field1', 'container'))
+                }
+            });
+
+            //repeat to exercise SimpleTable
+            multiInsert.add(LABKEY.Query.insertRows, {
+                containerPath: folderContainerId,
+                schemaName: 'vehicle',
+                queryName: 'EmissionTest',
+                scope: this,
+                failure: failure,
+                rows: [{
+                    Name: folderContainerId,
+                    container: null
+                },{
+                    Name: workbook1,
+                    container: workbook1
+                },{
+                    Name: workbook2,
+                    container: workbook2
+                }],
+                success: function (response) {
+                    multiSelect.add(LABKEY.Query.selectRows, getVerifySelect(response, 'rowid', 'Name', 'Container'));
+                }
+            });
+
+            multiInsert.send(function () {
+                multiSelect.send(function(){
+                    multiUpdate.send(function() {
+                        multiDelete.send(function() {
+                            document.getElementById('containerPathDiv').innerHTML = 'Container path tests complete: ' + successful + ' passing tests.';
+                        }, this);
+                    }, this);
+                }, this);
+            }, this);
+        }
+    }
+</script>
+<button onclick='testContainerPath();'>RunContainerPathTest</button>
