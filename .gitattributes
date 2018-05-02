@@ -601,8 +601,10 @@ src/org/labkey/test/pages/admin/PermissionsPage.java -text
 src/org/labkey/test/pages/admin/ReorderFoldersPage.java -text
 src/org/labkey/test/pages/admin/SetFolderPermissionsPage.java -text
 src/org/labkey/test/pages/admin/SetInitialFolderSettingsPage.java -text
+src/org/labkey/test/pages/announcements/AdminPage.java -text
 src/org/labkey/test/pages/announcements/BaseUpdatePage.java -text
 src/org/labkey/test/pages/announcements/InsertPage.java -text
+src/org/labkey/test/pages/announcements/ModeratorReviewPage.java -text
 src/org/labkey/test/pages/announcements/RespondPage.java -text
 src/org/labkey/test/pages/announcements/ThreadPage.java -text
 src/org/labkey/test/pages/announcements/UpdatePage.java -text
@@ -834,6 +836,7 @@ src/org/labkey/test/tests/WorkbookTest.java -text
 src/org/labkey/test/tests/announcements/AnnouncementsPermissionTest.java -text
 src/org/labkey/test/tests/announcements/DiscussionLinkTest.java -text
 src/org/labkey/test/tests/announcements/MessagesAttachmentTest.java -text
+src/org/labkey/test/tests/announcements/ModeratorReviewTest.java -text
 src/org/labkey/test/tests/api/CustomizeGridPermissionsTest.java -text
 src/org/labkey/test/tests/flow/BaseFlowTest.java -text
 src/org/labkey/test/tests/flow/FlowAnalysisResolverTest.java -text
