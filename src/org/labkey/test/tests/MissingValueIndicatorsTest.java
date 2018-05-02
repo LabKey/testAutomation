@@ -296,7 +296,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assertTextNotPresent("'25'");
         assertTextPresent("Zoe", "female");
         assertMvIndicatorPresent();
-        click(Locator.xpath("//img[@class='labkey-mv-indicator']/../../a"));
+        click(getMVILocator().append("/font/a"));
         assertTextPresent("'25'");
         dataRegion.clearAllFilters(columnName);
         testMvFiltering();
@@ -454,12 +454,16 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         testMvFiltering();
     }
 
+    private Locator.XPathLocator getMVILocator()
+    {
+        return Locator.tagWithClass("td", "labkey-mv-indicator");
+    }
+
     private void assertMvIndicatorPresent()
     {
         // We'd better have some
-        Locator loc = Locator.xpath("//img[@class='labkey-mv-indicator']");
-        waitForElement(loc);
-        assertElementPresent(Locator.xpath("//img[@class='labkey-mv-indicator']"));
+        waitForElement(getMVILocator());
+        assertElementPresent(getMVILocator());
     }
 
     private void testMvFiltering()
@@ -565,5 +569,11 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return getClass().getSimpleName() + " Project";
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
