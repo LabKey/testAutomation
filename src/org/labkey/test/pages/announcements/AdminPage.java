@@ -25,7 +25,7 @@ public class AdminPage extends LabKeyPage<AdminPage.ElementCache>
 
     public static AdminPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("announcements", containerPath, "customize")); //, Collections.singletonMap("returnUrl", encodeText(driver.getCurrentContainerPath()) + "/project-begin.view")));
+        driver.beginAt(WebTestHelper.buildURL("announcements", containerPath, "customize"));
         return new AdminPage(driver.getDriver());
     }
 
