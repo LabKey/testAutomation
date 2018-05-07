@@ -902,6 +902,7 @@ src/org/labkey/test/util/JUnitFooter.java -text
 src/org/labkey/test/util/JUnitHeader.java -text
 src/org/labkey/test/util/LabKeyExpectedConditions.java -text
 src/org/labkey/test/util/ListHelper.java -text
+src/org/labkey/test/util/Log4jUtils.java -text
 src/org/labkey/test/util/LogMethod.java -text
 src/org/labkey/test/util/LoggedParam.java -text
 src/org/labkey/test/util/Maps.java -text

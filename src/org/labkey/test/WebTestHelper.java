@@ -44,6 +44,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.reader.Readers;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
 import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -355,6 +356,11 @@ public class WebTestHelper
         }
 
         return parsedQuery;
+    }
+
+    public static Connection getRemoteApiConnection()
+    {
+        return new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
