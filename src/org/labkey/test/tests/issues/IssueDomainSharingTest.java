@@ -86,7 +86,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testInheritingDomain() throws Exception
+    public void testInheritingDomain()
     {
         final String listDef = "InheritedTestDef";
 
@@ -114,7 +114,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSharingDomain() throws Exception
+    public void testSharingDomain()
     {
         final String projectGroup = "ProjectGroup";
         _permissionsHelper.createProjectGroup(projectGroup, getProjectName());
@@ -143,7 +143,8 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
         adminPage.save();
 
         adminPage = AdminPage.beginAt(this, "Shared", listDef);
-        adminPage.configureFields().addField(new FieldDefinition(inheritedField).setLabel(inheritedField).setType(ColumnType.String));
+        // Append ":" to field name: Issue 32057: Issues forms can't handle complex field names
+        adminPage.configureFields().addField(new FieldDefinition(inheritedField + ":").setLabel(inheritedField).setType(ColumnType.String));
         adminPage.saveAndClose();
 
         ListPage issueList = ListPage.beginAt(this, getProjectName(), listDef);
@@ -166,7 +167,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testCantShareDomainBetweenProjects() throws Exception
+    public void testCantShareDomainBetweenProjects()
     {
         final String listDef = "UnSharedTestDef";
 
@@ -196,7 +197,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testOverlappingDomainInParent() throws Exception
+    public void testOverlappingDomainInParent()
     {
         final String listDef = "OverlappingTestDef";
 
@@ -223,12 +224,12 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     }
 
     //@Test @Ignore //TODO
-    public void testDeletingInheritedListDef() throws Exception
+    public void testDeletingInheritedListDef()
     {
     }
 
     //@Test @Ignore //TODO
-    public void testProtectedFields() throws Exception
+    public void testProtectedFields()
     {
     }
 
