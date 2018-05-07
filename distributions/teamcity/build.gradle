@@ -26,7 +26,8 @@ if (project.hasProperty('inheritedDistPath'))
     project.logger.info("inheriting from distribution ${inheritedDistPath}")
     project.evaluationDependsOn(inheritedDistPath)
     Distribution.inheritDependencies(project, inheritedDistPath)
-    BuildUtils.addModuleDistributionDependencies(project, [":server:modules:dumbster"])
+    BuildUtils.addModuleDistributionDependencies(project, [":server:modules:dumbster",
+                                                           ":server:test:modules:simpletest"])
     def split = inheritedDistPath.split(":")
     String inheritedDistName = split[split.length - 1]
     tasks.distribution.subDirName = "test/" + inheritedDistName
