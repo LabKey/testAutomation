@@ -565,7 +565,7 @@ public class FolderExportTest extends BaseWebDriverTest
         assertTextPresent(listName);
         clickAndWait(Locator.linkWithText(listName));
         assertTextPresent("persimmon");
-        assertElementPresent(Locator.tag("img").withAttribute("src", "/labkey/_images/mv_indicator.gif"));
+        assertElementPresent(Locator.tagWithClass("td", "labkey-mv-indicator"), 1);
         assertTextNotPresent("grapefruit");//this has been filtered out.  if "grapefruit" is present, the filter wasn't preserved
         goBack();
 
