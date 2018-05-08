@@ -78,7 +78,7 @@ import java.util.Properties;
  */
 public class WebTestHelper
 {
-    private static final String DEFAULT_CONTEXT_PATH = "/labkey";
+    private static final String DEFAULT_CONTEXT_PATH = "";
     private static final Integer DEFAULT_WEB_PORT = 8080;
     private static final String DEFAULT_TARGET_SERVER = "http://localhost";
     private static String _targetServer = null;
@@ -131,7 +131,7 @@ public class WebTestHelper
         {
             if (_webPort == null)
             {
-                String webPortStr = System.getProperty("labkey.port");
+                String webPortStr = System.getProperty("labkey.port").trim();
                 if (webPortStr == null || webPortStr.length() == 0)
                 {
                     System.out.println("Using default labkey port (" + DEFAULT_WEB_PORT +
@@ -170,15 +170,24 @@ public class WebTestHelper
 
     public static String stripContextPath(String url)
     {
-        if (!getContextPath().isEmpty())
+        String root = getContextPath() + "/";
+        int rootLoc;
+        if(root.length() == 1)
         {
-            String root = getContextPath() + "/";
-            int rootLoc = url.indexOf(root);
-            int endOfAction = url.indexOf("?");
-            if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
-                url = url.substring(rootLoc + root.length());
+            if(url.indexOf("//") > 0)
+                rootLoc = url.indexOf(root, url.indexOf("//")+2);
+            else
+                rootLoc = -1;
         }
-        if (url.indexOf("/") == 0)
+        else
+        {
+            rootLoc = url.indexOf(root);
+        }
+
+        int endOfAction = url.indexOf("?");
+        if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
+            url = url.substring(rootLoc + root.length());
+        else if (url.indexOf("/") == 0)
             url = url.substring(1);
         return url;
     }
