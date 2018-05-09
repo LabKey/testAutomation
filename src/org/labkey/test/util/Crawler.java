@@ -150,8 +150,7 @@ public class Crawler
             new ControllerActionId("ms2", "showProtein"), // TODO: 16617: MS1Test imports don't match provided FASTA file
             new ControllerActionId("pipeline-status", "showList"), // Is likely to contain 404 links
             new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
-            new ControllerActionId("project", "deleteWebPart"),
-            new ControllerActionId("project", "moveWebPart"),
+            new ControllerActionId("project", "togglePageAdminMode"),
             new ControllerActionId("query", "printRows"),
             new ControllerActionId("query", "exportRowsExcel"),
             new ControllerActionId("query", "excelWebQueryDefinition"),
@@ -729,11 +728,18 @@ public class Crawler
         // Breadth first crawl
         long startTime = System.currentTimeMillis();
         int linkCount = 0;
+        int currentDepth = 0;
 
         // Loop through links in list until its empty or time runs out
         while ((!_urlsToCheck.isEmpty()) && (_crawlTime < _maxCrawlTime))
         {
             UrlToCheck urlToCheck = _urlsToCheck.remove(0);
+            while (urlToCheck.getDepth() > currentDepth)
+            {
+                currentDepth++;
+                TestLogger.log("Crawl depth : " + currentDepth);
+                TestLogger.increaseIndent();
+            }
 
             if (urlToCheck.isVisitableURL())
             {
@@ -742,6 +748,13 @@ public class Crawler
             }
             _crawlTime = (int) (System.currentTimeMillis() - startTime);
         }
+
+        while (currentDepth > 0)
+        {
+            currentDepth--;
+            TestLogger.decreaseIndent();
+        }
+
 
         return linkCount;
     }
@@ -772,7 +785,11 @@ public class Crawler
             }
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
-                _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1));
+            {
+                UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
+                if (candidateUrl.isVisitableURL())
+                    _urlsToCheck.add(candidateUrl);
+            }
 
             checkForForbiddenWords(relativeURL);
 
