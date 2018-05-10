@@ -22,6 +22,7 @@ import org.labkey.test.util.TestLogger;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.time.Duration;
 import java.util.Properties;
 
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY;
@@ -111,6 +112,18 @@ public abstract class TestProperties
     public static boolean isHeapDumpCollectionEnabled()
     {
         return "true".equals(System.getProperty("enable.heap.dump"));
+    }
+
+    public static Duration getCrawlerTimeout()
+    {
+        try
+        {
+            return Duration.ofSeconds(Integer.parseInt(System.getProperty("crawlerTimeout")));
+        }
+        catch (NumberFormatException ignore)
+        {
+            return Duration.ofSeconds(90);
+        }
     }
 
     public static boolean isCloudPipelineEnabled()

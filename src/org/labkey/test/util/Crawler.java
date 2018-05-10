@@ -22,6 +22,7 @@ import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.api.ProjectMenu;
@@ -30,6 +31,7 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,33 +63,29 @@ public class Crawler
     private static Set<String> _urlsChecked = new HashSet<>();
     public static ActionProfiler _actionProfiler = new ActionProfiler();
     private boolean _needToGetProjectMenuLinks = true;
-    private int _finalDepth = 0;
-    private int _crawlTime = 0;
     private int _maxDepth = 3;
-    private ArrayList<UrlToCheck> _urlsToCheck = new ArrayList<>();
+    private final ArrayList<UrlToCheck> _startingUrls = new ArrayList<>();
 
-    private int _maxCrawlTime;
-    private static final int DEFAULT_CRAWL_TIME = 90000;
+    private final Duration _maxCrawlTime;
 
     private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
     private BaseWebDriverTest _test;
     private boolean _injectionCheckEnabled = false;
-    private Collection<String> _projects;
+    private final Set<String> _projects = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
 
     public Crawler(BaseWebDriverTest test)
     {
-        this(test, DEFAULT_CRAWL_TIME);
+        this(test, TestProperties.getCrawlerTimeout());
     }
 
-    public Crawler(BaseWebDriverTest test, int crawlTime)
+    public Crawler(BaseWebDriverTest test, Duration crawlTime)
     {
         this(test, test.getContainerHelper().getCreatedProjects(), crawlTime);
     }
 
-    public Crawler(BaseWebDriverTest test, Collection<String> projects, int crawlTime)
+    public Crawler(BaseWebDriverTest test, Collection<String> projects, Duration crawlTime)
     {
         _test = test;
-        _projects = projects;
         _maxCrawlTime = crawlTime;
         _adminControllers = Collections.unmodifiableCollection(getAdminControllers());
         _forbiddenWords = getForbiddenWords();
@@ -97,7 +95,7 @@ public class Crawler
         {
             addProject(project);
         }
-        _urlsToCheck.add(new UrlToCheck(null, "/project/begin.view?", 0));
+        _startingUrls.add(new UrlToCheck(null, "/project/begin.view?", 0));
     }
 
     protected Set<String> getForbiddenWords()
@@ -123,6 +121,8 @@ public class Crawler
             new ControllerActionId("admin", "resetQueryStatistics"),
             new ControllerActionId("admin", "queryStackTraces"),
             new ControllerActionId("admin", "shortURLAdmin"),
+            new ControllerActionId("admin", "showAllErrors"),
+            new ControllerActionId("admin", "showPrimaryLog"), // Can take very long to load
             new ControllerActionId("admin-sql", "saveReorderedScript"),
             new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
@@ -229,7 +229,11 @@ public class Crawler
 
     public void addProject(String project)
     {
-        _urlsToCheck.add(new UrlToCheck(null, WebTestHelper.buildRelativeUrl("project", project, "start"), 0));
+        if (!_projects.contains(project))
+        {
+            _projects.add(project);
+            _startingUrls.add(new UrlToCheck(null, WebTestHelper.buildRelativeUrl("project", project, "start"), 0));
+        }
     }
 
     public void setInjectionCheckEnabled(boolean enabled)
@@ -254,12 +258,6 @@ public class Crawler
         return _maxDepth = maxDepth;
     }
 
-    private void saveCrawlStats(BaseWebDriverTest test, int maxDepth, int newPages, int uniqueActions, int crawlTestLength)
-    {
-        String testName = test.getClass().getSimpleName();
-        _crawlStats.put(testName, new CrawlStats(maxDepth, newPages, uniqueActions, crawlTestLength));
-    }
-
     public static Map<String, CrawlStats> getCrawlStats()
     {
         return _crawlStats;
@@ -269,10 +267,10 @@ public class Crawler
     {
         private final int _newPages;
         private final int _uniqueActions;
-        private final int _crawlTestLength;
+        private final Duration _crawlTestLength;
         private final int _maxDepth;
 
-        public CrawlStats(int maxDepth, int newPages, int uniqueActions, int crawlTestLength)
+        public CrawlStats(int maxDepth, int newPages, int uniqueActions, Duration crawlTestLength)
         {
             _newPages = newPages;
             _uniqueActions = uniqueActions;
@@ -295,7 +293,7 @@ public class Crawler
             return _uniqueActions;
         }
 
-        public int getCrawlTestLength()
+        public Duration getCrawlTestLength()
         {
             return _crawlTestLength;
         }
@@ -431,8 +429,6 @@ public class Crawler
 
             if (getRelativeURL().contains("mailto:")) //Don't crawl mailto: links
                 return false;
-
-            _urlsChecked.add(strippedRelativeURL);
 
             // after navigating past the first N levels of links, we'll only try "new" actions:
             if (getDepth() >= getMaxDepth() && _actionsVisited.contains(getActionId()))
@@ -717,23 +713,25 @@ public class Crawler
         TestLogger.log("Starting crawl...");
 
         // Breadth first search
-        int newPages = crawl();
-        saveCrawlStats(_test, _finalDepth, newPages, _actionsVisited.size(), _crawlTime);
+        CrawlStats crawlStats = crawl();
+        _crawlStats.put(_test.getClass().getSimpleName(), crawlStats);
 
-        TestLogger.log("Crawl complete. " + newPages + " pages visited, " + _actionsVisited.size() + " unique actions tested by all tests.");
+        TestLogger.log("Crawl complete. " + crawlStats.getNewPages() + " pages visited, " + _actionsVisited.size() + " unique actions tested by all tests.");
     }
 
-    private int crawl()
+    private CrawlStats crawl()
     {
         // Breadth first crawl
-        long startTime = System.currentTimeMillis();
         int linkCount = 0;
         int currentDepth = 0;
+        int maxDepth = 0;
+        Timer crawlTimer = new Timer(_maxCrawlTime);
+        List<UrlToCheck> urlsToCheck = new ArrayList<>(_startingUrls);
 
         // Loop through links in list until its empty or time runs out
-        while ((!_urlsToCheck.isEmpty()) && (_crawlTime < _maxCrawlTime))
+        while (!urlsToCheck.isEmpty() && !crawlTimer.isTimedOut())
         {
-            UrlToCheck urlToCheck = _urlsToCheck.remove(0);
+            UrlToCheck urlToCheck = urlsToCheck.remove(0);
             while (urlToCheck.getDepth() > currentDepth)
             {
                 currentDepth++;
@@ -743,10 +741,10 @@ public class Crawler
 
             if (urlToCheck.isVisitableURL())
             {
-                crawlLink(urlToCheck);
+                maxDepth = Math.max(currentDepth, maxDepth);
+                urlsToCheck.addAll(crawlLink(urlToCheck));
                 linkCount++;
             }
-            _crawlTime = (int) (System.currentTimeMillis() - startTime);
         }
 
         while (currentDepth > 0)
@@ -755,18 +753,17 @@ public class Crawler
             TestLogger.decreaseIndent();
         }
 
-
-        return linkCount;
+        return new CrawlStats(maxDepth, linkCount, _actionsVisited.size(), crawlTimer.elapsed());
     }
 
-    private void crawlLink(UrlToCheck urlToCheck)
+    private List<UrlToCheck> crawlLink(UrlToCheck urlToCheck)
     {
-        _finalDepth = Math.max(urlToCheck.getDepth(), _finalDepth);
         String relativeURL = urlToCheck.getRelativeURL();
         ControllerActionId actionId = new ControllerActionId(relativeURL);
 
         // Keep track of where crawler has been
         _actionsVisited.add(actionId);
+        _urlsChecked.add(stripQueryParams(relativeURL));
         URL origin = urlToCheck.getOrigin();
         int depth = urlToCheck.getDepth();
 
@@ -784,12 +781,6 @@ public class Crawler
                 _test.projectMenu().open();
             }
             String[] linkAddresses = _test.getLinkAddresses();
-            for (String url : linkAddresses)
-            {
-                UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
-                if (candidateUrl.isVisitableURL())
-                    _urlsToCheck.add(candidateUrl);
-            }
 
             checkForForbiddenWords(relativeURL);
 
@@ -806,6 +797,15 @@ public class Crawler
 
             if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
                 testInjection(currentPageUrl);
+
+            List<UrlToCheck> newUrlsToCheck = new ArrayList<>();
+            for (String url : linkAddresses)
+            {
+                UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
+                if (candidateUrl.isVisitableURL())
+                    newUrlsToCheck.add(candidateUrl);
+            }
+            return newUrlsToCheck;
         }
         catch (RuntimeException | AssertionError rethrow)
         {

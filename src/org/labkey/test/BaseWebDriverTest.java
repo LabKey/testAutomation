@@ -422,7 +422,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
          */
         TestRule classTimeout = new TestWatcher()
         {
-            Statement createFailOnTimeoutStatement(Statement statement, Class<?> testClass) throws Exception
+            Statement createFailOnTimeoutStatement(Statement statement, Class<?> testClass)
             {
                 long minutes;
                 ClassTimeout timeout = testClass.getAnnotation(ClassTimeout.class);
@@ -430,6 +430,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     minutes = timeout.minutes();
                 else
                     minutes = ClassTimeout.DEFAULT;
+
+                if (isLinkCheckEnabled())
+                {
+                    // Increase timeout to account for crawler
+                    minutes += TestProperties.getCrawlerTimeout().toMinutes();
+                    minutes++;
+                }
 
                 return FailOnTimeout.builder()
                         .withTimeout(minutes, TimeUnit.MINUTES)
@@ -447,7 +454,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 {
                     return new Statement()
                     {
-                        @Override public void evaluate() throws Throwable
+                        @Override public void evaluate()
                         {
                             throw new RuntimeException("Invalid parameters for Timeout", e);
                         }
@@ -793,7 +800,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                             debugUrl.append(ref);
                         }
                         log("Re-invoking last action with _debug parameter set");
-                        WebTestHelper.getHttpResponse(debugUrl.toString()).getResponseCode();
+                        WebTestHelper.getHttpResponse(debugUrl.toString());
                     }
                     catch (MalformedURLException e)
                     {
@@ -1129,7 +1136,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         Locator.XPathLocator view = Locator.xpath("//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]");
-        int viewCount = getElementCount(view);
+        int viewCount = view.findElements(getDriver()).size();
         for (int i = 0; i < viewCount; i++)
         {
             Locator.XPathLocator thisView = view.index(i);
@@ -1224,12 +1231,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (isLinkCheckEnabled())
         {
             pauseJsErrorChecker();
-            String crawlerTimeoutProp = System.getProperty("crawlerTimeout");
-            int crawlerTimeout = 90000;
-            if (crawlerTimeoutProp != null)
-                crawlerTimeout = Integer.parseInt(crawlerTimeoutProp);
 
-            Crawler crawler = new Crawler(this, crawlerTimeout);
+            Crawler crawler = new Crawler(this, TestProperties.getCrawlerTimeout());
             crawler.addExcludedActions(getUncrawlableActions());
             crawler.setInjectionCheckEnabled(isInjectionCheckEnabled());
             crawler.addProject(getProjectName());
@@ -1591,7 +1594,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         // if the row does not exist then most likely the cohort passed in is incorrect
         int rowIndex = getCohortRow(cohortTable, cohort);
-        clickAndWait(cohortTable.updateLink(rowIndex));
+        cohortTable.clickEditRow(rowIndex);
 
         if (!enroll)
             uncheckCheckbox(Locator.name("quf_enrolled"));
@@ -1781,11 +1784,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (isExtTreeNodeSelected(schemaParts[schemaParts.length - 1]))
             return;
 
-        String schemaWithParents = "";
+        StringBuilder schemaWithParents = new StringBuilder();
         String separator = "";
         for (String schemaPart : schemaParts)
         {
-            schemaWithParents += separator + schemaPart;
+            schemaWithParents.append(separator).append(schemaPart);
             separator = ".";
 
             Locator.XPathLocator loc = Locator.schemaTreeNode(schemaPart);
@@ -1805,9 +1808,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 scrollIntoView(loc);
             }
-            catch (StaleElementReferenceException ignore)
+            catch (StaleElementReferenceException log)
             {
-                log(ignore.getMessage());
+                log(log.getMessage());
             }
             doAndWaitForPageSignal(() -> {
                 click(loc);
@@ -1832,8 +1835,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void clickFkExpando(String schemaName, String queryName, String columnName)
     {
-        String queryLabel = schemaName + "." + queryName;
-        click(Locator.tagWithClass("img", "lk-qd-expando").withAttribute("lkqdfieldkey", columnName)); // do we really need queryLabel?
+        click(Locator.tagWithClass("img", "lk-qd-expando").withAttribute("lkqdfieldkey", columnName));
     }
 
     public DataRegionTable viewQueryData(String schemaName, String queryName)
@@ -2034,11 +2036,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
 
             //Build folder path.
-            String path = "/";
+            StringBuilder path = new StringBuilder("/");
             for (String dir : dirNames)
-                path += dir + "/";
+                path.append(dir).append("/");
 
-            _fileBrowserHelper.selectFileBrowserItem(path);
+            _fileBrowserHelper.selectFileBrowserItem(path.toString());
 
             for (File copiedArchive : _copiedArchives)
                 _fileBrowserHelper.checkFileBrowserFileCheckbox(copiedArchive.getName());
@@ -2158,7 +2160,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             final List<String> descriptions = pipelineStatusTable.getColumnDataAsText("Description");
             fail("Timed out waiting for pipeline job to start. Waiting on " + (descriptions.isEmpty() ? "<unknown>" : descriptions));
         }
-        assertTrue("Running pipeline jobs were found.  Timeout:" + timeoutMilliseconds + "sec", statusValues.size() == getFinishedCount(statusValues));
+        assertEquals("Running pipeline jobs were found.  Timeout:" + timeoutMilliseconds + "sec", 0, statusValues.size() - getFinishedCount(statusValues));
 
         return statusValues;
     }
@@ -2299,7 +2301,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         final Locator svgLoc = Locator.css("div:not(.thumbnail) > svg").index(svgIndex);
 
-        waitFor(() -> { return isElementPresent(svgLoc);}, WAIT_FOR_JAVASCRIPT);
+        waitFor(() -> isElementPresent(svgLoc), WAIT_FOR_JAVASCRIPT);
 
         String svgText = getText(svgLoc);
         final String ignoredRaphaelText = "Created with Rapha\u00ebl 2.1.0";
@@ -2497,9 +2499,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     getWebDriver().quit();
                 }
             }
-            catch (UnreachableBrowserException ignore)
+            catch (UnreachableBrowserException log)
             {
-                ignore.printStackTrace(System.out);
+                log.printStackTrace(System.out);
             }
             finally
             {

@@ -63,6 +63,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -614,7 +615,7 @@ public class Runner extends TestSuite
         long total = 0;
         System.out.println("======================= Time Report ========================");
 
-        int totalCrawlTime = 0;
+        Duration totalCrawlTime = Duration.ZERO;
         int totalUniquePages = 0;
         int totalUniqueActions = 0;
         boolean crawl = false;
@@ -652,9 +653,8 @@ public class Runner extends TestSuite
                 System.out.println(getFixedWidthString("Crawler Statistics: ", "", width));
 
                 String[] statTitles = {"MaxDepth", "CrawlTime", "NewPages", "NewActions"};
-                int crawlTestLengthSeconds = ((crawlStats.getCrawlTestLength() / 1000) % 60);
                 String[] stats = { (Integer.toString(crawlStats.getMaxDepth())),
-                        ((crawlStats.getCrawlTestLength() / 60000) + ":" + (crawlTestLengthSeconds >= 10 ? crawlTestLengthSeconds : ("0" + crawlTestLengthSeconds))),
+                        crawlStats.getCrawlTestLength().toString().replace("PT", "").replaceAll("\\.\\d+", ""),
                         Integer.toString(crawlStats.getNewPages()),
                         Integer.toString((crawlStats.getUniqueActions() - totalUniqueActions)) };
 
@@ -662,7 +662,7 @@ public class Runner extends TestSuite
                 System.out.println(getRowString(statTitles, columnWidth));
                 System.out.println(getRowString(stats, columnWidth));
 
-                totalCrawlTime += crawlStats.getCrawlTestLength();
+                totalCrawlTime = totalCrawlTime.plus(crawlStats.getCrawlTestLength());
                 totalUniquePages += crawlStats.getNewPages();
                 totalUniqueActions = crawlStats.getUniqueActions();
             }
@@ -672,8 +672,7 @@ public class Runner extends TestSuite
             System.out.println(getFixedWidthString("Total Crawler Statistics: ", "", width));
 
             String[] statTitles = {"TotCrawlTime", "TotPages", "TotActions"};
-            int totalCrawlTimeSeconds = ((totalCrawlTime / 1000) % 60);
-            String[] stats = { ((totalCrawlTime / 60000) + ":" + (totalCrawlTimeSeconds >= 10 ? totalCrawlTimeSeconds : ("0" + totalCrawlTimeSeconds))),
+            String[] stats = { totalCrawlTime.toString().replace("PT", "").replaceAll("\\.\\d+", ""),
                     Integer.toString(totalUniquePages),
                     Integer.toString(totalUniqueActions) };
             int columnWidth = 13;
