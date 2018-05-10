@@ -425,6 +425,7 @@ public class ExtHelper
         selectComboBoxItem(Locators.formItemWithLabel(label).notHidden(), selection);
     }
 
+    @Deprecated
     public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         _test.click(parentLocator.append(Locator.tagWithClass("div", "x-form-trigger-arrow")));

@@ -340,7 +340,7 @@ public class ListHelper extends LabKeySiteWrapper
         if (col.isMvEnabled())
         {
             listFieldEditor.fieldProperties().selectAdvancedTab();
-            clickMvEnabled("");
+            clickMvEnabled();
         }
 
         if (col.getScale() != null)
@@ -515,21 +515,29 @@ public class ListHelper extends LabKeySiteWrapper
         pressTab(l);
     }
 
+    /** Use PropertiesEditor instead */
+    @Deprecated
     public void setColumnType(int index, ListColumnType type)
     {
         setColumnType(null, index, type);
     }
 
+    /** Use PropertiesEditor instead */
+    @Deprecated
     public void setColumnType(@Nullable String prefix, int index, ListColumnType type)
     {
         setColumnType(prefix, null, type, index);
     }
 
+    /** Use PropertiesEditor instead */
+    @Deprecated
     public void setColumnType(int index, LookupInfo lookup)
     {
         setColumnType(null, index, lookup);
     }
 
+    /** Use PropertiesEditor instead */
+    @Deprecated
     public void setColumnType(@Nullable String prefix, int index, LookupInfo lookup)
     {
         setColumnType(prefix, lookup, null, index);
@@ -538,47 +546,18 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod(quiet = true)
     private void setColumnType(@Nullable String prefix, @Nullable FieldDefinition.LookupInfo lookup, @LoggedParam @Nullable ListColumnType colType, @LoggedParam int i)
     {
-        Locator.XPathLocator typeField = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + i + "']");
-        // click the combobox trigger image
-        click(typeField.append("/../div[contains(@class, 'x-form-trigger-arrow')]"));
-        // click lookup checkbox
-        _extHelper.waitForExtDialog("Choose Field Type", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : colType) + "']/../input[@name = 'rangeURI']"));
-        if (lookup != null)
+        WebElement fieldTypeTrigger = Locator.tag("input").attributeStartsWith("name", "ff_type").append(Locator.xpath("/../../td/div")).findWhenNeeded(getDriver());
+        fieldTypeTrigger.click();
+        final PropertiesEditor.FieldTypeWindow window = new PropertiesEditor.FieldTypeWindow(this);
+        if (lookup == null)
         {
-            waitForElement(Locator.xpath("//input[@name='lookupContainer'][not(@disabled)]"));
-
-            if (lookup.getFolder() != null)
-            {
-                selectLookupComboItem("lookupContainer", lookup.getFolder());
-            }
-
-            if (!lookup.getSchema().equals(getFormElement(Locator.css("input[name=schema]"))))
-            {
-                selectLookupComboItem("schema", lookup.getSchema());
-            }
-            else
-                waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getSchema()).append("/input[@name='schema']"));
-
-            selectLookupTableComboItem(lookup.getTable(), lookup.getTableType());
-        }
-
-        clickButton("Apply", 0);
-        _extHelper.waitForExtDialogToDisappear("Choose Field Type");
-        String actualType = typeField.findElement(getDriver()).getAttribute("value");
-        if (lookup != null)
-        {
-            String expectedType = new StringBuilder()
-                    .append(lookup.getSchema())
-                    .append(".")
-                    .append(lookup.getTable())
-                    .append(" (").toString();
-            assertTrue("Test error: Failed to define lookup column. Expected: " + expectedType + " Actual: " + actualType, actualType.contains(expectedType));
+            FieldDefinition.ColumnType type = FieldDefinition.ColumnType.valueOf(colType.name());
+            window.selectType(type);
         }
         else
-        {
-            assertEquals("Test error: Failed to set column type", colType.toString(), actualType);
-        }
+            window.selectLookup(lookup);
+
+        window.clickApply();
     }
 
     private void selectLookupComboItem(String fieldName, String value)
@@ -649,26 +628,14 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void selectPropertyTab(String name)
     {
-        selectPropertyTab(null, name);
+        WebElement element = Locator.tagWithClass("div", "gwt-TabBarItem").withChild(Locator.xpath("//div[contains(@class, 'gwt-Label') and text()='" + name + "']")).findElement(getDriver());
+        element.click();
     }
 
-    public void selectPropertyTab(@Nullable String prefix, String name)
+    public void clickMvEnabled()
     {
-        click(Locator.xpath((null == prefix ? "" : prefix) + "//span[contains(@class,'x-tab-strip-text') and text()='" + name + "']"));
-    }
-
-    public void clickRequired(String prefix)
-    {
-        selectPropertyTab(prefix, "Validators");
-        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='required']");
-        waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        checkCheckbox(l);
-    }
-
-    public void clickMvEnabled(String prefix)
-    {
-        selectPropertyTab(prefix, "Advanced");
-        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='mvEnabled']");
+        selectPropertyTab("Advanced");
+        Locator l = Locator.xpath("//input[@name='mvEnabled']");
         waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         checkCheckbox(l);
     }
@@ -728,13 +695,8 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void addLookupField(String areaTitle, int index, String name, String label, LookupInfo type)
     {
-        String prefix = areaTitle==null ? "" : "//h3[text() = '" + areaTitle + "']/../..";
-        String addField = prefix + "//span" + Locator.lkButton("Add Field").toXpath();
-        click(Locator.xpath(addField));
-        waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        setColumnName(prefix, index, name);
-        setColumnLabel(prefix, index, label);
-        setColumnType(prefix, index, type);
+        PropertiesEditor editor = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle(areaTitle).waitFor();
+        editor.addField(new FieldDefinition(name).setLabel(label).setLookup(type));
     }
 
     public void deleteField(String areaTitle, int index)

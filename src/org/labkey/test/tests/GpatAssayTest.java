@@ -23,8 +23,10 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -88,13 +90,13 @@ public class GpatAssayTest extends BaseWebDriverTest
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         uncheckCheckbox(Locator.gwtCheckBoxOnImportGridByColLabel("Role"));
         click(Locator.gwtNextButtonOnImportGridByColLabel("Score"));
-        _extHelper.waitForExtDialog("Score Column Properties");
-        _extHelper.clickExtTab("Validators");
+        waitForGwtDialog("Score Column Properties");
+        clickGwtTab("Validators");
         checkCheckbox(Locator.checkboxByName("required"));
         clickButton("OK", 0);
         click(Locator.gwtNextButtonOnImportGridByColLabel("Primary"));
-        _extHelper.waitForExtDialog("Primary Column Properties");
-        _extHelper.clickExtTab("Advanced");
+        waitForGwtDialog("Primary Column Properties");
+        clickGwtTab("Advanced");
         checkCheckbox(Locator.checkboxByName("mvEnabled"));
         clickButton("OK", 0);
         assertEquals("SpecimenID", getFormElement(Locator.name("SpecimenID")));
@@ -120,13 +122,13 @@ public class GpatAssayTest extends BaseWebDriverTest
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         uncheckCheckbox(Locator.gwtCheckBoxOnImportGridByColLabel("Role"));
         click(Locator.gwtNextButtonOnImportGridByColLabel("Score"));
-        _extHelper.waitForExtDialog("Score Column Properties");
-        _extHelper.clickExtTab("Validators");
+        waitForGwtDialog("Score Column Properties");
+        clickGwtTab("Validators");
         checkCheckbox(Locator.checkboxByName("required"));
         clickButton("OK", 0);
         click(Locator.gwtNextButtonOnImportGridByColLabel("Primary"));
-        _extHelper.waitForExtDialog("Primary Column Properties");
-        _extHelper.clickExtTab("Advanced");
+        waitForGwtDialog("Primary Column Properties");
+        clickGwtTab("Advanced");
         checkCheckbox(Locator.checkboxByName("mvEnabled"));
         clickButton("OK", 0);
         assertEquals("SpecimenID", getFormElement(Locator.name("SpecimenID")));
@@ -149,13 +151,13 @@ public class GpatAssayTest extends BaseWebDriverTest
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         uncheckCheckbox(Locator.gwtCheckBoxOnImportGridByColLabel("Role"));
         click(Locator.gwtNextButtonOnImportGridByColLabel("Score"));
-        _extHelper.waitForExtDialog("Score Column Properties");
-        _extHelper.clickExtTab("Validators");
+        waitForGwtDialog("Score Column Properties");
+        clickGwtTab("Validators");
         checkCheckbox(Locator.checkboxByName("required"));
         clickButton("OK", 0);
         click(Locator.gwtNextButtonOnImportGridByColLabel("Primary"));
-        _extHelper.waitForExtDialog("Primary Column Properties");
-        _extHelper.clickExtTab("Advanced");
+        waitForGwtDialog("Primary Column Properties");
+        clickGwtTab("Advanced");
         checkCheckbox(Locator.checkboxByName("mvEnabled"));
         clickButton("OK", 0);
         assertEquals("SpecimenID", getFormElement(Locator.name("SpecimenID")));
@@ -169,9 +171,11 @@ public class GpatAssayTest extends BaseWebDriverTest
         _listHelper.setColumnLabel(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields"), 4, "Blank");
         _listHelper.setColumnLabel(7, "Result");
         _listHelper.setColumnName(7, "Result");
-        click(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//span[contains(@class,'x-tab-strip-text') and text()='" + "Advanced" + "']"));
-        setFormElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']"), "Score");
-        pressTab(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']"));
+
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(ASSAY_NAME_TSV + " Data Fields").find();
+        PropertiesEditor.FieldRow row = editor.selectField("Result");
+        PropertiesEditor.FieldPropertyDock.AdvancedTabPane tabPane = row.properties().selectAdvancedTab();
+        tabPane.importAliasesInput.set("Score");
 
         clickButton("Save & Close");
         clickButton("Next", defaultWaitForPage);
@@ -230,6 +234,17 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertTextPresent(
                 "Header", "HCJDRSZ07IVO6P", "HCJDRSZ07IL1GX", "HCJDRSZ07H5SPZ",
                 "CACCAGACAGGTGTTATGGTGTGTGCCTGTAATCCCAGCTACTTGGGAGGGAGCTCAGGT");
+    }
+
+    private void waitForGwtDialog(String caption)
+    {
+        waitForElement(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='" + caption + "']"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void clickGwtTab(String tabName)
+    {
+        WebElement element = Locator.tagWithClass("div", "gwt-TabBarItem").withChild(Locator.xpath("//div[contains(@class, 'gwt-Label') and text()='" + tabName + "']")).findElement(getDriver());
+        element.click();
     }
 
     /**

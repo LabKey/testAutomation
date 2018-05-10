@@ -26,8 +26,10 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -273,10 +275,12 @@ public class FileContentUploadTest extends BaseWebDriverTest
         // Setup custom file properties
         _fileBrowserHelper.goToEditProperties();
 
-        waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.name("ff_name0"), CUSTOM_PROPERTY);
-        setFormElement(Locator.id("url"), "http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
-        _listHelper.addLookupField(null, 1, COLUMN_NAME, COLUMN_NAME, new ListHelper.LookupInfo(getProjectName(), "lists", LIST_NAME));
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("File Properties").find();
+        PropertiesEditor.FieldRow row = editor.selectField(0);
+        row.setName(CUSTOM_PROPERTY);
+        row.properties().selectDisplayTab().url.set("http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
+
+        editor.addField(new FieldDefinition(COLUMN_NAME).setLabel(COLUMN_NAME).setLookup(new FieldDefinition.LookupInfo(getProjectName(), "lists", LIST_NAME)));
         clickButton("Save & Close");
     }
 

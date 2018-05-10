@@ -40,6 +40,7 @@ import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
@@ -681,9 +682,8 @@ public class AuditLogTest extends BaseWebDriverTest
         clickAndWait(Locator.lkButton("Design"));
         _listHelper.clickEditDesign();
 
-        _listHelper.addLookupField("List Fields", 3, FIELD03_NAME, FIELD03_LABEL,
-                new ListHelper.LookupInfo(null, "lists", LOOK_UP_LIST01));
-
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
+        editor.addField(new FieldDefinition(FIELD03_NAME).setLabel(FIELD03_LABEL).setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)));
         _listHelper.clickSave();
 
         log("Validate that a 'Create' event was logged for the new filed.");
@@ -720,8 +720,9 @@ public class AuditLogTest extends BaseWebDriverTest
         _listHelper.clickEditDesign();
 
         log("Change properties on field '" + FIELD03_NAME + "'.");
-        _listHelper.getListFieldEditor().selectField(FIELD03_NAME);
-        _listHelper.setColumnType(3, new ListHelper.LookupInfo(null, "lists", LOOK_UP_LIST02));
+        editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
+        PropertiesEditor.FieldRow row = editor.selectField(FIELD03_NAME);
+        row.setType(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02), null);
         _listHelper.clickSave();
 
         log("Validate that the expected row is there for the after modifying the Lookup field.");

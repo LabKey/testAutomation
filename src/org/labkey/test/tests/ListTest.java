@@ -298,10 +298,11 @@ public class ListTest extends BaseWebDriverTest
         uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInDetail']/input"));
 
         listHelper.addField(_listCol6);
-        selectPropertyTab("Advanced");
-        waitForElement(Locator.id("importAliases"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("importAliases"), ALIASED_KEY_NAME);
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
+        PropertiesEditor.FieldRow row = editor.selectField(_listCol6.getName());
+        PropertiesEditor.FieldPropertyDock.AdvancedTabPane tabPane = row.properties().selectAdvancedTab();
 
+        tabPane.importAliasesInput.set(ALIASED_KEY_NAME);
         click(Locator.id("partdown_2"));
 
         _listHelper.clickSave();
@@ -871,9 +872,11 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit Design", 0);
 
         // Set conditional format on boolean column. Bold, italic, strikethrough, cyan text, red background
-        click(Locator.name("ff_name3")); // BoolCol
-        click(Locator.xpath("//span[text()='Format']"));
-        clickButton("Add Conditional Format", 0);
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
+
+        PropertiesEditor.FieldRow row = editor.selectField("BoolCol");
+        PropertiesEditor.FieldPropertyDock.FormatTabPane tabPane = row.properties().selectFormatTab();
+        tabPane.addConditionalFormat.click();
         _extHelper.waitForExtDialog("Apply Conditional Format Where BoolCol", WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("value_1"), "true");
         _extHelper.clickExtButton("Apply Conditional Format Where BoolCol", "OK", 0);
@@ -883,27 +886,31 @@ public class ListTest extends BaseWebDriverTest
         click(Locator.xpath("//div[@title='Color']"));
         waitForElement(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//fieldset[./legend/span[text()='Background']]//input"), "FF0000"); // Red background
+        // don't know why this is necessary TODO: investigate
+        click(Locator.id("button_OK"));
         click(Locator.id("button_OK"));
         waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
         // Regression test for Issue 11435: reopen color dialog to set text color
         click(Locator.xpath("//div[@title='Color']"));
         waitForElement(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//fieldset[./legend/span[text()='Foreground']]//input"), "00FFFF"); // Cyan text
+        // don't know why this is necessary TODO: investigate
+        click(Locator.id("button_OK"));
         click(Locator.id("button_OK"));
         waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
 
         // Set multiple conditional formats on int column.
-        click(Locator.name("ff_name4")); // IntCol
-        click(Locator.xpath("//span[text()='Format']"));
+        row = editor.selectField("IntCol");
+        tabPane = row.properties().selectFormatTab();
+        tabPane.addConditionalFormat.click();
         // If greater than 5, Bold
-        clickButton("Add Conditional Format", 0);
         _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
         setFormElement(Locator.id("value_1"), "5");
         _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
         checkCheckbox(Locator.checkboxByName("Bold"));
         // If greater than 7, strikethrough
-        clickButton("Add Conditional Format", 0);
+        tabPane.addConditionalFormat.click();
         _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
         setFormElement(Locator.id("value_1"), "7");

@@ -151,12 +151,11 @@ public class PivotQueryTest extends ReportTest
         waitForElement(Locator.lkButton("Export Fields"));
 
         log("Select the ConcInRange field");
-        datasetFieldsPanel.selectField(CONC_INRANGE_STRING);
+        PropertiesEditor.FieldRow row = datasetFieldsPanel.selectField(CONC_INRANGE_STRING);
 
         log("Change the column's reporting status to 'measure'");
-        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text')][text()='Reporting']"));
-        Checkbox measure = Checkbox.Checkbox(Locator.tagWithName("input", "measure")).findWhenNeeded(datasetFieldsPanel);
-        measure.check();
+        PropertiesEditor.FieldPropertyDock.ReportingTabPane tabPane = row.properties().selectReportingTab();
+        tabPane.measure.check();
 
         doAndWaitForPageToLoad(() -> {
             click(Locator.linkWithSpan("Save"));

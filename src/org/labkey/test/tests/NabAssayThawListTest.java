@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DilutionAssayHelper;
@@ -115,8 +116,9 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
         log("Set default for ParticipantVisitResolver at Project level");
         // We'll override it later at the folder level.
-        click(Locator.xpath("//div[text()='ParticipantVisitResolver']"));
-        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Batch Fields").find();
+        PropertiesEditor.FieldRow row = editor.selectField("ParticipantVisitResolver");
+        row.properties().selectAdvancedTab();
         clickAndWait(Locator.linkContainingText("value"));
         click(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.ParticipantVisitDate.name()));
         clickButton("Save Defaults");

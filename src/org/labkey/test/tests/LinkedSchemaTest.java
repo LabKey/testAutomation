@@ -25,6 +25,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -735,7 +737,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 .viewListDesign(tableName);
 
         _listHelper.clickEditDesign();
-        _listHelper.setColumnType(index, info);
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
+        editor.selectField(index).setType(info, null);
         _listHelper.clickSave();
 
     }

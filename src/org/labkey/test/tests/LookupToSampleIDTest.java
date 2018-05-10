@@ -24,7 +24,9 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -190,7 +192,10 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo(sampleSetFolder, "samples", lookupTableValue);
         lookupInfo.setTableType(lookupTableType);
 
-        _listHelper.addLookupField(name + " Data Fields", 4, SAMPLE_ID_FIELD_NAME, SAMPLE_ID_FIELD_LABEL, lookupInfo);
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(name + " Data Fields").find();
+        editor.addField(new FieldDefinition(SAMPLE_ID_FIELD_NAME)
+                .setLabel(SAMPLE_ID_FIELD_LABEL)
+                .setLookup(lookupInfo));
         assayDesigner.saveAndClose();
     }
 

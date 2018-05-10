@@ -24,7 +24,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 
 import java.text.DateFormat;
@@ -132,10 +133,12 @@ public class ExpTest extends BaseWebDriverTest
         clickButton("Edit Metadata");
         int created_RowIndex = 5;
         waitForElement(Locator.name("ff_label" + created_RowIndex), WAIT_FOR_JAVASCRIPT);
-        _listHelper.clickRow(created_RowIndex);
-        _listHelper.setColumnLabel(created_RowIndex, "editedCreated");
-        _extHelper.clickExtTab("Format");
-        setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
+
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Metadata Properties").find();
+        PropertiesEditor.FieldRow row = editor.selectField("Created");
+        row.setLabel("editedCreated");
+        PropertiesEditor.FieldPropertyDock.FormatTabPane tabPane = row.properties().selectFormatTab();
+        tabPane.propertyFormat.set("ddd MMM dd yyyy");
         clickButton("Save", 0);
         waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
 
@@ -165,10 +168,11 @@ public class ExpTest extends BaseWebDriverTest
         click(Locator.xpath("//span").append(Locator.lkButton("OK")));
 
         // Make it a lookup into our custom query
+        editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Metadata Properties").find();
         int fieldCount = getElementCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
         assertTrue(fieldCount > 0);
-        _listHelper.setColumnType(fieldCount - 1, new ListHelper.LookupInfo(null, "exp", "dataCustomQuery"));
-        click(Locator.name("ff_type" + (fieldCount - 1)));
+        row = editor.selectField(fieldCount-1);
+        row.setType(new FieldDefinition.LookupInfo(null, "exp", "dataCustomQuery"), FieldDefinition.ColumnType.Lookup);
 
         // Save it
         clickButton("Save", 0);
