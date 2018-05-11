@@ -650,7 +650,7 @@ public class PropertiesEditor extends WebPartPanel
             Locator.tagWithName("input", fieldName).append(Locator.xpath("/../../td/div")).findElement(this).click();
             try
             {
-                _wrapper.waitAndClick(Locator.tag("div").withClass("x-ignore").childTag("div").containing(comboSubstring));
+                _wrapper.waitAndClick(Locator.tag("div").withClass("x-ignore").childTag("div").startsWith(comboSubstring));
             }
             catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
             {
