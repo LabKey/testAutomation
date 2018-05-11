@@ -784,15 +784,18 @@ public class Crawler
 
             checkForForbiddenWords(relativeURL);
 
-            // Check that there was no error
             int code = _test.getResponseCode();
+            if (code == 404 && origin == null) // Ignore 404s from the initial set of links
+                return Collections.emptyList();
+
+            // Check that there was no error
             if (code >= 400)
-                fail(relativeURL + "\nproduced response code " + code + ".\nOriginating page: " + origin.toString());
+                fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
             List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
             if (!serverError.isEmpty())
             {
                 String[] errorLines = serverError.get(0).split("\n");
-                fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\".\nOriginating page: " + origin.toString());
+                fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
             }
 
             if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
