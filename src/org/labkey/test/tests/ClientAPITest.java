@@ -655,8 +655,41 @@ public class ClientAPITest extends BaseWebDriverTest
         waitForText (5000, "maxRows Test");
         assertTextPresent("Janeson");
         assertTextNotPresent("Johnson");
-
     }
+
+    @Test
+    public void createDataset()
+    {
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetDate\",\n" +
+                "   domainDesign: {\n" +
+                "       name : 'My Test Dataset',\n" +
+                "       fields: [{\n" +
+                "           name: \"intFieldOne\",\n" +
+                "           rangeURI: \"int\"\n" +
+                "       },{\n" +
+                "           name: \"stringFieldOne\",\n" +
+                "           rangeURI: \"string\"\n" +
+                "       },{\n" +
+                "           name: \"labName\",\n" +
+                "           rangeURI: \"string\"\n" +
+                "       },{\n" +
+                "           name : \"labLocation\",\n" +
+                "           rangeURI : \"string\"\n" +
+                "       }]\n" +
+                "   },\n" +
+                "   options : {\n" +
+                "       datasetId : 81005,\n" +
+                "       categoryId : 3,\n" +
+                "       //keyPropertyName : 'intFieldOne',\n" +
+                "       //useTimeKeyField : true\n" +
+                "       //demographics : true\n" +
+                "   }\n" +
+                "});\n";
+        Map<String, Object> createResult = (Map<String, Object>)executeAsyncScript(create);
+        log(create);
+    }
+
     @Test
     public void webpartTest()
     {

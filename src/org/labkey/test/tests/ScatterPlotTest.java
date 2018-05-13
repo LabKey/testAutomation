@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -51,6 +52,7 @@ import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 import static org.labkey.test.components.ext4.Window.Window;
 
 @Category({DailyC.class, Reports.class, Charting.class, Hosting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class ScatterPlotTest extends GenericChartsTest
 {
     protected static final String DEVELOPER_USER = "developer_user1@report.test";

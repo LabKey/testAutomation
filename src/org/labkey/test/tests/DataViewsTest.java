@@ -38,6 +38,7 @@ import static org.junit.Assert.assertEquals;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 
 @Category({DailyC.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class DataViewsTest extends ParticipantListTest
 {
     private static final String REPORT_NAME = "TestReport";
