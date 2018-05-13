@@ -400,7 +400,6 @@ src/org/labkey/test/BaseWebDriverTest.java -text
 src/org/labkey/test/CachingLocator.java -text
 src/org/labkey/test/Cleanable.java -text
 src/org/labkey/test/ExtraSiteWrapper.java -text
-src/org/labkey/test/LabKeyJDBCTest.java -text
 src/org/labkey/test/LabKeySiteWrapper.java -text
 src/org/labkey/test/Locator.java -text
 src/org/labkey/test/Locators.java -text
@@ -849,6 +848,7 @@ src/org/labkey/test/tests/issues/IssueDomainSharingTest.java -text
 src/org/labkey/test/tests/issues/IssuesAdminTest.java -text
 src/org/labkey/test/tests/issues/IssuesAttachmentTest.java -text
 src/org/labkey/test/tests/issues/IssuesTest.java -text
+src/org/labkey/test/tests/jdbc/LabKeyJDBCTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/SchemaBrowserPerfTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
