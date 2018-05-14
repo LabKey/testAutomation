@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
@@ -31,6 +32,7 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 
 @Category({DailyC.class, Reports.class, Charting.class, Hosting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class BoxPlotTest extends GenericChartsTest
 {
     @LogMethod

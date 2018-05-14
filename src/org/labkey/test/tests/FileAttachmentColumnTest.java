@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 @Category({DailyC.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class FileAttachmentColumnTest extends BaseWebDriverTest
 {
     private final String FOLDER_NAME = "TestFolder";

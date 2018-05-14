@@ -32,6 +32,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyC.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class DiscussionLinkTest extends BaseWebDriverTest
 {
     public static final String WIKI_NAME = "Link test";

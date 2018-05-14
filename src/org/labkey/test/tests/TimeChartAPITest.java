@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.Pair;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
@@ -38,6 +39,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyC.class, Reports.class, Charting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class TimeChartAPITest extends TimeChartTest
 {
     private static final String WIKIPAGE_NAME = "VisualizationGetDataAPITest";

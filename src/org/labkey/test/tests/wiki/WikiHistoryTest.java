@@ -33,6 +33,7 @@ import java.util.List;
 // Based on WikiTest
 
 @Category({DailyC.class, Wiki.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class WikiHistoryTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "WikiHistoryVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;

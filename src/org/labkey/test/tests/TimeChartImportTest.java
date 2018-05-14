@@ -20,6 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
@@ -48,6 +49,7 @@ import java.util.List;
  * // TODO: add verification for plot line with and whether or not the data points are shown
  */
 @Category({DailyC.class, Reports.class, Charting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class TimeChartImportTest extends StudyBaseTest
 {
     private static final File MULTI_FOLDER_ZIP = TestFileUtils.getSampleData("studies/TimeChartTesting.folder.zip");

@@ -40,6 +40,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.MemberType;
 
 @Category({DailyC.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class CustomizeGridPermissionsTest extends BaseWebDriverTest
 {
     private static final String READER = "gp_reader@gridpermissions.test";

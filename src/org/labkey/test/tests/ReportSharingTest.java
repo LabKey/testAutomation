@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyC.class, Reports.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class ReportSharingTest extends BaseWebDriverTest
 {
     RReportHelper _rReportHelper = new RReportHelper(this);

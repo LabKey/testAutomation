@@ -21,6 +21,7 @@ import java.util.List;
  * Date: 4/30/2018
  */
 @Category({DailyC.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ModeratorReviewTest extends BaseWebDriverTest
 {
     private final String SPAM_TITLE = "This is a spam message";

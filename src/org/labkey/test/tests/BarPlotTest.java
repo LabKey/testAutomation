@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
@@ -35,6 +36,7 @@ import org.labkey.test.util.LogMethod;
 import java.net.URL;
 
 @Category({DailyC.class, Reports.class, Charting.class, Hosting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class BarPlotTest extends GenericChartsTest
 {
     private final String PREG_TEST_RESULTS = "17a. Preg. test result";

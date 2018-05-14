@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
@@ -35,6 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class, Reports.class, Charting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class TimeChartVisitBasedTest extends TimeChartTest
 {
     private static final String VISIT_REPORT_NAME = "TimeChartTest Visit Report";

@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
@@ -36,6 +37,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class, Reports.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class NonStudyReportsTest extends ReportTest
 {
     protected final PortalHelper portalHelper = new PortalHelper(this);

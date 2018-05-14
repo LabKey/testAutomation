@@ -32,6 +32,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class SampleSetNameExpressionTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleSetNameExprTest";

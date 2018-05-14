@@ -53,6 +53,7 @@ import java.util.Map;
  * Test trigger script matrix, expands on ScriptValidationTest which covers custom schemas (Vehicles)
  */
 @Category({DailyC.class, Data.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class TriggerScriptTest extends BaseWebDriverTest
 {
     //List constants

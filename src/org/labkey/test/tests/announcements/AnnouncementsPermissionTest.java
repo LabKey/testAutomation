@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyC.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class AnnouncementsPermissionTest extends BaseWebDriverTest
 {
     PortalHelper portalHelper = new PortalHelper(this);

@@ -18,6 +18,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyC.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class MultiplePKUploadAssayTest extends BaseWebDriverTest
 {
     @Override

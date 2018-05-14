@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category(DailyC.class)
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class FilesWebpartFileRootTest extends BaseWebDriverTest
 {
     private static final String CHILD_CONTAINER = "ChildContainerNotForFileRootSelection";

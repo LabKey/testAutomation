@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyC.class, FileBrowser.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class FilesQueryTest extends BaseWebDriverTest
 {
     private static final String EXP_SCHEMA = "exp";

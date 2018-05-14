@@ -42,6 +42,7 @@ import java.util.Map;
 import static org.junit.Assert.assertFalse;
 
 @Category({DailyC.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindowsTest
 {
     private static final File FILES_ARCHIVE = TestFileUtils.getSampleData("filenames/illegal_chars.tar.gz");
