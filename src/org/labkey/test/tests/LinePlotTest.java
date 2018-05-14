@@ -30,6 +30,7 @@ import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -110,7 +111,7 @@ public class LinePlotTest extends GenericChartsTest
                         .clickApply();
                 success = true;
             }
-            catch (Exception e)
+            catch (WebDriverException e)
             {
                 attempts++;
             }

@@ -67,7 +67,7 @@ public class WebServicesUtil
             InetAddress address = InetAddress.getByName(hostIp);
             return address.isReachable(5000);
         }
-        catch (Exception e)
+        catch (IOException e)
         {
             return false;
         }
