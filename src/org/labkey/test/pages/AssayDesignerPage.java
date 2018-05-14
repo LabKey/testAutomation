@@ -24,17 +24,14 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
-import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.Input.Input;
-import static org.labkey.test.components.html.OptionSelect.OptionSelect;
 import static org.labkey.test.components.html.SelectWrapper.Select;
 
 public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.ElementCache>
@@ -161,6 +158,11 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         return elementCache().dataFieldsPanel;
     }
 
+    public PropertiesEditor resultFields()
+    {
+        return elementCache().resultFieldsPanel;
+    }
+
     public AssayDesignerPage addBatchField(String name, @Nullable String label, @Nullable String type)
     {
         return addBatchField(name, label, FieldDefinition.ColumnType.valueOf(type));
@@ -255,5 +257,6 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         final PropertiesEditor batchFieldsPanel = PropertiesEditor(getDriver()).withTitleContaining("Batch Fields").findWhenNeeded();
         final PropertiesEditor runFieldsPanel = PropertiesEditor(getDriver()).withTitleContaining("Run Fields").findWhenNeeded();
         final PropertiesEditor dataFieldsPanel = PropertiesEditor(getDriver()).withTitleContaining("Data Fields").findWhenNeeded();
+        final PropertiesEditor resultFieldsPanel = PropertiesEditor(getDriver()).withTitleContaining("Result Fields").findWhenNeeded();
     }
 }

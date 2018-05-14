@@ -406,38 +406,8 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod(quiet = true)
     public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
     {
-        addField(areaTitle, name, label, type, null);
-    }
-
-    /**
-     * @deprecated Use {@link PropertiesEditor#addField(FieldDefinition)}
-     */
-    @Deprecated
-    @LogMethod(quiet = true)
-    public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type, FieldDefinition.FieldValidator validator)
-    {
-        addField(areaTitle, name, label, type, validator, false);
-    }
-
-    /**
-     * @deprecated Use {@link PropertiesEditor#addField(FieldDefinition)}
-     */
-    @Deprecated
-    @LogMethod(quiet = true)
-    public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type, FieldDefinition.FieldValidator validator, boolean required)
-    {
         PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(areaTitle).find()
-                .addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()).setValidator(validator).setRequired(required));
-    }
-
-    /**
-     * @deprecated Use {@link PropertiesEditor#selectField(int)}.{@link PropertiesEditor.FieldRow#markForDeletion()}
-     */
-    @Deprecated
-    public void deleteField(String areaTitle, int index)
-    {
-        PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(areaTitle).find()
-                .selectField(index).markForDeletion();
+                .addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
     }
 
     public List<String> getColumnNames()

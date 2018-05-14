@@ -682,7 +682,7 @@ public class AuditLogTest extends BaseWebDriverTest
         clickAndWait(Locator.lkButton("Design"));
         _listHelper.clickEditDesign();
 
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
+        PropertiesEditor editor = _listHelper.getListFieldEditor();
         editor.addField(new FieldDefinition(FIELD03_NAME).setLabel(FIELD03_LABEL).setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)));
         _listHelper.clickSave();
 
@@ -720,7 +720,7 @@ public class AuditLogTest extends BaseWebDriverTest
         _listHelper.clickEditDesign();
 
         log("Change properties on field '" + FIELD03_NAME + "'.");
-        editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
+        editor = _listHelper.getListFieldEditor();
         PropertiesEditor.FieldRow row = editor.selectField(FIELD03_NAME);
         row.setType(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02));
         _listHelper.clickSave();
@@ -748,7 +748,8 @@ public class AuditLogTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LIST_CHECK_LOG));
         clickAndWait(Locator.lkButton("Design"));
         _listHelper.clickEditDesign();
-        _listHelper.deleteField("List Fields", 3);
+        _listHelper.getListFieldEditor().selectField(3)
+                .markForDeletion();
         _listHelper.clickSave();
 
         log("Validate that the expected row is there after deleting the Lookup field.");

@@ -269,7 +269,8 @@ public class InlineImagesListTest extends BaseWebDriverTest
         log("Remove one of the attachment columns and validate that everything still works.");
         clickAndWait(Locator.linkWithText("Design"));
         _listHelper.clickEditDesign();
-        _listHelper.deleteField("List Fields", 3);
+        _listHelper.getListFieldEditor().selectField(3)
+                .markForDeletion();
         _listHelper.clickSave();
         clickAndWait(Locator.lkButton("Done"));
 

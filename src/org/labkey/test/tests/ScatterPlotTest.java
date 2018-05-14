@@ -492,15 +492,18 @@ public class ScatterPlotTest extends GenericChartsTest
                 .clickEditDefinition();
 
         waitForText(FIELDS_REGION_TITLE);
+        PropertiesEditor propertiesEditor = editDatasetPage.getFieldsEditor();
 
         listOfMeasureLabels = getLabels(FIELDS_REGION_TITLE);
         log("Remove color measure.");
         listIndex = listOfMeasureLabels.indexOf(MEASURE_7_NECK);
-        _listHelper.deleteField(FIELDS_REGION_TITLE, listIndex);
+        propertiesEditor.selectField(listIndex)
+                .markForDeletion();
 
         log("Remove shape measure.");
         listIndex = listOfMeasureLabels.indexOf(MEASURE_16_EVAL_SUM);
-        _listHelper.deleteField(FIELDS_REGION_TITLE, listIndex);
+        propertiesEditor.selectField(listIndex)
+                .markForDeletion();
 
         editDatasetPage.save();
 
@@ -532,14 +535,14 @@ public class ScatterPlotTest extends GenericChartsTest
 
         clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
         clickButton("Manage", WAIT_FOR_PAGE);
-        new DatasetPropertiesPage(getDriver()).clickEditDefinition();
+        editDatasetPage = new DatasetPropertiesPage(getDriver()).clickEditDefinition();
 
         waitForText(FIELDS_REGION_TITLE);
         listOfMeasureLabels = getLabels(FIELDS_REGION_TITLE);
         log("Remove x-axis measure.");
         listIndex = listOfMeasureLabels.indexOf(MEASURE_FORM_LANGUAGE);
-        _listHelper.deleteField(FIELDS_REGION_TITLE, listIndex);
-        clickButton("Save");
+        editDatasetPage.getFieldsEditor().selectField(listIndex).markForDeletion();
+        editDatasetPage.save();
 
         log("Verify missing measure error message.");
         clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));

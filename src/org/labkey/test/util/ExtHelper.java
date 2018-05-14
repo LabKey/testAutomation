@@ -425,13 +425,6 @@ public class ExtHelper
         selectComboBoxItem(Locators.formItemWithLabel(label).notHidden(), selection);
     }
 
-    @Deprecated
-    public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)
-    {
-        _test.click(parentLocator.append(Locator.tagWithClass("div", "x-form-trigger-arrow")));
-        _test.waitAndClick(Locator.tagWithClass("*", "x-combo-list-item").containing(selection));
-    }
-
     public void closeExtTab(String tabName)
     {
         _test.log("Closing Ext tab " + tabName);

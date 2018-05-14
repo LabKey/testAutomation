@@ -23,8 +23,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.TextSearcher;
 
 import java.io.File;
@@ -297,13 +297,13 @@ public class ViabilityTest extends AbstractViabilityTest
 
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
-        _assayHelper.clickEditAssayDesign(true);
+        AssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign(true);
         waitForElement(Locator.lkButton("Add Script"));
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
-        _listHelper.deleteField("Batch Fields", 0);
-        _listHelper.addField("Guava Assay Result Fields", "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
-        clickButton("Save & Close");
+        assayDesignerPage.batchFields().selectField(0).markForDeletion();
+        assayDesignerPage.resultFields().addField(new FieldDefinition("TargetStudy").setLabel("Target Study").setType(FieldDefinition.ColumnType.String));
+        assayDesignerPage.saveAndClose();
 
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));

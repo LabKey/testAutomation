@@ -736,7 +736,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 .viewListDesign(tableName);
 
         _listHelper.clickEditDesign();
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
+        PropertiesEditor editor = _listHelper.getListFieldEditor();
         editor.selectField(index).setType(info);
         _listHelper.clickSave();
 

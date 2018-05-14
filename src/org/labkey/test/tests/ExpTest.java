@@ -134,7 +134,7 @@ public class ExpTest extends BaseWebDriverTest
         int created_RowIndex = 5;
         waitForElement(Locator.name("ff_label" + created_RowIndex), WAIT_FOR_JAVASCRIPT);
 
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Metadata Properties").find();
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitle("Metadata Properties").find();
         PropertiesEditor.FieldRow row = editor.selectField("Created");
         row.setLabel("editedCreated");
         PropertiesEditor.FieldPropertyDock.FormatTabPane tabPane = row.properties().selectFormatTab();

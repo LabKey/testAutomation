@@ -123,9 +123,11 @@ public class UserTest extends BaseWebDriverTest
             int index = Integer.parseInt(deleteButton.getAttribute("id").replace("partdelete_", ""));
             customFieldIds.add(index);
         }
+        PropertiesEditor field_properties = new PropertiesEditor.PropertiesEditorFinder(_listHelper.getDriver()).withTitle("Field Properties").find();
         for (Integer index : customFieldIds)
         {
-            _listHelper.deleteField("Field Properties", index);
+            field_properties.selectField(index)
+                    .markForDeletion();
         }
         clickButton("Save");
     }

@@ -265,7 +265,7 @@ public abstract class TestFileUtils
             if (!FileUtils.directoryContains(new File(getLabKeyRoot()), file))
             {
                 // TODO: Consider throwing IllegalArgumentException
-                TestLogger.log("DEBUG: Attempting to delete a file outside of test enlistment");
+                TestLogger.log("DEBUG: Attempting to delete a file outside of test enlistment: " + getLabKeyRoot());
             }
         }
         catch (IOException ignore) { }

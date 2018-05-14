@@ -299,7 +299,7 @@ public class ListTest extends BaseWebDriverTest
         uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInDetail']/input"));
 
         listHelper.addField(_listCol6);
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
+        PropertiesEditor editor = _listHelper.getListFieldEditor();
         PropertiesEditor.FieldRow row = editor.selectField(_listCol6.getName());
         PropertiesEditor.FieldPropertyDock.AdvancedTabPane tabPane = row.properties().selectAdvancedTab();
 
@@ -873,7 +873,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit Design", 0);
 
         // Set conditional format on boolean column. Bold, italic, strikethrough, cyan text, red background
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
+        PropertiesEditor editor = _listHelper.getListFieldEditor();
 
         PropertiesEditor.FieldRow row = editor.selectField("BoolCol");
         PropertiesEditor.FieldPropertyDock.FormatTabPane tabPane = row.properties().selectFormatTab();
@@ -1119,7 +1119,7 @@ public class ListTest extends BaseWebDriverTest
 
         // Now remove attachment column and check audit log
         dataregionToEditDesign();
-        _listHelper.deleteField("List Fields", 2);
+        _listHelper.getListFieldEditor().selectField(2).markForDeletion();
         _listHelper.clickSave();
         AuditLogTest.verifyAuditEvent(this, "Attachment events", AuditLogTest.COMMENT_COLUMN, "The attachment searchData.tsv was deleted", 1);
     }

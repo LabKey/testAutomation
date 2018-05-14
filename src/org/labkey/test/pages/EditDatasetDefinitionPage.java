@@ -89,6 +89,17 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return this;
     }
 
+    public String getVisitDate()
+    {
+        return getSelectedOptionText(elementCache().visitDateColumn);
+    }
+
+    public EditDatasetDefinitionPage setVisitDate(String visitDate)
+    {
+        selectOptionByValue(elementCache().visitDateColumn, visitDate);
+        return this;
+    }
+
     public String getTag()
     {
         return elementCache().tagTextField.getText();
@@ -156,13 +167,13 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
 
     public EditDatasetDefinitionPage setAdditionalKeyColDataField(String field)
     {
-        setFormElement(Locator.id("list_dataField"), field);
+        setFormElement(elementCache().additionalKeyDataFieldSelect, field);
         return this;
     }
 
     public EditDatasetDefinitionPage setAdditionalKeyColManagedField(String field)
     {
-        selectOptionByValue(Locator.id("list_managedField"), field);
+        selectOptionByValue(elementCache().additionalKeyManagedFieldSelect, field);
         return this;
     }
 
@@ -209,17 +220,18 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
     {
         WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
         WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
-        WebElement nameTextField = Locator.id("DatasetDesignerName").findWhenNeeded(this);
+        WebElement nameTextField = Locator.input("dsName").findWhenNeeded(this);
         WebElement labelTextField = Locator.name("dsLabel").findWhenNeeded(this);
         WebElement categoryTextField = Locator.name("dsCategory").findWhenNeeded(this);
         WebElement tagTextField = Locator.name("tag").findWhenNeeded(this);
+        WebElement visitDateColumn = Locator.name("dsVisitDate").findWhenNeeded(this);
         WebElement descriptionTextField = Locator.name("description").findWhenNeeded(this);
         WebElement cohortAssociation = Locator.xpath("//tr/td[@class='labkey-form-label'][descendant::div[text()='Cohort Association' and @class='gwt-Label']]/following-sibling::td/descendant::em").findWhenNeeded(this);
         WebElement additionalKeyNoneRadio = Locator.radioButtonById("button_none").findWhenNeeded(this);
         WebElement additionalKeyDataFieldRadio = Locator.radioButtonById("button-datafield").findWhenNeeded(this);
         WebElement additionalKeyManagedFieldRadio = Locator.radioButtonById("button_managedField").findWhenNeeded(this);
-        WebElement additionalKeyDataFieldSelect = Locator.inputById("list_datafield").findWhenNeeded(this);
-        WebElement additionalKeyManagedFieldSelect = Locator.inputById("list_managedField").findWhenNeeded(this);
+        WebElement additionalKeyDataFieldSelect = Locator.name("list_dataField").findWhenNeeded(this);
+        WebElement additionalKeyManagedFieldSelect = Locator.name("list_managedField").findWhenNeeded(this);
         WebElement demographicsCheckbox = Locator.checkboxByName("demographicData").findWhenNeeded(this);
         WebElement showInOverviewCheckbox = Locator.checkboxByName("showByDefault").findWhenNeeded(this);
         WebElement importFieldsButton = Locator.lkButton("Import Fields").findWhenNeeded(this);

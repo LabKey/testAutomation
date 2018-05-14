@@ -16,7 +16,6 @@
 package org.labkey.test.components;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -299,29 +298,26 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         public FieldRow setType(FieldDefinition.LookupInfo lookupInfo)
         {
-            return setType(lookupInfo, null);
+            openTypeWindow()
+                    .selectLookup(lookupInfo)
+                    .clickApply();
+            return this;
         }
 
         public FieldRow setType(FieldDefinition.ColumnType type)
         {
             if (type == FieldDefinition.ColumnType.Lookup)
                 throw new IllegalArgumentException("Use FieldDefinition.LookupInfo to define a lookup");
-            return setType(null, type);
+            openTypeWindow()
+                    .selectType(type)
+                    .clickApply();
+            return this;
         }
 
-        private FieldRow setType(@Nullable FieldDefinition.LookupInfo lookupInfo, FieldDefinition.ColumnType type)
+        private FieldTypeWindow openTypeWindow()
         {
-            if (lookupInfo == null && type == null)
-                throw new IllegalArgumentException("Specify a type or lookup");
             fieldTypeTrigger.click();
-            final FieldTypeWindow window = new FieldTypeWindow(getWrapper());
-            if (lookupInfo == null)
-                window.selectType(type);
-            else
-                window.selectLookup(lookupInfo);
-
-            window.clickApply();
-            return this;
+            return new FieldTypeWindow(this);
         }
 
         public PropertiesEditor markForDeletion()
@@ -568,16 +564,16 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         }
     }
 
-    public static class FieldTypeWindow extends Window
+    public class FieldTypeWindow extends Window
     {
-        private WebDriverWrapper _wrapper;
+        private final FieldRow _row;
 
-        public FieldTypeWindow(WebDriverWrapper wrapper)
+        protected FieldTypeWindow(FieldRow row)
         {
-            super(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]").withDescendant(Locator.xpath("//div[contains(@class, 'Caption') and text()='Choose Field Type']")).
-                    waitForElement(wrapper.shortWait()), wrapper.getDriver());
+            super(Locator.tagWithClass("div", "gwt-DialogBox").withDescendant(Locator.tagWithClass("div", "Caption").withText("Choose Field Type")).
+                    waitForElement(PropertiesEditor.this.getWrapper().shortWait()), PropertiesEditor.this.getDriver());
 
-            _wrapper = wrapper;
+            _row = row;
         }
 
         public FieldTypeWindow selectType(FieldDefinition.ColumnType type)
@@ -588,7 +584,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         public FieldTypeWindow selectLookup(FieldDefinition.LookupInfo lookup)
         {
-            Locator.xpath("//label[text()='Lookup']/../input[@name = 'rangeURI']").findElement(this).click();
+            selectType(FieldDefinition.ColumnType.Lookup);
 
             if (lookup.getFolder() != null)
             {
@@ -619,7 +615,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
                     .findElement(this).click();
             try
             {
-                _wrapper.waitAndClick(Locator.tag("div").withClass("x-ignore").childTag("div").withText(value));
+                getWrapper().waitAndClick(Locator.tag("div").withClass("x-ignore").childTag("div").withText(value));
                 log(".. selected");
             }
             catch (NoSuchElementException | StaleElementReferenceException retry) // Workaround: sometimes fails on slower machines
@@ -660,7 +656,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             Locator.tagWithName("input", fieldName).append(Locator.xpath("/../../td/div")).findElement(this).click();
             try
             {
-                _wrapper.waitAndClick(Locator.tag("div").withClass("x-ignore").childTag("div").startsWith(comboSubstring));
+                getWrapper().waitAndClick(Locator.tag("div").withClass("x-ignore").childTag("div").startsWith(comboSubstring));
             }
             catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
             {
@@ -674,16 +670,18 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             Locator.tagWithClass("div", "test-marker-" + table).descendant("input").withAttribute("name", fieldName).waitForElement(this, WAIT_FOR_JAVASCRIPT);
         }
 
-        public void clickApply()
+        public FieldRow clickApply()
         {
             Locator.button("Apply").findElement(this).click();
             waitForClose();
+            return _row;
         }
 
-        public void clickCancel()
+        public FieldRow clickCancel()
         {
             Locator.button("Cancel").findElement(this).click();
             waitForClose();
+            return _row;
         }
     }
 
