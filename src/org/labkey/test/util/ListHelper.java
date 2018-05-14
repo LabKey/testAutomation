@@ -41,7 +41,6 @@ public class ListHelper extends LabKeySiteWrapper
 {
     public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
     private WrapsDriver _wrapsDriver;
-    private String _editorTitle = "List Fields"; // todo: capture the title of the first propertiesEditor and use it
 
     public ListHelper(WrapsDriver wrapsDriver)
     {
@@ -51,12 +50,6 @@ public class ListHelper extends LabKeySiteWrapper
     public ListHelper(WebDriver driver)
     {
         this(() -> driver);
-    }
-
-    public ListHelper withEditorTitle(String editorTitle)
-    {
-        _editorTitle = editorTitle;
-        return this;
     }
 
     @Override
@@ -75,7 +68,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public PropertiesEditor getListFieldEditor()
     {
-        return PropertiesEditor.PropertiesEditor(getDriver()).withTitle(_editorTitle).find();
+        return PropertiesEditor.PropertiesEditor(getDriver()).withTitle("List Fields").find();
     }
 
     public void uploadData(String listData)
