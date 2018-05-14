@@ -1,6 +1,13 @@
 apply plugin: 'java'
 apply plugin: 'org.labkey.testRunner'
 
+import org.labkey.gradle.util.BuildUtils
+
+if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
+{
+    BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":remoteapi:labkey-api-jdbc")
+}
+
 if (project.hasProperty("teamcity"))
 {
     sourceSets {
