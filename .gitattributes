@@ -756,7 +756,6 @@ src/org/labkey/test/tests/LinePlotTest.java -text
 src/org/labkey/test/tests/LinkedSchemaTest.java -text
 src/org/labkey/test/tests/ListExportTest.java -text
 src/org/labkey/test/tests/ListImportFieldsTest.java -text
-src/org/labkey/test/tests/ListTest.java -text
 src/org/labkey/test/tests/LookupToSampleIDTest.java -text
 src/org/labkey/test/tests/MS1Test.java -text
 src/org/labkey/test/tests/MenuBarTest.java -text
@@ -848,6 +847,7 @@ src/org/labkey/test/tests/issues/IssuesAdminTest.java -text
 src/org/labkey/test/tests/issues/IssuesAttachmentTest.java -text
 src/org/labkey/test/tests/issues/IssuesTest.java -text
 src/org/labkey/test/tests/jdbc/LabKeyJDBCTest.java -text
+src/org/labkey/test/tests/list/ListTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/SchemaBrowserPerfTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
