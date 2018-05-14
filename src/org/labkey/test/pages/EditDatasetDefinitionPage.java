@@ -21,9 +21,6 @@ import org.labkey.test.components.html.RadioButton;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-/**
- * Created by RyanS on 5/17/2017.
- */
 public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionPage.ElementCache>
 {
     public EditDatasetDefinitionPage(WebDriver driver)
@@ -154,18 +151,18 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
 
     public PropertiesEditor getFieldsEditor()
     {
-        return PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Dataset Fields").find();
+        return elementCache().fieldsEditor;
     }
 
     public EditDatasetDefinitionPage setAdditionalKeyColDataField(String field)
     {
-        setFormElement(Locator.id("list_dataField"),field);
+        setFormElement(Locator.id("list_dataField"), field);
         return this;
     }
 
     public EditDatasetDefinitionPage setAdditionalKeyColManagedField(String field)
     {
-        setFormElement(Locator.id("list_managedField"),field);
+        selectOptionByValue(Locator.id("list_managedField"), field);
         return this;
     }
 
@@ -243,5 +240,7 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         Locator.XPathLocator additionalKeyDisabledNone = Locator.xpath("//span[contains(@class,'gwt-RadioButton-disabled')]/input[@id='button_none']");
         Locator.XPathLocator additionalKeyDataFieldDisabled = Locator.xpath("//span[contains(@class,'gwt-RadioButton-disabled')]/input[@id='button_none']");
         Locator.XPathLocator additionalKeyMangedFieldDisabled = Locator.xpath("//span[contains(@class,'gwt-RadioButton-disabled')]/input[@id='button_none']");
+
+        PropertiesEditor fieldsEditor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Dataset Fields").findWhenNeeded();
     }
 }
