@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
@@ -32,6 +33,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyC.class, Reports.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class ParticipantReportTest extends ReportTest
 {
     private static final String PARTICIPANT_REPORT_NAME = "Test Participant Report";

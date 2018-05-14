@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -38,6 +39,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class, Reports.class, Charting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class LinePlotTest extends GenericChartsTest
 {
     protected static final String DEVELOPER_USER = "developer_user1@report.test";
