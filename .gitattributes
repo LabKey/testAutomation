@@ -576,7 +576,6 @@ src/org/labkey/test/pages/DatasetInsertPage.java -text
 src/org/labkey/test/pages/DatasetPropertiesPage.java -text
 src/org/labkey/test/pages/DefineDatasetPage.java -text
 src/org/labkey/test/pages/EditDatasetDefinitionPage.java -text
-src/org/labkey/test/pages/EditDatasetPage.java -text
 src/org/labkey/test/pages/FolderManagementFolderTree.java -text
 src/org/labkey/test/pages/ImportDataPage.java -text
 src/org/labkey/test/pages/InsertPage.java -text

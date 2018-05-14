@@ -28,6 +28,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
+/**
+ * @deprecated Use {@link org.labkey.test.pages.EditDatasetDefinitionPage}
+ */
+@Deprecated
 public class DatasetDesignerPage extends BaseDesignerPage
 {
     private Elements _elements;
