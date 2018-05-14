@@ -25,10 +25,12 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.SchemaHelper;
 
 import java.io.File;
@@ -95,6 +97,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private static final String SOURCE_FOLDER = "SourceFolder";
     private static final String TARGET_FOLDER = "TargetFolder";
     private static final String OTHER_FOLDER = "OtherFolder";
+    private static final String STUDY_FOLDER = "StudyFolder"; // Folder used to validate fix for issues 32454 & 32456
     private static final int MOTHER_ID = 3;
 
 
@@ -104,6 +107,14 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             "Adam\t65\tTrue\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz\n" +
             "Britt\t30\tFalse\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz\n" +
             "Josh\t30\tTrue\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz";
+
+    // List used to validate fix for issues 32454 & 32456
+    public static final String STUDY_LIST_NAME = "Consent";
+    public static final String STUDY_LIST_PK = "GlobalPid";
+    public static final String STUDY_LIST_DATA = STUDY_LIST_PK + "\tStudy\n" +
+            "249318596\tStudyA\n" +
+            "249320107\tStudyB\n" +
+            "249320127\tStudyA";
 
     // Original list definition title and URL
     public static final String LIST_DEF_TITLE = "Original List";
@@ -332,6 +343,27 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             "    </dat:table>\n" +
             "</dat:tables>\n";
 
+    // CommonData schema used to validate fix for issues 32454 & 32456
+    public static final String STUDY_SCHEMA_NAME = "CommonData";
+    public static final String STUDY_FILTER_METADATA =
+            "<tables xmlns=\"http://labkey.org/data/xml\" xmlns:cv=\"http://labkey.org/data/xml/queryCustomView\"> \n" +
+                    "<filters name=\"study-filter2\"> \n" +
+                    "     <cv:filter column=\"ParticipantId/Study\" operator=\"eq\" value=\"StudyA\"/>\n" +
+                    "</filters>\n" +
+                    "  <table tableName=\"Demographics\" tableDbType=\"TABLE\">\n" +
+                    "    <!-- <filters ref=\"study-filter2\"/> -->\n" +
+                    "    <columns>\n" +
+                    "      <column columnName=\"ParticipantId\">\n" +
+                    "        <fk>\n" +
+                    "          <fkDbSchema>lists</fkDbSchema>\n" +
+                    "          <fkTable>" + STUDY_LIST_NAME + "</fkTable>\n" +
+                    "          <fkColumnName>" + STUDY_LIST_PK + "</fkColumnName>\n" +
+                    "          <fkFolderPath>/" + PROJECT_NAME + "/" + STUDY_FOLDER+ "</fkFolderPath>\n" +
+                    "        </fk>\n" +
+                    "      </column>\n" +
+                    "  </columns>\n" +
+                    "  </table>\n" +
+                    "</tables>";
 
     @Override
     public List<String> getAssociatedModules()
@@ -420,7 +452,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         log("** Verifying linked schema tables are filtered");
         navigateToQuery("CustomFilterLinkedSchema", "NIMHDemographics");
         DataRegionTable table = new DataRegionTable("query", this);
-        assertEquals("Expected 7 Frisby members", table.getDataRowCount(), 7);
+        assertEquals("Expected 7 Frisby members", 7, table.getDataRowCount());
 
         Set<String> families = new HashSet<>(table.getColumnDataAsText("Family"));
         assertTrue("Expected only 'Frisby' in family collection: " + families, families.contains("Frisby") && families.size() == 1);
@@ -434,6 +466,91 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         Set<String> subjectNames = new HashSet<>(table.getColumnDataAsText("SubjectID"));
         assertTrue("Expected 'Mrs. Frisby' in names: " + subjectNames, subjectNames.contains("Mrs. Frisby"));
         assertFalse("Unexpected 'Nicodemus' in names: " + subjectNames, subjectNames.contains("Nicodemus"));
+    }
+
+    @Test
+    public void verifyLinkedSchemaWithLookup()
+    {
+        // This test validates the fixes for issues 32454 & 32456
+        log("Create a list in the study folder.");
+        _listHelper.createList(getProjectName() + "/" + STUDY_FOLDER, STUDY_LIST_NAME,
+                ListHelper.ListColumnType.String, "GlobalPid",
+                new ListHelper.ListColumn("Study", "Study", ListHelper.ListColumnType.String, "Study"));
+
+        clickButton("Import Data");
+        _listHelper.submitTsvData(STUDY_LIST_DATA);
+
+        log("Create the linked schema to the study.");
+        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
+        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, "study", "Demographics", STUDY_FILTER_METADATA);
+
+        log("Validate that with no filter all of the participants are visible in the linked schema.");
+        checkLinkedSchema(STUDY_FILTER_METADATA, null, 6);
+
+        log("Apply the filter. This should limit the user to those in 'StudyA'.");
+        String updatedMetaData = STUDY_FILTER_METADATA.replace("<!-- ", "").replace(" -->", "");
+        checkLinkedSchema(updatedMetaData, "StudyA", 2);
+
+        log("Replace the study name with a different value (should limit the number of participants returned).");
+        updatedMetaData = updatedMetaData.replace("StudyA", "StudyB");
+        checkLinkedSchema(updatedMetaData, "StudyB", 1);
+
+        log("Replace the study name with one that is not there, no participants should be returned.");
+        updatedMetaData = updatedMetaData.replace("StudyB", "StudyC");
+        checkLinkedSchema(updatedMetaData, "StudyC", 0);
+
+        log("Now validate that a wrapped field gives the expected error.");
+        goToProjectHome();
+        navigateToFolder(getProjectName(), STUDY_FOLDER);
+        wrapField("study", "Demographics","ParticipantId", "Pid2Consent");
+
+        log("Update the filter to use the wrapped field. Because the field is only wrapped and there is no foreign key it should error.");
+        updatedMetaData = updatedMetaData.replace("ParticipantId/Study", "Pid2Consent/Study");
+        _schemaHelper.updateLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
+        RelativeUrl queryURL = new RelativeUrl("query", "begin");
+        queryURL.setContainerPath(getCurrentContainerPath());
+        queryURL.addParameter("schemaName", "CommonData");
+        queryURL.navigate(this);
+
+        assertExt4MsgBox("An error occurred trying to load: Column Pid2Consent.Study not found in column map.", "OK");
+
+        log("Looks good, going home.");
+        goToProjectHome();
+    }
+
+    private void checkLinkedSchema(String updatedMetaData, String studyName, int expectedUsersCount)
+    {
+        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
+        _schemaHelper.updateLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
+
+        navigateToQuery("CommonData", "Demographics");
+        DataRegionTable table = new DataRegionTable("query", this);
+        assertEquals("Expected " + expectedUsersCount + " users from this study", expectedUsersCount, table.getDataRowCount());
+
+        if((expectedUsersCount > 0) && (null != studyName))
+        {
+            if (!table.getColumnNames().contains("ParticipantId/Study"))
+            {
+                CustomizeView cv = table.openCustomizeGrid();
+                cv.addColumn("ParticipantId/Study");
+                cv.saveDefaultView();
+            }
+
+            List<String> studyValues = table.getColumnDataAsText("ParticipantId/Study");
+            studyValues.forEach(value -> assertEquals("Value in column not as expected", studyName, value));
+        }
+
+    }
+
+    // TODO this should really be in a page object, however in the interest of time doing it this way for now.
+    private void wrapField(String schema, String query, String fieldToWrap, String aliasFieldName)
+    {
+        navigateToMetadataQuery(schema, query);
+        clickButton("Alias Field", 0);
+        selectOptionByValue(Locator.gwtListBoxByName("sourceColumn"), fieldToWrap);
+        clickButton("OK", 0);
+        setFormElement(Locator.tagWithAttribute("input", "value", "Wrapped" + fieldToWrap), aliasFieldName);
+        clickButton("Save", 0);
     }
 
     private String getCustomFilterMetadata(String familyName)
@@ -468,6 +585,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _containerHelper.enableModule("linkedschematest");
 
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER);
+
+        // Create a study folder.
+        _containerHelper.createSubfolder(getProjectName(), STUDY_FOLDER, "Study");
+        importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"), true);
     }
 
     @LogMethod

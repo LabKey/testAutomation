@@ -799,6 +799,11 @@ public abstract class Locator extends By
         return tagWithClass("select", "gwt-ListBox").withPredicate(xpath("../preceding-sibling::label").withText(label));
     }
 
+    public static XPathLocator gwtListBoxByName(String name)
+    {
+        return tagWithClass("select", "gwt-ListBox").withAttribute("name", name);
+    }
+
     public static XPathLocator gwtCheckBoxOnImportGridByColLabel(String label)
     {
         return tagWithAttribute("input", "type", "checkbox").withPredicate(xpath("../../following-sibling::td/span").containing(label));

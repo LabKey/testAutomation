@@ -919,6 +919,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
         queryURL.navigate(this);
     }
 
+    public void navigateToMetadataQuery(String schemaName, String queryName)
+    {
+        navigateToMetadataQuery(schemaName, queryName, null);
+    }
+
+    public void navigateToMetadataQuery(String schemaName, String queryName, Integer msTimeout)
+    {
+        RelativeUrl queryURL = new RelativeUrl("query", "metadataQuery");
+        queryURL.setContainerPath(getCurrentContainerPath());
+        queryURL.addParameter("schemaName", schemaName);
+        queryURL.addParameter("query.queryName", queryName);
+        queryURL.setTimeout(msTimeout);
+
+        queryURL.navigate(this);
+    }
+
     // Get the container id of the current page
     public String getContainerId()
     {
