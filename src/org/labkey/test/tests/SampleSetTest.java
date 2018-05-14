@@ -25,10 +25,11 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -385,10 +386,9 @@ public class SampleSetTest extends BaseWebDriverTest
     private void enableFileInput()
     {
         String fileField = "FileAttachment";
-        clickButton("Edit Fields");
-        waitForElement(Locator.lkButton("Add Field"), defaultWaitForPage);
-        ListHelper listHelper = new ListHelper(this).withEditorTitle("Field Properties");
-        listHelper.addField(new ListHelper.ListColumn(fileField, fileField, ListHelper.ListColumnType.File, fileField));
+        waitAndClickAndWait(Locator.lkButton("Edit Fields"));
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
+        fieldProperties.addField(new FieldDefinition(fileField).setType(FieldDefinition.ColumnType.File).setLabel(fileField).setDescription(fileField));
         clickButton("Save");
     }
 
@@ -452,8 +452,9 @@ public class SampleSetTest extends BaseWebDriverTest
     private void deleteAttachmentColumn()
     {
         log("Remove the attachment columns and validate that everything still works.");
-        _listHelper.clickEditFields();
-        _listHelper.deleteField("Field Properties", 2);
+        waitAndClickAndWait(Locator.lkButton("Edit Fields"));
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
+        fieldProperties.selectField(2).markForDeletion();
 
         // Can't use _listHelper.clickSave, it waits for a "Edit Desing" button and a "Done" button.
         waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);

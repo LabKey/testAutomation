@@ -541,7 +541,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assay.addDataField("sex", "Sex", FieldDefinition.ColumnType.String);
 
         log("setting fields to enable missing values and look up");
-        assay.dataFields().selectField(4).setType(new ListHelper.LookupInfo(null, "lists", "Ages"), FieldDefinition.ColumnType.Lookup);
+        assay.dataFields().selectField(4).setType(new ListHelper.LookupInfo(null, "lists", "Ages"));
         assay.dataFields().fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();
         assay.dataFields().selectField(5);
         assay.dataFields().fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();

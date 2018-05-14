@@ -23,8 +23,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.components.PropertiesEditor;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
@@ -106,7 +106,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         // Unable to check fail state: Selenium can't handle GWT alert.
         // clickButton("Begin import", 0);
         // assertAlert("Could not convert the value 'text' from line #202 in column #6 (Primary) to Integer");
-        _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
+        _listHelper.getListFieldEditor().selectField(5).setType(FieldDefinition.ColumnType.String); // Row 201 is a string
         clickButton("Begin import");
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
@@ -135,7 +135,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
         assertEquals("DrawDt", getFormElement(Locator.name("Date")));
-        _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
+        _listHelper.getListFieldEditor().selectField(5).setType(FieldDefinition.ColumnType.String); // Row 201 is a string
         clickButton("Begin import");
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
@@ -164,20 +164,20 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
         assertEquals("DrawDt", getFormElement(Locator.name("Date")));
-        _listHelper.setColumnType(5, ListHelper.ListColumnType.String);
+        _listHelper.getListFieldEditor().selectField(5).setType(FieldDefinition.ColumnType.String);
         clickButton("Show Assay Designer");
 
-        waitForElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields")), WAIT_FOR_JAVASCRIPT);
-        _listHelper.setColumnLabel(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields"), 4, "Blank");
-        _listHelper.setColumnLabel(7, "Result");
-        _listHelper.setColumnName(7, "Result");
+        AssayDesignerPage assayDesignerPage = new AssayDesignerPage(getDriver());
+        assayDesignerPage.dataFields().selectField(4)
+                .setLabel("Blank");
+        assayDesignerPage.dataFields().selectField(7)
+                .setName("Result")
+                .setLabel("Result")
+                .properties()
+                .selectAdvancedTab()
+                .importAliasesInput.set("Score");
 
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(ASSAY_NAME_TSV + " Data Fields").find();
-        PropertiesEditor.FieldRow row = editor.selectField("Result");
-        PropertiesEditor.FieldPropertyDock.AdvancedTabPane tabPane = row.properties().selectAdvancedTab();
-        tabPane.importAliasesInput.set("Score");
-
-        clickButton("Save & Close");
+        assayDesignerPage.saveAndClose();
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_TSV));

@@ -172,7 +172,7 @@ public class ExpTest extends BaseWebDriverTest
         int fieldCount = getElementCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
         assertTrue(fieldCount > 0);
         row = editor.selectField(fieldCount-1);
-        row.setType(new FieldDefinition.LookupInfo(null, "exp", "dataCustomQuery"), FieldDefinition.ColumnType.Lookup);
+        row.setType(new FieldDefinition.LookupInfo(null, "exp", "dataCustomQuery"));
 
         // Save it
         clickButton("Save", 0);

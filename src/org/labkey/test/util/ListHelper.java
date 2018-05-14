@@ -24,8 +24,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
@@ -34,9 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ListHelper extends LabKeySiteWrapper
@@ -77,13 +75,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public PropertiesEditor getListFieldEditor()
     {
-        return getSomeEditorByTitle(_editorTitle);
-    }
-
-    // TODO: Remove callers who use ListHelper to edit non-list PropertiesEditors (hence "some")
-    private PropertiesEditor getSomeEditorByTitle(final String title)
-    {
-        return PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(title).find();
+        return PropertiesEditor.PropertiesEditor(getDriver()).withTitle(_editorTitle).find();
     }
 
     public void uploadData(String listData)
@@ -287,67 +279,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void addField(ListColumn col)
     {
-        PropertiesEditor listFieldEditor = getListFieldEditor();
-        PropertiesEditor.FieldRow newField = listFieldEditor.addField();
-        newField.setName(col.getName());
-        newField.setLabel(col.getLabel());
-        newField.setType(col.getLookup(), col.getType());
-
-        listFieldEditor.fieldProperties().selectDisplayTab();
-        if (col.getDescription() != null)
-        {
-            setFormElement(Locator.id("propertyDescription"), col.getDescription());
-        }
-
-        if (col.getFormat() != null)
-        {
-            listFieldEditor.fieldProperties().selectFormatTab().propertyFormat.set(col.getFormat());
-        }
-
-        if (null != col.getURL())
-        {
-            setFormElement(Locator.id("url"), col.getURL());
-        }
-
-        if (col.isRequired())
-        {
-            listFieldEditor.fieldProperties().selectValidatorsTab().required.set(true);
-        }
-
-        FieldDefinition.FieldValidator validator = col.getValidator();
-        if (validator != null)
-        {
-            listFieldEditor.fieldProperties().selectValidatorsTab();
-            if (validator instanceof RegExValidator)
-                clickButton("Add RegEx Validator", 0);
-            else
-                clickButton("Add Range Validator", 0);
-            setFormElement(Locator.name("name"), validator.getName());
-            setFormElement(Locator.name("description"), validator.getDescription());
-            setFormElement(Locator.name("errorMessage"), validator.getMessage());
-
-            if (validator instanceof RegExValidator)
-            {
-                setFormElement(Locator.name("expression"), ((RegExValidator)validator).getExpression());
-            }
-            else if (validator instanceof RangeValidator)
-            {
-                setFormElement(Locator.name("firstRangeValue"), ((RangeValidator)validator).getFirstRange());
-            }
-            clickButton("OK", 0);
-        }
-
-        if (col.isMvEnabled())
-        {
-            listFieldEditor.fieldProperties().selectAdvancedTab();
-            clickMvEnabled();
-        }
-
-        if (col.getScale() != null)
-        {
-            listFieldEditor.fieldProperties().selectAdvancedTab();
-            setColumnScale(col.getScale());
-        }
+        getListFieldEditor().addField(col);
     }
 
     public void beginCreateListFromTab(String tabName, String listName)
@@ -451,19 +383,13 @@ public class ListHelper extends LabKeySiteWrapper
         waitForElement(Locator.id("tsv3"));
     }
 
-    public void clickEditDesign()
+    public EditListDefinitionPage clickEditDesign()
     {
         waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
         waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.id("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void clickEditFields()
-    {
-        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Fields"), 0);
-        waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        return new EditListDefinitionPage(getDriver());
     }
 
     public void clickSave()
@@ -480,282 +406,45 @@ public class ListHelper extends LabKeySiteWrapper
         waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Delete List"), BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
-    public void clickRow(int index)
-    {
-        clickRow(null, index);
-    }
-
-    public void clickRow(@Nullable String prefix, int index)
-    {
-        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_label" + index + "']");
-        click(l);
-    }
-
-    public void setColumnName(int index, String name)
-    {
-        setColumnName(null, index, name);
-    }
-
-    public void setColumnName(@Nullable String prefix, int index, String name)
-    {
-        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_name" + index + "']");
-        setFormElement(l, name);
-        pressTab(l);
-    }
-
-    public void setColumnLabel(int index, String label)
-    {
-        setColumnLabel(null, index, label);
-    }
-
-    public void setColumnLabel(@Nullable String prefix, int index, String label)
-    {
-        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_label" + index + "']");
-        setFormElement(l, label);
-        pressTab(l);
-    }
-
-    /** Use PropertiesEditor instead */
-    @Deprecated
-    public void setColumnType(int index, ListColumnType type)
-    {
-        setColumnType(null, index, type);
-    }
-
-    /** Use PropertiesEditor instead */
-    @Deprecated
-    public void setColumnType(@Nullable String prefix, int index, ListColumnType type)
-    {
-        setColumnType(prefix, null, type, index);
-    }
-
-    /** Use PropertiesEditor instead */
-    @Deprecated
-    public void setColumnType(int index, LookupInfo lookup)
-    {
-        setColumnType(null, index, lookup);
-    }
-
-    /** Use PropertiesEditor instead */
-    @Deprecated
-    public void setColumnType(@Nullable String prefix, int index, LookupInfo lookup)
-    {
-        setColumnType(prefix, lookup, null, index);
-    }
-
-    @LogMethod(quiet = true)
-    private void setColumnType(@Nullable String prefix, @Nullable FieldDefinition.LookupInfo lookup, @LoggedParam @Nullable ListColumnType colType, @LoggedParam int i)
-    {
-        WebElement fieldTypeTrigger = Locator.tag("input").attributeStartsWith("name", "ff_type").append(Locator.xpath("/../../td/div")).findWhenNeeded(getDriver());
-        fieldTypeTrigger.click();
-        final PropertiesEditor.FieldTypeWindow window = new PropertiesEditor.FieldTypeWindow(this);
-        if (lookup == null)
-        {
-            FieldDefinition.ColumnType type = FieldDefinition.ColumnType.valueOf(colType.name());
-            window.selectType(type);
-        }
-        else
-            window.selectLookup(lookup);
-
-        window.clickApply();
-    }
-
-    private void selectLookupComboItem(String fieldName, String value)
-    {
-        selectLookupComboItem(fieldName, value, 1);
-    }
-
-    private void selectLookupComboItem(String fieldName, String value, int attempt)
-    {
-        log("Select lookup combo item '" + fieldName + "', value=" + value + ", attempt=" + attempt);
-        click(Locator.css("input[name=" + fieldName + "] + div.x-form-trigger"));
-        try
-        {
-            scrollIntoView(Locator.tag("div").withClass("x-combo-list-item").withText(value), false);
-            waitAndClick(500 * attempt, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
-            log(".. selected");
-        }
-        catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
-        {
-            // Stop after 4 attempts
-            if (attempt == 4)
-                throw retry;
-
-            fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
-            selectLookupComboItem(fieldName, value, attempt + 1);
-        }
-
-        try
-        {
-            waitForElement(Locator.xpath("//div").withClass("test-marker-" + value).append("/input[@name='" + fieldName + "']"));
-            log(".. test-marker updated");
-        }
-        catch (NoSuchElementException ignore)
-        {
-            log(".. failed to update test-marker, soldier on anyway");
-        }
-    }
-
-    private void selectLookupTableComboItem(String table, String tableType)
-    {
-        selectLookupTableComboItem(table, tableType, 1);
-    }
-
-    private void selectLookupTableComboItem(String table, String tableType, int attempt)
-    {
-        final String comboSubstring =
-                null == tableType || tableType.isEmpty() ?
-                        table + " (" :
-                        String.format("%s (%s)", table, tableType);
-        log("Select lookup table combo item '" + table + "', attempt=" + attempt);
-        String fieldName = "table";
-        click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
-        try
-        {
-            waitAndClick(500*attempt, Locator.tagWithClass("div", "x-combo-list-item").startsWith(comboSubstring), 0);
-        }
-        catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
-        {
-            // Stop after 4 attempts
-            if (attempt == 4)
-                throw retry;
-
-            fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
-            selectLookupTableComboItem(table, tableType, attempt + 1);
-        }
-        waitForElement(Locator.xpath("//div").withClass("test-marker-" + table).append("/input[@name='" + fieldName + "']"));
-    }
-
-    public void selectPropertyTab(String name)
-    {
-        WebElement element = Locator.tagWithClass("div", "gwt-TabBarItem").withChild(Locator.xpath("//div[contains(@class, 'gwt-Label') and text()='" + name + "']")).findElement(getDriver());
-        element.click();
-    }
-
-    public void clickMvEnabled()
-    {
-        selectPropertyTab("Advanced");
-        Locator l = Locator.xpath("//input[@name='mvEnabled']");
-        waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        checkCheckbox(l);
-    }
-
     /**
-     * Set the value on the List Designer Scale widget
-     * @param value
+     * @deprecated Use {@link PropertiesEditor#addField(FieldDefinition)}
      */
-    public void setColumnScale(Integer value)
-    {
-        if (value == null)
-            return;
-
-        selectPropertyTab("Advanced");
-        Locator l = DesignerLocators.scaleTextbox;
-        waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        if (value == Integer.MAX_VALUE)
-        {
-            checkCheckbox(DesignerLocators.maxCheckbox);
-        }
-        else
-        {
-            uncheckCheckbox(DesignerLocators.maxCheckbox);
-            l.findElement(getDriver()).clear();
-            setFormElement(l, value.toString());
-        }
-    }
-
-    /**
-     * Gets the value from the Scale Textbox on the List Designer
-     */
-    public Integer getColumnScale()
-    {
-        selectPropertyTab("Advanced");
-        String value = getFormElement(DesignerLocators.scaleTextbox);
-        return Integer.valueOf(value.replace(",",""));
-    }
-
+    @Deprecated
     @LogMethod(quiet = true)
     public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
     {
         addField(areaTitle, name, label, type, null);
     }
 
+    /**
+     * @deprecated Use {@link PropertiesEditor#addField(FieldDefinition)}
+     */
+    @Deprecated
     @LogMethod(quiet = true)
     public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type, FieldDefinition.FieldValidator validator)
     {
         addField(areaTitle, name, label, type, validator, false);
     }
 
+    /**
+     * @deprecated Use {@link PropertiesEditor#addField(FieldDefinition)}
+     */
+    @Deprecated
     @LogMethod(quiet = true)
     public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type, FieldDefinition.FieldValidator validator, boolean required)
     {
-        getSomeEditorByTitle(areaTitle).addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()).setValidator(validator).setRequired(required));
+        PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(areaTitle).find()
+                .addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()).setValidator(validator).setRequired(required));
     }
 
-    public void addLookupField(String areaTitle, int index, String name, String label, LookupInfo type)
-    {
-        PropertiesEditor editor = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle(areaTitle).waitFor();
-        editor.addField(new FieldDefinition(name).setLabel(label).setLookup(type));
-    }
-
+    /**
+     * @deprecated Use {@link PropertiesEditor#selectField(int)}.{@link PropertiesEditor.FieldRow#markForDeletion()}
+     */
+    @Deprecated
     public void deleteField(String areaTitle, int index)
     {
-        getSomeEditorByTitle(areaTitle).selectField(index).markForDeletion();
-    }
-
-    public void addFieldsNoImport(String fieldList)
-    {
-        String name;
-        String label;
-        String type;
-        String format;
-        String hidden;
-        String required;
-        String mvenabled;
-        String description;
-
-        Scanner reader = new Scanner(fieldList);
-        while (reader.hasNextLine())
-        {
-            String line = reader.nextLine();
-            Scanner lineReader = new Scanner(line);
-            lineReader.useDelimiter("\t");
-
-            name = lineReader.next();
-            if ("Property".equals(name))
-            {
-                line = reader.nextLine();
-                lineReader = new Scanner(line);
-                lineReader.useDelimiter("\t");
-                name = lineReader.next();
-            }
-            label = lineReader.next();
-            type = lineReader.next();
-            format = lineReader.next();
-            required = lineReader.next();
-            hidden = lineReader.next();
-            mvenabled = lineReader.next();
-            if (lineReader.hasNext())
-            {
-                description = lineReader.next();
-            }
-            else description = "";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#string")) type = "String";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#double")) type = "Double";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#int")) type = "Integer";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#dateTime")) type = "DateTime";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#multiLine")) type = "MultiLine";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#boolean")) type = "Boolean";
-
-
-            ListColumnType typeEnum = ListColumnType.valueOf(type);
-            ListColumn newCol = new ListColumn(name, label, typeEnum, description);
-
-            if (required.equals("TRUE")) newCol.setRequired(true);
-            if (mvenabled.equals("TRUE")) newCol.setMvEnabled(true);
-            addField(newCol);
-        }
+        PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(areaTitle).find()
+                .selectField(index).markForDeletion();
     }
 
     public List<String> getColumnNames()

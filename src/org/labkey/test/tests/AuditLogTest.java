@@ -18,6 +18,8 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,8 +48,6 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -722,7 +722,7 @@ public class AuditLogTest extends BaseWebDriverTest
         log("Change properties on field '" + FIELD03_NAME + "'.");
         editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("List Fields").find();
         PropertiesEditor.FieldRow row = editor.selectField(FIELD03_NAME);
-        row.setType(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02), null);
+        row.setType(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02));
         _listHelper.clickSave();
 
         log("Validate that the expected row is there for the after modifying the Lookup field.");

@@ -50,7 +50,7 @@ import static org.labkey.test.params.FieldDefinition.RangeValidator;
 import static org.labkey.test.params.FieldDefinition.RegExValidator;
 import static org.labkey.test.util.TestLogger.log;
 
-public class PropertiesEditor extends WebPartPanel
+public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache>
 {
     public static final String EDITOR_CHANGE_SIGNAL = "propertiesEditorChange";
     private boolean _haveAlreadyDeletedOneFieldRow = false;
@@ -103,16 +103,20 @@ public class PropertiesEditor extends WebPartPanel
         newFieldRow.setName(col.getName());
         if (col.getLabel() != null)
             newFieldRow.setLabel(col.getLabel());
-        newFieldRow.setType(col.getLookup(), col.getType());
+
+        if (col.getLookup() != null)
+            newFieldRow.setType(col.getLookup());
+        else if (col.getType() != null)
+            newFieldRow.setType(col.getType());
 
         if (col.getDescription() != null)
             fieldProperties().selectDisplayTab().description.set(col.getDescription());
 
-        if (col.getFormat() != null)
-            fieldProperties().selectFormatTab().propertyFormat.set(col.getFormat());
-
         if (col.getURL() != null)
             fieldProperties().selectDisplayTab().url.set(col.getURL());
+
+        if (col.getFormat() != null)
+            fieldProperties().selectFormatTab().propertyFormat.set(col.getFormat());
 
         if (col.isRequired())
             fieldProperties().selectValidatorsTab().required.check();
@@ -169,12 +173,6 @@ public class PropertiesEditor extends WebPartPanel
     public FieldPropertyDock fieldProperties()
     {
         return elementCache().fieldPropertyDock;
-    }
-
-    @Override
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
     }
 
     @Override
@@ -299,7 +297,19 @@ public class PropertiesEditor extends WebPartPanel
             return this;
         }
 
-        public FieldRow setType(@Nullable FieldDefinition.LookupInfo lookupInfo, FieldDefinition.ColumnType type)
+        public FieldRow setType(FieldDefinition.LookupInfo lookupInfo)
+        {
+            return setType(lookupInfo, null);
+        }
+
+        public FieldRow setType(FieldDefinition.ColumnType type)
+        {
+            if (type == FieldDefinition.ColumnType.Lookup)
+                throw new IllegalArgumentException("Use FieldDefinition.LookupInfo to define a lookup");
+            return setType(null, type);
+        }
+
+        private FieldRow setType(@Nullable FieldDefinition.LookupInfo lookupInfo, FieldDefinition.ColumnType type)
         {
             if (lookupInfo == null && type == null)
                 throw new IllegalArgumentException("Specify a type or lookup");

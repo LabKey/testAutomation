@@ -40,6 +40,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.study.CreateStudyPage;
@@ -849,15 +850,9 @@ public class ClientAPITest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Edit Additional Properties"));
         waitForText(10000, "No fields have been defined.");
 
-        clickButton("Add Field", 0);
-
-        _listHelper.setColumnName(0, "customfield1");
-        _listHelper.setColumnLabel(0, "Custom Field 1");
-
-        clickButton("Add Field", 0);
-
-        _listHelper.setColumnName(1, "color");
-        _listHelper.setColumnLabel(1, "Color");
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").find();
+        fieldProperties.addField(new FieldDefinition("customfield1").setLabel("Custom Field 1"));
+        fieldProperties.addField(new FieldDefinition("color").setLabel("Color"));
 
         sleep(1000);
         clickButton("Save", WAIT_FOR_JAVASCRIPT);

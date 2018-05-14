@@ -24,6 +24,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -145,9 +147,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         // add a 'file' column
         log("editing fields in Vial Groups");
-        ListHelper vialGroupsFieldEditHelper = new ListHelper(getDriver()).withEditorTitle("Field Properties");
-        vialGroupsFieldEditHelper.clickEditFields();
-        vialGroupsFieldEditHelper.addField(new ListHelper.ListColumn("File", ListHelper.ListColumnType.File));
+        waitAndClickAndWait(Locator.lkButton("Edit Fields"));
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
+        fieldProperties.addField(new FieldDefinition("File").setType(FieldDefinition.ColumnType.File));
         clickButton("Save");
 
         DataRegionTable samplesTable = new DataRegionTable("Material", getDriver());
