@@ -61,44 +61,6 @@ public abstract class AbstractAssayHelper
         _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
     }
 
-    @LogMethod
-    public void addAliasedFieldToMetadata(String schemaName, String tableName, String aliasedColumn, String columnName, ListHelper.LookupInfo lookupInfo)
-    {
-        //go to schema browser
-        _test.goToSchemaBrowser();
-
-        //go to assay
-        _test.selectQuery(schemaName, tableName);
-
-        //edit metadata
-        _test.waitForText("edit metadata");
-        _test.clickAndWait(Locator.linkWithText("edit metadata"));
-        _test.sleep(5000); //TODO;
-        _test.clickButton("Alias Field", "Choose a field");
-
-        Locator l = Locator.name("sourceColumn");
-        _test.selectOptionByText(l, aliasedColumn);
-        _test.clickButton("OK", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-
-        //set name
-        //TODO:  better locator
-        int fieldCount = getLastPropertyFieldNumber();
-        _test.setFormElement(Locator.name("ff_name" + fieldCount), columnName);
-        _test._listHelper.setColumnType(fieldCount, lookupInfo);
-        //set lookup
-        //todo
-    }
-
-    //TODO:  best location for this?
-    private int getLastPropertyFieldNumber()
-    {
-        int count = _test.getElementCount(Locator.xpath("//input[contains(@name, 'ff_name')]"));
-        Locator l = Locator.xpath("(//input[contains(@name, 'ff_name')])["+count + "]");
-        _test.isElementPresent(l);
-        String name = _test.getAttribute(l,  "name");
-        return Integer.parseInt(name.substring(7));
-    }
-
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
     @LogMethod
