@@ -24,7 +24,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
-import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
@@ -103,10 +102,6 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
         assertEquals("DrawDt", getFormElement(Locator.name("Date")));
-        // Unable to check fail state: Selenium can't handle GWT alert.
-        // clickButton("Begin import", 0);
-        // assertAlert("Could not convert the value 'text' from line #202 in column #6 (Primary) to Integer");
-        _listHelper.getListFieldEditor().selectField(5).setType(FieldDefinition.ColumnType.String); // Row 201 is a string
         clickButton("Begin import");
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
@@ -135,7 +130,6 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
         assertEquals("DrawDt", getFormElement(Locator.name("Date")));
-        _listHelper.getListFieldEditor().selectField(5).setType(FieldDefinition.ColumnType.String); // Row 201 is a string
         clickButton("Begin import");
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
@@ -164,7 +158,6 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
         assertEquals("DrawDt", getFormElement(Locator.name("Date")));
-        _listHelper.getListFieldEditor().selectField(5).setType(FieldDefinition.ColumnType.String);
         clickButton("Show Assay Designer");
 
         AssayDesignerPage assayDesignerPage = new AssayDesignerPage(getDriver());
