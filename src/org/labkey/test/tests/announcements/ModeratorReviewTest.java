@@ -6,7 +6,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.announcements.AdminPage;
+import org.labkey.test.pages.announcements.EmailPrefsPage;
 import org.labkey.test.pages.announcements.InsertPage;
 import org.labkey.test.pages.announcements.ModeratorReviewPage;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -15,6 +17,9 @@ import org.labkey.test.util.PortalHelper;
 
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * User: tgaluhn
@@ -60,6 +65,10 @@ public class ModeratorReviewTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         new PortalHelper(this).addWebPart("Messages");
+        // Subscribe the admin user to be notified on all new messages
+        EmailPrefsPage.beginAt(this)
+                .setNotifyOnAll()
+                .update();
         _userHelper.createUser(APPROVED_USER);
         _userHelper.createUser(SPAM_USER);
         _userHelper.createUser(EDITOR_USER);
@@ -85,14 +94,12 @@ public class ModeratorReviewTest extends BaseWebDriverTest
                 .save();
 
         log("Verify initial post requires approval");
-        insertMessage(APPROVED_USER, APPROVED_TITLE, false);
-        reviewMessage(APPROVED_TITLE, true);
+        insertAndReviewMessage(APPROVED_USER, APPROVED_TITLE, true);
         // Author was approved once, next post should be auto-approved
         log("Verify second post is auto-approved");
         insertMessage(APPROVED_USER, "This is also an approved message", true);
         log("Verify only Approved user is auto-approved, others still require approval");
-        insertMessage(SPAM_USER, SPAM_TITLE, false);
-        reviewMessage(SPAM_TITLE, false);
+        insertAndReviewMessage(SPAM_USER, SPAM_TITLE, false);
     }
 
     @Test
@@ -104,12 +111,10 @@ public class ModeratorReviewTest extends BaseWebDriverTest
                 .save();
 
         log("Verify initial post requires approval");
-        insertMessage(APPROVED_USER, APPROVED_TITLE, false);
-        reviewMessage(APPROVED_TITLE, true);
+        insertAndReviewMessage(APPROVED_USER, APPROVED_TITLE, true);
         // Author was approved once, but future post should still require approval
         log("Verify second post still requires approval");
-        insertMessage(APPROVED_USER, SPAM_TITLE, false);
-        reviewMessage(SPAM_TITLE, false);
+        insertAndReviewMessage(APPROVED_USER, SPAM_TITLE, false);
 
         log("Verifying email sent to moderators (admins)");
         goToModule("Dumbster");
@@ -131,25 +136,30 @@ public class ModeratorReviewTest extends BaseWebDriverTest
         AdminPage.beginAt(this)
                 .setModeratorReviewAll()
                 .save();
-        insertMessage(SPAM_USER, APPROVED_TITLE, false);
-        reviewMessage(APPROVED_TITLE, true);
+        insertAndReviewMessage(SPAM_USER, APPROVED_TITLE, true);
     }
 
-    private void insertMessage(String user, String title, boolean expectAutoApproval)
+    private String insertMessage(String user, String title, boolean expectAutoApproval)
     {
         goToProjectHome();
         impersonate(user);
         log("Insert message");
+        // make title unique in test scope, to check email notifications later
+        title = title + " " + System.currentTimeMillis();
         InsertPage.beginAt(this)
                 .setTitle(title)
+                .setBody(title)
                 .submit();
         stopImpersonating();
 
         verifyMessage(title, expectAutoApproval);
+
+        return title;
     }
 
-    private void reviewMessage(String title, boolean approve)
+    private void insertAndReviewMessage(String user, String title, boolean approve)
     {
+        title = insertMessage(user, title, false);
         ModeratorReviewPage.beginAt(this)
                 .review(title, approve);
         verifyMessage(title, approve);
@@ -162,5 +172,16 @@ public class ModeratorReviewTest extends BaseWebDriverTest
             assertTextPresent(title);
         else
             assertTextNotPresent(title);
+        verifyNotification(title, expect);
+    }
+
+    private void verifyNotification(String title, boolean expect)
+    {
+        goToModule("Dumbster");
+        EmailRecordTable.EmailMessage notification = new EmailRecordTable(this).getMessage(title);
+        if (expect)
+            assertNotNull("Expected email notification for message '" + title + "'", notification);
+        else
+            assertNull("Expected no email notification for message '" + title + "'", notification);
     }
 }

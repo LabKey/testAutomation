@@ -601,6 +601,7 @@ src/org/labkey/test/pages/admin/SetFolderPermissionsPage.java -text
 src/org/labkey/test/pages/admin/SetInitialFolderSettingsPage.java -text
 src/org/labkey/test/pages/announcements/AdminPage.java -text
 src/org/labkey/test/pages/announcements/BaseUpdatePage.java -text
+src/org/labkey/test/pages/announcements/EmailPrefsPage.java -text
 src/org/labkey/test/pages/announcements/InsertPage.java -text
 src/org/labkey/test/pages/announcements/ModeratorReviewPage.java -text
 src/org/labkey/test/pages/announcements/RespondPage.java -text

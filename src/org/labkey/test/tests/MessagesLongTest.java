@@ -33,7 +33,6 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -46,7 +45,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.NBSP;
-import static org.labkey.test.Locator.name;
 
 @Category({DailyA.class})
 public class MessagesLongTest extends BaseWebDriverTest
@@ -132,6 +130,15 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToHome();
     }
 
+    /*
+        TODO:
+        - Break up this monolith into discrete test cases
+        - Migrate to the tests.announcements package
+        - Build out test.pages.announcements.AdminPage and call methods there for message board customization
+        - Use InsertPage
+        - Use EmailPrefsPage
+     */
+
     @Test
     public void testSteps()
     {
@@ -163,6 +170,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Update");
         clickButton("Done");
 
+        // TODO: Convert to test.pages.announcements.AdminPage
         log("Customize message board");
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.checkboxByName("expires"));
@@ -172,6 +180,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
 
         log("Check message works in Wiki");
+        // TODO: Convert to test.pages.announcements.InsertPage
         _portalHelper.clickWebpartMenuItem("Messages", true, "New");
         selectOptionByText(Locator.name("rendererType"), "Wiki Page");
         setFormElement(Locator.name("title"), MSG1_TITLE);
@@ -276,6 +285,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         permissionCheck("Editor", true);
 
         log("Check with security");
+        // TODO: Convert to test.pages.announcements.AdminPage
         clickProject(PROJECT_NAME);
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.radioButtonByName("secure").index(1));
@@ -284,18 +294,22 @@ public class MessagesLongTest extends BaseWebDriverTest
         permissionCheck("Editor", true);
 
         log("Check if the customized names work");
+
+        // TODO: Convert to test.pages.announcements.AdminPage
         clickProject(PROJECT_NAME);
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         setFormElement(Locator.name("boardName"), "Notes");
         setFormElement(Locator.name("conversationName"), "Thread");
         clickButton("Save");
         assertTextPresent("Notes", "thread");
+        // TODO: Convert to test.pages.announcements.AdminPage
         _portalHelper.clickWebpartMenuItem("Notes", true, "Admin");
         setFormElement(Locator.name("boardName"), "Messages");
         setFormElement(Locator.name("conversationName"), "Message");
         clickButton("Save");
 
         log("Check if sorting works");
+        // TODO: Convert to test.pages.announcements.InsertPage
         _portalHelper.clickWebpartMenuItem("Messages", true, "New");
         setFormElement(Locator.name("title"), MSG2_TITLE);
         clickButton("Submit", longWaitForPage);
@@ -345,6 +359,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         testMemberLists();
 
         clickProject(PROJECT_NAME);
+        // TODO: Convert to test.pages.announcements.AdminPage
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.radioButtonByName("secure"));
         clickButton("Save");
@@ -462,6 +477,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Update Group Membership");
 
         clickProject(PROJECT_NAME);
+        // TODO: Convert to test.pages.announcements.InsertPage
         _portalHelper.clickWebpartMenuItem("Messages", true, "New");
         setFormElement(Locator.id(MEMBER_LIST), USER2);
         clickButtonContainingText("Submit", "Title must not be blank");
