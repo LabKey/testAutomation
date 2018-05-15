@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
-import org.labkey.api.util.Path;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
@@ -159,17 +158,13 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
     }
 
+    @LogMethod
     @Override
     public void moveFolder(@LoggedParam String projectName, @LoggedParam String folderName, @LoggedParam String newParent, final boolean createAlias) throws CommandException
     {
         Connection connection = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
-        if (!projectName.startsWith("/"))
-            projectName = "/" + projectName;
-        if (!newParent.startsWith("/"))
-            newParent = "/" + newParent;
-        final Path containerPath = new Path(projectName, folderName);
-        final Path newParentPath = new Path(newParent);
+        final String containerPath = projectName + "/" + folderName;
         PostCommand command = new PostCommand("core", "moveContainer")
         {
             @Override
@@ -180,8 +175,8 @@ public class APIContainerHelper extends AbstractContainerHelper
                 {
                     result = new JSONObject();
                 }
-                result.put("container", containerPath.toString());
-                result.put("parent", newParentPath.toString());
+                result.put("container", containerPath);
+                result.put("parent", newParent);
                 result.put("addAlias", createAlias);
                 setJsonObject(result);
                 return result;
@@ -194,7 +189,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         catch (IOException fail)
         {
-            throw new RuntimeException("Failed to move '" + containerPath.toString() + "' to '" + newParentPath.toString() + "'", fail);
+            throw new RuntimeException("Failed to move '" + containerPath + "' to '" + newParent + "'", fail);
         }
     }
 }
