@@ -26,6 +26,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.ManageDatasetsPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.pages.study.ManageVisitPage;
@@ -372,13 +373,13 @@ public class StudyHelper
         _test.waitForPipelineJobsToComplete(expectedPipelineJobs, "Publish Study", false);
     }
 
-    public DatasetDesignerPage defineDataset(@LoggedParam String name, String containerPath)
+    public EditDatasetDefinitionPage defineDataset(@LoggedParam String name, String containerPath)
     {
         return defineDataset(name, containerPath, null);
     }
 
     @LogMethod
-    public DatasetDesignerPage defineDataset(@LoggedParam String name, String containerPath, @Nullable String id)
+    public EditDatasetDefinitionPage defineDataset(@LoggedParam String name, String containerPath, @Nullable String id)
     {
         _test.beginAt(WebTestHelper.buildURL("study", containerPath, "defineDatasetType"));
 
@@ -396,7 +397,7 @@ public class StudyHelper
 
         _test.clickButton("Next");
 
-        return new DatasetDesignerPage(_test.getDriver());
+        return new EditDatasetDefinitionPage(_test.getDriver());
     }
 
     @LogMethod

@@ -33,6 +33,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -254,7 +255,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
     public class FieldRow extends Component
     {
-        WebElement _rowEl;
+        private WebElement _rowEl;
 
         private FieldRow(WebElement rowEl)
         {
@@ -277,6 +278,21 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         private boolean isSelected()
         {
             return _rowEl.getAttribute("class").contains("selected-field-row");
+        }
+
+        private boolean isMarkedForDeletion()
+        {
+            return statusIndicator.getAttribute("class").contains("fa-plus-circle");
+        }
+
+        private boolean isNewField()
+        {
+            return statusIndicator.getAttribute("class").contains("fa-trash-o");
+        }
+
+        private boolean isModified()
+        {
+            return statusIndicator.getAttribute("class").contains("fa-wrench");
         }
 
         public String getName()
@@ -322,18 +338,27 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         public PropertiesEditor markForDeletion()
         {
-            Locator.xpath(".//div[contains(@id, 'partdelete_')]").waitForElement(getComponentElement(), 500).click();
-            if (!_haveAlreadyDeletedOneFieldRow) // if you've already dismissed this dialog, it won't appear again
+            if (isNewField())
             {
-                WebDriverWrapper.waitFor(() ->
-                        Locator.xpath("//div[@class='gwt-Label' and contains(text(), 'Are you sure you want to remove this field?')]")
-                                .findElementOrNull(getDriver()) != null, 1000);
-                WebElement okBtn = Locator.lkButton("OK").findElementOrNull(getDriver());
-                if (null != okBtn)
-                    okBtn.click();
-                _haveAlreadyDeletedOneFieldRow = true;
+                deleteButton.click();
+                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(_rowEl));
             }
-            return PropertiesEditor.this;
+            else
+            {
+                deleteButton.click();
+                if (!_haveAlreadyDeletedOneFieldRow) // if you've already dismissed this dialog, it won't appear again
+                {
+                    WebDriverWrapper.waitFor(() ->
+                            Locator.xpath("//div[@class='gwt-Label' and contains(text(), 'Are you sure you want to remove this field?')]")
+                                    .findElementOrNull(getDriver()) != null, 1000);
+                    WebElement okBtn = Locator.lkButton("OK").findElementOrNull(getDriver());
+                    if (null != okBtn)
+                        okBtn.click();
+                    _haveAlreadyDeletedOneFieldRow = true;
+                }
+                WebDriverWrapper.waitFor(this::isMarkedForDeletion, "Row not marked for deletion", 1000);
+            }
+            return up();
         }
 
         public FieldPropertyDock properties()
@@ -346,9 +371,12 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             return PropertiesEditor.this;
         }
 
+        private FormItem<String> nameInput;
         private FormItem<String> findNameEl()
         {
-            WebElement nameEl = this.customFieldName.findElementOrNull(this);
+            final Locator customFieldName = Locator.tag("input").attributeStartsWith("name", "ff_name");
+            final Locator requiredFieldName = Locator.tag("td").index(5).child(Locator.tagWithClass("div", "gwt-Label"));
+            WebElement nameEl = customFieldName.findElementOrNull(this);
             if (nameEl != null)
                 nameInput = new Input(nameEl, getDriver());
             else
@@ -356,12 +384,11 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             return nameInput;
         }
 
-        private FormItem<String> nameInput;
-        private final Locator requiredFieldName = Locator.tag("td").index(5).child(Locator.tagWithClass("div", "gwt-Label"));
-        private final Locator customFieldName = Locator.tag("input").attributeStartsWith("name", "ff_name");
+        private final WebElement statusIndicator = Locator.tag("div").attributeStartsWith("id", "partstatus_").childTag("span").findWhenNeeded(this);
+        private final WebElement deleteButton = Locator.tag("div").attributeStartsWith("id", "partdelete_").findWhenNeeded(this);
         private final Input labelInput = Input(Locator.tag("input").attributeStartsWith("name", "ff_label"), getDriver()).findWhenNeeded(this);
-        private final WebElement spacer = Locator.css("td:first-child").findWhenNeeded(this);
         private final WebElement fieldTypeTrigger = Locator.tag("input").attributeStartsWith("name", "ff_type").append(Locator.xpath("/../../td/div")).findWhenNeeded(this);
+        private final WebElement spacer = Locator.css("td:first-child").findWhenNeeded(this);
     }
 
     public class FieldPropertyDock extends Component

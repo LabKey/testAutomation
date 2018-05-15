@@ -28,19 +28,17 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.SaveChartDialog;
-import org.labkey.test.pages.BaseDesignerPage;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
-import org.labkey.test.util.BoxPlotReportHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.DatasetDesignerPage;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Reports.class, Charting.class})
 public class GenericMeasurePickerTest extends BaseWebDriverTest

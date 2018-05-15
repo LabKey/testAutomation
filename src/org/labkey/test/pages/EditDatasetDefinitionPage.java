@@ -20,8 +20,11 @@ import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.html.RadioButton;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionPage.ElementCache>
+import java.io.File;
+
+public class EditDatasetDefinitionPage extends BaseDesignerPage<EditDatasetDefinitionPage.ElementCache>
 {
     public EditDatasetDefinitionPage(WebDriver driver)
     {
@@ -39,10 +42,17 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return this;
     }
 
+    @Override
     public DatasetPropertiesPage save()
     {
         clickAndWait(elementCache().saveButton);
         return new DatasetPropertiesPage(getDriver());
+    }
+
+    @Override
+    public DatasetPropertiesPage saveAndClose()
+    {
+        return save();
     }
 
     public void cancel()
@@ -134,6 +144,32 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return elementCache().demographicsCheckbox.isSelected();
     }
 
+    public EditDatasetDefinitionPage shareDemographics(ShareDemographicsBy by)
+    {
+        selectOptionByValue(elementCache().demographicsSharedBy, by.toString());
+        return this;
+    }
+
+    public EditDatasetDefinitionPage inferFieldsFromFile(File file)
+    {
+        elementCache().inferFieldsButton.click();
+        WebElement dialog =
+                Locator.tagWithClass("div", "gwt-DialogBox")
+                        .withDescendant(Locator.tagWithClass("div", "Caption").withText("Infer Fields from File"))
+                        .waitForElement(shortWait());
+        WebElement radio = Locator.radioButtonByNameAndValue("source", "file").findElement(dialog);
+        radio.click();
+        WebElement fileField = Locator.tagWithName("input", "uploadFormElement").findElement(dialog);
+        setFormElement(fileField, file);
+        WebElement submitButton = Locator.lkButton("Submit").findElement(dialog);
+        submitButton.click();
+        shortWait().until(ExpectedConditions.stalenessOf(dialog));
+        return this;
+    }
+
+    public enum ShareDemographicsBy
+    {NONE, PTID}
+
     public EditDatasetDefinitionPage setShowInOverview(boolean showInOverview)
     {
         setCheckbox(elementCache().showInOverviewCheckbox, showInOverview);
@@ -177,20 +213,6 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return this;
     }
 
-    enum FieldType{
-        TEXT("Text (String)"), MULTILINE("Multi-Line Text"), BOOLEAN("Boolean"), INTEGER("Integer"), NUMBER_DBL("Number (Double)"), DATETIME("DateTime"), FLAG("Flag (String)"),
-        FILE("File"), ATTACHMENT("Attachment"), USER("User"), SUBJECT_PARTICIPANT("Subject/Participant (String)"),LOOKUP("Lookup");
-
-        private String type;
-
-        public String getType(){
-            return this.type;
-        }
-        FieldType(String type){
-            this.type = type;
-        }
-    }
-
     public enum LookupAdditionalKeyColType
     {
         NONE(Locator.xpath("//input[@id='button_none']")), DATAFIELD(Locator.xpath("//input[@id='button_dataField']")), MANAGEDFIELD(Locator.xpath("//input[@id='button_managedField']"));
@@ -216,7 +238,7 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends BaseDesignerPage.ElementCache
     {
         WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
         WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
@@ -233,6 +255,7 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         WebElement additionalKeyDataFieldSelect = Locator.name("list_dataField").findWhenNeeded(this);
         WebElement additionalKeyManagedFieldSelect = Locator.name("list_managedField").findWhenNeeded(this);
         WebElement demographicsCheckbox = Locator.checkboxByName("demographicData").findWhenNeeded(this);
+        WebElement demographicsSharedBy = Locator.name("demographicsSharedBy").findWhenNeeded(this);
         WebElement showInOverviewCheckbox = Locator.checkboxByName("showByDefault").findWhenNeeded(this);
         WebElement importFieldsButton = Locator.lkButton("Import Fields").findWhenNeeded(this);
         WebElement exportFieldsButton = Locator.lkButton("Export Fields").findWhenNeeded(this);

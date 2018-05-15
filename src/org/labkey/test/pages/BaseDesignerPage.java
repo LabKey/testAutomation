@@ -22,9 +22,6 @@ import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-// TODO: Tons of missing functionality
-// TODO: Much ListHelper functionality belongs here
-// TODO: Create subclasses for particular designer pages (e.g. Metadata)
 public abstract class BaseDesignerPage<EC extends BaseDesignerPage.ElementCache> extends LabKeyPage<EC>
 {
     protected static final String DESIGNER_DIRTY_SIGNAL = "designerDirty"; //org.labkey.api.gwt.client.AbstractDesignerMainPanel.java
@@ -55,30 +52,12 @@ public abstract class BaseDesignerPage<EC extends BaseDesignerPage.ElementCache>
         waitForElement(Locators.pageSignal(DESIGNER_DIRTY_SIGNAL, "false"));
     }
 
-    public void selectField(int index)
-    {
-        selectField(Locator.tagWithClass("tr", "editor-field-row").withDescendant(Locator.xpath("td/div").withAttribute("id", "partstatus_" + index)));
-    }
-
-    private void selectField(final Locator.XPathLocator rowLocator)
-    {
-        click(rowLocator.append("/td")); // First td (status) should be safe to click
-
-        waitForElement(rowLocator.withClass("selected-field-row"));
-    }
-
-    public void clickTab(String tab)
-    {
-        click(Locator.tagWithAttribute("ul", "role", "tablist").append("/li").withText(tab));
-        waitForElement(Locator.tagWithClass("li", "x-tab-strip-active").withText(tab));
-    }
-
     public LabKeyPage save()
     {
-        doAndExpectClean(() -> clickButton("Save", 0));
+        doAndExpectClean(() -> elementCache().saveButton.click());
         waitForElement(Locator.tagWithClass("div", "gwt-HTML").withText("Save successful."), 20000);
         clearCache();
-        return null;
+        return this;
     }
 
     public LabKeyPage saveAndClose()
@@ -87,13 +66,7 @@ public abstract class BaseDesignerPage<EC extends BaseDesignerPage.ElementCache>
         return null;
     }
 
-    @Override
-    protected EC newElementCache()
-    {
-        return (EC)new ElementCache();
-    }
-
-    public class ElementCache extends LabKeyPage.ElementCache
+    public abstract class ElementCache extends LabKeyPage.ElementCache
     {
         public WebElement saveButton = new RefindingWebElement(Locator.lkButton("Save"), this);
         public WebElement cancelButton = new RefindingWebElement(Locator.lkButton("Cancel"), this);

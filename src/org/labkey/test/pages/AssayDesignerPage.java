@@ -82,7 +82,7 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
 
     public AssayDesignerPage addTransformScript(File transformScript)
     {
-        int index = getElementCount(Locator.xpath("//input[starts-with(@id, 'AssayDesignerTransformScript')]"));
+        int index = Locator.xpath("//input[starts-with(@id, 'AssayDesignerTransformScript')]").findElements(getDriver()).size();
         click(Locator.lkButton("Add Script"));
 
         return setTransformScript(transformScript, index);
