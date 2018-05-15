@@ -3,6 +3,7 @@ package org.labkey.test.components.pipeline;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -182,7 +183,7 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         return new ElementCache();
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends Component.ElementCache
     {
         public ElementCache()
         {

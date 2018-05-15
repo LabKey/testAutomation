@@ -16,6 +16,7 @@
 package org.labkey.test.components.core;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.FileInput;
 import org.openqa.selenium.WebDriver;
@@ -107,7 +108,7 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends Component.ElementCache
     {
         protected FileInput findLastAttachmentInput()
         {

@@ -17,6 +17,7 @@ package org.labkey.test.components.ext4;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
@@ -135,7 +136,7 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
         return (EC) new ElementCache();
     }
 
-    public class ElementCache extends WebDriverComponent.ElementCache
+    public class ElementCache extends Component.ElementCache
     {
         protected ElementCache() { }
 

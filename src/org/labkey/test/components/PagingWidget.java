@@ -144,7 +144,7 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends Component.ElementCache
     {
         Locator.XPathLocator nextPageLoc = Locator.xpath("//button[ ./i[@class='fa fa-chevron-right']]");
         Locator.XPathLocator previousPageLoc = Locator.xpath("//button[ ./i[@class='fa fa-chevron-left']]");

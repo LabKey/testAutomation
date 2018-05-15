@@ -17,11 +17,9 @@ package org.labkey.test.components.labkey;
 
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.components.html.Input;
-import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -204,7 +202,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends Component.ElementCache
     {
         WebElement anchor = Locator.xpath("./a").findElement(getComponentElement());
     }

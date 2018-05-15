@@ -17,6 +17,7 @@ package org.labkey.test.components.api;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.pages.admin.CreateProjectPage;
 import org.labkey.test.pages.admin.CreateSubFolderPage;
@@ -206,7 +207,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends Component.ElementCache
     {
         final WebElement menuContainer = Locators.menuProjectNav.refindWhenNeeded(getComponentElement());
         final WebElement menuToggle = Locator.tagWithAttribute("a", "data-toggle", "dropdown").refindWhenNeeded(menuContainer);
