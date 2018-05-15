@@ -42,7 +42,7 @@ import java.util.TreeMap;
 import static org.junit.Assert.assertTrue;
 
 @Category({BVT.class, DailyA.class, DailyB.class, DailyC.class, Git.class, CustomModules.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 10)
+@BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
     @Override
