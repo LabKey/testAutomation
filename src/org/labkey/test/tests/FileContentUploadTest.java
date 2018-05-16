@@ -273,9 +273,8 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _listHelper.uploadData(COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
         clickProject(getProjectName());
         // Setup custom file properties
-        _fileBrowserHelper.goToEditProperties();
+        PropertiesEditor editor = _fileBrowserHelper.goToEditProperties();
 
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("File Properties").find();
         PropertiesEditor.FieldRow row = editor.selectField(0);
         row.setName(CUSTOM_PROPERTY);
         row.properties().selectDisplayTab().url.set("http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
