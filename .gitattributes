@@ -726,7 +726,6 @@ src/org/labkey/test/tests/ElisaAssayTest.java -text
 src/org/labkey/test/tests/ElispotAssayTest.java -text
 src/org/labkey/test/tests/EmbeddedWebPartTest.java -text
 src/org/labkey/test/tests/ExpTest.java -text
-src/org/labkey/test/tests/ExpressionMatrixAssayTest.java -text
 src/org/labkey/test/tests/ExternalSchemaTest.java -text
 src/org/labkey/test/tests/FacetedFilterCutoffTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
@@ -779,7 +778,6 @@ src/org/labkey/test/tests/PortalTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
 src/org/labkey/test/tests/ProjectSettingsTest.java -text
 src/org/labkey/test/tests/ProjectTermsOfUseTest.java -text
-src/org/labkey/test/tests/ProteinExpressionMatrixAssayTest.java -text
 src/org/labkey/test/tests/QueryExportTest.java -text
 src/org/labkey/test/tests/RaphaelRendererTest.java -text
 src/org/labkey/test/tests/RemoteConnectionTest.java -text
@@ -850,6 +848,7 @@ src/org/labkey/test/tests/issues/IssuesTest.java -text
 src/org/labkey/test/tests/jdbc/LabKeyJDBCTest.java -text
 src/org/labkey/test/tests/list/ColumnResizeTest.java -text
 src/org/labkey/test/tests/list/ListTest.java -text
+src/org/labkey/test/tests/microarray/ExpressionMatrixAssayTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/SchemaBrowserPerfTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
