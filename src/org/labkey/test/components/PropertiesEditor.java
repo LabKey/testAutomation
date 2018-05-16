@@ -287,7 +287,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         private boolean isNewField()
         {
-            return statusIndicator.getAttribute("class").contains("fa-trash-o");
+            return statusIndicator.getAttribute("class").contains("fa-plus-circle");
         }
 
         private boolean isModified()
