@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class SchemaBrowserTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "Schema Browser Test Project";

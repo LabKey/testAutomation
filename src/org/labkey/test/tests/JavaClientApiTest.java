@@ -64,6 +64,7 @@ import static org.junit.Assert.fail;
  * client API library to insert, read, update, and delete from that list
  */
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class JavaClientApiTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "~Java Client Api Verify Project~";

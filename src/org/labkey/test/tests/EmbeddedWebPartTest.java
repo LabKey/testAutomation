@@ -34,6 +34,7 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 
 @Category({DailyA.class, Wiki.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class EmbeddedWebPartTest extends BaseWebDriverTest
 {
     protected  final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "Embedded web part test";

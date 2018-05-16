@@ -48,6 +48,7 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertTrue;
 
 @Category({Base.class, DRT.class, BVT.class, DailyA.class, Git.class, Hosting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class BasicTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "BasicVerifyProject";

@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class DataViewsReportOrderingTest extends BaseWebDriverTest
 {
     private static final String ORIGINAL_WEBPART_TITLE = "Data Views";

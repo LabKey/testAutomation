@@ -74,6 +74,7 @@ import static org.junit.Assert.fail;
 * Tests the simple module and file-based resources introduced in version 9.1
 */
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class SimpleModuleTest extends BaseWebDriverTest
 {
     public static final String FOLDER_TYPE = "My XML-defined Folder Type"; // Folder type defined in customFolder.foldertype.xml

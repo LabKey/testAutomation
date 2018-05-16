@@ -44,6 +44,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 {
     ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);

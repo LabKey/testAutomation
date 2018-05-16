@@ -36,6 +36,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class AdminConsoleTest extends BaseWebDriverTest
 {
     protected static final String APP_ADMIN_USER = "app_admin_test_user@adminconsole.test";

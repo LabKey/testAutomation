@@ -42,6 +42,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @Category({DailyA.class, Data.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class DataRegionTest extends BaseWebDriverTest
 {
     private static final String LIST_NAME = "WebColors" + INJECT_CHARS_1;

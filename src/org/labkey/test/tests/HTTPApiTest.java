@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class HTTPApiTest extends BaseWebDriverTest
 {
     private static final String LIST_NAME = "Test List";

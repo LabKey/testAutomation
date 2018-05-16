@@ -43,6 +43,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class AssayAPITest extends BaseWebDriverTest
 {
     protected final static File CREST_FILE =  TestFileUtils.getSampleData("InlineImages/crest.png");

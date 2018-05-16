@@ -36,6 +36,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class, FileBrowser.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class FileContentActionButtonsTest extends BaseWebDriverTest
 {
     @BeforeClass

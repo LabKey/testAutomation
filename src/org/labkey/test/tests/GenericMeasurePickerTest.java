@@ -41,6 +41,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Reports.class, Charting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class GenericMeasurePickerTest extends BaseWebDriverTest
 {
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");

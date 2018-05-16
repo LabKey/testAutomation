@@ -37,6 +37,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class MS1Test extends BaseWebDriverTest
 {
     public static final String PROJ_MAIN = "~~MS1 BVT PROJECT~~"; //use spaces to test for url encoding issues

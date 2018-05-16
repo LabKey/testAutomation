@@ -47,6 +47,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.NBSP;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 11)
 public class MessagesLongTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "MessagesVerifyProject";

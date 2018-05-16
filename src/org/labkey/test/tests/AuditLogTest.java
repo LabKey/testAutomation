@@ -64,6 +64,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Hosting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class AuditLogTest extends BaseWebDriverTest
 {
     public static final String USER_AUDIT_EVENT = "User events";

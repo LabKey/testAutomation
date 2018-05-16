@@ -39,6 +39,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, FileBrowser.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class FileContentDownloadTest extends BaseWebDriverTest
 {
     @BeforeClass

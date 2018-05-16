@@ -33,6 +33,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class, Wiki.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class TimelineTest extends BaseWebDriverTest
 {
     PortalHelper portalHelper = new PortalHelper(this);

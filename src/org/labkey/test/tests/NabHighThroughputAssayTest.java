@@ -40,6 +40,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class, Assays.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class NabHighThroughputAssayTest extends BaseWebDriverTest
 {
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";

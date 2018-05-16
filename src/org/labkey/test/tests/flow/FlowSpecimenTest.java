@@ -18,6 +18,7 @@ package org.labkey.test.tests.flow;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
@@ -32,6 +33,7 @@ import static org.junit.Assert.assertTrue;
  * This test checks the flow specimen foreign key behavior from flow.FCSFiles and flow.FCSAnalyses.
  */
 @Category({DailyA.class, Flow.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class FlowSpecimenTest extends BaseFlowTest
 {
     public static final String STUDY_FOLDER = "KoStudy";

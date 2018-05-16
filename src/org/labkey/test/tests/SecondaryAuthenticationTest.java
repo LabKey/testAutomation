@@ -39,6 +39,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 1)
 public class SecondaryAuthenticationTest extends BaseWebDriverTest
 {
     @Test

@@ -59,6 +59,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({DailyA.class, Data.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class ExternalSchemaTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ExternalSchemaProject";

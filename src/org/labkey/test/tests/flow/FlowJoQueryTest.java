@@ -22,6 +22,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ExecuteSqlCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
@@ -48,6 +49,7 @@ import static org.junit.Assert.fail;
  * than 25 for any statistic.
  */
 @Category({DailyA.class, Flow.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class FlowJoQueryTest extends BaseFlowTest
 {
     @Test

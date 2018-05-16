@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class UniprotAnnotationTest extends BaseWebDriverTest
 {
     private static final String UNIPROT_FILENAME = "tinyuniprot.xml";

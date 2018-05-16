@@ -64,6 +64,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({Issues.class, DailyA.class, Data.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class IssuesTest extends BaseWebDriverTest
 {
     private static final String ISSUE_TITLE_0 = "A very serious issue";

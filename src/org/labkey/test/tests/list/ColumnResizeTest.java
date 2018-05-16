@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class ColumnResizeTest extends BaseWebDriverTest
 {
     //Column Names

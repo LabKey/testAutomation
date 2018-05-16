@@ -35,6 +35,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Wiki.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ButtonCustomizationTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_NAME = "ButtonVerifyProject";

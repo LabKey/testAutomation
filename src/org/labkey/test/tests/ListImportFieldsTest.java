@@ -39,6 +39,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Data.class, Hosting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class ListImportFieldsTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "List Import Fields Test";

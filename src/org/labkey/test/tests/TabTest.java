@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.BodyWebPart;
@@ -33,6 +34,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 13)
 public class TabTest extends SimpleModuleTest
 {
     @Override

@@ -30,6 +30,7 @@ import org.labkey.test.util.PortalHelper;
 import java.util.List;
 
 @Category(DailyA.class)
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class FacetedFilterCutoffTest extends BaseWebDriverTest
 {
     public static final int MAX_FACETS = 250;

@@ -19,6 +19,7 @@ import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -37,6 +38,7 @@ import java.nio.file.StandardCopyOption;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class, Reports.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class KnitrReportTest extends AbstractKnitrReportTest
 {
     private static final Path rmdDependenciesReport = scriptpadReports.resolve("kable.rmd");

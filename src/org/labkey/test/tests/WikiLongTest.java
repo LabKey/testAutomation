@@ -36,6 +36,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class, Wiki.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 11)
 public class WikiLongTest extends BaseWebDriverTest
 {
     PortalHelper portalHelper = new PortalHelper(this);

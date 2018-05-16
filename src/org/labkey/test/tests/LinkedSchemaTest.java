@@ -90,6 +90,7 @@ import static org.junit.Assert.assertTrue;
  *   (overrides title and URL for P)
  */
 @Category({DailyA.class, Data.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 11)
 public class LinkedSchemaTest extends BaseWebDriverTest
 {
     private SchemaHelper _schemaHelper = new SchemaHelper(this);

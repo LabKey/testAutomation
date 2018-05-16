@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class UserPermissionsTest extends BaseWebDriverTest
 {
     PortalHelper portalHelper = new PortalHelper(this);

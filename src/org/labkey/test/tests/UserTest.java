@@ -50,6 +50,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class UserTest extends BaseWebDriverTest
 {
     private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile"};

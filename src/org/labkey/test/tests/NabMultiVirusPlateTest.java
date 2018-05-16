@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyA.class, Assays.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class NabMultiVirusPlateTest extends BaseWebDriverTest
 {
     private static final String PLATE_TEMPLATE_NAME = "NabMultiVirusTest Template";

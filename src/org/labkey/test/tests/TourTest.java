@@ -30,6 +30,7 @@ import org.labkey.test.util.LogMethod;
 import java.util.List;
 
 @Category({DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class TourTest extends BaseWebDriverTest
 {
     public static final String SUBFOLDER1 = "test project 1";

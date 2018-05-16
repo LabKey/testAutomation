@@ -43,6 +43,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({Issues.class, DailyA.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class IssueDomainSharingTest extends BaseWebDriverTest
 {
     private static final String USER = "project_user@issuessharing.test";

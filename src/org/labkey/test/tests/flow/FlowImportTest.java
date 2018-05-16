@@ -18,6 +18,7 @@ package org.labkey.test.tests.flow;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebTestHelper;
@@ -32,6 +33,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class, Flow.class, FileBrowser.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class FlowImportTest extends BaseFlowTest
 {
     @Test

@@ -66,6 +66,7 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
 @Category({DailyA.class, Data.class, Hosting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 14)
 public class ListTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;

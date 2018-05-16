@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyA.class, Assays.class, FileBrowser.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class AffymetrixAssayTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "AffymetrixAssayVerifyProject";
