@@ -282,7 +282,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         private boolean isMarkedForDeletion()
         {
-            return statusIndicator.getAttribute("class").contains("fa-plus-circle");
+            return statusIndicator.getAttribute("class").contains("fa-trash-o");
         }
 
         private boolean isNewField()
@@ -384,7 +384,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             return nameInput;
         }
 
-        private final WebElement statusIndicator = Locator.tag("div").attributeStartsWith("id", "partstatus_").childTag("span").findWhenNeeded(this);
+        private final WebElement statusIndicator = Locator.tag("div").attributeStartsWith("id", "partstatus_").childTag("span").refindWhenNeeded(this);
         private final WebElement deleteButton = Locator.tag("div").attributeStartsWith("id", "partdelete_").findWhenNeeded(this);
         private final Input labelInput = Input(Locator.tag("input").attributeStartsWith("name", "ff_label"), getDriver()).findWhenNeeded(this);
         private final WebElement fieldTypeTrigger = Locator.tag("input").attributeStartsWith("name", "ff_type").append(Locator.xpath("/../../td/div")).findWhenNeeded(this);
