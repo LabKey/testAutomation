@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.components.html.Checkbox.Checkbox;
@@ -65,21 +66,31 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         return new PropertiesEditorFinder(driver);
     }
 
+    public FieldRow getField(String name)
+    {
+        return elementCache().findFieldRow(name);
+    }
+
     public FieldRow selectField(String name)
     {
-        elementCache().findFieldRow(name).select();
-        return elementCache().findFieldRow(name);
+        return getField(name).select();
+    }
+
+    public FieldRow getField(int index)
+    {
+        return elementCache().findFieldRows().get(index);
     }
 
     public FieldRow selectField(int index)
     {
-        elementCache().findFieldRows().get(index).select();
-        return elementCache().findFieldRows().get(index);
+        return getField(index).select();
     }
 
-    public  List<FieldRow> getFields()
+    public List<String> getFieldNames()
     {
-        return elementCache().findFieldRows();
+        return elementCache().findFieldRows().stream()
+                .map(FieldRow::getName)
+                .collect(Collectors.toList());
     }
 
     private FieldRow getSelectedField()
@@ -212,8 +223,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             {
                 fieldRows = new ArrayList<>();
                 rowLoc.findElements(PropertiesEditor.this.getComponentElement())
-                        .stream()
-                        .forEachOrdered(e -> fieldRows.add(new FieldRow(e)));
+                        .forEach(e -> fieldRows.add(new FieldRow(e)));
             }
             return fieldRows;
         }
@@ -265,13 +275,18 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         @Override
         public WebElement getComponentElement()
         {
+            if (_rowEl == null)
+                throw new StaleElementReferenceException("Field editor row has been deleted");
             return _rowEl;
         }
 
         public FieldRow select()
         {
-            spacer.click();
-            WebDriverWrapper.waitFor(this::isSelected, "Failed to select field row", 1000);
+            if (!isSelected())
+            {
+                spacer.click();
+                WebDriverWrapper.waitFor(this::isSelected, "Failed to select field row", 1000);
+            }
             return this;
         }
 
@@ -341,7 +356,9 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             if (isNewField())
             {
                 deleteButton.click();
-                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(_rowEl));
+                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(deleteButton));
+                _rowEl = null; // Prevent reuse
+                PropertiesEditor.this.elementCache().fieldRows = null; // Row elements get shifted. Need to start from scratch
             }
             else
             {
@@ -361,8 +378,12 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             return up();
         }
 
+        /**
+         * This component is shared between all rows. Will modify the currently selected row
+         */
         public FieldPropertyDock properties()
         {
+            select();
             return PropertiesEditor.this.elementCache().fieldPropertyDock;
         }
 
@@ -416,7 +437,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         public FieldPropertyDock setFieldProperties(FieldDefinition fieldDefinition)
         {
             // TODO
-            return this;
+            throw new UnsupportedOperationException("Not yet implemented");
         }
 
         public DisplayTabPane selectDisplayTab()
