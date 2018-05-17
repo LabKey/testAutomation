@@ -769,8 +769,17 @@ public class Crawler
 
         try
         {
-            long loadTime = _test.beginAt(relativeURL);
-            _actionProfiler.updateActionProfile(relativeURL, loadTime);
+            try
+            {
+                long loadTime = _test.beginAt(relativeURL);
+                _actionProfiler.updateActionProfile(relativeURL, loadTime);
+            }
+            catch (UnhandledAlertException alert)
+            {
+                // Ignore GWT deferredjs loading issue when navigating away from designer pages
+                if (!alert.getAlertText().contains("Script Tag Failure - no status available"))
+                    throw alert;
+            }
 
             URL currentPageUrl = _test.getURL();
 
