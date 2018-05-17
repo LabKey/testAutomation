@@ -662,8 +662,11 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void createDataset()
     {
+        projectMenu().navigateToFolder(PROJECT_NAME, VISIT_STUDY_FOLDER);
         String create = "LABKEY.Domain.create({\n" +
-                "   kind: \"StudyDatasetDate\",\n" +
+                "   success: callback," +
+                "   error: callback," +
+                "   kind: \"StudyDatasetVisit\",\n" +
                 "   domainDesign: {\n" +
                 "       name : 'My Test Dataset',\n" +
                 "       fields: [{\n" +
