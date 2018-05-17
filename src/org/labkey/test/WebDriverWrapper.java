@@ -355,10 +355,28 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return ((JavascriptExecutor) getDriver()).executeScript(script, arguments);
     }
 
+    public <T> T executeScript(String script, Class<T> expectedResultType, Object... arguments)
+    {
+        Object o = executeScript(script, arguments);
+        if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
+            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o.toString());
+
+        return (T) o;
+    }
+
     public Object executeAsyncScript(String script, Object... arguments)
     {
         script = "var callback = arguments[arguments.length - 1];\n" + script; // See WebDriver documentation
         return ((JavascriptExecutor) getDriver()).executeAsyncScript(script, arguments);
+    }
+
+    public <T> T executeAsyncScript(String script, Class<T> expectedResultType, Object... arguments)
+    {
+        Object o = executeAsyncScript(script, arguments);
+        if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
+            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o.toString());
+
+        return (T) o;
     }
 
     @LogMethod(quiet = true)
