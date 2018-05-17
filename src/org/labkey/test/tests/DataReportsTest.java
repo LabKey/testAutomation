@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
@@ -38,6 +39,7 @@ import java.io.File;
 import static org.junit.Assert.assertTrue;
 
 @Category({BVT.class, Reports.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class DataReportsTest extends ReportTest
 {
     protected final RReportHelper _rReportHelper = new RReportHelper(this);

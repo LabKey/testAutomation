@@ -54,6 +54,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({BVT.class, Charting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class ChartingAPITest extends BaseWebDriverTest
 {
     @Override

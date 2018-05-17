@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.util.Ext4Helper;
@@ -28,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({BVT.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class ParticipantListTest extends StudyBaseTest
 {
     protected static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};

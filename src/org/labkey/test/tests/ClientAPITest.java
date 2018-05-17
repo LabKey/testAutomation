@@ -76,6 +76,7 @@ import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 
 @Category({BVT.class, Wiki.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 14)
 public class ClientAPITest extends BaseWebDriverTest
 {
     public WikiHelper _wikiHelper = new WikiHelper(this);

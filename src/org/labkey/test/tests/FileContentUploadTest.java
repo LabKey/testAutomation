@@ -54,6 +54,7 @@ import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
 
 @Category({BVT.class, FileBrowser.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class FileContentUploadTest extends BaseWebDriverTest
 {
     private static final String FILE_DESCRIPTION = "FileContentTestFile";

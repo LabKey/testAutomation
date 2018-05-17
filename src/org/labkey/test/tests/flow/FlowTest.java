@@ -19,6 +19,7 @@ package org.labkey.test.tests.flow;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
@@ -51,6 +52,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({BVT.class, Flow.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 18)
 public class FlowTest extends BaseFlowTest
 {
     public static final String SELECT_CHECKBOX_NAME = ".select";

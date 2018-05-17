@@ -46,6 +46,7 @@ import static org.junit.Assert.assertEquals;
  * it was convenient to use the list test helpers for filter
  */
 @Category({BVT.class, Data.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 18)
 public class FilterTest extends BaseWebDriverTest
 {
     protected final static String R_VIEW = TRICKY_CHARACTERS + "R report";

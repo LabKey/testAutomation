@@ -40,6 +40,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({BVT.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class PortalTest extends BaseWebDriverTest
 {
     private static final String WIKI_WEBPART_TEXT = "The Wiki web part displays a single wiki page.";

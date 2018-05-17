@@ -62,6 +62,7 @@ import static org.labkey.test.WebTestHelper.getHttpResponse;
 import static org.labkey.test.pages.ConfigureDbLoginPage.PasswordStrength;
 
 @Category(BVT.class)
+@BaseWebDriverTest.ClassTimeout(minutes = 11)
 public class SecurityTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "SecurityVerifyProject";

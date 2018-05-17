@@ -32,6 +32,7 @@ import java.util.List;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category(BVT.class)
+@BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class MicroarrayTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "MicroarrayBVTProject";

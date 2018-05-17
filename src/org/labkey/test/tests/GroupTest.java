@@ -42,6 +42,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category(BVT.class)
+@BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class GroupTest extends BaseWebDriverTest
 {
     protected static final String SIMPLE_GROUP = "group1";

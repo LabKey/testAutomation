@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({BVT.class, Wiki.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class WikiTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES +  "WikiVerifyProject";
