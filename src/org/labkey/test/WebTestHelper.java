@@ -131,8 +131,8 @@ public class WebTestHelper
         {
             if (_webPort == null)
             {
-                String webPortStr = System.getProperty("labkey.port").trim();
-                if (webPortStr == null || webPortStr.length() == 0)
+                String webPortStr = System.getProperty("labkey.port");
+                if (webPortStr == null || webPortStr.trim().length() == 0)
                 {
                     System.out.println("Using default labkey port (" + DEFAULT_WEB_PORT +
                                         ").\nThis can be changed by setting the property 'labkey.port=[yourport]'.");
