@@ -16,10 +16,12 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Base;
 import org.labkey.test.categories.DRT;
 
 @Category({DRT.class, Base.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class SecurityShortTest extends SecurityTest
 {
     @Override
