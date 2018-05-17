@@ -37,6 +37,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class PipelineProtocolArchiveTest extends BaseWebDriverTest
 {
     public static final String WEB_PART_NAME_PIPELINE_PROTOCOLS = "Pipeline Protocols";

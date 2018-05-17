@@ -18,6 +18,7 @@ package org.labkey.test.tests.flow;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Flow;
@@ -25,6 +26,7 @@ import org.labkey.test.categories.Flow;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class, Flow.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class FlowAnalysisResolverTest extends BaseFlowTest
 {
     private final String FCS_FILE = "118795.fcs";

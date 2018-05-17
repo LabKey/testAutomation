@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
@@ -41,6 +42,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.etl.ETLHelper.ETL_SOURCE;
 
 @Category({DailyB.class, Data.class, ETL.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 25)
 public class ETLTest extends ETLAbstractTest
 {
     @Nullable

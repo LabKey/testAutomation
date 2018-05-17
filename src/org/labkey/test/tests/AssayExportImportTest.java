@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 12)
 public class AssayExportImportTest extends BaseWebDriverTest
 {
     private final String ASSAY_PROJECT_FOR_EXPORT_01 = "Assay_Project_For_Export_ByFilesWebPart";

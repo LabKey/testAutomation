@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 @Category({DailyB.class, Hosting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class ColumnChartTest extends BaseWebDriverTest
 {
     public static final String LANGUAGE_COLUMN_NAME = "Language";

@@ -33,6 +33,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({Assays.class, DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class GpatAssayTest extends BaseWebDriverTest
 {
     private static final String GPAT_ASSAY_XLS = "trial01.xls";

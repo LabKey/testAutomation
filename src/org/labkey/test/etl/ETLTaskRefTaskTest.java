@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
@@ -33,6 +34,7 @@ import static org.junit.Assert.assertTrue;
  * Keeping this as a separate class b/c it only needs a subset of the main setup
  */
 @Category({DailyB.class, Data.class, ETL.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class ETLTaskRefTaskTest extends ETLAbstractTest
 {
     private static final String PROJECT_NAME = "ETLTaskRefTaskProject";

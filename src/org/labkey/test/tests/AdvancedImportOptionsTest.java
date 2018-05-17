@@ -42,6 +42,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category(DailyB.class)
+@BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class AdvancedImportOptionsTest extends BaseWebDriverTest
 {
     private static final String LIMITED_USER = "limited@advancedimport.test";

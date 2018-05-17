@@ -45,6 +45,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category(DailyB.class)
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class InlineImagesAssayTest extends BaseWebDriverTest
 {
     protected final static File XLS_FILE = TestFileUtils.getSampleData("InlineImages/foo.xls");

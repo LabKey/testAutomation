@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.data.ColumnHeaderType;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -29,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyB.class, Hosting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class ListExportTest extends AbstractExportTest
 {
     private static final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/ListDemo.lists.zip");

@@ -36,6 +36,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class CustomizeViewTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "CustomizeViewTest";

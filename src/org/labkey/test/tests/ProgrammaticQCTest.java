@@ -23,8 +23,12 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.util.AssayImportOptions;
+import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.QCAssayScriptHelper;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
@@ -33,7 +37,7 @@ import java.util.List;
 
 @Category({DailyA.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
-public class ProgrammaticQCTest extends AbstractQCAssayTest
+public class ProgrammaticQCTest extends AbstractAssayTest
 {
     protected final static String TEST_PROGRAMMATIC_QC_PRJ = "Programmatic QC Test";
     protected final static String QC_ASSAY = "QC Assay";
@@ -250,5 +254,40 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    @LogMethod
+    public void prepareProgrammaticQC()
+    {
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.ensureEngineConfig();
+    }
+
+    public void deleteEngine()
+    {
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.deleteEngine();
+    }
+
+    protected void startCreateNabAssay(String name)
+    {
+        clickButton("New Assay Design");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
+        clickButton("Next");
+
+        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
+        waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
+        setFormElement(assayName, name);
+
+        log("Setting up NAb assay");
+    }
+
+    /**
+     * Import a new run into this assay
+     */
+    protected void importData(AssayImportOptions options)
+    {
+        AssayImporter importer = new AssayImporter(this, options);
+        importer.doImport();
     }
 }

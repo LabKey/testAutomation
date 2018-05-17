@@ -38,6 +38,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class ProjectSettingsTest extends BaseWebDriverTest
 {
     private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");

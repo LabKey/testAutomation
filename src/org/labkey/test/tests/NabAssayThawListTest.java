@@ -28,9 +28,12 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AssayImportOptions;
+import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.DilutionAssayHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.QCAssayScriptHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -38,7 +41,7 @@ import java.util.List;
 
 @Category({DailyA.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
-public class NabAssayThawListTest extends AbstractQCAssayTest
+public class NabAssayThawListTest extends AbstractAssayTest
 {
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
 
@@ -321,5 +324,40 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         log("Looks like pipeline job completed. Let's go home and clean up.");
         goToHome();
         _containerHelper.deleteProject(ASSAY_BACKGROUND_IMPORT_PROJECT, false);
+    }
+
+    @LogMethod
+    public void prepareProgrammaticQC()
+    {
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.ensureEngineConfig();
+    }
+
+    public void deleteEngine()
+    {
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.deleteEngine();
+    }
+
+    protected void startCreateNabAssay(String name)
+    {
+        clickButton("New Assay Design");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
+        clickButton("Next");
+
+        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
+        waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
+        setFormElement(assayName, name);
+
+        log("Setting up NAb assay");
+    }
+
+    /**
+     * Import a new run into this assay
+     */
+    protected void importData(AssayImportOptions options)
+    {
+        AssayImporter importer = new AssayImporter(this, options);
+        importer.doImport();
     }
 }

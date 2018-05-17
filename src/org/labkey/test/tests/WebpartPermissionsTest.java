@@ -31,6 +31,7 @@ import java.util.List;
 import static org.junit.Assert.fail;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class WebpartPermissionsTest extends BaseWebDriverTest
 {
     protected static final String DUMMY_PROJECT_NAME = "Dummy Project";

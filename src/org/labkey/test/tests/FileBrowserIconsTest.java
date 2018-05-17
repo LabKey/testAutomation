@@ -32,6 +32,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 @Category(DailyB.class)
+@BaseWebDriverTest.ClassTimeout(minutes = 4 )
 public class FileBrowserIconsTest extends BaseWebDriverTest
 {
     protected final static String SAMPLE_DATA_LOC =  "/sampledata/fileTypes/";

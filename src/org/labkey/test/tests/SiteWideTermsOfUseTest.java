@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
@@ -29,6 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
 {
     protected static final String SITE_WIDE_TERMS_TEXT = "Site-wide terms of use text for the win";

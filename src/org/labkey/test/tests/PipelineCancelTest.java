@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class PipelineCancelTest  extends BaseWebDriverTest
 {
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("pipelineCancel/LabkeyDemoStudy.zip");

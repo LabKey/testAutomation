@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
@@ -36,6 +37,7 @@ import java.util.List;
  * Having that import as part of the setup for all the ETL tests adds substantial unnecessary overhead time.
  */
 @Category({DailyB.class, Data.class, ETL.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class ETLRemoteSourceTest extends ETLAbstractTest
 {
     private static final String TRANSFORM_REMOTE = "{ETLtest}/remote";

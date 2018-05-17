@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class LookupToSampleIDTest extends BaseWebDriverTest
 {
     private static final String FOLDER_NAME = "TestingGPATAssay";

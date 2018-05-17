@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class SecurityApiTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "Security API Test Project";

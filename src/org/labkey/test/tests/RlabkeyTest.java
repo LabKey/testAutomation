@@ -40,6 +40,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class RlabkeyTest extends BaseWebDriverTest
 {
     RReportHelper _rReportHelper = new RReportHelper(this);

@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyB.class, Reports.class, Charting.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class RaphaelRendererTest extends BaseWebDriverTest
 {
     private static final String MULTI_FOLDER_ZIP = "/sampledata/vis/RaphaelRendererTest.folder.zip";

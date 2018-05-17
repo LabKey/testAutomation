@@ -37,6 +37,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class SurveyTest extends BaseWebDriverTest
 {
     private final String folderName = "subfolder";

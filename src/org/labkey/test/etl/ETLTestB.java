@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
@@ -41,6 +42,7 @@ import static org.junit.Assert.assertTrue;
  * multiple output files, and deleting rows are here
  */
 @Category({DailyB.class, Data.class, ETL.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 18)
 public class ETLTestB extends ETLAbstractTest
 {
     private static final int DEFAULT_OUTPUT_ROWS = 3;

@@ -38,6 +38,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({DailyB.class, FileBrowser.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ExpTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ExpVerifyProject";

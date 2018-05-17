@@ -56,6 +56,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Data.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class ContainerContextTest extends BaseWebDriverTest
 {
     private static final String SUB_FOLDER_A = "A";

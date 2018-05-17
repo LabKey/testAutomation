@@ -33,6 +33,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class WorkbookTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "Workbook Test Project";

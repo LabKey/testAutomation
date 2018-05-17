@@ -32,10 +32,12 @@ import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.util.AssayImportOptions;
+import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
@@ -50,7 +52,7 @@ import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
-public class NabAssayTest extends AbstractQCAssayTest
+public class NabAssayTest extends AbstractAssayTest
 {
     private final static String TEST_ASSAY_PRJ_NAB = "Nab Test Verify Project";            //project for nab test
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
@@ -1033,5 +1035,40 @@ public class NabAssayTest extends AbstractQCAssayTest
         sleep(500); // Wait for a moment to allow the tool tip to show up.
         String tipText = getText(Locator.xpath("//div[contains(@class, 'x4-tip-body')]//span//div"));
         assertTrue("Tool tip comment not as expected. Expected: '" + COMMENT + "' Found: '" + tipText + "'.", tipText.equals(COMMENT));
+    }
+
+    @LogMethod
+    public void prepareProgrammaticQC()
+    {
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.ensureEngineConfig();
+    }
+
+    public void deleteEngine()
+    {
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.deleteEngine();
+    }
+
+    protected void startCreateNabAssay(String name)
+    {
+        clickButton("New Assay Design");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
+        clickButton("Next");
+
+        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
+        waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
+        setFormElement(assayName, name);
+
+        log("Setting up NAb assay");
+    }
+
+    /**
+     * Import a new run into this assay
+     */
+    protected void importData(AssayImportOptions options)
+    {
+        AssayImporter importer = new AssayImporter(this, options);
+        importer.doImport();
     }
 }

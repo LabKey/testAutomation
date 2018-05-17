@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
@@ -31,6 +32,7 @@ import org.labkey.test.categories.ETL;
  * TODO: Fold this back into ETL Test after 23854 & 23855 have been fixed.
  */
 @Category({DailyB.class, Data.class, ETL.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class ETLSimpleTransformTest extends ETLAbstractTest
 {
     @Nullable

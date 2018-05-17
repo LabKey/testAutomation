@@ -38,6 +38,7 @@ import java.util.List;
  * This test will only work for production builds
  */
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class ResourceEncodingTest extends BaseWebDriverTest
 {
     @Nullable

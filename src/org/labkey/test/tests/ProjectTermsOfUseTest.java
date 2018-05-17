@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
@@ -27,6 +28,7 @@ import org.labkey.test.util.PasswordUtil;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
 {
     @Override

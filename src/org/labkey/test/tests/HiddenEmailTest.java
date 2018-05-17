@@ -29,6 +29,7 @@ import org.labkey.test.util.PortalHelper;
 import java.util.List;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class HiddenEmailTest extends BaseWebDriverTest
 {
     private static final String TEST_GROUP = "HiddenEmail Test group";

@@ -58,6 +58,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 17)
 public class FolderExportTest extends BaseWebDriverTest
 {
     private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);

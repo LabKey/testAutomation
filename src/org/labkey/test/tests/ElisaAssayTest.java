@@ -17,12 +17,17 @@ package org.labkey.test.tests;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.util.AssayImportOptions;
+import org.labkey.test.util.AssayImporter;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.QCAssayScriptHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -32,7 +37,8 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 
 @Category({DailyB.class, Assays.class})
-public class ElisaAssayTest extends AbstractQCAssayTest
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
+public class ElisaAssayTest extends AbstractAssayTest
 {
     private final static String TEST_ASSAY_PRJ_ELISA = "ELISA Test Verify Project";
     private final static String TEST_ASSAY_FLDR_NAB = "ELISA";
@@ -189,5 +195,40 @@ public class ElisaAssayTest extends AbstractQCAssayTest
     @Override public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    @LogMethod
+    public void prepareProgrammaticQC()
+    {
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.ensureEngineConfig();
+    }
+
+    public void deleteEngine()
+    {
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.deleteEngine();
+    }
+
+    protected void startCreateNabAssay(String name)
+    {
+        clickButton("New Assay Design");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
+        clickButton("Next");
+
+        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
+        waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
+        setFormElement(assayName, name);
+
+        log("Setting up NAb assay");
+    }
+
+    /**
+     * Import a new run into this assay
+     */
+    protected void importData(AssayImportOptions options)
+    {
+        AssayImporter importer = new AssayImporter(this, options);
+        importer.doImport();
     }
 }

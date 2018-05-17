@@ -45,6 +45,7 @@ import java.util.List;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({DailyB.class, Assays.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 16)
 public class MissingValueIndicatorsTest extends BaseWebDriverTest
 {
     @BeforeClass

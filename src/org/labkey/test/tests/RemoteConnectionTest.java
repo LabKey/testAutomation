@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class RemoteConnectionTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "RemoteConnectionsTestProject";

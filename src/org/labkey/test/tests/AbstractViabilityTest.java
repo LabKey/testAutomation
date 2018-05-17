@@ -19,8 +19,12 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.AssayImportOptions;
+import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.QCAssayScriptHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -28,7 +32,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public abstract class AbstractViabilityTest extends AbstractQCAssayTest
+public abstract class AbstractViabilityTest extends AbstractAssayTest
 {
     @Override
     public List<String> getAssociatedModules()
@@ -175,4 +179,38 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         pressTab(xpath);
     }
 
+    @LogMethod
+    public void prepareProgrammaticQC()
+    {
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.ensureEngineConfig();
+    }
+
+    public void deleteEngine()
+    {
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.deleteEngine();
+    }
+
+    protected void startCreateNabAssay(String name)
+    {
+        clickButton("New Assay Design");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
+        clickButton("Next");
+
+        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
+        waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
+        setFormElement(assayName, name);
+
+        log("Setting up NAb assay");
+    }
+
+    /**
+     * Import a new run into this assay
+     */
+    protected void importData(AssayImportOptions options)
+    {
+        AssayImporter importer = new AssayImporter(this, options);
+        importer.doImport();
+    }
 }

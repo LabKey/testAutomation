@@ -29,6 +29,7 @@ import org.labkey.remoteapi.di.RunTransformCommand;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationCommand;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationResponse;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
@@ -48,6 +49,7 @@ import static org.junit.Assert.assertTrue;
  * Keep these test cases separate from ETLTest as they only need a subset of the setup
  */
 @Category({DailyB.class, Data.class, ETL.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ETLClientApiCommandTest extends ETLAbstractTest
 {
     private static final String TRANSFORM_NOTFOUND = "{ETLtest}/notfound";

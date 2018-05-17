@@ -36,6 +36,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class, ETL.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ETLListTest extends BaseWebDriverTest
 {
     ETLHelper _etlHelper = new ETLHelper(this, getProjectName());

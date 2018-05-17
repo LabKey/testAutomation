@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
@@ -36,6 +37,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Data.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class PivotQueryTest extends ReportTest
 {
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");

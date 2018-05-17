@@ -51,6 +51,7 @@ import static org.junit.Assert.fail;
  * Test JavaScript validation in file-based modules.
  */
 @Category({DailyB.class, Data.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ScriptValidationTest extends BaseWebDriverTest
 {
     public static final String MODULE_NAME = "simpletest";

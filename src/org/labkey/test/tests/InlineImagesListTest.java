@@ -47,6 +47,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category(DailyB.class)
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class InlineImagesListTest extends BaseWebDriverTest
 {
     protected final static String LIST_NAME = "InlineImagesList";

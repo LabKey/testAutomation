@@ -47,6 +47,7 @@ import java.util.Set;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout (minutes = 9)
 public class FileBasedPipelineTest extends BaseWebDriverTest
 {
     private static final String PIPELINETEST_MODULE = "pipelinetest";
