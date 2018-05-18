@@ -28,7 +28,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PlateGrid;
-import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.util.AssayImportOptions;
@@ -44,7 +43,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -54,15 +52,15 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class NabAssayTest extends AbstractAssayTest
 {
-    private final static String TEST_ASSAY_PRJ_NAB = "Nab Test Verify Project";            //project for nab test
-    private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
+    private final static String TEST_ASSAY_PRJ_NAB = "Nab Test Verify Project";
+    private final static String TEST_ASSAY_FLDR_NAB = "NabAssayFolder";
     private final static String TEST_ASSAY_FLDR_NAB_RENAME = "Rename" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
     protected static final String TEST_ASSAY_NAB = "TestAssayNab";
     protected static final String TEST_ASSAY_NAB_DESC = "Description for NAb assay";
 
     protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
-    private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";   //name of Nab Dataset Readers group
+    private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";
 
     private static final String NAB_FILENAME2 = "m0902053;3999.xls";
     protected final File TEST_ASSAY_NAB_FILE1 = TestFileUtils.getSampleData("Nab/m0902051;3997.xls");
@@ -109,74 +107,7 @@ public class NabAssayTest extends AbstractAssayTest
     private static final String CURVE_IC80_POLY_STUDY_COL_TITLE = "Curve IC80 Poly";
 
     private static final String PLATE_TEMPLATE_NAME = "NabAssayTest Template";
-    private static final String STUDY_FOLDER = TEST_ASSAY_PRJ_NAB + "/Study 1";
-    private static final String STUDY_FOLDER_ENCODED = "Nab%20Test%20Verify%20Project/Study%201";
     private static final String TEST_DIV_ID = "testDiv";
-    private static String NABJS_WIKI =
-            "<div id=\"" + TEST_DIV_ID + "\"></div>\n" +
-            "<script type=\"text/javascript\">\n" +
-            "var runOnce = false;\n" +
-            "function runNabAssayTest()\n" +
-            "{\n" +
-            "    if (runOnce) return;\n" +
-            "    runOnce = true;\n" +
-            "    var runsConfig = {\n" +
-            "        assayName : 'TestAssayNab',\n" +
-            "        success : function(runs)\n" +
-            "        {\n" +
-            "            \n" +
-            "            for (var j = 0; j < runs.length; j += 1)\n" +
-            "            {\n" +
-            "                if (runs[j].cutoffs[0] != 50) \n" +
-            "                    fail('GetNabRuns failure 1');\n" +
-            "                else {\n" +
-            "                    var sampleIds = [];\n" +
-            "                    var samples = runs[j].samples;\n" +
-            "                    for (var k = 0; k < samples.length; k += 1)\n" +
-            "                    {\n" +
-            "                        sampleIds[k] = samples[k].objectId;\n" +
-            "                    }\n" +
-            "                    var studyRunsConfig = {\n" +
-            "                        objectIds : sampleIds,\n" +
-            "                        containerPath : '" + STUDY_FOLDER + "',\n" +
-            "                        success : function(runs)\n" +
-            "                        {\n" +
-            "                            if (runs.length == 0) return;\n" +
-            "                            if (runs[0].cutoffs[0] != 50) " +
-            "                               fail('GetStudyNabRuns failure 1');\n" +
-            "                            else {" +
-            "                                var studyRunsGraphConfig = {\n" +
-            "                                    objectIds : sampleIds,\n" +
-            "                                    containerPath : '" + STUDY_FOLDER + "',\n" +
-            "                                    success : function(graph)\n" +
-            "                                    {\n" +
-            "                                       if (graph.length == 0) return;\n" +
-            "                                       if (graph.url.indexOf('" + STUDY_FOLDER_ENCODED + "') < 0) throw 'GetStudyGraphURL failure';\n" +
-            "                                       var node = document.createElement('div');\n" +
-            "                                       var textnode = document.createTextNode('Success!');\n" +
-            "                                       node.appendChild(textnode);\n" +
-            "                                       document.getElementById('" + TEST_DIV_ID + "').appendChild(node);\n" +
-            "                                    },\n" +
-            "                                    failure : function() {fail('GetStudyGraphURL failure');}\n" +
-            "                                }\n" +
-            "                                var nabStudyGraphURl = LABKEY.Assay.getStudyNabGraphURL(studyRunsGraphConfig);\n" +
-            "                            }\n" +
-            "                        },\n" +
-            "                        failure : function() {fail('GetStudyNabRuns failure 2');}\n" +
-            "                    }\n" +
-            "                    var nabStudyRuns = LABKEY.Assay.getStudyNabRuns(studyRunsConfig);\n" +
-            "                }\n" +
-            "            }\n" +
-            "        },\n" +
-            "        failure : function() {fail('GetNabRuns failure 2');}\n" +
-            "    };\n" +
-            "    var nabRuns = LABKEY.Assay.getNAbRuns(runsConfig);\n" +
-            "};\n" +
-            "function fail(message) {\n" +
-            "    document.getElementById('" + TEST_DIV_ID + "').appendChild(document.createTextNode('Failure: ' + message));\n" +
-            "};\n" +
-            "runNabAssayTest();\n" +
-            "</script>\n";
 
     @Override
     public List<String> getAssociatedModules()
@@ -244,7 +175,7 @@ public class NabAssayTest extends AbstractAssayTest
      * Performs Nab designer/upload/publish.
      */
     @Test
-    public void runUITests() throws Exception
+    public void runUITests()
     {
         log("Testing NAb Assay Designer");
 
@@ -508,11 +439,11 @@ public class NabAssayTest extends AbstractAssayTest
         setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
         setStudyPerms(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_STUDY_READALL);
 
-        // view dataset, click [assay] link, see assay details in nabassay container
+        // view dataset, click [assay] link, see assay details in subfolder
         impersonate(TEST_ASSAY_USR_NAB_READER);
         popLocation();
         assertTextPresent(TEST_ASSAY_PRJ_NAB);
-        assertTextNotPresent(TEST_ASSAY_FLDR_NAB); // assert no read permissions to nabassay container
+        assertTextNotPresent(TEST_ASSAY_FLDR_NAB); // assert no read permissions to subfolder
         clickFolder(TEST_ASSAY_FLDR_STUDY1);
         clickAndWait(Locator.linkWithText("Study Navigator"));
         clickAndWait(Locator.linkWithText("2"));
@@ -626,20 +557,6 @@ public class NabAssayTest extends AbstractAssayTest
         waitForElements(Locator.id(TEST_DIV_ID).child(Locator.tagWithText("div", "Success!")), 2);
 
         portalHelper.removeWebPart(WIKIPAGE_NAME);
-    }
-
-    protected Pattern[] getIgnoredElements()
-    {
-        return new Pattern[] {
-                Pattern.compile("RunProperties", Pattern.CASE_INSENSITIVE),
-                Pattern.compile("RunGroups", Pattern.CASE_INSENSITIVE),
-                Pattern.compile("Input", Pattern.CASE_INSENSITIVE),
-                Pattern.compile("Batch", Pattern.CASE_INSENSITIVE),
-                Pattern.compile("Output", Pattern.CASE_INSENSITIVE),
-                Pattern.compile("Links", Pattern.CASE_INSENSITIVE),
-                Pattern.compile("runId", Pattern.CASE_INSENSITIVE),
-                Pattern.compile("assayId", Pattern.CASE_INSENSITIVE)
-        };
     }
 
     private void assertStudyData(int ptidCount)
@@ -770,11 +687,10 @@ public class NabAssayTest extends AbstractAssayTest
         log("Uploading NAb Runs with a transform script");
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        _assayHelper.clickEditAssayDesign();
 
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
-        assayDesigner.saveAndClose();
+        _assayHelper.clickEditAssayDesign()
+                .addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"))
+                .saveAndClose();
 
         navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
@@ -1038,35 +954,22 @@ public class NabAssayTest extends AbstractAssayTest
     }
 
     @LogMethod
-    public void prepareProgrammaticQC()
+    private void prepareProgrammaticQC()
     {
         QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
         javaEngine.ensureEngineConfig();
     }
 
-    public void deleteEngine()
+    private void deleteEngine()
     {
         QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
         javaEngine.deleteEngine();
     }
 
-    protected void startCreateNabAssay(String name)
-    {
-        clickButton("New Assay Design");
-        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
-        clickButton("Next");
-
-        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
-        waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
-        setFormElement(assayName, name);
-
-        log("Setting up NAb assay");
-    }
-
     /**
      * Import a new run into this assay
      */
-    protected void importData(AssayImportOptions options)
+    private void importData(AssayImportOptions options)
     {
         AssayImporter importer = new AssayImporter(this, options);
         importer.doImport();

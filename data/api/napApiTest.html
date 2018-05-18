@@ -1,62 +1,48 @@
 <div id="testDiv"></div>
 <script type="text/javascript">
-var runOnce = false;
-function runNabAssayTest()
-{
-    if (runOnce) return;
-    runOnce = true;
-    var runsConfig = {
-        assayName : 'TestAssayNab',
-        success : function(runs)
-        {
-            for (var j = 0; j < runs.length; j += 1)
-            {
-                if (runs[j].cutoffs[0] != 50)
-                    return;
-                else {
-                    var sampleIds = [];
-                    var samples = runs[j].samples;
-                    for (var k = 0; k < samples.length; k += 1)
-                    {
-                        sampleIds[k] = samples[k].objectId;
-                    }
-                    var studyRunsConfig = {
-                        objectIds : sampleIds,
-                        containerPath : 'Nab Test Verify Project/Study 1',
-                        success : function(runs)
-                        {
-                            if (runs.length == 0) return;
-                            if (runs[0].cutoffs[0] != 50)
-                                return;
-                            else {
-                                var studyRunsGraphConfig = {
-                                    objectIds : sampleIds,
-                                    containerPath : 'Nab Test Verify Project/Study 1',
-                                    success : function(graph) {
-                                        if (graph.length == 0)
-                                            return;
-                                        if (graph.url.indexOf('Nab%20Test%20Verify%20Project/Study%201') < 0)
-                                            return;
-                                        var node = document.createElement('div');
-                                        var textnode = document.createTextNode('Success!');
-                                        node.appendChild(textnode);
-                                        document.getElementById('testDiv').appendChild(node);
-                                    },
-                                    failure : function() {}
-                                };
-                                LABKEY.Assay.getStudyNabGraphURL(studyRunsGraphConfig);
-                            }
-                        },
-                        failure : function() {}
-                    };
-                    LABKEY.Assay.getStudyNabRuns(studyRunsConfig);
+(function() {
+    var testProjectName = 'Nab Test Verify Project';
+    var testStudyName = 'Study 1';
+    var testAssayName = 'TestAssayNab';
+
+    LABKEY.Assay.getNAbRuns({
+        assayName: testAssayName,
+        success: function(runs) {
+            for (var j = 0; j < runs.length; j += 1) {
+                if (runs[j].cutoffs[0] !== 50) return;
+
+                var sampleIds = [];
+                var samples = runs[j].samples;
+                for (var k = 0; k < samples.length; k++) {
+                    sampleIds.push(samples[k].objectId);
                 }
+
+                LABKEY.Assay.getStudyNabRuns({
+                    objectIds: sampleIds,
+                    containerPath: testProjectName + '/' + testStudyName,
+                    success: function(runs) {
+                        if (runs.length === 0) return;
+                        if (runs[0].cutoffs[0] !== 50) return;
+
+                        LABKEY.Assay.getStudyNabGraphURL({
+                            objectIds: sampleIds,
+                            containerPath: testProjectName + '/' + testStudyName,
+                            success : function(graph) {
+                                if (graph.length === 0) return;
+                                if (graph.url.indexOf(encodeURIComponent(testProjectName) + '/' + encodeURIComponent(testStudyName)) < 0) return;
+
+                                var node = document.createElement('div');
+                                node.appendChild(document.createTextNode('Success!'));
+                                document.getElementById('testDiv').appendChild(node);
+                            },
+                            failure : function() {}
+                        });
+                    },
+                    failure : function() {}
+                });
             }
         },
         failure : function() {}
-    };
-    LABKEY.Assay.getNAbRuns(runsConfig);
-}
-
-runNabAssayTest();
+    });
+})();
 </script>
