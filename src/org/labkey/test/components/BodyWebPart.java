@@ -57,5 +57,5 @@ public class BodyWebPart<EC extends BodyWebPart.ElementCache> extends WebPart<EC
         return (EC) new ElementCache();
     }
 
-    protected class ElementCache extends WebPart.ElementCache {}
+    public class ElementCache extends WebPart.ElementCache {}
 }

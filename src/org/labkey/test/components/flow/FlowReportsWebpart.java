@@ -17,7 +17,6 @@ package org.labkey.test.components.flow;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.BodyWebPart;
-import org.labkey.test.components.WebPart;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.flow.reports.PositivityReportEditorPage;
 import org.labkey.test.pages.flow.reports.QCReportEditorPage;
@@ -91,7 +90,7 @@ public class FlowReportsWebpart extends BodyWebPart<FlowReportsWebpart.ElementCa
         return new ElementCache();
     }
 
-    protected class ElementCache extends WebPart.ElementCache
+    protected class ElementCache extends BodyWebPart.ElementCache
     {
         WebElement createQCReport = Locator.lkButton("create qc report").findWhenNeeded(this);
         WebElement createPositivityReport = Locator.lkButton("create positivity report").findWhenNeeded(this);

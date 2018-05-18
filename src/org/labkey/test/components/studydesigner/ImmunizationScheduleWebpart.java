@@ -18,8 +18,6 @@ package org.labkey.test.components.studydesigner;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.BodyWebPart;
-import org.labkey.test.components.WebPart;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -62,7 +60,7 @@ public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationSchedul
         return new ElementCache();
     }
 
-    public class ElementCache extends WebPart.ElementCache
+    public class ElementCache extends BodyWebPart.ElementCache
     {
         private int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
         private Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
