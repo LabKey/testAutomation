@@ -19,7 +19,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
+public class BodyWebPart<EC extends BodyWebPart.ElementCache> extends WebPart<EC>
 {
     public BodyWebPart(WebDriver driver, WebElement webPartElement)
     {
@@ -50,4 +50,12 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 
     @Override
     protected void waitForReady() {}
+
+    @Override
+    protected EC newElementCache()
+    {
+        return (EC) new ElementCache();
+    }
+
+    protected class ElementCache extends WebPart.ElementCache {}
 }

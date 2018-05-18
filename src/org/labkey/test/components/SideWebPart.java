@@ -16,8 +16,6 @@
 package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
-import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -31,7 +29,7 @@ public class SideWebPart extends WebPart
 
     public SideWebPart(WebDriver test, String title, int index)
     {
-        this(test, locator(title).index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
+        this(test, webPartLoc(title).index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
         _title = title;
     }
 
@@ -42,19 +40,15 @@ public class SideWebPart extends WebPart
 
     public SideWebPart(WebDriver test, int index)
     {
-        this(test, locator().index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
+        this(test, webPartLoc().index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
     }
 
     @Override
     protected void waitForReady() {}
 
-    private static Locator.XPathLocator locator()
+    @Override
+    protected ElementCache newElementCache()
     {
-        return webPartLoc();
-    }
-
-    private static Locator.XPathLocator locator(String title)
-    {
-        return webPartLoc(title);
+        return new ElementCache();
     }
 }

@@ -74,7 +74,7 @@ public class ListsWebPart extends BodyWebPart<ListsWebPart.Elements>
         return new Elements();
     }
 
-    class Elements extends WebPart.Elements
+    class Elements extends BodyWebPart.ElementCache
     {
         private List<WebElement> listLinks;
 

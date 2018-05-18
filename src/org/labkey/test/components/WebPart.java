@@ -141,28 +141,11 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPa
         new BootstrapMenu(getDriver(), elementCache().UX_MENU).collapse();
     }
 
-    @Deprecated // Use elementCache()
-    protected EC elements()
-    {
-        return elementCache();
-    }
-
-    protected EC newElementCache()
-    {
-        return (EC) new ElementCache();
-    }
+    protected abstract EC newElementCache();
 
     public class ElementCache extends WebPartPanel.ElementCache
     {
         public WebElement UX_MENU = new LazyWebElement(
                 Locator.xpath("//span[contains(@class,'dropdown') and ./a[@data-toggle='dropdown']]"), this);
-    }
-
-    /**
-     * @deprecated Renamed to {@link ElementCache} for consistency
-     */
-    @Deprecated
-    public class Elements extends ElementCache
-    {
     }
 }

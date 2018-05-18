@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ParticipantListWebPart extends BodyWebPart
+public class ParticipantListWebPart extends BodyWebPart<ParticipantListWebPart.Elements>
 {
     private final String _participantNounSingular;
     private final String _participantNounPlural;
@@ -49,10 +49,10 @@ public class ParticipantListWebPart extends BodyWebPart
     protected void waitForBody()
     {
         getWrapper().waitForAnyElement(
-                elements().statusMessageLoc.withText(String.format("No %s were found in this study. %s IDs will appear here after specimens or datasets are imported.",
+                elementCache().statusMessageLoc.withText(String.format("No %s were found in this study. %s IDs will appear here after specimens or datasets are imported.",
                         _participantNounPlural.toLowerCase(), _participantNounSingular)),
-                elements().statusMessageLoc.startsWith("Found "),
-                elements().statusMessageLoc.startsWith("Showing all "));
+                elementCache().statusMessageLoc.startsWith("Found "),
+                elementCache().statusMessageLoc.startsWith("Showing all "));
         WebDriverWrapper.sleep(500);
     }
 
@@ -99,15 +99,15 @@ public class ParticipantListWebPart extends BodyWebPart
 
     public String getStatusMessage()
     {
-        return elements().statusMessage.getText();
+        return elementCache().statusMessage.getText();
     }
 
-    public Elements elements()
+    public Elements newElementCache()
     {
         return new Elements();
     }
 
-    protected class Elements extends WebPart.Elements
+    protected class Elements extends BodyWebPart.ElementCache
     {
         public Locator.XPathLocator tableLoc = Locator.tagWithText("table", "lk-participants-list-table");
         public Locator.XPathLocator statusMessageLoc = Locator.tag("span").attributeEndsWith("id", ".status");
