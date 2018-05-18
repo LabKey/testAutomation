@@ -29,6 +29,7 @@ import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TextSearcher;
+import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -476,7 +477,7 @@ public class MS1Test extends BaseWebDriverTest
         log("Cleaning up MS1 BVT...");
         _containerHelper.deleteProject(getProjectName(), afterTest);
         try{purgeFiles();}
-        catch(Throwable ignore) {}
+        catch(WebDriverException ignore) {}
         log("MS1 BVT cleaned up successfully.");
     }
 
