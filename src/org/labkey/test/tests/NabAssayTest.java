@@ -38,6 +38,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -139,7 +140,7 @@ public class NabAssayTest extends AbstractAssayTest
         ensureSignedInAsPrimaryTestUser();
 
         // set up a scripting engine to run a java transform script
-        prepareProgrammaticQC();
+        new QCAssayScriptHelper(this).ensureEngineConfig();
 
         _containerHelper.createProject(getProjectName(), null);
 
@@ -166,9 +167,9 @@ public class NabAssayTest extends AbstractAssayTest
 
         try
         {
-            deleteEngine();
+            new QCAssayScriptHelper(this).deleteEngine();
         }
-        catch(Throwable ignore) {}
+        catch(WebDriverException ignore) {}
     }
 
     /**
@@ -243,8 +244,7 @@ public class NabAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         log("Uploading NAb Runs");
-        importData(
-                new AssayImportOptions.ImportOptionsBuilder().
+        new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
                         assayId("ptid + visit").
                         visitResolver(AssayImportOptions.VisitResolverType.ParticipantVisit).
                         cutoff1("50").
@@ -258,12 +258,10 @@ public class NabAssayTest extends AbstractAssayTest
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
                         runFile(TEST_ASSAY_NAB_FILE1).
-                        build()
-        );
+                        build()).doImport();
 
         // verify that we catch an invalid date prior to upload
-        importData(
-                new AssayImportOptions.ImportOptionsBuilder().
+        new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
                         assayId("ptid + date").
                         visitResolver(AssayImportOptions.VisitResolverType.ParticipantDate).
                         cutoff1("50").
@@ -277,16 +275,14 @@ public class NabAssayTest extends AbstractAssayTest
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
                         runFile(TEST_ASSAY_NAB_FILE2).
-                        build()
-        );
+                        build()).doImport();
 
         assertElementPresent(Locators.labkeyError.containing("Date must be of type Date and Time. Value \"bad-date\" could not be converted."), 1);
         assertElementPresent(Locators.labkeyError.containing("Only dates between January 1, 1753 and December 31, 9999 are accepted."), 1);
         clickButton("Cancel");
 
         // retry the import with a valid date
-        importData(
-                new AssayImportOptions.ImportOptionsBuilder().
+        new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
                         assayId("ptid + date").
                         visitResolver(AssayImportOptions.VisitResolverType.ParticipantDate).
                         cutoff1("50").
@@ -300,11 +296,9 @@ public class NabAssayTest extends AbstractAssayTest
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
                         runFile(TEST_ASSAY_NAB_FILE2).
-                        build()
-        );
+                        build()).doImport();
 
-        importData(
-                new AssayImportOptions.ImportOptionsBuilder().
+        new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
                         assayId("ptid + visit + date").
                         visitResolver(AssayImportOptions.VisitResolverType.ParticipantVisitDate).
                         cutoff1("50").
@@ -319,11 +313,9 @@ public class NabAssayTest extends AbstractAssayTest
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
                         runFile(TEST_ASSAY_NAB_FILE3).
-                        build()
-        );
+                        build()).doImport();
 
-        importData(
-                new AssayImportOptions.ImportOptionsBuilder().
+        new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
                         assayId("ptid + visit + specimenid").
                         visitResolver(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit).
                         cutoff1("50").
@@ -338,8 +330,7 @@ public class NabAssayTest extends AbstractAssayTest
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
                         runFile(TEST_ASSAY_NAB_FILE4).
-                        build()
-        );
+                        build()).doImport();
 
         verifyRunDetails();
         // Test editing runs
@@ -694,8 +685,7 @@ public class NabAssayTest extends AbstractAssayTest
 
         navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        importData(
-                new AssayImportOptions.ImportOptionsBuilder().
+        new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
                         assayId(ASSAY_ID_TRANSFORM).
                         visitResolver(AssayImportOptions.VisitResolverType.ParticipantVisit).
                         cutoff1("50").
@@ -707,8 +697,7 @@ public class NabAssayTest extends AbstractAssayTest
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
                         runFile(TEST_ASSAY_NAB_FILE1).
-                        build()
-        );
+                        build()).doImport();
 
         // verify the run property FileID was generated by the transform script
         clickAndWait(Locator.linkWithText("View Runs"));
@@ -951,27 +940,5 @@ public class NabAssayTest extends AbstractAssayTest
         sleep(500); // Wait for a moment to allow the tool tip to show up.
         String tipText = getText(Locator.xpath("//div[contains(@class, 'x4-tip-body')]//span//div"));
         assertTrue("Tool tip comment not as expected. Expected: '" + COMMENT + "' Found: '" + tipText + "'.", tipText.equals(COMMENT));
-    }
-
-    @LogMethod
-    private void prepareProgrammaticQC()
-    {
-        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
-        javaEngine.ensureEngineConfig();
-    }
-
-    private void deleteEngine()
-    {
-        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
-        javaEngine.deleteEngine();
-    }
-
-    /**
-     * Import a new run into this assay
-     */
-    private void importData(AssayImportOptions options)
-    {
-        AssayImporter importer = new AssayImporter(this, options);
-        importer.doImport();
     }
 }

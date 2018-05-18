@@ -23,9 +23,6 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.PropertiesEditor;
-import org.labkey.test.util.AssayImportOptions;
-import org.labkey.test.util.AssayImporter;
-import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
 
@@ -78,7 +75,7 @@ public class ElisaAssayTest extends AbstractAssayTest
         log("Testing ELISA Assay Designer");
 
         // set up a scripting engine to run a java transform script
-        prepareProgrammaticQC();
+        new QCAssayScriptHelper(this).ensureEngineConfig();
 
         //create a new test project
         _containerHelper.createProject(TEST_ASSAY_PRJ_ELISA, null);
@@ -195,40 +192,5 @@ public class ElisaAssayTest extends AbstractAssayTest
     @Override public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
-    }
-
-    @LogMethod
-    public void prepareProgrammaticQC()
-    {
-        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
-        javaEngine.ensureEngineConfig();
-    }
-
-    public void deleteEngine()
-    {
-        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
-        javaEngine.deleteEngine();
-    }
-
-    protected void startCreateNabAssay(String name)
-    {
-        clickButton("New Assay Design");
-        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
-        clickButton("Next");
-
-        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
-        waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
-        setFormElement(assayName, name);
-
-        log("Setting up NAb assay");
-    }
-
-    /**
-     * Import a new run into this assay
-     */
-    protected void importData(AssayImportOptions options)
-    {
-        AssayImporter importer = new AssayImporter(this, options);
-        importer.doImport();
     }
 }

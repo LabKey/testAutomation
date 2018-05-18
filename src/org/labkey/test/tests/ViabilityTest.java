@@ -26,6 +26,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.TextSearcher;
 
 import java.io.File;
@@ -65,7 +66,7 @@ public class ViabilityTest extends AbstractViabilityTest
     public void runUITests() throws Exception
     {
         // setup a scripting engine to run a java transform script
-        prepareProgrammaticQC();
+        new QCAssayScriptHelper(this).ensureEngineConfig();
 
         initializeStudyFolder();
         importSpecimens();

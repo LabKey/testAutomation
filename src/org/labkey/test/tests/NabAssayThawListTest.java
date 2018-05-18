@@ -31,9 +31,7 @@ import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.DilutionAssayHelper;
 import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.QCAssayScriptHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -177,7 +175,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
                 methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
                 runFile(TEST_ASSAY_NAB_FILE1);
 
-        importData(iob.build());
+        new AssayImporter(this, iob.build()).doImport();
 
         verifyRunDetails();
 
@@ -243,13 +241,13 @@ public class NabAssayThawListTest extends AbstractAssayTest
         waitForElement(Locator.css(".query-loaded-marker"));
         _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), THAW_LIST_BAD_DATATYPES);
         clickButton("Save Defaults");
-        importData(iob.resetDefaults(true).assayId(THAW_LIST_ASSAY_ID + " Bad Datatype").build());
+        new AssayImporter(this, iob.resetDefaults(true).assayId(THAW_LIST_ASSAY_ID + " Bad Datatype").build()).doImport();
         assertTextPresent("Can not convert VisitId value: 1x to double for specimenId: 1",
                 "Can not convert VisitId value: 4x to double for specimenId: 4");
 
         log("Verify import with unresolved specimens fails.");
         setDefaultThawList(THAW_LIST_MISSING_ROWS);
-        importData(iob.assayId(THAW_LIST_ASSAY_ID + " Missing thaw list rows").build());
+        new AssayImporter(this, iob.assayId(THAW_LIST_ASSAY_ID + " Missing thaw list rows").build()).doImport();
         assertTextPresent("Can not resolve thaw list entry for specimenId: 4",
                 "Can not resolve thaw list entry for specimenId: 5");
     }
@@ -314,7 +312,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
 
         portalHelper.checkRadioButton(Locator.radioButtonById("Fileupload"));
         portalHelper.waitForElement(Locator.xpath("//input[@name='__primaryFile__']"));
-        portalHelper.setFormElement(Locator.xpath("//input[@name='__primaryFile__']"), STUDY_ZIP.getPath());
+        portalHelper.setFormElement(Locator.xpath("//input[@name='__primaryFile__']"), STUDY_ZIP);
 
         portalHelper.clickButton("Save and Finish", "Data Pipeline");
 
@@ -324,40 +322,5 @@ public class NabAssayThawListTest extends AbstractAssayTest
         log("Looks like pipeline job completed. Let's go home and clean up.");
         goToHome();
         _containerHelper.deleteProject(ASSAY_BACKGROUND_IMPORT_PROJECT, false);
-    }
-
-    @LogMethod
-    public void prepareProgrammaticQC()
-    {
-        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
-        javaEngine.ensureEngineConfig();
-    }
-
-    public void deleteEngine()
-    {
-        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
-        javaEngine.deleteEngine();
-    }
-
-    protected void startCreateNabAssay(String name)
-    {
-        clickButton("New Assay Design");
-        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
-        clickButton("Next");
-
-        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
-        waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
-        setFormElement(assayName, name);
-
-        log("Setting up NAb assay");
-    }
-
-    /**
-     * Import a new run into this assay
-     */
-    protected void importData(AssayImportOptions options)
-    {
-        AssayImporter importer = new AssayImporter(this, options);
-        importer.doImport();
     }
 }
