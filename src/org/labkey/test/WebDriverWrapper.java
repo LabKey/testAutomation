@@ -2392,10 +2392,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void mouseOut()
     {
-        new Actions(getDriver())
-                .moveByOffset(-10,-10)
-                .moveByOffset(-50,-50)
-                .moveByOffset(-100,-100).build().perform();
+        try
+        {
+            new Actions(getDriver())
+                    .moveByOffset(-10, -10)
+                    .moveByOffset(-50, -50)
+                    .moveByOffset(-100, -100).build().perform();
+        }
+        catch (WebDriverException ignore) { }
     }
 
     public void mouseOver(Locator l)
