@@ -41,7 +41,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -740,32 +739,9 @@ public class DataRegionTable extends DataRegion
         clickRowDetails(getRowIndexStrict(key));
     }
 
-
-    protected void setRowData(Map<String, String> data, boolean validateText)
+    protected void setRowData(Map<String, ?> data, boolean validateText)
     {
-        for (String key : data.keySet())
-        {
-            getWrapper().waitForElement(Locator.name("quf_" + key));
-            WebElement field = Locator.name("quf_" + key).findElement(getDriver());
-            String inputType = field.getAttribute("type");
-            switch (inputType)
-            {
-                case "checkbox":
-                    getWrapper().setCheckbox(field, data.get(key).toLowerCase().equals("true"));
-                    break;
-                case "file":
-                    getWrapper().setFormElement(field, new File(data.get(key)));
-                    break;
-                default:
-                    getWrapper().setFormElement(field, data.get(key));
-            }
-        }
-        getWrapper().clickButton("Submit");
-
-        if (validateText)
-        {
-            getWrapper().assertTextPresent(data.values().iterator().next());  //make sure some text from the map is present
-        }
+        new ListHelper(getWrapper()).setRowData(data, validateText);
     }
 
     public String getDetailsHref(int row)

@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
@@ -146,48 +147,52 @@ public class ListHelper extends LabKeySiteWrapper
      * @param data key = the the name of the field, value = the value to enter in that field
      */
 
-    public void insertNewRow(Map<String, String> data)
+    public void insertNewRow(Map<String, ?> data)
     {
         insertNewRow(data, true);
     }
 
-    public void insertNewRow(Map<String, String> data, boolean validateText)
+    public void insertNewRow(Map<String, ?> data, boolean validateText)
     {
         DataRegionTable list = new DataRegionTable("query", getDriver());
         list.clickInsertNewRow();
         setRowData(data, validateText);
     }
 
-    protected void setRowData(Map<String, String> data, boolean validateText)
+    protected void setRowData(Map<String, ?> data, boolean validateText)
     {
         for (String key : data.keySet())
         {
             WebElement field = waitForElement(Locator.name("quf_" + key));
             String inputType = field.getAttribute("type");
-            switch (inputType)
+            Object value = data.get(key);
+            if (value instanceof File)
+                setFormElement(field, (File) value);
+            else if (value instanceof Boolean)
+                setCheckbox(field, (Boolean) value);
+            else if (value instanceof OptionSelect.SelectOption)
+                new OptionSelect<>(field).selectOption((OptionSelect.SelectOption)value);
+            else
             {
-                case "file":
-                    setFormElement(field, new File(data.get(key)));
-                    break;
-                case "checkbox":
-                    if(data.get(key).toLowerCase().equals("true"))
-                    {
-                        setCheckbox(field, true);
-                    }
-                    else
-                    {
-                        setCheckbox(field, false);
-                    }
-                    break;
-                default:
-                    setFormElement(field, data.get(key));
+                String strVal = String.valueOf(value);
+                switch (inputType)
+                {
+                    case "file":
+                        setFormElement(field, new File(strVal));
+                        break;
+                    case "checkbox":
+                        setCheckbox(field, strVal.toLowerCase().equals("true"));
+                        break;
+                    default:
+                        setFormElement(field, strVal);
+                }
             }
         }
         clickButton("Submit");
 
         if (validateText)
         {
-            assertTextPresent(data.values().iterator().next());  //make sure some text from the map is present
+            assertTextPresent(String.valueOf(data.values().iterator().next()));  //make sure some text from the map is present
         }
     }
 
