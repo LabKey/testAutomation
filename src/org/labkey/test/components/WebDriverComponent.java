@@ -53,7 +53,7 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
             this.driver = driver;
         }
 
-        protected WebDriver getDriver()
+        public WebDriver getDriver()
         {
             return driver;
         }

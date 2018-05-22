@@ -51,15 +51,6 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
         return new WindowFinder(driver);
     }
 
-    /**
-     * @deprecated Use {@link Window#Window(WebDriver)}
-     */
-    @Deprecated
-    public static WindowFinder Window()
-    {
-        return new WindowFinder();
-    }
-
     @Override
     protected WebDriver getDriver()
     {
@@ -164,38 +155,9 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
             super(driver);
         }
 
-        /**
-         * Bridge transition from redundant FloatingComponent
-         */
-        private WebDriver _driver;
-        @Deprecated
-        public WindowFinder()
-        {
-            this(null);
-        }
-        @Deprecated
-        public Window find(WebDriver driver)
-        {
-            _driver = driver;
-            return super.find();
-        }
-        @Deprecated
-        public Window waitFor(WebDriver driver)
-        {
-            _driver = driver;
-            return super.waitFor();
-        }
-        @Deprecated
-        public Window findWhenNeeded(WebDriver driver)
-        {
-            _driver = driver;
-            return super.findWhenNeeded();
-        }
         @Override
-        protected WebDriver getDriver()
+        public WebDriver getDriver()
         {
-            if (_driver != null)
-                return _driver;
             return super.getDriver();
         }
 
