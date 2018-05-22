@@ -114,6 +114,18 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("enable.heap.dump"));
     }
 
+    public static double getTimeoutMultiplier()
+    {
+        try
+        {
+            return Math.max(0, Double.parseDouble(System.getProperty("webtest.timeout.multiplier")));
+        }
+        catch (NumberFormatException badProp)
+        {
+            return 1.0;
+        }
+    }
+
     public static Duration getCrawlerTimeout()
     {
         try

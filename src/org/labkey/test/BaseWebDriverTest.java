@@ -431,6 +431,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 else
                     minutes = ClassTimeout.DEFAULT;
 
+                minutes *= TestProperties.getTimeoutMultiplier();
+
+                // Don't disable timeout unless multiplier is exactly zero
+                if (minutes == 0 && TestProperties.getTimeoutMultiplier() > 0)
+                    minutes = 1;
+
                 if (isLinkCheckEnabled())
                 {
                     // Increase timeout to account for crawler
