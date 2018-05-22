@@ -732,11 +732,16 @@
                 ## remove one of the columns
                 df <- data.frame(intKey=c(1:3), customInt=c(1:3))
                 fields <- labkey.domain.inferFields(baseUrl="%baseUrl%", folderPath="%projectName%", df)
-                newDesign <- labkey.domain.createDesign(name="test list", fields=fields)
                 oldDesign <- labkey.domain.get(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list")
+                newDesign <- labkey.domain.createDesign(name="test list", fields=fields)
 
                 newDesign$domainId = oldDesign$domainId
                 newDesign$domainURI = oldDesign$domainURI
+
+                newDesign$fields[1,]$propertyId = oldDesign$fields[1,]$propertyId
+                newDesign$fields[1,]$propertyURI = oldDesign$fields[1,]$propertyURI
+                newDesign$fields[2,]$propertyId = oldDesign$fields[2,]$propertyId
+                newDesign$fields[2,]$propertyURI = oldDesign$fields[2,]$propertyURI
 
                 labkey.domain.save(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=newDesign)
                 newrow <- data.frame(
