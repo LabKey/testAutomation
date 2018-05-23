@@ -51,6 +51,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.seleniumhq.jetty9.util.URIUtil;
@@ -373,11 +374,15 @@ public class WebTestHelper
     }
 
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
-    public static void logToServer(String message) throws IOException, CommandException
+    public static void logToServer(String message)
     {
         try(CloseableHttpClient client = (CloseableHttpClient)getHttpClient())
         {
             logToServer(message, client, WebTestHelper.getBasicHttpContext());
+        }
+        catch (IOException | CommandException e)
+        {
+            TestLogger.log("Unable to log message to server: " + e.getMessage());
         }
     }
 

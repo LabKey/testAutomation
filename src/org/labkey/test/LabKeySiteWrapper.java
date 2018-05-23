@@ -608,7 +608,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             verifyInitialUserError(email, PasswordUtil.getPassword(), PasswordUtil.getPassword(), null);
 
             // Runner was unable to log the test start prior to initial user creation
-            try{logToServer("=== Starting " + getClass().getSimpleName() + " ===");} catch (CommandException | IOException ignore){}
+            logToServer("=== Starting " + getClass().getSimpleName() + " ===");
 
             log("Attempting to register another initial user");
             popLocation();

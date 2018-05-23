@@ -651,7 +651,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 TestLogger.resetLogger();
                 TestLogger.log("// Begin Test Case - " + description.getMethodName() + " \\\\");
-                try{logToServer("=== Begin Test Case - " + description.getTestClass().getSimpleName() + "." + description.getMethodName());} catch (CommandException | IOException ignore){}
+                logToServer("=== Begin Test Case - " + description.getTestClass().getSimpleName() + "." + description.getMethodName());
                 TestLogger.increaseIndent();
             }
 

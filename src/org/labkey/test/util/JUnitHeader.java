@@ -72,7 +72,7 @@ public class JUnitHeader extends BaseWebDriverTest
     }
 
     @AfterClass
-    public static void logStart() throws Exception
+    public static void logStart()
     {
         logToServer("=== Starting Server-side JUnit Tests ===");
     }
