@@ -118,7 +118,7 @@ public abstract class TestProperties
     {
         try
         {
-            return Math.max(0, Double.parseDouble(System.getProperty("webtest.timeout.multiplier")));
+            return Math.max(0, Double.parseDouble(System.getProperty("webtest.timeout.multiplier", "")));
         }
         catch (NumberFormatException badProp)
         {
