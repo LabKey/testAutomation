@@ -79,10 +79,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -138,7 +140,6 @@ import static org.labkey.test.components.html.RadioButton.RadioButton;
 public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cleanable, WebTest
 {
     private static BaseWebDriverTest currentTest;
-    private static final SingletonWebDriver _driver = SingletonWebDriver.getInstance();
     private final BrowserType BROWSER_TYPE;
 
     private String _lastPageTitle = null;
@@ -228,7 +229,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public WebDriver getWrappedDriver()
     {
-        return _driver.getWebDriver();
+        return SingletonWebDriver.getInstance().getWebDriver();
     }
 
     protected void setIsPerfTest(boolean isPerfTest)
@@ -247,7 +248,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             doTearDown();
         }
 
-        _driver.setUp(this);
+        SingletonWebDriver.getInstance().setUp(this);
 
         getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
         getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
@@ -286,7 +287,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static void doTearDown()
     {
         boolean closeWindow = !_testFailed || Boolean.parseBoolean(System.getProperty("close.on.fail", "true"));
-        _driver.tearDown(closeWindow || isTestRunningOnTeamCity());
+        SingletonWebDriver.getInstance().tearDown(closeWindow || isTestRunningOnTeamCity());
     }
 
     private void populateLastPageInfo()
@@ -342,7 +343,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             public void starting(Description description)
             {
                 testClassStartTime = System.currentTimeMillis();
-                _driver.clear();
+                SingletonWebDriver.getInstance().clear();
                 testCount = description.getChildren().size();
                 currentTestNumber = 0;
                 beforeClassSucceeded = false;
@@ -473,7 +474,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 if (e instanceof TestTimedOutException || e instanceof InterruptedException)
                 {
-                    _driver.clear();
+                    SingletonWebDriver.getInstance().clear();
                     currentTest = null;
                 }
             }
@@ -737,15 +738,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         error.printStackTrace();
 
-        if (error instanceof TestTimedOutException ||
-                error instanceof InterruptedException ||
-                error.getCause() != null && error.getCause() instanceof InterruptedException)
+        if (Thread.interrupted() || wasCausedBy(error, Arrays.asList(TestTimedOutException.class, InterruptedException.class)))
         {
-            _testTimeout = true;
+            log("Test interrupted. Skipping failure handling");
             return;
         }
-
-        System.err.println("ERROR: " + error.getMessage());
 
         try
         {
@@ -757,12 +754,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"));
                     getArtifactCollector().dumpPipelineFiles();
                 }
-                if (_testTimeout)
-                    getArtifactCollector().dumpThreads();
             }
             catch (RuntimeException | Error e)
             {
                 log("Unable to dump pipeline files");
+                System.err.println(e.getMessage());
+            }
+            try
+            {
+                if (wasCausedBy(error, Arrays.asList(TestTimeoutException.class, SocketTimeoutException.class)))
+                    getArtifactCollector().dumpThreads();
+            }
+            catch (RuntimeException | Error e)
+            {
+                log("Unable to dump threads");
                 System.err.println(e.getMessage());
             }
 
@@ -771,11 +776,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 log("Browser is unavailable. Skipping browser-dependant failure handling.");
                 return;
             }
-            if (error instanceof TestTimeoutException || error instanceof TimeoutException)
-            {
-                _testTimeout = true;
-            }
-            else if (error instanceof UnhandledAlertException)
+
+            if (error instanceof UnhandledAlertException)
             {
                 dismissAllAlerts();
             }
@@ -857,6 +859,22 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             doTearDown();
         }
+    }
+
+    private boolean wasCausedBy(Throwable throwable, Collection<Class<? extends Throwable>> causes)
+    {
+        while (throwable != null)
+        {
+            for (Class<? extends Throwable> check : causes)
+            {
+                if (check.isAssignableFrom(throwable.getClass()))
+                {
+                    return true;
+                }
+            }
+            throwable = throwable.getCause();
+        }
+        return false;
     }
 
     @LogMethod
@@ -979,7 +997,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public static File getDownloadDir()
     {
-        return _driver.getDownloadDir();
+        return SingletonWebDriver.getInstance().getDownloadDir();
     }
 
     @LogMethod
@@ -2482,6 +2500,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         private static SingletonWebDriver getInstance()
         {
+            if (Thread.interrupted())
+                return null; // Not for you
             return INSTANCE;
         }
 
