@@ -492,6 +492,9 @@ public class SecurityTest extends BaseWebDriverTest
 
         // create the project and set permissions
         _containerHelper.createProject(PROJECT_NAME, null);
+
+        // Add permissions for a site group
+        _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
         // Add a non-group permission
         _permissionsHelper.setUserPermissions(ADMIN_USER_TEMPLATE, "Editor");
         _permissionsHelper.createPermissionsGroup("Administrators");
@@ -517,6 +520,10 @@ public class SecurityTest extends BaseWebDriverTest
         goToProjectHome();
         ApiPermissionsHelper helper = new ApiPermissionsHelper(this);
         helper.assertPermissionSetting(PROJECT_ADMIN_USER, "Editor");
+        log("Verify that group permissions did not get assigned individually");
+        _permissionsHelper.assertNoPermission(PROJECT_ADMIN_USER, "Reader");
+        _permissionsHelper.assertNoPermission(NORMAL_USER, "Reader");
+        _permissionsHelper.assertNoPermission(NORMAL_USER, "Editor");
 
         // verify permissions
         checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators", 2);
