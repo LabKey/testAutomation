@@ -125,17 +125,17 @@ public class FileBrowserHelper extends WebDriverWrapper
     private void selectFolderTreeNode(@LoggedParam String nodeId)
     {
         final Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
-        final Locator.XPathLocator folderTreeNode = fBrowser.append(Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId));
+        final Locator.XPathLocator folderTreeNodeLoc = fBrowser.append(Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId));
 
-        waitForElement(folderTreeNode);
+        final WebElement folderTreeNode = waitForElement(folderTreeNodeLoc);
         waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
 
-        final Locator folderTreeNodeSelected = folderTreeNode.withClass("x4-grid-row-selected");
-        if (!isElementPresent(folderTreeNodeSelected))
+        if (!folderTreeNode.getAttribute("class").contains("x4-grid-row-selected"))
         {
+            scrollIntoView(folderTreeNode);
             try
             {
-                doAndWaitForPageSignal(() -> click(folderTreeNode), IMPORT_SIGNAL_NAME);
+                doAndWaitForPageSignal(folderTreeNode::click, IMPORT_SIGNAL_NAME);
             }
             catch (StaleElementReferenceException staleSignal)
             {
