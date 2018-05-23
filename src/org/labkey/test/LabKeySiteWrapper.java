@@ -59,6 +59,7 @@ import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.Timer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriverException;
@@ -66,6 +67,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -506,14 +508,35 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     private void waitForStartup()
     {
-        boolean hitFirstPage = false;
+        Boolean hitFirstPage = null;
         log("Verifying that server has started...");
-        long ms = System.currentTimeMillis();
+        Timer startupTimer = new Timer(Duration.ofSeconds(MAX_SERVER_STARTUP_WAIT_SECONDS));
+        Throwable lastError = null;
         do
         {
+            if (hitFirstPage == null)
+            {
+                hitFirstPage = false;
+            }
+            else
+            {
+                // retrying
+                log("Server is not ready.  Waiting " + startupTimer.timeRemaining().getSeconds() + " more seconds...");
+                sleep(1000);
+            }
             try
             {
-                WebTestHelper.getHttpResponse(buildURL("login", "logout"));
+                SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("project", "home", "begin"));
+                if (httpResponse.getResponseCode() >= 400)
+                {
+                    log("Waiting for server: " + httpResponse.getResponseCode());
+                    // Don't try to interact with the WebDriver while the site is unresponsive. It can cause tests to hang
+                    continue;
+                }
+                else
+                {
+                    log("Response: " + httpResponse.getResponseCode());
+                }
                 getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
                 getDriver().get(buildURL("login", "logout"));
 
@@ -522,11 +545,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     waitForElement(Locator.CssLocator.union(Locator.css("table.labkey-main"), Locator.css("#permalink"), Locator.css("#headerpanel")));
                     hitFirstPage = true;
                 }
-                catch (NoSuchElementException notReady)
+                catch (NoSuchElementException e)
                 {
-                    long elapsedMs = System.currentTimeMillis() - ms;
-                    log("Server is not ready.  Waiting " + (MAX_SERVER_STARTUP_WAIT_SECONDS -
-                            (elapsedMs / 1000)) + " more seconds...");
+                    lastError = e;
                 }
             }
             catch (WebDriverException e)
@@ -534,26 +555,22 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 // ignore timeouts that occur during startup; a poorly timed request
                 // as the webapp is loading may hang forever, causing a timeout.
                 log("Waiting for server: " + e.getMessage());
+                lastError = e;
             }
             catch (RuntimeException e)
             {
                 if (e.getCause() != null && e.getCause() instanceof IOException)
+                {
                     log("Waiting for server: " + e.getCause().getMessage());
+                    lastError = e;
+                }
                 else
                     throw e;
             }
-            finally
-            {
-                if (!hitFirstPage)
-                {
-                    sleep(1000);
-                }
-            }
-
-        } while (!hitFirstPage && ((System.currentTimeMillis() - ms)/1000) < MAX_SERVER_STARTUP_WAIT_SECONDS);
+        } while (!hitFirstPage && !startupTimer.isTimedOut());
         if (!hitFirstPage)
         {
-            throw new RuntimeException("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
+            throw new RuntimeException("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.", lastError);
         }
         log("Server is running.");
         WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
