@@ -214,7 +214,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
             log("Check Absolute File Path in WebDav");
             String nodeId = "/_webdav" + getCurrentContainerPath() + "/@files/";
             URL webdavURL = new URL(WebTestHelper.getBaseURL() + "/_webdav" + getCurrentContainerPath());
-            goToURL(webdavURL, 1000);
+            goToURL(webdavURL, 5000);
             waitForText("WebDav URL");
 
             /* --- This sometimes works in Firefox, but not Chrome in which the click does not happen (expect with breakpoints in IntelliJ)

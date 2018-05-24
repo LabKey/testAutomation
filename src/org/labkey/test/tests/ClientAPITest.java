@@ -1021,6 +1021,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         // The next test will cause server errors, so check first if there are any
         checkErrors();
+        int count = getServerErrorCount();
 
         impersonate(EMAIL_SENDER);
         {
@@ -1031,7 +1032,7 @@ public class ClientAPITest extends BaseWebDriverTest
         }
         stopImpersonating();
         assertTrue("We should have recorded a server side error if no recipients are present.", getServerErrors().contains("Error sending email: No recipient addresses"));
-        checkExpectedErrors(1);
+        checkExpectedErrors(count + 1);
 
         signOut();
         assertEquals("api requires user in system for guests", "The current user does not have permission to use the SendMessage API.", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_ERROR, new String[]{EMAIL_RECIPIENTS[1]}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));

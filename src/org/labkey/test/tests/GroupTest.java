@@ -170,7 +170,7 @@ public class GroupTest extends BaseWebDriverTest
         assertEquals("Unexpected groups", new HashSet<>(expectedGroups), new HashSet<>(groupsForUser));
 
         //expand plus to check specific groups
-        click(Locator.tag("img").withAttributeContaining("src", "/labkey/_images/plus.gif").index(rowIndex));
+        click(Locator.tag("img").withAttributeContaining("src", "/_images/plus.gif").index(rowIndex));
 
         //confirm details link leads to right user, page
         clickAndWait(Locator.linkContainingText("details").index(rowIndex - 1)); // TODO: Table component uses one-based indexing
