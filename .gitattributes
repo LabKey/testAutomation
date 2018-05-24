@@ -610,6 +610,7 @@ src/org/labkey/test/pages/announcements/UpdatePage.java -text
 src/org/labkey/test/pages/assay/AssayImportPage.java -text
 src/org/labkey/test/pages/assay/DataImportPage.java -text
 src/org/labkey/test/pages/assay/DeleteSelectedRunsPage.java -text
+src/org/labkey/test/pages/assay/ExclusionConfirmationPage.java -text
 src/org/labkey/test/pages/assay/RunQCPage.java -text
 src/org/labkey/test/pages/assay/SampleSetImportPage.java -text
 src/org/labkey/test/pages/core/UserNotificationsPage.java -text

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -24,9 +25,12 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.assay.ExclusionConfirmationPage;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -138,6 +142,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
 
+        verifyAssayDataExclusions();
+
         log("Import TSV GPAT assay");
         clickProject(getProjectName());
         _fileBrowserHelper.importFile(GPAT_ASSAY_TSV, "Create New General Assay Design");
@@ -228,6 +234,124 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertTextPresent(
                 "Header", "HCJDRSZ07IVO6P", "HCJDRSZ07IL1GX", "HCJDRSZ07H5SPZ",
                 "CACCAGACAGGTGTTATGGTGTGTGCCTGTAATCCCAGCTACTTGGGAGGGAGCTCAGGT");
+    }
+
+    private void verifyAssayDataExclusions()
+    {
+        log("Verify assay data exclusion");
+        DataRegionTable assayResultsTable = goToAssayResults(ASSAY_NAME_XLSX, GPAT_ASSAY_XLSX);
+        log("Verify 'Exclude' button is disabled until row selection is made");
+        Locator disabledExclude = Locator.tagWithClass("a", "labkey-disabled-button").withText("Exclude");
+        assertElementPresent(disabledExclude);
+        int rowsToExclude = 10;
+        log("Exclude the first " + rowsToExclude + " data rows from for assay run " + ASSAY_NAME_XLSX + " " + GPAT_ASSAY_XLSX);
+        for (int i = 0 ; i < rowsToExclude; i++)
+            assayResultsTable.checkCheckbox(i);
+        assayResultsTable.clickHeaderButton("Exclude");
+        ExclusionConfirmationPage confirmPage = new ExclusionConfirmationPage(getDriver());
+        String comment1 = "first exclusion of " + rowsToExclude + " rows";
+        confirmPage.verifyCountAndSave(rowsToExclude, comment1);
+
+        log("Verify confirm exclusion redirects back to assay results page");
+        assertElementPresent(Locator.tagWithText("h3", ASSAY_NAME_XLSX + " Results"));
+
+        log("Verify exclusion highlight");
+        Assert.assertEquals("Number of rows highlighted as excluded is not as expected",rowsToExclude, Locator.css(".labkey-error-row").findElements(getDriver()).size());
+
+        int startInd = 5;
+        int endInd = 15;
+        log("Create another exclusion event with overlapping data rows. Exclude data row " + (startInd + 1) + " through row " + endInd);
+        for (int i = startInd ; i < endInd; i++)
+            assayResultsTable.checkCheckbox(i);
+        assayResultsTable.clickHeaderButton("Exclude");
+        String comment2 = "second exclusion of " + (endInd - startInd) + " rows";
+        confirmPage.verifyCountAndSave(endInd - startInd, comment2);
+
+        Locator.XPathLocator runFilterLoc = Locator.tagWithClass("div", "lk-region-context-action").append(Locator.tagWithClass("i", "fa-filter"));
+        String runFilter = runFilterLoc.findElement(getDriver()).getText();
+
+        Locator viewExclusionReportHeaderBtn = Locator.linkWithText("view excluded data");
+
+        log("Go to Exclusion Report");
+        clickAndWait(viewExclusionReportHeaderBtn);
+        DataRegionTable exclusionReportTable = new DataRegionTable.DataRegionFinder(getDriver()).find();
+
+        log("Verify Exclusion Report is filtered down to Run that the link is coming from");
+        assertElementPresent(runFilterLoc.withText(runFilter));
+
+        log("Verify Exclusion Report columns and content");
+        Assert.assertEquals("Exclusion report data row count is not as expected", endInd, exclusionReportTable.getDataRowCount());
+        List<String> expectedColumns = Arrays.asList("Additive", "Run", "Excluded By", "Excluded At", "Exclusion Comment", "Row Id");
+        List<String> columns = exclusionReportTable.getColumnLabels();
+        for (String expected : expectedColumns)
+            Assert.assertTrue("Column is missing: " + expected, columns.contains(expected));
+        List<String> rowContent = exclusionReportTable.getRowDataAsText(0, "Additive", "Run", "Exclusion Comment", "Row Id");
+        Assert.assertEquals("Row 1 content not as expected", Arrays.asList("ACD", GPAT_ASSAY_XLSX, comment1, "1"), rowContent);
+        rowContent = exclusionReportTable.getRowDataAsText(startInd, "Additive", "Run", "Exclusion Comment", "Row Id");
+        Assert.assertEquals("Row " + (startInd + 1) + " content not as expected", Arrays.asList("ACD", GPAT_ASSAY_XLSX, comment2, String.valueOf(startInd + 1)), rowContent);
+
+        log("Verify Exclusion Report link from runs view");
+        goToAssayHome(ASSAY_NAME_XLSX);
+        clickAndWait(Locator.linkWithText("view runs"));
+        clickAndWait(viewExclusionReportHeaderBtn);
+        assertElementNotPresent(runFilterLoc.withText(runFilter));
+
+        log("Verify Exclusions Warning present on re import run with exclusions present");
+        Locator exclusionWarningHeader = Locator.tagWithClass("span", "labkey-wp-title-text").withText("Exclusions Warning");
+        goToAssayResults(ASSAY_NAME_XLSX, GPAT_ASSAY_XLSX);
+        assayResultsTable.clickHeaderButton("Re-import run");
+        clickButton("Next");
+        assertElementPresent(exclusionWarningHeader);
+        assertTextPresent("The run you are replacing has " + endInd + " exclusions");
+
+        log("Verify Exclusion Report is filtered down to Run from re-import run page");
+        clickAndWait(Locator.tagWithClass("a", "labkey-text-link").withText("exclusions report"));
+        assertElementPresent(runFilterLoc.withText(runFilter));
+
+        log("Remove all exclusions");
+        DataRegionTable exclusionTable = goToExclusionsTable();
+        Assert.assertEquals("Exclusion record count is not as expected", 2, exclusionTable.getDataRowCount());
+        exclusionTable.checkAll();
+        Locator deleteBtn = Locator.tagWithAttribute("a", "data-original-title","Delete");
+        click(deleteBtn);
+        assertAlert("Are you sure you want to delete the selected rows?");
+
+        log("Verify ExclusionMaps are deleted with Exclusion");
+        DataRegionTable exclusionMapTable = goToExclusionMapsTable();
+        Assert.assertEquals("Exclusion map should have been cleared on exclusion deletion", 0, exclusionMapTable.getDataRowCount());
+        assertElementNotPresent(deleteBtn);
+
+        log("Verify Exclusions Warning is not present on re import run with 0 exclusions");
+        goToAssayResults(ASSAY_NAME_XLSX, GPAT_ASSAY_XLSX);
+        assayResultsTable.clickHeaderButton("Re-import run");
+        clickButton("Next");
+        assertElementNotPresent(exclusionWarningHeader);
+    }
+
+    private DataRegionTable goToExclusionsTable()
+    {
+        beginAt(getProjectName() + "/query-executeQuery.view?schemaName=exp&query.queryName=Exclusions");
+        return new DataRegionTable.DataRegionFinder(getDriver()).find();
+    }
+
+    private DataRegionTable goToExclusionMapsTable()
+    {
+        beginAt(getProjectName() + "/query-executeQuery.view?schemaName=exp&query.queryName=ExclusionMaps");
+        return new DataRegionTable.DataRegionFinder(getDriver()).find();
+    }
+
+    private DataRegionTable goToAssayResults(String assayName, String runName)
+    {
+        goToAssayHome(assayName);
+        clickAndWait(Locator.linkWithText("view runs"));
+        waitAndClickAndWait(Locator.tagWithText("a", runName));
+        return new DataRegionTable.DataRegionFinder(getDriver()).find();
+    }
+
+    private void goToAssayHome(String assayName)
+    {
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(assayName));
     }
 
     private void waitForGwtDialog(String caption)
