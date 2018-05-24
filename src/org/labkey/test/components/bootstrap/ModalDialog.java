@@ -39,6 +39,10 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         waitForReady();
     }
 
+    /**
+     * @deprecated Inline me. Use {@link ModalDialog.ModalDialogFinder}
+     */
+    @Deprecated
     static public ModalDialogFinder finder(WebDriver driver)
     {
         return new ModalDialogFinder(driver);
@@ -75,18 +79,23 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     public void close()
     {
         elementCache().closeButton.click();
-        getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
+        waitForClose();
     }
 
     public void dismiss()
     {
         Locator.tagWithClass("button", "close").findElement(getComponentElement()).click();
-        getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
+        waitForClose();
     }
 
     public void dismiss(String buttonText)
     {
         Locators.dismissButton(buttonText).findElement(getComponentElement()).click();
+        waitForClose();
+    }
+
+    protected void waitForClose()
+    {
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
     }
 
@@ -120,7 +129,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     {
         private Locator _locator;
 
-        private ModalDialogFinder(WebDriver driver)
+        public ModalDialogFinder(WebDriver driver)
         {
             super(driver);
             _locator=Locators.dialog;
