@@ -29,6 +29,7 @@ import org.labkey.test.util.TestLogger;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -193,6 +194,10 @@ public class MethodLoggingAspect
         else if (arg instanceof File)
         {
             argString = ((File) arg).getName();
+        }
+        else if (arg instanceof Duration)
+        {
+            argString = ((Duration) arg).toString().replace("PT", "");
         }
         else
         {
