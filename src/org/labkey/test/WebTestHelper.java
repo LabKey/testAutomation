@@ -26,7 +26,7 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -36,7 +36,6 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -45,6 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.api.reader.Readers;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -376,13 +376,33 @@ public class WebTestHelper
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
     public static void logToServer(String message)
     {
-        try(CloseableHttpClient client = (CloseableHttpClient)getHttpClient())
+        if (message.contains("\n"))
         {
-            logToServer(message, client, WebTestHelper.getBasicHttpContext());
+            String [] splitMessage = message.split("\n");
+            for (String thisMessage: splitMessage)
+            {
+                if (thisMessage.length() > 0)
+                    logToServer(thisMessage);
+            }
+            return;
         }
-        catch (IOException | CommandException e)
+
+        Connection connection = getRemoteApiConnection();
+        PostCommand command = new PostCommand("admin", "log");
+        Map<String, Object> params = new HashMap<>();
+        params.put("message", message);
+        command.setParameters(params);
+        try
+        {
+            command.execute(connection, "/");
+        }
+        catch (IOException e)
         {
             TestLogger.log("Unable to log message to server: " + e.getMessage());
+        }
+        catch (CommandException e)
+        {
+            TestLogger.log("Unable to log message to server: " + e.getStatusCode());
         }
     }
 
@@ -404,8 +424,8 @@ public class WebTestHelper
         String responseStatusLine = "";
         try
         {
-            HttpGet get = new HttpGet(encodedUrl);
-            response = client.execute(get, context);
+            HttpPost post = new HttpPost(encodedUrl);
+            response = client.execute(post, context);
             responseCode = response.getStatusLine().getStatusCode();
             responseStatusLine = response.getStatusLine().toString();
         }
@@ -421,7 +441,7 @@ public class WebTestHelper
     private static String encodeURI(String parameter)
     {
         // Percent-escape any characters that cause GetMethod to throw an exception.
-        return parameter.replaceAll(" ", "%20");
+        return URIUtil.encodePath(parameter);
     }
 
     public static HttpClient getHttpClient()
