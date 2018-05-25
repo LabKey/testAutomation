@@ -18,7 +18,6 @@ package org.labkey.test;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
@@ -26,19 +25,16 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.reader.Readers;
@@ -373,8 +369,13 @@ public class WebTestHelper
         return new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
-    // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
     public static void logToServer(String message)
+    {
+        logToServer(message, getRemoteApiConnection());
+    }
+
+    // Writes message to the labkey server log. Message parameter is output as sent
+    public static void logToServer(String message, Connection connection)
     {
         if (message.contains("\n"))
         {
@@ -382,12 +383,11 @@ public class WebTestHelper
             for (String thisMessage: splitMessage)
             {
                 if (thisMessage.length() > 0)
-                    logToServer(thisMessage);
+                    logToServer(thisMessage, connection);
             }
             return;
         }
 
-        Connection connection = getRemoteApiConnection();
         PostCommand command = new PostCommand("admin", "log");
         Map<String, Object> params = new HashMap<>();
         params.put("message", message);
@@ -404,44 +404,6 @@ public class WebTestHelper
         {
             TestLogger.log("Unable to log message to server: " + e.getStatusCode());
         }
-    }
-
-    public static void logToServer(String message, HttpClient client, HttpContext context) throws CommandException, IOException
-    {
-        if (message.contains("\n"))
-        {
-            String [] splitMessage = message.split("\n");
-            for (String thisMessage: splitMessage)
-            {
-                if (thisMessage.length() > 0)
-                    logToServer(thisMessage, client, context);
-            }
-            return;
-        }
-        String encodedUrl = getBaseURL() + "/admin/log.view?message=" + encodeURI(message);
-        HttpResponse response = null;
-        int responseCode;
-        String responseStatusLine = "";
-        try
-        {
-            HttpPost post = new HttpPost(encodedUrl);
-            response = client.execute(post, context);
-            responseCode = response.getStatusLine().getStatusCode();
-            responseStatusLine = response.getStatusLine().toString();
-        }
-        finally
-        {
-            if (null != response)
-                EntityUtils.consumeQuietly(response.getEntity());
-        }
-        if (responseCode != HttpStatus.SC_OK)
-            throw new CommandException("Contacting server at URL " + encodedUrl + " failed: " + responseStatusLine);
-    }
-
-    private static String encodeURI(String parameter)
-    {
-        // Percent-escape any characters that cause GetMethod to throw an exception.
-        return URIUtil.encodePath(parameter);
     }
 
     public static HttpClient getHttpClient()
