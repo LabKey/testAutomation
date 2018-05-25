@@ -23,16 +23,17 @@ import junit.framework.TestSuite;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONValue;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
@@ -45,11 +46,14 @@ import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.net.SocketTimeoutException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -146,7 +150,7 @@ public class JUnitTest extends TestSuite
         }
         catch (Throwable t)
         {
-            log("Unable to fetch Remote JUnit tests");
+            err("Unable to fetch Remote JUnit tests");
             t.printStackTrace();
             TestSuite testSuite = new TestSuite();
             testSuite.addTest(new Runner.ErrorTest(JUnitTest.class.getSimpleName(), t));
@@ -231,7 +235,7 @@ public class JUnitTest extends TestSuite
                     }
                 }
 
-                if (json == null || !(json instanceof Map))
+                if (!(json instanceof Map))
                     throw new AssertionFailedError("Can't parse or cast json response: " + responseBody);
 
                 TestSuite remotesuite = new JUnitTest();
@@ -287,60 +291,55 @@ public class JUnitTest extends TestSuite
         private final int _timeout;
 
         /** Stash and reuse so that we can keep using the same session instead of re-authenticating with every request */
-        private static final HttpContext context = WebTestHelper.getBasicHttpContext();
+        private static final Connection connection = WebTestHelper.getRemoteApiConnection();
 
         public RemoteTest(String remoteClass, int timeout)
         {
             super(remoteClass);
             _remoteClass = remoteClass;
             _timeout = timeout;
-
-            /* Configure to use cookies so that we remember our session ID */
-            context.setAttribute(HttpClientContext.COOKIE_STORE, new BasicCookieStore());
         }
 
         @Override
-        protected void runTest() throws Throwable
+        protected void runTest()
         {
-            // Need to clear request config to change socket timeout
-            context.setAttribute("http.request-config", null);
-
             long startTime = System.currentTimeMillis();
-            RequestConfig requestConfig = RequestConfig.custom()
-                    .setSocketTimeout(_timeout * 1000 * 2)
-                    .build();
-
-            HttpResponse response = null;
-            try (CloseableHttpClient client = WebTestHelper.getHttpClientBuilder()
-                    .setDefaultRequestConfig(requestConfig).build())
+            try
             {
-                URIBuilder builder = new URIBuilder(WebTestHelper.getBaseURL() + "/junit/go.view");
-                builder.addParameter("testCase", _remoteClass);
-                HttpGet method = new HttpGet(builder.build());
-                response = client.execute(method, context);
-                int status = response.getStatusLine().getStatusCode();
-                String responseBody = WebTestHelper.getHttpResponseBody(response);
+                Command command = new Command("junit", "go");
+                Map<String, Object> params = new HashMap<>();
+                params.put("testCase", _remoteClass);
+                command.setParameters(params);
+                command.setTimeout(_timeout * 1000 * 2);
 
-                WebTestHelper.logToServer(getLogTestString("successful", startTime) + ", " + dump(responseBody, false), client, context);
-                if (status == HttpStatus.SC_OK)
-                {
-                    log(getLogTestString("successful", startTime));
-                    log(dump(responseBody, true));
-                }
-                else
-                {
-                    log(getLogTestString("failed", startTime));
-                    fail("remote junit failed (HTTP status code " + status + "): " + _remoteClass + "\n" + dump(responseBody, true));
-                }
+                CommandResponse response = command.execute(connection, "/");
+                Map<String, Object> resultJson = response.getParsedData();
+
+                if (resultJson.get("wasSuccessful") != Boolean.TRUE)
+                    throw new RuntimeException("Bad response from failed test: " + dump(resultJson, true));
+
+                WebTestHelper.logToServer(getLogTestString("successful", startTime) + ", " + dump(resultJson, false), connection);
+                log(getLogTestString("successful", startTime));
+                log(dump(resultJson, true));
+            }
+            catch (SocketTimeoutException ste)
+            {
+                String timed_out = getLogTestString("timed out", startTime);
+                err(timed_out);
+                throw new RuntimeException(timed_out, ste);
             }
             catch (IOException ioe)
             {
-                throw new RuntimeException(getLogTestString("failed", startTime), ioe);
+                String message = getLogTestString("failed: " + ioe.getMessage(), startTime);
+                err(message);
+                throw new RuntimeException(message, ioe);
             }
-            finally
+            catch (CommandException ce)
             {
-                if (response != null)
-                    EntityUtils.consumeQuietly(response.getEntity());
+                WebTestHelper.logToServer(getLogTestString("failed", startTime) + ", " + dump(ce.getResponseText(), false), connection);
+                err(getLogTestString("failed", startTime));
+                err(dump(ce.getResponseText(), false));
+                fail(("remote junit failed (HTTP status code " + ce.getStatusCode() + "): " + _remoteClass) + "\n" + dump(ce.getResponseText(), true));
             }
         }
 
@@ -356,11 +355,19 @@ public class JUnitTest extends TestSuite
             if (json == null)
                 return response;
 
+            return dump(json, dumpFailures);
+        }
+
+        @NotNull
+        private static String dump(Map<String, Object> json, boolean dumpFailures)
+        {
             StringBuilder sb = new StringBuilder();
-            sb.append("ran: ").append(json.get("runCount"));
-//            sb.append(", errors: ").append(json.get("errorCount"));
-            sb.append(", failed: ").append(json.get("failureCount")).append("\n");
-//            dumpFailures(sb, (List<Map<String, Object>>) json.get("errors"));
+            sb.append("ran: ").append(json.get("runCount")).append(", ");
+            sb.append("failed: ").append(json.get("failureCount"));
+            Object ignored = json.get("ignored");
+            if (ignored != null)
+                sb.append(", ignored: ").append(ignored);
+            sb.append("\n");
             if(dumpFailures) dumpFailures(sb, (List<Map<String, Object>>) json.get("failures"));
             return sb.toString();
         }
@@ -381,11 +388,21 @@ public class JUnitTest extends TestSuite
 
     }
 
+    static void err(String str)
+    {
+        log(str, System.err);
+    }
+
     static void log(String str)
+    {
+        log(str, System.out);
+    }
+
+    static void log(String str, PrintStream printStream)
     {
         if (str == null || str.length() == 0)
             return;
         String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date());      // Include time with log entry.  Use format that matches labkey log.
-        System.out.println(d + " " + str);
+        printStream.println(d + " " + str);
     }
 }
