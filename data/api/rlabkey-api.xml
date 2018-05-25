@@ -786,8 +786,27 @@
         </url>
         <response>
             <![CDATA[
-                "Domain deleted\"
-                "success\"
+                [1] "Domain deleted"
+                $success
+                [1] TRUE
+            ]]>
+        </response>
+    </test>
+    <test name="create a domain from a domain template" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.domain.create(baseUrl="%baseUrl%", folderPath="%projectName%", domainTemplate="Priority", module="simpletest", domainGroup="todolist")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $success
+                [1] TRUE
+                $templateDescription
+                [1] "simpletest: todolist#Priority"
+                $name
+                [1] "Priority"
             ]]>
         </response>
     </test>
