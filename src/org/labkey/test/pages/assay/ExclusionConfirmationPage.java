@@ -9,7 +9,6 @@ import org.openqa.selenium.WebElement;
 
 public class ExclusionConfirmationPage extends LabKeyPage
 {
-    public static final Locator GRID_TABLE_LOC = Locator.css("table.labkey-data-region");
     private DataRegionTable excludedRowsDataGrid = null;
 
     public ExclusionConfirmationPage(WebDriver driver)
@@ -21,20 +20,16 @@ public class ExclusionConfirmationPage extends LabKeyPage
 
     public ExclusionConfirmationPage setComment(String comment)
     {
-        WebElement input = Locator.xpath("//textarea[@name='comment']").findElement(getDriver());
+        WebElement input = Locator.css("textarea[name=comment]").findElement(getDriver());
         setFormElement(input, comment);
         return this;
     }
 
     public DataRegionTable getTrackingDataGrid()
     {
-        if (isElementPresent(GRID_TABLE_LOC))
-        {
-            if (excludedRowsDataGrid == null)
-                excludedRowsDataGrid = new DataRegionTable.DataRegionFinder(getDriver()).find();
-            return excludedRowsDataGrid;
-        }
-        return null;
+        if (excludedRowsDataGrid == null)
+            excludedRowsDataGrid = new DataRegionTable.DataRegionFinder(getDriver()).find();
+        return excludedRowsDataGrid;
     }
 
     public void verifyCountAndSave(int exclusionCount, String comment)

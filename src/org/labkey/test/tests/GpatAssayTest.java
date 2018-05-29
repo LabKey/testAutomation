@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
@@ -30,7 +31,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -241,8 +241,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         log("Verify assay data exclusion");
         DataRegionTable assayResultsTable = goToAssayResults(ASSAY_NAME_XLSX, GPAT_ASSAY_XLSX);
         log("Verify 'Exclude' button is disabled until row selection is made");
-        Locator disabledExclude = Locator.tagWithClass("a", "labkey-disabled-button").withText("Exclude");
-        assertElementPresent(disabledExclude);
+        WebElement excludeButton = assayResultsTable.getHeaderButton("Exclude");
+        Assert.assertTrue("Exclude button not initially disabled", excludeButton.getAttribute("class").contains("disabled"));
         int rowsToExclude = 10;
         log("Exclude the first " + rowsToExclude + " data rows from for assay run " + ASSAY_NAME_XLSX + " " + GPAT_ASSAY_XLSX);
         for (int i = 0 ; i < rowsToExclude; i++)
@@ -252,8 +252,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         String comment1 = "first exclusion of " + rowsToExclude + " rows";
         confirmPage.verifyCountAndSave(rowsToExclude, comment1);
 
-        log("Verify confirm exclusion redirects back to assay results page");
-        assertElementPresent(Locator.tagWithText("h3", ASSAY_NAME_XLSX + " Results"));
+        assertEquals("Exclusion redirected to wrong page", ASSAY_NAME_XLSX + " Results", getText(Locators.bodyTitle()));
 
         log("Verify exclusion highlight");
         Assert.assertEquals("Number of rows highlighted as excluded is not as expected",rowsToExclude, Locator.css(".labkey-error-row").findElements(getDriver()).size());
@@ -267,8 +266,9 @@ public class GpatAssayTest extends BaseWebDriverTest
         String comment2 = "second exclusion of " + (endInd - startInd) + " rows";
         confirmPage.verifyCountAndSave(endInd - startInd, comment2);
 
-        Locator.XPathLocator runFilterLoc = Locator.tagWithClass("div", "lk-region-context-action").append(Locator.tagWithClass("i", "fa-filter"));
+        Locator.XPathLocator runFilterLoc = DataRegionTable.Locators.filterContextAction();
         String runFilter = runFilterLoc.findElement(getDriver()).getText();
+        Assert.assertTrue("Filter context message is not as expected", runFilter.contains("Run "));
 
         Locator viewExclusionReportHeaderBtn = Locator.linkWithText("view excluded data");
 
@@ -297,7 +297,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertElementNotPresent(runFilterLoc.withText(runFilter));
 
         log("Verify Exclusions Warning present on re import run with exclusions present");
-        Locator exclusionWarningHeader = Locator.tagWithClass("span", "labkey-wp-title-text").withText("Exclusions Warning");
+        Locator exclusionWarningHeader = Locators.panelWebpartTitle.withText("Exclusions Warning");
         goToAssayResults(ASSAY_NAME_XLSX, GPAT_ASSAY_XLSX);
         assayResultsTable.clickHeaderButton("Re-import run");
         clickButton("Next");
@@ -312,13 +312,13 @@ public class GpatAssayTest extends BaseWebDriverTest
         DataRegionTable exclusionTable = goToExclusionsTable();
         Assert.assertEquals("Exclusion record count is not as expected", 2, exclusionTable.getDataRowCount());
         exclusionTable.checkAll();
-        Locator deleteBtn = Locator.tagWithAttribute("a", "data-original-title","Delete");
-        click(deleteBtn);
+        exclusionTable.clickHeaderButton("Delete");
         assertAlert("Are you sure you want to delete the selected rows?");
 
         log("Verify ExclusionMaps are deleted with Exclusion");
         DataRegionTable exclusionMapTable = goToExclusionMapsTable();
         Assert.assertEquals("Exclusion map should have been cleared on exclusion deletion", 0, exclusionMapTable.getDataRowCount());
+        Locator deleteBtn = Locator.tagWithAttribute("a", "data-original-title","Delete");
         assertElementNotPresent(deleteBtn);
 
         log("Verify Exclusions Warning is not present on re import run with 0 exclusions");
@@ -326,6 +326,35 @@ public class GpatAssayTest extends BaseWebDriverTest
         assayResultsTable.clickHeaderButton("Re-import run");
         clickButton("Next");
         assertElementNotPresent(exclusionWarningHeader);
+
+        goToAdminConsole().clickAuditLog();
+        doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "Assay/Experiment events"));
+        DataRegionTable auditTable =  new DataRegionTable("query", getDriver());
+
+        log("Verify audit log for adding and deleting exclusions");
+        String[][] columnAndValues = new String[][] {
+                    {"Created By", getDisplayName()},
+                    {"Assay/Protocol", ASSAY_NAME_XLSX}, {"Run", GPAT_ASSAY_XLSX},
+                    {"Comment", "10 data rows have been marked for exclusion for run '" + GPAT_ASSAY_XLSX +
+                            "' with comment '" + comment1 + "'. DataRowId: 1,2"},
+                };
+        verifyAuditLog(auditTable, columnAndValues, 3);
+
+        columnAndValues = new String[][] {
+                {"Created By", getDisplayName()},
+                {"Assay/Protocol", ASSAY_NAME_XLSX}, {"Run", GPAT_ASSAY_XLSX},
+                {"Comment", "Exclusion event has been deleted from run 'trial01a.xlsx'"},
+        };
+        verifyAuditLog(auditTable, columnAndValues, 0);
+    }
+
+    private void verifyAuditLog(DataRegionTable auditTable, String[][] columnAndValues, int rowId)
+    {
+        for (String[] columnAndValue : columnAndValues)
+        {
+            Assert.assertTrue("Audit log is not as expected for " + columnAndValue[0],
+                    auditTable.getDataAsText(rowId, columnAndValue[0]).contains(columnAndValue[1]));
+        }
     }
 
     private DataRegionTable goToExclusionsTable()

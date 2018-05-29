@@ -1345,6 +1345,11 @@ public class DataRegionTable extends DataRegion
         {
             return Locator.tagWithClass("tr", "labkey-col-header-row").attributeEndsWith("id", "-float");
         }
+
+        public static Locator.XPathLocator filterContextAction()
+        {
+            return Locator.tagWithClass("div", "lk-region-context-action").withChild(Locator.tagWithClass("i", "fa-filter"));
+        }
     }
 
     public class Elements extends ElementCache
