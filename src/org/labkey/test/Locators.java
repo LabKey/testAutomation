@@ -22,8 +22,7 @@ public abstract class Locators
     public static final Locator.XPathLocator alertWarning = Locator.byClass("alert").withClass("alert-warning");
     public static final Locator signInLink = Locator.tagWithAttributeContaining("a", "href", "login.view");
     public static final Locator.XPathLocator folderTab = Locator.tagWithClass("div", "lk-nav-tabs-ct").append(Locator.tagWithClass("ul", "lk-nav-tabs")).childTag("li");
-    public static final Locator.XPathLocator portalWebpartTitle = Locator.tagWithClass("div", "labkey-wp-title-text");
-    public static final Locator.XPathLocator panelWebpartTitle = Locator.tagWithClass("span", "labkey-wp-title-text");
+    public static final Locator.XPathLocator panelWebpartTitle = Locator.byClass("labkey-wp-title-text");
 
     public static Locator.XPathLocator headerContainer()
     {
