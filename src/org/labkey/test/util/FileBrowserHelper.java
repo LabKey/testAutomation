@@ -155,14 +155,13 @@ public class FileBrowserHelper extends WebDriverWrapper
         return Locator.waitForAnyElement(shortWait(), gridRow, emptyGrid);
     }
 
-    @LogMethod
+    @LogMethod(quiet = true)
     public void checkFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
         checkFileBrowserFileCheckbox(fileName, true);
     }
 
-    @LogMethod
-    public void checkFileBrowserFileCheckbox(@LoggedParam String fileName, boolean checkTheBox)
+    private void checkFileBrowserFileCheckbox(String fileName, boolean checkTheBox)
     {
         scrollToGridRow(fileName);
 
@@ -176,7 +175,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
-    @LogMethod
+    @LogMethod(quiet = true)
     public void uncheckFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
         checkFileBrowserFileCheckbox(fileName, false);
