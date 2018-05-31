@@ -262,7 +262,8 @@ public class PortalHelper extends WebDriverWrapper
     {
         SiteNavBar navBar = new SiteNavBar(getDriver());
         boolean wasInAdminModeAlready = navBar.isInPageAdminMode();
-        navBar.enterPageAdminMode();
+        if (!wasInAdminModeAlready)
+            navBar.enterPageAdminMode();
         return wasInAdminModeAlready;
     }
 
