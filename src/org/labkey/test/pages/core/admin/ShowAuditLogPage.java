@@ -3,13 +3,10 @@ package org.labkey.test.pages.core.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.DataRegionTable;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
@@ -32,14 +29,14 @@ public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
 
     public ShowAuditLogPage selectView(String viewName)
     {
-        doAndWaitForPageToLoad(()-> {
-                try                 // the selection will cause a page refresh; ignore staleElementReferences in here
-                {
-                    new Select(elementCache().viewSelect).selectByVisibleText(viewName);
-                }catch (StaleElementReferenceException stale){}
+        if (!viewName.equals(elementCache().viewSelect.getFirstSelectedOption().getText()))
+        {
+            doAndWaitForPageToLoad(() -> {
+                elementCache().viewSelect.selectByVisibleText(viewName);
             });
-
-        return new ShowAuditLogPage(getDriver());
+            clearCache();
+        }
+        return this;
     }
 
     public DataRegionTable getLogTable()
@@ -54,10 +51,7 @@ public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-
-        WebElement viewSelect = Locator.tagWithName("select", "view")
-                .findWhenNeeded(this).withTimeout(4000);
-
-
+        Select viewSelect = SelectWrapper.Select(Locator.tagWithName("select", "view")).timeout(4000)
+                .findWhenNeeded(this);
     }
 }

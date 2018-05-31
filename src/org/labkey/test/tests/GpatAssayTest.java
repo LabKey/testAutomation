@@ -327,11 +327,9 @@ public class GpatAssayTest extends BaseWebDriverTest
         clickButton("Next");
         assertElementNotPresent(exclusionWarningHeader);
 
-        goToAdminConsole().clickAuditLog();
-        if (!getSelectedOptionText(Locator.name("view")).equalsIgnoreCase("Assay/Experiment events"))
-            doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "Assay/Experiment events"));
-
-        DataRegionTable auditTable =  new DataRegionTable("query", getDriver());
+        DataRegionTable auditTable = goToAdminConsole().clickAuditLog()
+                .selectView("Assay/Experiment events")
+                .getLogTable();
 
         log("Verify audit log for adding and deleting exclusions");
         String[][] columnAndValues = new String[][] {
