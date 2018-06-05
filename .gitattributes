@@ -845,7 +845,6 @@ src/org/labkey/test/tests/issues/IssueDomainSharingTest.java -text
 src/org/labkey/test/tests/issues/IssuesAdminTest.java -text
 src/org/labkey/test/tests/issues/IssuesAttachmentTest.java -text
 src/org/labkey/test/tests/issues/IssuesTest.java -text
-src/org/labkey/test/tests/jdbc/LabKeyJDBCTest.java -text
 src/org/labkey/test/tests/list/ColumnResizeTest.java -text
 src/org/labkey/test/tests/list/ListTest.java -text
 src/org/labkey/test/tests/microarray/BaseExpressionMatrixTest.java -text
