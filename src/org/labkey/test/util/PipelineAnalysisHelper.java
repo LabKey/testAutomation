@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.openqa.selenium.WebElement;
@@ -35,6 +34,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -68,20 +69,31 @@ public class PipelineAnalysisHelper
     @LogMethod
     public void runPipelineAnalysis(@LoggedParam String importAction, String[] files, Map<String, String> protocolProperties, String analyzeButtonText, boolean expectSuccess)
     {
-        StringBuilder fileString = new StringBuilder();
+        Set<String> fileNames = new HashSet<>();
+        String filePrefix = null;
 
         _test.goToModule("FileContent");
         for (String file : files)
         {
-            _test._fileBrowserHelper.selectFileBrowserItem(file);
-            if (fileString.length() > 0)
-                fileString.append("\n");
-            fileString.append(file.substring(file.lastIndexOf("/") + 1, file.length()));
+            String directory = file.substring(0, file.lastIndexOf("/") + 1);
+            String fileName = file.substring(file.lastIndexOf("/") + 1, file.length());
+            if (filePrefix == null)
+            {
+                filePrefix = directory;
+                _test._fileBrowserHelper.selectFileBrowserItem(file);
+            }
+            else
+            {
+                if (!filePrefix.equals(directory))
+                    throw new IllegalArgumentException("Unable to import files from different directories: " + filePrefix + " & " + directory);
+                _test._fileBrowserHelper.checkFileBrowserFileCheckbox(fileName);
+            }
+            fileNames.add(fileName);
         }
         _test._fileBrowserHelper.selectImportDataAction(importAction);
 
-        _test.waitForElement(Locator.id("fileStatus").withText(fileString.toString()), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, false);
-        assertEquals("Wrong file(s)", fileString.toString(), _test.getText(Locator.id("fileStatus")));
+        _test.waitForElement(Locator.id("fileStatus").containing(files[0]), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, false);
+        assertEquals("Wrong file(s)", fileNames, new HashSet<>(Arrays.asList(_test.getText(Locator.id("fileStatus")).trim().split("\n"))));
         for (Map.Entry<String, String> property : protocolProperties.entrySet())
         {
             if ("xmlParameters".equals(property.getKey()))
