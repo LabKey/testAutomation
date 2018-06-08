@@ -1034,7 +1034,7 @@ public abstract class Locator extends By
         @Override
         public XPathLocator child(XPathLocator childLocator)
         {
-            XPathLocator xLoc = this._xLoc.child(childLocator);
+            XPathLocator xLoc = _xLoc.child(childLocator);
             if (!(childLocator instanceof XPathCSSLocator))
                 return xLoc;
 

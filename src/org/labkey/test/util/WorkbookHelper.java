@@ -85,7 +85,7 @@ public class WorkbookHelper
 
         WorkbookFolderType(String type)
         {
-            this._type = type;
+            _type = type;
         }
 
         @Override

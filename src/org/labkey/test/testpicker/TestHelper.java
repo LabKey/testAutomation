@@ -748,7 +748,7 @@ public class TestHelper
 
         NodeSelectionListener(JTree tree)
         {
-          this._tree = tree;
+            _tree = tree;
         }
 
         public void mouseClicked(MouseEvent e)

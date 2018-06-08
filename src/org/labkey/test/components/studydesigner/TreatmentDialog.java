@@ -111,7 +111,7 @@ public class TreatmentDialog extends Window
 
         Sections(String text)
         {
-            this._text = text;
+            _text = text;
         }
     }
 }

@@ -154,7 +154,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
     public void setExperimentLinks(String[] experimentLinks)
     {
-        this._experimentLinks = experimentLinks;
+        _experimentLinks = experimentLinks;
     }
 
     public PipelineFolder.MailSettings getMailSettings()

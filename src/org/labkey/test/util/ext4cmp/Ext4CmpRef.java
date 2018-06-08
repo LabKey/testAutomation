@@ -32,16 +32,16 @@ public class Ext4CmpRef
 
     public Ext4CmpRef(String id, WebDriverWrapper test)
     {
-        this._id = id;
-        this._test = test;
-        this._el = test.getDriver().findElement(By.id(id));
+        _id = id;
+        _test = test;
+        _el = test.getDriver().findElement(By.id(id));
     }
 
     public Ext4CmpRef(WebElement el, WebDriverWrapper test)
     {
-        this._id = el.getAttribute("id");
-        this._test = test;
-        this._el = el;
+        _id = el.getAttribute("id");
+        _test = test;
+        _el = el;
     }
 
     public String getId()
