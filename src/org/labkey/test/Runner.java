@@ -831,7 +831,7 @@ public class Runner extends TestSuite
         Map<String, Class> testsClasses = new HashMap<>();
 
         List<String> nonSuites = Arrays.asList("daily", "weekly", "test", "continue", "empty");
-        Collection<String> suites = _suites.getSuites().stream()
+        List<String> suites = new ArrayList<>(_suites.getSuites()).stream()
                 .filter(s -> !nonSuites.contains(s.toLowerCase())) // Ignore non-suites and suites that don't get run regularly
                 .sorted(Comparator.comparingInt((String s) -> _suites.getTestSet(s).getTestList().size()).reversed())
                 .collect(Collectors.toList());
@@ -870,8 +870,8 @@ public class Runner extends TestSuite
                         String.join(", ", testsSuites.get(testName)) + "\t" + // Suites
                         getTestTimeout(testClass) + "\t" + // Timeout
                         testClass.getPackage().getName() + "\t" + // Package
-                        String.join("\t", checkedInterfaces.stream().map(i -> i.isAssignableFrom(testClass) ? "Y" : "").collect(Collectors.toList())) + "\t" + // Interfaces
-                        String.join("\t", suites.stream().map(s -> testsSuites.get(testName).contains(s) ? "Y" : "").collect(Collectors.toList())) + "\t" + // Suites
+                        String.join("\t", checkedInterfaces.stream().map(i -> i.isAssignableFrom(testClass) ? i.getSimpleName() : "").collect(Collectors.toList())) + "\t" + // Interfaces
+                        String.join("\t", suites.stream().map(s -> testsSuites.get(testName).contains(s) ? s : "").collect(Collectors.toList())) + "\t" + // Suites
                         "\n";
                 writer.write(line);
             }
