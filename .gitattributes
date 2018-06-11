@@ -396,6 +396,7 @@ src/org/labkey/remoteapi/security/GetRolesCommand.java -text
 src/org/labkey/remoteapi/security/GetRolesResponse.java -text
 src/org/labkey/remoteapi/security/RemoveAssignmentCommand.java -text
 src/org/labkey/test/AssayAPITest.java -text
+src/org/labkey/test/BaseBlueGreenTest.java -text
 src/org/labkey/test/BaseWebDriverTest.java -text
 src/org/labkey/test/CachingLocator.java -text
 src/org/labkey/test/Cleanable.java -text
@@ -425,6 +426,7 @@ src/org/labkey/test/aspects/TestPerfAspect.java -text
 src/org/labkey/test/categories/Assays.java -text
 src/org/labkey/test/categories/BVT.java -text
 src/org/labkey/test/categories/Base.java -text
+src/org/labkey/test/categories/BlueGreen.java -text
 src/org/labkey/test/categories/Charting.java -text
 src/org/labkey/test/categories/Cluster.java -text
 src/org/labkey/test/categories/Continue.java -text
