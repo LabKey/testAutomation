@@ -65,7 +65,7 @@ public class RReportHelper
         }
     }
 
-    protected BaseWebDriverTest _test;
+    protected final BaseWebDriverTest _test;
 
     public RReportHelper(BaseWebDriverTest test)
     {
@@ -74,6 +74,9 @@ public class RReportHelper
 
     private static File rExecutable = null;
     private static File rScriptExecutable = null;
+
+    private static final String localEngineName = "R Scripting Engine";
+    private static final String dockerEngineName = "R Docker Scripting Engine";
 
     private static final String INSTALL_RLABKEY = "install.packages(\"Rlabkey\", repos=\"http://cran.r-project.org\")";
     private static final String INSTALL_LOCAL_RLABKEY = "install.packages(\"%s\", repos=NULL)";
@@ -201,19 +204,20 @@ public class RReportHelper
         return ensureRConfig(false);
     }
 
+    /**
+     * Ensure that an R script engine is configured
+     * @param useDocker Specify whether the Dockerized R engine should be used
+     * @return R version (e.g. 3.4.2); or "RDocker" for dockerized R engine
+     */
     @LogMethod
     public String ensureRConfig(boolean useDocker)
     {
         _test.ensureAdminMode();
 
-        ShowAdminPage.beginAt(_test).clickViewsAndScripting();
+        ConfigureReportsAndScriptsPage scripts = ShowAdminPage.beginAt(_test).clickViewsAndScripting();
 
         _test.log("Check if R already is configured");
 
-        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
-
-        String localEngineName = "R Scripting Engine";
-        String dockerEngineName = "R Docker Scripting Engine";
         String rVersion = null;
         if (scripts.isEnginePresent(dockerEngineName))
         {
@@ -255,6 +259,7 @@ public class RReportHelper
                 else // Reset R scripting engine on TeamCity
                 {
                     scripts.deleteEngine(localEngineName);
+                    _test.refresh(); // Avoid menu alignment issue on TeamCity
                 }
             }
 
@@ -552,5 +557,4 @@ public class RReportHelper
 
         return lineCount == expectedLineCount;
     }
-
 }
