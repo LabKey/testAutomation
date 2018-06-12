@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -33,31 +34,29 @@ import java.util.Map;
 /**
  * org.labkey.query.reports.ReportsController.ConfigureReportsAndScriptsAction
  */
-public class ConfigureReportsAndScriptsPage
+public class ConfigureReportsAndScriptsPage extends LabKeyPage
 {
     private static final String DEFAULT_ENGINE = "Mozilla Rhino";
 
-    BaseWebDriverTest _test;
-
-    public ConfigureReportsAndScriptsPage(BaseWebDriverTest test)
+    public ConfigureReportsAndScriptsPage(WebDriverWrapper test)
     {
-        _test = test;
+        super(test);
         waitForEnginesGrid();
     }
 
     public void waitForEnginesGrid()
     {
-        _test.waitForElement(Locators.enginesGridRowForName(DEFAULT_ENGINE));
+        waitForElement(Locators.enginesGridRowForName(DEFAULT_ENGINE));
     }
 
     public boolean isEnginePresentForLanguage(String language)
     {
-        return _test.isElementPresent(Locators.enginesGridRowForLanguage(language));
+        return isElementPresent(Locators.enginesGridRowForLanguage(language));
     }
 
     public boolean isEnginePresent(String engineName)
     {
-        return _test.isElementPresent(Locators.enginesGridRowForName(engineName));
+        return isElementPresent(Locators.enginesGridRowForName(engineName));
     }
 
     @LogMethod
@@ -72,25 +71,25 @@ public class ConfigureReportsAndScriptsPage
         Map<Locator, String> configMap = config.getConfigMap();
 
         String menuText = "New " + type + " Engine";
-        _test._extHelper.clickExtMenuButton(false, Locator.id("btn_addEngine"), menuText);
-        WebElement menuItem = Locator.menuItem(menuText).findElementOrNull(_test.getDriver());
+        _extHelper.clickExtMenuButton(false, Locator.id("btn_addEngine"), menuText);
+        WebElement menuItem = Locator.menuItem(menuText).findElementOrNull(getDriver());
         if (menuItem != null)
         {
-            _test.mouseOver(menuItem);
+            mouseOver(menuItem);
             menuItem.click(); // Retry for unresponsive button
         }
-        WebElement window = _test.waitForElement(Locators.editEngineWindow);
+        WebElement window = waitForElement(Locators.editEngineWindow);
 
         for (Map.Entry<Locator, String> entry : configMap.entrySet())
         {
-            _test.setFormElement(entry.getKey(), entry.getValue());
+            setFormElement(entry.getKey(), entry.getValue());
         }
 
-        String language = _test.getFormElement(Locator.id("editEngine_languageName"));
+        String language = getFormElement(Locator.id("editEngine_languageName"));
 
-        _test.clickButton("Submit", 0);
-        _test.shortWait().until(ExpectedConditions.stalenessOf(window));
-        _test.waitForElement(Locators.enginesGridRowForLanguage(language));
+        clickButton("Submit", 0);
+        shortWait().until(ExpectedConditions.stalenessOf(window));
+        waitForElement(Locators.enginesGridRowForLanguage(language));
     }
 
     public void deleteEngine(String engineName)
@@ -117,27 +116,27 @@ public class ConfigureReportsAndScriptsPage
     {
         selectEngineNamed(engineName);
 
-        _test.clickButton("Edit", 0);
+        clickButton("Edit", 0);
 
-        _test.waitForElement(Locators.editEngineWindow);
+        waitForElement(Locators.editEngineWindow);
     }
 
     private void deleteSelectedEngine(WebElement selectedEngineRow)
     {
-        _test.clickButton("Delete", 0);
+        clickButton("Delete", 0);
 
-        _test._extHelper.waitForExtDialog("Delete Engine Configuration", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        String confirmationMessage = Locator.byClass("ext-mb-text").findElement(_test.getDriver()).getText();
+        _extHelper.waitForExtDialog("Delete Engine Configuration", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        String confirmationMessage = Locator.byClass("ext-mb-text").findElement(getDriver()).getText();
 
         TestLogger.log("Deleting: " + confirmationMessage.substring(confirmationMessage.indexOf(":") + 1));
 
-        _test.clickButton("Yes", 0);
-        _test.shortWait().until(ExpectedConditions.stalenessOf(selectedEngineRow));
+        clickButton("Yes", 0);
+        shortWait().until(ExpectedConditions.stalenessOf(selectedEngineRow));
     }
 
     private WebElement selectEngineNamed(String engineName)
     {
-        WebElement engineRow = Locators.enginesGridRowForName(engineName).findElement(_test.getDriver());
+        WebElement engineRow = Locators.enginesGridRowForName(engineName).findElement(getDriver());
         engineRow.click();
         return engineRow;
     }
@@ -145,7 +144,7 @@ public class ConfigureReportsAndScriptsPage
     @Nullable
     private WebElement selectFirstEngineForLanguage(String engineLanguage)
     {
-        WebElement engineRow = Locators.enginesGridRowForLanguage(engineLanguage).findElementOrNull(_test.getDriver());
+        WebElement engineRow = Locators.enginesGridRowForLanguage(engineLanguage).findElementOrNull(getDriver());
         if (engineRow != null)
             engineRow.click();
         return engineRow;
