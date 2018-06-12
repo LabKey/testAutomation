@@ -18,6 +18,7 @@ package org.labkey.test.pages.core.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -161,10 +162,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().systemPropertiesLink);
     }
 
-    public void clickViewsAndScripting()
+    public ConfigureReportsAndScriptsPage clickViewsAndScripting()
     {
         goToAdminConsoleLinksSection();
         clickAndWait(elementCache().viewsAndScriptingLink);
+        return new ConfigureReportsAndScriptsPage(this);
     }
 
     protected ElementCache newElementCache()
