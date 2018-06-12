@@ -1427,17 +1427,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void clickTab(String tabname)
     {
-        tabname = tabname.trim();
-        if (tabname.equals("+") || tabname.equals("add"))
-            throw new IllegalArgumentException("Use PortalHelper.addTab");
-
-        log("Selecting tab " + tabname);
-        WebElement tab = Locator.folderTab(tabname).waitForElement(shortWait());
-        mouseOver(tab);
-        clickAndWait(tab);
+        clickTab(tabname, true);
     }
 
-    public void clickTabSamePage(String tabname)
+    public void clickTab(String tabname, boolean waitForPageLoad)
     {
         tabname = tabname.trim();
         if (tabname.equals("+") || tabname.equals("add"))
@@ -1446,7 +1439,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         log("Selecting tab " + tabname);
         WebElement tab = Locator.folderTab(tabname).waitForElement(shortWait());
         mouseOver(tab);
-        tab.click();
+        if (waitForPageLoad)
+            clickAndWait(tab);
+        else
+            tab.click();
     }
 
     public void verifyTabSelected(String caption)
