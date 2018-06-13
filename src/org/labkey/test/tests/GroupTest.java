@@ -22,7 +22,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.html.Table;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -31,7 +31,6 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
-import org.openqa.selenium.NoSuchElementException;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,7 +40,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Category(BVT.class)
+@Category(DailyC.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class GroupTest extends BaseWebDriverTest
 {

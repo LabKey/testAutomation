@@ -24,7 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.flow.FlowReportsWebpart;
@@ -51,7 +51,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Category({BVT.class, Flow.class})
+@Category({DailyB.class, Flow.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 18)
 public class FlowTest extends BaseFlowTest
 {

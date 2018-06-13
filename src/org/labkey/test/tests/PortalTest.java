@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.WebPart;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -39,7 +39,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category({BVT.class})
+@Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class PortalTest extends BaseWebDriverTest
 {

@@ -26,7 +26,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.files.WebFilesPage;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.SimpleHttpRequest;
@@ -42,7 +42,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category(BVT.class)
+@Category(DailyB.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class WebDavTest extends BaseWebDriverTest
 {
