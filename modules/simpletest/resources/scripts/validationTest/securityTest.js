@@ -13,7 +13,7 @@ function doTest()
 {
     var errors = [];
 
-    var containerPath = "ServerSideJavascriptTest";
+    var containerPath = "_ServerSideJavascriptTest";
     var userEmail = "securitytest@validation.test";
     var groupName = "validationTest group";
     var currentUser = LABKEY.Security.currentUser;
@@ -33,7 +33,7 @@ function doTest()
         name: containerPath,
         containerPath: '/'
     });
-    if( container.path != "/" + containerPath )
+    if( container.path !== "/" + containerPath )
         errors[errors.length] = new Error("Security.createContainer() = "+Ext.util.JSON.encode(container));
 
     // LABKEY.Security.createGroup()
@@ -41,7 +41,7 @@ function doTest()
         groupName: groupName,
         containerPath: containerPath
     });
-    if( group.name != groupName )
+    if( group.name !== groupName )
         errors[errors.length] = new Error("Security.createGroup() = "+Ext.util.JSON.encode(group));
 
     // LABKEY.Security.createNewUser()
@@ -50,7 +50,7 @@ function doTest()
         sendEmail: false,
         containerPath: containerPath
     });
-    if( user.email != userEmail )
+    if( user.email !== userEmail )
         errors[errors.length] = new Error("Security.createNewUser() = "+Ext.util.JSON.encode(user));
 
     // LABKEY.Security.addGroupMembers()
@@ -63,10 +63,9 @@ function doTest()
         errors[errors.length] = new Error("Security.addGroupMembers() = "+Ext.util.JSON.encode(result));
 
     // LABKEY.Security.getFolderTypes()
-    result = LABKEY.Security.getFolderTypes({
-    });
-    if( !result.Study )
-        errors[errors.length] = new Error("Security.getFolderTypes() = "+Ext.util.JSON.encode(result));
+    result = LABKEY.Security.getFolderTypes({});
+    if (!result.Collaboration)
+        errors[errors.length] = new Error("Security.getFolderTypes() = " + Ext.util.JSON.encode(result));
 
     result = LABKEY.Security.getSecurableResources({
         containerPath: containerPath
@@ -80,15 +79,17 @@ function doTest()
     });
     if( !result.groups )
         errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
-    else if( result.groups.length >= 3
+    else if (result.groups.length < 4
             // User should be in at least 3 groups (id): Guests (-3), All Site Users (-2), and Site Administrators (-1)
             // They should be in order by group Id; possibly starting with the Developers (-4) group.
-            && result.groups[(result.groups[0].id * -1) - 3].id != -3
-            && result.groups[(result.groups[0].id * -1) - 3].name != 'Guests'
-            && result.groups[(result.groups[0].id * -1) - 2].id != -2
-            && result.groups[(result.groups[0].id * -1) - 2].name != 'All Site Users'
-            && result.groups[(result.groups[0].id * -1) - 1].id != -1
-            && result.groups[(result.groups[0].id * -1) - 1].name != 'Site Administrators')
+            || result.groups[0].id !== -4
+            || result.groups[0].name !== "Developers"
+            || result.groups[1].id !== -3
+            || result.groups[1].name !== 'Guests'
+            || result.groups[2].id !== -2
+            || result.groups[2].name !== 'All Site Users'
+            || result.groups[3].id !== -1
+            || result.groups[3].name !== 'Site Administrators')
         errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
 
     // LABKEY.Security.getContainers()
@@ -121,17 +122,18 @@ function doTest()
     if( !permissions.container || !permissions.user || permissions.user.userId!=user.userId )
         errors[errors.length] = new Error("Security.getUserPermissions() = "+Ext.util.JSON.encode(permissions));
 
+    // LABKEY.Security.hasPermission()
     result = LABKEY.Security.hasPermission({
-        perms:permissions,
-        perm:LABKEY.Security.permissions.read
+        perms: permissions.container.permissions,
+        perm: LABKEY.Security.permissions.read
     });
-    if ( result != 0 )
+    if ( result !== 0 )
         errors[errors.length] = new Error("Security.hasPermission() = "+Ext.util.JSON.encode(result));
 
-    //ECmaError: scripts/labkey/Security.js: 923
-//    result = LABKEY.Security.getRoles({
-//    });
-//    errors[errors.length] = new Error("Security.getRoles() = "+Ext.util.JSON.encode(result));
+    // LABKEY.Security.getRoles()
+    result = LABKEY.Security.getRoles({});
+    if (!(result.permissions && result.permissions.length > 0))
+        errors[errors.length] = new Error("Security.getRoles() = " + Ext.util.JSON.encode(result));
 
     // LABKEY.Security.removeGroupMembers()
     result = LABKEY.Security.removeGroupMembers({
@@ -163,7 +165,7 @@ function doTest()
     result = LABKEY.Security.deleteContainer({
         containerPath: containerPath
     });
-    if( Ext.util.JSON.encode(result) != Ext.util.JSON.encode({}) )
+    if( Ext.util.JSON.encode(result) !== Ext.util.JSON.encode({}) )
         errors[errors.length] = new Error("Security.deleteContainer() = "+Ext.util.JSON.encode(result));
 
     if( errors.length > 0 )
