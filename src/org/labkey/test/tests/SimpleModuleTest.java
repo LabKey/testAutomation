@@ -33,6 +33,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -947,7 +948,11 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         clickButton("RunContainerPathTest", 0);
 
-        waitForText("Container path tests complete: 8 passing tests.");
+        waitForText("Workbook tests complete.");
+
+        List<WebElement> errors = Locators.labkeyError.findElements(getDriver());
+
+        assertTrue("Error running workbook test: " + errors.get(0).getText(), errors.isEmpty());
     }
 
     @LogMethod
