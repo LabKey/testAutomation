@@ -1,5 +1,4 @@
 <div id="testDiv"></div>
-<head>
 <script type="text/javascript">
 LABKEY.requiresExt3ClientAPI(function(){
         var div = Ext.get('testDiv');
@@ -28,6 +27,10 @@ LABKEY.requiresExt3ClientAPI(function(){
                     html: date.format('h:i:s:u') + '\tTest Complete<br>'
                 });
             }
+        }
+
+        function logErr(msg, errorMsg){
+            logMsg(msg, errorMsg ? errorMsg : 'unknown');
         }
 
         logMsg('Test Started');
@@ -156,7 +159,7 @@ LABKEY.requiresExt3ClientAPI(function(){
                     success("Deleted file: " + path);
                 },
                 failure: function(e){
-                    logMsg('ERROR: unable to delete file ' + path, e.message);
+                    logErr('ERROR: unable to delete file ' + path, e.message);
                 },
                 scope: this
             }, this);
@@ -170,10 +173,10 @@ LABKEY.requiresExt3ClientAPI(function(){
                         success('Loaded directory with ' + records.length + ' files');
                     }
                     else
-                        logMsg('ERROR: wrong number of files found', 'Expected:  ' + expected + ', Found: ' + records.length);
+                        logErr('ERROR: wrong number of files found', 'Expected:  ' + expected + ', Found: ' + records.length);
                 },
                 failure: function(e){
-                    logMsg('ERROR: unable to load files', e.message);
+                    logErr('ERROR: unable to load files', e.message);
                 },
                 scope: this
             }, this);
@@ -186,7 +189,7 @@ LABKEY.requiresExt3ClientAPI(function(){
                     success('Created folder: ' + name);
                 },
                 failure: function(response, options){
-                    logMsg("ERROR: unable to creating directory: " + name, response.message);
+                    logErr("ERROR: unable to creating directory: " + name, response.message);
                 },
                 scope: this
             });
@@ -201,7 +204,7 @@ LABKEY.requiresExt3ClientAPI(function(){
                     success("Moved files from: " + source + ' to ' + dest);
                 },
                 failure: function(response, options){
-                    logMsg('ERROR: unable to perform move', response.message);
+                    logErr('ERROR: unable to perform move', response.message);
                 },
                 scope: this
             });
@@ -216,7 +219,7 @@ LABKEY.requiresExt3ClientAPI(function(){
                     success("Renamed file from: " + source + ' to ' + dest);
                 },
                 failure: function(response, options){
-                    logMsg('ERROR: unable to perform rename', response.message);
+                    logErr('ERROR: unable to perform rename', response.message);
                 },
                 scope: this
             });
@@ -229,10 +232,10 @@ LABKEY.requiresExt3ClientAPI(function(){
                     if(records.length > 0)
                         success("Obtained history for: " + path);
                     else
-                        logMsg('ERROR: problem getting history for file', path);
+                        logErr('ERROR: problem getting history for file', path);
                 },
                 failure: function(response, options){
-                    logMsg('ERROR getting history for file: ' + path, response.message);
+                    logErr('ERROR getting history for file: ' + path, response.message);
                 },
                 scope: this
             });
@@ -248,7 +251,7 @@ LABKEY.requiresExt3ClientAPI(function(){
                         success("File created: " + name);
                     else
                     {
-                        logMsg('ERROR: unable to create file', "status = " + client.status);
+                        logErr('ERROR: unable to create file', "status = " + client.status);
                         console.log(client)
                     }
                 }
@@ -273,17 +276,17 @@ LABKEY.requiresExt3ClientAPI(function(){
                         if(record)
                             success('Verified file exists: ' + filepath);
                         else
-                            logMsg('ERROR: file does not exist', filepath);
+                            logErr('ERROR: file does not exist', filepath);
                     }
                     else {
                         if(!record)
                             success('Verified file does not exist: ' + filepath);
                         else
-                            logMsg('ERROR: file exists', filepath);
+                            logErr('ERROR: file exists', filepath);
                     }
                 },
                 failure: function(e){
-                    logMsg('ERROR: unable to load files: ' + path, e.message);
+                    logErr('ERROR: unable to load files: ' + path, e.message);
                 },
                 scope: this
             }, this);
@@ -300,4 +303,3 @@ LABKEY.requiresExt3ClientAPI(function(){
         }
     });
 </script>
-</head>
