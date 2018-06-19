@@ -60,7 +60,7 @@ public class MdxCommand extends PostCommand<MdxResponse>
 
     public void setConfigId(String configId)
     {
-        this._configId = configId;
+        _configId = configId;
     }
 
     public String getSchemaName()
@@ -70,7 +70,7 @@ public class MdxCommand extends PostCommand<MdxResponse>
 
     public void setSchemaName(String schemaName)
     {
-        this._schemaName = schemaName;
+        _schemaName = schemaName;
     }
 
     public String getCubeName()
@@ -80,7 +80,7 @@ public class MdxCommand extends PostCommand<MdxResponse>
 
     public void setCubeName(String cubeName)
     {
-        this._cubeName = cubeName;
+        _cubeName = cubeName;
     }
 
     public String getQuery()
