@@ -99,7 +99,8 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
         public SimpleWebDriverComponentFinder(WebDriverComponentFinder finder)
         {
             this(finder.getDriver(), finder.locator());
-            index(finder.getIndex());
+            if (finder.getIndex() != null)
+                index(finder.getIndex());
             timeout(finder.getTimeout());
         }
 

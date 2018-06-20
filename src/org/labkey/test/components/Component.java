@@ -207,7 +207,8 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         public SimpleComponentFinder(ComponentFinder finder)
         {
             this(finder.locator());
-            index(finder.getIndex());
+            if (finder.getIndex() != null)
+                index(finder.getIndex());
             timeout(finder.getTimeout());
         }
 
