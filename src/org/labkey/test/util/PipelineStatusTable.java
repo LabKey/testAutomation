@@ -17,6 +17,8 @@ package org.labkey.test.util;
 
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.pages.LabKeyPage;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,12 +27,31 @@ import static org.junit.Assert.assertTrue;
 
 public class PipelineStatusTable extends DataRegionTable
 {
-    private final Map<String, String> _mapDescriptionStatus;
+    public static final String REGION_NAME = "StatusFiles";
+    private final Map<String, String> _mapDescriptionStatus = new LinkedHashMap<>();
 
     public PipelineStatusTable(WebDriverWrapper test)
     {
-        super("StatusFiles", test);
-        _mapDescriptionStatus = new LinkedHashMap<>();
+        super(REGION_NAME, test);
+    }
+
+    private PipelineStatusTable(WebElement el, WebDriver driver)
+    {
+        super(el, driver);
+    }
+
+    public static SimpleWebDriverComponentFinder<PipelineStatusTable> finder(WebDriver driver)
+    {
+        return new SimpleWebDriverComponentFinder<PipelineStatusTable>(new DataRegionFinder(driver).withName("StatusFiles"))
+        {
+            @Override
+            protected PipelineStatusTable construct(WebElement el, WebDriver driver)
+            {
+                PipelineStatusTable pipelineStatusTable = new PipelineStatusTable(el, driver);
+                pipelineStatusTable.setRegionName(REGION_NAME);
+                return pipelineStatusTable;
+            }
+        };
     }
 
     @Override
