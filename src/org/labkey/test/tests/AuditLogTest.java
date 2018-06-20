@@ -45,6 +45,7 @@ import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -159,21 +160,9 @@ public class AuditLogTest extends BaseWebDriverTest
     protected void turnOnAuditLogFile()
     {
         goToHome();
-
-        ManagerPage lmp = ManagerPage.beginAt(this);
-
-        lmp.setSearchText("org.labkey.audit.event");
-
-        log("Setting org.labkey.audit.event and org.labkey.audit.event.UserAuditEvent to ALL.");
-        if (lmp.getLoggingLevel("org.labkey.audit.event") != LoggingLevel.ALL)
-            lmp.setLoggingLevel("org.labkey.audit.event", LoggingLevel.ALL).clickRefresh();
-
-        // Setting org.labkey.audit.event.UserAuditEvent because it is called out in the webapps/log4j.xml file.
-        if ((lmp.isLoggerPresent("org.labkey.audit.event.UserAuditEvent")) && (lmp.getLoggingLevel("org.labkey.audit.event.UserAuditEvent") != LoggingLevel.ALL))
-            lmp.setLoggingLevel("org.labkey.audit.event.UserAuditEvent", LoggingLevel.ALL).clickRefresh();
-
-        lmp.setSearchText("").clickRefresh();
-
+        Log4jUtils.setLogLevel("org.labkey.audit.event", LoggingLevel.ALL);
+        Log4jUtils.setLogLevel("org.labkey.audit.event.UserAuditEvent", LoggingLevel.ALL);
+        Log4jUtils.setLogLevel("org.labkey.core.Login.LoginController", LoggingLevel.ALL);
     }
 
     protected ArrayList<String> getAuditLogFromFile() throws IOException
