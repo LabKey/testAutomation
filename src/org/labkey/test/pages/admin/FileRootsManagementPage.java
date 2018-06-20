@@ -75,20 +75,24 @@ public class FileRootsManagementPage extends FolderManagementPage
         return this;
     }
 
+    public FileRootsManagementPage setMigrateFilesOption(MigrateFilesOption option)
+    {
+        elementCache().migrateFilesOption.selectByValue(option.name());
+        return this;
+    }
+
     public PipelineStatusTable saveAndCopyFiles()
     {
-        elementCache().migrateFilesOption.selectByValue(MigrateFilesOption.copy.name());
+        setMigrateFilesOption(MigrateFilesOption.copy);
         clickSave();
-        clickAndWait(Locator.linkWithText("View Pipeline Job"));
-        return PipelineStatusTable.finder(getDriver()).waitFor();
+        return viewMigrationPipelineJob();
     }
 
     public PipelineStatusTable saveAndMoveFiles()
     {
-        elementCache().migrateFilesOption.selectByValue(MigrateFilesOption.move.name());
+        setMigrateFilesOption(MigrateFilesOption.move);
         clickSave();
-        clickAndWait(Locator.linkWithText("View Pipeline Job"));
-        return PipelineStatusTable.finder(getDriver()).waitFor();
+        return viewMigrationPipelineJob();
     }
 
     public FileRootsManagementPage clickSave()
@@ -96,6 +100,12 @@ public class FileRootsManagementPage extends FolderManagementPage
         clickAndWait(elementCache().saveButton);
         clearCache();
         return this;
+    }
+
+    public PipelineStatusTable viewMigrationPipelineJob()
+    {
+        clickAndWait(Locator.linkWithText("View Pipeline Job"));
+        return PipelineStatusTable.finder(getDriver()).waitFor();
     }
 
     public String getRootPath()
