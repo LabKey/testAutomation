@@ -87,10 +87,20 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
             return (F)this;
         }
 
+        protected final int getTimeout()
+        {
+            return timeout;
+        }
+
         public F index(int index)
         {
             this.index = index;
             return (F)this;
+        }
+
+        protected final Integer getIndex()
+        {
+            return index;
         }
 
         public SimpleComponentFinder<C> locatedBy(Locator loc)
@@ -192,6 +202,13 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         public SimpleComponentFinder(Locator locator)
         {
             _locator = locator;
+        }
+
+        public SimpleComponentFinder(ComponentFinder finder)
+        {
+            this(finder.locator());
+            index(finder.getIndex());
+            timeout(finder.getTimeout());
         }
 
         @Override

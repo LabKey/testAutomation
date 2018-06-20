@@ -91,4 +91,28 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
 
         protected abstract Cmp construct(WebElement el, WebDriver driver);
     }
+
+    public static abstract class SimpleWebDriverComponentFinder<Cmp> extends WebDriverComponentFinder<Cmp, SimpleWebDriverComponentFinder<Cmp>>
+    {
+        private final Locator _locator;
+
+        public SimpleWebDriverComponentFinder(WebDriverComponentFinder finder)
+        {
+            this(finder.getDriver(), finder.locator());
+            index(finder.getIndex());
+            timeout(finder.getTimeout());
+        }
+
+        public SimpleWebDriverComponentFinder(WebDriver driver, Locator locator)
+        {
+            super(driver);
+            this._locator = locator;
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return _locator;
+        }
+    }
 }
