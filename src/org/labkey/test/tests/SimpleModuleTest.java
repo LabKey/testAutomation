@@ -948,11 +948,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         clickButton("RunContainerPathTest", 0);
 
-        waitForText("Workbook tests complete.");
+        waitForElement(Locator.id("containerPathDiv").withText());
 
         List<WebElement> errors = Locators.labkeyError.findElements(getDriver());
 
-        assertTrue("Error running workbook test: " + errors.get(0).getText(), errors.isEmpty());
+        if (!errors.isEmpty())
+            fail("Error(s) running workbook test. First error: " + errors.get(0).getText());
     }
 
     @LogMethod
