@@ -1741,16 +1741,33 @@ public abstract class WebDriverWrapper implements WrapsDriver
     /**
      * Do something that should make an element disappear and reappear
      */
-    public WebElement doAndWaitForElementToRefresh(Runnable func, Locator loc, SearchContext context, WebDriverWait wait)
+    public WebElement doAndWaitForElementToRefresh(Runnable func, Supplier<WebElement> elementFinder, WebDriverWait wait)
     {
-        WebElement previousElement = loc.findElementOrNull(context);
+        WebElement previousElement = null;
+        try
+        {
+            previousElement = elementFinder.get();
+        }
+        catch (NoSuchElementException ignore) {}
 
         func.run();
 
         if (previousElement != null)
             wait.until(ExpectedConditions.stalenessOf(previousElement));
 
-        return wait.until(LabKeyExpectedConditions.elementPresent(loc, context));
+        return wait.until(new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(WebDriver input)
+            {
+                return elementFinder.get();
+            }
+        });
+    }
+
+    public WebElement doAndWaitForElementToRefresh(Runnable func, Locator loc, SearchContext context, WebDriverWait wait)
+    {
+        return doAndWaitForElementToRefresh(func, () -> loc.findElement(context), wait);
     }
 
     public WebElement doAndWaitForElementToRefresh(Runnable func, Locator loc, WebDriverWait wait)

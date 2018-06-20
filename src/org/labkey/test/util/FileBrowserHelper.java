@@ -43,7 +43,8 @@ import static org.labkey.test.components.ext4.Window.Window;
 
 public class FileBrowserHelper extends WebDriverWrapper
 {
-    public static final String IMPORT_SIGNAL_NAME = "import-actions-updated";
+    private static final String IMPORT_SIGNAL_NAME = "import-actions-updated";
+    private static final String FILE_LIST_SIGNAL_NAME = "file-list-updated";
     public static final Locator fileGridCell = Locator.tagWithClass("div", "labkey-filecontent-grid").append(Locator.tagWithClass("div", "x4-grid-cell-inner"));
 
     WrapsDriver _driver;
@@ -130,19 +131,20 @@ public class FileBrowserHelper extends WebDriverWrapper
         final WebElement folderTreeNode = waitForElement(folderTreeNodeLoc);
         waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
 
-        if (!folderTreeNode.getAttribute("class").contains("x4-grid-row-selected"))
+        boolean atRoot = !isElementPresent(fBrowser.append(Locator.byClass("x4-grid-row-selected"))); // Root node is not initially highlighted
+        if (atRoot && "0".equals(folderTreeNode.getAttribute("data-recordindex")))
         {
-            scrollIntoView(folderTreeNode);
-            try
-            {
-                doAndWaitForPageSignal(folderTreeNode::click, IMPORT_SIGNAL_NAME);
-            }
-            catch (StaleElementReferenceException staleSignal)
-            {
-                waitForElement(org.labkey.test.Locators.pageSignal(IMPORT_SIGNAL_NAME));
-            }
-            waitForGrid();
+            doAndWaitForPageSignal(folderTreeNode::click, IMPORT_SIGNAL_NAME);
         }
+        else if (!folderTreeNode.getAttribute("class").contains("x4-grid-row-selected"))
+        {
+            doAndWaitForFileListRefresh(folderTreeNode::click);
+        }
+    }
+
+    private void doAndWaitForFileListRefresh(Runnable func)
+    {
+        doAndWaitForElementToRefresh(() -> doAndWaitForPageSignal(func, FILE_LIST_SIGNAL_NAME), this::waitForGrid, shortWait());
     }
 
     private WebElement waitForGrid()
@@ -251,6 +253,39 @@ public class FileBrowserHelper extends WebDriverWrapper
         Window(getDriver()).withTitle("Delete Files").waitFor()
                 .clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         waitForElementToDisappear(fileGridCell.withText(fileName));
+    }
+
+    public void deleteAll()
+    {
+        selectFileBrowserRoot();
+        List<Checkbox> checkboxes = Ext4Checkbox().locatedBy(Locators.gridRowCheckbox()).findAll(getDriver());
+        if (!checkboxes.isEmpty())
+        {
+            for (Checkbox checkbox : checkboxes)
+            {
+                scrollIntoView(checkbox.getComponentElement());
+                checkbox.check();
+            }
+            deleteSelectedFiles();
+        }
+    }
+
+    public void deleteSelectedFiles()
+    {
+        doAndWaitForFileListRefresh(() ->
+        {
+            clickFileBrowserButton(BrowserAction.DELETE);
+            Window(getDriver()).withTitle("Delete Files").waitFor()
+                    .clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        });
+    }
+
+    public void refreshFileList()
+    {
+        doAndWaitForFileListRefresh(() ->
+        {
+            clickFileBrowserButton(BrowserAction.REFRESH);
+        });
     }
 
     public void createFolder(String folderName)
@@ -490,7 +525,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         FOLDER_TREE("sitemap", "Toggle Folder Tree", "folderTreeToggle"),
         UP("arrow-up", "Parent Folder", "parentFolder"),
-        RELOAD("refresh", "Refresh", "refresh"),
+        REFRESH("refresh", "Refresh", "refresh"),
         NEW_FOLDER("folder", "Create Folder", "createDirectory"),
         DOWNLOAD("download", "Download", "download"),
         DELETE("trash-o", "Delete", "deletePath"),
@@ -564,7 +599,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     public void waitForFileGridReady()
     {
-        waitForElement(org.labkey.test.Locators.pageSignal(IMPORT_SIGNAL_NAME));
+        waitForElement(org.labkey.test.Locators.pageSignal(FILE_LIST_SIGNAL_NAME));
         waitForGrid();
     }
 
@@ -596,6 +631,11 @@ public class FileBrowserHelper extends WebDriverWrapper
         public static Locator.XPathLocator gridRowCheckbox(String fileName)
         {
             return gridRowWithNodeId(fileName).append(Locator.tagWithClass("div", "x4-grid-row-checker"));
+        }
+
+        public static Locator.XPathLocator gridRowCheckbox()
+        {
+            return gridRow().append(Locator.tagWithClass("div", "x4-grid-row-checker"));
         }
 
         public static Locator.XPathLocator gridRow()

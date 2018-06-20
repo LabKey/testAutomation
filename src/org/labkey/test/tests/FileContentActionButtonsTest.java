@@ -92,7 +92,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         assertActionsAvailable(
                 BrowserAction.FOLDER_TREE,
                 BrowserAction.UP,
-                BrowserAction.RELOAD,
+                BrowserAction.REFRESH,
                 BrowserAction.NEW_FOLDER,
                 BrowserAction.DOWNLOAD,
                 BrowserAction.DELETE,
@@ -115,7 +115,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         assertActionsAvailable(
                 BrowserAction.FOLDER_TREE,
                 BrowserAction.UP,
-                BrowserAction.RELOAD,
+                BrowserAction.REFRESH,
                 BrowserAction.NEW_FOLDER,
                 BrowserAction.DOWNLOAD,
                 BrowserAction.EDIT_PROPERTIES,
@@ -135,7 +135,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         assertActionsAvailable(
                 BrowserAction.FOLDER_TREE,
                 BrowserAction.UP,
-                BrowserAction.RELOAD,
+                BrowserAction.REFRESH,
                 BrowserAction.NEW_FOLDER,
                 BrowserAction.DOWNLOAD,
                 BrowserAction.EDIT_PROPERTIES,
@@ -155,7 +155,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         assertActionsAvailable(
                 BrowserAction.FOLDER_TREE,
                 BrowserAction.UP,
-                BrowserAction.RELOAD,
+                BrowserAction.REFRESH,
                 BrowserAction.DOWNLOAD,
                 BrowserAction.EMAIL_SETTINGS
         );
@@ -171,7 +171,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         click(Locator.xpath("//tr[@data-recordid='download']/td[2]")); // Unhide text for 'Download' button
         click(Locator.xpath("//tr[@data-recordid='download']/td[3]")); // Hide icon for 'Download' button
         click(Ext4Helper.Locators.ext4Button("submit"));
-        waitForElementToDisappear(BrowserAction.RELOAD.getButtonIconLocator());
+        waitForElementToDisappear(BrowserAction.REFRESH.getButtonIconLocator());
         waitForElementToDisappear(BrowserAction.DOWNLOAD.getButtonIconLocator());
         waitForElement(BrowserAction.DOWNLOAD.getButtonTextLocator());
 
@@ -182,8 +182,8 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         click(Ext4Helper.Locators.ext4Button("submit"));
         waitForElementToDisappear(BrowserAction.DOWNLOAD.getButtonTextLocator());
         waitForElementToDisappear(BrowserAction.DOWNLOAD.getButtonIconLocator());
-        waitForElement(BrowserAction.RELOAD.getButtonIconLocator());
-        waitForElement(BrowserAction.RELOAD.getButtonTextLocator());
+        waitForElement(BrowserAction.REFRESH.getButtonIconLocator());
+        waitForElement(BrowserAction.REFRESH.getButtonTextLocator());
 
         resetToDefaultToolbar();
         waitForElement(BrowserAction.UP.getButtonIconLocator());
