@@ -20,9 +20,12 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PipelineStatusTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import static org.labkey.test.components.html.RadioButton.RadioButton;
 
@@ -44,7 +47,16 @@ public class FileRootsManagementPage extends FolderManagementPage
         return new FileRootsManagementPage(wrapper.getDriver());
     }
 
+    /**
+     * @deprecated Renamed to {@link #selectFileRootType(FileRootOption)}
+     */
+    @Deprecated
     public FileRootsManagementPage setFileRoot(FileRootOption fileRootOption)
+    {
+        return selectFileRootType(fileRootOption);
+    }
+
+    public FileRootsManagementPage selectFileRootType(FileRootOption fileRootOption)
     {
         elementCache().findFileRootOptionRadio(fileRootOption.name()).check();
         return this;
@@ -52,8 +64,8 @@ public class FileRootsManagementPage extends FolderManagementPage
 
     public FileRootsManagementPage useCloudBasedStorage(String cloudRootName)
     {
-        elementCache().findFileRootOptionRadio("cloudRoot").check();
-        selectOptionByValue(Locator.id("cloudRootName"), cloudRootName);
+        selectFileRootType(FileRootOption.cloudRoot);
+        elementCache().cloudRootName.selectByValue(cloudRootName);
         return this;
     }
 
@@ -61,6 +73,22 @@ public class FileRootsManagementPage extends FolderManagementPage
     {
         elementCache().findCloudStoreCheckbox(name).set(enabled);
         return this;
+    }
+
+    public PipelineStatusTable saveAndCopyFiles()
+    {
+        elementCache().migrateFilesOption.selectByValue(MigrateFilesOption.copy.name());
+        clickSave();
+        clickAndWait(Locator.linkWithText("View Pipeline Job"));
+        return PipelineStatusTable.finder(getDriver()).waitFor();
+    }
+
+    public PipelineStatusTable saveAndMoveFiles()
+    {
+        elementCache().migrateFilesOption.selectByValue(MigrateFilesOption.move.name());
+        clickSave();
+        clickAndWait(Locator.linkWithText("View Pipeline Job"));
+        return PipelineStatusTable.finder(getDriver()).waitFor();
     }
 
     public FileRootsManagementPage clickSave()
@@ -77,7 +105,7 @@ public class FileRootsManagementPage extends FolderManagementPage
 
     public String getCloudRootName()
     {
-        return getSelectedOptionValue(elementCache().cloudRootName);
+        return elementCache().cloudRootName.getFirstSelectedOption().getAttribute("value");
     }
 
     public String getSelectedFileRootOption()
@@ -107,7 +135,8 @@ public class FileRootsManagementPage extends FolderManagementPage
             return RadioButton(fileRootOptionLoc.withAttribute("value", value)).find(this);
         }
         WebElement rootPath = Locator.id("rootPath").findWhenNeeded(this);
-        WebElement cloudRootName = Locator.id("cloudRootName").findWhenNeeded(this);
+        Select cloudRootName = SelectWrapper.Select(Locator.id("cloudRootName")).findWhenNeeded(this);
+        Select migrateFilesOption = SelectWrapper.Select(Locator.id("migrateFilesOption")).findWhenNeeded(this);
 
         Checkbox findCloudStoreCheckbox(String name)
         {
@@ -121,5 +150,12 @@ public class FileRootsManagementPage extends FolderManagementPage
         siteDefault,
         folderOverride,
         cloudRoot
+    }
+
+    public enum MigrateFilesOption
+    {
+        leave,
+        copy,
+        move
     }
 }
