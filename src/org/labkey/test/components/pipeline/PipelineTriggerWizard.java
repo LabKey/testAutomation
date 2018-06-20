@@ -168,8 +168,16 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public void saveConfiguration()
     {
+        saveConfiguration(true);
+    }
+
+    public void saveConfiguration(boolean wait)
+    {
         goToConfiguration();
-        getWrapper().clickAndWait(elementCache().saveButton);
+        if (wait)
+            getWrapper().clickAndWait(elementCache().saveButton);
+        else
+            elementCache().saveButton.click();
     }
 
     public void cancelEditing()
