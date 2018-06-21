@@ -105,7 +105,7 @@ public class FileRootsManagementPage extends FolderManagementPage
     public PipelineStatusTable viewMigrationPipelineJob()
     {
         clickAndWait(Locator.linkWithText("View Pipeline Job"));
-        return PipelineStatusTable.finder(getDriver()).waitFor();
+        return new PipelineStatusTable(this);
     }
 
     public String getRootPath()
