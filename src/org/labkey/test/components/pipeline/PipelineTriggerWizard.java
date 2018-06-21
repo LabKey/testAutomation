@@ -5,11 +5,15 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.components.labkey.LabKeyAlert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import static org.junit.Assert.assertEquals;
 
 public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWizard.ElementCache>
 {
@@ -168,16 +172,17 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public void saveConfiguration()
     {
-        saveConfiguration(true);
+        goToConfiguration();
+        getWrapper().clickAndWait(elementCache().saveButton);
     }
 
-    public void saveConfiguration(boolean wait)
+    public ModalDialog saveAndExpectError()
     {
         goToConfiguration();
-        if (wait)
-            getWrapper().clickAndWait(elementCache().saveButton);
-        else
-            elementCache().saveButton.click();
+        elementCache().saveButton.click();
+        LabKeyAlert labKeyAlert = new LabKeyAlert(getDriver(), 10000);
+        assertEquals("Pipeline Trigger Wizard did not produce an error as expected", "Error", labKeyAlert.getTitle());
+        return labKeyAlert;
     }
 
     public void cancelEditing()
