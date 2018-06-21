@@ -24,6 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -182,7 +183,12 @@ public class ETLHelper
 
         portalHelper.addQueryWebPart("Delete", ETL_TEST_SCHEMA, ETL_DELETE, null);
         portalHelper.addQueryWebPart("Transfers", ETL_TEST_SCHEMA, TRANSFER, null);
-        portalHelper.addQueryWebPart("TransformRun", DATAINTEGRATION_SCHEMA, "TransformRun", null);
+
+        // UNDONE: remove when we finalize casing of table names versus views across pg and mssql
+        String transformRun =  (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL) ?
+                "transformrun" : "TransformRun";
+
+        portalHelper.addQueryWebPart("TransformRun", DATAINTEGRATION_SCHEMA, transformRun, null);
         portalHelper.addQueryWebPart("TransformHistory", DATAINTEGRATION_SCHEMA, "TransformHistory", null);
         portalHelper.addQueryWebPart("TransformSummary", DATAINTEGRATION_SCHEMA, "TransformSummary", null);
         portalHelper.addWebPart("Data Transform Jobs");
