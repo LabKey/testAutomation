@@ -101,7 +101,8 @@ public abstract class AbstractAssayValidator
 
         Map<String, Object> row = new HashMap<>();
         row.put("Date", new Date());
-        row.put("Container", getRunProperty(Props.containerPath));
+        //NOTE: if a row provides a value for 'container', it needs to be a valid containerId, not path
+        //row.put("Container", getRunProperty(Props.containerPath));
         row.put("AssayId", getRunProperty(Props.assayId));
         row.put("AssayName", getRunProperty(Props.assayName));
         row.put("User", getRunProperty(Props.userName));
