@@ -62,6 +62,7 @@ public class DataRegionTest extends BaseWebDriverTest
                     new Pair<>("Filter by Tag equals blue", "testFilterArray"),
                     new Pair<>("Sort by Tag", "testSort"),
                     new Pair<>("Hide buttons", "testHideButtons"),
+                    new Pair<>("RStudio buttons", "testRStudioButtons"),
                     new Pair<>("Hide Edit and Details columns", "testHideColumns"),
                     new Pair<>("Set Paging to 3 with config", "testPagingConfig"),
                     new Pair<>("Set Paging to 2 with API", "testSetPaging"),
