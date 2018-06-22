@@ -13,7 +13,10 @@ target folder, that should be respected.  The same is true for both updateRows a
         var folderContainerId = LABKEY.Security.currentContainer.type === 'workbook' ? LABKEY.Security.currentContainer.parentId : LABKEY.Security.currentContainer.id;
         var workbook1;
         var workbook2;
-        var subfolder1;
+        var subfolder1 = 'this is a placeholder so we fail if the actual ID is not found';
+        var workbook1Path;
+        var workbook2Path;
+        var subfolder1Path = 'this is a placeholder so we fail if the actual ID is not found';
         var listName = 'TestList';
         var successCount = 0;
         var errorCount = 0;
@@ -58,6 +61,7 @@ target folder, that should be respected.  The same is true for both updateRows a
             success: function (response) {
                 success('Created workbook 1');
                 workbook1 = response.id;
+                workbook1Path = response.path;
             }
         });
 
@@ -71,6 +75,7 @@ target folder, that should be respected.  The same is true for both updateRows a
             success: function (response) {
                 success('Created workbook 2');
                 workbook2 = response.id;
+                workbook2Path = response.path;
             }
         });
 
@@ -85,6 +90,7 @@ target folder, that should be respected.  The same is true for both updateRows a
             success: function (response) {
                 success('Created subfolder: API_Test_Folder');
                 subfolder1 = response.id;
+                subfolder1Path = response.path;
             }
         });
 
@@ -138,8 +144,10 @@ target folder, that should be respected.  The same is true for both updateRows a
                 filterArray: [LABKEY.Filter.create(pkField, pks.join(';'), LABKEY.Filter.Types.IN)],
                 columns: expectedFieldName + ',' + containerField,
                 success: function(results){
+                    var pass = true;
                     if (results.rows.length !== expectedRows){
                         logError('Insufficient rows, found ' + results.rows.length + ', expected: ' + expectedRows);
+                        pass = false;
                     }
 
                     for (var i=0;i<results.rows.length;i++){
@@ -147,15 +155,19 @@ target folder, that should be respected.  The same is true for both updateRows a
                         if (!r[containerField] || !r[expectedFieldName]){
                             logError('Unable to find expected or container fields: ' + r[containerField] + '/' + r[expectedFieldName]);
                             console.log(r);
+                            pass = false;
                         }
 
                         if (r[containerField] !== r[expectedFieldName]){
                             logError('Row lacks correct container, expected ' + r[expectedFieldName] + ', but found ' + r[containerField]);
+                            pass = false;
                         }
                     }
 
-                    success('Inserted ' + results.rows.length + ' rows');
-                    doTestUpdate(results, pks, pkField, containerField, expectedFieldName);
+                    if (pass){
+                        success('Inserted ' + results.rows.length + ' rows');
+                        doTestUpdate(results, pks, pkField, containerField, expectedFieldName);
+                    }
                 }
             }
         }
@@ -178,8 +190,10 @@ target folder, that should be respected.  The same is true for both updateRows a
                 failure: failureCallback,
                 rows: rows,
                 success: function (results) {
+                    var pass = true;
                     if (results.rows.length !== pks.length){
                         logError('Insufficient rows, found ' + results.rows.length + ', expected: ' + pks.length);
+                        pass = false;
                     }
 
                     for (var i = 0; i < results.rows.length; i++) {
@@ -189,11 +203,14 @@ target folder, that should be respected.  The same is true for both updateRows a
                         if ('updated' !== val) {
                             console.log(r);
                             logError('Row was not updated.  value was: ' + val);
+                            pass = false;
                         }
                     }
 
-                    success('Updated ' + results.rowsAffected + ' rows');
-                    doTestDelete(results, rows, pkField, containerField, expectedFieldName);
+                    if (pass) {
+                        success('Updated ' + results.rowsAffected + ' rows');
+                        doTestDelete(results, rows, pkField, containerField, expectedFieldName);
+                    }
                 }
             });
         }
@@ -218,8 +235,9 @@ target folder, that should be respected.  The same is true for both updateRows a
                     if (results.rowsAffected !== origRows.length){
                         logError('Insufficient rows, found ' + results.rowsAffected + ', expected: ' + origRows.length);
                     }
-
-                    success('Deleted ' + results.rowsAffected + ' rows');
+                    else {
+                        success('Deleted ' + results.rowsAffected + ' rows');
+                    }
                 }
             });
         }
@@ -261,7 +279,9 @@ target folder, that should be respected.  The same is true for both updateRows a
                     if (response.exception !== 'Row is not from the correct container: ' + subfolder1){
                         logError('Incorrect error from cross-container insert: ' + response.exception);
                     }
-                    success('Cross-container insert into non-workbook');
+                    else {
+                        success('Cross-container insert into non-workbook');
+                    }
                 },
                 success: function (response) {
                     logError('ERROR: This should have failed because it is not from the correct container');
@@ -284,6 +304,12 @@ target folder, that should be respected.  The same is true for both updateRows a
                 },{
                     field1: workbook2,
                     container: workbook2
+                },{
+                    field1: workbook1,
+                    container: workbook1Path
+                },{
+                    field1: workbook2,
+                    container: workbook2Path
                 }],
                 success: function (response) {
                     multiSelect.add(LABKEY.Query.selectRows, getVerifySelect(response, 'id', 'field1', 'container'))
@@ -306,6 +332,12 @@ target folder, that should be respected.  The same is true for both updateRows a
                 },{
                     Name: workbook2,
                     container: workbook2
+                },{
+                    Name: workbook1,
+                    container: workbook1Path
+                },{
+                    Name: workbook2,
+                    container: workbook2Path
                 }],
                 success: function (response) {
                     multiSelect.add(LABKEY.Query.selectRows, getVerifySelect(response, 'rowid', 'Name', 'Container'));

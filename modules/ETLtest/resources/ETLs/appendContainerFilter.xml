@@ -5,7 +5,15 @@
 <transforms>
     <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
         <description>Copy to target</description>
-        <source schemaName="etltest" queryName="source" containerFilter="CurrentAndSubfolders"/>
+        <source schemaName="etltest" queryName="source" containerFilter="CurrentAndSubfolders">
+            <sourceColumns>
+                <column>rowid</column>
+                <column>id</column>
+                <column>name</column>
+                <!--Note: container is excluded, since if a container value is included in the row maps, LK will attempt to insert against that container, rather than insert all rows into the current container as this is expecting-->
+                <!--<column>container</container>-->
+            </sourceColumns>
+        </source>
         <destination schemaName="etltest" queryName="target" />
     </transform>
 </transforms>
