@@ -19,6 +19,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.util.Maps;
@@ -59,6 +60,19 @@ public class FileRootsManagementPage extends FolderManagementPage
     public FileRootsManagementPage selectFileRootType(FileRootOption fileRootOption)
     {
         elementCache().findFileRootOptionRadio(fileRootOption.name()).check();
+        return this;
+    }
+
+    public FileRootsManagementPage useDefaultFileRoot()
+    {
+        selectFileRootType(FileRootOption.siteDefault);
+        return this;
+    }
+
+    public FileRootsManagementPage useCustomFileRoot(String filePath)
+    {
+        selectFileRootType(FileRootOption.folderOverride);
+        elementCache().folderRootPath.set(filePath);
         return this;
     }
 
@@ -145,6 +159,8 @@ public class FileRootsManagementPage extends FolderManagementPage
             return RadioButton(fileRootOptionLoc.withAttribute("value", value)).find(this);
         }
         WebElement rootPath = Locator.id("rootPath").findWhenNeeded(this);
+        Input folderRootPath = Input.Input(Locator.id("folderRootPath"), getDriver()).findWhenNeeded(this);
+
         Select cloudRootName = SelectWrapper.Select(Locator.id("cloudRootName")).findWhenNeeded(this);
         Select migrateFilesOption = SelectWrapper.Select(Locator.id("migrateFilesOption")).findWhenNeeded(this);
 

@@ -737,6 +737,7 @@ src/org/labkey/test/tests/FileBrowserIconsTest.java -text
 src/org/labkey/test/tests/FileContentActionButtonsTest.java -text
 src/org/labkey/test/tests/FileContentDownloadTest.java -text
 src/org/labkey/test/tests/FileContentUploadTest.java -text
+src/org/labkey/test/tests/FileRootMigrationTest.java -text
 src/org/labkey/test/tests/FilesQueryTest.java -text
 src/org/labkey/test/tests/FilesWebpartFileRootTest.java -text
 src/org/labkey/test/tests/FilterTest.java -text
