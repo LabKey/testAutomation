@@ -209,7 +209,7 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         Input nameInput = new Input(Locator.tagWithName("input", "name").findWhenNeeded(this), getDriver());
         Input descriptionInput =  new Input(Locator.tagWithName("textarea", "description").findWhenNeeded(this), getDriver());
         OptionSelect typeSelect = new OptionSelect(Locator.tagWithName("select", "type").findWhenNeeded(this));
-        OptionSelect taskSelect = new OptionSelect(Locator.tagWithName("select", "pipelineTask").findWhenNeeded(this));
+        OptionSelect taskSelect = new OptionSelect(Locator.tagWithName("select", "pipelineId").findWhenNeeded(this));
         Input usernameInput =  new Input(Locator.tagWithName("input", "username").findWhenNeeded(this), getDriver());
         Input assayProviderInput =  new Input(Locator.tagWithName("input", "assay provider").findWhenNeeded(this), getDriver());
         Checkbox enabledCheckbox = new Checkbox(Locator.tagWithName("input", "enabled").findWhenNeeded(this));
