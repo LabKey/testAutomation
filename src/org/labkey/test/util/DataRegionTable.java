@@ -1277,6 +1277,11 @@ public class DataRegionTable extends DataRegion
         getWrapper().waitAndClick(Locator.linkWithText("Ok"));  //results popup
     }
 
+    public int getCheckedCount(BaseWebDriverTest test)
+    {
+        return test.executeScript("return LABKEY.DataRegions['" + getDataRegionName() + "'].getChecked().length", Long.class).intValue();
+    }
+
     public static String getInsertNewButtonText()
     {
         return "Insert new row";
