@@ -1113,7 +1113,9 @@ public class DataRegionTable extends DataRegion
     public void uncheckAllOnPage()
     {
         WebElement toggle = elementCache().toggleAllOnPage;
-        if (null != doAndWaitForUpdate(toggle::click))
+
+        //if the DR already has all rows checked, this initial click will de-selected all and return '0'
+        if (!"0".equals(doAndWaitForUpdate(toggle::click)))
             doAndWaitForUpdate(toggle::click);
     }
 
