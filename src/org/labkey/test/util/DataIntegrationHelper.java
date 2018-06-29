@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.di.ResetTransformStateCommand;
@@ -27,6 +28,7 @@ import org.labkey.remoteapi.di.UpdateTransformConfigurationResponse;
 import org.labkey.remoteapi.query.ExecuteSqlCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
@@ -58,6 +60,15 @@ public class DataIntegrationHelper
     {
         _folderPath = folderPath;
         _baseUrl = baseUrl;
+    }
+
+    public SelectRowsResponse selectRows(String folderPath, String schemaName, String queryName) throws IOException, CommandException
+    {
+        SelectRowsResponse rsp = null;
+        Connection cn = new Connection(_baseUrl, _username, _password);
+        SelectRowsCommand cmd = new SelectRowsCommand(schemaName, queryName);
+        rsp = cmd.execute(cn, folderPath);
+        return rsp;
     }
 
     public SelectRowsResponse executeQuery(String folderPath, String schemaName, String queryStatement) throws IOException, CommandException
@@ -134,17 +145,15 @@ public class DataIntegrationHelper
         return response.getRows().get(0).get(fieldName).toString();
     }
 
-    public String getTransformRunFieldByJobId(String jobId, String fieldName) throws CommandException, IOException
+    public String getTransformRunFieldByJobId(@NotNull String jobId, String fieldName) throws CommandException, IOException
     {
-        // TODO: Proper handling of null jobId
         String query = "SELECT " + fieldName + " FROM dataintegration.TransformRun WHERE JobId = '" + jobId + "'";
         SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
         return response.getRows().get(0).get(fieldName).toString();
     }
 
-    public String getTransformState(String transformId) throws CommandException, IOException
+    public String getTransformState(@NotNull String transformId) throws CommandException, IOException
     {
-        // TODO: Proper handling of null transformId
         String query = "SELECT TransformState FROM dataintegration.TransformConfiguration WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
         SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
         return response.getRows().get(0).get("TransformState").toString();
@@ -158,15 +167,22 @@ public class DataIntegrationHelper
         return rcmd.execute(cn, _folderPath);
     }
 
-    private UpdateTransformConfigurationResponse UpdateTransformConfiguration(String transformId, Boolean verbose, Boolean enabled) throws CommandException, IOException
+    public UpdateTransformConfigurationResponse updateTransformConfiguration(String transformId, Boolean verbose, Boolean enabled) throws CommandException, IOException
     {
         Connection cn = new Connection(_baseUrl, _username, _password);
-        UpdateTransformConfigurationResponse response = null;
+        UpdateTransformConfigurationResponse response;
         UpdateTransformConfigurationCommand command = new UpdateTransformConfigurationCommand(transformId);
         command.setVerboseLogging(verbose);
         command.setEnabled(enabled);
-        response = command.execute(cn, DI_SCHEMA);
+        response = command.execute(cn, _folderPath);
         return response;
+    }
+
+    public boolean getTransformEnabled(@NotNull String transformId) throws CommandException, IOException
+    {
+        String query = "SELECT Enabled FROM dataintegration.TransformConfiguration WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
+        SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
+        return Boolean.parseBoolean(response.getRows().get(0).get("Enabled").toString());
     }
 
     private String getContainerForFolder(String folderName) throws CommandException, IOException

@@ -561,6 +561,7 @@ src/org/labkey/test/debug/DummyProcess.java -text
 src/org/labkey/test/debug/ThreadDumpAndKill.java -text
 src/org/labkey/test/etl/ETLAbstractTest.java -text
 src/org/labkey/test/etl/ETLClientApiCommandTest.java -text
+src/org/labkey/test/etl/ETLDefinitionEditorTest.java -text
 src/org/labkey/test/etl/ETLHelper.java -text
 src/org/labkey/test/etl/ETLListTest.java -text
 src/org/labkey/test/etl/ETLRemoteSourceTest.java -text
@@ -568,6 +569,9 @@ src/org/labkey/test/etl/ETLSimpleTransformTest.java -text
 src/org/labkey/test/etl/ETLTaskRefTaskTest.java -text
 src/org/labkey/test/etl/ETLTest.java -text
 src/org/labkey/test/etl/ETLTestB.java -text
+src/org/labkey/test/etl/pages/ConfirmDeletePage.java -text
+src/org/labkey/test/etl/pages/DefinitionPage.java -text
+src/org/labkey/test/etl/pages/DefinitionsQueryView.java -text
 src/org/labkey/test/io/Grep.java -text
 src/org/labkey/test/module/ModuleTest.java -text
 src/org/labkey/test/pages/AssayDesignerPage.java -text

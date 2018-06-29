@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
+import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -30,6 +32,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.IOException;
@@ -55,8 +58,9 @@ public class ETLHelper
     private static final String TRANSFER = "transfer";
     public static final String ERROR = "ERROR";
     public static final String COMPLETE = "COMPLETE";
-    private static final String DATAINTEGRATION_MODULE = "DataIntegration";
-    private static final String DATAINTEGRATION_SCHEMA = "dataintegration";
+    static final String DATAINTEGRATION_MODULE = "DataIntegration";
+    public static final String DATAINTEGRATION_SCHEMA = "dataintegration";
+    public static final String DATAINTEGRATION_ETLDEF = "etlDef";
     private static final String ETL_180_COLUMN_SOURCE = "x180column_source";
     private static final String ETL_180_COLUMN_TARGET = "x180column_target";
     private static final String TITLE_180_COLUMN_SOURCE = "x180ColumnSource";
@@ -390,12 +394,19 @@ public class ETLHelper
 
     void insertSourceRow(String id, String name, String runId)
     {
-        insertQueryRow(id, name, runId, "source");
+        insertQueryRow(id, name, runId, ETL_SOURCE);
+    }
+
+    void insertSourceRowApi(String id, String name, String runId) throws Exception
+    {
+        Map<String, Object> row = Maps.of("id", id, "name", name, "runId", runId);
+        SaveRowsResponse insertResp = _diHelper.executeInsert("/" + _projectName, ETL_TEST_SCHEMA, ETL_SOURCE, row);
+        assertEquals("Row not inserted.", 1, insertResp.getRowsAffected().intValue());
     }
 
     void insertDeleteSourceRow(String id, String name, String runId)
     {
-        insertQueryRow(id, name, runId, "delete");
+        insertQueryRow(id, name, runId, ETL_DELETE);
     }
 
     void insertTransferRow(String rowId, String transferStart, String transferComplete, String description, String log, String status)
@@ -687,6 +698,29 @@ public class ETLHelper
         assertQueryWebPart(ETL_TARGET_2, "Target2", true, targets);
     }
 
+    void assertInTarget1_Api(String targetName) throws IOException, CommandException
+    {
+        SelectRowsResponse rsp = _diHelper.executeQuery("/" + _projectName, ETL_TEST_SCHEMA, "SELECT * FROM etltest.target WHERE name = '" + targetName +"'");
+        assertTrue("Target name '" + targetName + "' not found", rsp.getRowCount().intValue() > 0) ;
+    }
+
+    void assertInTarget2_Api(String targetName) throws IOException, CommandException
+    {
+        SelectRowsResponse rsp = _diHelper.executeQuery("/" + _projectName, ETL_TEST_SCHEMA, "SELECT * FROM etltest.target2 WHERE name = '" + targetName +"'");
+        assertTrue("Target name '" + targetName + "' not found", rsp.getRowCount().intValue() > 0) ;
+    }
+
+    void assertNotInTarget1_Api(String targetName) throws IOException, CommandException
+    {
+        SelectRowsResponse rsp = _diHelper.executeQuery("/" + _projectName, ETL_TEST_SCHEMA, "SELECT * FROM etltest.target WHERE name = '" + targetName +"'");
+        assertEquals("Target name '" + targetName + "' was present", 0, rsp.getRowCount().intValue());
+    }
+
+    void assertNotInTarget2_Api(String targetName) throws IOException, CommandException
+    {
+        SelectRowsResponse rsp = _diHelper.executeQuery("/" + _projectName, ETL_TEST_SCHEMA, "SELECT * FROM etltest.target WHERE name = '" + targetName +"'");
+        assertEquals("Target name '" + targetName + "' wasp present", 0, rsp.getRowCount().intValue());
+    }
     private void gotoQueryWebPart(String webpartName)
     {
         gotoQueryWebPart(webpartName, webpartName);
