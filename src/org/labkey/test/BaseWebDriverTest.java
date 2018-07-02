@@ -2216,14 +2216,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void deleteAllPipelineJobs() {
         goToModule("Pipeline");
         PipelineStatusTable table = new PipelineStatusTable(this);
-        if (table.getDataRowCount() > 0)
-        {
-            table.checkAll();
-            table.clickHeaderButton("Delete");
-            if (isElementPresent(Locator.id("deleteRuns")))
-                checkCheckbox(Locator.id("deleteRuns"));
-            clickButton("Confirm Delete");
-        }
+        table.deleteAllPipelineJobs();
     }
 
     @LogMethod

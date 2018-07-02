@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -155,5 +156,17 @@ public class PipelineStatusTable extends DataRegionTable
         int row = getJobRow(description);
         assertTrue("Job not found " + description, row != -1);
         return row;
+    }
+
+    public void deleteAllPipelineJobs()
+    {
+        if (getDataRowCount() > 0)
+        {
+            checkAll();
+            clickHeaderButton("Delete");
+            if (getWrapper().isElementPresent(Locator.id("deleteRuns")))
+                getWrapper().checkCheckbox(Locator.id("deleteRuns"));
+            getWrapper().clickButton("Confirm Delete");
+        }
     }
 }
