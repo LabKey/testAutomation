@@ -28,6 +28,7 @@ import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
@@ -155,10 +156,9 @@ public class DataRegionTest extends BaseWebDriverTest
         log("Testing " + QWP_SCHEMA_LISTING.first);
         click(Locator.linkWithText(QWP_SCHEMA_LISTING.first));
 
-        if (pageHasAlert(3000, QWP_SCHEMA_LISTING.second)) {
-            dismissAllAlerts();
-            fail(QWP_SCHEMA_LISTING.first + " failed");
-        }
+        String alert = waitForSignalOrAlert(3000, QWP_SCHEMA_LISTING.second);
+        if (alert != null)
+            fail(QWP_SCHEMA_LISTING.first + " failed: " + alert);
         waitForElement(Locator.css("span.labkey-wp-title-text").withText(QWP_SCHEMA_LISTING.first));
 
         QWP_TAB_SIGNALS.stream().forEach(this::testQWPTab);
@@ -169,30 +169,34 @@ public class DataRegionTest extends BaseWebDriverTest
     }
 
     // check every 500ms for specified wait amount for either alert or successSignal
-    private boolean pageHasAlert(long wait, String successSignal)
+    private String waitForSignalOrAlert(long wait, String successSignal)
     {
         long t= System.currentTimeMillis();
         long end = t + wait;
         while (System.currentTimeMillis() < end)
         {
-            if (null != getAlertIfPresent())
-                return true;
+            Alert alert = getAlertIfPresent();
+            if (null != alert)
+            {
+                String alertText = alert.getText();
+                alert.accept();
+                return alertText;
+            }
             if (isElementPresent(Locators.pageSignal(successSignal)))
-                return false;
+                return null;
             sleep(500);
         }
-        return false;
+        return "Test signal did not appear - " + successSignal;
     }
 
     private void testQWPTab(Pair<String, String> titleSignalPair)
     {
         log("Testing " + titleSignalPair.first);
         click(Locator.linkWithText(titleSignalPair.first));
-        if (pageHasAlert(3000, titleSignalPair.second))
-        {
-            dismissAllAlerts();
-            fail(titleSignalPair.first + " failed");
-        }
+        String alert = waitForSignalOrAlert(3000, titleSignalPair.second);
+        if (alert != null)
+            fail(titleSignalPair.first + " failed: " + alert);
+
         waitForElement(Locator.css(".labkey-data-region"));
     }
 
