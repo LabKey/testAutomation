@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.pages.wiki.EditPage;
 
@@ -131,23 +132,33 @@ public class WikiHelper
      */
     public void createNewWikiPage(String format)
     {
-        if(_test.isElementPresent(Locator.linkWithText("new page")))
-            _test.clickAndWait(Locator.linkWithText("new page"));
-        else if(_test.isElementPresent(Locator.linkWithText("Create a new wiki page")))
-            _test.clickAndWait(Locator.linkWithText("Create a new wiki page"));
-        else if(_test.isElementPresent(Locator.linkWithText("add content")))
-            _test.clickAndWait(Locator.linkWithText("add content"));
-        else if(_test.isTextPresent("Pages"))
+        if(!clickCreateNewWiki())
         {
-            PortalHelper portalHelper = new PortalHelper(_test);
-            portalHelper.clickWebpartMenuItem("Pages", "New");
+            _test.goToModule("Wiki");
+            if(!clickCreateNewWiki())
+            {
+                throw new IllegalStateException("Could not find a link on the current page to create a new wiki page." +
+                        " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
+                        " before calling this method.");
+            }
         }
-        else
-            throw new IllegalStateException("Could not find a link on the current page to create a new wiki page." +
-                    " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
-                    " before calling this method.");
 
         convertWikiFormat(format);
+    }
+
+    private boolean clickCreateNewWiki()
+    {
+        if(_test.isElementPresent(Locator.linkWithText("Create a new wiki page")))
+            _test.clickAndWait(Locator.linkWithText("Create a new wiki page"));
+        else if(_test.isElementPresent(Locators.panelWebpartTitle.withText("Pages")))
+            new PortalHelper(_test).clickWebpartMenuItem("Pages", "New");
+        else if(_test.isElementPresent(Locator.linkWithText("new page")))
+            _test.clickAndWait(Locator.linkWithText("new page"));
+        else if(_test.isElementPresent(Locator.linkWithText("add content")))
+            _test.clickAndWait(Locator.linkWithText("add content"));
+        else
+            return false;
+        return true;
     }
 
     public void createNewWikiPage(WikiRendererType format)
