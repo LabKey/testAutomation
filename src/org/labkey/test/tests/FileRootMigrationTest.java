@@ -85,7 +85,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         final File folderFile2 = TestFileUtils.getSampleData("fileTypes/cmd_sample.cmd");
         List<File> sourceFiles = new ArrayList<>();
 
-        String folderName = "folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        String folderName = "folder \u2603";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
         log("Upload files to project");
         goToProjectHome();
@@ -145,7 +145,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         File folderFile2 = TestFileUtils.getSampleData("fileTypes/cmd_sample.cmd");
         List<File> sourceFiles = new ArrayList<>();
 
-        String folderName = "folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        String folderName = "folder \u2603";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
         log("Upload files to project");
         goToProjectHome();
