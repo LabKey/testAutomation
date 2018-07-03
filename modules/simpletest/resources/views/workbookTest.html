@@ -276,11 +276,11 @@ target folder, that should be respected.  The same is true for both updateRows a
                     container: subfolder1
                 }],
                 failure: function (response) {
-                    if (response.exception !== 'Row is not from the correct container: ' + subfolder1){
+                    if (response.exception !== 'Unknown table: lists.' + listName + ' in container: ' + subfolder1Path){
                         logError('Incorrect error from cross-container insert: ' + response.exception);
                     }
                     else {
-                        success('Cross-container insert into non-workbook');
+                        success('Cross-container insert into non-workbook for list');
                     }
                 },
                 success: function (response) {
@@ -341,6 +341,29 @@ target folder, that should be respected.  The same is true for both updateRows a
                 }],
                 success: function (response) {
                     multiSelect.add(LABKEY.Query.selectRows, getVerifySelect(response, 'rowid', 'Name', 'Container'));
+                }
+            });
+
+            //expect failure because container isnt a child workbook
+            multiInsert.add(LABKEY.Query.insertRows, {
+                containerPath: folderContainerId,
+                schemaName: 'vehicle',
+                queryName: 'EmissionTest',
+                scope: this,
+                rows: [{
+                    field1: subfolder1,
+                    container: subfolder1
+                }],
+                failure: function (response) {
+                    if (response.exception !== 'Row is not from the correct container: ' + subfolder1){
+                        logError('Incorrect error from cross-container insert: ' + response.exception);
+                    }
+                    else {
+                        success('Cross-container insert into non-workbook for module-schema');
+                    }
+                },
+                success: function (response) {
+                    logError('ERROR: This should have failed because it is not from the correct container');
                 }
             });
 
