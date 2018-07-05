@@ -620,10 +620,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             WebTestHelper.saveSession(email, getDriver());
         }
 
-        if (bootstrapped || "Sign In".equals(getDriver().getTitle()))
+        if (bootstrapped || getDriver().getTitle().startsWith("Sign In"))
         {
             // if the logout page takes us to the sign-in page, then we may have a schema update to do:
-            if ("Sign In".equals(getDriver().getTitle()))
+            if (getDriver().getTitle().startsWith("Sign In"))
                 simpleSignIn();
 
             String upgradeText = "Please wait, this page will automatically update with progress information.";
@@ -644,7 +644,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 long startTime = System.currentTimeMillis();
                 long elapsed = 0;
 
-                while (elapsed < waitMs && (!isButtonPresent("Next")))
+                while (elapsed < waitMs && (!isElementPresent(Locator.lkButton("Next"))))
                 {
                     try
                     {
@@ -659,6 +659,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                         sleep(2000);
                         if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
                             throw new RuntimeException("A startup failure occurred.");
+                        WebElement progressBar = Locator.id("status-progress-bar").findElementOrNull(getDriver());
+                        log(bootstrapped ? "Bootstrapping" : "Upgrading" + (progressBar != null ? (": \"" + progressBar.getText() + "\"") : ""));
                     }
                     catch (WebDriverException ignore)
                     {
