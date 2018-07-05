@@ -15,19 +15,15 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
-import org.labkey.test.pages.assay.ExclusionConfirmationPage;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
@@ -243,14 +239,5 @@ public class GpatAssayTest extends BaseWebDriverTest
     {
         WebElement element = Locator.tagWithClass("div", "gwt-TabBarItem").withChild(Locator.xpath("//div[contains(@class, 'gwt-Label') and text()='" + tabName + "']")).findElement(getDriver());
         element.click();
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.components.PropertiesEditor} from _assayHelper or _listHelper
-     */
-    @Deprecated
-    public String getPropertyXPath(String propertyHeading)
-    {
-        return "//h3[text() = '" + propertyHeading + "']/../..";
     }
 }
