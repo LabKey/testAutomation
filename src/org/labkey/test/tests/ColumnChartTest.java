@@ -516,8 +516,8 @@ public class ColumnChartTest extends BaseWebDriverTest
         // create a subfolder and set the subfolder pipeline root to match the project
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), newFolderName, "Collaboration", null, true);
         clickFolder(newFolderName);
-        goToModule("Pipeline");
-        clickButton("Setup");
+        goToDataPipeline()
+                .clickSetup();
         if (isElementPresent(Locator.linkWithText("override")))
             clickAndWait(Locator.linkWithText("override"));
         checkRadioButton(Locator.radioButtonById("pipeOptionProjectSpecified"));

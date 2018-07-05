@@ -99,9 +99,6 @@ public class PipelineFolder
 
     protected void setupPipeline()
     {
-        _test.log("Setup pipeline.");
-        _test.clickButton("Setup");
-
         _test.log("Set pipeline root.");
         _test.setPipelineRoot(_pipelinePath);
 

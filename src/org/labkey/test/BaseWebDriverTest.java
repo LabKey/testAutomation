@@ -1487,8 +1487,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void setPipelineRoot(String rootPath, boolean inherit)
     {
         log("Set pipeline to: " + rootPath);
-        goToModule("Pipeline");
-        clickButton("Setup");
+        goToDataPipeline()
+                .clickSetup();
 
         if (isElementPresent(Locator.linkWithText("override")))
         {
@@ -1518,8 +1518,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void setPipelineRootToDefault()
     {
         log("Set pipeline to default based on the site-level root");
-        goToModule("Pipeline");
-        clickButton("Setup");
+        goToDataPipeline()
+                .clickSetup();
         checkRadioButton(Locator.radioButtonById("pipeOptionSiteDefault"));
         clickButton("Save");
         log("Finished setting pipeline to default based on the site-level root");

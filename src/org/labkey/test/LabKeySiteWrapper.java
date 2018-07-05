@@ -54,6 +54,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
@@ -981,6 +982,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void goToMyAccount()
     {
         clickUserMenuItem("My Account");
+    }
+
+    public PipelineStatusTable goToDataPipeline()
+    {
+        goToModule("Pipeline");
+        return new PipelineStatusTable(this);
     }
 
     protected WebElement openMenu(String menuText)
