@@ -708,10 +708,8 @@ src/org/labkey/test/tests/ApiKeyTest.java -text
 src/org/labkey/test/tests/AssayExportImportTest.java -text
 src/org/labkey/test/tests/AssayResultsExportTest.java -text
 src/org/labkey/test/tests/AuditLogTest.java -text
-src/org/labkey/test/tests/BarPlotTest.java -text
 src/org/labkey/test/tests/BaseTermsOfUseTest.java -text
 src/org/labkey/test/tests/BasicTest.java -text
-src/org/labkey/test/tests/BoxPlotTest.java -text
 src/org/labkey/test/tests/ButtonCustomizationTest.java -text
 src/org/labkey/test/tests/ChartingAPITest.java -text
 src/org/labkey/test/tests/ClientAPITest.java -text
@@ -759,7 +757,6 @@ src/org/labkey/test/tests/JUnitDRTTest.java -text
 src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
 src/org/labkey/test/tests/KnitrReportTest.java -text
-src/org/labkey/test/tests/LinePlotTest.java -text
 src/org/labkey/test/tests/LinkedSchemaTest.java -text
 src/org/labkey/test/tests/ListExportTest.java -text
 src/org/labkey/test/tests/ListImportFieldsTest.java -text
@@ -778,7 +775,6 @@ src/org/labkey/test/tests/NabMultiVirusPlateTest.java -text
 src/org/labkey/test/tests/NonStudyReportsTest.java -text
 src/org/labkey/test/tests/ParticipantListTest.java -text
 src/org/labkey/test/tests/ParticipantReportTest.java -text
-src/org/labkey/test/tests/PieChartTest.java -text
 src/org/labkey/test/tests/PipelineCancelTest.java -text
 src/org/labkey/test/tests/PivotQueryTest.java -text
 src/org/labkey/test/tests/PortalTest.java -text
@@ -797,7 +793,6 @@ src/org/labkey/test/tests/ResourceEncodingTest.java -text
 src/org/labkey/test/tests/RlabkeyTest.java -text
 src/org/labkey/test/tests/SampleSetNameExpressionTest.java -text
 src/org/labkey/test/tests/SampleSetTest.java -text
-src/org/labkey/test/tests/ScatterPlotTest.java -text
 src/org/labkey/test/tests/SchemaBrowserTest.java -text
 src/org/labkey/test/tests/ScriptValidationTest.java -text
 src/org/labkey/test/tests/SecondaryAuthenticationTest.java -text
@@ -861,6 +856,11 @@ src/org/labkey/test/tests/perf/SchemaBrowserPerfTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
 src/org/labkey/test/tests/pipeline/PipelineProtocolArchiveTest.java -text
 src/org/labkey/test/tests/remoteapi/BulkUpdateGroupApiTest.java -text
+src/org/labkey/test/tests/visualization/BarPlotTest.java -text
+src/org/labkey/test/tests/visualization/BoxPlotTest.java -text
+src/org/labkey/test/tests/visualization/LinePlotTest.java -text
+src/org/labkey/test/tests/visualization/PieChartTest.java -text
+src/org/labkey/test/tests/visualization/ScatterPlotTest.java -text
 src/org/labkey/test/tests/wiki/WikiHistoryTest.java -text
 src/org/labkey/test/util/APIAssayHelper.java -text
 src/org/labkey/test/util/APIContainerHelper.java -text

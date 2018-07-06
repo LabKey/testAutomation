@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.tests;
+package org.labkey.test.tests.visualization;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -27,6 +27,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.LookAndFeelPieChart;
+import org.labkey.test.tests.GenericChartsTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;

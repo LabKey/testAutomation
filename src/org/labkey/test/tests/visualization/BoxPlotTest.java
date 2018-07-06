@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.tests;
+package org.labkey.test.tests.visualization;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -25,6 +25,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelBoxPlot;
 import org.labkey.test.components.SaveChartDialog;
+import org.labkey.test.tests.GenericChartsTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;

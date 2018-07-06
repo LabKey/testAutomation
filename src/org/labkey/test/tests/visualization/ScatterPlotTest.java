@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.tests;
+package org.labkey.test.tests.visualization;
 
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
@@ -35,6 +35,7 @@ import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.ViewDatasetDataPage;
+import org.labkey.test.tests.GenericChartsTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
