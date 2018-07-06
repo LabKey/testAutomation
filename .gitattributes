@@ -713,7 +713,6 @@ src/org/labkey/test/tests/BasicTest.java -text
 src/org/labkey/test/tests/ButtonCustomizationTest.java -text
 src/org/labkey/test/tests/ChartingAPITest.java -text
 src/org/labkey/test/tests/ClientAPITest.java -text
-src/org/labkey/test/tests/ColumnChartTest.java -text
 src/org/labkey/test/tests/ContainerContextTest.java -text
 src/org/labkey/test/tests/CustomizeEmailTemplateTest.java -text
 src/org/labkey/test/tests/CustomizeViewTest.java -text
@@ -858,6 +857,7 @@ src/org/labkey/test/tests/pipeline/PipelineProtocolArchiveTest.java -text
 src/org/labkey/test/tests/remoteapi/BulkUpdateGroupApiTest.java -text
 src/org/labkey/test/tests/visualization/BarPlotTest.java -text
 src/org/labkey/test/tests/visualization/BoxPlotTest.java -text
+src/org/labkey/test/tests/visualization/ColumnChartTest.java -text
 src/org/labkey/test/tests/visualization/LinePlotTest.java -text
 src/org/labkey/test/tests/visualization/PieChartTest.java -text
 src/org/labkey/test/tests/visualization/ScatterPlotTest.java -text
