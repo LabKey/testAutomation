@@ -21,11 +21,12 @@ public class DefinitionPage extends LabKeyPage<DefinitionPage.ElementCache>
 
     public DefinitionPage setDefinitionXml(String definitionXml)
     {
+        waitForElementToBeVisible(Locator.tagWithClass("div", "CodeMirror"));
         setCodeEditorValue(DEFINITION_ID, definitionXml);
         return new DefinitionPage(getDriver());
     }
 
-    public String getDefintionXml()
+    public String getDefinitionXml()
     {
         return _extHelper.getCodeMirrorValue(DEFINITION_ID);
     }
@@ -56,10 +57,10 @@ public class DefinitionPage extends LabKeyPage<DefinitionPage.ElementCache>
         return new DefinitionPage(getDriver());
     }
 
-    public LabKeyPage showGrid()
+    public DefinitionsQueryView showGrid()
     {
         elementCache().showGridButton.click();
-        return new LabKeyPage(getDriver());
+        return new DefinitionsQueryView(getDriver());
     }
 
     protected DefinitionPage.ElementCache newElementCache()

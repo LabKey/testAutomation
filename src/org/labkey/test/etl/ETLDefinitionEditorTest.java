@@ -4,12 +4,16 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.test.categories.DRT;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
 import org.labkey.test.etl.pages.ConfirmDeletePage;
 import org.labkey.test.etl.pages.DefinitionPage;
 import org.labkey.test.etl.pages.DefinitionsQueryView;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -34,7 +38,7 @@ public class ETLDefinitionEditorTest extends ETLAbstractTest
             "\t</transforms>\n" +
             "\t<incrementalFilter className=\"ModifiedSinceFilterStrategy\" timestampColumnName=\"modified\"/>\n" +
             "\t<schedule>\n" +
-            "\t\t<poll interval=\"1s\" />\n" +
+            "\t\t<poll interval=\"5s\" />\n" +
             "\t</schedule>\n" +
             "</etl>";
 
@@ -81,7 +85,7 @@ public class ETLDefinitionEditorTest extends ETLAbstractTest
         goToProjectHome();
 
         log("Create a new ETL definition");
-        DefinitionsQueryView defsView = DefinitionsQueryView.beginAtFolderMgmt(this);
+        DefinitionsQueryView defsView = DefinitionsQueryView.beginAt(this);
         defsView.createNew(DEFINITION_XML);
         defsView.assertEtlPresent(DEFINITION_NAME);
 
@@ -91,6 +95,7 @@ public class ETLDefinitionEditorTest extends ETLAbstractTest
         defPage.cancel();
 
         log("Verify xml is validated");
+        defsView = DefinitionsQueryView.beginAt(this);
         defsView.editAndSave(DEFINITION_NAME, BAD_DEFINITION_XML, "Document does not conform to its XML schema");
 
         log("Verify edit is saved. Both etl name and a step name are going to be changed");
@@ -98,12 +103,11 @@ public class ETLDefinitionEditorTest extends ETLAbstractTest
         defsView.assertEtlPresent(DEFINITION_NAME_2);
         log("Verify details page - look for changed step name");
         defPage = defsView.details(DEFINITION_NAME_2);
-        assertTrue("Definition XML did not contain expected string", defPage.getDefintionXml().contains(NEW_STEP_NAME));
-        defPage.showGrid();
+        assertTrue("Definition XML did not contain expected string: '" + NEW_STEP_NAME + "'", defPage.getDefinitionXml().contains(NEW_STEP_NAME));
+        defsView = defPage.showGrid();
 
         log("Verify edit button from the details page");
-        defPage = defsView.details(DEFINITION_NAME_2);
-        defPage.edit();
+        defPage = defsView.details(DEFINITION_NAME_2).edit();
         defPage.setDefinitionXml(DEFINITION_XML_3).save(null);
         defsView.assertEtlPresent(DEFINITION_NAME_3);
 
@@ -124,23 +128,23 @@ public class ETLDefinitionEditorTest extends ETLAbstractTest
         final String SOURCE_ROW_NAME = "NameForEtlTesting";
 
         log("Create a new ETL definition");
-        DefinitionsQueryView defsView = DefinitionsQueryView.beginAtQuery(this);
+        DefinitionsQueryView defsView = DefinitionsQueryView.beginAt(this);
         defsView.createNew(DEFINITION_XML);
         final String transformId = "{DataIntegration}/User_Defined_EtlDefId_" + defsView.getRowPk(DEFINITION_NAME);
 
         log("Add a source row");
         final String SOURCE_ROW_NAME_1 = SOURCE_ROW_NAME + 1;
-        _etlHelper.insertSourceRowApi("1", SOURCE_ROW_NAME_1, null);
+        _etlHelper.insertSourceRow("1", SOURCE_ROW_NAME_1, null);
         log("Enable the ETL");
         // Doing this through the UI also ensures the cache got updated
         goToModule(ETLHelper.DATAINTEGRATION_MODULE);
         _etlHelper.enableScheduledRun(DEFINITION_NAME);
         log("Verify it ran successfully");
-        sleep(2000);
+        _etlHelper.waitForStatus(transformId, ETLHelper.COMPLETE, 30000);;
         _etlHelper.assertInTarget1_Api(SOURCE_ROW_NAME_1);
 
         log("Verify edit behavior");
-        defsView = DefinitionsQueryView.beginAtFolderMgmt(this);
+        defsView = DefinitionsQueryView.beginAt(this);
         DefinitionPage defPage = defsView.edit(DEFINITION_NAME);
         assertTextPresent("Warning: This ETL has been enabled and is scheduled to run.");
         log("Change definition, later we verify the change propagates through cache.");
@@ -150,32 +154,45 @@ public class ETLDefinitionEditorTest extends ETLAbstractTest
         assertFalse("ETL is still enabled to run", _etlHelper.getDiHelper().getTransformEnabled(transformId));
         log("Verify we really did remove from scheduler");
         final String SOURCE_ROW_NAME_2 = SOURCE_ROW_NAME + 2;
-        _etlHelper.insertSourceRowApi("2", SOURCE_ROW_NAME_2, null);
-        sleep(2000);
+        _etlHelper.insertSourceRow("2", SOURCE_ROW_NAME_2, null);
+        sleep(10000);
         // verify not in either target or target2. Whether or not change propagated, if scheduled run happened one of these asserts would fail
         _etlHelper.assertNotInTarget1_Api(SOURCE_ROW_NAME_2);
         _etlHelper.assertNotInTarget2_Api(SOURCE_ROW_NAME_2);
 
         log("Verify delete confirmation for unscheduled etls");
-        defsView = DefinitionsQueryView.beginAtFolderMgmt(this);
+        defsView = DefinitionsQueryView.beginAt(this);
         ConfirmDeletePage deletePage = defsView.deleteWithEnabledCheck(DEFINITION_NAME, false);
         deletePage.cancel();
 
         log("Verify change propagated - reenable the ETL, let it run.");
         _etlHelper.getDiHelper().updateTransformConfiguration(transformId, null, true);
-        sleep(2000);
-        _etlHelper.assertInTarget2_Api(SOURCE_ROW_NAME_2);
+        waitFor(()->
+                {
+                    log("Waiting for insertion of new target text.");
+                    try
+                    {
+                        return _etlHelper.isInTarget2(SOURCE_ROW_NAME_2);
+                    }
+                    catch (IOException | CommandException e)
+                    {
+                        return false;
+                    }
+
+                }, 20000
+        );
+        log("Target text found.");
 
         log("Verify delete behavior for scheduled etls");
-        defsView = DefinitionsQueryView.beginAtFolderMgmt(this);
+        defsView = DefinitionsQueryView.beginAt(this);
         deletePage = defsView.deleteWithEnabledCheck(DEFINITION_NAME, true);
         deletePage.confirmDelete();
         log("Verify we really did disable");
         assertFalse("ETL is still enabled to run", _etlHelper.getDiHelper().getTransformEnabled(transformId));
         log("Verify we really did remove from scheduler");
         final String SOURCE_ROW_NAME_3 = SOURCE_ROW_NAME + 3;
-        _etlHelper.insertSourceRowApi("3", SOURCE_ROW_NAME_3, null);
-        sleep(2000);
+        _etlHelper.insertSourceRow("3", SOURCE_ROW_NAME_3, null);
+        sleep(10000);
         _etlHelper.assertNotInTarget2_Api(SOURCE_ROW_NAME);
         log("Verify deleted etl removed from available transforms");
         goToModule(ETLHelper.DATAINTEGRATION_MODULE);

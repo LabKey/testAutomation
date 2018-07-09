@@ -137,12 +137,24 @@ public class DataIntegrationHelper
         return getTransformRunFieldByJobId(jobId, "ExpRunId");
     }
 
+    public Integer getJobIdByTransformId(String transformId) throws IOException, CommandException
+    {
+        String jobId = getTransformRunFieldByTransformId(transformId, "jobId");
+        if (null == jobId)
+            return null;
+        else
+            return Integer.valueOf(jobId);
+    }
+
     public String getTransformRunFieldByTransformId(String transformId, String fieldName) throws CommandException, IOException
     {
         // TODO: Proper handling of null transformId
         String query = "SELECT " + fieldName + " FROM dataintegration.TransformRun WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
         SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
-        return response.getRows().get(0).get(fieldName).toString();
+        if (response.getRows().isEmpty())
+            return null;
+        else
+            return response.getRows().get(0).get(fieldName).toString();
     }
 
     public String getTransformRunFieldByJobId(@NotNull String jobId, String fieldName) throws CommandException, IOException

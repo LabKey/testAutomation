@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
-import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -32,7 +31,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.IOException;
@@ -46,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ETLHelper
@@ -354,7 +353,7 @@ public class ETLHelper
             _test.clickTab("Portal");
         else
             _test.clickFolder(subFolder);
-        _test.waitAndClickAndWait(Locator.linkWithText(StringUtils.capitalize(query)));
+        _test.navigateToQuery(ETL_TEST_SCHEMA, query);
         DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRow();
         _test.waitForElement(Locator.name("quf_id"));
         _test.setFormElement(Locator.name("quf_id"), id);
@@ -395,13 +394,6 @@ public class ETLHelper
     void insertSourceRow(String id, String name, String runId)
     {
         insertQueryRow(id, name, runId, ETL_SOURCE);
-    }
-
-    void insertSourceRowApi(String id, String name, String runId) throws Exception
-    {
-        Map<String, Object> row = Maps.of("id", id, "name", name, "runId", runId);
-        SaveRowsResponse insertResp = _diHelper.executeInsert("/" + _projectName, ETL_TEST_SCHEMA, ETL_SOURCE, row);
-        assertEquals("Row not inserted.", 1, insertResp.getRowsAffected().intValue());
     }
 
     void insertDeleteSourceRow(String id, String name, String runId)
@@ -706,8 +698,13 @@ public class ETLHelper
 
     void assertInTarget2_Api(String targetName) throws IOException, CommandException
     {
+        assertTrue("Target name '" + targetName + "' not found", isInTarget2(targetName));
+    }
+
+    boolean isInTarget2(String targetName) throws IOException, CommandException
+    {
         SelectRowsResponse rsp = _diHelper.executeQuery("/" + _projectName, ETL_TEST_SCHEMA, "SELECT * FROM etltest.target2 WHERE name = '" + targetName +"'");
-        assertTrue("Target name '" + targetName + "' not found", rsp.getRowCount().intValue() > 0) ;
+        return rsp.getRowCount().intValue() > 0;
     }
 
     void assertNotInTarget1_Api(String targetName) throws IOException, CommandException
@@ -718,8 +715,8 @@ public class ETLHelper
 
     void assertNotInTarget2_Api(String targetName) throws IOException, CommandException
     {
-        SelectRowsResponse rsp = _diHelper.executeQuery("/" + _projectName, ETL_TEST_SCHEMA, "SELECT * FROM etltest.target WHERE name = '" + targetName +"'");
-        assertEquals("Target name '" + targetName + "' wasp present", 0, rsp.getRowCount().intValue());
+        SelectRowsResponse rsp = _diHelper.executeQuery("/" + _projectName, ETL_TEST_SCHEMA, "SELECT * FROM etltest.target2 WHERE name = '" + targetName +"'");
+        assertFalse("Target name '" + targetName + "' was present", isInTarget2(targetName));
     }
     private void gotoQueryWebPart(String webpartName)
     {

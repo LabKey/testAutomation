@@ -1,14 +1,11 @@
 package org.labkey.test.etl.pages;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.CustomizeView;
-import org.labkey.test.etl.ETLHelper;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 
@@ -21,26 +18,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class DefinitionsQueryView extends LabKeyPage<DefinitionsQueryView.ElementCache>
 {
-    private final String _regionName;
-
-    public DefinitionsQueryView(WebDriver driver, String regionName)
+    public DefinitionsQueryView(WebDriver driver)
     {
         super(driver);
-        _regionName = regionName;
     }
 
-    public static DefinitionsQueryView beginAtFolderMgmt(WebDriverWrapper driver)
+    public static DefinitionsQueryView beginAt(WebDriverWrapper driver)
     {
         driver.beginAt(driver.getCurrentContainerPath());
         driver.goToFolderManagement().selectTab("etls");
-        return new DefinitionsQueryView(driver.getDriver(), "transforms");
-    }
-
-    public static DefinitionsQueryView beginAtQuery(WebDriverWrapper driver)
-    {
-        driver.beginAt(driver.getCurrentContainerPath());
-        driver.navigateToQuery(ETLHelper.DATAINTEGRATION_SCHEMA, ETLHelper.DATAINTEGRATION_ETLDEF);
-        return new DefinitionsQueryView(driver.getDriver(), "query");
+        return new DefinitionsQueryView(driver.getDriver());
     }
 
     public LabKeyPage createNew(String definitionXml)
@@ -100,7 +87,7 @@ public class DefinitionsQueryView extends LabKeyPage<DefinitionsQueryView.Elemen
 
     public String getRowPk(String name)
     {
-        beginAtQuery(this);
+        beginAt(this);
         if (elementCache()._dataRegionTable.getColumnIndex("EtlDefId") < 0)
         {
             CustomizeView helper = elementCache()._dataRegionTable.getCustomizeView();
@@ -119,21 +106,12 @@ public class DefinitionsQueryView extends LabKeyPage<DefinitionsQueryView.Elemen
 
     protected DefinitionsQueryView.ElementCache newElementCache()
     {
-        return new DefinitionsQueryView.ElementCache(_regionName);
+        return new DefinitionsQueryView.ElementCache();
     }
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        private final String _regionName;
-        DataRegionTable _dataRegionTable;
-        WebElement deleteButton = Locator.lkButton("Delete").findWhenNeeded(this);
-
-        public ElementCache(String regionName)
-        {
-            super();
-            _regionName = regionName;
-            _dataRegionTable = new DataRegionTable.DataRegionFinder(getDriver()).withName(_regionName).findWhenNeeded(this);
-        }
+        DataRegionTable _dataRegionTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("transforms").findWhenNeeded(this);
     }
 
 }
