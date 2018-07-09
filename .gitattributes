@@ -767,10 +767,6 @@ src/org/labkey/test/tests/MicroarrayTest.java -text
 src/org/labkey/test/tests/MissingValueIndicatorsTest.java -text
 src/org/labkey/test/tests/ModuleAssayTest.java -text
 src/org/labkey/test/tests/MultiplePKUploadAssayTest.java -text
-src/org/labkey/test/tests/NabAssayTest.java -text
-src/org/labkey/test/tests/NabAssayThawListTest.java -text
-src/org/labkey/test/tests/NabHighThroughputAssayTest.java -text
-src/org/labkey/test/tests/NabMultiVirusPlateTest.java -text
 src/org/labkey/test/tests/NonStudyReportsTest.java -text
 src/org/labkey/test/tests/ParticipantListTest.java -text
 src/org/labkey/test/tests/ParticipantReportTest.java -text
@@ -849,6 +845,10 @@ src/org/labkey/test/tests/list/ColumnResizeTest.java -text
 src/org/labkey/test/tests/list/ListTest.java -text
 src/org/labkey/test/tests/microarray/BaseExpressionMatrixTest.java -text
 src/org/labkey/test/tests/microarray/ExpressionMatrixAssayTest.java -text
+src/org/labkey/test/tests/nab/NabAssayTest.java -text
+src/org/labkey/test/tests/nab/NabAssayThawListTest.java -text
+src/org/labkey/test/tests/nab/NabHighThroughputAssayTest.java -text
+src/org/labkey/test/tests/nab/NabMultiVirusPlateTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/SchemaBrowserPerfTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text

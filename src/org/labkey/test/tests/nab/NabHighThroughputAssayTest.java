@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.tests;
+package org.labkey.test.tests.nab;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;

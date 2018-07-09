@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.labkey.test.tests;
+package org.labkey.test.tests.nab;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -26,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
