@@ -745,7 +745,6 @@ src/org/labkey/test/tests/FilesWebpartFileRootTest.java -text
 src/org/labkey/test/tests/FilterTest.java -text
 src/org/labkey/test/tests/FolderExportTest.java -text
 src/org/labkey/test/tests/FolderTest.java -text
-src/org/labkey/test/tests/GenericChartsTest.java -text
 src/org/labkey/test/tests/GenericMeasurePickerTest.java -text
 src/org/labkey/test/tests/GpatAssayTest.java -text
 src/org/labkey/test/tests/GroupTest.java -text
@@ -817,7 +816,6 @@ src/org/labkey/test/tests/TabTest.java -text
 src/org/labkey/test/tests/TimeChartAPITest.java -text
 src/org/labkey/test/tests/TimeChartDateBasedTest.java -text
 src/org/labkey/test/tests/TimeChartImportTest.java -text
-src/org/labkey/test/tests/TimeChartTest.java -text
 src/org/labkey/test/tests/TimeChartVisitBasedTest.java -text
 src/org/labkey/test/tests/TimelineTest.java -text
 src/org/labkey/test/tests/TourTest.java -text
@@ -859,9 +857,11 @@ src/org/labkey/test/tests/remoteapi/BulkUpdateGroupApiTest.java -text
 src/org/labkey/test/tests/visualization/BarPlotTest.java -text
 src/org/labkey/test/tests/visualization/BoxPlotTest.java -text
 src/org/labkey/test/tests/visualization/ColumnChartTest.java -text
+src/org/labkey/test/tests/visualization/GenericChartsTest.java -text
 src/org/labkey/test/tests/visualization/LinePlotTest.java -text
 src/org/labkey/test/tests/visualization/PieChartTest.java -text
 src/org/labkey/test/tests/visualization/ScatterPlotTest.java -text
+src/org/labkey/test/tests/visualization/TimeChartTest.java -text
 src/org/labkey/test/tests/wiki/WikiHistoryTest.java -text
 src/org/labkey/test/util/APIAssayHelper.java -text
 src/org/labkey/test/util/APIContainerHelper.java -text
