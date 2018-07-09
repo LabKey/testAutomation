@@ -147,7 +147,7 @@ public class PipelineStatusTable extends DataRegionTable
 
     public LabKeyPage clickSetup()
     {
-        clickHeaderButton("Setup");
+        clickHeaderButtonAndWait("Setup");
         return null; // TODO: Create pipeline setup page
     }
 
