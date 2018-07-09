@@ -24,6 +24,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.tests.visualization.TimeChartTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;

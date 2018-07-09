@@ -28,7 +28,6 @@ import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.LookAndFeelBarPlot;
 import org.labkey.test.components.LookAndFeelScatterPlot;
-import org.labkey.test.tests.GenericChartsTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;

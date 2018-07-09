@@ -27,7 +27,6 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelLinePlot;
 import org.labkey.test.components.SaveChartDialog;
-import org.labkey.test.tests.GenericChartsTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;

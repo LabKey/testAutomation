@@ -24,6 +24,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.TimeChartWizard;
+import org.labkey.test.tests.visualization.TimeChartTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;

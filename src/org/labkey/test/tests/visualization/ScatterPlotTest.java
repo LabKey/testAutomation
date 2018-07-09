@@ -35,7 +35,6 @@ import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.ViewDatasetDataPage;
-import org.labkey.test.tests.GenericChartsTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;

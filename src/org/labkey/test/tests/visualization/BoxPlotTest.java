@@ -25,7 +25,6 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelBoxPlot;
 import org.labkey.test.components.SaveChartDialog;
-import org.labkey.test.tests.GenericChartsTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
