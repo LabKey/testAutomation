@@ -3,7 +3,6 @@ package org.labkey.test.tests;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -30,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 public class FileRootMigrationTest extends BaseWebDriverTest
 {
     private static final String FOLDER = "subfolder";
-    private final File targetFileRoot = TestFileUtils.getTestTempDir();
+    private final File targetFileRoot = new File(TestFileUtils.getTestTempDir(), "target");
     private File defaultProjectFileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
     private File defaultFolderFileRoot = TestFileUtils.getDefaultFileRoot(getProjectName() + "/" + FOLDER);
 
@@ -69,7 +68,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         _fileBrowserHelper.deleteAll();
         deleteAllPipelineJobs();
 
-        FileRootsManagementPage.beginAt(this, getProjectName())
+        FileRootsManagementPage.beginAt(this, getProjectName() + "/" + FOLDER)
                 .useDefaultFileRoot()
                 .clickSave();
         clickFolder(FOLDER);
@@ -213,16 +212,62 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         assertElementPresent(Locators.labkeyError);
     }
 
-    @Test @Ignore("TODO")
+    @Test
     public void testMigratingProjectWithNonInheritingSubfolder()
     {
+        final File projFile1 = TestFileUtils.getSampleData("fileTypes/sample.txt");
+        final File projFile2 = TestFileUtils.getSampleData("fileTypes/rtf_sample.rtf");
+        final File folderFile1 = TestFileUtils.getSampleData("fileTypes/csv_sample.csv");
+        final File folderFile2 = TestFileUtils.getSampleData("fileTypes/cmd_sample.cmd");
+        List<File> sourceFiles = new ArrayList<>();
+        File nonInheritingFileRoot = new File(TestFileUtils.getTestTempDir(), "custom");
+        TestFileUtils.deleteDir(nonInheritingFileRoot);
+        nonInheritingFileRoot.mkdirs();
 
-    }
+        String folderName = "folder \u2603";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
-    @Test @Ignore("TODO")
-    public void testDisableEnableFileSharing()
-    {
+        log("Upload files to project");
+        goToProjectHome();
+        _fileBrowserHelper.uploadFile(projFile1);
+        _fileBrowserHelper.createFolder(folderName);
+        _fileBrowserHelper.selectFileBrowserItem(folderName + "/");
+        _fileBrowserHelper.uploadFile(projFile2);
 
+        log("Upload files to subfolder with non-inherited file root");
+        FileRootsManagementPage.beginAt(this, getProjectName() + "/" + FOLDER)
+                .useCustomFileRoot(nonInheritingFileRoot.getAbsolutePath())
+                .clickSave();
+        clickFolder(FOLDER);
+        _fileBrowserHelper.uploadFile(folderFile1);
+        sourceFiles.add(new File(nonInheritingFileRoot, folderFile1.getName()));
+        _fileBrowserHelper.createFolder(folderName);
+        _fileBrowserHelper.selectFileBrowserItem(folderName + "/");
+        _fileBrowserHelper.uploadFile(folderFile2);
+        sourceFiles.add(new File(nonInheritingFileRoot, folderName + "/" + folderFile2.getName()));
+
+        goToProjectHome();
+
+        FileRootsManagementPage fileRootsManagementPage = goToFolderManagement().goToFilesTab();
+
+        PipelineStatusTable pipelineStatusTable = fileRootsManagementPage
+                .useCustomFileRoot(targetFileRoot.getAbsolutePath())
+                .saveAndMoveFiles();
+        pipelineStatusTable.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS);
+        waitForPipelineJobsToComplete(1, "Copy Files for File Root Change", false);
+        clickAndWait(Locator.linkWithText("COMPLETE"));
+
+        assertTextPresent(projFile1.getName(),
+                projFile2.getName());
+        assertTextNotPresent(FOLDER,
+                folderFile1.getName(),
+                folderFile2.getName());
+
+        clickFolder(FOLDER);
+        _fileBrowserHelper.selectFileBrowserItem("/" + folderFile1.getName());
+        _fileBrowserHelper.selectFileBrowserItem("/" + folderName + "/" + folderFile2.getName());
+
+        List<String> unfoundFiles = sourceFiles.stream().filter(f -> !f.exists()).map(File::getName).collect(Collectors.toList());
+        assertTrue("File(s) missing from non-inheriting file root after parent move: " + String.join(", ", unfoundFiles), unfoundFiles.isEmpty());
     }
 
     @Override
