@@ -698,6 +698,7 @@ src/org/labkey/test/testpicker/TestHelper.java -text
 src/org/labkey/test/tests/AbstractAssayTest.java -text
 src/org/labkey/test/tests/AbstractExportTest.java -text
 src/org/labkey/test/tests/AbstractKnitrReportTest.java -text
+src/org/labkey/test/tests/AbstractQWPTest.java -text
 src/org/labkey/test/tests/AbstractViabilityTest.java -text
 src/org/labkey/test/tests/AdminConsoleTest.java -text
 src/org/labkey/test/tests/AdvancedImportOptionsTest.java -text

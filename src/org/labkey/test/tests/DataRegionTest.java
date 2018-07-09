@@ -21,14 +21,12 @@ import org.junit.experimental.categories.Category;
 import org.labkey.api.util.Pair;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
@@ -40,11 +38,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 @Category({DailyA.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
-public class DataRegionTest extends BaseWebDriverTest
+public class DataRegionTest extends AbstractQWPTest
 {
     private static final String LIST_NAME = "WebColors" + INJECT_CHARS_1;
     private static final ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;
@@ -63,7 +60,6 @@ public class DataRegionTest extends BaseWebDriverTest
                     new Pair<>("Filter by Tag equals blue", "testFilterArray"),
                     new Pair<>("Sort by Tag", "testSort"),
                     new Pair<>("Hide buttons", "testHideButtons"),
-                    new Pair<>("RStudio buttons", "testRStudioButtons"),
                     new Pair<>("Hide Edit and Details columns", "testHideColumns"),
                     new Pair<>("Set Paging to 3 with config", "testPagingConfig"),
                     new Pair<>("Set Paging to 2 with API", "testSetPaging"),
@@ -78,8 +74,6 @@ public class DataRegionTest extends BaseWebDriverTest
                     new Pair<>("Use getBaseFilters", "testGetBaseFilters"),
                     new Pair<>("Filter on \"Sort\" column", "testFilterOnSortColumn")
                     );
-
-    private static final Pair<String, String> QWP_SCHEMA_LISTING = new Pair<>("List out all queries in schema", "testSchemaOnly");
 
     static
     {
@@ -142,62 +136,10 @@ public class DataRegionTest extends BaseWebDriverTest
         testQWPDemoPage();
     }
 
-    private void testQWPDemoPage()
+    @Override
+    protected List<Pair<String, String>> getTabSignalsPairs()
     {
-        log("Begin testing QWPDemo page");
-        beginAt("/query/" + getProjectName() + "/QWPDemo.view");
-
-        log("Drop and reload QWPDemo test data");
-        clickButton("Drop schema and clear test data");
-        waitForElement(Locator.button("Populate test data"));
-        clickButton("Populate test data");
-        sleep(1000);
-
-        log("Testing " + QWP_SCHEMA_LISTING.first);
-        click(Locator.linkWithText(QWP_SCHEMA_LISTING.first));
-
-        String alert = waitForSignalOrAlert(3000, QWP_SCHEMA_LISTING.second);
-        if (alert != null)
-            fail(QWP_SCHEMA_LISTING.first + " failed: " + alert);
-        waitForElement(Locator.css("span.labkey-wp-title-text").withText(QWP_SCHEMA_LISTING.first));
-
-        QWP_TAB_SIGNALS.stream().forEach(this::testQWPTab);
-
-        log("Drop QWPDemo test data");
-        beginAt("/query/" + getProjectName() + "/QWPDemo.view");
-        clickButton("Drop schema and clear test data"); // drop domain, needed for clean up project
-    }
-
-    // check every 500ms for specified wait amount for either alert or successSignal
-    private String waitForSignalOrAlert(long wait, String successSignal)
-    {
-        long t= System.currentTimeMillis();
-        long end = t + wait;
-        while (System.currentTimeMillis() < end)
-        {
-            Alert alert = getAlertIfPresent();
-            if (null != alert)
-            {
-                String alertText = alert.getText();
-                alert.accept();
-                return alertText;
-            }
-            if (isElementPresent(Locators.pageSignal(successSignal)))
-                return null;
-            sleep(500);
-        }
-        return "Test signal did not appear - " + successSignal;
-    }
-
-    private void testQWPTab(Pair<String, String> titleSignalPair)
-    {
-        log("Testing " + titleSignalPair.first);
-        click(Locator.linkWithText(titleSignalPair.first));
-        String alert = waitForSignalOrAlert(3000, titleSignalPair.second);
-        if (alert != null)
-            fail(titleSignalPair.first + " failed: " + alert);
-
-        waitForElement(Locator.css(".labkey-data-region"));
+        return QWP_TAB_SIGNALS;
     }
 
     private void exportLoggingTest()
