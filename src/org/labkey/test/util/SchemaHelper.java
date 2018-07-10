@@ -21,6 +21,7 @@ import org.labkey.test.WebDriverWrapper;
 public class SchemaHelper
 {
     protected WebDriverWrapper _test;
+    private int _queryLoadTimeOut = 0;
 
     public SchemaHelper(WebDriverWrapper test)
     {
@@ -37,6 +38,11 @@ public class SchemaHelper
     public void updateLinkedSchema(String projectName, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {
         _editLinkedSchema(false, projectName, targetFolder, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
+    }
+
+    public void setQueryLoadTimeout(int timeout)
+    {
+        _queryLoadTimeOut = timeout;
     }
 
     public void _editLinkedSchema(boolean create, String projectName, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
@@ -76,7 +82,10 @@ public class SchemaHelper
             // There are multiple Ext form elements on this row, so the label for the actual combo box is empty
             _test._ext4Helper.selectComboBoxItem("", sourceSchemaName);
 
-            _test.waitForElement(Locator.css(".query-loaded-marker"));
+            if(_queryLoadTimeOut > 0)
+                _test.waitForElement(Locator.css(".query-loaded-marker"), _queryLoadTimeOut);
+            else
+                _test.waitForElement(Locator.css(".query-loaded-marker"));
         }
 
         if (tables != null)
