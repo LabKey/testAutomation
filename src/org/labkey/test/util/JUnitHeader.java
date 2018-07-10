@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.labkey.test.WebTestHelper.logToServer;
 
+@BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class JUnitHeader extends BaseWebDriverTest
 {
     @Override

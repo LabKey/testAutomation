@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 
 import java.util.List;
 
+@BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class JUnitFooter extends BaseWebDriverTest
 {
     @Override
