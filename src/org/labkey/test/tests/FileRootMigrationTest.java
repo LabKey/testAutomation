@@ -239,11 +239,11 @@ public class FileRootMigrationTest extends BaseWebDriverTest
                 .clickSave();
         clickFolder(FOLDER);
         _fileBrowserHelper.uploadFile(folderFile1);
-        sourceFiles.add(new File(nonInheritingFileRoot, folderFile1.getName()));
+        sourceFiles.add(new File(nonInheritingFileRoot, "@files/" + folderFile1.getName()));
         _fileBrowserHelper.createFolder(folderName);
         _fileBrowserHelper.selectFileBrowserItem(folderName + "/");
         _fileBrowserHelper.uploadFile(folderFile2);
-        sourceFiles.add(new File(nonInheritingFileRoot, folderName + "/" + folderFile2.getName()));
+        sourceFiles.add(new File(nonInheritingFileRoot, "@files/" + folderName + "/" + folderFile2.getName()));
 
         goToProjectHome();
 
