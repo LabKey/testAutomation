@@ -243,26 +243,20 @@ target folder, that should be respected.  The same is true for both updateRows a
         }
 
         function doTests() {
-            //expect failure because container doesnt exist
+            //this container value will not resolve, so the primary container will be used
             multiInsert.add(LABKEY.Query.insertRows, {
                 containerPath: folderContainerId,
                 schemaName: 'lists',
                 queryName: listName,
                 scope: this,
                 rows: [{
-                    field1: workbook1,
+                    field1: folderContainerId,
                     container: workbook1 + 'x'
                 }],
-                failure: function (response) {
-                    if (response.exception !== 'Unknown container: ' + workbook1 + 'x'){
-                        logError('Incorrect error from insert into unknown container: ' + response.exception);
-                    }
-
-                    success('Insert into unknown container');
-                },
                 success: function (response) {
-                    logError('ERROR: This should have failed because the container doesnt exist');
-                }
+                    success('Insert using bogus non-GUID value for list');
+                },
+                failure: failureCallback
             });
 
             //expect failure because container isnt a child workbook
@@ -305,11 +299,11 @@ target folder, that should be respected.  The same is true for both updateRows a
                     field1: workbook2,
                     container: workbook2
                 },{
-                    field1: workbook1,
-                    container: workbook1Path
+                    field1: folderContainerId,
+                    container: workbook1Path //this will silently got rejected
                 },{
-                    field1: workbook2,
-                    container: workbook2Path
+                    field1: folderContainerId,
+                    container: workbook2Path //this will silently got rejected
                 }],
                 success: function (response) {
                     multiSelect.add(LABKEY.Query.selectRows, getVerifySelect(response, 'id', 'field1', 'container'))
@@ -333,11 +327,11 @@ target folder, that should be respected.  The same is true for both updateRows a
                     Name: workbook2,
                     container: workbook2
                 },{
-                    Name: workbook1,
-                    container: workbook1Path
+                    Name: folderContainerId,
+                    container: workbook1Path //this will silently got rejected
                 },{
-                    Name: workbook2,
-                    container: workbook2Path
+                    Name: folderContainerId,
+                    container: workbook2Path //this will silently got rejected
                 }],
                 success: function (response) {
                     multiSelect.add(LABKEY.Query.selectRows, getVerifySelect(response, 'rowid', 'Name', 'Container'));
@@ -355,7 +349,7 @@ target folder, that should be respected.  The same is true for both updateRows a
                     container: subfolder1
                 }],
                 failure: function (response) {
-                    if (response.exception !== 'Row is not from the correct container: ' + subfolder1){
+                    if (response.exception !== 'Row supplied container value: ' + subfolder1 + ' cannot be used for actions against the container: ' + LABKEY.Security.currentContainer.path){
                         logError('Incorrect error from cross-container insert: ' + response.exception);
                     }
                     else {
