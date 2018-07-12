@@ -22,6 +22,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.Collections;
 
@@ -90,13 +91,25 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public void dismiss(String buttonText)
     {
+        dismiss(buttonText, 10);
+    }
+
+    /* for synchronous operations that take time, the caller can specify how long to wait */
+    public void dismiss(String buttonText, Integer waitSeconds)
+    {
         Locators.dismissButton(buttonText).findElement(getComponentElement()).click();
-        waitForClose();
+        waitForClose(waitSeconds);
     }
 
     protected void waitForClose()
     {
-        getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
+        waitForClose(10);
+    }
+
+    protected void waitForClose(Integer waitSeconds)
+    {
+        new WebDriverWait(getDriver(), waitSeconds)
+                .until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
     }
 
     protected ElementCache newElementCache()
