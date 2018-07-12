@@ -550,7 +550,9 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         String responseBody = response.getResponseBody();
 
         assertEquals("Wrong response code. Response: " + responseBody, HttpStatus.SC_OK, status);
-        assertTrue("Expected error message not present (row in wrong container). Response: " + responseBody, responseBody.contains("The row is from the wrong container."));
+        assertTrue("Expected error message not present (The row is from the container: <some GUID> which does not allow deletes from the container: /ExternalSchemaProject)). Response: " + responseBody,
+                responseBody.contains("The row is from the container:") &&
+                        responseBody.contains("which does not allow deletes from the container: /ExternalSchemaProject"));
     }
 
     public void deleteViaForm(String containerPath, int[] pk)
