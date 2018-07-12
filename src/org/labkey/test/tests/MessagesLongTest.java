@@ -28,7 +28,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.dumbster.EmailRecordTable;
-import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.DataRegionTable;
@@ -220,8 +219,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementPresent(Locator.tagWithText("li", "stinky feet"));
         assertElementPresent(Locator.tagWithText("li", "internet trolls"));
         clickButton("Submit", 0);
-        Window confirmWindow = Window.Window(getDriver()).withTitle("Confirm message formatting").find();
-        confirmWindow.clickButton("Yes");
+
         assertElementPresent(Locator.tagWithText("h1", "Holy Header, Batman!"));
         assertElementPresent(Locator.tagWithText("strong", "bold as bold can possibly be"));
 
