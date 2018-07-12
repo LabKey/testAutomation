@@ -726,7 +726,6 @@ src/org/labkey/test/tests/DatabaseDiagnosticsTest.java -text
 src/org/labkey/test/tests/DatasetExportTest.java -text
 src/org/labkey/test/tests/DatasetPublishTest.java -text
 src/org/labkey/test/tests/DrugSensitivityAssayTest.java -text
-src/org/labkey/test/tests/ElispotAssayTest.java -text
 src/org/labkey/test/tests/EmbeddedWebPartTest.java -text
 src/org/labkey/test/tests/ExpTest.java -text
 src/org/labkey/test/tests/ExternalSchemaTest.java -text
@@ -830,6 +829,7 @@ src/org/labkey/test/tests/announcements/MessagesAttachmentTest.java -text
 src/org/labkey/test/tests/announcements/ModeratorReviewTest.java -text
 src/org/labkey/test/tests/api/CustomizeGridPermissionsTest.java -text
 src/org/labkey/test/tests/elisa/ElisaAssayTest.java -text
+src/org/labkey/test/tests/elispotassay/ElispotAssayTest.java -text
 src/org/labkey/test/tests/flow/BaseFlowTest.java -text
 src/org/labkey/test/tests/flow/FlowAnalysisResolverTest.java -text
 src/org/labkey/test/tests/flow/FlowImportTest.java -text

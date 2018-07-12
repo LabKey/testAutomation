@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.labkey.test.tests;
+package org.labkey.test.tests.elispotassay;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Before;
@@ -32,6 +32,7 @@ import org.labkey.test.components.CrosstabDataRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
