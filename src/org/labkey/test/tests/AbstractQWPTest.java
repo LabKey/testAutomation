@@ -67,7 +67,7 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
     {
         log("Testing " + titleSignalPair.first);
         click(Locator.linkWithText(titleSignalPair.first));
-        String alert = waitForSignalOrAlert(3000, titleSignalPair.second);
+        String alert = waitForSignalOrAlert(10000, titleSignalPair.second);
         if (alert != null)
             fail(titleSignalPair.first + " failed: " + alert);
 
