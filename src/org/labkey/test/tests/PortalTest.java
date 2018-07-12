@@ -114,6 +114,7 @@ public class PortalTest extends BaseWebDriverTest
                 "Pending MageML Files",
                 "Assay List");
         final List<String> collaborationPreferredWebparts = Arrays.asList(
+                "Subfolders",
                 "Wiki",
                 "Messages",
                 "Pages");
