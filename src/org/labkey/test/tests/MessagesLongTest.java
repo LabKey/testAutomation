@@ -29,6 +29,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.pages.InsertPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -46,7 +47,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.NBSP;
 
 @Category({DailyA.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 11)
+@BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class MessagesLongTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "MessagesVerifyProject";
@@ -476,18 +477,16 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Update Group Membership");
 
         clickProject(PROJECT_NAME);
-        // TODO: Convert to test.pages.announcements.InsertPage
         _portalHelper.clickWebpartMenuItem("Messages", true, "New");
-        setFormElement(Locator.id(MEMBER_LIST), USER2);
-        clickButtonContainingText("Submit", "Title must not be blank");
-        clickButtonContainingText("OK", 0);
-        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.name("title"), MSG3_TITLE);
-        clickButton("Submit");
-        assertTextPresent("This user doesn't have permission");
-        setFormElement(Locator.id(MEMBER_LIST), USER1);
-        selectOptionByText(Locator.name("assignedTo"), _userHelper.getDisplayNameForEmail(USER3));
-        clickButton("Submit");
+        InsertPage insertPage = new InsertPage(getDriver());
+        insertPage.setFormElement(Locator.id(MEMBER_LIST), USER2);
+        insertPage.clickButtonContainingText("Submit", "Title must not be blank");
+        insertPage.assertTextPresent("This user doesn't have permission");
+        insertPage.setFormElement(Locator.name("title"), MSG3_TITLE);
+
+        insertPage.setFormElement(Locator.id(MEMBER_LIST), USER1);
+        insertPage.selectOptionByText(Locator.name("assignedTo"), _userHelper.getDisplayNameForEmail(USER3));
+        insertPage.clickButton("Submit");
         clickAndWait(Locator.linkWithText("view message or respond"));
         verifyMemberList();
         assertElementPresent(Locator.tagWithName("div", "webpart").withDescendant(Locator.tag("td")
