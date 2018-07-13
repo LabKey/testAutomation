@@ -28,6 +28,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.InsertPage;
 import org.labkey.test.pages.admin.PermissionsPage;
@@ -220,7 +221,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementPresent(Locator.tagWithText("li", "stinky feet"));
         assertElementPresent(Locator.tagWithText("li", "internet trolls"));
         clickButton("Submit", 0);
-
+        Window confirmWindow = Window.Window(getDriver()).withTitle("Confirm message formatting").find();
+        confirmWindow.clickButton("Yes");
         assertElementPresent(Locator.tagWithText("h1", "Holy Header, Batman!"));
         assertElementPresent(Locator.tagWithText("strong", "bold as bold can possibly be"));
 
@@ -481,6 +483,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         InsertPage insertPage = new InsertPage(getDriver());
         insertPage.setFormElement(Locator.id(MEMBER_LIST), USER2);
         insertPage.clickButtonContainingText("Submit", "Title must not be blank");
+        insertPage.clickButtonContainingText("OK", 0);
+        insertPage._extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        insertPage.setFormElement(Locator.name("title"), MSG3_TITLE);
+        insertPage.clickButton("Submit");
         insertPage.assertTextPresent("This user doesn't have permission");
         insertPage.setFormElement(Locator.name("title"), MSG3_TITLE);
 
