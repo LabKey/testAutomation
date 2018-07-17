@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class ThreadDumpAndKill
 {
-    public static void main(String... args) throws IOException, IllegalConnectorArgumentsException, AbsentInformationException, IncompatibleThreadStateException
+    public static void main(String... args) throws IOException, IllegalConnectorArgumentsException, IncompatibleThreadStateException
     {
         if (args.length != 1)
         {
@@ -72,7 +72,7 @@ public class ThreadDumpAndKill
         System.exit(1);
     }
 
-    private static void connect(SocketAttachingConnector connector, int port) throws IllegalConnectorArgumentsException, IOException, AbsentInformationException, IncompatibleThreadStateException
+    private static void connect(SocketAttachingConnector connector, int port) throws IllegalConnectorArgumentsException, IOException, IncompatibleThreadStateException
     {
         Map<String, Connector.Argument> arguments = connector.defaultArguments();
         arguments.get("hostname").setValue("localhost");
@@ -98,7 +98,7 @@ public class ThreadDumpAndKill
         }
     }
 
-    private static void dumpThread(ThreadReference threadReference) throws IncompatibleThreadStateException, AbsentInformationException
+    private static void dumpThread(ThreadReference threadReference) throws IncompatibleThreadStateException
     {
         System.out.println("Thread '" + threadReference.name() + "', status = " + getStatus(threadReference));
         ObjectReference objectRef = threadReference.currentContendedMonitor();
