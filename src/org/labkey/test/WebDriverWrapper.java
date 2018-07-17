@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.labkey.api.util.FileUtil;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.FolderManagementPage;
@@ -3054,9 +3055,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertFalse("Button '" + buttonText + "' was present", isButtonPresent(buttonText));
     }
 
-    public void checkRadioButton(Locator radioButtonLocator)
+    public RadioButton checkRadioButton(Locator radioButtonLocator)
     {
-        RadioButton(radioButtonLocator).find(getDriver()).check();
+        RadioButton radioButton = RadioButton(radioButtonLocator).find(getDriver());
+        radioButton.check();
+        waitFor(()-> radioButton.isChecked(), "The radio button did not become checked as expected", 1500);
+        return radioButton;
     }
 
     public void checkCheckbox(Locator checkBoxLocator)
