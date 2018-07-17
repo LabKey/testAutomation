@@ -32,6 +32,11 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         //waitForElement(elementCache().systemDescription);
     }
 
+    public String getHeaderShortName()
+    {
+        return (elementCache().headerShortName.getAttribute("value"));
+    }
+
     public void setTheme(String theme)
     {
         selectOptionByText(elementCache().theme, theme);
