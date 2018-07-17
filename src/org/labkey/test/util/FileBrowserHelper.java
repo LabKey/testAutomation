@@ -118,7 +118,16 @@ public class FileBrowserHelper extends WebDriverWrapper
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory
                 checkFileBrowserFileCheckbox(parts[i]);// select last item: click on tree node name
             else
-                selectFolderTreeNode(nodeId.toString());
+            {
+                try
+                {
+                    selectFolderTreeNode(nodeId.toString());
+                }
+                catch (NoSuchElementException nse)
+                {
+                    throw new AssertionError("Folder not found: " + parts[i], nse);
+                }
+            }
         }
     }
 
@@ -167,7 +176,15 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         scrollToGridRow(fileName);
 
-        final Checkbox checkbox = Ext4Checkbox().locatedBy(Locators.gridRowCheckbox(fileName)).find(getDriver());
+        final Checkbox checkbox;
+        try
+        {
+            checkbox = Ext4Checkbox().locatedBy(Locators.gridRowCheckbox(fileName)).find(getDriver());
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new AssertionError("File not found: " + fileName, nse);
+        }
 
         // Check the box if it is not checked and should be or if if it is checked and it should not be.
         if (checkbox.isChecked() != checkTheBox)
