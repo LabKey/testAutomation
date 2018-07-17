@@ -116,7 +116,8 @@ public class APIContainerHelper extends AbstractContainerHelper
     }
 
     @Override
-    public void deleteFolder(String project, String folderName, int waitTime)
+    @LogMethod
+    public void deleteFolder(@LoggedParam String project, @LoggedParam String folderName, int waitTime)
     {
         deleteContainer(project + "/" + folderName, true, waitTime);
     }
