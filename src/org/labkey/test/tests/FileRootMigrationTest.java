@@ -106,8 +106,8 @@ public class FileRootMigrationTest extends BaseWebDriverTest
 
         goToProjectHome();
 
+        log("Moving file root to " + targetFileRoot);
         FileRootsManagementPage fileRootsManagementPage = goToFolderManagement().goToFilesTab();
-
         PipelineStatusTable pipelineStatusTable = fileRootsManagementPage
                 .useCustomFileRoot(targetFileRoot.getAbsolutePath())
                 .saveAndMoveFiles();
@@ -124,6 +124,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         assertTextPresent("Copying file", hasUploadLogs ? 6 : 4);
         assertTextPresent("Copying directory", 4);
 
+        log("Verify that all files are still present");
         clickFolder(getProjectName());
         _fileBrowserHelper.selectFileBrowserItem("/" + projFile1.getName());
         _fileBrowserHelper.selectFileBrowserItem("/" + folderName + "/" + projFile2.getName());
@@ -166,8 +167,8 @@ public class FileRootMigrationTest extends BaseWebDriverTest
 
         goToProjectHome();
 
+        log("Copying file root to " + targetFileRoot);
         FileRootsManagementPage fileRootsManagementPage = goToFolderManagement().goToFilesTab();
-
         PipelineStatusTable pipelineStatusTable = fileRootsManagementPage
                 .useCustomFileRoot(targetFileRoot.getAbsolutePath())
                 .saveAndCopyFiles();
@@ -184,6 +185,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         assertTextPresent("Copying file", hasUploadLogs ? 6 : 4);
         assertTextPresent("Copying directory", 4);
 
+        log("Verify that all files are still present");
         clickFolder(getProjectName());
         _fileBrowserHelper.selectFileBrowserItem("/" + projFile1.getName());
         _fileBrowserHelper.selectFileBrowserItem("/" + folderName + "/" + projFile2.getName());
@@ -247,8 +249,8 @@ public class FileRootMigrationTest extends BaseWebDriverTest
 
         goToProjectHome();
 
+        log("Moving file root of project to " + targetFileRoot);
         FileRootsManagementPage fileRootsManagementPage = goToFolderManagement().goToFilesTab();
-
         PipelineStatusTable pipelineStatusTable = fileRootsManagementPage
                 .useCustomFileRoot(targetFileRoot.getAbsolutePath())
                 .saveAndMoveFiles();
@@ -262,6 +264,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
                 folderFile1.getName(),
                 folderFile2.getName());
 
+        log("Verify that files are still present");
         clickFolder(FOLDER);
         _fileBrowserHelper.selectFileBrowserItem("/" + folderFile1.getName());
         _fileBrowserHelper.selectFileBrowserItem("/" + folderName + "/" + folderFile2.getName());
