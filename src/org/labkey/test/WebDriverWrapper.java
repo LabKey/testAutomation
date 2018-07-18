@@ -3059,7 +3059,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         RadioButton radioButton = RadioButton(radioButtonLocator).find(getDriver());
         radioButton.check();
-        waitFor(()-> radioButton.isChecked(), "The radio button did not become checked as expected", 1500);
+        if (!waitFor(()-> radioButton.isChecked(), 250))
+            radioButton.check();
         return radioButton;
     }
 
