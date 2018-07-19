@@ -304,7 +304,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
 
     protected void goToDataViews()
     {
-        clickFolder(_currentProject);
+        clickProject(_currentProject);
         waitAndClickAndWait(Locator.linkWithText("Clinical and Assay Data"));
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT); // Lots of stuff on this page. Can take a while to load.
     }
