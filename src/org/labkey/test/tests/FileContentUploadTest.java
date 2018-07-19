@@ -195,8 +195,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         final String ABSOLUTE_FILE_PATH_BUTTON_ID = "10";
 
-        goToProjectHome();
-        clickFolder(subfolderName);
+        navigateToFolder(getProjectName(), subfolderName);
         final File testFile = TestFileUtils.getSampleData("security/InlineFile2.html");
         final String filename = testFile.getName();
         _fileBrowserHelper.uploadFile(testFile, FILE_DESCRIPTION, Collections.emptyList(), false);
