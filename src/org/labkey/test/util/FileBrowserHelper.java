@@ -422,7 +422,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     @LogMethod
     public void uploadFile(@LoggedParam final File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties, boolean replace)
     {
-        waitForFileGridReady();
+        int initialCount = waitForFileGridReady();
 
         openUploadPanel();
 
@@ -436,7 +436,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         if (description != null)
             setFormElement(Locator.name("description"), description);
 
-        Runnable clickUpload = () -> {
+        String signalValue = doAndWaitForPageSignal(() -> {
             clickButton("Upload", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
             if (replace)
@@ -445,16 +445,10 @@ public class FileBrowserHelper extends WebDriverWrapper
                 assertTrue("Unexpected confirmation message.", confirmation.getBody().contains("Would you like to replace it?"));
                 confirmation.clickButton("Yes", true);
             }
-        };
+        }, FILE_LIST_SIGNAL_NAME, longWait());
+        int fileCount = Integer.parseInt(signalValue);
+        assertEquals("Wrong number of files after upload", initialCount + (replace ? 0 : 1), fileCount);
         Locator uploadedFile = fileGridCell.withText(file.getName());
-        try
-        {
-            doAndWaitForElementToRefresh(clickUpload, uploadedFile, shortWait());
-        }
-        catch (NoSuchElementException retry)
-        {
-            doAndWaitForElementToRefresh(clickUpload, uploadedFile, shortWait());
-        }
 
         if (description != null)
             waitForElement(fileGridCell.withText(description));
@@ -614,10 +608,15 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
-    public void waitForFileGridReady()
+    /**
+     * Waits for file grid to be ready for use
+     * @return Count of files in selected folder
+     */
+    public int waitForFileGridReady()
     {
-        waitForElement(org.labkey.test.Locators.pageSignal(FILE_LIST_SIGNAL_NAME));
+        String signalValue = waitForElement(org.labkey.test.Locators.pageSignal(FILE_LIST_SIGNAL_NAME)).getAttribute("value");
         waitForGrid();
+        return Integer.parseInt(signalValue);
     }
 
     public void openFolderTree()
