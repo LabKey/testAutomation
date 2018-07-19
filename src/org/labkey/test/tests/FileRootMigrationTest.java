@@ -125,7 +125,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         assertTextPresent("Copying directory", 4);
 
         log("Verify that all files are still present");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         _fileBrowserHelper.selectFileBrowserItem("/" + projFile1.getName());
         _fileBrowserHelper.selectFileBrowserItem("/" + folderName + "/" + projFile2.getName());
         clickFolder(FOLDER);
@@ -186,7 +186,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         assertTextPresent("Copying directory", 4);
 
         log("Verify that all files are still present");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         _fileBrowserHelper.selectFileBrowserItem("/" + projFile1.getName());
         _fileBrowserHelper.selectFileBrowserItem("/" + folderName + "/" + projFile2.getName());
         clickFolder(FOLDER);
