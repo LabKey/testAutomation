@@ -125,6 +125,12 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().lookAndFeelSettingsLink);
     }
 
+    public void clickMasterPatientIndex()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().masterPatientIndex);
+    }
+
     public void clickProfiler()
     {
         goToAdminConsoleLinksSection();
@@ -190,6 +196,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
         protected WebElement fullTextSearchLink = Locator.linkWithText("full-text search").findWhenNeeded(this);
         protected WebElement lookAndFeelSettingsLink = Locator.linkWithText("look and feel settings").findWhenNeeded(this);
+        protected WebElement masterPatientIndex = Locator.linkWithText("Master Patient Index").findWhenNeeded(this);
         protected WebElement profilerLink = Locator.linkWithText("profiler").findWhenNeeded(this);
         protected WebElement runningThreadsLink = Locator.linkWithText("running threads").findWhenNeeded(this);
         protected WebElement siteSettingsLink = Locator.linkWithText("site settings").findWhenNeeded(this);
