@@ -106,6 +106,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().emailCustomizationLink);
     }
 
+    public void clickNotificationServiceAdmin()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().notificationServiceAdminLink);
+    }
     public ConfigureFileSystemAccessPage clickFiles()
     {
         goToAdminConsoleLinksSection();
@@ -193,6 +198,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement configureFooterLink = Locator.linkWithText("configure footer").findWhenNeeded(this);
         protected WebElement configureHeaderLink = Locator.linkWithText("configure header").findWhenNeeded(this);
         protected WebElement emailCustomizationLink = Locator.linkWithText("email customization").findWhenNeeded(this);
+        protected WebElement notificationServiceAdminLink = Locator.linkWithText("notification service admin").findWhenNeeded(this);
         protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
         protected WebElement fullTextSearchLink = Locator.linkWithText("full-text search").findWhenNeeded(this);
         protected WebElement lookAndFeelSettingsLink = Locator.linkWithText("look and feel settings").findWhenNeeded(this);
