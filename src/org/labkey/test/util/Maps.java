@@ -16,10 +16,13 @@
 
 package org.labkey.test.util;
 
+import org.labkey.api.annotations.JavaRuntimeVersion;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@JavaRuntimeVersion  // TODO: Remove once Java 9+ is required (change to built-in Map.of())
 public class Maps
 {
     public static <K, V> Map<K, V> of()
