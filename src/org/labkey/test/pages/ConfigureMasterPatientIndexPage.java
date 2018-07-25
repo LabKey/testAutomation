@@ -2,12 +2,9 @@ package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
-import static org.labkey.test.components.html.SelectWrapper.Select;
 
 public class ConfigureMasterPatientIndexPage extends LabKeyPage<ConfigureMasterPatientIndexPage.ElementCache>
 {
