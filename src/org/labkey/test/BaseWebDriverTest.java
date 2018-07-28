@@ -1317,7 +1317,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @LogMethod
-    protected void prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, int locationIndex)
+    protected void prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles, int locationIndex)
     {
         if (folderName != null)
             clickFolder(folderName);
@@ -1331,6 +1331,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             new Checkbox(Locator.tagWithText("label", "Role assignments for users and groups").precedingSibling("input").findElement(getDriver())).check();
         if (includeSubfolders)
             new Checkbox(Locator.tagContainingText("label", "Include Subfolders").precedingSibling("input").findElement(getDriver())).check();
+        if (includeFiles)
+            new Checkbox(Locator.tagContainingText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
         checkRadioButton(Locator.tagWithClass("table", "export-location").index(locationIndex)); // first locator with this name is "Pipeline root export directory, as individual files
     }
 
@@ -1338,20 +1340,26 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void exportFolderAsIndividualFiles(String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders)
     {
         // first locator with this name is "Pipeline root export directory, as individual files
-        prepareForFolderExport(folderName, exportSecurityGroups, exportRoleAssignments, includeSubfolders, 0);
+        prepareForFolderExport(folderName, exportSecurityGroups, exportRoleAssignments, includeSubfolders, false, 0);
         clickButton("Export");
         _fileBrowserHelper.waitForFileGridReady();
     }
 
     protected void exportFolderAsZip(boolean exportSecurityGroups, boolean exportRoleAssignments)
     {
-        prepareForFolderExport(null, exportSecurityGroups, exportRoleAssignments, false, 1);
+        prepareForFolderExport(null, exportSecurityGroups, exportRoleAssignments, false, false,1);
         clickButton("Export");
+    }
+
+    protected File exportFolderAsZip(String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles)
+    {
+        prepareForFolderExport(folderName, exportSecurityGroups, exportRoleAssignments, includeSubfolders, includeFiles,2);
+        return clickAndWaitForDownload(findButton("Export"));
     }
 
     protected File exportFolderToBrowserAsZip()
     {
-        prepareForFolderExport(null, false, false, false, 2);
+        prepareForFolderExport(null, false, false, false, false,2);
         return clickAndWaitForDownload(findButton("Export"));
     }
 

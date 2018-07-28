@@ -2,14 +2,12 @@ package org.labkey.test.pages.admin;
 
 import org.labkey.api.security.PrincipalType;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -19,7 +17,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
@@ -356,6 +353,26 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         clickButton("Done", 0);
         _extHelper.waitForExtDialogToDisappear(groupName + " Information");
         return ret;
+    }
+
+    public boolean isUserInRole(String userName, String permissionString)
+    {
+        String role = toRole(permissionString);
+        if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
+        {
+            throw new IllegalArgumentException("Can't set NoPermissionRole; call removePermission()");
+        }
+        else
+        {
+            log("verifying whether user " + userName + " has permission " + role);
+            _ext4Helper.clickTabContainingText("Permissions");
+
+            Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
+            waitForElement(roleCombo);
+            scrollIntoView(roleCombo);
+
+            return isElementPresent(Locator.permissionButton(userName, permissionString));
+        }
     }
 
     public void selectGroup(String groupName)
