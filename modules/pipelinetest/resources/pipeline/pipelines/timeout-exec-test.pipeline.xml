@@ -10,7 +10,7 @@
             <outputs>
                 <file name="output.tsv"/>
             </outputs>
-            <exec exe="node" timeout="1">
+            <exec exe="node" timeout="5">
                 node pipeline/pipelines/timeout-exec-test.js
             </exec>
         </task>
