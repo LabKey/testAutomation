@@ -114,7 +114,7 @@
                     "name": "Security API Test Project",
                     "roles": [
                         "org.labkey.api.security.roles.SiteAdminRole",
-                        "org.labkey.api.security.roles.DeveloperRole"
+                        "org.labkey.api.security.roles.PlatformDeveloperRole"
                     ],
                     "path": "/Security API Test Project",
                     "permissions": 32783,
@@ -177,7 +177,6 @@
                         "org.labkey.study.security.permissions.ManageNewRequestFormPermission",
                         "org.labkey.api.security.permissions.UpdatePermission",
                         "org.labkey.study.security.permissions.LockSpecimensPermission",
-                        "org.labkey.wiki.permissions.IncludeScriptPermission",
                         "org.labkey.api.security.permissions.ReadSomePermission",
                         "org.labkey.api.lists.permissions.DesignListPermission"
                     ]
@@ -576,7 +575,6 @@
                         "org.labkey.study.security.permissions.ManageNewRequestFormPermission",
                         "org.labkey.api.security.permissions.UpdatePermission",
                         "org.labkey.study.security.permissions.LockSpecimensPermission",
-                        "org.labkey.wiki.permissions.IncludeScriptPermission",
                         "org.labkey.api.security.permissions.ReadSomePermission",
                         "org.labkey.api.lists.permissions.DesignListPermission"
                     ]
