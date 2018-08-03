@@ -591,7 +591,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             verifyInitialUserRedirects();
 
             log("Testing bad email addresses");
-            verifyInitialUserError(null, null, null, "Invalid email address:");
+            verifyInitialUserError(null, null, null, "Invalid email address");
             verifyInitialUserError("bogus@bogus@bogus", null, null, "Invalid email address: bogus@bogus@bogus");
 
             log("Testing bad passwords");
