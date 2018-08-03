@@ -356,6 +356,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return ((JavascriptExecutor) getDriver()).executeScript(script, arguments);
     }
 
+    /**
+     * Wrapper for executing JavaScript through WebDriver and verifying return type.
+     * @param <T> See {@link JavascriptExecutor#executeScript(java.lang.String, java.lang.Object...)} for valid return types
+     */
     public <T> T executeScript(String script, Class<T> expectedResultType, Object... arguments)
     {
         Object o = executeScript(script, arguments);
@@ -365,6 +369,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (T) o;
     }
 
+    /**
+     * Wrapper for synchronous execution of asynchronous JavaScript. This wrapper extracts the 'callback' from the argument list
+     * See {@link JavascriptExecutor#executeAsyncScript(java.lang.String, java.lang.Object...)} for details
+     */
     public Object executeAsyncScript(String script, Object... arguments)
     {
         script = "var callback = arguments[arguments.length - 1];\n" + script; // See WebDriver documentation
