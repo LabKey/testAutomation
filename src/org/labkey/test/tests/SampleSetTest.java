@@ -218,7 +218,7 @@ public class SampleSetTest extends BaseWebDriverTest
         waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
         Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
         clickButton("Submit");
-        assertTextPresent("More than one match for parent material");
+        assertTextPresent("Failed to find sample parent: Found 2 values matching: SampleSetBVT4");
 
         // Try again with a qualified sample name
         setFormElement(Locator.name("data"), CHILD_SAMPLE_SET_TSV);
