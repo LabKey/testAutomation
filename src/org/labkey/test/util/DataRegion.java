@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.Locator;
@@ -101,7 +102,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public DataRegionApi api()
     {
-        return new DataRegionApi();
+        return elementCache().dataRegionApi;
     }
 
     public WebDriverWrapper getWrapper()
@@ -302,10 +303,12 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public class ElementCache extends Component.ElementCache
     {
-        public ElementCache()
+        protected ElementCache()
         {
             getWrapper().waitForElement(pageSignal(getUpdateSignal()), DEFAULT_WAIT);
         }
+
+        private final DataRegionApi dataRegionApi = new DataRegionApi();
 
         private final WebElement buttonBar = Locator.tagWithClass("*", "labkey-button-bar").findWhenNeeded(this);
         private final WebElement UX_ButtonBar = Locator.tagWithClass("div", "lk-region-bar").findWhenNeeded(this);
@@ -382,11 +385,16 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     private abstract class BaseDataRegionApi
     {
-        final String regionJS = "LABKEY.DataRegions['" + getDataRegionName() + "']";
+        final String regionJS = "LABKEY.DataRegions['" + getDataRegionName().replaceAll("'", "\\'") + "']";
 
         public void executeScript(String methodWithArgs)
         {
-            getWrapper().executeScript(regionJS + "." + methodWithArgs);
+            executeScript(methodWithArgs, null);
+        }
+
+        public <T> T executeScript(String methodWithArgs, Class<T> expectedResultType)
+        {
+            return getWrapper().executeScript(expectedResultType != null ? "return " : "" + regionJS + "." + methodWithArgs, expectedResultType);
         }
 
         public void callMethod(String apiMethod, String... args)
@@ -398,18 +406,26 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public class DataRegionApi extends BaseDataRegionApi
     {
+        private final DataRegionApiExpectingRefresh refreshApi = new DataRegionApiExpectingRefresh();
+
+        private DataRegionApi() { }
+
         public DataRegionApiExpectingRefresh expectingRefresh()
         {
-            return new DataRegionApiExpectingRefresh();
+            return refreshApi;
         }
     }
 
     public class DataRegionApiExpectingRefresh extends BaseDataRegionApi
     {
+        private DataRegionApiExpectingRefresh() { }
+
         @Override
-        public void executeScript(String methodWithArgs)
+        public <T> T executeScript(String methodWithArgs, Class<T> expectedResultType)
         {
-            doAndWaitForUpdate(() -> super.executeScript(methodWithArgs));
+            MutableObject<T> result = new MutableObject<>();
+            doAndWaitForUpdate(() -> result.setValue(super.executeScript(methodWithArgs, expectedResultType)));
+            return result.getValue();
         }
     }
 }

@@ -1093,7 +1093,7 @@ public class DataRegionTable extends DataRegion
     {
         if (!getDataRegionName().contains("'") && !getDataRegionName().contains(">") &&!getDataRegionName().contains("<"))
         {   // use API unless the table name contains illegal chars for script
-            new DataRegionApiExpectingRefresh().executeScript("showSelected()");
+            api().expectingRefresh().executeScript("showSelected()");
         }
         else
         {
@@ -1279,9 +1279,15 @@ public class DataRegionTable extends DataRegion
         getWrapper().waitAndClick(Locator.linkWithText("Ok"));  //results popup
     }
 
+    public int getCheckedCount()
+    {
+        return api().executeScript("getChecked().length;", Long.class).intValue();
+    }
+
+    @Deprecated
     public int getCheckedCount(BaseWebDriverTest test)
     {
-        return test.executeScript("return LABKEY.DataRegions['" + getDataRegionName() + "'].getChecked().length", Long.class).intValue();
+        return getCheckedCount();
     }
 
     public static String getInsertNewButtonText()
