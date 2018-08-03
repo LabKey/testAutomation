@@ -20,15 +20,17 @@ import org.labkey.test.components.Component;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.Arrays;
+
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class NotificationPanelItem extends Component
 {
-    WebElement _el;
-    WebElement _createdBy = Locator.css("div.labkey-notification-createdby").findWhenNeeded(this);
-    WebElement _notificationBody = Locator.css("div.labkey-notification-body").findWhenNeeded(this);
-    WebElement _markAsRead = Locator.css("div.labkey-notification-times").findWhenNeeded(this);
-    WebElement _icon = Locator.css("div.labkey-notification-icon").findWhenNeeded(this);
+    private final WebElement _el;
+    private final WebElement _createdBy = Locator.css("div.labkey-notification-createdby").findWhenNeeded(this);
+    private final WebElement _notificationBody = Locator.css("div.labkey-notification-body").findWhenNeeded(this);
+    private final WebElement _markAsRead = Locator.css("div.labkey-notification-times").findWhenNeeded(this);
+    private final WebElement _icon = Locator.css("div.labkey-notification-icon").findWhenNeeded(this);
 
     public NotificationPanelItem(WebElement rowItem)
     {
@@ -71,7 +73,7 @@ public class NotificationPanelItem extends Component
     public void markAsRead()
     {
         _markAsRead.click();
-        waitFor(() -> ExpectedConditions.stalenessOf(_el).apply(null), 1000);
+        waitFor(() -> ExpectedConditions.invisibilityOfAllElements(Arrays.asList(_el)).apply(null), "Notification did not go away when marked as read", 2000);
     }
 
     public void toggleExpand()
