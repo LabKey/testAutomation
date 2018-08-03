@@ -18,10 +18,14 @@ package org.labkey.test.pages.core;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -29,17 +33,37 @@ import java.util.regex.Pattern;
 
 public class UserNotificationsPage extends LabKeyPage
 {
-
     public UserNotificationsPage(WebDriver test)
     {
         super(test);
-        waitForReady();
     }
 
-    private void waitForReady()
+    public static UserNotificationsPage beginAt(WebDriverWrapper driver)
+    {
+        return beginAt(driver, driver.getCurrentContainerPath());
+    }
+
+    public static UserNotificationsPage beginAt(WebDriverWrapper driver, String containerPath)
+    {
+        driver.beginAt(WebTestHelper.buildURL("notification", containerPath, "userNotifications"));
+        return new UserNotificationsPage(driver.getDriver());
+    }
+
+    protected void waitForPage()
     {
         waitForText(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, "User Notifications");
         waitForElement(Locators.allNotificationsPanel);
+    }
+
+    public UserNotificationsPage deleteAll()
+    {
+        if (getNotificationCount() > 0)
+        {
+            WebElement deleteAllLink = Locators.deleteAll.findElement(getDriver());
+            deleteAllLink.click();
+            shortWait().until(ExpectedConditions.stalenessOf(deleteAllLink));
+        }
+        return this;
     }
 
     public List<String> getGroupHeaders()
