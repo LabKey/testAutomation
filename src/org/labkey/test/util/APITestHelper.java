@@ -31,12 +31,10 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -148,7 +146,7 @@ public class APITestHelper
         return testCase;
     }
 
-    private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch, @NotNull String username, @NotNull String password, boolean acceptErrors) throws UnsupportedEncodingException
+    private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch, @NotNull String username, @NotNull String password, boolean acceptErrors)
     {
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpUriRequest method = null;
@@ -201,43 +199,6 @@ public class APITestHelper
         org.openqa.selenium.Cookie csrf = WebTestHelper.getCookies(username).get("X-LABKEY-CSRF");
         if (csrf != null)
             method.setHeader(csrf.getName(), csrf.getValue());
-    }
-
-    private void sendRequest(String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch)
-    {
-        switch (type)
-        {
-            case get:
-                test.setFormElement(Locator.id("txtUrlGet"), url);
-                test.click(Locator.xpath("//input[@id='btnGet']"));
-                break;
-            case post:
-                test.setFormElement(Locator.id("txtUrlPost"), url);
-                test.setFormElement(Locator.id("txtPost"), StringUtils.trimToEmpty(formData));
-                test.click(Locator.xpath("//input[@id='btnPost']"));
-                break;
-        }
-
-        if (test.isElementPresent(Locator.xpath("//div[@id='lblStatus' and contains(text(), 'ERROR')]")))
-            fail("The request has failed: " + url);
-
-        test.waitForText(test.getDefaultWaitForPage(),"Request Complete");
-
-        // Once response has loaded, check it, also check 'Request Complete'
-        if (!StringUtils.isEmpty(expectedResponse))
-        {
-            if (failOnMatch)
-                test.assertElementNotPresent(Locator.xpath("//pre[@id='lblResponse' and contains(text(), '" + expectedResponse + "')]"));
-            else
-                test.assertElementPresent(Locator.xpath("//pre[@id='lblResponse' and contains(text(), '" + expectedResponse + "')]"));
-
-            test.assertTextPresent("Request Complete.");
-        }
-
-        // clear all the forms elements
-        test.setFormElement(Locator.id("txtUrlGet"), "");
-        test.setFormElement(Locator.id("txtUrlPost"), "");
-        test.setFormElement(Locator.id("txtPost"), "");
     }
 
     enum ActionType {

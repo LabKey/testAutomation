@@ -68,9 +68,9 @@ public class JSONHelper
         JSONObject expectedJSON = (JSONObject)JSONValue.parse(expected);
         JSONObject actualJSON = (JSONObject)JSONValue.parse(actual);
 
-        if(actualJSON == null)
+        if (actualJSON == null)
         {
-            fail("Unable to parse response:\n"+actual);
+            fail("Unable to parse response:\n" + actual);
         }
 
         assertEquals(msg, expectedJSON, actualJSON);
@@ -160,18 +160,13 @@ public class JSONHelper
     {
         if (o1 instanceof Map)
             return compareMap((Map)o1, (Map)o2);
-        else if (o1 instanceof List)
+        if (o1 instanceof List)
             return compareList((List)o1, (List)o2);
-        else
-        {
-            if (StringUtils.equals(String.valueOf(o1), String.valueOf(o2)))
-                return true;
-            else
-            {
-                log("Comparison of elements: " + o1 + " and: " + o2 + " failed", fatal);
-                return false;
-            }
-        }
+        if (StringUtils.equals(String.valueOf(o1), String.valueOf(o2)))
+            return true;
+
+        log("Comparison of elements: " + o1 + " and: " + o2 + " failed", fatal);
+        return false;
     }
 
     private void log(String msg, boolean fatal)
@@ -184,7 +179,8 @@ public class JSONHelper
     {
         for (Pattern ignore : _ignoredElements)
         {
-            if (ignore.matcher(element).matches()) return true;
+            if (ignore.matcher(element).matches())
+                return true;
         }
         return false;
     }
