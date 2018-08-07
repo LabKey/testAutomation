@@ -385,7 +385,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     private abstract class BaseDataRegionApi
     {
-        final String regionJS = "LABKEY.DataRegions['" + getDataRegionName().replaceAll("'", "\\'") + "']";
+        final String regionJS = "LABKEY.DataRegions['" + getDataRegionName().replaceAll("'", "\\\\'") + "']";
 
         public void executeScript(String methodWithArgs)
         {
@@ -394,7 +394,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
         public <T> T executeScript(String methodWithArgs, Class<T> expectedResultType)
         {
-            return getWrapper().executeScript(expectedResultType != null ? "return " : "" + regionJS + "." + methodWithArgs, expectedResultType);
+            return getWrapper().executeScript((expectedResultType != null ? "return " : "") + regionJS + "." + methodWithArgs, expectedResultType);
         }
 
         public void callMethod(String apiMethod, String... args)
