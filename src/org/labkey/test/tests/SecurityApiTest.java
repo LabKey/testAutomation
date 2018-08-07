@@ -23,6 +23,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.APITestHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -73,16 +74,16 @@ public class SecurityApiTest extends BaseWebDriverTest
         _userHelper.createUser(USER_2);
 
         _containerHelper.createProject(PROJECT_NAME, null);
-        _permissionsHelper.createPermissionsGroup(GROUP_1, USER_1);
-        _permissionsHelper.createPermissionsGroup(GROUP_2, USER_1, USER_2);
-        _permissionsHelper.setPermissions(GROUP_1, "Editor");
-        _permissionsHelper.setPermissions(GROUP_2, "Reader");
-        _permissionsHelper.exitPermissionsUI();
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        apiPermissionsHelper.createPermissionsGroup(GROUP_1, USER_1);
+        apiPermissionsHelper.createPermissionsGroup(GROUP_2, USER_1, USER_2);
+        apiPermissionsHelper.setPermissions(GROUP_1, "Editor");
+        apiPermissionsHelper.setPermissions(GROUP_2, "Reader");
 
         // Create the admin user that will be used to call the APIs.
         _userHelper.createUserAndNotify(ADMIN_USER);
         setInitialPassword(ADMIN_USER, ADMIN_USER_PWD);
-        _permissionsHelper.addUserToSiteGroup(ADMIN_USER, "Site Administrators");
+        apiPermissionsHelper.addUserToSiteGroup(ADMIN_USER, "Site Administrators");
 
     }
 
@@ -90,7 +91,7 @@ public class SecurityApiTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(PROJECT_NAME, afterTest);
-        deleteUsersIfPresent(USER_1, USER_2, ADMIN_USER, USER_CREATED_BY_API);
+        _userHelper.deleteUsers(false, USER_1, USER_2, ADMIN_USER, USER_CREATED_BY_API);
     }
 
     protected Pattern[] getIgnoredElements()
