@@ -4,7 +4,7 @@ apply plugin: 'org.labkey.testRunner'
 import org.labkey.gradle.util.BuildUtils
 
 project.dependencies {
-    compile "com.github.lookfirst:sardine:${project.newSardineVersion}"
+    compile "com.github.lookfirst:sardine:${project.lookfirstSardineVersion}"
     compile "javax.xml.bind:jaxb-api:${jaxbVersion}"
     compile "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
     compile "com.sun.xml.bind:jaxb-core:${jaxbVersion}"
