@@ -131,7 +131,8 @@ public class APIContainerHelper extends AbstractContainerHelper
     public void deleteContainer(String path, boolean failIfNotFound, int wait) throws TestTimeoutException
     {
         boolean resetLogger = true;
-        Log4jUtils.setLogLevel("org.labkey.api.data.ContainerManager", ManagerPage.LoggingLevel.DEBUG);
+        if((WebTestHelper.getWebPort() != 80) && (!WebTestHelper.getContextPath().isEmpty()))
+            Log4jUtils.setLogLevel("org.labkey.api.data.ContainerManager", ManagerPage.LoggingLevel.DEBUG);
         WebTestHelper.logToServer("=Test= Starting container delete: " + path);
 
         DeleteContainerCommand dcc = new DeleteContainerCommand();
@@ -169,7 +170,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         finally
         {
-            if (resetLogger)
+            if((resetLogger) && (WebTestHelper.getWebPort() != 80) && (!WebTestHelper.getContextPath().isEmpty()))
                 Log4jUtils.setLogLevel("org.labkey.api.data.ContainerManager", ManagerPage.LoggingLevel.INFO);
         }
     }
