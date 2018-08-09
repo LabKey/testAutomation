@@ -147,6 +147,8 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
         else if (!folderTreeNode.getAttribute("class").contains("x4-grid-row-selected"))
         {
+            // Scroll bars get in the way sometimes, need to scroll folder tree manually
+            scrollIntoView(folderTreeNode);
             doAndWaitForFileListRefresh(folderTreeNode::click);
         }
     }
@@ -300,9 +302,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     public void refreshFileList()
     {
         doAndWaitForFileListRefresh(() ->
-        {
-            clickFileBrowserButton(BrowserAction.REFRESH);
-        });
+                clickFileBrowserButton(BrowserAction.REFRESH));
     }
 
     public void createFolder(String folderName)
