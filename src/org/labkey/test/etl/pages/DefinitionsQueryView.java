@@ -41,6 +41,14 @@ public class DefinitionsQueryView extends LabKeyPage<DefinitionsQueryView.Elemen
         return new DefinitionPage(getDriver()).setDefinitionXml(definitionXml).save(expectedError);
     }
 
+    public DefinitionPage createNewWithNameConflict(String definitionXml)
+    {
+        final String NAME_CONFLICT_TITLE = "Definition Name Conflict";
+        final String NAME_CONFLICT_MESSAGE = "This definition name is already in use in the current folder. Please specify a different name.";
+        elementCache()._dataRegionTable.clickInsertNewRow();
+        return new DefinitionPage(getDriver()).setDefinitionXml(definitionXml).saveWithModal(NAME_CONFLICT_TITLE, NAME_CONFLICT_MESSAGE);
+    }
+
     public DefinitionPage edit(String name)
     {
         elementCache()._dataRegionTable.clickEditRow(getRowIndex(name));
@@ -75,9 +83,14 @@ public class DefinitionsQueryView extends LabKeyPage<DefinitionsQueryView.Elemen
         return deletePage;
     }
 
+    public boolean isEtlPresent(String name)
+    {
+        return getRowIndex(name) > -1;
+    }
+
     public void assertEtlPresent(String name)
     {
-        assertTrue("Etl with name '" + name + "' not present in grid", getRowIndex(name) > -1);
+        assertTrue("Etl with name '" + name + "' not present in grid", isEtlPresent(name));
     }
 
     public void assertEtlNotPresent(String name)

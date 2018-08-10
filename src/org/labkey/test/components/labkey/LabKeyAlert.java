@@ -19,10 +19,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.security.Credentials;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 /**
- * Component for bootstrap modal created by LABKEY.Utils.alert()
+ * Component for bootstrap modal created by LABKEY.Utils.alert() and LABKEY.Utils.modal()
  * clientapi/dom/Utils.js
  */
 public class LabKeyAlert extends ModalDialog implements Alert
@@ -35,6 +38,11 @@ public class LabKeyAlert extends ModalDialog implements Alert
     public LabKeyAlert(WebDriver driver, long timeout)
     {
         super(Locator.id("lk-utils-modal").findWhenNeeded(driver).withTimeout(timeout), driver);
+    }
+
+    public WebElement getFunctionBody()
+    {
+        return ExtraLocators.functionBody.findWhenNeeded(getComponentElement()).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
@@ -63,4 +71,8 @@ public class LabKeyAlert extends ModalDialog implements Alert
 
     @Override
     public void authenticateUsing(Credentials credentials) { }
+
+    public static class ExtraLocators {
+        static public Locator.XPathLocator functionBody = Locator.tagWithClass("div", "modal-fn-body");
+    }
 }

@@ -5,7 +5,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.test.categories.DRT;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
@@ -49,6 +48,15 @@ public class ETLDefinitionEditorTest extends ETLAbstractTest
     private final String DEFINITION_NAME_3 = "User Defined ETL 3";
     private final String DEFINITION_XML_3 = DEFINITION_XML.replace(DEFINITION_NAME, DEFINITION_NAME_3);
 
+    private final String DEFINITION_NAME_4 = "User Defined ETL 4";
+    private final String DEFINITION_XML_4 = DEFINITION_XML.replace(DEFINITION_NAME, DEFINITION_NAME_4);
+
+    private final String DEFINITION_NAME_5 = "User Defined ETL 5";
+    private final String DEFINITION_XML_5 = DEFINITION_XML.replace(DEFINITION_NAME, DEFINITION_NAME_5);
+
+    private final String DEFINITION_NAME_6 = "User Defined ETL 6";
+    private final String DEFINITION_XML_6 = DEFINITION_XML.replace(DEFINITION_NAME, DEFINITION_NAME_6);
+
     private final String BAD_DEFINITION_NAME = "Bad User Defined ETL";
     private final String BAD_DEFINITION_XML = DEFINITION_XML.replace(DEFINITION_NAME, BAD_DEFINITION_NAME).replace("<transforms>", "<transforms><BadXml/>");
 
@@ -90,7 +98,7 @@ public class ETLDefinitionEditorTest extends ETLAbstractTest
         defsView.assertEtlPresent(DEFINITION_NAME);
 
         log("Verify name must be unique in folder");
-        defsView.createNew(DEFINITION_XML, "An ETL with that name is already defined in this folder.");
+        defsView.createNewWithNameConflict(DEFINITION_XML);
         DefinitionPage defPage = new DefinitionPage(getDriver());
         defPage.cancel();
 
@@ -98,26 +106,65 @@ public class ETLDefinitionEditorTest extends ETLAbstractTest
         defsView = DefinitionsQueryView.beginAt(this);
         defsView.editAndSave(DEFINITION_NAME, BAD_DEFINITION_XML, "Document does not conform to its XML schema");
 
-        log("Verify edit is saved. Both etl name and a step name are going to be changed");
-        defPage.setDefinitionXml(DEFINITION_XML_2).save(null);
-        defsView.assertEtlPresent(DEFINITION_NAME_2);
-        log("Verify details page - look for changed step name");
-        defPage = defsView.details(DEFINITION_NAME_2);
-        assertTrue("Definition XML did not contain expected string: '" + NEW_STEP_NAME + "'", defPage.getDefinitionXml().contains(NEW_STEP_NAME));
-        defsView = defPage.showGrid();
+        log("Verify the malformed xml is not thrown away on refresh");
+        defPage = new DefinitionPage(getDriver());
+        assertTrue(defPage.getDefinitionXml().contains(BAD_DEFINITION_XML));
+        defPage.cancel();
 
         log("Verify edit button from the details page");
-        defPage = defsView.details(DEFINITION_NAME_2).edit();
-        defPage.setDefinitionXml(DEFINITION_XML_3).save(null);
-        defsView.assertEtlPresent(DEFINITION_NAME_3);
+        defsView = DefinitionsQueryView.beginAt(this);
+        defsView.details(DEFINITION_NAME).edit().setDefinitionXml(DEFINITION_XML_3).cancel();
 
         log("Verify deletions");
         defsView.createNew(DEFINITION_XML_2);
-        ConfirmDeletePage deletePage = defsView.delete(DEFINITION_NAME_2, DEFINITION_NAME_3);
+        ConfirmDeletePage deletePage = defsView.delete(DEFINITION_NAME_2);
         deletePage.confirmDelete();
 
         defsView.assertEtlNotPresent(DEFINITION_NAME_2);
-        defsView.assertEtlNotPresent(DEFINITION_NAME_3);
+    }
+
+    @Test
+    public void testSaveOptions()
+    {
+        goToProjectHome();
+
+        log("Create a new ETL definition");
+        DefinitionsQueryView defsView = DefinitionsQueryView.beginAt(this);
+        defsView.createNew(DEFINITION_XML_4);
+        defsView.assertEtlPresent(DEFINITION_NAME_4);
+
+        log("Change the name of the same definition and overwrite");
+        DefinitionPage defPage = defsView.edit(DEFINITION_NAME_4);
+        defPage.setDefinitionXml(DEFINITION_XML_5).saveChangedName(false);
+        defsView.assertEtlPresent(DEFINITION_NAME_5);
+        defsView.assertEtlNotPresent(DEFINITION_NAME_4);
+
+        log("Change the name of the same definition and save as new");
+        defPage = defsView.edit(DEFINITION_NAME_5);
+        defPage.setDefinitionXml(DEFINITION_XML_4).saveChangedName(true);
+        defsView.assertEtlPresent(DEFINITION_NAME_5);
+        defsView.assertEtlPresent(DEFINITION_NAME_4);
+    }
+
+    @Test
+    public void testCopyFromExisting()
+    {
+        goToProjectHome();
+        DefinitionsQueryView defsView = DefinitionsQueryView.beginAt(this);
+        if (!defsView.isEtlPresent(DEFINITION_NAME_5))
+            defsView.createNew(DEFINITION_XML_5);
+
+        log("Create a new ETL definition");
+        defsView.createNew(DEFINITION_XML_6);
+        defsView.assertEtlPresent(DEFINITION_NAME_6);
+
+        log("Copy xml from an existing ETL definition");
+        DefinitionPage defPage = defsView.edit(DEFINITION_NAME_6);
+        defPage.copyFromExisting(getCurrentContainerPath(), DEFINITION_NAME_5);
+
+        log("Ensure the XML was copied over properly");
+        assertTrue(defPage.getDefinitionXml().contains(DEFINITION_XML_5));
+
     }
 
     @Test
