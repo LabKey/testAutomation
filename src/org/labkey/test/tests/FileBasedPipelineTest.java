@@ -313,9 +313,9 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
-                "INFO : hello node timeout world!",
-                "Process killed after exceeding timeout of 1 seconds");
-        assertTextNotPresent("goodbye node timeout world!");
+                "INFO : hello Nashorn timeout world!",
+                "Process killed after exceeding timeout of 3 seconds");
+        assertTextNotPresent("goodbye Nashorn timeout world!");
     }
 
 

@@ -10,8 +10,9 @@
             <outputs>
                 <file name="output.tsv"/>
             </outputs>
-            <exec exe="node" timeout="5">
-                node pipeline/pipelines/timeout-exec-test.js
+            <!-- jjs is the command-line frontend to Nashorn included in the JDK -->
+            <exec installPath="${JAVA_HOME}/bin" timeout="3">
+                jjs pipeline/pipelines/timeout-exec-test.js
             </exec>
         </task>
     </tasks>
