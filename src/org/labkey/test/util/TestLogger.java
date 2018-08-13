@@ -61,6 +61,11 @@ public class TestLogger
         // TODO: Log at debug level if/when we convert to Log4J or similar
     }
 
+    public static void error(String str)
+    {
+        log(str, System.err);
+    }
+
     public static void log(String str)
     {
         log(str, System.out);
