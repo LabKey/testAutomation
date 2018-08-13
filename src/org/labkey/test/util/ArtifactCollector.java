@@ -41,6 +41,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -103,7 +105,7 @@ public class ArtifactCollector
     // http://www.jetbrains.net/confluence/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-PublishingArtifactswhiletheBuildisStillinProgress
     public void publishArtifact(File file)
     {
-        if (file != null && isTestRunningOnTeamCity())
+        if (file != null && file.exists() && isTestRunningOnTeamCity())
         {
             // relativize path to labkey project root
             String labkeyRoot = TestFileUtils.getLabKeyRoot();
@@ -148,9 +150,9 @@ public class ArtifactCollector
 
         String baseName = screenshotBaseName(testName);
 
-        dumpFullScreen(dumpDir, baseName);
-        dumpScreen(dumpDir, baseName);
-        dumpHtml(dumpDir, baseName);
+        publishArtifact(dumpFullScreen(dumpDir, baseName));
+        publishArtifact(dumpScreen(dumpDir, baseName));
+        publishArtifact(dumpHtml(dumpDir, baseName));
     }
 
     public void dumpHeap()
@@ -171,11 +173,16 @@ public class ArtifactCollector
         String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
         File heapDump = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", filename);
         File destFile = new File(destDir, filename);
-
-        if ( heapDump.renameTo(destFile) )
+        try
+        {
+            Files.move(heapDump.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             publishArtifact(destFile);
-        else
-            TestLogger.log("Unable to move HeapDump file to test logs directory.");
+        }
+        catch (IOException e)
+        {
+            TestLogger.error("Failed to move HeapDump file to test logs directory.");
+            e.printStackTrace();
+        }
 
         _driver.popLocation(); // go back to get screenshot if needed.
     }

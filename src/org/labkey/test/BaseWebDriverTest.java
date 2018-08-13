@@ -81,6 +81,8 @@ import java.lang.annotation.Target;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1244,9 +1246,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         // Download full action coverage table and add to TeamCity artifacts.
         File download = doAndWaitForDownload(() -> getDriver().get(WebTestHelper.buildURL("admin", "exportActions")));
         File actionCoverageFile = new File(TestProperties.getDumpDir(), "ActionCoverage.tsv");
-        actionCoverageFile.delete();
-        download.renameTo(actionCoverageFile);
-        getArtifactCollector().publishArtifact(actionCoverageFile);
+        try
+        {
+            Files.move(download.toPath(), actionCoverageFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            getArtifactCollector().publishArtifact(actionCoverageFile);
+        }
+        catch (IOException e)
+        {
+            TestLogger.error("Failed to move exported action coverage file.");
+            e.printStackTrace();
+        }
     }
 
     @LogMethod
