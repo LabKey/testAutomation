@@ -121,6 +121,11 @@ public class ArtifactCollector
         }
     }
 
+    public void publishDumpedArtifacts()
+    {
+        publishArtifact(ensureDumpDir());
+    }
+
     public void dumpThreads()
     {
         if (!isLocalServer())
@@ -150,9 +155,9 @@ public class ArtifactCollector
 
         String baseName = screenshotBaseName(testName);
 
-        publishArtifact(dumpFullScreen(dumpDir, baseName));
-        publishArtifact(dumpScreen(dumpDir, baseName));
-        publishArtifact(dumpHtml(dumpDir, baseName));
+        dumpFullScreen(dumpDir, baseName);
+        dumpScreen(dumpDir, baseName);
+        dumpHtml(dumpDir, baseName);
     }
 
     public void dumpHeap()

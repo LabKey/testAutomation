@@ -859,6 +859,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         finally
         {
+            getArtifactCollector().publishDumpedArtifacts();
             doTearDown();
         }
     }
