@@ -12,6 +12,9 @@ import java.util.Map;
 
 public abstract class Log4jUtils
 {
+    // Only log the first failed attempt at setting log level. It isn't fatal and will tend add noise to logs.
+    private static boolean loggedError = false;
+
     @LogMethod(quiet = true)
     public static void setLogLevel(@LoggedParam String name, @LoggedParam ManagerPage.LoggingLevel level)
     {
@@ -25,9 +28,18 @@ public abstract class Log4jUtils
         {
             command.execute(connection, "/");
         }
-        catch (IOException | CommandException e)
+        catch (IOException e)
         {
             throw new RuntimeException(e);
+        }
+        catch (CommandException e)
+        {
+            if (!loggedError)
+            {
+                loggedError = true;
+                TestLogger.warn("Failed to set log level for '" + name + "'. We will not log any subsequent failures.");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -40,9 +52,18 @@ public abstract class Log4jUtils
         {
             command.execute(connection, "/");
         }
-        catch (IOException | CommandException e)
+        catch (IOException e)
         {
             throw new RuntimeException(e);
+        }
+        catch (CommandException e)
+        {
+            if (!loggedError)
+            {
+                loggedError = true;
+                TestLogger.warn("Failed to reset server logging levels. We will not log any subsequent failures.");
+                e.printStackTrace();
+            }
         }
     }
 }
