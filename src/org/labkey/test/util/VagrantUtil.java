@@ -123,13 +123,13 @@ public class VagrantUtil
         if(!new Integer(0).equals(returnCode))
         {
             if (returnCode != null)
-                TestLogger.log("Unexpected exit code " + returnCode, System.err);
+                TestLogger.error("Unexpected exit code " + returnCode);
             else
-                TestLogger.log("Process did not exit after last output", System.err);
+                TestLogger.error("Process did not exit after last output");
             for (int i = output.size() - 10; i < output.size(); i++)
             {
                 if(i >= 0)
-                    System.err.println(output.get(i));
+                    TestLogger.error(output.get(i));
             }
         }
         else if (!_outputPassthrough)
