@@ -295,15 +295,16 @@ public abstract class TestFileUtils
 
     public static List<String> getFilesInZipArchive(File zipArchive) throws IOException
     {
-        final ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(new FileInputStream(zipArchive)));
-
-        ZipEntry entry;
-        List<String> files = new ArrayList<>();
-        while ((entry = zipInputStream.getNextEntry()) != null)
+        try (ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(new FileInputStream(zipArchive))))
         {
-            files.add(entry.getName());
+            ZipEntry entry;
+            List<String> files = new ArrayList<>();
+            while ((entry = zipInputStream.getNextEntry()) != null)
+            {
+                files.add(entry.getName());
+            }
+            return files;
         }
-        return files;
     }
 
     /** Untar an input file into an output file.
