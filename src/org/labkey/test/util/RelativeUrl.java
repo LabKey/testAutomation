@@ -15,13 +15,10 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.StringUtils;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class RelativeUrl
@@ -40,60 +37,9 @@ public class RelativeUrl
         _parameters = new HashMap<>();
     }
 
-    private String paramString()
-    {
-        StringBuilder paramString = new StringBuilder();
-
-        for (Map.Entry<String, String> param : _parameters.entrySet())
-        {
-            if (paramString.length() == 0)
-                paramString.append("?");
-            else
-                paramString.append("&");
-
-            paramString.append(param.getKey());
-
-            if (param.getValue() != null)
-            {
-                paramString.append("=");
-                paramString.append(param.getValue());
-            }
-        }
-
-        return paramString.toString();
-    }
-
     public String toString()
     {
-        StringBuilder relativeURL = new StringBuilder();
-
-        relativeURL.append(_controller);
-        relativeURL.append("/");
-
-        if (_containerPath != null)
-        {
-            relativeURL.append(encodeContainerPath());
-            relativeURL.append("/");
-        }
-
-        relativeURL.append(_action);
-        relativeURL.append(".view");
-
-        relativeURL.append(paramString());
-
-        return relativeURL.toString();
-    }
-
-    private String encodeContainerPath()
-    {
-        List<String> encodedPath = new ArrayList<>();
-
-        for (String node : _containerPath.split("/"))
-        {
-            encodedPath.add(EscapeUtil.encode(node));
-        }
-
-        return StringUtils.join(encodedPath, "/");
+        return WebTestHelper.buildRelativeUrl(_controller, _containerPath, _action, _parameters);
     }
 
     public void addParameter(String param)
