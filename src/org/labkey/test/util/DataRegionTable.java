@@ -893,34 +893,40 @@ public class DataRegionTable extends DataRegion
         getWrapper()._extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
-    public void setFilter(String columnName, String filterType)
+    @LogMethod (quiet = true)
+    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType)
     {
         setFilter(columnName, filterType, null, isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
-    public void setFilter(String columnName, String filterType, @Nullable String filter)
+    @LogMethod (quiet = true)
+    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter)
     {
         setFilter(columnName, filterType, filter, isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
-    public void setFilter(String columnName, String filterType, @Nullable String filter, int waitMillis)
+    @LogMethod (quiet = true)
+    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, int waitMillis)
     {
         setFilter(columnName, filterType, filter, waitMillis, false);
     }
 
-    public void setFilter(String columnName, String filterType, @Nullable String filter, int waitMillis, boolean isPHILoggingColumn)
+    @LogMethod (quiet = true)
+    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, int waitMillis, boolean isPHILoggingColumn)
     {
         setUpFilter(columnName, filterType, filter, isPHILoggingColumn);
         doAndWaitForUpdate(() -> getWrapper().clickButton("OK", waitMillis));
     }
 
-    public void setFilter(String columnName, String filterType, @Nullable String filter, @Nullable String filter2Type, @Nullable String filter2)
+    @LogMethod (quiet = true)
+    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, @Nullable @LoggedParam String filter2Type, @Nullable @LoggedParam String filter2)
     {
         setUpFilter(columnName, filterType, filter, filter2Type, filter2);
         doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE));
     }
 
-    public void setFacetedFilter(String columnName, String... values)
+    @LogMethod (quiet = true)
+    public void setFacetedFilter(@LoggedParam String columnName, @LoggedParam String... values)
     {
         setUpFacetedFilter(columnName, values);
         doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE));
