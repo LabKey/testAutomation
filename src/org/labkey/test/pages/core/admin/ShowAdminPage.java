@@ -20,6 +20,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.premium.ConfigureAntivirusScannerPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -180,6 +181,13 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ConfigureReportsAndScriptsPage(this);
     }
 
+    public ConfigureAntivirusScannerPage clickAntivirus()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().antivirusLink);
+        return new ConfigureAntivirusScannerPage(this);
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -193,6 +201,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement sectionActiveUsers = Locator.linkWithText("Active Users").findWhenNeeded(this);
 
         protected WebElement analyticsSettingsLink = Locator.linkWithText("analytics settings").findWhenNeeded(this);
+        protected WebElement antivirusLink = Locator.linkWithText("Antivirus").findWhenNeeded(this);
         protected WebElement auditLogLink = Locator.linkWithText("audit log").findWhenNeeded(this);
         protected WebElement authenticationLink = Locator.linkWithText("authentication").findWhenNeeded(this);
         protected WebElement configureFooterLink = Locator.linkWithText("configure footer").findWhenNeeded(this);
