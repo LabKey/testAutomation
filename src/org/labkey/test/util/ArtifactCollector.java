@@ -102,8 +102,8 @@ public class ArtifactCollector
     }
 
     // Publish artifacts while the build is still in progress:
-    // http://www.jetbrains.net/confluence/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-PublishingArtifactswhiletheBuildisStillinProgress
-    public void publishArtifact(File file)
+    // http://www.jetbrains.net/confluence/display/TCD18/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-PublishingArtifactswhiletheBuildisStillinProgress
+    private void publishArtifact(File file, @Nullable String destination)
     {
         if (file != null && file.exists() && isTestRunningOnTeamCity())
         {
@@ -116,14 +116,29 @@ public class ArtifactCollector
                 String path = strFile.substring(labkeyRoot.length());
                 if (path.startsWith(File.separator))
                     path = path.substring(1);
-                System.out.println("##teamcity[publishArtifacts '" + path + "']");
+                StringBuilder message = new StringBuilder();
+                message.append("##teamcity[publishArtifacts '");
+                message.append(path);
+                if (destination != null)
+                {
+                    message.append(" => ");
+                    message.append(destination);
+                }
+                message.append("']");
+                System.out.println(message.toString());
             }
         }
     }
 
+    public void publishArtifact(File file)
+    {
+        publishArtifact(file, null);
+    }
+
     public void publishDumpedArtifacts()
     {
-        publishArtifact(ensureDumpDir());
+        File dumpDir = ensureDumpDir();
+        publishArtifact(dumpDir, dumpDir.getName());
     }
 
     public void dumpThreads()
