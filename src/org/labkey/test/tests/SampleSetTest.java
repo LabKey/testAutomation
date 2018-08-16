@@ -19,8 +19,11 @@ package org.labkey.test.tests;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -36,8 +39,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -47,6 +53,8 @@ public class SampleSetTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleSetTestProject";
     private static final String FOLDER_NAME = "SampleSetTestFolder";
+    private static final String LINEAGE_FOLDER = "LineageSampleSetFolder";
+    private static final String LINEAGE_SAMPLE_SET_NAME = "LineageSampleSet";
     private static final String PROJECT_SAMPLE_SET_NAME = "ProjectSampleSet";
     private static final String FOLDER_SAMPLE_SET_NAME = "FolderSampleSet";
     private static final String FOLDER_CHILDREN_SAMPLE_SET_NAME = "FolderChildrenSampleSet";
@@ -87,17 +95,84 @@ public class SampleSetTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
+    @BeforeClass
+    public static void setupProject()
+    {
+        SampleSetTest init = (SampleSetTest) getCurrentTest();
+
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        PortalHelper portalHelper = new PortalHelper(this);
+        _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment"});
+        _containerHelper.createSubfolder(PROJECT_NAME, LINEAGE_FOLDER, new String[]{"Experiment"});
+
+        projectMenu().navigateToProject(PROJECT_NAME);
+        portalHelper.addWebPart("Sample Sets");
+
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        portalHelper.addWebPart("Sample Sets");
+
+        projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
+        portalHelper.addWebPart("Sample Sets");
+    }
+
+    @Test
+    public void doLineageDerivationTest()
+    {
+        String sampleText = "KeyCol\tIntCol\tStringCol\n" +
+                "Sample12ab\t1012\talpha\n" +
+                "Sample13c4\t1023\tbeta\n" +
+                "Sample14d5\t1024\tgamma\n" +
+                "Sampleabcd\t1035\tepsilon\n" +
+                "Sampledefg\t1046\tzeta";
+        importSampleSet(PROJECT_NAME, LINEAGE_FOLDER, LINEAGE_SAMPLE_SET_NAME, sampleText);
+
+        // at this point, we're in the LINEAGE_FOLDER, on the Experiment tab, looking at the sample sets properties and Sample Set contents webparts.
+        // now we add more samples,
+        String deriveSamples = "Name\tMaterialInputs/LineageSampleSet\n" +
+                "A\t\n" +
+                "B\tA\n" +      // B and C both derive from A, so should get the same Run
+                "C\tA\n" +      // D derives from B, so should get its own run
+                "D\tB\n";
+        clickButton("Import More Samples");
+        setFormElement(Locator.name("data"), deriveSamples);
+        checkRadioButton(Locator.radioButtonById("insertOnlyChoice"));
+        clickButton("Submit");
+
+        log("foo");
+        SelectRowsResponse samples = executeSelectRowCommand("samples", LINEAGE_SAMPLE_SET_NAME, ContainerFilter.Current, getProjectName()+"/"+LINEAGE_FOLDER, null);
+        Map<String, Object> rowA =  samples.getRows().stream().filter((a)-> a.get("Name").equals("A")).collect(Collectors.toList()).get(0);
+        Map<String, Object> rowB =  samples.getRows().stream().filter((a)-> a.get("Name").equals("B")).collect(Collectors.toList()).get(0);
+        Map<String, Object> rowC =  samples.getRows().stream().filter((a)-> a.get("Name").equals("C")).collect(Collectors.toList()).get(0);
+        Map<String, Object> rowD =  samples.getRows().stream().filter((a)-> a.get("Name").equals("D")).collect(Collectors.toList()).get(0);
+
+        assertTrue ("Row A shouldn't have a parent", rowA.get("Run")==(null));
+        assertEquals("Rows B and C should both derive from A and get the same run", rowB.get("Run"), rowC.get("Run"));
+        assertTrue("RowD should have a parent", rowD.get("Run")!= null);
+        assertNotEquals("RowD should not equal B", rowD.get("Run"), rowB.get("Run"));
+        assertNotEquals("RowD should not equal C", rowD.get("Run"), rowC.get("Run"));
+    }
+
+    private void importSampleSet(String project, String folder, String samplesetName, String sampleText)
+    {
+        projectMenu().navigateToFolder(project, folder);
+
+        clickButton("Import Sample Set");
+        setFormElement(Locator.id("name"), samplesetName);
+        setFormElement(Locator.name("data"), sampleText);
+        clickButton("Submit");
+    }
+
     @Test
     public void testSteps()
     {
         PortalHelper portalHelper = new PortalHelper(this);
 
-        _containerHelper.createProject(PROJECT_NAME, null);
-        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment"});
-
         clickProject(PROJECT_NAME);
-        portalHelper.addWebPart("Sample Sets");
-
         clickButton("Import Sample Set");
         setFormElement(Locator.id("name"), PROJECT_SAMPLE_SET_NAME);
         checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
@@ -108,7 +183,6 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Submit");
 
         clickFolder(FOLDER_NAME);
-        portalHelper.addWebPart("Sample Sets");
         clickButton("Import Sample Set");
         setFormElement(Locator.id("name"), FOLDER_SAMPLE_SET_NAME);
         setFormElement(Locator.name("data"), "KeyCol-Folder\tIntCol-Folder\tStringCol-Folder\n" +
