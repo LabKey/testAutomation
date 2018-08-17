@@ -36,6 +36,7 @@ public class FileInput extends Input
     @Override
     protected void assertElementType(WebElement el)
     {
+        super.assertElementType(el);
         String type = el.getAttribute("type");
         Assert.assertEquals("Not a file input: " + el.toString(), "file", type);
     }

@@ -28,6 +28,7 @@ public class Input extends WebDriverComponent implements FormItem<String>
 {
     private final WebElement _el;
     private final WebDriver _driver; // getFormElement uses javascript
+    private boolean validatedType = false;
 
     public Input(WebElement el, WebDriver driver)
     {
@@ -50,7 +51,11 @@ public class Input extends WebDriverComponent implements FormItem<String>
     @Override
     public WebElement getComponentElement()
     {
-        assertElementType(_el);
+        if (!validatedType)
+        {
+            assertElementType(_el);
+            validatedType = true;
+        }
         return _el;
     }
 
