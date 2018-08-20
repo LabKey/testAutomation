@@ -14,7 +14,6 @@ import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserExtendedProperty;
-import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -90,7 +89,7 @@ public class FilesQueryTest extends BaseWebDriverTest
         final File testFile2 = TestFileUtils.getSampleData("security/InlineFile2.html");
         final String subFileFolder = "Sub Folder";
         _fileBrowserHelper.createFolder(subFileFolder);
-        doubleClick(FileBrowserHelper.Locators.gridRow(subFileFolder));
+        _fileBrowserHelper.selectFileBrowserItem(subFileFolder + "/");
         final String customPropValue2 = "CustomPropValue2";
         uploadFile(testFile2, customPropValue2, "This is another html file");
 
