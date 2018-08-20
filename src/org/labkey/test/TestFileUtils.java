@@ -23,12 +23,24 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.PGPCompressedData;
+import org.bouncycastle.openpgp.PGPEncryptedDataList;
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPLiteralData;
+import org.bouncycastle.openpgp.PGPPBEEncryptedData;
+import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
+import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
+import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.util.FileUtil;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.util.TestLogger;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -40,6 +52,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -366,4 +379,38 @@ public abstract class TestFileUtils
         destDir.mkdirs();
         return unTar(unGzip(archive, destDir), destDir);
     }
+
+    public static byte[] decrypt(byte[] encrypted, char[] passPhrase) throws IOException, PGPException
+    {
+        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+
+        InputStream in = new ByteArrayInputStream(encrypted);
+        in = PGPUtil.getDecoderStream(in);
+
+        JcaPGPObjectFactory pgpF = new JcaPGPObjectFactory(in);
+        PGPEncryptedDataList enc;
+        Object o = pgpF.nextObject();
+
+        if (o instanceof PGPEncryptedDataList)
+        {
+            enc = (PGPEncryptedDataList) o;
+        }
+        else
+        {
+            enc = (PGPEncryptedDataList) pgpF.nextObject();
+        }
+
+        PGPPBEEncryptedData pbe = (PGPPBEEncryptedData) enc.get(0);
+        InputStream clear = pbe.getDataStream(new JcePBEDataDecryptorFactoryBuilder(new JcaPGPDigestCalculatorProviderBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME).build())
+                .setProvider(BouncyCastleProvider.PROVIDER_NAME).build(passPhrase));
+
+        JcaPGPObjectFactory pgpFact = new JcaPGPObjectFactory(clear);
+        PGPCompressedData cData = (PGPCompressedData) pgpFact.nextObject();
+        pgpFact = new JcaPGPObjectFactory(cData.getDataStream());
+        PGPLiteralData ld = (PGPLiteralData) pgpFact.nextObject();
+        return Streams.readAll(ld.getInputStream());
+    }
+
 }

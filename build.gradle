@@ -8,6 +8,7 @@ project.dependencies {
     compile "javax.xml.bind:jaxb-api:${jaxbVersion}"
     compile "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
     compile "com.sun.xml.bind:jaxb-core:${jaxbVersion}"
+    compile "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
 }
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
