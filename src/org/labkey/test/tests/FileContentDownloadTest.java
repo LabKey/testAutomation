@@ -179,7 +179,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
 
         String folderName = "redirectTest";
         _fileBrowserHelper.createFolder(folderName);
-        doubleClick(FileBrowserHelper.Locators.gridRow(folderName));
+        _fileBrowserHelper.selectFileBrowserItem(folderName + "/");
         _fileBrowserHelper.uploadFile(textFile);
 
         signOut();
