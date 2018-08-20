@@ -110,7 +110,6 @@ public class Crawler
             new ControllerActionId("admin", "dbChecker"),
             new ControllerActionId("admin", "runSystemMaintenance"),
             new ControllerActionId("admin", "deleteFolder"),
-            new ControllerActionId("admin", "defineWebThemes"),
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("admin", "setAdminMode"),
             new ControllerActionId("admin", "dumpHeap"),

@@ -29,7 +29,6 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
     public LookAndFeelSettingsPage(WebDriver driver)
     {
         super(driver);
-        //waitForElement(elementCache().systemDescription);
     }
 
     public String getHeaderShortName()
@@ -40,11 +39,6 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
     public void setTheme(String theme)
     {
         selectOptionByText(elementCache().theme, theme);
-    }
-
-    public void setFontSize(String fontSize)
-    {
-        selectOptionByText(elementCache().fontSize, fontSize);
     }
 
     public void setShowNavAlways()
@@ -59,14 +53,18 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
 
     public void enableHelp(boolean enable)
     {
-        if(enable){checkCheckbox(elementCache().enableHelpChk);}
-        else{uncheckCheckbox(elementCache().enableHelpChk);}
+        if (enable)
+            checkCheckbox(elementCache().enableHelpChk);
+        else
+            uncheckCheckbox(elementCache().enableHelpChk);
     }
 
     public void enableObjectLevelDiscussions(boolean enable)
     {
-        if(enable){checkCheckbox(elementCache().enableDiscussionChk);}
-        else{uncheckCheckbox(elementCache().enableDiscussionChk);}
+        if (enable)
+            checkCheckbox(elementCache().enableDiscussionChk);
+        else
+            uncheckCheckbox(elementCache().enableDiscussionChk);
     }
 
     public void setLogoLink(String link)
@@ -119,11 +117,16 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         return (elementCache().organizationNameTxt).getText();
     }
 
-    public void setDateParsingMode(boolean isMurican)
+    public void setDateParsingMode(boolean isUSDateFormat)
     {
-        if(isMurican){new RadioButton(elementCache().USDateParsingRdio).check();}
-        //isCommie
-        else{new RadioButton(elementCache().NonUSDateParsingRdio).check();}
+        RadioButton button;
+
+        if (isUSDateFormat)
+            button = new RadioButton(elementCache().USDateParsingRdio);
+        else
+            button = new RadioButton(elementCache().NonUSDateParsingRdio);
+
+        button.check();
     }
 
     public void setDefaultDateDisplay(String displayFormat)
@@ -158,8 +161,10 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
 
     public void restrictChartingCols(boolean restrict)
     {
-        if(restrict){checkCheckbox(elementCache().restrictChartingColsChk);}
-        else{uncheckCheckbox(elementCache().restrictChartingColsChk);}
+        if (restrict)
+            checkCheckbox(elementCache().restrictChartingColsChk);
+        else
+            uncheckCheckbox(elementCache().restrictChartingColsChk);
     }
 
     public void setAltLoginPage(String loginPage)
@@ -172,9 +177,15 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         return (elementCache().altLoginPageTxt).getText();
     }
 
-    public void save(){click(elementCache().saveBtn);}
+    public void save()
+    {
+        click(elementCache().saveBtn);
+    }
 
-    public void reset(){click(elementCache().resetBtn);}
+    public void reset()
+    {
+        click(elementCache().resetBtn);
+    }
 
     @Override
     protected ElementCache newElementCache()
@@ -187,7 +198,6 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         WebElement systemDescription = Locator.name("systemDescription").findWhenNeeded(this);
         WebElement headerShortName = Locator.name("systemShortName").findWhenNeeded(this);
         WebElement theme = Locator.name("themeName").findWhenNeeded(this);
-        WebElement fontSize = Locator.name("themeFont").findWhenNeeded(this);
         WebElement showNavAlways = Locator.xpath("//input[@name='folderDisplayMode' and @value='ALWAYS']").findWhenNeeded(this);
         WebElement showNavForAdmin = Locator.xpath("//input[@name='folderDisplayMode' and @value='ADMIHN']").findWhenNeeded(this);
         WebElement enableHelpChk = Locator.name("enableHelpMenu").findWhenNeeded(this);
