@@ -101,22 +101,22 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     {
         final String LIST_NAME = "MVList";
         final String TEST_DATA_SINGLE_COLUMN_LIST =
-                "Name\tAge\tSex\n" +
+                "Name\tAge with space\tSex\n" +
                 "Ted\tN\tmale\n" +
                 "Alice\t17\tfemale\n" +
                 "Bob\tQ\tN";
         final String TEST_DATA_TWO_COLUMN_LIST =
-                "Name\tAge\tAgeMVIndicator\tSex\tSexMVIndicator\n" +
+                "Name\tAge with space\tAge with spaceMVIndicator\tSex\tSexMVIndicator\n" +
                 "Franny\t\tN\tmale\t\n" +
                 "Zoe\t25\tQ\tfemale\t\n" +
                 "J.D.\t50\t\tmale\tQ";
         final String TEST_DATA_SINGLE_COLUMN_LIST_BAD =
-                "Name\tAge\tSex\n" +
+                "Name\tAge with space\tSex\n" +
                 "Ted\t.N\tmale\n" +
                 "Alice\t17\tfemale\n" +
                 "Bob\tQ\tN";
         final String TEST_DATA_TWO_COLUMN_LIST_BAD =
-                "Name\tAge\tAgeMVIndicator\tSex\tSexMVIndicator\n" +
+                "Name\tAge with space\tAge with spaceMVIndicator\tSex\tSexMVIndicator\n" +
                 "Franny\t\tN\tmale\t\n" +
                 "Zoe\t25\tQ\tfemale\t\n" +
                 "J.D.\t50\t\tmale\t.Q";
@@ -127,7 +127,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         ListHelper.ListColumn listColumn = new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, "");
         columns[0] = listColumn;
 
-        listColumn = new ListHelper.ListColumn("age", "Age", ListHelper.ListColumnType.Integer, "");
+        listColumn = new ListHelper.ListColumn("age with space", "Age with space", ListHelper.ListColumnType.Integer, "");
         listColumn.setMvEnabled(true);
         columns[1] = listColumn;
 
@@ -153,7 +153,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         DataRegion(getDriver()).find().clickInsertNewRow();
         setFormElement(Locator.name("quf_name"), "Sid");
         setFormElement(Locator.name("quf_sex"), "male");
-        selectOptionByValue(Locator.name("quf_ageMVIndicator"), "Z");
+        selectOptionByValue(Locator.name("quf_age with spaceMVIndicator"), "Z");
         clickButton("Submit");
         assertNoLabKeyErrors();
         assertTextPresent("Sid", "male", "N");
@@ -188,22 +188,22 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         final String datasetName = "MV Dataset";
         final String DATASET_SCHEMA_FILE = "/sampledata/mvIndicators/dataset_schema.tsv";
         final String TEST_DATA_SINGLE_COLUMN_DATASET =
-                "participantid\tSequenceNum\tAge\tSex\n" +
+                "participantid\tSequenceNum\tAge with space\tSex\n" +
                         "Ted\t1\tN\tmale\n" +
                         "Alice\t1\t17\tfemale\n" +
                         "Bob\t1\tQ\tN";
         final String TEST_DATA_TWO_COLUMN_DATASET =
-                "participantid\tSequenceNum\tAge\tAgeMVIndicator\tSex\tSexMVIndicator\n" +
+                "participantid\tSequenceNum\tAge with space\tAge with spaceMVIndicator\tSex\tSexMVIndicator\n" +
                         "Franny\t1\t\tN\tmale\t\n" +
                         "Zoe\t1\t25\tQ\tfemale\t\n" +
                         "J.D.\t1\t50\t\tmale\tQ";
         final String TEST_DATA_SINGLE_COLUMN_DATASET_BAD =
-                "participantid\tSequenceNum\tAge\tSex\n" +
+                "participantid\tSequenceNum\tAge with space\tSex\n" +
                         "Ted\t1\t.N\tmale\n" +
                         "Alice\t1\t17\tfemale\n" +
                         "Bob\t1\tQ\tN";
         final String TEST_DATA_TWO_COLUMN_DATASET_BAD =
-                "participantid\tSequenceNum\tAge\tAgeMVIndicator\tSex\tSexMVIndicator\n" +
+                "participantid\tSequenceNum\tAge with space\tAge with spaceMVIndicator\tSex\tSexMVIndicator\n" +
                         "Franny\t1\t\tN\tmale\t\n" +
                         "Zoe\t1\t25\tQ\tfemale\t\n" +
                         "J.D.\t1\t50\t\tmale\t.Q";
@@ -251,7 +251,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         DataRegion(getDriver()).find().clickInsertNewRow();
         setFormElement(Locator.name("quf_ParticipantId"), "Sid");
         setFormElement(Locator.name("quf_SequenceNum"), "1");
-        selectOptionByValue(Locator.name("quf_AgeMVIndicator"), "Z");
+        selectOptionByValue(Locator.name("quf_Age with spaceMVIndicator"), "Z");
         setFormElement(Locator.name("quf_Sex"), "male");
         clickButton("Submit");
         assertNoLabKeyErrors();
@@ -270,7 +270,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         log("19874: Regression test for reshow of missing value indicators when submitting default forms with errors");
         DataRegion(getDriver()).find().clickInsertNewRow();
-        Locator mvSeletor = Locator.name("quf_AgeMVIndicator");
+        Locator mvSeletor = Locator.name("quf_Age with spaceMVIndicator");
         Assert.assertEquals("There should not be a devault missing value indicator selection", "", getSelectedOptionText(mvSeletor));
         String mvSelection = "Z";
         selectOptionByValue(mvSeletor, mvSelection);
