@@ -264,10 +264,10 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
     protected void setProtocolMetadata(String specimenIdColumn, String participantColumn, String dateColumn, String visitColumn, boolean setBackground)
     {
-        log("** Specify ICS metadata");
+        log("** Specify metadata");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Other settings"));
-        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+        clickAndWait(Locator.linkWithText("Edit Metadata"));
 
         // specify PTID and Visit/Date columns
         if (specimenIdColumn != null)
@@ -291,7 +291,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             setFormElement(Locator.name("ff_backgroundFilterValue").index(0), "Neg Cont");
         }
 
-        clickButton("Set ICS Metadata");
+        clickButton("Set Metadata");
     }
 
 
