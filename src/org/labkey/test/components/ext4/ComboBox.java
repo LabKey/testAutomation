@@ -164,7 +164,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
                 Locator.byClass(getCssPrefix() + "pickerfield-open").findElementOrNull(getComponentElement()) != null;
     }
 
-    private void selectItemFromOpenComboList(String itemText, boolean toggle, ComboListMatcher matchTechnique)
+    public void selectItemFromOpenComboList(String itemText, boolean toggle, ComboListMatcher matchTechnique)
     {
         WebElement listItem = matchTechnique.getLocator(comboListItem(), itemText).waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
