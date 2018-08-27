@@ -111,7 +111,7 @@ public class SuiteBuilder
                 addTestToSuite(test, category.getSimpleName());
                 Class supercategory = category.getSuperclass();
 
-                while (Test.class.isAssignableFrom(supercategory))
+                while (supercategory != null && Test.class.isAssignableFrom(supercategory))
                 {
                     addTestToSuite(test, supercategory.getSimpleName());
                     supercategory = supercategory.getSuperclass();
