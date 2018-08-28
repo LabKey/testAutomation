@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
@@ -222,20 +223,22 @@ public class RReportHelper
         if (scripts.isEnginePresent(dockerEngineName))
         {
             scripts.editEngine(dockerEngineName);
+            Checkbox enabledCheckbox = Checkbox.Ext4Checkbox().withLabel("Enabled:").find(_test.getDriver());
             if (useDocker)
             {
                 TestLogger.log("Enable existing " + dockerEngineName);
-                _test.checkCheckbox(Locator.id("editEngine_enabled"));
+                enabledCheckbox.check();
                 rVersion = RDOCKER;
             }
             else
             {
                 TestLogger.log("Disable existing " + dockerEngineName);
-                _test.uncheckCheckbox(Locator.id("editEngine_enabled"));
+                enabledCheckbox.uncheck();
             }
 
             _test.clickButton("Submit", 0);
             _test.waitForElementToDisappear(ConfigureReportsAndScriptsPage.Locators.editEngineWindow);
+            new Ext4Helper(_test).waitForMaskToDisappear();
         }
         else if (useDocker)
         {
@@ -250,7 +253,7 @@ public class RReportHelper
                 if (!TestProperties.isTestRunningOnTeamCity())
                 {
                     scripts.editEngine(localEngineName);
-                    rExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath")));
+                    rExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath-inputEl")));
                     TestLogger.log(localEngineName + " is already configured using: " + rExecutable.getAbsolutePath());
                     rVersion = getRVersion(rExecutable);
                     _test.clickButton("Cancel", 0);
@@ -286,10 +289,11 @@ public class RReportHelper
 
         scripts.editEngine(defaultScriptName);
 
+        Checkbox enabledCheckbox = Checkbox.Ext4Checkbox().withLabel("Use pandoc & rmarkdown:").find(_test.getDriver());
         if(enabled)
-            _test.checkCheckbox(Locator.id("editEngine_pandocEnabled"));
+            enabledCheckbox.check();
         else
-            _test.uncheckCheckbox(Locator.id("editEngine_pandocEnabled"));
+            enabledCheckbox.uncheck();
 
         _test.clickButton("Submit", 0);
     }

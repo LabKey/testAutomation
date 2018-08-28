@@ -17,19 +17,19 @@ package org.labkey.test.pages;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.labkey.test.components.ext4.Window.Window;
 
 /**
  * org.labkey.query.reports.ReportsController.ConfigureReportsAndScriptsAction
@@ -37,6 +37,7 @@ import java.util.Map;
 public class ConfigureReportsAndScriptsPage extends LabKeyPage
 {
     private static final String DEFAULT_ENGINE = "Mozilla Rhino";
+    private static final String EDIT_WINDOW_TITLE = "Edit Engine Configuration";
 
     public ConfigureReportsAndScriptsPage(WebDriverWrapper test)
     {
@@ -71,24 +72,24 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         Map<Locator, String> configMap = config.getConfigMap();
 
         String menuText = "New " + type + " Engine";
-        _extHelper.clickExtMenuButton(false, Locator.id("btn_addEngine"), menuText);
+        _ext4Helper.clickExt4MenuButton(false, Locator.id("btn_addEngine"), false, menuText);
         WebElement menuItem = Locator.menuItem(menuText).findElementOrNull(getDriver());
         if (menuItem != null)
         {
             mouseOver(menuItem);
             menuItem.click(); // Retry for unresponsive button
         }
-        WebElement window = waitForElement(Locators.editEngineWindow);
+        Window(getDriver()).withTitle(EDIT_WINDOW_TITLE).waitFor();
 
         for (Map.Entry<Locator, String> entry : configMap.entrySet())
         {
             setFormElement(entry.getKey(), entry.getValue());
         }
 
-        String language = getFormElement(Locator.id("editEngine_languageName"));
+        String language = getFormElement(Locator.id("editEngine_languageName-inputEl"));
 
         clickButton("Submit", 0);
-        shortWait().until(ExpectedConditions.stalenessOf(window));
+        waitForElementToDisappear(ConfigureReportsAndScriptsPage.Locators.editEngineWindow);
         waitForElement(Locators.enginesGridRowForLanguage(language));
     }
 
@@ -118,20 +119,21 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
         clickButton("Edit", 0);
 
-        waitForElement(Locators.editEngineWindow);
+        Window(getDriver()).withTitle(EDIT_WINDOW_TITLE).waitFor();
     }
 
     private void deleteSelectedEngine(WebElement selectedEngineRow)
     {
         clickButton("Delete", 0);
 
-        _extHelper.waitForExtDialog("Delete Engine Configuration", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        String confirmationMessage = Locator.byClass("ext-mb-text").findElement(getDriver()).getText();
+        Window(getDriver()).withTitle("Delete Engine Configuration").waitFor();
+
+        String confirmationMessage = Locator.byClass("x4-window-body").findElement(getDriver()).getText();
 
         TestLogger.log("Deleting: " + confirmationMessage.substring(confirmationMessage.indexOf(":") + 1));
 
         clickButton("Yes", 0);
-        shortWait().until(ExpectedConditions.stalenessOf(selectedEngineRow));
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     private WebElement selectEngineNamed(String engineName)
@@ -190,13 +192,13 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         public Map<Locator, String> getConfigMap()
         {
             configMap = new HashMap<>();
-            addToConfigMap(Locator.id("editEngine_name"), getName());
-            addToConfigMap(Locator.id("editEngine_languageName"), getLanguageName());
-            addToConfigMap(Locator.id("editEngine_languageVersion"), getLanguageVersion());
-            addToConfigMap(Locator.id("editEngine_extensions"), getExtensions());
-            addToConfigMap(Locator.id("editEngine_exePath"), getPath() != null ? getPath().getAbsolutePath() : null);
-            addToConfigMap(Locator.id("editEngine_exeCommand"), getCommand());
-            addToConfigMap(Locator.id("editEngine_outputFileName"), getOutputFileName());
+            addToConfigMap(Locator.id("editEngine_name-inputEl"), getName());
+            addToConfigMap(Locator.id("editEngine_languageName-inputEl"), getLanguageName());
+            addToConfigMap(Locator.id("editEngine_languageVersion-inputEl"), getLanguageVersion());
+            addToConfigMap(Locator.id("editEngine_extensions-inputEl"), getExtensions());
+            addToConfigMap(Locator.id("editEngine_exePath-inputEl"), getPath() != null ? getPath().getAbsolutePath() : null);
+            addToConfigMap(Locator.id("editEngine_exeCommand-inputEl"), getCommand());
+            addToConfigMap(Locator.id("editEngine_outputFileName-inputEl"), getOutputFileName());
 
             return configMap;
         }
@@ -294,14 +296,14 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
         public static Locator enginesGridRowForName(String engineName)
         {
-            return enginesGrid.append(Locator.tagWithClass("div", "x-grid3-row").withPredicate(Locator.xpath(String.format("//td[%d]", nameColumnIndex + 1)).containing(engineName + "enabled")));
+            return enginesGrid.append(Locator.tagWithClass("tr", "x4-grid-row").withPredicate(Locator.xpath(String.format("//td[%d]", nameColumnIndex + 1)).containing(engineName)));
         }
 
         public static Locator enginesGridRowForLanguage(String engineLanguage)
         {
-            return enginesGrid.append(Locator.tagWithClass("div", "x-grid3-row").withPredicate(Locator.xpath(String.format("//td[%d]", languageColumnIndex + 1)).withText(engineLanguage)));
+            return enginesGrid.append(Locator.tagWithClass("tr", "x4-grid-row").withPredicate(Locator.xpath(String.format("//td[%d]", languageColumnIndex + 1)).withText(engineLanguage)));
         }
 
-        public static Locator editEngineWindow = ExtHelper.Locators.window("Edit Engine Configuration");
+        public static Locator editEngineWindow = Ext4Helper.Locators.window("Edit Engine Configuration");
     }
 }

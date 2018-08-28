@@ -62,7 +62,7 @@ public class PythonHelper
             if (!TestProperties.isTestRunningOnTeamCity())
             {
                 scripts.editEngine(defaultScriptName);
-                pythonExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath")));
+                pythonExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath-inputEl")));
                 return getPythonVersion(pythonExecutable);
             }
             else // Reset Python scripting engine on TeamCity
