@@ -511,6 +511,15 @@ public class SecurityTest extends BaseWebDriverTest
         setFormElement(Locator.name("names"), NORMAL_USER_TEMPLATE);
         clickButton("Update Group Membership");
 
+        // Issue 35282: Create a group that contains another group to assure group membership for the cloned user is
+        // only to the direct group a user is not, not the recursive set of groups.
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.createPermissionsGroup("Containing Group");
+        _permissionsHelper.clickManageGroup("Containing Group");
+        setFormElement(Locator.name("names"), "Testers");
+        clickButton("Update Group Membership");
+        // make sure user that is cloned from NORMAL_USER_TEMPLATE is not added to the containing group, only to the contained one
+
         // create users and verify permissions
         uiUserHelper.cloneUser(PROJECT_ADMIN_USER, ADMIN_USER_TEMPLATE);
         uiUserHelper.cloneUser(SITE_ADMIN_USER, PasswordUtil.getUsername());
