@@ -67,11 +67,10 @@ public class FlowImportTest extends BaseFlowTest
         assertChecked(Locator.name("selectedSamples.rows[295].selected"));
         assertChecked(Locator.name("selectedSamples.rows[296].selected"));
         importAnalysis_reviewSamples(getContainerPath(), false, null, null);
-        importAnalysis_analysisEngine(getContainerPath(), AnalysisEngine.FlowJoWorkspace);
         // assert previous analysis folder is available in drop down
         assertTextPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(getContainerPath(), analysisFolder, true);
-        importAnalysis_confirm(getContainerPath(), workspacePath, SelectFCSFileOption.Browse, keywordDirs, AnalysisEngine.FlowJoWorkspace, analysisFolder, true);
+        importAnalysis_confirm(getContainerPath(), workspacePath, SelectFCSFileOption.Browse, keywordDirs, analysisFolder, true);
         importAnalysis_checkErrors(null);
         // assert one keyword run created, one additional analysis run created
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
@@ -103,11 +102,10 @@ public class FlowImportTest extends BaseFlowTest
         importAnalysis_reviewSamples(getContainerPath(), false, Arrays.asList("All Samples"), null);
         assertElementPresent(Locator.css(".labkey-error").withText("All selected rows must be matched to a previously imported FCS file."));
         importAnalysis_reviewSamples(getContainerPath(), false, Arrays.asList("labkey-demo-samples"), null);
-        importAnalysis_analysisEngine(getContainerPath(), AnalysisEngine.FlowJoWorkspace);
         // assert FlowJoAnalysis analysis folder doesn't show up in list of folders
         assertTextNotPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(getContainerPath(), analysisFolder + "_1", false);
-        importAnalysis_confirm(getContainerPath(), workspacePath, SelectFCSFileOption.Previous, keywordDirs, AnalysisEngine.FlowJoWorkspace, analysisFolder + "_1", false);
+        importAnalysis_confirm(getContainerPath(), workspacePath, SelectFCSFileOption.Previous, keywordDirs, analysisFolder + "_1", false);
         importAnalysis_checkErrors(null);
 
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");

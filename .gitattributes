@@ -838,7 +838,6 @@ src/org/labkey/test/tests/flow/BaseFlowTest.java -text
 src/org/labkey/test/tests/flow/FlowAnalysisResolverTest.java -text
 src/org/labkey/test/tests/flow/FlowImportTest.java -text
 src/org/labkey/test/tests/flow/FlowJoQueryTest.java -text
-src/org/labkey/test/tests/flow/FlowNormalizationTest.java -text
 src/org/labkey/test/tests/flow/FlowSpecimenTest.java -text
 src/org/labkey/test/tests/flow/FlowTest.java -text
 src/org/labkey/test/tests/issues/IssueDomainSharingTest.java -text

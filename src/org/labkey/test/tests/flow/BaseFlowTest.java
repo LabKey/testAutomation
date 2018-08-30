@@ -89,18 +89,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         getPipelineWorkDirectory().mkdir();
         setFormElement(Locator.id("workingDirectory"), getPipelineWorkDirectory().toString());
 
-        boolean normalizationEnabled = requiresNormalization();
-        if (normalizationEnabled)
-            checkCheckbox(Locator.id("normalizationEnabled"));
-        else
-            uncheckCheckbox(Locator.id("normalizationEnabled"));
-
         clickButton("update");
         assertTextNotPresent("Path does not exist");
-        if (normalizationEnabled)
-        {
-            assertTextNotPresent("The R script engine is not available.", "Please install the flowWorkspace R library");
-        }
 
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Flow", null);
@@ -172,11 +162,6 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         }
         catch (WebDriverException ignored) {}
         deletePipelineWorkDirectory();
-    }
-
-    protected boolean requiresNormalization()
-    {
-        return false;
     }
 
     //Issue 12597: Need to delete exp.data objects when deleting a flow run
@@ -344,14 +329,6 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         boolean resolving = options.getSelectFCSFilesOption() == SelectFCSFileOption.Previous;
         importAnalysis_reviewSamples(options.getContainerPath(), resolving, options.getSelectedGroupNames(), options.getSelectedSampleIds());
 
-        // R Analysis engine can only be selected when using Mac FlowJo workspaces
-        if (!options.getWorkspacePath().endsWith(".wsp"))
-            importAnalysis_analysisEngine(options.getContainerPath(), options.getAnalysisEngine());
-
-        // Analysis option page only shown when using R normalization.
-        if (options.getAnalysisEngine() == AnalysisEngine.R && options.isREngineNormalization())
-            importAnalysis_analysisOptions(options.getContainerPath(), options.isREngineNormalization(), options.getREngineNormalizationReference(), options.getREngineNormalizationSubsets(), options.getREngineNormalizationParameters());
-
         importAnalysis_analysisFolder(options.getContainerPath(), options.getAnalysisName(), options.isExistingAnalysisFolder());
 
         importAnalysis_confirm(
@@ -361,11 +338,6 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 options.getKeywordDirs(),
                 options.getSelectedGroupNames(),
                 options.getSelectedSampleIds(),
-                options.getAnalysisEngine(),
-                options.isREngineNormalization(),
-                options.getREngineNormalizationReference(),
-                options.getREngineNormalizationSubsets(),
-                options.getREngineNormalizationParameters(),
                 options.getAnalysisName(),
                 options.isExistingAnalysisFolder());
 
@@ -460,55 +432,6 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void importAnalysis_analysisEngine(String containerPath, AnalysisEngine engine)
-    {
-        assertTitleEquals("Import Analysis: Analysis Engine: " + containerPath);
-        waitForElement(Locator.id(engine.name()), defaultWaitForPage);
-        click(Locator.radioButtonById(engine.name()));
-        clickButton("Next");
-    }
-
-    @LogMethod
-    protected void importAnalysis_analysisOptions(String containerPath, boolean rEngineNormalization, String rEngineNormalizationReference, List<String> rEngineNormalizationSubsets, List<String> rEngineNormalizationParameters)
-    {
-        assertTitleEquals("Import Analysis: Analysis Options: " + containerPath);
-
-        // R normalization options only present if rEngine as selected
-        if (isElementPresent(Locator.id("rEngineNormalization")))
-        {
-            log("Setting normalization options");
-            assertTextNotPresent("Normalization is current disabled");
-            if (rEngineNormalization)
-            {
-                checkCheckbox(Locator.checkboxByName("rEngineNormalization"));
-                if (rEngineNormalizationReference != null)
-                {
-                    selectOptionByText(Locator.id("rEngineNormalizationReference"), rEngineNormalizationReference);
-                    String formValue = getFormElement(Locator.id("rEngineNormalizationReference"));
-                    assertEquals(rEngineNormalizationReference, getText(Locator.xpath("id('rEngineNormalizationReference')/option[@value='" + formValue + "']")));
-                }
-
-                if (rEngineNormalizationSubsets != null)
-                    setFormElement(Locator.id("rEngineNormalizationSubsets"), StringUtils.join(rEngineNormalizationSubsets, ImportAnalysisOptions.PARAMETER_SEPARATOR));
-
-                if (rEngineNormalizationParameters != null)
-                    setFormElement(Locator.id("rEngineNormalizationParameters"), StringUtils.join(rEngineNormalizationParameters, ImportAnalysisOptions.PARAMETER_SEPARATOR));
-            }
-            else
-            {
-                uncheckCheckbox(Locator.checkboxByName("rEngineNormalization"));
-            }
-        }
-        else
-        {
-            if (rEngineNormalization)
-                fail("Expected to find R normalization options");
-            log("Not setting normalization options");
-        }
-        clickButton("Next");
-    }
-
-    @LogMethod
     protected void importAnalysis_analysisFolder(String containerPath, String analysisName, boolean existing)
     {
         assertTitleEquals("Import Analysis: Analysis Folder: " + containerPath);
@@ -525,15 +448,12 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
     protected void importAnalysis_confirm(String containerPath, String workspacePath,
                                           SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs,
-                                          AnalysisEngine analysisEngine,
                                           String analysisFolder, boolean existingAnalysisFolder)
     {
         importAnalysis_confirm(containerPath, workspacePath,
                 selectFCSFilesOption, keywordDirs,
                 Arrays.asList("All Samples"),
                 null,
-                analysisEngine,
-                false, null, null, null,
                 analysisFolder, existingAnalysisFolder);
     }
 
@@ -543,36 +463,12 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                                           List<String> keywordDirs,
                                           List<String> selectedGroupNames,
                                           List<String> selectedSampleIds,
-                                          AnalysisEngine analysisEngine,
-                                          boolean rEngineNormalization,
-                                          String rEngineNormalizationReference,
-                                          List<String> rEngineNormalizationSubsets,
-                                          List<String> rEngineNormalizationParameters,
                                           String analysisFolder,
                                           boolean existingAnalysisFolder)
     {
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
 
         assertElementPresent(Locator.tag("li").startsWith("FlowJo ").containing("Workspace: " + workspacePath));
-
-        switch (analysisEngine)
-        {
-            case FlowJoWorkspace:
-                assertElementPresent(Locator.tag("li").withText("Analysis Engine: No analysis engine selected"));
-                break;
-            case R:
-                assertElementPresent(Locator.tag("li").withText("Analysis Engine: External R analysis engine with normalization"));
-                break;
-        }
-
-        if (rEngineNormalization)
-        {
-            WebElement normalizationOptions = Locator.tag("li").startsWith("Normalization Options:").findElement(getDriver());
-            String normalizationOptionsText = normalizationOptions.getText();
-            assertTrue("Wrong Refernce Sample", normalizationOptionsText.contains("Reference Sample: " + rEngineNormalizationReference));
-            assertTrue("Wrong Normalize Subsets", normalizationOptionsText.contains("Normalize Subsets: " + (rEngineNormalizationSubsets == null ? "All subsets" : StringUtils.join(rEngineNormalizationSubsets, ", "))));
-            assertTrue("Wrong Normalize Parameters", normalizationOptionsText.contains("Normalize Parameters: " + (rEngineNormalizationParameters == null ? "All parameters" : StringUtils.join(rEngineNormalizationParameters, ", "))));
-        }
 
         if (existingAnalysisFolder)
             assertElementPresent(Locator.tag("li").withText("Existing Analysis Folder: " + analysisFolder));
@@ -612,23 +508,15 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     }
 
     protected enum SelectFCSFileOption { None, Included, Previous, Browse }
-    protected enum AnalysisEngine { FlowJoWorkspace, R }
 
     protected static class ImportAnalysisOptions
     {
-        public static final String PARAMETER_SEPARATOR = "\ufe50";
-
         private final String _containerPath;
         private final String _workspacePath;
         private SelectFCSFileOption _selectFCSFilesOption;
         private final List<String> _keywordDirs;
         private final List<String> _selectedGroupNames;
         private final List<String> _selectedSampleIds;
-        private final AnalysisEngine _analysisEngine;
-        private final boolean _rEngineNormalization;
-        private final String _rEngineNormalizationReference;
-        private final List<String> _rEngineNormalizationSubsets;
-        private final List<String> _rEngineNormalizationParameters;
         private final String _analysisName;
         private final boolean _existingAnalysisFolder;
         private final boolean _viaPipeline;
@@ -650,11 +538,6 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             _keywordDirs = keywordDirs;
             _selectedGroupNames = Collections.emptyList();
             _selectedSampleIds = null;
-            _analysisEngine = AnalysisEngine.FlowJoWorkspace;
-            _rEngineNormalization = false;
-            _rEngineNormalizationReference = null;
-            _rEngineNormalizationSubsets = null;
-            _rEngineNormalizationParameters = null;
             _analysisName = analysisName;
             _existingAnalysisFolder = existingAnalysisFolder;
             _viaPipeline = viaPipeline;
@@ -668,11 +551,6 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 List<String> keywordDirs,
                 List<String> selectGroupNames,
                 List<String> selectSampleIds,
-                AnalysisEngine analysisEngine,
-                boolean rEngineNormalization,
-                String rEngineNormalizationReference,
-                List<String> rEngineNormalizationSubsets,
-                List<String> rEngineNormalizationParameters,
                 String analysisName,
                 boolean existingAnalysisFolder,
                 boolean viaPipeline,
@@ -684,11 +562,6 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             _keywordDirs = keywordDirs;
             _selectedGroupNames = selectGroupNames;
             _selectedSampleIds = selectSampleIds;
-            _analysisEngine = analysisEngine;
-            _rEngineNormalization = rEngineNormalization;
-            _rEngineNormalizationReference = rEngineNormalizationReference;
-            _rEngineNormalizationSubsets = rEngineNormalizationSubsets;
-            _rEngineNormalizationParameters = rEngineNormalizationParameters;
             _analysisName = analysisName;
             _existingAnalysisFolder = existingAnalysisFolder;
             _viaPipeline = viaPipeline;
@@ -722,31 +595,6 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         public List<String> getSelectedSampleIds()
         {
             return _selectedSampleIds;
-        }
-
-        public AnalysisEngine getAnalysisEngine()
-        {
-            return _analysisEngine;
-        }
-
-        public boolean isREngineNormalization()
-        {
-            return _rEngineNormalization;
-        }
-
-        public String getREngineNormalizationReference()
-        {
-            return _rEngineNormalizationReference;
-        }
-
-        public List<String> getREngineNormalizationSubsets()
-        {
-            return _rEngineNormalizationSubsets;
-        }
-
-        public List<String> getREngineNormalizationParameters()
-        {
-            return _rEngineNormalizationParameters;
         }
 
         public String getAnalysisName()
