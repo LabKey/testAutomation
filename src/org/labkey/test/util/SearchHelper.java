@@ -51,7 +51,7 @@ public class SearchHelper
 
     public SearchHelper(BaseWebDriverTest test)
     {
-        this(test, 8);
+        this(test, 12);
     }
     private static final Locator noResultsLocator = Locator.css(".labkey-search-results-counts").withText("Found 0 results");
     private static final String unsearchableValue = "UNSEARCHABLE";
