@@ -299,7 +299,7 @@ public class RReportHelper
     }
 
 
-    private File getRExecutable()
+    public File getRExecutable()
     {
         if (rExecutable != null)
             return rExecutable;

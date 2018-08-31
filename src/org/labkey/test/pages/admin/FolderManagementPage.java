@@ -66,6 +66,12 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return goToFilesTab();
     }
 
+    public FileRootsManagementPage goToRConfigTab()
+    {
+        selectTab("rConfig");
+        return new FileRootsManagementPage(getDriver());
+    }
+
     public FolderTypePage goToFolderTypeTab()
     {
         selectTab("folderType");

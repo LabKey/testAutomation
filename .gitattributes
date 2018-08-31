@@ -779,6 +779,7 @@ src/org/labkey/test/tests/ProgrammaticQCTest.java -text
 src/org/labkey/test/tests/ProjectSettingsTest.java -text
 src/org/labkey/test/tests/ProjectTermsOfUseTest.java -text
 src/org/labkey/test/tests/QueryExportTest.java -text
+src/org/labkey/test/tests/RConfigTest.java -text
 src/org/labkey/test/tests/RaphaelRendererTest.java -text
 src/org/labkey/test/tests/RemoteConnectionTest.java -text
 src/org/labkey/test/tests/ReportAndDatasetNotificationTest.java -text
