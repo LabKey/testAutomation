@@ -22,6 +22,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.AssayAPITest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -29,6 +32,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
@@ -42,6 +46,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -59,6 +64,18 @@ public class ModuleAssayTest extends AbstractAssayTest
             "Second\t251379110131_A01\n" +
             "Third\t\n" +
             "Fourth\t\n";
+
+    protected final Boolean _useTransform;
+
+    public ModuleAssayTest()
+    {
+        this(false);
+    }
+
+    protected ModuleAssayTest(boolean useTransform)
+    {
+        _useTransform = useTransform;
+    }
 
     @Override
     public List<String> getAssociatedModules()
@@ -88,6 +105,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     public static void setupStuff() throws Exception
     {
         ModuleAssayTest init = (ModuleAssayTest)getCurrentTest();
+        assertNotNull(init._useTransform);
         init.doSetup();
     }
 
@@ -125,6 +143,16 @@ public class ModuleAssayTest extends AbstractAssayTest
         log("Setting up simple assay");
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), ASSAY_NAME);
         setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), "My Simple Assay Description");
+        if (_useTransform)
+        {
+            log("setting transform script in assay design");
+            AssayDesignerPage designer = new AssayDesignerPage(getDriver());
+            designer.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        }
+        else
+        {
+            log("not setting transform script");
+        }
 
         sleep(1000);
         clickButton("Save", 0);
@@ -217,7 +245,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTitleEquals(ASSAY_NAME + " Results: /" + PROJECT_NAME);
         DataRegionTable dataTable = new DataRegionTable("Data", getDriver());
 
-                // Verify file-based view associated with assay design shows up, with expected columns
+        // Verify file-based view associated with assay design shows up, with expected columns
         dataTable.goToView( "AssayDesignData");
         dataTable.goToView( "AssayDesignChildSchemaData");
         assertTextPresent("Created By", "Modified");
@@ -235,7 +263,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertElementContains(Locator.id("SampleId_div"), "Monkey 1");
         assertElementContains(Locator.id("TimePoint_div"), "2008/11/01 11:22:33");
         assertElementContains(Locator.id("DoubleData_div"), String.valueOf(3.2));
-        assertElementContains(Locator.id("HiddenData_div"), "super secret!");
+        assertElementContains(Locator.id("HiddenData_div"), _useTransform ? "super secret! transformed" : "super secret!");
 
 
         log("Issue 13404: Test assay query metadata is available when module is active or inactive");
@@ -271,7 +299,9 @@ public class ModuleAssayTest extends AbstractAssayTest
         selectQuery("assay", "LegacyAssayDataQueryName");
         waitForText("view data");
         clickAndWait(Locator.linkWithText("view data"));
-        assertTextPresent("LegacyPrefixsuper secret!Suffix", "LegacyPrefixwakka wakkaSuffix");
+        assertTextPresent(
+                "LegacyPrefixsuper secret!" + (_useTransform ? " transformed" : "") +  "Suffix",
+                "LegacyPrefixwakka wakka" + (_useTransform ? " transformed" : "") +  "Suffix");
     }
 
     @Test
@@ -317,6 +347,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     }
 
     // Issue 22632: import runs into module-based assay using LABKEY.Assay.importRun() API with data rows
+    // Issue 35262: assay with transform script fails when using assay-importRun.api and dataRows
     @Test
     public void testImportRun_dataRows() throws Exception
     {
@@ -336,6 +367,20 @@ public class ModuleAssayTest extends AbstractAssayTest
         Assert.assertTrue("Expected to insert a run", runId > 0);
         beginAt(resp.getSuccessURL());
         assertTextPresent("Monkey 72");
+
+        SelectRowsCommand selectRows = new SelectRowsCommand("assay.simple." + ASSAY_NAME, "Data");
+        selectRows.setColumns(Arrays.asList("RowId", "SampleId", "HiddenData"));
+        selectRows.setFilters(Arrays.asList(new Filter("run/rowId", runId)));
+
+        SelectRowsResponse selectResp = selectRows.execute(createDefaultConnection(true), PROJECT_NAME);
+        List<Map<String, Object>> rows = selectResp.getRows();
+        log("rows:\n" + rows);
+        assertEquals("Expected single data row", 1, rows.size());
+
+        // verify the hidden data column was transformed
+        Map<String, Object> row = rows.get(0);
+        String hiddenData = (String)row.get("hiddenData");
+        assertEquals(_useTransform ? "foo transformed" : "foo", hiddenData);
     }
 
     @Test

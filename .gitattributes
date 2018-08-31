@@ -767,6 +767,7 @@ src/org/labkey/test/tests/MessagesLongTest.java -text
 src/org/labkey/test/tests/MicroarrayTest.java -text
 src/org/labkey/test/tests/MissingValueIndicatorsTest.java -text
 src/org/labkey/test/tests/ModuleAssayTest.java -text
+src/org/labkey/test/tests/ModuleAssayTransformTest.java -text
 src/org/labkey/test/tests/MultiplePKUploadAssayTest.java -text
 src/org/labkey/test/tests/NonStudyReportsTest.java -text
 src/org/labkey/test/tests/ParticipantListTest.java -text
