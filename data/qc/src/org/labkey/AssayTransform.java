@@ -62,6 +62,9 @@ public class AssayTransform extends AbstractAssayValidator
                 case "TZM-bl Neutralization (NAb), High-throughput (Cross Plate Dilution)":
                     runHTNAbTest();
                     break;
+                case "Noblis Simple":
+                    runFileBasedAssayTest();
+                    break;
                 default:
                     throw new IllegalArgumentException("Test does not exist for assay type: " + type);
             }
@@ -434,6 +437,63 @@ public class AssayTransform extends AbstractAssayValidator
                         header = false;
                         sb.append('\n');
                         pw.write(sb.toString());
+                    }
+                }
+            }
+            else
+                writeError("Unable to locate the runDataFile", "runDataFile");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void runFileBasedAssayTest()
+    {
+        try
+        {
+            if (getRunProperties().containsKey(Props.runDataFile.name()))
+            {
+                String runDataFile = getRunProperties().get(Props.runDataFile.name());
+                List<Map<String, String>> dataMap = parseRunData(new File(runDataFile));
+                File transformFile = new File(getTransformFile().get(runDataFile));
+
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
+                {
+                    List<String> columns = new ArrayList<>();
+
+                    // write out transformed data
+                    for (Map<String, String> row : dataMap)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        if (columns.isEmpty())
+                        {
+                            for (String col : row.keySet())
+                            {
+                                columns.add(col);
+
+                                sb.append(col);
+                                sb.append('\t');
+                            }
+                            sb.append('\n');
+                            pw.write(sb.toString());
+                        }
+                        else
+                        {
+                            for (String col : columns)
+                            {
+                                String value = row.get(col);
+                                if (col.equalsIgnoreCase("HiddenData"))
+                                    value = value + " transformed";
+
+                                if (value != null)
+                                    sb.append(value);
+                                sb.append('\t');
+                            }
+                            sb.append('\n');
+                            pw.write(sb.toString());
+                        }
                     }
                 }
             }
