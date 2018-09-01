@@ -12,7 +12,6 @@
     <Prop name="sourceTabVisible">false</Prop>
     <Prop name="runInBackground">false</Prop>
     <Prop name="knitrFormat">Markdown</Prop>
-    <Prop name="modified">2015-10-26</Prop>
     <Prop name="moduleReportCreatedDate">2015-08-01</Prop>
   </Properties>
   <tags>
