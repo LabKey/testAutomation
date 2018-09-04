@@ -106,7 +106,8 @@ public class Crawler
     protected List<ControllerActionId> getDefaultExcludedActions()
     {
         List<ControllerActionId> list = new ArrayList<>();
-        Collections.addAll(list, new ControllerActionId("admin", "resetErrorMark"),
+        Collections.addAll(list, new ControllerActionId("*", "download"), // Never crawl download links
+            new ControllerActionId("admin", "resetErrorMark"),
             new ControllerActionId("admin", "dbChecker"),
             new ControllerActionId("admin", "runSystemMaintenance"),
             new ControllerActionId("admin", "deleteFolder"),
@@ -555,9 +556,11 @@ public class Crawler
         @Override
         public boolean equals(Object obj)
         {
-            return obj instanceof ControllerActionId &&
-                   _action.equalsIgnoreCase(((ControllerActionId) obj).getAction()) &&
-                   _controller.equalsIgnoreCase(((ControllerActionId) obj).getController());
+            return obj instanceof ControllerActionId
+                    && _action.equalsIgnoreCase(((ControllerActionId) obj).getAction())
+                    && (_controller.equalsIgnoreCase(((ControllerActionId) obj).getController())
+                            || "*".equals(_controller)
+                            || "*".equals(((ControllerActionId) obj).getController()));
         }
     }
 
