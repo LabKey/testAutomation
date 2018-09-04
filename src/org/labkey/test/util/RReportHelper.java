@@ -220,34 +220,20 @@ public class RReportHelper
         _test.log("Check if R already is configured");
 
         String rVersion = null;
-        if (scripts.isEnginePresent(dockerEngineName))
+        if (useDocker)
         {
-            scripts.editEngine(dockerEngineName);
-            Checkbox enabledCheckbox = Checkbox.Ext4Checkbox().withLabel("Enabled:").find(_test.getDriver());
-            if (useDocker)
-            {
-                TestLogger.log("Enable existing " + dockerEngineName);
-                enabledCheckbox.check();
-                rVersion = RDOCKER;
-            }
-            else
-            {
-                TestLogger.log("Disable existing " + dockerEngineName);
-                enabledCheckbox.uncheck();
-            }
-
-            _test.clickButton("Submit", 0);
-            _test.waitForElementToDisappear(ConfigureReportsAndScriptsPage.Locators.editEngineWindow);
-            new Ext4Helper(_test).waitForMaskToDisappear();
-        }
-        else if (useDocker)
-        {
-            scripts.addEngineWithDefaults(EngineType.R_DOCKER);
             rVersion = RDOCKER;
+            if (!scripts.isEnginePresent(dockerEngineName))
+                scripts.addEngineWithDefaults(EngineType.R_DOCKER);
         }
-
-        if (!useDocker)
+        else
         {
+            if (scripts.isEnginePresent(dockerEngineName))
+            {
+                scripts.deleteEngine(dockerEngineName);
+                _test.refresh(); // Avoid menu alignment issue on TeamCity
+            }
+
             if (scripts.isEnginePresent(localEngineName))
             {
                 if (!TestProperties.isTestRunningOnTeamCity())
@@ -296,6 +282,7 @@ public class RReportHelper
             enabledCheckbox.uncheck();
 
         _test.clickButton("Submit", 0);
+        _test.waitForElementToDisappear(ConfigureReportsAndScriptsPage.Locators.editEngineWindow);
     }
 
 
