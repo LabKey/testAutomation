@@ -684,7 +684,7 @@ public class FlowTest extends BaseFlowTest
                 .findElement(container).click();
         WebElement matchedFileInput = Locator.xpath("//select[@name='selectedSamples.rows[0.0.1].matchedFile']").findElement(container);
         selectOptionByText(matchedFileInput,"91745.fcs (L02-060120-QUV-JS)");
-        clickButton("Next");
+        mashButton("Next");
         waitForText("Import Analysis: Analysis Folder");
         clickButton("Next");
         waitForText("Import Analysis: Confirm");
