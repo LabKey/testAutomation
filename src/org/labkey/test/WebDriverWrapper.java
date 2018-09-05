@@ -1258,7 +1258,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         TextSearcher searcher = new TextSearcher(this);
         searcher.setSearchTransformer(TextSearcher.TextTransformers.IDENTITY);
         searcher.setSourceTransformer(TextSearcher.TextTransformers.IDENTITY);
-        searcher.searchForTexts(handler, texts);
+        searcher.searchForTexts(handler, Arrays.asList(texts));
 
         return present.getValue();
     }
@@ -1273,7 +1273,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             return true;
         };
 
-        searcher.searchForTexts(handler, texts);
+        searcher.searchForTexts(handler, Arrays.asList(texts));
 
         List<String> orderedTexts = new ArrayList<>();
         foundTexts.stream()
@@ -1285,17 +1285,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public List<String> getMissingTexts(TextSearcher searcher, String... texts)
     {
-        final List<String> missingTexts = new ArrayList<>();
-
-        TextSearcher.TextHandler handler = (textSource, text) -> {
-            if (!textSource.contains(text))
-                missingTexts.add(text);
-            return true;
-        };
-
-        searcher.searchForTexts(handler, texts);
-
-        return missingTexts;
+        return searcher.getMissingTexts(Arrays.asList(texts));
     }
 
     public String getText(Locator elementLocator)
@@ -1368,7 +1358,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
         };
         TextSearcher searcher = new TextSearcher(this);
-        searcher.searchForTexts(handler, texts);
+        searcher.searchForTexts(handler, Arrays.asList(texts));
 
         if (!found.getValue())
             fail("Did not find any of the following values on current page " + Arrays.toString(texts));
@@ -1495,7 +1485,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
         };
 
-        searcher.searchForTexts(handler, new String[]{text});
+        searcher.searchForTexts(handler, Arrays.asList(text));
         return foundIndices.size();
     }
 
@@ -1526,7 +1516,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
         };
 
-        searcher.searchForTexts(handler, texts);
+        searcher.searchForTexts(handler, Arrays.asList(texts));
         Assert.assertTrue(String.join("\n", errors), errors.isEmpty());
     }
 

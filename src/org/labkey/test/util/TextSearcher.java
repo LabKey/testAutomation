@@ -20,6 +20,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -27,7 +29,8 @@ public class TextSearcher
 {
     private Function<String, String> sourceTransformer;
     private Function<String, String> searchTransformer;
-    private Supplier<String> sourceSupplier;
+    private final Supplier<String> sourceSupplier;
+    private String lastSearchedText = null;
 
     public TextSearcher(final Supplier<String> sourceSupplier)
     {
@@ -82,18 +85,13 @@ public class TextSearcher
         return setSearchTransformer(null);
     }
 
-    public final TextSearcher setSourceSupplier(Supplier<String> sourceSupplier)
+    public final void searchForTexts(TextHandler textHandler, List<String> texts)
     {
-        this.sourceSupplier = sourceSupplier;
-        return this;
-    }
-
-    public final void searchForTexts(TextHandler textHandler, String[] texts)
-    {
-        if (null == texts || 0 == texts.length)
+        if (texts == null || texts.isEmpty())
             return;
 
         String transformedSource = sourceTransformer.apply(sourceSupplier.get());
+        lastSearchedText = transformedSource;
 
         for (String text : texts)
         {
@@ -103,6 +101,29 @@ public class TextSearcher
             if (!textHandler.handle(transformedSource, transformedText))
                 return;
         }
+    }
+
+    public List<String> getMissingTexts(List<String> texts)
+    {
+        final List<String> missingTexts = new ArrayList<>();
+
+        TextSearcher.TextHandler handler = (textSource, text) -> {
+            if (!textSource.contains(text))
+                missingTexts.add(text);
+            return true;
+        };
+
+        searchForTexts(handler, texts);
+
+        return missingTexts;
+    }
+
+    /**
+     * @return source text from the last search attempt
+     */
+    public String getLastSearchedText()
+    {
+        return lastSearchedText;
     }
 
     public interface TextHandler
