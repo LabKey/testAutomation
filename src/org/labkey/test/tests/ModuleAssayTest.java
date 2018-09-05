@@ -30,6 +30,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.AssayDesignerPage;
@@ -37,6 +38,8 @@ import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.QCAssayScriptHelper;
+import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -101,6 +104,18 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickProject(PROJECT_NAME);
     }
 
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+
+        try
+        {
+            new QCAssayScriptHelper(this).deleteEngine();
+        }
+        catch (WebDriverException ignored) { }
+    }
+
     @BeforeClass
     public static void setupStuff() throws Exception
     {
@@ -117,6 +132,12 @@ public class ModuleAssayTest extends AbstractAssayTest
 
     protected void setupProject() throws Exception
     {
+        if (_useTransform)
+        {
+            // set up a scripting engine to run a java transform script
+            new QCAssayScriptHelper(this).ensureEngineConfig();
+        }
+
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.enableModule("miniassay");
         setupPipeline(PROJECT_NAME);
