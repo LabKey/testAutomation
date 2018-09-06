@@ -391,11 +391,11 @@ public class DataReportsTest extends ReportTest
         clickSourceTab();
         _rReportHelper.selectOption(RReportHelper.ReportOption.shareReport);
         _rReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
-        clickReportTab();
+        saveReport(R_SCRIPTS[1]);
 
         log("Check that R script worked");
-        assertTextPresent(R_SCRIPT2_TEXT1);
-        saveReport(R_SCRIPTS[1]);
+        clickReportTab();
+        assertElementPresent(Locator.lkButton("Start Job"));
 
         log("Check that background run works");
 

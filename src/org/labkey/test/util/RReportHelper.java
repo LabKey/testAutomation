@@ -40,6 +40,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
+import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class RReportHelper
@@ -430,21 +431,19 @@ public class RReportHelper
     private void _selectOption(ReportOption option, boolean checked)
     {
         ensureFieldSetExpanded(option._fieldSet);
+        Checkbox checkbox;
         if (option._isCheckbox)
         {
-            Locator checkbox = Ext4Helper.Locators.checkbox(_test, option._label);
-            _test.waitForElement(checkbox);
-            if (checked)
-                Ext4Checkbox().withLabel(option._label).waitFor(_test._ext4Helper._test.getDriver()).check();
-            else
-                Ext4Checkbox().withLabel(option._label).waitFor(_test._ext4Helper._test.getDriver()).uncheck();
+            checkbox = Ext4Checkbox().withLabel(option._label).waitFor(_test.getDriver());
         }
         else
         {
-            Locator checkbox = Ext4Helper.Locators.radiobutton(_test, option._label);
-            _test.waitForElement(checkbox);
-            _test._ext4Helper.selectRadioButton(option._label);
+            if (!checked)
+                throw new IllegalArgumentException("Can't uncheck a radio button");
+            checkbox = RadioButton().withLabel(option._label).waitFor(_test.getDriver());
         }
+        checkbox.set(checked);
+        _test.waitFor(() -> checkbox.isChecked() == checked, 1000);
     }
 
     public void clickReportTab()
