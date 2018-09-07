@@ -72,7 +72,8 @@ public class DataRegionTest extends AbstractQWPTest
                     new Pair<>("Hide Paging Count", "testHidePagingCount"),
                     new Pair<>("Show All Rows", "testShowAllTotalRows"),
                     new Pair<>("Use getBaseFilters", "testGetBaseFilters"),
-                    new Pair<>("Filter on \"Sort\" column", "testFilterOnSortColumn")
+                    new Pair<>("Filter on \"Sort\" column", "testFilterOnSortColumn"),
+                    new Pair<>("Use onRender via ButtonBarOptions", "testButtonBarConfig")
                     );
 
     static
