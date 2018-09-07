@@ -1095,20 +1095,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    @LogMethod(quiet = true)
-    public void disableLoginAttemptLimit()
-    {
-        goToAdminConsole().goToAdminConsoleLinksSection();
-        if (isElementPresent(Locator.linkWithText("Compliance Settings")))
-        {
-            log("Compliance module present, ensuring login attempt limit is off");
-            clickAndWait(Locator.linkWithText("Compliance Settings"));
-            clickAndWait(Locator.tagWithClass("div", "tab").childTag("a").withText("Login"));
-            uncheckCheckbox(Locator.checkboxById("enableLogin"));
-            click(Locator.linkWithSpan("Save"));
-        }
-    }
-
     public ProjectMenu projectMenu()
     {
         return new ProjectMenu(getDriver());

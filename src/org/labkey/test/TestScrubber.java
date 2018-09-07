@@ -15,6 +15,11 @@
  */
 package org.labkey.test;
 
+import org.apache.http.HttpStatus;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.ConfigureDbLoginPage;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
@@ -22,6 +27,11 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
 
 public class TestScrubber extends ExtraSiteWrapper
 {
@@ -82,7 +92,7 @@ public class TestScrubber extends ExtraSiteWrapper
         {
             disableLoginAttemptLimit();
         }
-        catch (RuntimeException e)
+        catch (IOException | CommandException e)
         {
             log("Failed to disable login attempt limit after test");
         }
@@ -94,6 +104,29 @@ public class TestScrubber extends ExtraSiteWrapper
         catch (RuntimeException e)
         {
             log("Failed to re-enable file Upload after test");
+        }
+    }
+
+    @LogMethod(quiet = true)
+    private void disableLoginAttemptLimit() throws IOException, CommandException
+    {
+        Connection connection = getRemoteApiConnection();
+        PostCommand<CommandResponse> command = new PostCommand<>("compliance", "complianceSettings");
+        Map<String, Object> params = new HashMap<>();
+        params.put("tab", "login");
+        params.put("attemptEnabled", "false");
+        command.setParameters(params);
+
+        try
+        {
+            command.execute(connection, "/");
+        }
+        catch (CommandException e)
+        {
+            if (e.getStatusCode() != HttpStatus.SC_NOT_FOUND)
+            {
+                throw e;
+            }
         }
     }
 
