@@ -51,9 +51,9 @@ public class RReportHelper
         shareReport("Make this report available to all users", null, true),
         showSourceTab("Show source tab to all users", null, true),
         runInPipeline("Run this report in the background as a pipeline job", null, true),
-        knitrNone("None", "Knitr Options", false),
-        knitrHtml("Html", "Knitr Options", false),
-        knitrMarkdown("Markdown", "Knitr Options", false);
+        knitrNone("None" + Locator.NBSP, "Knitr Options", false),
+        knitrHtml("Html" + Locator.NBSP, "Knitr Options", false),
+        knitrMarkdown("Markdown" + Locator.NBSP, "Knitr Options", false);
 
         public String _label;
         public boolean _isCheckbox;
