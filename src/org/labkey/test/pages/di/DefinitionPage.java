@@ -1,4 +1,4 @@
-package org.labkey.test.etl.pages;
+package org.labkey.test.pages.di;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

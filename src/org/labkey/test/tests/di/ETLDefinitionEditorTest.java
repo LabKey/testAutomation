@@ -1,4 +1,4 @@
-package org.labkey.test.etl;
+package org.labkey.test.tests.di;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
@@ -8,9 +8,9 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
-import org.labkey.test.etl.pages.ConfirmDeletePage;
-import org.labkey.test.etl.pages.DefinitionPage;
-import org.labkey.test.etl.pages.DefinitionsQueryView;
+import org.labkey.test.pages.di.ConfirmDeletePage;
+import org.labkey.test.pages.di.DefinitionPage;
+import org.labkey.test.pages.di.DefinitionsQueryView;
 
 import java.io.IOException;
 

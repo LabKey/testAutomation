@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.etl;
+package org.labkey.test.tests.di;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -26,12 +26,12 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.di.DataIntegrationHelper;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -85,7 +85,7 @@ public class ETLHelper
     //
     private ArrayList<String []> _transformSummaries = new ArrayList<>();
 
-    public ETLHelper(BaseWebDriverTest test, String projectName)
+    public ETLHelper(ETLAbstractTest test, String projectName)
     {
         _test = test;
         _diHelper = new DataIntegrationHelper("/" + projectName);

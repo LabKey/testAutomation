@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.etl;
+package org.labkey.test.tests.di;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

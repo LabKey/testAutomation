@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.etl;
+package org.labkey.test.tests.di;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -39,7 +39,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.etl.ETLHelper.ETL_SOURCE;
+import static org.labkey.test.tests.di.ETLHelper.ETL_SOURCE;
 
 @Category({DailyB.class, Data.class, ETL.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 25)

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.etl;
+package org.labkey.test.tests.di;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -27,6 +27,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.ETL;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.di.DataIntegrationHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ import static org.junit.Assert.assertEquals;
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ETLListTest extends BaseWebDriverTest
 {
-    ETLHelper _etlHelper = new ETLHelper(this, getProjectName());
+    DataIntegrationHelper _etlHelper = new DataIntegrationHelper(getProjectName());
     private static final String ETL_LIST_MERGE = "{ETLtest}/ListAToListB";
     private static final String ETL_AUTO_INCR_LIST_TRUNCATE = "{ETLtest}/AutoIncrementListAToListB_truncate";
     // TODO: revert to ETL_ListAListB.lists.zip when 24725 is resolved. Delete xETL_ListAListB.lists.zip
@@ -81,10 +82,10 @@ public class ETLListTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testMergeEtl()
+    public void testMergeEtl() throws Exception
     {
         List<String> expectedKeys = new ArrayList<>(Arrays.asList("K1", "K3"));
-        _etlHelper.runETL(ETL_LIST_MERGE);
+        _etlHelper.runTransform(ETL_LIST_MERGE);
 
         clickAndWait(Locator.linkWithText(DEST_LIST));
         DataRegionTable dest = new DataRegionTable("query", this);
@@ -95,7 +96,7 @@ public class ETLListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SRC_LIST));
         // TODO: switch back to "Key" when 24725 is resolved
         _listHelper.insertNewRow(Maps.of("xKey", "K4", "Field1", "new"));
-        _etlHelper.runETL(ETL_LIST_MERGE);
+        _etlHelper.runTransform(ETL_LIST_MERGE);
         expectedKeys.add("K4");
 
         clickAndWait(Locator.linkWithText(DEST_LIST));
@@ -105,10 +106,10 @@ public class ETLListTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAutoIncrTruncateEtl()
+    public void testAutoIncrTruncateEtl() throws Exception
     {
         List<String> expectedRows = new ArrayList<>(Arrays.asList("Row1", "Row2"));
-        _etlHelper.runETL(ETL_AUTO_INCR_LIST_TRUNCATE);
+        _etlHelper.runTransform(ETL_AUTO_INCR_LIST_TRUNCATE);
 
         clickAndWait(Locator.linkWithText(AUTO_INCR_DEST_LIST));
         DataRegionTable dest = new DataRegionTable("query", this);
@@ -118,7 +119,7 @@ public class ETLListTest extends BaseWebDriverTest
         goBack();
         clickAndWait(Locator.linkWithText(AUTO_INCR_SRC_LIST));
         _listHelper.insertNewRow(Maps.of("Field1", "new"));
-        _etlHelper.runETL(ETL_AUTO_INCR_LIST_TRUNCATE);
+        _etlHelper.runTransform(ETL_AUTO_INCR_LIST_TRUNCATE);
         expectedRows.add("new");
 
         clickAndWait(Locator.linkWithText(AUTO_INCR_DEST_LIST));
