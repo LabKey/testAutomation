@@ -620,9 +620,6 @@ src/org/labkey/test/pages/core/admin/ShowAdminPage.java -text
 src/org/labkey/test/pages/core/admin/ShowAuditLogPage.java -text
 src/org/labkey/test/pages/core/admin/logger/ManagerPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
-src/org/labkey/test/pages/di/ConfirmDeletePage.java -text
-src/org/labkey/test/pages/di/DefinitionPage.java -text
-src/org/labkey/test/pages/di/DefinitionsQueryView.java -text
 src/org/labkey/test/pages/files/CustomizeFilesWebPartPage.java -text
 src/org/labkey/test/pages/files/FileContentPage.java -text
 src/org/labkey/test/pages/files/WebDavPage.java -text
@@ -824,16 +821,6 @@ src/org/labkey/test/tests/announcements/DiscussionLinkTest.java -text
 src/org/labkey/test/tests/announcements/MessagesAttachmentTest.java -text
 src/org/labkey/test/tests/announcements/ModeratorReviewTest.java -text
 src/org/labkey/test/tests/api/CustomizeGridPermissionsTest.java -text
-src/org/labkey/test/tests/di/ETLAbstractTest.java -text
-src/org/labkey/test/tests/di/ETLClientApiCommandTest.java -text
-src/org/labkey/test/tests/di/ETLDefinitionEditorTest.java -text
-src/org/labkey/test/tests/di/ETLHelper.java -text
-src/org/labkey/test/tests/di/ETLListTest.java -text
-src/org/labkey/test/tests/di/ETLRemoteSourceTest.java -text
-src/org/labkey/test/tests/di/ETLSimpleTransformTest.java -text
-src/org/labkey/test/tests/di/ETLTaskRefTaskTest.java -text
-src/org/labkey/test/tests/di/ETLTest.java -text
-src/org/labkey/test/tests/di/ETLTestB.java -text
 src/org/labkey/test/tests/elisa/ElisaAssayTest.java -text
 src/org/labkey/test/tests/elispotassay/ElispotAssayTest.java -text
 src/org/labkey/test/tests/flow/BaseFlowTest.java -text
