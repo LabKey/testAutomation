@@ -27,6 +27,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.labkey.test.components.ext4.Window.Window;
@@ -101,15 +102,61 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     }
 
     @LogMethod
+    public void deleteEnginesFromList(@LoggedParam List<String> engineNames)
+    {
+        String defaultName = "";
+        for (String engineName : engineNames)
+        {
+            if (isEnginePresent(engineName)) {
+                WebElement engineRow = selectEngineNamed(engineName);
+                if (engineRow.getText().contains("default : true"))
+                {
+                    defaultName = engineName;
+                }
+                else
+                {
+                    deleteSelectedEngine(engineRow);
+                }
+            }
+        }
+
+        // delete default engine last
+        WebElement defaultRow = selectEngineNamed(defaultName);
+        defaultRow.click();
+        deleteSelectedEngine(defaultRow);
+    }
+
+    @LogMethod
     public void deleteEnginesForLanguage(@LoggedParam String engineLanguage)
     {
         WebElement engineRow = selectFirstEngineForLanguage(engineLanguage);
+        WebElement defaultRow = null;
 
         while (engineRow != null)
         {
-            deleteSelectedEngine(engineRow);
-            engineRow = selectFirstEngineForLanguage(engineLanguage);
+            if (engineRow.getText().contains("default : true"))
+            {
+                defaultRow = engineRow;
+                List<WebElement> elements = Locators.enginesGridRowForLanguage(engineLanguage).findElements(getDriver());
+                if (elements.size() < 2)
+                {
+                    engineRow = null;
+                }
+                else
+                {
+                    elements.get(1).click();
+                    engineRow = elements.get(1);
+                }
+            }
+            else
+            {
+                deleteSelectedEngine(engineRow);
+                engineRow = selectFirstEngineForLanguage(engineLanguage);
+            }
         }
+
+        // delete default engine last
+        deleteSelectedEngine(defaultRow);
     }
 
     @LogMethod(quiet = true)
