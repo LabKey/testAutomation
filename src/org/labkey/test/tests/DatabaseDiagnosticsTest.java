@@ -70,9 +70,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     @Test
     public void databaseCheckTest()
     {
-        goToAdminConsole().goToAdminConsoleLinksSection();
-        clickAndWait(Locator.linkWithText("Check Database"));
-        clickAndWait(Locator.linkWithText("Do Database Check"), 120000);
+        beginAt(WebTestHelper.buildURL("admin", "doCheck"), 180000);
         waitForText(60000, "Database Consistency checker complete");
         assertTextNotPresent("ERROR");
     }
