@@ -104,7 +104,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     @LogMethod
     public void deleteEnginesFromList(@LoggedParam List<String> engineNames)
     {
-        String defaultName = "";
+        String defaultName = null;
         for (String engineName : engineNames)
         {
             if (isEnginePresent(engineName)) {
@@ -121,9 +121,12 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         }
 
         // delete default engine last
-        WebElement defaultRow = selectEngineNamed(defaultName);
-        defaultRow.click();
-        deleteSelectedEngine(defaultRow);
+        if (defaultName != null)
+        {
+            WebElement defaultRow = selectEngineNamed(defaultName);
+            defaultRow.click();
+            deleteSelectedEngine(defaultRow);
+        }
     }
 
     @LogMethod
