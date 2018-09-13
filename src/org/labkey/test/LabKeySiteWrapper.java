@@ -705,8 +705,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                         goToHome();
                     }
                 }
-
-                checkErrors(); // Check for errors from bootstrap/upgrade
             }
 
             // Tests hit Home portal a lot. Make it load as fast as possible
@@ -717,6 +715,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 webPart.remove();
             if (bootstrapped)
                 _userHelper.setDisplayName(PasswordUtil.getUsername(), AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername()) + BaseWebDriverTest.INJECT_CHARS_1);
+
+            PipelineStatusTable pipelineStatusTable = goToDataPipeline();
+            pipelineStatusTable.setContainerFilter(DataRegionTable.ContainerFilterType.ALL_FOLDERS);
+            log("Wait for any upgrade/bootstrap pipeline jobs");
+            waitForRunningPipelineJobs(false,120000);
+
+            checkErrors(); // Check for errors from bootstrap/upgrade
         }
     }
 
