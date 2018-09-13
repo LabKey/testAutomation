@@ -19,6 +19,10 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -39,10 +43,13 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
+import org.labkey.test.util.Timer;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -120,6 +127,8 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @Test
     public void testFileBrowser()
     {
+        sendFileDigest();
+
         SearchHelper _searchHelper = getSearchHelper();
         _searchHelper.initialize();
 
@@ -179,10 +188,19 @@ public class FileContentUploadTest extends BaseWebDriverTest
         sendFileDigest();
         goToModule("Dumbster");
         addUrlParameter("reverse=true"); // List emails chronologically, in case of multiple notifications
-        waitForElementWithRefresh(Locator.linkWithText("File Management Notification"), WAIT_FOR_JAVASCRIPT).click();
+
+        Timer timer = new Timer(Duration.ofSeconds(15));
+        Locator.XPathLocator notificationLoc = Locator.linkWithText("File Management Notification");
+        do
+        {
+            sleep(1000);
+            sendFileDigest();
+            refresh();
+        } while (!timer.isTimedOut() && !isElementPresent(notificationLoc));
+        click(notificationLoc);
         // All notifications might not appear in one digest
-        if (isElementPresent(Locator.linkWithText("File Management Notification").index(1)))
-            click(Locator.linkWithText("File Management Notification").index(1));
+        if (isElementPresent(notificationLoc.index(1)))
+            click(notificationLoc.index(1));
         assertTextPresentInThisOrder("File uploaded", "annotations updated", "File deleted");
 
         assertTextNotPresent(TEST_USER);  // User opted out of notifications
@@ -233,8 +251,17 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @LogMethod(quiet = true)
     private void sendFileDigest()
     {
-        beginAt(WebTestHelper.buildURL("filecontent", getProjectName(), "sendShortDigest"));
-        assertElementPresent(Locator.tagWithText("div", "15 Minute digest sent"));
+        Command<CommandResponse> command = new Command<>("filecontent", "sendShortDigest");
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+
+        try
+        {
+            command.execute(connection, getProjectName());
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to send file digest", e);
+        }
     }
 
     @LogMethod
