@@ -50,6 +50,7 @@ import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -63,6 +64,7 @@ import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.Timer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -77,9 +79,11 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -1276,5 +1280,162 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
 
         return selectResp;
+    }
+
+    // Returns the text contents of every "Status" cell in the pipeline StatusFiles grid
+    public List<String> getPipelineStatusValues()
+    {
+        PipelineStatusTable status = new PipelineStatusTable(this);
+        try
+        {
+            return status.getColumnDataAsText("Status");
+        }
+        catch (StaleElementReferenceException retry) // Page auto-refreshes
+        {
+            return status.getColumnDataAsText("Status");
+        }
+    }
+
+    // Returns count of "COMPLETE" and "ERROR"
+    private int getFinishedCount(List<String> statusValues)
+    {
+        List<String> finishedStates = Arrays.asList("COMPLETE", "ERROR", "CANCELLED");
+        return statusValues.stream().filter(finishedStates::contains).collect(Collectors.toList()).size();
+    }
+
+    public void waitForPipelineJobsToComplete(final int finishedJobsExpected, final String description, final boolean expectError)
+    {
+        waitForPipelineJobsToComplete(finishedJobsExpected, description, expectError, BaseWebDriverTest.MAX_WAIT_SECONDS * 1000);
+    }
+
+    /**
+     * Wait for all in-progress pipeline jobs to finish, then assert the quantity and lack of or presence of an error
+     * @param finishedJobsExpected Exact number of jobs to expect
+     * @param description "Description" field for at least one of the finished jobs (Not currently a strict check)
+     * @param expectError If true, at least one job must have an ERROR state; otherwise all must be COMPLETE
+     * @param timeoutMilliseconds Maximum time to wait for pipeline jobs to finish (default 10 minutes)
+     */
+    @LogMethod
+    public void waitForPipelineJobsToComplete(@LoggedParam final int finishedJobsExpected, @LoggedParam final String description, final boolean expectError, int timeoutMilliseconds)
+    {
+        final List<String> statusValues = waitForPipelineJobsToFinish(finishedJobsExpected, Duration.ofMillis(timeoutMilliseconds));
+
+        if (expectError)
+            assertTrue("Did not find expected pipeline error.", statusValues.contains("ERROR"));
+        else
+            assertFalse("Found unexpected pipeline error.", statusValues.contains("ERROR"));
+
+        if (description != null)
+        {
+            DataRegionTable status = new DataRegionTable("StatusFiles", getDriver());
+            final List<String> actualDescriptions = status.getColumnDataAsText("Description");
+            if (actualDescriptions.parallelStream().noneMatch(desc -> desc.contains(description)))
+            {
+                log("WARNING: Did not find a job with expected description: " + description); // TODO: change to fail state?
+            }
+        }
+    }
+
+    public List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
+    {
+        return waitForPipelineJobsToFinish(jobsExpected, Duration.ofSeconds(BaseWebDriverTest.MAX_WAIT_SECONDS));
+    }
+
+    /**
+     * Wait until pipeline UI shows that all jobs have finished then assert the quantity
+     * @param jobsExpected Exact number of jobs to expect
+     * @param timeout {@link Duration} to wait for pipeline jobs to finish (default 10 minutes)
+     * @return {@link List} of status values for all pipeline jobs
+     */
+    @LogMethod
+    public List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected, @LoggedParam Duration timeout)
+    {
+        log("Waiting for " + jobsExpected + " pipeline jobs to finish");
+        Timer timer = new Timer(timeout);
+        List<String> statusValues = waitForRunningPipelineJobs(timeout.toMillis());
+        while (statusValues.size() < jobsExpected && !timer.isTimedOut())
+        {
+            sleep(1000);
+            refresh();
+            statusValues = waitForRunningPipelineJobs(timer.timeRemaining().toMillis());
+        }
+        assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
+        return statusValues;
+    }
+
+    /**
+     * Wait until pipeline UI shows that all jobs have finished
+     * If the timeout is exceeded and one of the pipeline jobs is in a "WAIT" state, we show the pipeline status grid
+     * filtered to ALL_FOLDERS and exclude and finished or waiting jobs to get more informative failure information
+     * @param timeoutMilliseconds Maximum time to wait for pipeline jobs to finish (default 10 minutes)
+     * @return {@link List} of status values for all pipeline jobs
+     */
+    @LogMethod
+    public List<String> waitForRunningPipelineJobs(long timeoutMilliseconds)
+    {
+        List<String> statusValues = getPipelineStatusValues();
+        long start = System.currentTimeMillis();
+        while (statusValues.size() > getFinishedCount(statusValues) && System.currentTimeMillis() - start < timeoutMilliseconds)
+        {
+            log("[" + StringUtils.join(statusValues,",") + "]");
+            log("Waiting for " + (statusValues.size() - getFinishedCount(statusValues)) + " job(s) to complete...");
+            sleep(1000);
+            refresh();
+            statusValues = getPipelineStatusValues();
+        }
+        log("Final: [" + StringUtils.join(statusValues,",") + "]");
+
+        boolean waitingJobs = statusValues.stream().anyMatch(status -> status.contains("WAIT"));
+        if (waitingJobs)
+        {
+            log("WARNING: Pipeline appears stalled. Showing all unfinished jobs.");
+            PipelineStatusTable pipelineStatusTable = new PipelineStatusTable(this);
+            pipelineStatusTable.setContainerFilter(DataRegionTable.ContainerFilterType.ALL_FOLDERS);
+            addUrlParameter(pipelineStatusTable.getDataRegionName() + ".Status~notin=COMPLETE;CANCELLED;ERROR&" +
+                    pipelineStatusTable.getDataRegionName() + ".Status~doesnotcontain=WAIT");
+            final List<String> descriptions = pipelineStatusTable.getColumnDataAsText("Description");
+            fail("Timed out waiting for pipeline job to start. Waiting on " + (descriptions.isEmpty() ? "<unknown>" : descriptions));
+        }
+        assertEquals("Running pipeline jobs were found.  Timeout:" + timeoutMilliseconds + "sec", 0, statusValues.size() - getFinishedCount(statusValues));
+
+        return statusValues;
+    }
+
+    public List<String> waitForRunningPipelineJobs(boolean expectError, long timeoutMilliseconds)
+    {
+        List<String> statusValues = waitForRunningPipelineJobs(timeoutMilliseconds);
+        if (expectError)
+            assertTrue("Didn't find expected pipeline error", statusValues.contains("ERROR"));
+        else
+            assertFalse("Found unexpected pipeline error", statusValues.contains("ERROR"));
+        return statusValues;
+    }
+
+    @LogMethod
+    protected void deletePipelineJob(@LoggedParam String jobDescription, @LoggedParam boolean deleteRuns)
+    {
+        deletePipelineJob(jobDescription, deleteRuns, false);
+    }
+
+    protected void deleteAllPipelineJobs() {
+        goToModule("Pipeline");
+        PipelineStatusTable table = new PipelineStatusTable(this);
+        table.deleteAllPipelineJobs();
+    }
+
+    @LogMethod
+    protected void deletePipelineJob(@LoggedParam String jobDescription, @LoggedParam boolean deleteRuns, @LoggedParam boolean descriptionStartsWith)
+    {
+        goToModule("Pipeline");
+
+        PipelineStatusTable table = new PipelineStatusTable(this);
+        int tableJobRow = table.getJobRow(jobDescription, descriptionStartsWith);
+        assertNotEquals("Failed to find job rowid", -1, tableJobRow);
+        table.checkCheckbox(tableJobRow);
+        table.clickHeaderButton("Delete");
+        assertElementPresent(Locator.linkContainingText(jobDescription));
+        if (deleteRuns && isElementPresent(Locator.id("deleteRuns")))
+            checkCheckbox(Locator.id("deleteRuns"));
+        clickButton("Confirm Delete");
     }
 }
