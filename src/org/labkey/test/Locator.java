@@ -1606,7 +1606,7 @@ public abstract class Locator extends By
             if (elements.size() == 0 && !_linkText.equals(_linkText.toUpperCase()))
                 return (new LinkLocator(_linkText.toUpperCase())).findElements(context);
             else
-                return decorateWebElements(elements);
+                return elements;
         }
 
         @Override
