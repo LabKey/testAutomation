@@ -707,19 +707,20 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 }
             }
 
-            // Tests hit Home portal a lot. Make it load as fast as possible
-            PortalHelper portalHelper = new PortalHelper(this);
-            for (BodyWebPart webPart : portalHelper.getBodyWebParts())
-                webPart.remove();
-            for (SideWebPart webPart : portalHelper.getSideWebParts())
-                webPart.remove();
             if (bootstrapped)
+            {
+                // Tests hit Home portal a lot. Make it load as fast as possible
+                PortalHelper portalHelper = new PortalHelper(this);
+                for (BodyWebPart webPart : portalHelper.getBodyWebParts())
+                    webPart.remove();
+                for (SideWebPart webPart : portalHelper.getSideWebParts())
+                    webPart.remove();
                 _userHelper.setDisplayName(PasswordUtil.getUsername(), AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername()) + BaseWebDriverTest.INJECT_CHARS_1);
 
-            PipelineStatusTable pipelineStatusTable = goToDataPipeline();
-            pipelineStatusTable.setContainerFilter(DataRegionTable.ContainerFilterType.ALL_FOLDERS);
-            log("Wait for any upgrade/bootstrap pipeline jobs");
-            waitForRunningPipelineJobs(false,120000);
+                PipelineStatusTable.goToAllJobsPage(this);
+                log("Wait for any upgrade/bootstrap pipeline jobs");
+                waitForRunningPipelineJobs(false, 120000);
+            }
 
             checkErrors(); // Check for errors from bootstrap/upgrade
         }
@@ -1304,7 +1305,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     // Returns count of "COMPLETE" and "ERROR"
     private int getFinishedCount(List<String> statusValues)
     {
-        List<String> finishedStates = Arrays.asList("COMPLETE", "ERROR", "CANCELLED");
+        List<String> finishedStates = new ArrayList<>(Arrays.asList("COMPLETE", "ERROR", "CANCELLED"));
+        if (statusValues.contains("ERROR"))
+            finishedStates.add("SPLIT WAITING"); // Split jobs never "finish" if subjobs have errors
         return statusValues.stream().filter(finishedStates::contains).collect(Collectors.toList()).size();
     }
 

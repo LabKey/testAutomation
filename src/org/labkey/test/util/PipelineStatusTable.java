@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -53,6 +54,12 @@ public class PipelineStatusTable extends DataRegionTable
                 return pipelineStatusTable;
             }
         };
+    }
+
+    public static PipelineStatusTable goToAllJobsPage(WebDriverWrapper driverWrapper)
+    {
+        driverWrapper.beginAt(WebTestHelper.buildURL("pipeline-status", "home", "showList", Maps.of(REGION_NAME + ".containerFilterName", "AllFolders")));
+        return new PipelineStatusTable(driverWrapper);
     }
 
     @Override
