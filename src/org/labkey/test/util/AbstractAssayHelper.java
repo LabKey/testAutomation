@@ -145,7 +145,7 @@ public abstract class AbstractAssayHelper
     {
         new DataRegionTable.DataRegionFinder(_test.getDriver()).waitFor(); // Just to ensure that the page has loaded
         BootstrapMenu.finder(_test.getDriver()).timeout(WAIT_FOR_JAVASCRIPT)
-                .withButtonText(MANAGE_LINK_TEXT).find().withExpandRetries(1)
+                .withButtonText(MANAGE_LINK_TEXT).find().withExpandRetries(3)
                 .clickSubMenu(wait, subMenuLabels);
     }
 
