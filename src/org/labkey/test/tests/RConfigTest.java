@@ -27,11 +27,6 @@ public class RConfigTest extends BaseWebDriverTest
     private String DEFAULT_ENGINE_NAME = "R Scripting Engine";
     private String SECONDARY_ENGINE_NAME = "R Scripting Engine 2";
     private String DISABLED_ENGINE_NAME = "Disabled Engine";
-    private List<String> R_ENGINES = new ArrayList<String>() {{
-        add(DEFAULT_ENGINE_NAME);
-        add(SECONDARY_ENGINE_NAME);
-        add(DISABLED_ENGINE_NAME);
-    }};
 
     private String FOLDER_NAME = "subfolder";
 
@@ -45,7 +40,7 @@ public class RConfigTest extends BaseWebDriverTest
         ConfigureReportsAndScriptsPage scripts = ShowAdminPage.beginAt(getCurrentTest()).clickViewsAndScripting();
 
         log("Clean up scripting engines");
-         scripts.deleteEnginesFromList(R_ENGINES);
+        scripts.deleteAllREngines();
 
         log("Delete project");
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -67,7 +62,7 @@ public class RConfigTest extends BaseWebDriverTest
     @Before
     public void configureEngines()
     {
-                log("Navigate to 'Views and Scripting' admin console page");
+        log("Navigate to 'Views and Scripting' admin console page");
         goToAdminConsole().goToAdminConsoleLinksSection();
         ConfigureReportsAndScriptsPage scripts = ShowAdminPage.beginAt(getCurrentTest()).clickViewsAndScripting();
 
@@ -90,9 +85,11 @@ public class RConfigTest extends BaseWebDriverTest
             log("Configure and disable R engine");
             config.setName(DISABLED_ENGINE_NAME);
             scripts.addEngine(EngineType.R, config);
+            sleep(2000); //wait for store and view update
             scripts.editEngine(DISABLED_ENGINE_NAME);
             Assert.assertTrue(_Ext4Helper.isChecked(XPathLocator.id("editEngine_enabled-inputEl")));
             _Ext4Helper.uncheckCheckbox(XPathLocator.id("editEngine_enabled-inputEl"));
+            sleep(2000); // wait for store update
             clickButton("Submit", -1);
         }
     }
@@ -192,7 +189,7 @@ public class RConfigTest extends BaseWebDriverTest
         ConfigureReportsAndScriptsPage scripts = ShowAdminPage.beginAt(getCurrentTest()).clickViewsAndScripting();
 
         log("Delete all R engine definitions");
-        scripts.deleteEnginesForLanguage("R");
+        scripts.deleteAllREngines();
 
         log("Verify user is notified of lack of engines in folder management page");
         goToProjectHome();

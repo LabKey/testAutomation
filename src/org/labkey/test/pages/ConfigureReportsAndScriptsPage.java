@@ -130,36 +130,53 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     }
 
     @LogMethod
-    public void deleteEnginesForLanguage(@LoggedParam String engineLanguage)
+    public void deleteAllREngines(boolean sandboxed)
     {
-        WebElement engineRow = selectFirstEngineForLanguage(engineLanguage);
-        WebElement defaultRow = null;
+        WebElement engineRow = selectFirstREngine(sandboxed);
+        WebElement defaultR = null;
 
         while (engineRow != null)
         {
             if (engineRow.getText().contains("default : true"))
             {
-                defaultRow = engineRow;
-                List<WebElement> elements = Locators.enginesGridRowForLanguage(engineLanguage).findElements(getDriver());
+                defaultR = engineRow;
+                List<WebElement> elements = getREngineLoc(sandboxed).findElements(getDriver());
                 if (elements.size() < 2)
                 {
                     engineRow = null;
                 }
                 else
                 {
-                    elements.get(1).click();
                     engineRow = elements.get(1);
                 }
             }
             else
             {
                 deleteSelectedEngine(engineRow);
-                engineRow = selectFirstEngineForLanguage(engineLanguage);
+                engineRow = selectFirstREngine(sandboxed);
             }
         }
 
         // delete default engine last
-        deleteSelectedEngine(defaultRow);
+        if (defaultR != null)
+            deleteSelectedEngine(defaultR);
+    }
+
+    public void deleteAllNonSandboxedREngines()
+    {
+        deleteAllREngines(false);
+    }
+
+    public void deleteAllSandboxedREngines()
+    {
+        deleteAllREngines(true);
+    }
+
+    @LogMethod
+    public void deleteAllREngines()
+    {
+        deleteAllNonSandboxedREngines();
+        deleteAllSandboxedREngines();
     }
 
     @LogMethod(quiet = true)
@@ -174,16 +191,20 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
     private void deleteSelectedEngine(WebElement selectedEngineRow)
     {
+        selectedEngineRow.click();
         clickButton("Delete", 0);
 
         Window(getDriver()).withTitle("Delete Engine Configuration").waitFor();
 
         String confirmationMessage = Locator.byClass("x4-window-body").findElement(getDriver()).getText();
 
-        TestLogger.log("Deleting: " + confirmationMessage.substring(confirmationMessage.indexOf(":") + 1));
+        String engineName = confirmationMessage.substring(confirmationMessage.indexOf(":") + 1).replace("?", "");
+        TestLogger.log("Deleting: " + engineName);
 
         clickButton("Yes", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        waitForElementToDisappear(Locators.enginesGridRowForName(engineName));
+        waitForEnginesGrid();
+        sleep(2000); //wait for store and view update
     }
 
     private WebElement selectEngineNamed(String engineName)
@@ -194,12 +215,18 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     }
 
     @Nullable
-    private WebElement selectFirstEngineForLanguage(String engineLanguage)
+    private WebElement selectFirstREngine(boolean sandboxed)
     {
-        WebElement engineRow = Locators.enginesGridRowForLanguage(engineLanguage).findElementOrNull(getDriver());
+        Locator engineLoc = getREngineLoc(sandboxed);
+        WebElement engineRow = engineLoc.findElementOrNull(getDriver());
         if (engineRow != null)
             engineRow.click();
         return engineRow;
+    }
+
+    public Locator getREngineLoc(boolean sandboxed)
+    {
+        return sandboxed ? Locators.enginesGridRowForLanguageSandboxed("R") : Locators.enginesGridRowForLanguageNotSandboxed("R");
     }
 
     public enum EngineType
@@ -346,12 +373,22 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
         public static Locator enginesGridRowForName(String engineName)
         {
-            return enginesGrid.append(Locator.tagWithClass("tr", "x4-grid-row").withPredicate(Locator.xpath(String.format("//td[%d]", nameColumnIndex + 1)).containing(engineName)));
+            return enginesGrid.append(Locator.tagWithClass("tr", "x4-grid-row").withDescendant(Locator.tagWithText("b", engineName)));
         }
 
-        public static Locator enginesGridRowForLanguage(String engineLanguage)
+        public static Locator.XPathLocator enginesGridRowForLanguage(String engineLanguage)
         {
             return enginesGrid.append(Locator.tagWithClass("tr", "x4-grid-row").withPredicate(Locator.xpath(String.format("//td[%d]", languageColumnIndex + 1)).withText(engineLanguage)));
+        }
+
+        public static Locator enginesGridRowForLanguageSandboxed(String engineLanguage)
+        {
+            return enginesGridRowForLanguage(engineLanguage).withPredicate(Locator.xpath(String.format("//td[%d]", nameColumnIndex + 1)).containing("sandboxed : true"));
+        }
+
+        public static Locator enginesGridRowForLanguageNotSandboxed(String engineLanguage)
+        {
+            return enginesGridRowForLanguage(engineLanguage).withoutPredicate(Locator.xpath(String.format("//td[%d]", nameColumnIndex + 1)).containing("sandboxed : true"));
         }
 
         public static Locator editEngineWindow = Ext4Helper.Locators.window("Edit Engine Configuration");
