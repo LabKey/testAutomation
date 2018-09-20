@@ -70,7 +70,8 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     @Test
     public void databaseCheckTest()
     {
-        beginAt(WebTestHelper.buildURL("admin", "doCheck"), 120000);
+        // This can take very long depending on what modules are present
+        beginAt(WebTestHelper.buildURL("admin", "doCheck"), 600000);
         waitForText(60000, "Database Consistency checker complete");
         assertTextNotPresent("ERROR");
     }
