@@ -20,6 +20,7 @@ import org.apache.poi.ss.format.CellGeneralFormatter;
 import org.apache.poi.ss.formula.FormulaParseException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -114,15 +115,15 @@ public abstract class ExcelHelper
 
             if ("General".equals(cell.getCellStyle().getDataFormatString()))
             {
-                switch (cell.getCellType())
+                switch (cell.getCellTypeEnum())
                 {
-                    case Cell.CELL_TYPE_BOOLEAN:
+                    case BOOLEAN:
                         return formatter.format(cell.getBooleanCellValue());
-                    case Cell.CELL_TYPE_NUMERIC:
+                    case NUMERIC:
                         return formatter.format(cell.getNumericCellValue());
-                    case Cell.CELL_TYPE_FORMULA:
+                    case FORMULA:
                     {
-                        if (cell.getCachedFormulaResultType() == Cell.CELL_TYPE_STRING)
+                        if (cell.getCachedFormulaResultTypeEnum() == CellType.STRING)
                         {
                             return cell.getStringCellValue();
                         }
@@ -146,7 +147,7 @@ public abstract class ExcelHelper
             }
             else if (isCellNumeric(cell) && DateUtil.isCellDateFormatted(cell) && cell.getDateCellValue() != null)
                 return formatter.format(cell.getDateCellValue());
-            else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA && cell.getCachedFormulaResultType() == Cell.CELL_TYPE_STRING)
+            else if (cell.getCellTypeEnum() == CellType.FORMULA && cell.getCachedFormulaResultTypeEnum() == CellType.STRING)
                 return cell.getStringCellValue();
             else
                 // This seems to be the best way to get the value that's shown in Excel
@@ -160,13 +161,13 @@ public abstract class ExcelHelper
     {
         if (cell != null)
         {
-            int type = cell.getCellType();
-            if (type == Cell.CELL_TYPE_FORMULA)
+            CellType type = cell.getCellTypeEnum();
+            if (type == CellType.FORMULA)
             {
-                type = cell.getCachedFormulaResultType();
+                type = cell.getCachedFormulaResultTypeEnum();
             }
 
-            return type == Cell.CELL_TYPE_BLANK || type == Cell.CELL_TYPE_NUMERIC;
+            return type == CellType.BLANK || type == CellType.NUMERIC;
         }
         return false;
     }
