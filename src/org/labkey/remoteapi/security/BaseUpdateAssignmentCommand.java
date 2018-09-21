@@ -24,6 +24,7 @@ public abstract class BaseUpdateAssignmentCommand extends PostCommand<CommandRes
     private Integer principalId;
     private String email;
     private String roleClassName;
+    private Boolean confirm;
 
     protected BaseUpdateAssignmentCommand(String action)
     {
@@ -36,6 +37,7 @@ public abstract class BaseUpdateAssignmentCommand extends PostCommand<CommandRes
         principalId = source.principalId;
         email = source.email;
         roleClassName = source.roleClassName;
+        confirm = source.confirm;
     }
 
     public void setPrincipalId(Integer principalId)
@@ -53,6 +55,11 @@ public abstract class BaseUpdateAssignmentCommand extends PostCommand<CommandRes
         this.email = email;
     }
 
+    public void setConfirm(Boolean confirm)
+    {
+        this.confirm = confirm;
+    }
+
     @Override
     public double getRequiredVersion()
     {
@@ -66,6 +73,7 @@ public abstract class BaseUpdateAssignmentCommand extends PostCommand<CommandRes
 
         result.put("principalId", principalId);
         result.put("email", email);
+        result.put("confirm", confirm);
         if (roleClassName != null && !roleClassName.isEmpty()) result.put("roleClassName", roleClassName);
         return result;
     }

@@ -137,6 +137,13 @@ public class ApiPermissionsHelper extends PermissionsHelper
         return false;
     }
 
+    public boolean doesUserHaveRole(String userEmail, String roleName, String containerPath)
+    {
+        List<String> userRoles = getUserRoles(containerPath, userEmail);
+        roleName = toRole(roleName);
+        return userRoles.contains(roleName);
+    }
+
     private List<Map<String, Object>> getGroups(String container)
     {
         Connection connection = _driver.createDefaultConnection(false);
@@ -361,11 +368,18 @@ public class ApiPermissionsHelper extends PermissionsHelper
         Connection connection = _driver.createDefaultConnection(true);
 
         command.setEmail(userEmail);
-        command.setRoleClassName(toRole(permissionString));
+        String roleClassName = toRole(permissionString);
+        command.setRoleClassName(roleClassName);
+        command.setConfirm(true);
 
         try
         {
-            command.execute(connection, container);
+            CommandResponse response = command.execute(connection, container);
+            if (!Boolean.TRUE.equals(response.getProperty("success")))
+            {
+                throw new RuntimeException("Failed to remove user from role: " + response.getProperty("message") + "\n" +
+                        String.format("User: %s\nRole: %s\nContainer: %s", userEmail, roleClassName, container));
+            }
         }
         catch (IOException | CommandException e)
         {
