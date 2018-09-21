@@ -41,7 +41,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -52,6 +51,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -1019,16 +1019,20 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Save & Close");
 
         log("Check that parameterized query doesn't cause page load.");
-        SiteNavBar bar = new SiteNavBar(getDriver());
-        WebElement searchInput = bar.expandSearchBar();
-        setFormElement(searchInput, MODULE_NAME);
-        waitForElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), "P");
+        WebElement rootEl = Locator.css(":root").findElement(getDriver());
+        WebElement parameterInput = waitForElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), WAIT_FOR_JAVASCRIPT);
+        setFormElement(parameterInput, "P");
         clickButton("Submit", 0);
-        waitForText("Manufacturer");
-        assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(searchInput));
-        waitForText(WAIT_FOR_JAVASCRIPT, "Pinto");
+        waitForText("Manufacturer", "Pinto");
         assertTextNotPresent("Prius");
+        try
+        {
+            rootEl.isDisplayed();
+        }
+        catch (StaleElementReferenceException stale)
+        {
+            fail("Unwanted page load from parameterized query webpart");
+        }
     }
 
     @LogMethod
