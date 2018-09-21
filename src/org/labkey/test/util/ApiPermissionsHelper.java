@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ApiPermissionsHelper extends PermissionsHelper
 {
@@ -551,9 +550,25 @@ public class ApiPermissionsHelper extends PermissionsHelper
     private void addMembersToGroup(String project, Integer groupId, String... members)
     {
         AddGroupMembersCommand command = new AddGroupMembersCommand(groupId);
-        List<Integer> principalIds = Arrays.asList(members).stream().map(this::getUserId).collect(Collectors.toList());
-        principalIds.addAll(Arrays.asList(members).stream().map((s -> getProjectGroupId(s, project))).collect(Collectors.toList()));
-        principalIds.removeIf((integer -> null == integer));
+        List<Integer> principalIds = new ArrayList<>();
+        ArrayList<String> memberList = new ArrayList<>(Arrays.asList(members));
+        Iterator<String> memberIter = memberList.iterator();
+        while (memberIter.hasNext())
+        {
+            String member = memberIter.next();
+            Integer principalId = getUserId(member);
+            if (principalId == null)
+            {
+                principalId = getProjectGroupId(member, project);
+            }
+            if (principalId != null)
+            {
+                principalIds.add(principalId);
+                memberIter.remove();
+            }
+        }
+        if (!memberList.isEmpty())
+            throw new IllegalArgumentException("Specified users/groups do not exist: " + memberList);
         command.addPrincipalId(principalIds);
 
         try
