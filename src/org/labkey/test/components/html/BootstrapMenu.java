@@ -23,7 +23,6 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestLogger;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -53,14 +52,13 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         return new BootstrapMenuFinder(driver);
     }
 
+    /**
+     * @deprecated Use {@link BootstrapMenuFinder} directly
+     */
+    @Deprecated
     static public BootstrapMenu find(WebDriver driver, String menuToggleText)
     {
         return new BootstrapMenuFinder(driver).withButtonTextContaining(menuToggleText).find();
-    }
-
-    static public BootstrapMenu find(WebDriver driver, SearchContext searchContext, String menuToggleText)
-    {
-        return new BootstrapMenuFinder(driver).withButtonTextContaining(menuToggleText).find(searchContext);
     }
 
     /* Sometimes the menu doesn't expand on the first try.
@@ -85,8 +83,7 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
 
     public boolean isExpanded()
     {
-        String expandedAttribute = elementCache().toggleAnchor.getAttribute("aria-expanded");
-        return expandedAttribute != null && expandedAttribute.equals("true");
+        return "true".equals(elementCache().toggleAnchor.getAttribute("aria-expanded"));
     }
 
     public void expand()
@@ -241,7 +238,7 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
 
     public static class BootstrapMenuFinder extends WebDriverComponentFinder<BootstrapMenu, BootstrapMenu.BootstrapMenuFinder>
     {
-        private Locator _locator = Locators.bootstrapMenuContainer();
+        private Locator _locator = Locators.bootstrapMenuContainer().withChild(Locators.toggleAnchor());
 
         public BootstrapMenuFinder(WebDriver driver)
         {
