@@ -998,22 +998,14 @@ public class DataRegionTable extends DataRegion
 
     public void setUpFacetedFilter(String columnName, String... values)
     {
-        String log;
         if (values.length > 0)
         {
-            log = "Setting filter in " + getDataRegionName() + " for " + columnName + " to one of: [";
-            for (String v : values)
-            {
-                log += v + ", ";
-            }
-            log = log.substring(0, log.length() - 2) + "]";
+            TestLogger.log("Setting filter in " + getDataRegionName() + " for " + columnName + " to one of: [" + String.join(", ", values) + "]");
         }
         else
         {
-            log = "Clear filter in " + getDataRegionName() + " for " + columnName;
+            TestLogger.log("Clear filter in " + getDataRegionName() + " for " + columnName);
         }
-
-        TestLogger.log(log);
 
         openFilterDialog(columnName);
         String columnLabel = elementCache().getColumnHeader(columnName).getText();
@@ -1088,25 +1080,9 @@ public class DataRegionTable extends DataRegion
                 .clickSubMenu(pageLoad, menuItems);
     }
 
-    public void openSelectionMenu()
+    public SelectorMenu rowSelector()
     {
-        WebElement firstColumnHeader = elementCache().getColumnHeaders().get(0);
-        Locator.XPathLocator loc = Locator.tagWithClass("span", "dropdown-toggle");
-        loc.findElement(firstColumnHeader).click();
-    }
-
-    public void showSelected()
-    {
-        if (!getDataRegionName().contains("'") && !getDataRegionName().contains(">") &&!getDataRegionName().contains("<"))
-        {   // use API unless the table name contains illegal chars for script
-            api().expectingRefresh().executeScript("showSelected()");
-        }
-        else
-        {
-            // find the flyout menu toggle in the first column header
-            openSelectionMenu();
-            Locator.linkContainingText("Show Selected").waitForElement(getDriver(), 2000).click();
-        }
+        return elementCache().selectionMenu;
     }
 
     public void checkAllOnPage()
@@ -1125,12 +1101,19 @@ public class DataRegionTable extends DataRegion
             doAndWaitForUpdate(toggle::click);
     }
 
-    // TODO: Inline usages so that check/uncheckAll can select all rows on paged data region
+    /**
+     * @deprecated Use {@link #checkAllOnPage()} or {@link #rowSelector()}.{@link SelectorMenu#selectAll()}
+     */
+    @Deprecated
     public void checkAll()
     {
         checkAllOnPage();
     }
 
+    /**
+     * @deprecated Use {@link #uncheckAllOnPage()} or {@link #rowSelector()}.{@link SelectorMenu#selectNone()}
+     */
+    @Deprecated
     public void uncheckAll()
     {
         uncheckAllOnPage();
@@ -1171,25 +1154,23 @@ public class DataRegionTable extends DataRegion
     public void pageNext()
     {
         TestLogger.log("Clicking page next on data region '" + getDataRegionName() + "'");
-        doAndWaitForUpdate(getPagingWidget()::clickNextPage);
+        getPagingWidget().clickNextPage();
     }
 
     public void pagePrev()
     {
         TestLogger.log("Clicking page previous on data region '" + getDataRegionName() + "'");
-        doAndWaitForUpdate(getPagingWidget()::clickPreviousPage);
+        getPagingWidget().clickPreviousPage();
     }
 
-    public void clickDataRegionPageLink(String title)
-    {
-        String headerId = Locator.xq(getTableId() + "-header");
-        getWrapper().clickAndWait(Locator.xpath("//table[@id=" + headerId + "]//div/a[@title='" + title + "']"));
-    }
-
+    /**
+     * @deprecated Ambiguous. Use {@link #rowSelector()}.{@link SelectorMenu#showAll()}
+     * or {@link #getPagingWidget()}.{@link PagingWidget#clickShowAll()}
+     */
+    @Deprecated
     public void showAll()
     {
-        openSelectionMenu();
-        Locator.linkContainingText("Show All").waitForElement(getDriver(), 2000).click();
+        rowSelector().showAll();
     }
 
     public void setPageSize(int size)
@@ -1390,7 +1371,9 @@ public class DataRegionTable extends DataRegion
         private Map<Integer, List<WebElement>> cells;
         private final WebElement summaryStatRow = Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total").findWhenNeeded(getDriver());
         private List<WebElement> summaryStatCells;
-        private final WebElement toggleAllOnPage = Locator.tagWithAttribute("input", "name", ".toggle").findWhenNeeded(this); // tri-state checkbox
+        private final WebElement toggleHeaderCell = Locator.tag("th").withClasses("labkey-column-header", "labkey-selectors").findWhenNeeded(columnHeaderRow);
+        private final WebElement toggleAllOnPage = Locator.input(".toggle").findWhenNeeded(toggleHeaderCell); // tri-state checkbox
+        private SelectorMenu selectionMenu = new SelectorMenu(new BootstrapMenu.BootstrapMenuFinder(getDriver()).findWhenNeeded(columnHeaderRow));
 
         protected List<WebElement> getDataRows()
         {
@@ -1497,6 +1480,39 @@ public class DataRegionTable extends DataRegion
             if (null != button)
                 return button;
             return getHeaderButton("Export / Sign Data");
+        }
+    }
+
+    public class SelectorMenu extends BootstrapMenu
+    {
+        private SelectorMenu(BootstrapMenu menu)
+        {
+            super(DataRegionTable.this.getWrapper(), menu.getComponentElement());
+        }
+
+        public void selectAll()
+        {
+            DataRegionTable.this.doAndWaitForUpdate(() -> clickSubMenu(!DataRegionTable.this.isAsync(),"Select All"));
+        }
+
+        public void selectNone()
+        {
+            DataRegionTable.this.doAndWaitForUpdate(() -> clickSubMenu(!DataRegionTable.this.isAsync(),"Select None"));
+        }
+
+        public void showSelected()
+        {
+            DataRegionTable.this.doAndWaitForUpdate(() -> clickSubMenu(!DataRegionTable.this.isAsync(),"Show Selected"));
+        }
+
+        public void showUnselected()
+        {
+            DataRegionTable.this.doAndWaitForUpdate(() -> clickSubMenu(!DataRegionTable.this.isAsync(),"Show Unselected"));
+        }
+
+        public void showAll()
+        {
+            DataRegionTable.this.doAndWaitForUpdate(() -> clickSubMenu(!DataRegionTable.this.isAsync(),"Show All"));
         }
     }
 
