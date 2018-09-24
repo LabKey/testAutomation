@@ -40,7 +40,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.PropertiesEditor;
-import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -514,7 +513,10 @@ public class AuditLogTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("query", instance);
         int i = table.getColumnIndex(column);
         if (shouldFindText)
+        {
+            instance.waitForTextWithRefresh(10000, msg);
             assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
+        }
         else
             assertFalse("Text '" + msg + "' was present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
     }
