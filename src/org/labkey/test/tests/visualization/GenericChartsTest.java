@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests.visualization;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartTypeDialog;
@@ -136,5 +137,29 @@ public abstract class GenericChartsTest extends ReportTest
         clickButton("Edit", WAIT_FOR_PAGE);
         _ext4Helper.waitForMaskToDisappear();
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
+    }
+
+    protected void export(String type, String xAxis, String yAxis)
+    {
+        waitForElement(Locator.css("svg"));
+
+        log("Export as PDF");
+        clickExportPDFIcon("chart-render-div", 0);
+
+        log("Export as PNG");
+        clickExportPNGIcon("chart-render-div", 0);
+
+        log("Export to script.");
+        Assert.assertEquals("Unexpected number of export script icons", 1, getExportScriptIconCount("chart-render-div"));
+        clickExportScriptIcon("chart-render-div", 0);
+        String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
+        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
+
+        log("Validate that the script is as expected.");
+        Assert.assertTrue("Script did not contain expected text: '" + type + "' ", exportScript.toLowerCase().contains(type.toLowerCase()));
+        Assert.assertTrue("Script did not contain expected text: '" + xAxis + "' ", exportScript.toLowerCase().contains(xAxis.toLowerCase()));
+        Assert.assertTrue("Script did not contain expected text: '" + yAxis + "' ", exportScript.toLowerCase().contains(yAxis.toLowerCase()));
+
+        goToProjectHome();
     }
 }

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests.visualization;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -24,6 +23,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelLinePlot;
 import org.labkey.test.components.SaveChartDialog;
@@ -56,6 +56,7 @@ public class LinePlotTest extends GenericChartsTest
     protected void testPlots()
     {
         doManageViewsLinePlotTest();
+        doNewChartViewTimePlotTest();
         doDataRegionLinePlotTest();
         doQuickChartLinePlotTest();
         doCustomizeLinePlotTest(); // Uses Line plot created by doDataRegionLinePlotTest()
@@ -65,12 +66,17 @@ public class LinePlotTest extends GenericChartsTest
 
     private static final String LINE_PLOT_MV_1 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
     private static final String LINE_PLOT_MV_2 = "60\n70\n80\n90\n100\n110\n32.0\n33.0\n34.0\n35.0\n36.0\n37.0\n38.0\n39.0\n40.0\nTestTitle\nTestXAxis\nTestYAxis";
+    private static final String LINE_PLOT_MULTI_YAXIS_1 = "60\n80\n100\n120\n140\n160\n180\n200\n10\n20\n30\n40\n50\n60\n70\n80\n90\n100\n110APX-1: Abbreviated Physical Exam\n1. Weight\n4. Pulse, 5. Respirations\n4. Pulse\n5. Respirations";
+    private static final String LINE_PLOT_MULTI_YAXIS_2 = "60\n80\n100\n120\n140\n160\n180\n200\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\n115\n6\n8\n10\n12\n14\n16\n18APX-1: Abbreviated Physical Exam\n1. Weight\n4. Pulse\n5. Respirations\n4. Pulse\n5. Respirations";
     private static final String LINE_PLOT_NAME_MV = "ManageViewsLinePlot";
     private static final String LINE_PLOT_DESC_MV = "This line plot was created through the manage views UI";
+    private static final String LINE_PLOT_MULTI_YAXIS_NAME = "LinePlotMultiYAxis";
+    private static final String LINE_PLOT_MULTI_YAXIS_DESC = "This line plot has multiple y axis";
 
     private static final String MEASURE_1_WEIGHT = "1. Weight";
     private static final String MEASURE_2_BODY_TEMP = "2. Body Temp";
     private static final String MEASURE_4_PULSE = "4. Pulse";
+    private static final String MEASURE_5_RESPIRATIONS = "5. Respirations";
     private static final String MEASURE_MOUSE_ID = "Mouse Id";
 
     private static final String QUERY_APX_1 = "APX-1 (APX-1: Abbreviated Physical Exam)";
@@ -152,6 +158,54 @@ public class LinePlotTest extends GenericChartsTest
 
 
         savePlot(LINE_PLOT_NAME_MV, LINE_PLOT_DESC_MV);
+    }
+
+    @LogMethod
+    private void doNewChartViewTimePlotTest()
+    {
+        ChartTypeDialog chartTypeDialog;
+        ChartLayoutDialog chartLayoutDialog;
+
+        log("test multiple yaxis in line plot");
+        navigateToFolder(getProjectName(), getFolderName());
+        chartTypeDialog = clickAddChart("study", QUERY_APX_1);
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Line)
+                .setXAxis(MEASURE_1_WEIGHT)
+                .setYAxis(MEASURE_4_PULSE)
+                .setYAxis(MEASURE_5_RESPIRATIONS,true)
+                .clickApply();
+        assertSVG(LINE_PLOT_MULTI_YAXIS_1);
+
+        log("test left and right side of y axis");
+        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog.setYAxisSide(1,ChartTypeDialog.YAxisSide.Right)
+                .clickApply();
+        assertSVG(LINE_PLOT_MULTI_YAXIS_2);
+
+        log("test multiple y axis and sides on saving and re-rendering");
+        savePlot(LINE_PLOT_MULTI_YAXIS_NAME, LINE_PLOT_MULTI_YAXIS_DESC);
+        navigateToFolder(getProjectName(), getFolderName());
+        openSavedPlotInEditMode(LINE_PLOT_MULTI_YAXIS_NAME);
+        assertSVG(LINE_PLOT_MULTI_YAXIS_2);
+
+        //chart layout dialog changes
+        log("Verify y axis related properties(scale and range) in chart layout dialog");
+        chartLayoutDialog = clickChartLayoutButton();
+        chartLayoutDialog.clickYAxisTabLeft();
+        assertTextPresent("Linear", "Log");
+
+        log("Verify one chart or per measure charts ");
+        assertTextPresent("One Chart","One Per Measure");
+        chartLayoutDialog.clickCancel();
+
+        log("Validate the export of new scatter plot works");
+        final String EXPORTED_SCRIPT_CHECK_TYPE = "\"renderType\":\"line_plot\"";
+        goToProjectHome();
+        navigateToFolder(getProjectName(), getFolderName());
+        clickTab("Clinical and Assay Data");
+        waitForElement(Locator.linkWithText(LINE_PLOT_MULTI_YAXIS_NAME));
+        clickAndWait(Locator.linkWithText(LINE_PLOT_MULTI_YAXIS_NAME), WAIT_FOR_PAGE);
+        export(EXPORTED_SCRIPT_CHECK_TYPE, MEASURE_1_WEIGHT, MEASURE_5_RESPIRATIONS);
     }
 
     private static final String LINE_PLOT_DR_1 = "60\n65\n70\n75\n80\n85\n90\n50\n55\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
@@ -293,26 +347,7 @@ public class LinePlotTest extends GenericChartsTest
         waitForElement(Locator.linkWithText(LINE_PLOT_NAME_DR + " Colored"));
         clickAndWait(Locator.linkWithText(LINE_PLOT_NAME_DR + " Colored"), WAIT_FOR_PAGE);
 
-        waitForElement(Locator.css("svg"));
-
-        log("Export as PDF");
-        clickExportPDFIcon("chart-render-div", 0);
-
-        log("Export as PNG");
-        clickExportPNGIcon("chart-render-div", 0);
-
-        log("Export to script.");
-        Assert.assertEquals("Unexpected number of export script icons", 1, getExportScriptIconCount("chart-render-div"));
-        clickExportScriptIcon("chart-render-div", 0);
-        String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
-        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
-
-        log("Validate that the script is as expected.");
-        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_TYPE + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_TYPE.toLowerCase()));
-        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_XAXIS + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_XAXIS.toLowerCase()));
-        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_YAXIS + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_YAXIS.toLowerCase()));
-
-        goToProjectHome();
+        export(EXPORTED_SCRIPT_CHECK_TYPE, EXPORTED_SCRIPT_CHECK_XAXIS, EXPORTED_SCRIPT_CHECK_YAXIS);
 
     }
 

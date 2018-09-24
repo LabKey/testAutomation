@@ -55,6 +55,17 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return this;
     }
 
+    public ChartLayoutDialog clickYAxisTabLeft()
+    {
+        clickTab(elementCache().yAxisTabLeft);
+        return this;
+    }
+    public ChartLayoutDialog clickYAxisTabRight()
+    {
+        clickTab(elementCache().yAxisTabRight);
+        return this;
+    }
+
     public boolean isDeveloperTabVisible()
     {
         return getWrapper().isElementPresent(elementCache().developerTabLoc);
@@ -433,6 +444,8 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         public WebElement generalTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='General']"), this).withTimeout(wait);
         public WebElement xAxisTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='X-Axis']"), this).withTimeout(wait);
         public WebElement yAxisTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='Y-Axis']"), this).withTimeout(wait);
+        public WebElement yAxisTabLeft = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='Y-Axis (Left)']"), this).withTimeout(wait);
+        public WebElement yAxisTabRight = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='Y-Axis (Right)']"), this).withTimeout(wait);
         public WebElement developerTab = new LazyWebElement(developerTabLoc, this).withTimeout(wait);
         public WebElement visiblePanel = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH), getWrapper().getWrappedDriver());
         public WebElement plotTitleTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Title:']/parent::td/following-sibling::td//input"), this);
