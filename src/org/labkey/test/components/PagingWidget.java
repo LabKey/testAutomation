@@ -89,10 +89,18 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
         return this;
     }
 
+    public PagingWidget clickShowAll()
+    {
+        getDataRegionTable().doAndWaitForUpdate(() ->
+                elementCache().paginationMenu.clickSubMenu(false,  "Show all"));
+        return this;
+    }
+
     public PagingWidget setPageSize(int pageSize, boolean wait)
     {
         String menuText = String.valueOf(pageSize) + " per page";
-        elementCache().paginationMenu.clickSubMenu(wait, "Paging", menuText);
+        getDataRegionTable().doAndWaitForUpdate(() ->
+            elementCache().paginationMenu.clickSubMenu(wait, "Paging", menuText));
         return this;
     }
 
