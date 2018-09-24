@@ -192,10 +192,11 @@ public class LinePlotTest extends GenericChartsTest
         log("Verify y axis related properties(scale and range) in chart layout dialog");
         chartLayoutDialog = clickChartLayoutButton();
         chartLayoutDialog.clickYAxisTabLeft();
-        assertTextPresent("Linear", "Log");
+        assertElementPresent(Locator.tagWithText("label","Linear"));
 
         log("Verify one chart or per measure charts ");
-        assertTextPresent("One Chart","One Per Measure");
+        assertElementPresent(Locator.tagWithText("label","One Chart"));
+        assertElementPresent(Locator.tagWithText("label","One Per Measure"));
         chartLayoutDialog.clickCancel();
 
         log("Validate the export of new scatter plot works");
