@@ -79,7 +79,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         waitForElement(datasetRow);
         click(datasetRow);
         clickButton("Finish");
-        waitForPipelineJobsToFinish(3);
+        waitForPipelineJobsToComplete(3, "Publish Specimen Study", false);
     }
 
     private void republishStudy()
@@ -94,7 +94,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         setFormElement(Locator.name("studyDescription"), REPUBLISH_STUDY_DESC);
         clickButton("Next", WAIT_FOR_EXT_MASK_TO_APPEAR);
         clickButton("Finish");
-        waitForPipelineJobsToFinish(4);
+        waitForPipelineJobsToComplete(4, "Republish Specimen Study", false);
     }
 
     private void createRequest()
