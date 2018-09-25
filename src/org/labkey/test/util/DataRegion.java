@@ -29,6 +29,7 @@ import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -44,7 +45,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
     public static final String UPDATE_SIGNAL = "dataRegionUpdate";
     public static final String PANEL_SHOW_SIGNAL = "dataRegionPanelShow";
     public static final String PANEL_HIDE_SIGNAL = "dataRegionPanelHide";
-    protected static final int DEFAULT_WAIT = 30000;
+    protected static final int DEFAULT_WAIT_MS = 30000;
 
     private final WebDriverWrapper _webDriverWrapper;
     private final WebElement _el;
@@ -57,6 +58,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     // Settable
     private boolean _isAsync = false;
+    private int _updateTimeout = DEFAULT_WAIT_MS;
 
     protected DataRegion(WebElement el, WebDriverWrapper driverWrapper)
     {
@@ -77,7 +79,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
      */
     protected DataRegion(String regionName, WebDriverWrapper driverWrapper)
     {
-        this(Locators.form(regionName).refindWhenNeeded(driverWrapper.getDriver()).withTimeout(10000), driverWrapper);
+        this(Locators.form(regionName).refindWhenNeeded(driverWrapper.getDriver()).withTimeout(DEFAULT_WAIT_MS), driverWrapper);
         setRegionName(regionName);
     }
 
@@ -130,6 +132,21 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
         _isAsync = async;
     }
 
+    public int getUpdateTimeout()
+    {
+        return _updateTimeout;
+    }
+
+    public void setUpdateTimeout(int milliseconds)
+    {
+        _updateTimeout = milliseconds;
+        if (_el instanceof RefindingWebElement)
+        {
+            ((RefindingWebElement) _el).withTimeout(milliseconds);
+        }
+
+    }
+
     public void afterPageLoad()
     {
         clearCache();
@@ -151,7 +168,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public String doAndWaitForUpdate(Runnable run)
     {
-        return getWrapper().doAndWaitForPageSignal(run, getUpdateSignal());
+        return getWrapper().doAndWaitForPageSignal(run, getUpdateSignal(), new WebDriverWait(getDriver(), getUpdateTimeout() / 1000));
     }
 
     public String getDataRegionName()
@@ -305,7 +322,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
     {
         protected ElementCache()
         {
-            getWrapper().waitForElement(pageSignal(getUpdateSignal()), DEFAULT_WAIT);
+            getWrapper().waitForElement(pageSignal(getUpdateSignal()), getUpdateTimeout());
         }
 
         private final DataRegionApi dataRegionApi = new DataRegionApi();

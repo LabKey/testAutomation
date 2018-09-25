@@ -148,17 +148,20 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
     }
 
     @LogMethod(quiet = true)
-    public void clickSubMenu(boolean wait, @LoggedParam String ... subMenuLabels)
+    public void clickSubMenu(int timeout, @LoggedParam String ... subMenuLabels)
     {
         if (subMenuLabels.length < 1)
             throw new IllegalArgumentException("Specify menu item(s)");
 
         WebElement item = openMenuTo(subMenuLabels);
 
-        if (wait)
-            getWrapper().clickAndWait(item);
-        else
-            getWrapper().clickAndWait(item, 0);
+        getWrapper().clickAndWait(item, timeout);
+    }
+
+    @LogMethod(quiet = true)
+    public void clickSubMenu(boolean wait, @LoggedParam String ... subMenuLabels)
+    {
+        clickSubMenu(wait ? getWrapper().getDefaultWaitForPage() : 0, subMenuLabels);
     }
 
     @Override

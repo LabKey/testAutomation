@@ -53,7 +53,6 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 
 /**
  * Component wrapper class for interacting with a LabKey Data Region (see clientapi/dom/DataRegion.js)
@@ -78,7 +77,7 @@ public class DataRegionTable extends DataRegion
      */
     public DataRegionTable(String regionName, WebDriverWrapper driverWrapper)
     {
-        super(Locators.dataRegion(regionName).refindWhenNeeded(driverWrapper.getDriver()).withTimeout(10000), driverWrapper);
+        super(Locators.dataRegion(regionName).refindWhenNeeded(driverWrapper.getDriver()).withTimeout(DEFAULT_WAIT_MS), driverWrapper);
         setRegionName(regionName);
     }
 
@@ -181,7 +180,7 @@ public class DataRegionTable extends DataRegion
         public DataRegionFinder(WebDriver driver)
         {
             super(driver);
-            timeout(DEFAULT_WAIT);
+            timeout(DEFAULT_WAIT_MS);
         }
 
         public DataRegionFinder withName(String name)
@@ -213,7 +212,8 @@ public class DataRegionTable extends DataRegion
         @Override
         protected DataRegionTable construct(WebElement el, WebDriver driver)
         {
-            DataRegionTable constructed = new DataRegionTable(new RefindingWebElement(el, buildLocator(), getContext()), driver);
+            DataRegionTable constructed = new DataRegionTable(new RefindingWebElement(el, buildLocator(), getContext()).withTimeout(getTimeout()), driver);
+            constructed.setUpdateTimeout(getTimeout());
             if (!_lazy)
                 constructed.elementCache();
             return constructed;
@@ -238,7 +238,7 @@ public class DataRegionTable extends DataRegion
 
     public boolean hasSummaryStatisticRow()
     {
-        return Locator.css("tr.labkey-col-total").findElements(getComponentElement()).size() > 0;
+        return Locator.css("tr.labkey-col-total").findElements(elementCache()).size() > 0;
     }
 
     /**
@@ -811,7 +811,7 @@ public class DataRegionTable extends DataRegion
         int initialNumOfPlots = cssPlotLocator.findElements(this).size();
 
         clickColumnMenu(columnName, false, chartType);
-        cssPlotLocator.index(initialNumOfPlots).waitForElement(this, 60000);
+        cssPlotLocator.index(initialNumOfPlots).waitForElement(this, getUpdateTimeout());
 
         return new ColumnChartRegion(this);
     }
@@ -896,21 +896,35 @@ public class DataRegionTable extends DataRegion
     @LogMethod (quiet = true)
     public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType)
     {
-        setFilter(columnName, filterType, null, isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE);
+        setFilter(columnName, filterType, null);
     }
 
     @LogMethod (quiet = true)
     public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter)
     {
-        setFilter(columnName, filterType, filter, isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE);
+        setFilter(columnName, filterType, filter, isAsync() ? 0 : getUpdateTimeout());
     }
 
+    /**
+     * @deprecated Use {@link #setUpdateTimeout(int)} and {@link #setAsync(boolean)} to specify expected behavior
+     */
+    @Deprecated
     @LogMethod (quiet = true)
     public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, int waitMillis)
     {
         setFilter(columnName, filterType, filter, waitMillis, false);
     }
 
+    @LogMethod (quiet = true)
+    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, boolean isPHILoggingColumn)
+    {
+        setFilter(columnName, filterType, filter, isAsync() ? 0 : getUpdateTimeout(), isPHILoggingColumn);
+    }
+
+    /**
+     * @deprecated Use {@link #setUpdateTimeout(int)} and {@link #setAsync(boolean)} to specify expected behavior
+     */
+    @Deprecated
     @LogMethod (quiet = true)
     public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, int waitMillis, boolean isPHILoggingColumn)
     {
@@ -922,14 +936,14 @@ public class DataRegionTable extends DataRegion
     public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, @Nullable @LoggedParam String filter2Type, @Nullable @LoggedParam String filter2)
     {
         setUpFilter(columnName, filterType, filter, filter2Type, filter2);
-        doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE));
+        doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : getUpdateTimeout()));
     }
 
     @LogMethod (quiet = true)
     public void setFacetedFilter(@LoggedParam String columnName, @LoggedParam String... values)
     {
         setUpFacetedFilter(columnName, values);
-        doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE));
+        doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : getUpdateTimeout()));
     }
 
     public void setUpFilter(String columnName, String filterType, String filter)
@@ -1069,7 +1083,7 @@ public class DataRegionTable extends DataRegion
                 closePhiLoggingColumnMsg();
             }
         }
-        doAndWaitForUpdate(() -> getWrapper().clickButton("Clear All Filters", isAsync() ? 0 : WAIT_FOR_PAGE));
+        doAndWaitForUpdate(() -> getWrapper().clickButton("Clear All Filters", isAsync() ? 0 : getUpdateTimeout()));
     }
 
     public void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
@@ -1077,7 +1091,7 @@ public class DataRegionTable extends DataRegion
         final WebElement menu = elementCache().getColumnHeader(columnName);
         getWrapper().scrollIntoView(menu);   // some columns will be scrolled out of view;
         new BootstrapMenu(getDriver(), menu)
-                .clickSubMenu(pageLoad, menuItems);
+                .clickSubMenu(pageLoad ? getUpdateTimeout() : 0, menuItems);
     }
 
     public SelectorMenu rowSelector()
@@ -1490,29 +1504,35 @@ public class DataRegionTable extends DataRegion
             super(DataRegionTable.this.getWrapper(), menu.getComponentElement());
         }
 
+        private void clickSubMenu(String... subMenuLabels)
+        {
+            DataRegionTable.this.doAndWaitForUpdate(() ->
+                    super.clickSubMenu(DataRegionTable.this.isAsync() ? 0 : DataRegionTable.this.getUpdateTimeout(), subMenuLabels));
+        }
+
         public void selectAll()
         {
-            DataRegionTable.this.doAndWaitForUpdate(() -> clickSubMenu(!DataRegionTable.this.isAsync(),"Select All"));
+            clickSubMenu("Select All");
         }
 
         public void selectNone()
         {
-            DataRegionTable.this.doAndWaitForUpdate(() -> clickSubMenu(!DataRegionTable.this.isAsync(),"Select None"));
+            clickSubMenu("Select None");
         }
 
         public void showSelected()
         {
-            DataRegionTable.this.doAndWaitForUpdate(() -> clickSubMenu(!DataRegionTable.this.isAsync(),"Show Selected"));
+            clickSubMenu("Show Selected");
         }
 
         public void showUnselected()
         {
-            DataRegionTable.this.doAndWaitForUpdate(() -> clickSubMenu(!DataRegionTable.this.isAsync(),"Show Unselected"));
+            clickSubMenu("Show Unselected");
         }
 
         public void showAll()
         {
-            DataRegionTable.this.doAndWaitForUpdate(() -> clickSubMenu(!DataRegionTable.this.isAsync(),"Show All"));
+            clickSubMenu("Show All");
         }
     }
 
