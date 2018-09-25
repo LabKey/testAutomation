@@ -117,7 +117,8 @@ public class SchemaHelper
         // If the tables variable is null, and create is false, the code will not wait for the table value to be loaded
         // and will click save. The result is that table value is then set to empty.
         // Wait for the mask to disappear before clicking create or update.
-       _test._ext4Helper.waitForMaskToDisappear();
+        if (schemaTemplate == null)
+            _test._ext4Helper.waitForMaskToDisappear();
 
         if (create)
             _test.clickButton("Create");
