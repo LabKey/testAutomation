@@ -158,7 +158,8 @@ public abstract class GenericChartsTest extends ReportTest
         log("Validate that the script is as expected.");
         Assert.assertTrue("Script did not contain expected text: '" + type + "' ", exportScript.toLowerCase().contains(type.toLowerCase()));
         Assert.assertTrue("Script did not contain expected text: '" + xAxis + "' ", exportScript.toLowerCase().contains(xAxis.toLowerCase()));
-        Assert.assertTrue("Script did not contain expected text: '" + yAxis + "' ", exportScript.toLowerCase().contains(yAxis.toLowerCase()));
+        if (yAxis != null)
+            Assert.assertTrue("Script did not contain expected text: '" + yAxis + "' ", exportScript.toLowerCase().contains(yAxis.toLowerCase()));
 
         goToProjectHome();
     }

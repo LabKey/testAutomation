@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests.visualization;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -275,12 +274,13 @@ public class ScatterPlotTest extends GenericChartsTest
         //chart layout dialog changes
         log("Verify y axis related properties(scale and range) in chart layout dialog");
         chartLayoutDialog = clickChartLayoutButton();
-        chartLayoutDialog.clickYAxisTabLeft();
+        chartLayoutDialog.clickYAxisTabRight();
         assertElementPresent(Locator.tagWithText("label","Linear"));
 
         log("Verify one chart or per measure charts ");
         assertElementPresent(Locator.tagWithText("label","One Chart"));
         assertElementPresent(Locator.tagWithText("label","One Per Measure"));
+        // TODO select one per measure and verify the multiple SVGs
         chartLayoutDialog.clickCancel();
 
         log("Validate the export of new scatter plot works");
@@ -291,7 +291,6 @@ public class ScatterPlotTest extends GenericChartsTest
         waitForElement(Locator.linkWithText(SCATTER_PLOT_MULTI_YAXIS_NAME));
         clickAndWait(Locator.linkWithText(SCATTER_PLOT_MULTI_YAXIS_NAME), WAIT_FOR_PAGE);
         export(EXPORTED_SCRIPT_CHECK_TYPE, MEASURE_1_WEIGHT, MEASURE_5_RESPIRATIONS);
-
     }
 
     private static final String SCATTER_PLOT_DR_1 = "60\n65\n70\n75\n80\n85\n90\n50\n55\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";

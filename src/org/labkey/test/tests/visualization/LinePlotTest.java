@@ -56,7 +56,7 @@ public class LinePlotTest extends GenericChartsTest
     protected void testPlots()
     {
         doManageViewsLinePlotTest();
-        doNewChartViewTimePlotTest();
+        doMultiYAxisLinePlotTest();
         doDataRegionLinePlotTest();
         doQuickChartLinePlotTest();
         doCustomizeLinePlotTest(); // Uses Line plot created by doDataRegionLinePlotTest()
@@ -161,7 +161,7 @@ public class LinePlotTest extends GenericChartsTest
     }
 
     @LogMethod
-    private void doNewChartViewTimePlotTest()
+    private void doMultiYAxisLinePlotTest()
     {
         ChartTypeDialog chartTypeDialog;
         ChartLayoutDialog chartLayoutDialog;
@@ -191,15 +191,16 @@ public class LinePlotTest extends GenericChartsTest
         //chart layout dialog changes
         log("Verify y axis related properties(scale and range) in chart layout dialog");
         chartLayoutDialog = clickChartLayoutButton();
-        chartLayoutDialog.clickYAxisTabLeft();
+        chartLayoutDialog.clickYAxisTabRight();
         assertElementPresent(Locator.tagWithText("label","Linear"));
 
         log("Verify one chart or per measure charts ");
         assertElementPresent(Locator.tagWithText("label","One Chart"));
         assertElementPresent(Locator.tagWithText("label","One Per Measure"));
+        // TODO select one per measure and verify the multiple SVGs
         chartLayoutDialog.clickCancel();
 
-        log("Validate the export of new scatter plot works");
+        log("Validate the export of new line plot works");
         final String EXPORTED_SCRIPT_CHECK_TYPE = "\"renderType\":\"line_plot\"";
         goToProjectHome();
         navigateToFolder(getProjectName(), getFolderName());

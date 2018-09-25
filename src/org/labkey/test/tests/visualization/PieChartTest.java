@@ -246,24 +246,6 @@ public class PieChartTest extends GenericChartsTest
         clickTab("Clinical and Assay Data");
         waitForElement(Locator.linkWithText(PIE_CHART_SAVE_NAME));
         clickAndWait(Locator.linkWithText(PIE_CHART_SAVE_NAME), WAIT_FOR_PAGE);
-
-        waitForElement(Locator.css("svg"));
-
-        log("Export as PDF");
-        clickExportPDFIcon("chart-render-div", 0);
-
-        log("Export as PNG");
-        clickExportPNGIcon("chart-render-div", 0);
-
-        log("Export to script.");
-        Assert.assertEquals("Unexpected number of export script icons", 1, getExportScriptIconCount("chart-render-div"));
-        clickExportScriptIcon("chart-render-div", 0);
-        String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
-        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
-
-        log("Validate that the script is as expected.");
-        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_TYPE + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_TYPE.toLowerCase()));
-        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_XAXIS + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_XAXIS.toLowerCase()));
+        export(EXPORTED_SCRIPT_CHECK_TYPE, EXPORTED_SCRIPT_CHECK_XAXIS, null);
     }
-
 }
