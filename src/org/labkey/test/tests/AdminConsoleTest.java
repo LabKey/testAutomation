@@ -28,12 +28,13 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 import org.openqa.selenium.WebElement;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
@@ -110,8 +111,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
         // verify that all of the following links are visible to AppAdmin:
         goToAdminConsole().goToAdminConsoleLinksSection();
-        List<String> actualLinkTexts = new ArrayList<>();
-        List<String> expectedLinkTexts = Arrays.asList("change user properties",
+        List<String> expectedLinkTexts = new ArrayList<>(Arrays.asList("change user properties",
                 "folder types",
                 "look and feel settings",
                 "missing value indicators",
@@ -119,8 +119,6 @@ public class AdminConsoleTest extends BaseWebDriverTest
                 "project display order",
                 "short urls",
                 "audit log",
-                "etl- all job histories",
-                "etl- run site scope etls",
                 "full-text search",
                 "ms1",
                 "pipeline",
@@ -139,14 +137,12 @@ public class AdminConsoleTest extends BaseWebDriverTest
                 "system properties",
                 "view all site errors",
                 "view all site errors since reset",
-                "view primary site log file");
-        for(String linkText: expectedLinkTexts)
-        {
-            WebElement elem = Locator.linkWithText(linkText).findElementOrNull(getDriver());
-            if (elem != null)
-                actualLinkTexts.add(linkText);
-        }
-        assertEquals(expectedLinkTexts, actualLinkTexts);
+                "view primary site log file"));
+        if (_containerHelper.getAllModules().contains("dataintegration"))
+            expectedLinkTexts.addAll(Arrays.asList("etl- all job histories", "etl- run site scope etls"));
+
+        expectedLinkTexts.removeIf(linkText -> isElementPresent(Locator.linkWithText(linkText)));
+        assertTrue("Missing expected admin console links: " + expectedLinkTexts, expectedLinkTexts.isEmpty());
 
         // confirm that NONE of the following are visible to AppAdmin:
         List<String> notShownLinks = Arrays.asList("files","flow cytometry","experimental features","mascot server",
