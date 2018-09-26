@@ -93,7 +93,8 @@ public class PipelineAnalysisHelper
         _test._fileBrowserHelper.selectImportDataAction(importAction);
 
         _test.waitForElement(Locator.id("fileStatus").containing(files[0]), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, false);
-        assertEquals("Wrong file(s)", fileNames, new HashSet<>(Arrays.asList(_test.getText(Locator.id("fileStatus")).trim().split("\n"))));
+        assertEquals("Wrong file(s)", fileNames,
+                new HashSet<>(Arrays.asList(_test.getText(Locator.id("fileStatus")).replace("(Refreshing status)", "").trim().split("\n"))));
         for (Map.Entry<String, String> property : protocolProperties.entrySet())
         {
             if ("xmlParameters".equals(property.getKey()))
