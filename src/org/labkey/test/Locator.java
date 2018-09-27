@@ -1120,6 +1120,11 @@ public abstract class Locator extends By
                 return this;
         }
 
+        public XPathLocator notContaining(String contains)
+        {
+            return this.withPredicate("not(contains(normalize-space(), "+xq(contains)+"))");
+        }
+
         public XPathLocator withText(String text)
         {
             return this.withPredicate("normalize-space()="+xq(text));
