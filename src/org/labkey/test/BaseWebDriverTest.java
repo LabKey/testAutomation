@@ -2069,10 +2069,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             clickFolder(_studyFolderName);
             clickAndWait(Locator.linkWithText("Manage Files"));
 
-            if (_expectError)
-                waitForPipelineJobsToFinish(_completeJobsExpected);
-            else
-                waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import", _expectError);
+            waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import", _expectError);
 
             for (File copiedArchive : _copiedArchives)
                 if (!copiedArchive.delete())

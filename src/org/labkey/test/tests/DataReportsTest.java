@@ -458,7 +458,7 @@ public class DataReportsTest extends ReportTest
         clickButton("Start Job", 0);
         waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
         goToModule("Pipeline");
-        waitForPipelineJobsToFinish(2);
+        waitForPipelineJobsToComplete(2, false);
         // go back to the report and confirm it is visible
         clickReportGridLink(R_SCRIPTS[1]);
         waitForText(R_SCRIPT2_TEXT2);

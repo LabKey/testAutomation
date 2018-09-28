@@ -1311,6 +1311,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return statusValues.stream().filter(finishedStates::contains).collect(Collectors.toList()).size();
     }
 
+    public void waitForPipelineJobsToComplete(final int finishedJobsExpected, final boolean expectError)
+    {
+        waitForPipelineJobsToComplete(finishedJobsExpected, null, expectError);
+    }
+
     public void waitForPipelineJobsToComplete(final int finishedJobsExpected, final String description, final boolean expectError)
     {
         waitForPipelineJobsToComplete(finishedJobsExpected, description, expectError, BaseWebDriverTest.MAX_WAIT_SECONDS * 1000);
@@ -1344,6 +1349,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
+    /**
+     * @deprecated Use {@link #waitForPipelineJobsToComplete(int, boolean)}
+     * This tends to cause tests to blow past pipeline errors because people are unaware of the method above
+     * TODO: Remove in 19.1
+     */
+    @Deprecated
     public List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
     {
         return waitForPipelineJobsToFinish(jobsExpected, Duration.ofSeconds(BaseWebDriverTest.MAX_WAIT_SECONDS));
@@ -1356,7 +1367,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      * @return {@link List} of status values for all pipeline jobs
      */
     @LogMethod
-    public List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected, @LoggedParam Duration timeout)
+    private List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected, @LoggedParam Duration timeout)
     {
         log("Waiting for " + jobsExpected + " pipeline jobs to finish");
         Timer timer = new Timer(timeout);

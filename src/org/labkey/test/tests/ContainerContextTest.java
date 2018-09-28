@@ -258,6 +258,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Viewing pipeline status from project container. Sort by Description (report name) and include sub-folders");
         beginAt("/pipeline-status/" + getProjectName() + "/showList.view?StatusFiles.sort=Description&StatusFiles.containerFilterName=CurrentAndSubfolders");
 
+        waitForPipelineJobsToComplete(2, false);
+
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.tagWithText("a", "COMPLETE").index(0), "href");
         assertTrue("Expected 'COMPLETE' link 0 to go to current A container: " + href,
@@ -298,8 +300,6 @@ public class ContainerContextTest extends BaseWebDriverTest
         waitForElement(Locator.lkButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
         waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
-        goToModule("Pipeline");
-        waitForPipelineJobsToFinish(1);
     }
 
     // Issue 20375: DetailsURL link has no container in certain cases
