@@ -418,10 +418,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_01);
 
         log("Import the folder.");
-        goToFolderManagement().goToImportTab();
-        setFormElement(Locator.input("folderZip"), exportedFolderFile);
-        clickAndWait(Locator.lkButton("Import Folder"));
-        waitForPipelineJobsToFinish(1);
+        importFolderFromZip(exportedFolderFile);
 
         log("Validate that the data has been imported as expected.");
         goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_01);
@@ -526,10 +523,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_02);
 
         log("Import the folder.");
-        goToFolderManagement().goToImportTab();
-        setFormElement(Locator.input("folderZip"), exportedFolderFile);
-        clickAndWait(Locator.lkButton("Import Folder"));
-        waitForPipelineJobsToFinish(1);
+        importFolderFromZip(exportedFolderFile);
 
         log("Validate that the data has been imported as expected.");
         goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_02);
@@ -614,10 +608,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_03);
 
         log("Import the folder.");
-        goToFolderManagement().goToPane("tabimport");
-        setFormElement(Locator.input("folderZip"), exportedFolderFile);
-        clickAndWait(Locator.lkButton("Import Folder"));
-        waitForPipelineJobsToFinish(1);
+        importFolderFromZip(exportedFolderFile);
 
         log("Validate that the data has been imported as expected.");
         goToProjectHome(ASSAY_PROJECT_FOR_IMPORT_03);
