@@ -49,6 +49,18 @@ public class Checkbox extends org.labkey.test.components.html.Checkbox
 
     public static class CheckboxFinder extends FormItemFinder<Checkbox, CheckboxFinder>
     {
+        private final CheckboxType _type;
+
+        public CheckboxFinder(CheckboxType type)
+        {
+            _type = type;
+        }
+
+        public CheckboxFinder()
+        {
+            this(CheckboxType.FORM);
+        }
+
         @Override
         protected Checkbox construct(WebElement el)
         {
@@ -57,7 +69,27 @@ public class Checkbox extends org.labkey.test.components.html.Checkbox
 
         protected Locator.XPathLocator itemLoc()
         {
-            return Locator.tagWithClass("input", Ext4Helper.getCssPrefix() + "form-checkbox");
+            return _type.itemLoc();
         }
+    }
+
+    public enum CheckboxType
+    {
+        FORM
+                {
+                    protected Locator.XPathLocator itemLoc()
+                    {
+                        return Locator.tagWithClass("input", Ext4Helper.getCssPrefix() + "form-checkbox");
+                    }
+                },
+        GRID_CHECKER_COLUMN
+                {
+                    protected Locator.XPathLocator itemLoc()
+                    {
+                        return Locator.tagWithClass("img", Ext4Helper.getCssPrefix() + "grid-checkcolumn");
+                    }
+                };
+
+        protected abstract Locator.XPathLocator itemLoc();
     }
 }
