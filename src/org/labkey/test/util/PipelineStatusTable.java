@@ -76,6 +76,12 @@ public class PipelineStatusTable extends DataRegionTable
         return super.newElementCache();
     }
 
+    public FileBrowserHelper clickProcessData()
+    {
+        clickHeaderButtonAndWait("Process and Import Data");
+        return new FileBrowserHelper(getWrapper());
+    }
+
     private void disablePipelineRefresh()
     {
         getWrapper().executeScript("LABKEY.disablePipelineRefresh = true;");
