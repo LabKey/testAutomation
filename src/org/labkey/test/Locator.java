@@ -1029,6 +1029,14 @@ public abstract class Locator extends By
         }
 
         @Override
+        public XPathLocator withoutAttribute(String attribute)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.withoutAttribute(attribute),
+                    _cssLoc.withoutAttribute(attribute));
+        }
+
+        @Override
         public XPathLocator followingSibling(String tag)
         {
             return new XPathCSSLocator(
@@ -1352,6 +1360,11 @@ public abstract class Locator extends By
             return this.withoutPredicate("@" + attrName + "=" + xq(attrVal));
         }
 
+        public XPathLocator withoutAttribute(String attrName)
+        {
+            return this.withoutPredicate("@" + attrName);
+        }
+
         public XPathLocator withoutAttributeContaining(String attrName, String partialAttrVal)
         {
             return this.withoutPredicate("contains(@" + attrName + ", " + xq(partialAttrVal) + ")");
@@ -1533,6 +1546,11 @@ public abstract class Locator extends By
         public CssLocator withAttribute(String attribute)
         {
             return append("[" + attribute + "]");
+        }
+
+        public CssLocator withoutAttribute(String attribute)
+        {
+            return append(":not([" + attribute + "])");
         }
 
         public CssLocator withAttributeContaining(String attribute, String text)

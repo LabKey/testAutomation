@@ -26,15 +26,17 @@ import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class NotificationPanelItem extends Component
 {
+    private final UserNotificationsPanel _panel;
     private final WebElement _el;
     private final WebElement _createdBy = Locator.css("div.labkey-notification-createdby").findWhenNeeded(this);
     private final WebElement _notificationBody = Locator.css("div.labkey-notification-body").findWhenNeeded(this);
     private final WebElement _markAsRead = Locator.css("div.labkey-notification-times").findWhenNeeded(this);
     private final WebElement _icon = Locator.css("div.labkey-notification-icon").findWhenNeeded(this);
 
-    public NotificationPanelItem(WebElement rowItem)
+    public NotificationPanelItem(WebElement rowItem, UserNotificationsPanel panel)
     {
         _el = rowItem;
+        _panel = panel;
     }
 
     @Override
@@ -72,14 +74,24 @@ public class NotificationPanelItem extends Component
 
     public void markAsRead()
     {
+        final int initialCount = _panel.getNotificationCount();
         _markAsRead.click();
-        waitFor(() -> ExpectedConditions.invisibilityOfAllElements(Arrays.asList(_el)).apply(null), "Notification did not go away when marked as read", 2000);
+        waitFor(() -> ExpectedConditions.invisibilityOfAllElements(Arrays.asList(_el)).apply(null)
+                && _panel.getNotificationCount() == initialCount - 1,
+                "Notification did not go away when marked as read: " + _el.getAttribute("id"), 2000);
     }
 
     public void toggleExpand()
     {
-        final WebElement notificationBody = Locator.css(".labkey-notification-body").findElement(this);
+        boolean initiallyExpanded = isExpanded();
         Locator.css(" div.labkey-notification-toggle").findElement(this).click();
+        waitFor(() -> isExpanded() != initiallyExpanded,
+                "Notification did not toggle expansion: " + _el.getAttribute("id"), 2000);
+    }
+
+    private boolean isExpanded()
+    {
+        return _notificationBody.getAttribute("class").contains("expand");
     }
 
     public void click()
