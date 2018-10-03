@@ -659,4 +659,23 @@ public class ApiPermissionsHelper extends PermissionsHelper
             throw new RuntimeException(e);
         }
     }
+
+    private static final String APP_ADMIN = "Application Admin";
+
+    public void addUserAsAppAdmin(String userEmail)
+    {
+        if(!isUserAppAdmin(userEmail))
+            addMemberToRole(userEmail, APP_ADMIN, PermissionsHelper.MemberType.user, "/");
+    }
+
+    public void removeUserFromAppAdmin(String userEmail)
+    {
+        if (isUserAppAdmin(userEmail))
+            removeUserRoleAssignment(userEmail, APP_ADMIN, "/");
+    }
+
+    private boolean isUserAppAdmin(String userEmail)
+    {
+        return doesUserHaveRole(userEmail, APP_ADMIN, "/");
+    }
 }
