@@ -28,6 +28,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -141,6 +142,18 @@ public class DataReportsTest extends ReportTest
         // need this to turn off the demographic bit in the DEM-1 dataset
         initTest.clickFolder(initTest.getFolderName());
         initTest.setDemographicsBit("DEM-1: Demographics", false);
+
+        // Make sure the Developers group has the Platform Developer role.
+        initTest.addDeveloperGroupToPlatformDeveloperRole();
+    }
+
+    private void addDeveloperGroupToPlatformDeveloperRole()
+    {
+        goToHome();
+
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+
+        apiPermissionsHelper.addMemberToRole("Developers", "Platform Developer", ApiPermissionsHelper.MemberType.siteGroup, "/");
     }
 
     @Before
