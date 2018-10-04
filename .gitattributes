@@ -223,6 +223,7 @@ modules/scriptpad/resources/web/input_data.tsv -text
 modules/simpletest/module.properties -text
 modules/simpletest/resources/data/category.tsv -text
 modules/simpletest/resources/data/item-categories.tsv -text
+modules/simpletest/resources/data/milestone.tsv -text
 modules/simpletest/resources/data/priority.tsv -text
 modules/simpletest/resources/data/samples.tsv -text
 modules/simpletest/resources/data/todolist.tsv -text

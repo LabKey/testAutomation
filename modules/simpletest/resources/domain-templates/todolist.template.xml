@@ -41,6 +41,28 @@
         </options>
     </template>
 
+    <template xsi:type="ListTemplateType">
+        <table tableName="Milestone" tableDbType="NOT_IN_DB">
+            <dat:columns>
+                <dat:column columnName="m">
+                    <dat:rangeURI>int</dat:rangeURI>
+                    <dat:nullable>false</dat:nullable>
+                </dat:column>
+                <dat:column columnName="title">
+                    <dat:rangeURI>string</dat:rangeURI>
+                    <dat:scale>50</dat:scale>
+                </dat:column>
+            </dat:columns>
+        </table>
+        <initialData importIdentity="true">
+            <file>/data/milestone.tsv</file>
+        </initialData>
+        <options>
+            <keyCol>m</keyCol>
+            <keyType>Integer</keyType>
+        </options>
+    </template>
+
     <template xsi:type="SampleSetTemplateType">
         <table tableName="Samples" tableDbType="NOT_IN_DB">
             <dat:columns>
@@ -87,6 +109,13 @@
                     <dat:fk>
                         <dat:fkDbSchema>lists</dat:fkDbSchema>
                         <dat:fkTable>Priority</dat:fkTable>
+                    </dat:fk>
+                </dat:column>
+                <dat:column columnName="milestone" mandatory="true">
+                    <dat:nullable>true</dat:nullable>
+                    <dat:fk>
+                        <dat:fkDbSchema>lists</dat:fkDbSchema>
+                        <dat:fkTable>Milestone</dat:fkTable>
                     </dat:fk>
                 </dat:column>
                 <!-- TODO: create a multi-value lookup -->
