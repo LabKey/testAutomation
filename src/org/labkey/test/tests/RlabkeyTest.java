@@ -29,7 +29,6 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.TestLogger;
 
@@ -65,27 +64,31 @@ public class RlabkeyTest extends BaseWebDriverTest
 
     public void doInit()
     {
+        _rReportHelper.ensureRConfig();
+
         _userHelper.createUser(USER);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         log("Create Projects");
-        _containerHelper.createProject(PROJECT_NAME, null);
-        apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME, "Users");
-        apiPermissionsHelper.setPermissions("Users", "Editor");
         _containerHelper.createProject(PROJECT_NAME_2, null);
         apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME_2, "Users");
         apiPermissionsHelper.setPermissions("Users", "Editor");
-        clickProject(PROJECT_NAME);
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Lists");
-       
+        _containerHelper.createProject(PROJECT_NAME, null);
+        apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME, "Users");
+        apiPermissionsHelper.setPermissions("Users", "Editor");
+
         log("Import Lists");
         File listArchive = new File(_rReportHelper.getRLibraryPath(), "/listArchive.zip");
 
         if (!listArchive.exists())
             fail("Unable to locate the list archive: " + listArchive.getName());
 
-        _listHelper.importListArchive(PROJECT_NAME, listArchive);
+        _listHelper.importListArchive(listArchive);
         // create an issues list in a project and subfolder to test ContainerFilters.
+
+        goToModule("FileContent");
+        // Dummy files for saveBatch API test
+        _fileBrowserHelper.createFolder("data.tsv");
+        _fileBrowserHelper.createFolder("result.txt");
 
         IssuesHelper issuesHelper = new IssuesHelper(this);
 
@@ -106,8 +109,6 @@ public class RlabkeyTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME_2);
         createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
         issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_2));
-        
-        _rReportHelper.ensureRConfig();
     }
 
     /**

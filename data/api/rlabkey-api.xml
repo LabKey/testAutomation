@@ -418,7 +418,7 @@
                 labkey.deleteRows(baseUrl="%baseUrl%", folderPath="/%projectName%", schemaName="lists", queryName="AllTypes",  toDelete=deleterow)
 
                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/%projectName%",schemaName="lists", queryName="AllTypes"
-                        ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))            
+                        ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))
             ]]>
         </url>
         <response>
@@ -455,7 +455,7 @@
                 <NA> NA <NA> <NA> Required
                 Required Integer Category Lookup
                 0 <NA>
-            ]]>            
+            ]]>
         </response>
     </test>
     <test name="executeSql" type="post">
@@ -594,10 +594,10 @@
 
                 # setup new rows data frame with 10,000 identical rows
                 newrows <- data.frame(
-	                DisplayFld="Imported from R"
-	                , RequiredText="abc"
-	                , RequiredInt=1
-	                , stringsAsFactors=FALSE)
+                    DisplayFld="Imported from R"
+                    , RequiredText="abc"
+                    , RequiredInt=1
+                    , stringsAsFactors=FALSE)
                 newrows = newrows[rep(1:nrow(newrows),each=10000),]
 
                 importedInfo <- labkey.importRows("%baseUrl%", folderPath="/%projectName%",schemaName="lists", queryName="AllTypes", toImport=newrows)
@@ -807,6 +807,60 @@
                 [1] "simpletest: todolist#Priority"
                 $name
                 [1] "Priority"
+            ]]>
+        </response>
+    </test>
+    <test name="experiment saveBatch of runs with material inputs and outputs" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                m1 <- labkey.experiment.createMaterial(list(name = "87444063.2604.626"))
+                m2 <- labkey.experiment.createMaterial(list(name = "87444063.2604.625"))
+                run <- labkey.experiment.createRun(list(name = "new run with materials"), materialInputs = m1, materialOutputs = m2)
+                labkey.experiment.saveBatch(protocolName=labkey.experiment.SAMPLE_DERIVATION_PROTOCOL, runList=run, baseUrl="%baseUrl%", folderPath="%projectName%")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $batch$created
+
+                $batch$name
+
+                $batch$runs[[1]]$materialInputs[[1]]$name
+                [1] "87444063.2604.626"
+
+                $batch$runs[[1]]$materialOutputs[[1]]$name
+                [1] "87444063.2604.625"
+
+                $batch$runs[[1]]$name
+                [1] "new run with materials"
+            ]]>
+        </response>
+    </test>
+    <test name="experiment saveBatch of runs with data inputs and outputs" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                d1 <- labkey.experiment.createData(list(pipelinePath = "data.tsv"))
+                d2 <- labkey.experiment.createData(list(pipelinePath = "result.txt"))
+                run <- labkey.experiment.createRun(list(name = "new run with datas"), dataInputs = d1, dataOutputs = d2)
+                labkey.experiment.saveBatch(protocolName=labkey.experiment.SAMPLE_DERIVATION_PROTOCOL, runList=run, baseUrl="%baseUrl%", folderPath="%projectName%")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $batch$created
+
+                $batch$name
+
+                $batch$runs[[1]]$dataOutputs[[1]]$name
+                [1] "result.txt"
+
+                $batch$runs[[1]]$dataInputs[[1]]$name
+                [1] "data.tsv"
+
+                $batch$runs[[1]]$name
+                [1] "new run with datas"
             ]]>
         </response>
     </test>
