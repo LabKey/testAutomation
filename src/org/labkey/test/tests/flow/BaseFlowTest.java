@@ -26,7 +26,6 @@ import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,8 +35,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 abstract public class BaseFlowTest extends BaseWebDriverTest
 {
@@ -353,6 +350,15 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         _fileBrowserHelper.selectFileBrowserItem(workspacePath);
 
         _fileBrowserHelper.selectImportDataAction("Import FlowJo Workspace");
+    }
+
+    @LogMethod
+    protected void analysisFolder_viewFiles(String containerPath)
+    {
+        log("examine imported FCS files in container "+ containerPath);
+        goToFlowDashboard();
+        clickAndWait(Locator.linkWithText("2 FCS files"));
+        assertTitleEquals("FCSFiles: /Flow Verify Project/FlowImportTest");
     }
 
     @LogMethod

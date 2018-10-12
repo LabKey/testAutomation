@@ -18,6 +18,7 @@ package org.labkey.test.tests.flow;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.util.DateUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -27,17 +28,19 @@ import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Flow.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class FlowImportTest extends BaseFlowTest
 {
     @Test
-    public void importTest()
+    public void importTest() throws ParseException
     {
         String workspacePath = "/flowjoquery/microFCS/microFCS.xml";
         List<String> keywordDirs = Arrays.asList("/flowjoquery/microFCS");
@@ -82,6 +85,17 @@ public class FlowImportTest extends BaseFlowTest
         assertEquals("Expected an Analysis run", table.getDataAsText(2, "Protocol Step"), "Analysis");
         // UNDONE: Check Runs.Workspace column
 
+        // check for flow.FCSFiles has a FileDate column and verify the values
+        log( "**  Verify FileDate column for new FCS files exists  **");
+        analysisFolder_viewFiles(getContainerPath());
+        DataRegionTable filesTable = DataRegionTable.DataRegion(getDriver()).withName("query").find();
+        assertTrue("table should now have a 'File Date' column",filesTable.getColumnNames().contains("FileDate"));
+        List<String> fileDates = filesTable.getColumnDataAsText("FileDate");
+        for (String date : fileDates)
+        {
+            assertTrue("expect each field in FileDate column to have a value, is [" + date + "]", !date.isEmpty());
+            DateUtil.parseDateTime(date, "YYYY-MM-DD HH:mm");   // make sure the resulting value parses to a date
+        }
         // UNDONE: Check '118795.fcs' FCSAnalysis well has a fake FCSFile that has an original FCSFile data input.
         // UNDONE: Check FCSFiles.Original column
         //assertEquals(
