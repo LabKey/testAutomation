@@ -57,6 +57,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.search.SearchResultsPage;
+import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
@@ -1228,7 +1229,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             return;
 
         int rowCount, coveredActions, totalActions;
-        Double actionCoveragePercent;
+        double actionCoveragePercent;
         String actionCoveragePercentString;
         beginAt("/admin/actions.view");
 
@@ -1278,21 +1279,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return Collections.emptyList();
     }
 
-    private void writeActionStatistics(int totalActions, int coveredActions, Double actionCoveragePercent)
+    private void writeActionStatistics(int totalActions, int coveredActions, double actionCoveragePercent)
     {
-        // TODO: Create static class for managing teamcity-info.xml file.
-        File xmlFile = new File(TestFileUtils.getLabKeyRoot(), "teamcity-info.xml");
-        try (Writer writer = PrintWriters.getPrintWriter(xmlFile))
-        {
-            xmlFile.createNewFile();
-
-            writer.write("<build>\n");
-            writer.write("\t<statisticValue key=\"totalActions\" value=\"" + totalActions + "\"/>\n");
-            writer.write("\t<statisticValue key=\"coveredActions\" value=\"" + coveredActions + "\"/>\n");
-            writer.write("\t<statisticValue key=\"actionCoveragePercent\" value=\"" + actionCoveragePercent + "\"/>\n");
-            writer.write("</build>");
-        }
-        catch (IOException ignore){}
+        TeamCityUtils.reportBuildStatisticValue("totalActions", totalActions);
+        TeamCityUtils.reportBuildStatisticValue("coveredActions", coveredActions);
+        TeamCityUtils.reportBuildStatisticValue("actionCoveragePercent", actionCoveragePercent);
     }
 
     /**

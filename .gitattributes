@@ -680,6 +680,7 @@ src/org/labkey/test/selenium/WebElementDecorator.java -text
 src/org/labkey/test/selenium/WebElementWrapper.java -text
 src/org/labkey/test/studysampler/Runner.java -text
 src/org/labkey/test/studysampler/words.txt -text
+src/org/labkey/test/teamcity/TeamCityUtils.java -text
 src/org/labkey/test/testpicker/CheckNode.java -text
 src/org/labkey/test/testpicker/CheckRenderer.java -text
 src/org/labkey/test/testpicker/TestHelper.java -text
