@@ -23,7 +23,7 @@ public class WebDavUtils
     {
         return WebTestHelper.getBaseURL() + "/_webdav/"
                 + StringUtils.strip(containerPath, "/").replace(" ", "%20") + "/"
-                + StringUtils.strip(webDavDir, "/");
+                + StringUtils.strip(webDavDir, "/") + "/";
     }
 
     public static String buildBaseWebDavUrl(String containerPath)
