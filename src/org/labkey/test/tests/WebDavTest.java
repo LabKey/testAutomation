@@ -35,10 +35,12 @@ import org.labkey.test.util.core.webdav.WebDavUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -80,34 +82,37 @@ public class WebDavTest extends BaseWebDriverTest
     public void testWebDav() throws Exception
     {
         final String testURL = baseWebDavUrl;
+        final String fileName = "testfile_wd.txt";
+
+        Set<String> expectedFiles = new HashSet<>();
+        expectedFiles.add("@files");
 
         // make sure the indexer isn't really busy
         waitForIdle();
 
         beginAt(testURL + "?listing=html");
-        assertTextNotPresent("testfile1");
+        assertTextNotPresent("testfile");
 
         Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
         List<String> names = _listNames(sardine, testURL);
-        assertEquals(1, names.size());
-        assertFalse(names.contains("testfile1"));
+        assertEquals("Initial webdav listing", expectedFiles, new HashSet<>(names));
 
-        sardine.put(testURL + "testfile1.txt", TEXT.getBytes(StandardCharsets.UTF_8));
+        sardine.put(testURL + fileName, TEXT.getBytes(StandardCharsets.UTF_8));
+        expectedFiles.add(fileName);
         refresh();
-        assertTextPresent("testfile1.txt");
+        assertTextPresent(fileName);
         names = _listNames(sardine,testURL);
-        assertEquals(2, names.size());
-        assertTrue(names.contains("testfile1.txt"));
+        assertEquals("Webdav listing after upload", expectedFiles, new HashSet<>(names));
 
         // TODO test search
 
-        deleteFile(sardine, testURL + "testfile1.txt");
+        deleteFile(sardine, testURL + fileName);
+        expectedFiles.remove(fileName);
 
         refresh();
-        assertTextNotPresent("testfile1.txt");
+        assertTextNotPresent(fileName);
         names = _listNames(sardine,testURL);
-        assertEquals(1, names.size());
-        assertFalse(names.contains("testfile1.txt"));
+        assertEquals("Webdav listing after deleting file", expectedFiles, new HashSet<>(names));
 
         verifyExpected404(sardine, testURL);
     }
@@ -128,6 +133,9 @@ public class WebDavTest extends BaseWebDriverTest
     {
         setEnableWebfiles(true);
 
+        Set<String> expectedWebFiles = new HashSet<>();
+        expectedWebFiles.add(getProjectName());
+
         String testURL = baseWebFilesUrl;
 
         // make sure the indexer isn't really busy
@@ -135,21 +143,22 @@ public class WebDavTest extends BaseWebDriverTest
         WebFilesPage.beginAt(this, getProjectName());
 
         Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        List<String> names = _listNames(sardine, testURL);
-        assertEquals("_webfiles for project should be empty", 1, names.size());
+        Set<String> names = new HashSet<>(_listNames(sardine, testURL));
+        assertEquals("_webfiles for project should be empty (with just a self-reference)", expectedWebFiles, names);
 
-        String projectFileName = "testfile1.txt";
+        String projectFileName = "testfile_wf1.txt";
         log("Verify creating file under project");
         sardine.put(testURL + projectFileName, TEXT.getBytes(StandardCharsets.UTF_8));
+        expectedWebFiles.add(projectFileName);
         refresh();
-        names = _listNames(sardine, testURL);
-        assertEquals("Content for _webfiles is not as expected", 2, names.size());
+        names = new HashSet<>(_listNames(sardine, testURL));
+        assertEquals("Content for _webfiles is not as expected", expectedWebFiles, names);
         assertTrue(projectFileName + " file is not present in _webfiles", names.contains(projectFileName));
 
         String conflictFolderName = "childContainerAndDirectory";
         log("Create a subdirectory: \"" + conflictFolderName + "\" under project (which maps to @files of project)");
         sardine.createDirectory(testURL + conflictFolderName);
-        String childFileName = "testfile2.txt";
+        String childFileName = "testfile_wf2.txt";
         log("Create a file: \"" + childFileName + "\" under subdirectory: \"" + conflictFolderName + "\"");
         sardine.put(testURL + conflictFolderName + "/" + childFileName, TEXT.getBytes(StandardCharsets.UTF_8));
         log("Verify file under subdirectory");
@@ -162,19 +171,16 @@ public class WebDavTest extends BaseWebDriverTest
         log("Verify that subdirectory name that conflicts with child container is decorated correctly for _webfiles");
         beginAt(testURL + "?listing=html");
         String expectedConflictingDirectoryName = conflictFolderName + " (files)";
-        names = _listNames(sardine, testURL);
-        assertEquals("Content for _webfiles is not as expected", 4, names.size());
-        log(names.toString());
-        assertTrue(projectFileName + " file is not present in _webfiles", names.contains(projectFileName));
-        assertTrue(conflictFolderName + " child container is not present in _webfiles", names.contains(conflictFolderName));
-        assertTrue(conflictFolderName + " directory is not present in _webfiles", names.contains(expectedConflictingDirectoryName));
+        expectedWebFiles.add(expectedConflictingDirectoryName);
+        expectedWebFiles.add(conflictFolderName);
+
+        names = new HashSet<>(_listNames(sardine, testURL));
+        assertEquals("Content for _webfiles is not as expected", expectedWebFiles, new HashSet<>(names));
 
         log("Verify file and sub directories uploaded to project from _webfiles is present at @files _webdav node");
         beginAt(baseWebDavUrl + "?listing=html");
-        names = _listNames(sardine, baseWebDavUrl);
-        assertEquals("Content for _webdav/@files is not as expected", 3, names.size());
-        assertTrue(projectFileName + " file is not present in _webdav/@files", names.contains(projectFileName));
-        assertTrue(conflictFolderName + " directory is not present in _webdav/@files", names.contains(conflictFolderName));
+        names = new HashSet<>(_listNames(sardine, baseWebDavUrl));
+        assertEquals("Content for _webdav/@files is not as expected", new HashSet<>(Arrays.asList("@files", conflictFolderName, projectFileName)), names);
 
         goToProjectHome();
         _containerHelper.deleteFolder(getProjectName(), conflictFolderName);
@@ -186,8 +192,8 @@ public class WebDavTest extends BaseWebDriverTest
         deleteFile(sardine, testURL + conflictFolderName);
         refresh();
         assertTextNotPresent(projectFileName);
-        names = _listNames(sardine,testURL);
-        assertFalse(names.contains(projectFileName));
+        names = new HashSet<>(_listNames(sardine,testURL));
+        assertEquals(new HashSet<>(Arrays.asList(getProjectName())), names);
 
         verifyExpected404(sardine, testURL);
 
