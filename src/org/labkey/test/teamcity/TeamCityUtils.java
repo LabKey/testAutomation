@@ -88,26 +88,24 @@ public class TeamCityUtils
     // https://confluence.jetbrains.com/display/TCD18/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-Escapedvalues
     public static void serviceMessage(String messageName, Map<String, String> attributes)
     {
-//        if (!isTestRunningOnTeamCity())
-//        {
-//            return;
-//        }
-
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append("##teamcity[");
         messageBuilder.append(validateId(messageName));
+        // Certain message types take a single unkeyed value rather than key/value pairs (e.g. 'publishArtifacts')
         if (attributes.size() == 1 && attributes.containsKey(null))
         {
             messageBuilder.append(" ");
-            appendValue(messageBuilder, attributes.keySet().iterator().next());
+            appendValue(messageBuilder, attributes.values().iterator().next());
+        }
+        else if (attributes.containsKey(null) || attributes.containsValue(null))
+        {
+            throw new IllegalArgumentException("Provide keys and values for all service message attributes: " + attributes);
         }
         else
         {
             for (String key : attributes.keySet())
             {
                 String value = attributes.get(key);
-                if (value == null)
-                    throw new IllegalArgumentException("Provide values for all service message attributes: " + attributes);
                 messageBuilder.append(" ");
                 messageBuilder.append(validateId(key));
                 messageBuilder.append("=");
