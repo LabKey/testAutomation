@@ -423,6 +423,15 @@ public class WebTestHelper
 
     public static HttpClientBuilder getHttpClientBuilder(String username, String password)
     {
+        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom()
+                .setSocketTimeout(60000)
+                .setConnectTimeout(60000)
+                .setConnectionRequestTimeout(60000);
+        return getHttpClientBuilder(username, password, requestConfigBuilder);
+    }
+
+    public static HttpClientBuilder getHttpClientBuilder(String username, String password, RequestConfig.Builder requestConfigBuilder)
+    {
         URI target;
         try
         {
@@ -440,10 +449,7 @@ public class WebTestHelper
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(authScope, credentials);
 
-        RequestConfig requestConfig = RequestConfig.custom()
-                .setSocketTimeout(60000)
-                .setConnectTimeout(60000)
-                .setConnectionRequestTimeout(60000)
+        RequestConfig requestConfig = requestConfigBuilder
                 .build();
 
         ConnectionConfig connectionConfig = ConnectionConfig.custom()
