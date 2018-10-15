@@ -26,6 +26,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.teamcity.TeamCityUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -101,33 +102,9 @@ public class ArtifactCollector
         return dumpDir;
     }
 
-    // Publish artifacts while the build is still in progress:
-    // http://www.jetbrains.net/confluence/display/TCD18/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-PublishingArtifactswhiletheBuildisStillinProgress
     private void publishArtifact(File file, @Nullable String destination)
     {
-        if (file != null && file.exists() && isTestRunningOnTeamCity())
-        {
-            // relativize path to labkey project root
-            String labkeyRoot = TestFileUtils.getLabKeyRoot();
-            labkeyRoot = new File(labkeyRoot).getAbsolutePath();
-            String strFile = file.getAbsolutePath();
-            if (strFile.toLowerCase().startsWith(labkeyRoot.toLowerCase()))
-            {
-                String path = strFile.substring(labkeyRoot.length());
-                if (path.startsWith(File.separator))
-                    path = path.substring(1);
-                StringBuilder message = new StringBuilder();
-                message.append("##teamcity[publishArtifacts '");
-                message.append(path);
-                if (destination != null)
-                {
-                    message.append(" => ");
-                    message.append(destination);
-                }
-                message.append("']");
-                System.out.println(message.toString());
-            }
-        }
+        TeamCityUtils.publishArtifact(file, destination);
     }
 
     public void publishArtifact(File file)
