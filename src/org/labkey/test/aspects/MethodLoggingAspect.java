@@ -201,7 +201,7 @@ public class MethodLoggingAspect
         }
         else
         {
-            if (arg != null)
+            if (arg != null && arg.toString() != null)
             {
                 argString = arg.toString();
                 if (!(arg instanceof Number || arg instanceof Boolean))
