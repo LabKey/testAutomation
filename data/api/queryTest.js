@@ -216,6 +216,32 @@ var testFunctions = [
         });
     },
 
+    function() // testResults[20]
+    {
+        LABKEY.Query.selectRows({
+            schemaName: schemaName,
+            queryName: queryName,
+            filterArray: [
+                LABKEY.Filter.create('LastName', ['Mandy;son'], LABKEY.Filter.Types.IN)
+            ],
+            success: successHandler,
+            failure: failureHandler
+        });
+    },
+
+    function() // testResults[21]
+    {
+        LABKEY.Query.selectRows({
+            schemaName: schemaName,
+            queryName: queryName,
+            filterArray: [
+                new LABKEY.Query.Filter('LastName', ['Mandy;son'], LABKEY.Filter.Types.IN)
+            ],
+            success: successHandler,
+            failure: failureHandler
+        });
+    },
+
     // last function returns results.
     function()
     {
@@ -328,10 +354,20 @@ var testFunctions = [
         else
             html += '18)FAILURE: SelectDistinctRows failed to return expected result of 2 values\n';
 
-        if (testResults[19].rowCount !== undefined && testResults[19].rowCount == 2)
+        if (testResults[19].rowCount !== undefined && testResults[19].rowCount === 2)
             html += '19)SUCCESS: SelectRows returned correct expected result when using a search filter\n';
         else
             html += '19)FAILURE: SelectRows failed to return expected result of 2 rows. Result had ' + testResults[19].rowCount + ' rows\n';
+
+        if (testResults[20].rowCount !== undefined && testResults[20].rowCount === 2)
+            html += '20)SUCCESS: SelectRows returned correct expected result when using a json-delimited filter\n';
+        else
+            html += '20)FAILURE: SelectRows failed to return expected result of 2 rows. Result had ' + testResults[20].rowCount + ' rows\n';
+
+        if (testResults[21].rowCount !== undefined && testResults[21].rowCount === 2)
+            html += '21)SUCCESS: SelectRows returned correct expected result when using a json-delimited filter\n';
+        else
+            html += '21)FAILURE: SelectRows failed to return expected result of 2 rows. Result had ' + testResults[21].rowCount + ' rows\n';
 
         callback(html);
     }

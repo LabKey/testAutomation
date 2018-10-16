@@ -116,7 +116,7 @@ public class ClientAPITest extends BaseWebDriverTest
         { "1", "Bill", "Billson", "34" },
         { "2", "Jane", "Janeson", "42" },
         { "3", "John", "Johnson", "17" },
-        { "4", "Mandy", "Mandyson", "32" },
+        { "4", "Mandy", "Mandy;son", "32" },
         { "5", "Norbert", "Norbertson", "28" },
         { "6", "Penny", "Pennyson", "38" },
         { "7", "Yak", "Yakson", "88" },
@@ -917,7 +917,7 @@ public class ClientAPITest extends BaseWebDriverTest
             log(result);
         }
         assertFalse(scriptResult.contains("FAILURE"));
-        assertEquals("Wrong number of results", 22, testResults.length);
+        assertEquals("Wrong number of results", 24, testResults.length);
     }
 
     @Test
