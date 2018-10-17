@@ -102,7 +102,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
     {
         log("Defining a QC test assay at the project level");
 
-        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        goToProjectHome(TEST_PROGRAMMATIC_QC_PRJ);
         new PortalHelper(this).addWebPart("Assay List");
 
         _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampleData("ProgrammaticQC/QC Assay.xar"), 1);
@@ -121,7 +121,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
     {
         log("Defining a transform test assay at the project level");
 
-        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        goToProjectHome(TEST_PROGRAMMATIC_QC_PRJ);
         new PortalHelper(this).addWebPart("Assay List");
 
         clickButton("Manage Assays");
@@ -155,7 +155,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
     private void uploadQCRuns()
     {
         log("uploading runs");
-        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        goToProjectHome(TEST_PROGRAMMATIC_QC_PRJ);
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(QC_ASSAY));
 
@@ -173,7 +173,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         clickButton("Save and Finish");
 
         // verify the log entry
-        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        goToProjectHome(TEST_PROGRAMMATIC_QC_PRJ);
         clickAndWait(Locator.linkWithText("QC Log"));
 
         assertTextPresent("Programmatic QC was run and 2 errors were found", "Programmatic QC was run and 0 errors were found");
@@ -202,7 +202,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         assertTextPresent("monkey", "hamster");
 
         // verify the log entry
-        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        goToProjectHome(TEST_PROGRAMMATIC_QC_PRJ);
         clickAndWait(Locator.linkWithText("QC Log"));
 
         assertTextPresent("Programmatic Data Transform was run and 2 errors were found",
@@ -232,7 +232,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         assertTextPresent("monkey", "hamster", "goat");
 
         // verify the log entry
-        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        goToProjectHome(TEST_PROGRAMMATIC_QC_PRJ);
         clickAndWait(Locator.linkWithText("QC Log"));
 
         assertTextPresent("Programmatic QC was run and 1 errors were found");
