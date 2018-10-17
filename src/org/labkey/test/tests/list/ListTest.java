@@ -541,8 +541,8 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("was created", 2);                // Once for the list, once for the domain
         // List insert/update events should each have a link to the list item that was modified, but the other events won't have a link
         assertEquals("details Links", 6, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size());
-        assertEquals("Project Links", 20, Locator.linkWithText(PROJECT_VERIFY).findElements(getDriver()).size()); // Table links + header link
-        assertEquals("List Links", 20, Locator.linkWithText(LIST_NAME_COLORS).findElements(getDriver()).size()); // Table links + header link
+        assertEquals("Project Links", 19, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size());
+        assertEquals("List Links", 19, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size());
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
         dataRegionTable.clickRowDetails(0);
         assertTextPresent("List Item Details");
