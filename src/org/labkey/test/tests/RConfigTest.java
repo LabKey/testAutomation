@@ -31,7 +31,6 @@ public class RConfigTest extends BaseWebDriverTest
     private String FOLDER_NAME = "subfolder";
 
     private RReportHelper _RReportHelper = new RReportHelper(this);
-    private Ext4Helper _Ext4Helper = new Ext4Helper(this);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -87,8 +86,8 @@ public class RConfigTest extends BaseWebDriverTest
             scripts.addEngine(EngineType.R, config);
             sleep(2000); //wait for store and view update
             scripts.editEngine(DISABLED_ENGINE_NAME);
-            Assert.assertTrue(_Ext4Helper.isChecked(XPathLocator.id("editEngine_enabled-inputEl")));
-            _Ext4Helper.uncheckCheckbox(XPathLocator.id("editEngine_enabled-inputEl"));
+            Assert.assertTrue(_ext4Helper.isChecked(XPathLocator.id("editEngine_enabled-inputEl")));
+            _ext4Helper.uncheckCheckbox(XPathLocator.id("editEngine_enabled-inputEl"));
             sleep(2000); // wait for store update
             clickButton("Submit", -1);
         }
@@ -147,31 +146,25 @@ public class RConfigTest extends BaseWebDriverTest
 
         log("Verify site default checkbox is checked and disabled");
         scripts.editEngine(DEFAULT_ENGINE_NAME);
-        Assert.assertTrue(_Ext4Helper.isChecked(XPathLocator.id("editEngine_default-inputEl")));
+        Assert.assertTrue(_ext4Helper.isChecked(XPathLocator.id("editEngine_default-inputEl")));
         assertAttributeEquals(XPathLocator.id("editEngine_default-inputEl"), "disabled", "true");
 
         log("Disabling site default should be prevented");
-        Assert.assertTrue(_Ext4Helper.isChecked(XPathLocator.id("editEngine_enabled-inputEl")));
-        _Ext4Helper.uncheckCheckbox(XPathLocator.id("editEngine_enabled-inputEl"));
+        Assert.assertTrue(_ext4Helper.isChecked(XPathLocator.id("editEngine_enabled-inputEl")));
+        _ext4Helper.uncheckCheckbox(XPathLocator.id("editEngine_enabled-inputEl"));
         clickButton("Submit", -1);
         assertExt4MsgBox("Site default engine must be enabled.", "OK");
         clickButton("Cancel", -1);
 
         log("Switch site default");
-        scripts.editEngine(SECONDARY_ENGINE_NAME);
-        XPathLocator loc = XPathLocator.id("editEngine_default-inputEl");
-        Assert.assertFalse(_Ext4Helper.isChecked(XPathLocator.id("editEngine_default-inputEl")));
-        _Ext4Helper.checkCheckbox(XPathLocator.id("editEngine_default-inputEl"));
-        click(Locator.linkWithText("Submit"));
-        acceptAlert();
-        _Ext4Helper.waitForMaskToDisappear();
+        scripts.setSiteDefault(SECONDARY_ENGINE_NAME);
 
         log("Verify site default has switched in admin console page");
         scripts.editEngine(DEFAULT_ENGINE_NAME);
-        Assert.assertFalse(_Ext4Helper.isChecked(XPathLocator.id("editEngine_default-inputEl")));
+        Assert.assertFalse(_ext4Helper.isChecked(XPathLocator.id("editEngine_default-inputEl")));
         clickButton("Cancel", -1);
         scripts.editEngine(SECONDARY_ENGINE_NAME);
-        Assert.assertTrue(_Ext4Helper.isChecked(XPathLocator.id("editEngine_default-inputEl")));
+        Assert.assertTrue(_ext4Helper.isChecked(XPathLocator.id("editEngine_default-inputEl")));
         clickButton("Cancel", -1);
 
         log("Verify site default has switched in folder management page");

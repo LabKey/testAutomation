@@ -61,17 +61,38 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         return isElementPresent(Locators.enginesGridRowForName(engineName));
     }
 
+    public void setSiteDefault(String engineName)
+    {
+        log("Ensure " + engineName + " is the site default engine");
+        editEngine(engineName);
+        Locator.XPathLocator defaultCheckbox = Locator.id("editEngine_default-inputEl");
+        if (_ext4Helper.isChecked(defaultCheckbox))
+        {
+            log(engineName + " is already the site default engine");
+            return;
+        }
+        log("Change site default engine to " + engineName);
+        _ext4Helper.checkCheckbox(defaultCheckbox);
+        click(Locator.linkWithText("Submit"));
+        acceptAlert();
+        _ext4Helper.waitForMaskToDisappear();
+    }
+
     @LogMethod
     public void addEngineWithDefaults(@LoggedParam EngineType type)
     {
         addEngine(type, new EngineConfig(null));
     }
 
-    @LogMethod
     public void addEngine(@LoggedParam EngineType type, EngineConfig config)
     {
         Map<Locator, String> configMap = config.getConfigMap();
+        addEngine(type, configMap);
+    }
 
+    @LogMethod
+    public void addEngine(@LoggedParam EngineType type, Map<Locator, String> configMap)
+    {
         String menuText = "New " + type + " Engine";
         _ext4Helper.clickExt4MenuButton(false, Locator.id("btn_addEngine"), false, menuText);
         WebElement menuItem = Locator.menuItem(menuText).findElementOrNull(getDriver());

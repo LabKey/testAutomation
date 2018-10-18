@@ -78,7 +78,7 @@ public class RReportHelper
     private static File rScriptExecutable = null;
 
     private static final String localEngineName = "R Scripting Engine";
-    private static final String dockerEngineName = "R Docker Scripting Engine";
+    public static final String R_DOCKER_SCRIPTING_ENGINE = "R Docker Scripting Engine";
 
     private static final String INSTALL_RLABKEY = "install.packages(\"Rlabkey\", repos=\"http://cran.r-project.org\")";
     private static final String INSTALL_LOCAL_RLABKEY = "install.packages(\"%s\", repos=NULL)";
@@ -224,14 +224,16 @@ public class RReportHelper
         if (useDocker)
         {
             rVersion = RDOCKER;
-            if (!scripts.isEnginePresent(dockerEngineName))
+            if (!scripts.isEnginePresent(R_DOCKER_SCRIPTING_ENGINE))
                 scripts.addEngineWithDefaults(EngineType.R_DOCKER);
+            else
+                scripts.setSiteDefault(R_DOCKER_SCRIPTING_ENGINE);
         }
         else
         {
-            if (scripts.isEnginePresent(dockerEngineName))
+            if (scripts.isEnginePresent(R_DOCKER_SCRIPTING_ENGINE))
             {
-                scripts.deleteEngine(dockerEngineName);
+                scripts.deleteEngine(R_DOCKER_SCRIPTING_ENGINE);
                 _test.refresh(); // Avoid menu alignment issue on TeamCity
             }
 
@@ -260,6 +262,45 @@ public class RReportHelper
             scripts.addEngine(EngineType.R, config);
         }
         return rVersion;
+    }
+
+    public void ensureFolderREngine(String engineName)
+    {
+        _test.goToFolderManagement().goToRConfigTab();
+        Locator inheritRadio = Locator.radioButtonByNameAndValue("overrideDefault", "parent");
+        Locator overrideRadio = Locator.radioButtonByNameAndValue("overrideDefault", "override");
+
+        boolean isEngineSiteDefault = engineName.equals(_test.getText(inheritRadio));
+
+        if (isEngineSiteDefault)
+        {
+            if (_test.isChecked(inheritRadio))
+            {
+                _test.log(engineName + " site default engine is already inherited by folder");
+                return;
+            }
+            _test.log("Use site default engine " + engineName + " as folder's engine.");
+            _test.checkRadioButton(inheritRadio);
+        }
+        else
+        {
+            if (_test.isChecked(inheritRadio))
+                _test.checkRadioButton(overrideRadio);
+
+            assertTrue(engineName + " engine does not exist.", _test.isElementPresent(Locator.tagWithText("option", engineName)));
+
+            Locator overrideEngineSelect = Locator.name("engineRowId");
+            if (engineName.equals(_test.getSelectedOptionText(overrideEngineSelect)))
+            {
+                _test.log(engineName + "engine is already selected as default for folder");
+                return;
+            }
+            _test.log("Change folder's engine to " + engineName);
+            _test.selectOptionByText(overrideEngineSelect, engineName);
+        }
+
+        _test.clickButton("Save", "Override Default R Configuration");
+        _test.clickButton("Yes");
     }
 
     public void setPandocEnabled(Boolean enabled)
