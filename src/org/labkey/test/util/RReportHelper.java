@@ -270,7 +270,7 @@ public class RReportHelper
         Locator inheritRadio = Locator.radioButtonByNameAndValue("overrideDefault", "parent");
         Locator overrideRadio = Locator.radioButtonByNameAndValue("overrideDefault", "override");
 
-        boolean isEngineSiteDefault = engineName.equals(_test.getText(inheritRadio));
+        boolean isEngineSiteDefault = engineName.equals(_test.getText(Locator.id("parentConfig")));
 
         if (isEngineSiteDefault)
         {
