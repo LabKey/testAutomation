@@ -864,6 +864,74 @@
             ]]>
         </response>
     </test>
+    <test name="create a dataset with a invalid category ID" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                df <- data.frame(customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
+                fields <- labkey.domain.inferFields(baseUrl="%baseUrl%", folderPath="%projectName%", df)
+                dd <- labkey.domain.createDesign(name="test dataset one", fields=fields)
+                labkey.domain.create(baseUrl="%baseUrl%", folderPath="%projectName%", domainKind="StudyDatasetVisit", domainDesign=dd, options=list(categoryId = -1))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Status code = 500, Error message = Unable to find a category with the ID : -1 in this folder.
+            ]]>
+        </response>
+    </test>
+    <test name="create a dataset with a category ID and category name" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                df <- data.frame(customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
+                fields <- labkey.domain.inferFields(baseUrl="%baseUrl%", folderPath="%projectName%", df)
+                dd <- labkey.domain.createDesign(name="test dataset one", fields=fields)
+                labkey.domain.create(baseUrl="%baseUrl%", folderPath="%projectName%", domainKind="StudyDatasetVisit", domainDesign=dd, options=list(categoryId = -1, categoryName = "Control Group A"))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Status code = 500, Error message = Category ID and category name cannot both be specified
+            ]]>
+        </response>
+    </test>
+    <test name="create a dataset with a invalid category name" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                df <- data.frame(customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
+                fields <- labkey.domain.inferFields(baseUrl="%baseUrl%", folderPath="%projectName%", df)
+                dd <- labkey.domain.createDesign(name="test dataset one", fields=fields)
+                labkey.domain.create(baseUrl="%baseUrl%", folderPath="%projectName%", domainKind="StudyDatasetVisit", domainDesign=dd, options=list(categoryName = "Invalid"))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Status code = 500, Error message = Unable to find a category named : Invalid in this folder.
+            ]]>
+        </response>
+    </test>
+    <test name="create a dataset with a valid category name" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                df <- data.frame(customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
+                fields <- labkey.domain.inferFields(baseUrl="%baseUrl%", folderPath="%projectName%", df)
+                dd <- labkey.domain.createDesign(name="test dataset one", fields=fields)
+                labkey.domain.create(baseUrl="%baseUrl%", folderPath="%projectName%", domainKind="StudyDatasetVisit", domainDesign=dd, options=list(categoryName = "Control Group A"))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $success
+                [1] TRUE
+
+                $name
+                [1] "test dataset one"
+            ]]>
+        </response>
+    </test>
     <test name="final test" type="post">
         <url>
             <![CDATA[

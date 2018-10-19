@@ -24,12 +24,14 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestLogger;
 
 import java.io.File;
@@ -72,7 +74,12 @@ public class RlabkeyTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME_2, null);
         apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME_2, "Users");
         apiPermissionsHelper.setPermissions("Users", "Editor");
-        _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.createProject(PROJECT_NAME, "Study");
+        CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
+        createStudyPage.setLabel("Rlabkey Study")
+                .setTimepointType(StudyHelper.TimepointType.VISIT)
+                .createStudy();
+
         apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME, "Users");
         apiPermissionsHelper.setPermissions("Users", "Editor");
 
@@ -82,6 +89,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         if (!listArchive.exists())
             fail("Unable to locate the list archive: " + listArchive.getName());
 
+        goToProjectHome();
         _listHelper.importListArchive(listArchive);
         // create an issues list in a project and subfolder to test ContainerFilters.
 
@@ -125,8 +133,11 @@ public class RlabkeyTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testRlabkey()
+    public void testRlabkey() throws Exception
     {
+        // need to setup some view categories first
+        createCategoriesViaApi();
+
         File testData = new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/rlabkey-api.xml");
         if (testData.exists())
         {
@@ -196,5 +207,14 @@ public class RlabkeyTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
+    }
+
+    private void createCategoriesViaApi() throws Exception
+    {
+        File testFile = new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/rlabkey-category-api.xml");
+
+        APITestHelper apiTester = new APITestHelper(this);
+        apiTester.setTestFiles(testFile);
+        apiTester.runApiTests();
     }
 }

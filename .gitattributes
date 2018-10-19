@@ -42,6 +42,7 @@ data/api/napApiTest.html -text
 data/api/queryRegressionTest.js -text
 data/api/queryTest.js -text
 data/api/rlabkey-api.xml -text
+data/api/rlabkey-category-api.xml -text
 data/api/scatterPlotPointClickTestFn.js -text
 data/api/security-api.xml -text
 data/api/study-api.xml -text
