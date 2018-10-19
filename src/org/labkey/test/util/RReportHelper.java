@@ -226,16 +226,14 @@ public class RReportHelper
             rVersion = RDOCKER;
             if (!scripts.isEnginePresent(R_DOCKER_SCRIPTING_ENGINE))
                 scripts.addEngineWithDefaults(EngineType.R_DOCKER);
-            else
-                scripts.setSiteDefault(R_DOCKER_SCRIPTING_ENGINE);
+
+            scripts.setSiteDefault(R_DOCKER_SCRIPTING_ENGINE);
         }
         else
         {
-            if (scripts.isEnginePresent(R_DOCKER_SCRIPTING_ENGINE))
-            {
-                scripts.deleteEngine(R_DOCKER_SCRIPTING_ENGINE);
-                _test.refresh(); // Avoid menu alignment issue on TeamCity
-            }
+            scripts.deleteAllDockerEngines();
+
+            _test.refresh(); // Avoid menu alignment issue on TeamCity
 
             if (scripts.isEnginePresent(localEngineName))
             {
@@ -301,6 +299,18 @@ public class RReportHelper
 
         _test.clickButton("Save", "Override Default R Configuration");
         _test.clickButton("Yes");
+    }
+
+    public void resetFolderREngine()
+    {
+        _test.goToFolderManagement().goToRConfigTab();
+        Locator inheritRadio = Locator.radioButtonByNameAndValue("overrideDefault", "parent");
+
+        if (_test.isChecked(inheritRadio))
+            return;
+
+        _test.log("Remove folder's engine override.");
+        _test.checkRadioButton(inheritRadio);
     }
 
     public void setPandocEnabled(Boolean enabled)

@@ -26,6 +26,7 @@ import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -181,6 +182,38 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         // delete default engine last
         if (defaultR != null)
             deleteSelectedEngine(defaultR);
+    }
+
+    public void deleteAllDockerEngines()
+    {
+        List<String> dockerEngineNames = new ArrayList<>();
+        String defaultDockerR = null;
+
+        List<WebElement> engines = getREngineLoc(true).findElements(getDriver());
+        for (WebElement engine : engines)
+        {
+            engine.click();
+            clickButton("Edit", 0);
+            Window(getDriver()).withTitle(EDIT_WINDOW_TITLE).waitFor();
+            if (isElementPresent(Locator.id("dockerimage-imageName-labelEl")))
+            {
+                String engineName = Locator.id("editEngine_name-inputEl").findElement(getDriver()).getAttribute("value");
+                Locator.XPathLocator defaultCheckbox = Locator.id("editEngine_default-inputEl");
+                if (_ext4Helper.isChecked(defaultCheckbox))
+                {
+                    defaultDockerR = engineName;
+                }
+                else
+                {
+                    dockerEngineNames.add(engineName);
+                }
+            }
+            click(Locator.linkWithText("Cancel"));
+        }
+
+        deleteEnginesFromList(dockerEngineNames);
+        if (defaultDockerR != null)
+            deleteEngine(defaultDockerR);
     }
 
     public void deleteAllNonSandboxedREngines()
