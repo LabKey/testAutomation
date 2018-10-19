@@ -87,7 +87,24 @@
         <datatype>int</datatype>
       </column>
       <column columnName="InitialReleaseYear"/>
-
+      <column columnName="Image">
+        <datatype>varchar</datatype>
+        <displayColumnFactory>
+          <className>org.labkey.api.data.URLDisplayColumn$Factory</className>
+          <properties>
+            <property name="thumbnailImageWidth">50px</property>
+            <property name="thumbnailImageUrl">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>
+            <property name="popupImageUrl">/_webdav/SimpleModuleTest%20Project/%40files/${popupImage}</property>
+          </properties>
+        </displayColumnFactory>
+        <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>
+      </column>
+      <column columnName="ThumbnailImage">
+        <datatype>varchar</datatype>
+      </column>
+      <column columnName="PopupImage">
+        <datatype>varchar</datatype>
+      </column>
       <column columnName="urlBadColumnWithDefaultBehavior" wrappedColumnName="RowId">
         <url>/simpletest/model.view?rowid=${RowId}&amp;doesNotExist=${doesNotExist}</url>
       </column>

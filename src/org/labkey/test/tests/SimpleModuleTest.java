@@ -15,7 +15,9 @@
  */
 package org.labkey.test.tests;
 
+import jdk.internal.jline.internal.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,8 +53,10 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,6 +117,31 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private static final String DATE_FORMAT = "yyyy-MM-dd";
 
+    private static final File DEFAULT_IMAGE =  TestFileUtils.getSampleData("Thumbnails/default.jpg");
+    private static final File PRIUS_THUMBNAIL =  TestFileUtils.getSampleData("Thumbnails/prius.jpg");
+    private static final File PRIUS_POPUP =  TestFileUtils.getSampleData("Thumbnails/priusPopup.jpg");
+    private static final File CAMRY_THUMBNAIL =  TestFileUtils.getSampleData("Thumbnails/camry.jpg");
+    private static final File FOCUS_POPUP =  TestFileUtils.getSampleData("Thumbnails/focusPopup.jpg");
+
+    private static final String XML_METADATA = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
+            "  <table tableName=\"Models\" tableDbType=\"TABLE\">\n" +
+            "    <columns>\n" +
+            "      <column columnName=\"Image\">\n" +
+            "        <datatype>varchar</datatype>\n" +
+            "        <displayColumnFactory>\n" +
+            "          <className>org.labkey.api.data.URLDisplayColumn$Factory</className>\n" +
+            "          <properties>\n" +
+            "            <property name=\"thumbnailImageUrl\">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>\n" +
+            "            <property name=\"popupImageUrl\">/_webdav/SimpleModuleTest%20Project/%40files/${popupImage}</property>\n" +
+            "            <property name=\"popupImageWidth\">150px</property>\n" +
+            "          </properties>\n" +
+            "        </displayColumnFactory>\n" +
+            "        <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>\n" +
+            "      </column>\n" +
+            "    </columns>\n" +
+            "  </table>\n" +
+            "</tables>\n";
+
     private final PortalHelper portalHelper = new PortalHelper(this);
 
     protected String getProjectName()
@@ -150,6 +179,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToProjectSettings();
         setFormElement(Locator.name("defaultDateFormat"), DATE_FORMAT);
         clickAndWait(Locator.lkButton("Save"));
+
+        // images for thumbnails
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(DEFAULT_IMAGE);
+        _fileBrowserHelper.uploadFile(PRIUS_THUMBNAIL);
+        _fileBrowserHelper.uploadFile(PRIUS_POPUP);
+        _fileBrowserHelper.uploadFile(CAMRY_THUMBNAIL);
+        _fileBrowserHelper.uploadFile(FOCUS_POPUP);
 
         goToProjectHome();
     }
@@ -238,12 +275,18 @@ public class SimpleModuleTest extends BaseWebDriverTest
         insertCmd.getRows().addAll(Arrays.asList(
                 Maps.of("ManufacturerId", toyotaId,
                         "Name", "Prius C",
-                        "InitialReleaseYear", null),
+                        "Image", DEFAULT_IMAGE.getName(),
+                        "ThumbnailImage", PRIUS_THUMBNAIL.getName(),
+                        "PopupImage", PRIUS_POPUP.getName()),
                 Maps.of("ManufacturerId", toyotaId,
                         "Name", "Camry",
+                        "Image", DEFAULT_IMAGE.getName(),
+                        "ThumbnailImage", CAMRY_THUMBNAIL.getName(),
                         "InitialReleaseYear", 1982),
                 Maps.of("ManufacturerId", fordId,
-                        "Name", "Focus"),
+                        "Name", "Focus",
+                        "Image", DEFAULT_IMAGE.getName(),
+                        "PopupImage", FOCUS_POPUP.getName()),
                 Maps.of("ManufacturerId", fordId,
                         "Name", "F150"),
                 Maps.of("ManufacturerId", fordId,
@@ -251,6 +294,37 @@ public class SimpleModuleTest extends BaseWebDriverTest
         ));
         insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 5 rows.", 5, insertResp.getRowsAffected().intValue());
+
+        // test thumbnail images
+        log("testing custom thumbnail and popup images");
+        goToSchemaBrowser();
+        selectQuery("vehicle", "Models");
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+
+        // default thumbnail
+        validateThumbnails(DEFAULT_IMAGE.getName(), "50px", FOCUS_POPUP.getName(), null);
+        // both thumbnail and popup
+        validateThumbnails(PRIUS_THUMBNAIL.getName(), "50px", PRIUS_POPUP.getName(), null);
+        // should have default popup
+        validateThumbnails(CAMRY_THUMBNAIL.getName(), "50px", DEFAULT_IMAGE.getName(), null);
+
+        // override the metadata to set the thumbnail and popup widths
+        goToSchemaBrowser();
+        selectQuery("vehicle", "Models");
+        waitForText("edit metadata");
+        clickAndWait(Locator.linkWithText("edit metadata"));
+        // wait for the domain editor to appear:
+        clickButton("Edit Source", defaultWaitForPage);
+        _ext4Helper.clickExt4Tab("XML Metadata");
+        setCodeEditorValue("metadataText", XML_METADATA);
+        clickButton("Save & Finish");
+
+        // revalidate with the updated sizes
+        validateThumbnails(DEFAULT_IMAGE.getName(), null, FOCUS_POPUP.getName(), "150px");
+        validateThumbnails(PRIUS_THUMBNAIL.getName(), null, PRIUS_POPUP.getName(), "150px");
+        validateThumbnails(CAMRY_THUMBNAIL.getName(), null, DEFAULT_IMAGE.getName(), "150px");
+        log("finished testing custom thumbnail and popup images");
 
         Long priusId = null;
         Long f150Id = null;
@@ -496,6 +570,26 @@ public class SimpleModuleTest extends BaseWebDriverTest
             assertEquals(403, ex.getStatusCode());
 //            assertEquals("The row is from the wrong container.", ex.getMessage());
         }
+    }
+
+    private void validateThumbnails(String thumbnailImage, @Nullable String thumbnailWidth, String popupImage, @Nullable String popupWidth)
+    {
+        Locator thumbnail = Locator.tag("img").withAttributeContaining("src", thumbnailImage).
+                withAttributeContaining("style", thumbnailWidth != null ? "width:" + thumbnailWidth : "max-width:32px");
+        assertElementPresent(thumbnail);
+
+        log("Hover over the thumbnail and make sure the pop-up is as expected.");
+        mouseOver(thumbnail);
+        //mouseOver(Locator.xpath("//img[contains(@src, '" + thumbnailImage + "')]"));
+        shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
+        Locator popup = Locator.tag("div").withAttribute("id", "helpDiv").descendant("img").withAttributeContaining("src", popupImage).
+                withAttributeContaining("style", popupWidth != null ? "width:" + popupWidth : "max-width:300px");
+        String src = popup.findElement(getDriver()).getAttribute("src");
+        mouseOut();
+        shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("#helpDiv")));
+
+        assertTrue("Wrong image in popup: " + src, src.contains(popupImage));
+        assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
     }
 
     @LogMethod
