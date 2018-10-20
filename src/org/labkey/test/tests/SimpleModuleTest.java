@@ -15,9 +15,9 @@
  */
 package org.labkey.test.tests;
 
-import jdk.internal.jline.internal.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
