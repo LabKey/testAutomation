@@ -263,7 +263,9 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
     private WebElement selectEngineNamed(String engineName)
     {
-        WebElement engineRow = Locators.enginesGridRowForName(engineName).findElement(getDriver());
+        Locator engineRowLoc = Locators.enginesGridRowForName(engineName);
+        waitForElement(engineRowLoc);
+        WebElement engineRow = engineRowLoc.findElement(getDriver());
         engineRow.click();
         return engineRow;
     }
