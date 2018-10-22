@@ -684,14 +684,10 @@ public class ClientAPITest extends BaseWebDriverTest
                 "       }]\n" +
                 "   },\n" +
                 "   options : {\n" +
-                "       datasetId : 81005,\n" +
-                "       categoryId : 3,\n" +
-                "       //keyPropertyName : 'intFieldOne',\n" +
-                "       //useTimeKeyField : true\n" +
-                "       //demographics : true\n" +
+                "       datasetId : 81005\n" +
                 "   }\n" +
                 "});\n";
-        Map<String, Object> createResult = (Map<String, Object>)executeAsyncScript(create);
+        executeAsyncScript(create);
         log(create);
     }
 
