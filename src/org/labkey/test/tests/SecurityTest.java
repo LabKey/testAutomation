@@ -343,9 +343,9 @@ public class SecurityTest extends BaseWebDriverTest
         ensureSignedOut();
 
         clickAndWait(Locator.linkWithText("Sign In"));
-        clickAndWait(Locator.linkContainingText("forgot password"));
+        clickAndWait(Locator.linkContainingText("Forgot your password?"));
         setFormElement(Locator.id("EmailInput"), username);
-        clickButtonContainingText("Submit", 0);
+        clickButtonContainingText("Reset", 0);
 
         signIn();
         return getPasswordResetUrl(username);
@@ -798,7 +798,7 @@ public class SecurityTest extends BaseWebDriverTest
         }
         assertTitleContains("Sign In");
         assertElementPresent(Locator.tagWithName("form", "login"));
-        clickAndWait(Locator.linkWithText("Register for a new account"));
+        clickAndWait(Locator.lkButton("Register"));
 
         assertTitleContains("Register");
         assertElementPresent(Locator.tagWithName("form", "register"));
@@ -826,7 +826,7 @@ public class SecurityTest extends BaseWebDriverTest
             clickAndWait(Locator.linkWithText("Sign In"));
         }
         assertTitleContains("Sign In");
-        assertElementNotPresent(Locator.linkWithText("Register for a new account"));
+        assertElementNotPresent(Locator.button("Register"));
 
         // cleanup: sign admin back in
         signIn();
