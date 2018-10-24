@@ -621,6 +621,7 @@ src/org/labkey/test/pages/core/admin/ShowAdminPage.java -text
 src/org/labkey/test/pages/core/admin/ShowAuditLogPage.java -text
 src/org/labkey/test/pages/core/admin/logger/ManagerPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
+src/org/labkey/test/pages/experiment/InsertDataClassPage.java -text
 src/org/labkey/test/pages/files/CustomizeFilesWebPartPage.java -text
 src/org/labkey/test/pages/files/FileContentPage.java -text
 src/org/labkey/test/pages/files/WebDavPage.java -text
