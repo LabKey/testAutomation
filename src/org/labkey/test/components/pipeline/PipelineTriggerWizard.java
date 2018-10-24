@@ -2,7 +2,7 @@ package org.labkey.test.components.pipeline;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.Locators;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -201,8 +201,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         public ElementCache()
         {
             if (getWrapper().getUrlParameters().containsKey("rowId"))
-                // Wait for initial value to populate
-                WebDriverWrapper.waitFor(() -> nameInput.get().isEmpty(), 1000);
+                // Wait for saved config to populate form
+                Locators.pageSignal("triggerConfigLoaded").waitForElement(getDriver(), 10000);
         }
 
         //details page elements
