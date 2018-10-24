@@ -117,11 +117,11 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private static final String DATE_FORMAT = "yyyy-MM-dd";
 
-    private static final File DEFAULT_IMAGE =  TestFileUtils.getSampleData("Thumbnails/default.jpg");
-    private static final File PRIUS_THUMBNAIL =  TestFileUtils.getSampleData("Thumbnails/prius.jpg");
-    private static final File PRIUS_POPUP =  TestFileUtils.getSampleData("Thumbnails/priusPopup.jpg");
-    private static final File CAMRY_THUMBNAIL =  TestFileUtils.getSampleData("Thumbnails/camry.jpg");
-    private static final File FOCUS_POPUP =  TestFileUtils.getSampleData("Thumbnails/focusPopup.jpg");
+    private static final File DEFAULT_IMAGE =  TestFileUtils.getSampleData("thumbnails/default.jpg");
+    private static final File PRIUS_THUMBNAIL =  TestFileUtils.getSampleData("thumbnails/prius.jpg");
+    private static final File PRIUS_POPUP =  TestFileUtils.getSampleData("thumbnails/priusPopup.jpg");
+    private static final File CAMRY_THUMBNAIL =  TestFileUtils.getSampleData("thumbnails/camry.jpg");
+    private static final File FOCUS_POPUP =  TestFileUtils.getSampleData("thumbnails/focusPopup.jpg");
 
     private static final String XML_METADATA = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
             "  <table tableName=\"Models\" tableDbType=\"TABLE\">\n" +
