@@ -35,9 +35,30 @@ public class LabKeyAlert extends ModalDialog implements Alert
         this(driver, 0);
     }
 
-    public LabKeyAlert(WebDriver driver, long timeout)
+    /**
+     * @deprecated Use {@link #getFinder(WebDriver)}
+     */
+    @Deprecated
+    public LabKeyAlert(WebDriver driver, int timeout)
     {
-        super(Locator.id("lk-utils-modal").findWhenNeeded(driver).withTimeout(timeout), driver);
+        this(getFinder(driver).timeout(timeout).findWhenNeeded(driver).getComponentElement(), driver);
+    }
+
+    private LabKeyAlert(WebElement element, WebDriver driver)
+    {
+        super(element, driver);
+    }
+
+    public static SimpleWebDriverComponentFinder<LabKeyAlert> getFinder(WebDriver driver)
+    {
+        return new SimpleWebDriverComponentFinder<LabKeyAlert>(driver, Locator.id("lk-utils-modal"))
+        {
+            @Override
+            protected LabKeyAlert construct(WebElement el, WebDriver driver)
+            {
+                return new LabKeyAlert(el, driver);
+            }
+        };
     }
 
     public WebElement getFunctionBody()
