@@ -23,6 +23,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
@@ -550,6 +551,36 @@ public class RReportHelper
 
         saveReport(name);
     }
+
+    /**
+     * pre-condition: at folder that the report is to be created from
+     * @param reportName
+     * @param reportSource
+     * @param shareView
+     * @return labkey-output content of report
+     */
+    public String createAndRunRReport(String reportName, String reportSource, boolean shareView)
+    {
+        _test.goToManageViews();
+
+        BootstrapMenu.find(_test.getDriver(), "Add Report")
+                .clickSubMenu(true, "R Report");
+        RReportHelper rReportHelper = new RReportHelper(_test);
+
+        _test.setCodeEditorValue("script-report-editor", reportSource);
+
+        if (shareView)
+            selectOption(RReportHelper.ReportOption.shareReport);
+
+        rReportHelper.saveReport(reportName);
+        _test.waitForText(reportName);
+        _test.log("Report created: " + reportName);
+
+        Locator reportOutput = Locator.tagWithClass("table", "labkey-output");
+        _test.waitForElement(reportOutput);
+        return _test.getText(reportOutput);
+    }
+
 
     /**
      * pre-conditions: at report's Report tab

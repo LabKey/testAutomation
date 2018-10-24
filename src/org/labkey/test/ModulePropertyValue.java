@@ -29,6 +29,7 @@ public class ModulePropertyValue
     {
         display("displayfield"),
         text("textfield"),
+        textarea("textarea"),
         select("combo")
                 {
                     @Override

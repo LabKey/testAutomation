@@ -74,6 +74,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.TestFileUtils.getLabKeyRoot;
 
 /**
 * Tests the simple module and file-based resources introduced in version 9.1
@@ -86,6 +87,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
     public static final String TABBED_FOLDER_TYPE = "My XML-defined Tabbed Folder Type";
     public static final String MODULE_NAME = "simpletest";
     public static final String FOLDER_NAME = "subfolder";
+    public static final String FOLDER_NAME_2 = "subfolder2";
+    public static final String FOLDER_NAME_3 = "subfolder3";
     public static final String VEHICLE_SCHEMA = "vehicle";
     public static final String CORE_SCHEMA = "core";
     public static final String LIST_NAME = "People";
@@ -170,6 +173,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertModuleEnabledByDefault(MODULE_NAME);
         assertModuleEnabledByDefault("Query");
         assertModuleEnabledByDefault("Study");
+
+        goToProjectHome();
+        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME_2);
+
+        goToProjectHome();
+        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME_3);
 
         goToProjectHome();
         portalHelper.addWebPart("Data Views");
@@ -1157,24 +1166,98 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     private final String subfolderPath = "/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?";
+
+    private final static String GET_MODULEP_PROPS_SCRIPT = "library('Rlabkey')\n" +
+            "baseUrl = labkey.url.base\n" +
+            "folderPath = \"SimpleModuleTest Project/subfolder\"\n" +
+            "moduleName = \"simpletest\"\n" +
+            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp1\")\n" +
+            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp2\")\n" +
+            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestTextArea\")\n" +
+            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCheckbox\")\n" +
+            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestSelect\")\n" +
+            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCombo\")";
+
+    private static final String SET_MODULE_PROPS_SCRIPT = "library('Rlabkey')\n" +
+            "baseUrl = labkey.url.base\n" +
+            "moduleName = \"simpletest\"\n" +
+            "\n" +
+            "## set site wide properties\n" +
+            "folderPath = \"/\"\n" +
+            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp1\", propValue = \"Prop1apiValue\")\n" +
+            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCheckbox\", propValue = \"false\")\n" +
+            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestSelect\", propValue = \"value2\")\n" +
+            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCombo\", propValue = \"comboValue2\")\n" +
+            "\n" +
+            "## set folder level properties\n" +
+            "folderPath = \"SimpleModuleTest Project/subfolder\"\n" +
+            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp2\", propValue = \"Prop2apiValue\")\n" +
+            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestTextArea\", propValue = \"$$folder1value$$\")\n" +
+            "\n" +
+            "## set folder level property for another folder\n" +
+            "folderPath = \"SimpleModuleTest Project/subfolder2\"\n" +
+            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestTextArea\", propValue = \"$$folder2value$$\")";
+
+
+    private static final String ENSURE_RLIBPATHS_SOURCE = "library('Rlabkey')\n" +
+            "baseUrl = labkey.url.base\n" +
+            "moduleName = \"simpletest\"\n" +
+            "propName = \"TestTextArea\"\n" +
+            "\n" +
+            "labkey.ensureRLibPath <- function(append=FALSE)\n" +
+            "{\n" +
+            "  propValue <- labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName)\n" +
+            "  \n" +
+            "  splits <- strsplit(propValue, '\\r\\n|\\n|\\r')\n" +
+            "  paths <- splits[[1]]\n" +
+            "  \n" +
+            "  if (append == TRUE)\n" +
+            "  \t.libPaths(c(paths, .libPaths()))\n" +
+            "  else\n" +
+            "  \t.libPaths(c(paths[1], paths[2]))\n" +
+            "  \n" +
+            "  .libPaths()\n" +
+            "}\n" +
+            "     \n" +
+            "folderPath = \"SimpleModuleTest Project/subfolder\"\n" +
+            "print(\"BEGIN-FIRST-CALL\")\n" +
+            "labkey.ensureRLibPath()  \n" +
+            "print(\"END-FIRST-CALL\")\n" +
+            "     \n" +
+            "folderPath = \"SimpleModuleTest Project/subfolder2\"  \n" +
+            "print(\"BEGIN-SECOND-CALL\")\n" +
+            "labkey.ensureRLibPath()\n" +
+            "print(\"END-SECOND-CALL\")     \n" +
+            "\n" +
+            "folderPath = \"SimpleModuleTest Project/subfolder\"  \n" +
+            "print(\"BEGIN-THIRD-CALL\")\n" +
+            "labkey.ensureRLibPath(append=TRUE)\n" +
+            "print(\"END-THIRD-CALL\")\n" +
+            "  ";
+
     @LogMethod
     @Test
     public void testModuleProperties() throws Exception
     {
+        RReportHelper rReportHelper = new RReportHelper(this);
+        rReportHelper.ensureRConfig(false);
+
         String prop1 = "TestProp1";
         String prop1Value = "Prop1Value";
         String prop2 = "TestProp2";
+        String propTextArea = "TestTextArea";
 
         beginAt(subfolderPath);
         portalHelper.addWebPart("Simple Module Web Part");
         waitForText("This is a web part view in the simple test module");
 
-        assertEquals("Module context not set properly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
+        assertEquals("Module context not set properly for text type module property", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
+        assertEquals("Module context not set properly for textArea type module property", "line1\nline2\nline3", executeScript("return LABKEY.getModuleContext('simpletest')." + propTextArea));
 
-        Map<String, List<String[]>> props = new HashMap<>();
         List<ModulePropertyValue> propList = new ArrayList<>();
         propList.add(new ModulePropertyValue(MODULE_NAME, "/", prop1, prop1Value));
         propList.add(new ModulePropertyValue(MODULE_NAME, "/" + getProjectName() + "/" + FOLDER_NAME, prop2 , "FolderValue"));
+        propList.add(new ModulePropertyValue(MODULE_NAME, "/" + getProjectName() + "/" + FOLDER_NAME, propTextArea , "updated1\nupdated2", ModulePropertyValue.InputType.textarea));
         propList.add(new ModulePropertyValue(MODULE_NAME, "/", "TestCheckbox", "true", ModulePropertyValue.InputType.checkbox));
         propList.add(new ModulePropertyValue(MODULE_NAME, "/", "TestSelect", "value1", ModulePropertyValue.InputType.select));
         propList.add(new ModulePropertyValue(MODULE_NAME, "/", "TestCombo", "comboValue1", ModulePropertyValue.InputType.combo));
@@ -1183,9 +1266,68 @@ public class SimpleModuleTest extends BaseWebDriverTest
         setModuleProperties(propList);
         // Validate values in folder in which they were set
         validateValues(propList);
-        // Now check value at parent level
+
+        log("Verify get module properties using Rlabkey api");
+        String apiModulePropResults = rReportHelper.createAndRunRReport("getModuleProps", GET_MODULEP_PROPS_SCRIPT, false);
+        String expectedProps = "[1] \"Prop1Value\"\n" +
+                "[1] \"FolderValue\"\n" +
+                "[1] \"updated1\\nupdated2\"\n" +
+                "[1] \"true\"\n" +
+                "[1] \"value1\"\n" +
+                "[1] \"comboValue1\"";
+        assertTrue("R api labkey.getModuleProperty is not returning module properties as expected", apiModulePropResults.contains(expectedProps));
+
+        log("Set site and folder level module properties using Rlabkey api");
+        String fileRootFolder1 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME);
+        String fileRootFolder2 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME_2);
+        String fileRootFolder3 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME_3);
+        String rlibPathsFolder1 = fileRootFolder1 + "\n" + fileRootFolder3;
+        String setModulePropsScript = SET_MODULE_PROPS_SCRIPT
+                .replace("$$folder1value$$", rlibPathsFolder1)
+                .replace("$$folder2value$$", fileRootFolder2);
+        rReportHelper.createAndRunRReport("setModuleProps", setModulePropsScript, false);
+
+        log("Verify R api setModuleProperty correctly sets property values");
+        goToManageViews();
+        waitAndClickAndWait(Locator.linkWithText("getModuleProps"));
+        Locator reportOutput = Locator.tagWithClass("table", "labkey-output");
+        waitForElement(reportOutput);
+        apiModulePropResults = getText(reportOutput);
+        expectedProps = "[1] \"Prop1apiValue\"\n" +
+                "[1] \"Prop2apiValue\"\n" +
+                "[1] \"" + rlibPathsFolder1.replace("\n", "\\n") + "\"\n" +
+                "[1] \"false\"\n" +
+                "[1] \"value2\"\n" +
+                "[1] \"comboValue2\"";
+        assertTrue("R api labkey.getModuleProperty followed by labkey.setModuleProperty is not returning module properties as expected",
+                apiModulePropResults.contains(expectedProps));
+
+        log("Test R api getModuleProperty in example of using it to set rLibPaths");
+        apiModulePropResults = rReportHelper.createAndRunRReport("ensureRLibPaths", ENSURE_RLIBPATHS_SOURCE, false);
+        String folderOneResult = "[1] \"BEGIN-FIRST-CALL\"\n" +
+                "[1] \"" + fileRootFolder1 + "\" \n" +
+                "[2] \"" + fileRootFolder3 + "\"";
+        String folderTwoResult = "[1] \"BEGIN-SECOND-CALL\"\n" +
+                "[1] \"" + fileRootFolder2 + "\"";
+        String setWithAppend = "[1] \"BEGIN-THIRD-CALL\"\n" +
+                "[1] \"" + fileRootFolder1 + "\" \n" +
+                "[2] \"" + fileRootFolder3 + "\"\n" +
+                "[3] \"" + fileRootFolder2 + "\"";
+        assertTrue("ensureRLibPaths script result is not as expected", apiModulePropResults.contains(folderOneResult));
+        assertTrue("ensureRLibPaths script result is not as expected", apiModulePropResults.contains(folderTwoResult));
+        assertTrue("ensureRLibPaths script result is not as expected", apiModulePropResults.contains(setWithAppend));
+
         goToProjectHome();
         assertEquals("Module context not set properly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
+
+    }
+
+    private String getContainerRoot(String containerPath)
+    {
+        String lkRoot = getLabKeyRoot();
+        if (!lkRoot.endsWith("/"))
+            lkRoot += "/";
+        return  lkRoot + "build/deploy/files/" + containerPath;
     }
 
     private void validateInputTypes(List<ModulePropertyValue> propList)
@@ -1289,7 +1431,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), NEW_FOLDER_NAME, "Collaboration", null);
         createPeopleListInFolder(NEW_FOLDER_NAME);
         navigateToFolder(getProjectName(), NEW_FOLDER_NAME);
-        importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), RESTRICTED_FOLDER_IMPORT_NAME), false, 1, true);
+        importFolderFromZip(new File(getLabKeyRoot(), RESTRICTED_FOLDER_IMPORT_NAME), false, 1, true);
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
                 "Folder type 'Folder With Restricted Module' not set because it requires a restricted module for which you do not have permission.",

@@ -10,6 +10,11 @@
                 <permission>UPDATE</permission>
             </editPermissions>
         </propertyDescriptor>
+        <propertyDescriptor name="TestTextArea">
+            <canSetPerContainer>true</canSetPerContainer>
+            <inputType>textArea</inputType>
+            <defaultValue>line1&#xa;line2&#xa;line3</defaultValue>
+        </propertyDescriptor>
         <propertyDescriptor name="TestCheckbox">
             <inputType>checkbox</inputType>
         </propertyDescriptor>
