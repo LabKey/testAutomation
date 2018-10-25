@@ -39,10 +39,8 @@ public class QCAssayScriptHelper
     @LogMethod
     public void ensureEngineConfig()
     {
-        _test.goToAdminConsole().clickViewsAndScripting();
         _test.log("setup a java engine");
-
-        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
         if (!scripts.isEnginePresentForLanguage(engineLanguage))
         {
@@ -71,9 +69,7 @@ public class QCAssayScriptHelper
     @LogMethod
     public void deleteEngine()
     {
-        _test.goToAdminConsole().clickViewsAndScripting();
-
-        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
         if (scripts.isEnginePresentForLanguage(engineLanguage))
         {

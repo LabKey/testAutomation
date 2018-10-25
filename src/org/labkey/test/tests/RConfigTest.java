@@ -14,11 +14,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
-import org.labkey.test.pages.core.admin.ShowAdminPage;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.RReportHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Category({DailyB.class})
@@ -35,8 +32,7 @@ public class RConfigTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        goToAdminConsole().goToAdminConsoleLinksSection();
-        ConfigureReportsAndScriptsPage scripts = ShowAdminPage.beginAt(getCurrentTest()).clickViewsAndScripting();
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(this);
 
         log("Clean up scripting engines");
         scripts.deleteAllREngines();
@@ -61,9 +57,7 @@ public class RConfigTest extends BaseWebDriverTest
     @Before
     public void configureEngines()
     {
-        log("Navigate to 'Views and Scripting' admin console page");
-        goToAdminConsole().goToAdminConsoleLinksSection();
-        ConfigureReportsAndScriptsPage scripts = ShowAdminPage.beginAt(getCurrentTest()).clickViewsAndScripting();
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(this);
 
         EngineConfig config = new EngineConfig(_RReportHelper.getRExecutable());
 
@@ -96,9 +90,7 @@ public class RConfigTest extends BaseWebDriverTest
     @Test
     public void testAddMultipleEngines()
     {
-        log("Navigate to 'Views and Scripting' admin console page");
-        goToAdminConsole().goToAdminConsoleLinksSection();
-        ConfigureReportsAndScriptsPage scripts = ShowAdminPage.beginAt(getCurrentTest()).clickViewsAndScripting();
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(this);
 
         log("Verify R engines exist");
         Assert.assertTrue("Default R engine does not exist", scripts.isEnginePresent(DEFAULT_ENGINE_NAME));
@@ -140,9 +132,7 @@ public class RConfigTest extends BaseWebDriverTest
     @Test
     public void testSwitchDefaultEngine()
     {
-        log("Navigate to 'Views and Scripting' admin console page");
-        goToAdminConsole().goToAdminConsoleLinksSection();
-        ConfigureReportsAndScriptsPage scripts = ShowAdminPage.beginAt(getCurrentTest()).clickViewsAndScripting();
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(this);
 
         log("Verify site default checkbox is checked and disabled");
         scripts.editEngine(DEFAULT_ENGINE_NAME);
@@ -177,9 +167,7 @@ public class RConfigTest extends BaseWebDriverTest
     @Test
     public void testNoEngines()
     {
-        log("Navigate to 'Views and Scripting' admin console page");
-        goToAdminConsole().goToAdminConsoleLinksSection();
-        ConfigureReportsAndScriptsPage scripts = ShowAdminPage.beginAt(getCurrentTest()).clickViewsAndScripting();
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(this);
 
         log("Delete all R engine definitions");
         scripts.deleteAllREngines();

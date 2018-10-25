@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -45,6 +46,12 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     {
         super(test);
         waitForEnginesGrid();
+    }
+
+    public static ConfigureReportsAndScriptsPage beginAt(WebDriverWrapper driver)
+    {
+        driver.beginAt(WebTestHelper.buildURL("core", "configureReportsAndScripts"));
+        return new ConfigureReportsAndScriptsPage(driver);
     }
 
     public void waitForEnginesGrid()

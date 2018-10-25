@@ -36,10 +36,8 @@ public class PerlHelper
     @LogMethod
     public void ensurePerlConfig()
     {
-        _test.goToAdminConsole().clickViewsAndScripting();
         _test.log("Check if Perl already is configured");
-
-        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
         if (scripts.isEnginePresentForLanguage("Perl"))
             return;

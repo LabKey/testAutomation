@@ -27,7 +27,6 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
-import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -217,7 +216,7 @@ public class RReportHelper
     {
         _test.ensureAdminMode();
 
-        ConfigureReportsAndScriptsPage scripts = ShowAdminPage.beginAt(_test).clickViewsAndScripting();
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
         _test.log("Check if R already is configured");
 

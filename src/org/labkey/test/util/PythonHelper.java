@@ -47,13 +47,9 @@ public class PythonHelper
     @LogMethod
     public String ensurePythonConfig()
     {
-        _test.ensureAdminMode();
-
-        _test.goToAdminConsole().clickViewsAndScripting();
-
         _test.log("Check if Python already is configured");
 
-        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
         String defaultScriptName = "Python Scripting Engine";
         if (scripts.isEnginePresent("Python"))
