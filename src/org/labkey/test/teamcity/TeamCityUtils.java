@@ -1,5 +1,6 @@
 package org.labkey.test.teamcity;
 
+import org.apache.commons.collections.map.UnmodifiableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.util.FileUtil;
@@ -12,7 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -20,19 +23,53 @@ import java.util.regex.Pattern;
 
 public class TeamCityUtils
 {
-    public static void reportBuildStatisticValue(String key, double value)
+    private static final Map<String, List<Number>> buildStatistics = new HashMap<>();
+
+    public static Map<String, List<Number>> getBuildStatistics()
     {
+        return UnmodifiableMap.decorate(buildStatistics);
+    }
+
+    public static void reportBuildStatisticValue(String key, Number value)
+    {
+        reportBuildStatisticValue(key, value, true);
+    }
+
+    public static void reportBuildStatisticValue(String key, Number value, boolean combine)
+    {
+        List<Number> allValues = storeBuildStatistic(key, value);
+        if (combine && allValues.size() > 1)
+        {
+            value = allValues.stream().mapToDouble(Number::doubleValue).sum() / allValues.size();
+        }
+        else if (allValues.size() > 1)
+        {
+            TestLogger.log("WARNING: Overwriting previous build statistic [" + key + "]: " + allValues.get(0) + " => " + value);
+        }
+
         String valString = new DecimalFormat("#.######").format(value);
-        valString = StringUtils.strip(valString, "0");
+        if (valString.contains("."))
+            valString = StringUtils.strip(valString, "0");
+        else
+            valString = StringUtils.stripStart(valString, "0");
 
         reportBuildStatisticValue(key, valString);
     }
 
-    public static void reportBuildStatisticValue(String key, int value)
+    private static List<Number> storeBuildStatistic(String key, Number value)
     {
-        String valString = String.valueOf(value);
-
-        reportBuildStatisticValue(key, valString);
+        final List<Number> statisticValues;
+        if (buildStatistics.containsKey(key))
+        {
+            statisticValues = buildStatistics.get(key);
+        }
+        else
+        {
+            statisticValues = new ArrayList<>();
+            buildStatistics.put(key, statisticValues);
+        }
+        statisticValues.add(value);
+        return statisticValues;
     }
 
     // https://confluence.jetbrains.com/display/TCD18/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-ReportingBuildStatistics

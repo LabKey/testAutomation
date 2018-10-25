@@ -42,6 +42,7 @@ import org.labkey.junit.runner.WebTestProperties;
 import org.labkey.test.aspects.TestPerfAspect;
 import org.labkey.test.categories.Continue;
 import org.labkey.test.categories.Empty;
+import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.tests.BasicTest;
 import org.labkey.test.tests.DatabaseDiagnosticsTest;
@@ -665,6 +666,21 @@ public class Runner extends TestSuite
             int columnWidth = 13;
             System.out.println(getRowString(statTitles, columnWidth));
             System.out.println(getRowString(stats, columnWidth));
+        }
+        if (!TeamCityUtils.getBuildStatistics().isEmpty())
+        {
+            System.out.println("--------------------- Build Statistics ---------------------");
+            for (String stat : TeamCityUtils.getBuildStatistics().keySet())
+            {
+                List<Number> values = TeamCityUtils.getBuildStatistics().get(stat);
+                String valueStr;
+                if (values.size() == 1)
+                    valueStr = String.valueOf(values.get(0));
+                else
+                    valueStr = values.toString();
+
+                System.out.println(" " + stat + " = " + valueStr);
+            }
         }
         System.out.println("------------------------------------------------------------");
         System.out.println(getFixedWidthString("Total duration:", formatDuration(total), width) + "\n");
