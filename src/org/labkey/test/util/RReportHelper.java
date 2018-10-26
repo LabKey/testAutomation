@@ -288,7 +288,7 @@ public class RReportHelper
             assertTrue(engineName + " engine does not exist.", _test.isElementPresent(Locator.tagWithText("option", engineName)));
 
             Locator overrideEngineSelect = Locator.name("engineRowId");
-            if (engineName.equals(_test.getSelectedOptionText(overrideEngineSelect)))
+            if (engineName.equals(_test.getSelectedOptionText(overrideEngineSelect).trim()))
             {
                 _test.log(engineName + "engine is already selected as default for folder");
                 return;
