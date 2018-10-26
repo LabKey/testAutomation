@@ -826,6 +826,7 @@ src/org/labkey/test/tests/announcements/DiscussionLinkTest.java -text
 src/org/labkey/test/tests/announcements/MessagesAttachmentTest.java -text
 src/org/labkey/test/tests/announcements/ModeratorReviewTest.java -text
 src/org/labkey/test/tests/api/CustomizeGridPermissionsTest.java -text
+src/org/labkey/test/tests/core/security/AppAdminRoleTest.java -text
 src/org/labkey/test/tests/core/webdav/WebDavPerfTest.java -text
 src/org/labkey/test/tests/elisa/ElisaAssayTest.java -text
 src/org/labkey/test/tests/elispotassay/ElispotAssayTest.java -text
