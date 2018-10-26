@@ -24,9 +24,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.pages.files.WebFilesPage;
+import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
+import org.labkey.test.pages.files.WebDavPage;
+import org.labkey.test.pages.files.WebFilesHtmlViewPage;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
@@ -52,6 +57,7 @@ public class WebDavTest extends BaseWebDriverTest
     "Now we are engaged in a great civil war, testing whether that nation, or any nation, so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.\n"+
     "But, in a larger sense, we can not dedicate, we can not consecrate, we can not hallow this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced. It is rather for us to be here dedicated to the great task remaining before us-that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion-that we here highly resolve that these dead shall not have died in vain-that this nation, under God, shall have a new birth of freedom-and that government of the people, by the people, for the people, shall not perish from the earth.";
 
+    private final String OTHER_PROJECT = "WebFileCache Project";
     private final String baseWebDavUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName(), getWebDavDir());
     private final String baseWebFilesUrl = WebDavUtils.buildBaseWebfilesUrl(getProjectName());
 
@@ -87,11 +93,9 @@ public class WebDavTest extends BaseWebDriverTest
         Set<String> expectedFiles = new HashSet<>();
         expectedFiles.add("@files");
 
-        // make sure the indexer isn't really busy
-        waitForIdle();
-
         beginAt(testURL + "?listing=html");
         assertTextNotPresent("testfile");
+        assertElementPresent(Locator.linkWithText("_webdav/"));
 
         Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
         List<String> names = _listNames(sardine, testURL);
@@ -106,6 +110,7 @@ public class WebDavTest extends BaseWebDriverTest
 
         // TODO test search
 
+        waitForIdle();
         deleteFile(sardine, testURL + fileName);
         expectedFiles.remove(fileName);
 
@@ -138,9 +143,8 @@ public class WebDavTest extends BaseWebDriverTest
 
         String testURL = baseWebFilesUrl;
 
-        // make sure the indexer isn't really busy
-        waitForIdle();
-        WebFilesPage.beginAt(this, getProjectName());
+        WebFilesHtmlViewPage.beginAt(this, getProjectName());
+        assertElementPresent(Locator.linkWithText("_webfiles/"));
 
         Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
         Set<String> names = new HashSet<>(_listNames(sardine, testURL));
@@ -185,12 +189,12 @@ public class WebDavTest extends BaseWebDriverTest
         goToProjectHome();
         _containerHelper.deleteFolder(getProjectName(), conflictFolderName);
 
+        waitForIdle();
         log("Verify deleting file from _webfiles");
-        beginAt(baseWebDavUrl + "?listing=html");
         deleteFile(sardine, testURL + projectFileName);
         deleteFile(sardine, testURL + conflictFolderName + "/" + childFileName);
         deleteFile(sardine, testURL + conflictFolderName);
-        refresh();
+        beginAt(baseWebDavUrl + "?listing=html");
         assertTextNotPresent(projectFileName);
         names = new HashSet<>(_listNames(sardine,testURL));
         assertEquals(new HashSet<>(Arrays.asList(getProjectName())), names);
@@ -200,6 +204,26 @@ public class WebDavTest extends BaseWebDriverTest
         log("Verify _webfiles is not available after disabling it from site settings");
         setEnableWebfiles(false);
         verifyExpected404(sardine, testURL, false);
+    }
+
+    @Test // 35730: WebDav: newly created project not showing up in _webfiles
+    public void testWebfilesCaching()
+    {
+        setEnableWebfiles(true);
+
+        log("Visit WebDav and WebFiles to initialize cache");
+        WebDavPage.beginAt(this, "");
+        assertTextNotPresent(OTHER_PROJECT);
+        WebFilesHtmlViewPage.beginAt(this, "");
+        assertTextNotPresent(OTHER_PROJECT);
+
+        _containerHelper.createProject(OTHER_PROJECT, null);
+
+        log("Visit WebDav and WebFiles after project creation");
+        WebDavPage.beginAt(this, "");
+        assertTextPresent(OTHER_PROJECT);
+        WebFilesHtmlViewPage.beginAt(this, "");
+        assertTextPresent(OTHER_PROJECT);
     }
 
     private void verifyExpected404(Sardine sardine, String testURL)
@@ -237,11 +261,10 @@ public class WebDavTest extends BaseWebDriverTest
         }
     }
 
-    private void setEnableWebfiles(boolean enable)
+    @LogMethod (quiet = true)
+    private void setEnableWebfiles(@LoggedParam boolean enable)
     {
-        goToProjectHome();
-        goToAdminConsole()
-            .clickFiles()
+        ConfigureFileSystemAccessPage.beginAt(this)
             .setEnableWebFiles(enable)
             .save();
     }
@@ -273,6 +296,7 @@ public class WebDavTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(OTHER_PROJECT, afterTest);
     }
 
     @Override

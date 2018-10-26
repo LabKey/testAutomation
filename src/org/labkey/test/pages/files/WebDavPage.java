@@ -33,13 +33,6 @@ public class WebDavPage extends LabKeyPage<WebDavPage.ElementCache>
         return _fileBrowserHelper;
     }
 
-    public WebFilesPage goToWebFiles()
-    {
-        clickAndWait(elementCache().htmlViewButton);
-
-        return new WebFilesPage(getDriver());
-    }
-
     public String getWebDavUrl()
     {
         return elementCache().webDavUrlElement.getText();

@@ -7,25 +7,25 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class WebFilesPage extends LabKeyPage<WebFilesPage.ElementCache>
+public class WebFilesHtmlViewPage extends LabKeyPage<WebFilesHtmlViewPage.ElementCache>
 {
-    public WebFilesPage(WebDriver driver)
+    public WebFilesHtmlViewPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static WebFilesPage beginAt(WebDriverWrapper driver)
+    public static WebFilesHtmlViewPage beginAt(WebDriverWrapper driver)
     {
         return beginAt(driver, driver.getCurrentContainerPath());
     }
 
-    public static WebFilesPage beginAt(WebDriverWrapper driver, String containerPath)
+    public static WebFilesHtmlViewPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.getBaseURL() + "/_webdav/" + containerPath + "/?listing=html/");
-        return new WebFilesPage(driver.getDriver());
+        driver.beginAt(WebTestHelper.getBaseURL() + "/_webfiles/" + containerPath + "/?listing=html");
+        return new WebFilesHtmlViewPage(driver.getDriver());
     }
 
-    public LabKeyPage clickButton()
+    public LabKeyPage goToStandardView()
     {
         clickAndWait(elementCache().standardViewButton);
 

@@ -627,7 +627,7 @@ src/org/labkey/test/pages/experiment/InsertDataClassPage.java -text
 src/org/labkey/test/pages/files/CustomizeFilesWebPartPage.java -text
 src/org/labkey/test/pages/files/FileContentPage.java -text
 src/org/labkey/test/pages/files/WebDavPage.java -text
-src/org/labkey/test/pages/files/WebFilesPage.java -text
+src/org/labkey/test/pages/files/WebFilesHtmlViewPage.java -text
 src/org/labkey/test/pages/flow/reports/BeginPage.java -text
 src/org/labkey/test/pages/flow/reports/PositivityReportEditorPage.java -text
 src/org/labkey/test/pages/flow/reports/QCReportEditorPage.java -text
