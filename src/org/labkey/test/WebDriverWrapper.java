@@ -2895,11 +2895,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
             input.clear();
-            paste(input, text);
+            input.sendKeys(text);
         }
         else
         {
-            setFormElementJS(input, text);
+            paste(input, text);
         }
 
         String elementClass = input.getAttribute("class");
