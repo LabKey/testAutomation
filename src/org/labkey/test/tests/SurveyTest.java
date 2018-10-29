@@ -283,6 +283,9 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("dblfield"), "999.1");
         // set the date to an invalid format
         setFormElement(Locator.name("dtfield"), "01/04/2013");
+        // set the date for the date/time field
+        setFormElement(Locator.name("dttimefield-date"), "2018-10-01");
+
         // check survey skip logic that attachment field appears with selectin of lkField = Test1
         assertElementPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), Ext4Helper.TextMatchTechnique.CONTAINS, "Test1");
@@ -306,7 +309,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickButton("Next", 0);
         clickButton("Next", 0);
         // verify question counts on section header
-        assertTextPresent("Section 1 (2)", "Section 2 (5)");
+        assertTextPresent("Section 1 (2)", "Section 2 (7)");
         assertTextNotPresent("-Txt Field", "-Int Field", "-Dt Field");
         assertTrue("Submit button should not be disabled", !isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Submit completed form']")));
         clickButton("Submit completed form");
@@ -314,7 +317,7 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextPresent(secondSurvey);
         // verify survey responses in the current folder
         clickAndWait(Locator.linkWithText("listA"));
-        assertTextPresent("[{\"field1\":\"field1\",\"field2\":\"field2\"}]");
+        assertTextPresent("[{\"field1\":\"field1\",\"field2\":\"field2\"}]", "2018-10-01 00:00");
     }
 
     private void addSurveyWebpart(String surveyDesignName)
