@@ -1,6 +1,5 @@
 package org.labkey.test.teamcity;
 
-import org.apache.commons.collections4.map.UnmodifiableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.util.FileUtil;
@@ -15,6 +14,7 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class TeamCityUtils
 
     public static Map<String, List<Number>> getBuildStatistics()
     {
-        return UnmodifiableMap.unmodifiableMap(buildStatistics);
+        return Collections.unmodifiableMap(buildStatistics);
     }
 
     public static void reportBuildStatisticValue(String key, Number value)

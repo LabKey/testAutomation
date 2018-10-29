@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
@@ -43,6 +42,7 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -460,7 +460,7 @@ public class DataRegionTable extends DataRegion
                 _columnLabels.remove(0);
         }
 
-        return ImmutableList.copyOf(_columnLabels);
+        return Collections.unmodifiableList(_columnLabels);
     }
 
     public List<String> getColumnNames()
@@ -479,7 +479,7 @@ public class DataRegionTable extends DataRegion
             }
         }
 
-        return ImmutableList.copyOf(_columnNames);
+        return Collections.unmodifiableList(_columnNames);
     }
 
     public String getColumnTitle(String columnName)
@@ -1392,7 +1392,7 @@ public class DataRegionTable extends DataRegion
         protected List<WebElement> getDataRows()
         {
             if (rows == null)
-                rows = ImmutableList.copyOf(Locator.css(""+
+                rows = Collections.unmodifiableList(Locator.css(""+
                         "#" + getTableId() + " > tbody > tr.labkey-alternate-row:not(.labkey-col-total)," +
                         "#" + getTableId() + " > tbody > tr.labkey-row:not(.labkey-col-total)," +
                         "#" + getTableId() + " > tbody > tr.labkey-error-row:not(.labkey-col-total)").findElements(getDriver()));
@@ -1445,7 +1445,7 @@ public class DataRegionTable extends DataRegion
             if (cells == null)
                 cells = new TreeMap<>();
             if (cells.get(row) == null)
-                cells.put(row, ImmutableList.copyOf(Locator.xpath("td").findElements(getDataRow(row))));
+                cells.put(row, Collections.unmodifiableList(Locator.xpath("td").findElements(getDataRow(row))));
             return cells.get(row);
         }
 
@@ -1465,7 +1465,7 @@ public class DataRegionTable extends DataRegion
         protected List<WebElement> getSummaryStatisticCells()
         {
             if (summaryStatCells == null)
-                summaryStatCells = ImmutableList.copyOf(Locator.xpath("td").findElements(summaryStatRow));
+                summaryStatCells = Collections.unmodifiableList(Locator.xpath("td").findElements(summaryStatRow));
 
             return summaryStatCells;
         }
@@ -1484,7 +1484,7 @@ public class DataRegionTable extends DataRegion
         protected List<WebElement> getColumnHeaders()
         {
             if (columnHeaders == null)
-                columnHeaders = ImmutableList.copyOf(Locator.css("th.labkey-column-header").findElements(columnHeaderRow));
+                columnHeaders = Collections.unmodifiableList(Locator.css("th.labkey-column-header").findElements(columnHeaderRow));
             return columnHeaders;
         }
 

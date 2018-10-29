@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages.issues;
 
-import com.google.common.collect.ImmutableList;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -28,6 +27,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,7 +187,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
                 {
                     issueComments.add(new IssueComment(commentEl));
                 }
-                issueComments = ImmutableList.copyOf(issueComments);
+                issueComments = Collections.unmodifiableList(issueComments);
             }
 
             return issueComments;

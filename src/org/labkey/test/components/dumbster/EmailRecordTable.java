@@ -15,7 +15,6 @@
  */
 package org.labkey.test.components.dumbster;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -24,6 +23,7 @@ import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.WebDriver;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -286,7 +286,7 @@ public class EmailRecordTable extends Table
 
         private void setViews(List<String> views)
         {
-            this.views = ImmutableList.copyOf(views);
+            this.views = Collections.unmodifiableList(views);
         }
     }
 

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +32,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -342,7 +342,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
         protected List<WebElement> getAllHeaderButtons()
         {
             if (allHeaderButtons == null)
-                allHeaderButtons = ImmutableList.copyOf(Locator.css("a.labkey-button, a.labkey-menu-button")
+                allHeaderButtons = Collections.unmodifiableList(Locator.css("a.labkey-button, a.labkey-menu-button")
                         .findElements(UX_ButtonBar));
             return allHeaderButtons;
         }

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.components;
 
-import com.google.common.collect.ImmutableList;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.SearchContext;
@@ -23,6 +22,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -153,7 +153,7 @@ public class PlateSummary extends Component
             if (dataCells.get(_measurement) == null)
                 dataCells.put(_measurement, new TreeMap<>());
             if (dataCells.get(_measurement).get(row) == null)
-                dataCells.get(_measurement).put(row, ImmutableList.copyOf(Locator.css("td:not(:first-child) a." + _measurement.locatorClass).findElements(getDataRow(row))));
+                dataCells.get(_measurement).put(row, Collections.unmodifiableList(Locator.css("td:not(:first-child) a." + _measurement.locatorClass).findElements(getDataRow(row))));
             return dataCells.get(_measurement).get(row);
         }
 
