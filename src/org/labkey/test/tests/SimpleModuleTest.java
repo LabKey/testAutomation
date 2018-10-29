@@ -1269,13 +1269,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Verify get module properties using Rlabkey api");
         String apiModulePropResults = rReportHelper.createAndRunRReport("getModuleProps", GET_MODULEP_PROPS_SCRIPT, false);
-        String expectedProps = "[1] \"Prop1Value\"\n" +
-                "[1] \"FolderValue\"\n" +
-                "[1] \"updated1\\nupdated2\"\n" +
-                "[1] \"true\"\n" +
-                "[1] \"value1\"\n" +
-                "[1] \"comboValue1\"";
-        assertTrue("R api labkey.getModuleProperty is not returning module properties as expected", apiModulePropResults.contains(expectedProps));
+        List<String> expectedProps = Arrays.asList("[1] \"Prop1Value\"\n",
+                "[1] \"FolderValue\"\n",
+                "[1] \"updated1\\nupdated2\"\n",
+                "[1] \"true\"\n",
+                "[1] \"value1\"\n",
+                "[1] \"comboValue1\"");
+        for (String expected: expectedProps)
+            assertTrue("R api labkey.getModuleProperty is not returning module properties as expected", apiModulePropResults.contains(expected));
 
         log("Set site and folder level module properties using Rlabkey api");
         String fileRootFolder1 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME);
@@ -1293,14 +1294,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Locator reportOutput = Locator.tagWithClass("table", "labkey-output");
         waitForElement(reportOutput);
         apiModulePropResults = getText(reportOutput);
-        expectedProps = "[1] \"Prop1apiValue\"\n" +
-                "[1] \"Prop2apiValue\"\n" +
-                "[1] \"" + rlibPathsFolder1.replace("\n", "\\n") + "\"\n" +
-                "[1] \"false\"\n" +
-                "[1] \"value2\"\n" +
-                "[1] \"comboValue2\"";
-        assertTrue("R api labkey.getModuleProperty followed by labkey.setModuleProperty is not returning module properties as expected",
-                apiModulePropResults.contains(expectedProps));
+        expectedProps = Arrays.asList("[1] \"Prop1apiValue\"\n",
+                "[1] \"Prop2apiValue\"\n",
+                "[1] \"" + rlibPathsFolder1.replace("\n", "\\n") + "\"\n",
+                "[1] \"false\"\n",
+                "[1] \"value2\"\n",
+                "[1] \"comboValue2\"");
+        for (String expected: expectedProps)
+            assertTrue("R api labkey.getModuleProperty followed by labkey.setModuleProperty is not returning module properties as expected",
+                apiModulePropResults.contains(expected));
 
         log("Test R api getModuleProperty in example of using it to set rLibPaths");
         apiModulePropResults = rReportHelper.createAndRunRReport("ensureRLibPaths", ENSURE_RLIBPATHS_SOURCE, false);
