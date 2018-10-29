@@ -311,6 +311,9 @@ public class RReportHelper
 
         _test.log("Remove folder's engine override.");
         _test.checkRadioButton(inheritRadio);
+
+        _test.clickButton("Save", "Override Default R Configuration");
+        _test.clickButton("Yes");
     }
 
     public void setPandocEnabled(Boolean enabled)
