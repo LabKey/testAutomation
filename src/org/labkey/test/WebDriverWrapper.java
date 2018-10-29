@@ -2899,8 +2899,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else
         {
-            input.clear();
-            paste(input, text);
+            setFormElementJS(input, text);
         }
 
         String elementClass = input.getAttribute("class");
