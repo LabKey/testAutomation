@@ -43,7 +43,9 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
+import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -227,6 +229,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestDatasetsAndFileBasedQueries();
         doTestViewEditing();
         doTestRowLevelContainerPath();
+        doTestCustomLogin();
     }
 
     @LogMethod
@@ -1402,6 +1405,55 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("My Custom View", "Hello Dataset", "Visit");
         assertTextNotPresent("Participant Identifier");
     }
+
+    @LogMethod
+    private void doTestCustomLogin()
+    {
+        log("Test basic override of login page");
+        goToAdminConsole().goToAdminConsoleLinksSection().clickLookAndFeelSettings();
+        LookAndFeelSettingsPage lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
+        lookAndFeelSettingsPage.setAltLoginPage("simpletest-testCustomLogin");
+        lookAndFeelSettingsPage.save();
+        signOut();
+        ensureSignedOut();
+
+        beginAt(WebTestHelper.buildURL("login", "login"));
+        waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu);
+        assertElementPresent(Locator.tagWithText("p", "SimpleTest Module Custom Sign In"));
+        signIn();
+        assertEquals("This should redirect to /home", "/home", getCurrentContainerPath());
+
+        log("Test override of login page using a hard-coded returnUrl");
+        goToAdminConsole().goToAdminConsoleLinksSection().clickLookAndFeelSettings();
+        lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
+        lookAndFeelSettingsPage.setAltLoginPage("simpletest-testCustomLoginWithReturnUrl");
+        lookAndFeelSettingsPage.save();
+        signOut();
+        ensureSignedOut();
+
+        beginAt(WebTestHelper.buildURL("login", "login"));
+        waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu);
+        assertElementPresent(Locator.tagWithText("p", "SimpleTest Module Custom Sign In With Custom ReturnUrl"));
+        signIn();
+        assertEquals("This should redirect to /Shared", "/Shared", getCurrentContainerPath());
+
+        log("ensure we dont get an IllegalArgumentException if an empty string is saved as login page");
+        goToAdminConsole().goToAdminConsoleLinksSection().clickLookAndFeelSettings();
+        lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
+        lookAndFeelSettingsPage.setAltLoginPage("");
+        lookAndFeelSettingsPage.save();
+        signOut();
+        ensureSignedOut();
+        signIn();
+
+        log("restore original login page");
+        goToAdminConsole().goToAdminConsoleLinksSection().clickLookAndFeelSettings();
+        lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
+        lookAndFeelSettingsPage.setAltLoginPage("login-login");
+        lookAndFeelSettingsPage.save();
+        goToProjectHome();
+    }
+
 
     @LogMethod
     private void doTestRestrictedModule()

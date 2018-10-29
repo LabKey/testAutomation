@@ -365,6 +365,10 @@ modules/simpletest/resources/views/begin.html -text
 modules/simpletest/resources/views/model.html -text
 modules/simpletest/resources/views/other.html -text
 modules/simpletest/resources/views/parameterizedQWP.html -text
+modules/simpletest/resources/views/testCustomLogin.html -text
+modules/simpletest/resources/views/testCustomLogin.view.xml -text
+modules/simpletest/resources/views/testCustomLoginWithReturnUrl.html -text
+modules/simpletest/resources/views/testCustomLoginWithReturnUrl.view.xml -text
 modules/simpletest/resources/views/vehicle.html -text
 modules/simpletest/resources/views/webpart.html -text
 modules/simpletest/resources/views/workbookTest.html -text
