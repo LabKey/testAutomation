@@ -1671,7 +1671,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     listener.beforePageLoad();
             });
             getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
-            toBeStale = Locator.css(":root").findElement(getDriver()); // Document should become stale
+            toBeStale = Locators.documentRoot.findElement(getDriver()); // Document should become stale
         }
 
         func.run();
@@ -2292,6 +2292,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return el;
     }
 
+    public void scrollTo(Integer x, Integer y)
+    {
+        executeScript("window.scrollTo(" + x.toString() +", " + y.toString() + ");");
+    }
+
     public void scrollBy(Integer x, Integer y)
     {
         executeScript("window.scrollBy(" + x.toString() +", " + y.toString() + ");");
@@ -2409,14 +2414,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
         click(Locator.permissionsTreeNode(folderName));
     }
 
+    /**
+     * Move mouse to the upper left corner of the document to dismiss tooltips and the like
+     * Will scroll page if necessary
+     */
     public void mouseOut()
     {
         try
         {
-            new Actions(getDriver())
-                    .moveByOffset(-10, -10)
-                    .moveByOffset(-50, -50)
-                    .moveByOffset(-100, -100).build().perform();
+            scrollTo(0, 0);
+            WebElement root = Locators.documentRoot.findElement(getDriver());
+            new Actions(getDriver()).moveToElement(root, 0, 0).perform();
         }
         catch (WebDriverException ignore) { }
     }
