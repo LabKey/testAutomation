@@ -20,6 +20,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 public class SetFolderPermissionsPage extends LabKeyPage
@@ -68,6 +69,7 @@ public class SetFolderPermissionsPage extends LabKeyPage
                 { // Workaround: erratic combo-box behavior
                     try{_ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), projectToCopy);}
                     catch (NoSuchElementException recheck) {return false;}
+                    catch (WebDriverException ignore) {} // Probably failed to close combo box
 
                     if (!getFormElement(Locator.css("#targetProject input")).equals(projectToCopy))
                     {
