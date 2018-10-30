@@ -460,7 +460,7 @@ public class DataRegionTable extends DataRegion
                 _columnLabels.remove(0);
         }
 
-        return Collections.unmodifiableList(_columnLabels);
+        return new ArrayList<>(_columnLabels);
     }
 
     public List<String> getColumnNames()
@@ -479,7 +479,7 @@ public class DataRegionTable extends DataRegion
             }
         }
 
-        return Collections.unmodifiableList(_columnNames);
+        return new ArrayList<>(_columnNames);
     }
 
     public String getColumnTitle(String columnName)
