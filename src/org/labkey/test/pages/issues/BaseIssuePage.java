@@ -26,13 +26,13 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.components.html.Input.Input;
 import static org.labkey.test.components.html.OptionSelect.OptionSelect;
@@ -182,12 +182,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
             if (issueComments == null)
             {
                 List<WebElement> commentEls = Locator.css("div.currentIssue").findElements(this);
-                issueComments = new ArrayList<>();
-                for (WebElement commentEl : commentEls)
-                {
-                    issueComments.add(new IssueComment(commentEl));
-                }
-                issueComments = Collections.unmodifiableList(issueComments);
+                issueComments = Collections.unmodifiableList(commentEls.stream().map(IssueComment::new).collect(Collectors.toList()));
             }
 
             return issueComments;

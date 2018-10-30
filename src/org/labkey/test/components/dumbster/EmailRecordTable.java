@@ -286,7 +286,7 @@ public class EmailRecordTable extends Table
 
         private void setViews(List<String> views)
         {
-            this.views = Collections.unmodifiableList(views);
+            this.views = Collections.unmodifiableList(new ArrayList<>(views));
         }
     }
 
