@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
@@ -89,7 +90,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         new RReportHelper(this).createRReport(rReportName);
         popLocation();
 
-        WebElement el = Locator.css(":root").findElement(getDriver());
+        WebElement el = Locators.documentRoot.findElement(getDriver());
 
         DataRegionTable.DataRegion(getDriver()).find().goToReport(false, rReportName);
 

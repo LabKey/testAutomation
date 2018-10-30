@@ -1125,7 +1125,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Save & Close");
 
         log("Check that parameterized query doesn't cause page load.");
-        WebElement rootEl = Locator.css(":root").findElement(getDriver());
+        WebElement rootEl = Locators.documentRoot.findElement(getDriver());
         WebElement parameterInput = waitForElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), WAIT_FOR_JAVASCRIPT);
         setFormElement(parameterInput, "P");
         clickButton("Submit", 0);
