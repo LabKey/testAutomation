@@ -1282,10 +1282,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
             assertTrue("R api labkey.getModuleProperty is not returning module properties as expected", apiModulePropResults.contains(expected));
 
         log("Set site and folder level module properties using Rlabkey api");
-        String fileRootFolder1 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME);
-        String fileRootFolder2 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME_2);
-        String fileRootFolder3 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME_3);
+        String fileRootPath1 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME);
+        String fileRootPath2 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME_2);
+        String fileRootPath3 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME_3);
+        String fileRootFolder1 = getRStr(fileRootPath1);
+        String fileRootFolder2 = getRStr(fileRootPath2);
+        String fileRootFolder3 = getRStr(fileRootPath3);
         String rlibPathsFolder1 = fileRootFolder1 + "\n" + fileRootFolder3;
+
         String setModulePropsScript = SET_MODULE_PROPS_SCRIPT
                 .replace("$$folder1value$$", rlibPathsFolder1)
                 .replace("$$folder2value$$", fileRootFolder2);
@@ -1310,14 +1314,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Test R api getModuleProperty in example of using it to set rLibPaths");
         apiModulePropResults = rReportHelper.createAndRunRReport("ensureRLibPaths", ENSURE_RLIBPATHS_SOURCE, false);
         String folderOneResult = "[1] \"BEGIN-FIRST-CALL\"\n" +
-                "[1] \"" + fileRootFolder1 + "\" \n" +
-                "[2] \"" + fileRootFolder3 + "\"";
+                "[1] \"" + fileRootPath1.replaceAll("\\\\", "/") + "\" \n" +
+                "[2] \"" + fileRootPath3.replaceAll("\\\\", "/") + "\"";
         String folderTwoResult = "[1] \"BEGIN-SECOND-CALL\"\n" +
-                "[1] \"" + fileRootFolder2 + "\"";
+                "[1] \"" + fileRootPath2.replaceAll("\\\\", "/") + "\"";
         String setWithAppend = "[1] \"BEGIN-THIRD-CALL\"\n" +
-                "[1] \"" + fileRootFolder1 + "\" \n" +
-                "[2] \"" + fileRootFolder3 + "\"\n" +
-                "[3] \"" + fileRootFolder2 + "\"";
+                "[1] \"" + fileRootPath1.replaceAll("\\\\", "/") + "\" \n" +
+                "[2] \"" + fileRootPath3.replaceAll("\\\\", "/") + "\"\n" +
+                "[3] \"" + fileRootPath2.replaceAll("\\\\", "/") + "\"";
         assertTrue("ensureRLibPaths script result is not as expected", apiModulePropResults.contains(folderOneResult));
         assertTrue("ensureRLibPaths script result is not as expected", apiModulePropResults.contains(folderTwoResult));
         assertTrue("ensureRLibPaths script result is not as expected", apiModulePropResults.contains(setWithAppend));
@@ -1329,10 +1333,34 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private String getContainerRoot(String containerPath)
     {
-        String lkRoot = getLabKeyRoot();
-        if (!lkRoot.endsWith("/"))
-            lkRoot += "/";
-        return  lkRoot + "build/deploy/files/" + containerPath;
+        File containerRoot = new File(getLabKeyRoot(), "build/deploy/files/" + containerPath);
+        return containerRoot.getPath();
+    }
+
+    private String getRStr(String rawString)
+    {
+        StringBuilder rStr = new StringBuilder();
+        int len = rawString.length();
+        for (int i = 0 ; i<len ; i++)
+        {
+            char c = rawString.charAt(i);
+            switch (c)
+            {
+                case '\\':
+                    rStr.append("\\\\");
+                    break;
+                case '\'':
+                    rStr.append("\\'");
+                    break;
+                case '\"':
+                    rStr.append("\\\"");
+                    break;
+                default:
+                    rStr.append(c);
+                    break;
+            }
+        }
+        return rStr.toString();
     }
 
     private void validateInputTypes(List<ModulePropertyValue> propList)
