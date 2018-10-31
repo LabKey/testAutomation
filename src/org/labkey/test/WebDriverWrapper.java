@@ -80,9 +80,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -2879,19 +2876,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             setInput(el, text);
         }
-    }
-
-    public void paste(WebElement el, String text)
-    {
-        // load up the clipboard with the text
-        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        StringSelection sel = new StringSelection(text);
-        c.setContents(sel, sel);
-
-        new Actions(getDriver())                // paste instead of sending keys
-                .keyDown(Keys.LEFT_CONTROL)
-                .sendKeys(el, "v")
-                .keyUp(Keys.LEFT_CONTROL).build().perform();
     }
 
     private void setInput(WebElement input, String text)
