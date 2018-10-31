@@ -610,7 +610,9 @@ src/org/labkey/test/pages/announcements/ModeratorReviewPage.java -text
 src/org/labkey/test/pages/announcements/RespondPage.java -text
 src/org/labkey/test/pages/announcements/ThreadPage.java -text
 src/org/labkey/test/pages/announcements/UpdatePage.java -text
+src/org/labkey/test/pages/assay/AssayDataPage.java -text
 src/org/labkey/test/pages/assay/AssayImportPage.java -text
+src/org/labkey/test/pages/assay/AssayRunsPage.java -text
 src/org/labkey/test/pages/assay/DataImportPage.java -text
 src/org/labkey/test/pages/assay/DeleteSelectedRunsPage.java -text
 src/org/labkey/test/pages/assay/ExclusionConfirmationPage.java -text
