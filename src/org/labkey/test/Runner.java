@@ -449,7 +449,7 @@ public class Runner extends TestSuite
                         System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
                         continue;
                     }
-                    else if (interfaces.contains(SqlserverOnlyTest.class) && !("sqlserver".equals(databaseType) || "mssql".equals(databaseType)))
+                    else if (interfaces.contains(SqlserverOnlyTest.class) && !("sqlserver".equals(databaseType) || "mssql".equals(databaseType) || "SQLEXPRESS".equals(databaseType)))
                     {
                         System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
                         continue;
