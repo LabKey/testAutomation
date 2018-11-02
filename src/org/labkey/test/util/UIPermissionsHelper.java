@@ -287,17 +287,17 @@ public class UIPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    public void removeUserFromSiteGroup(String groupName, String userName)
+    public void removeUserFromSiteGroup(String groupName, String userEmail)
     {
-        removeUserFromGroup(groupName, userName);
+        removeUserFromGroup(groupName, userEmail);
     }
 
-    public void removeUserFromGroup(String groupName, String userName)
+    public void removeUserFromGroup(String groupName, String userEmail)
     {
         if (!_driver.isTextPresent("Group " + groupName))
             selectGroup(groupName);
 
-        Locator l = Locator.xpath("//td[text()='" + userName +  "']/..//td/a/span[text()='remove']");
+        Locator l = Locator.xpath("//td[contains(text(), '" + userEmail +  "')]/..//td/a/span[text()='remove']");
         _driver.click(l);
         _driver.waitForElementToDisappear(l);
     }

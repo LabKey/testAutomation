@@ -143,4 +143,16 @@ public class UIUserHelper extends AbstractUserHelper
             getWrapper().assertTextNotPresent(userEmails);
         }
     }
+
+    public void deactivateUser(String userEmail)
+    {
+        getWrapper().goToSiteUsers();
+        DataRegionTable usersTable = new DataRegionTable("Users", getWrapper().getDriver());
+        usersTable.setFilter("Email", "Equals", userEmail);
+        int row = usersTable.getRowIndex("Email", userEmail);
+        usersTable.checkCheckbox(row);
+        getWrapper().clickButton("Deactivate");
+        getWrapper().clickButton("Deactivate");
+        getWrapper().assertTextNotPresent(userEmail);
+    }
 }
