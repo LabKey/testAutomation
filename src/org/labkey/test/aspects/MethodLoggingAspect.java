@@ -207,7 +207,7 @@ public class MethodLoggingAspect
                 if (!(arg instanceof Number || arg instanceof Boolean))
                 {
                     if (argString.length() > maxArgLength)
-                        argString = argString.substring(0, maxArgLength - T_STR.length()) + T_STR;
+                        argString = T_STR + argString.substring(argString.length() - maxArgLength); // trim start of long arguments
                     argString = "'" + argString + "'";
                 }
             }
