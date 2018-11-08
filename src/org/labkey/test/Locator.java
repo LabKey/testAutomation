@@ -778,6 +778,11 @@ public abstract class Locator extends By
         return ehrCheckbox().withAttributeContaining("id", partialId);
     }
 
+    public static XPathLocator ehrCheckboxWithLabel(String label)
+    {
+        return ehrCheckbox().followingSibling("label").withText(label);
+    }
+
     public static XPathLocator radioButton()
     {
         return tag("input").withAttribute("type", "radio");

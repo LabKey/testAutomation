@@ -139,7 +139,14 @@ public class Ext4GridRef extends Ext4CmpRef
     //1-based result for consistency w/ other methods
     protected int getIndexOfColumn(String value, String propName, boolean visibleOnly)
     {
+        Object names = getFnEval("var names = [];" +
+            "for (var i=0;i<this.columns.length;i++){" +
+            "  names.push(this.columns[i]['"+propName+"']);" +
+            "}" +
+            "return names;");
+        _test.log(propName + "s: " + names);
         Long idx = (Long)getFnEval("for (var i=0;i<this.columns.length;i++){if (this.columns[i]['"+propName+"'] == '" + value + "') return " + (visibleOnly ? "this.columns[i].getVisibleIndex()" : "i") + ";}; return -1");
+
 
         return idx.intValue() > -1 ? idx.intValue() + 1 : -1;
     }
@@ -153,25 +160,32 @@ public class Ext4GridRef extends Ext4CmpRef
         // NOTE: sometimes this editor is picky about appearing
         // for now, solve this by repeating.  however, it would be better to resolve this issue.
         // one theory is that we need to shift focus prior to the doubleclick
-        WebElement el = null;
+        WebElement cellInput = null;
         int i = 0;
-        while (el == null)
+        while (cellInput == null)
         {
-            el = startEditing(rowIdx, colName);
+            cellInput = startEditing(rowIdx, colName);
             assert i < 4 : "Unable to trigger editor after " + i + " attempts";
             i++;
         }
 
-        Locator moreSpecific = Locator.id(el.getAttribute("id"));
-        _test.setFormElement(moreSpecific, value);
+        if (!value.equals(""))
+            _test.setFormElement(cellInput, value);
+        else
+        {
+            _test.log("Locator : " + cellInput);
+            WebElement inputTrigger = Locator.xpath("../following-sibling::td").withClass("x4-trigger-cell").findElement(cellInput);
+            inputTrigger.click();
+
+        }
 
         //if the editor is still displayed, try to close it
-        if (el.isDisplayed())
+        if (cellInput.isDisplayed())
         {
             completeEdit();
         }
 
-        assertFalse("Grid input should not be visible", el.isDisplayed());
+        assertFalse("Grid input should not be visible", cellInput.isDisplayed());
         waitForGridEditorToDisappear();
     }
 

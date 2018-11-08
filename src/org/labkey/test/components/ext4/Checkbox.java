@@ -34,7 +34,7 @@ public class Checkbox extends org.labkey.test.components.html.Checkbox
 
     public boolean isChecked()
     {
-        assertElementType();
+        //assertElementType();
 
         String atlasPosition = getComponentElement().getCssValue("background-position");
         String atlasYOffset = atlasPosition.split(" ")[1];
