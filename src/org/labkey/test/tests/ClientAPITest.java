@@ -1076,7 +1076,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         for (String email : recipients)
         {
-            if (NumberUtils.isNumber(email))
+            if (NumberUtils.isCreatable(email))
             {
                 // principal id
                 recipientStr.append("LABKEY.Message.createPrincipalIdRecipient(LABKEY.Message.recipientType.to, '");
