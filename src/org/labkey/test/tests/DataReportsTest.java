@@ -37,6 +37,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({BVT.class, Reports.class})
@@ -347,6 +348,7 @@ public class DataReportsTest extends ReportTest
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
 
         saveReport(R_SCRIPTS[0]);
+        verifyReportPdfDownload("study", 4500d);
         popLocation();
 
         log("Create view");
@@ -381,6 +383,7 @@ public class DataReportsTest extends ReportTest
         assertTextPresent("null device", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
         assertTextNotPresent("Error executing command");
+        verifyReportPdfDownload("study", 4500d);
         popLocation();
 
         log("Test user permissions");
@@ -466,21 +469,27 @@ public class DataReportsTest extends ReportTest
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[1]);
 
-        clickReportTab();
-        waitForElement(Locator.lkButton("Start Job"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Start Job", 0);
-        waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
-        goToModule("Pipeline");
+        waitAndClick(Locator.lkButton("Start Job"));
+        WebElement pipelineLink = waitForElement(Locator.linkWithText("click here"));
+        waitForElement(Locator.byClass("x4-window").containing("Start Pipeline Job").hidden());
+        clickAndWait(pipelineLink);
         waitForPipelineJobsToComplete(2, false);
         // go back to the report and confirm it is visible
         clickReportGridLink(R_SCRIPTS[1]);
-        waitForText(R_SCRIPT2_TEXT2);
+        waitForElement(Locator.tagWithName("img", "resultImage"));
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
-        resaveReport();
 
-        log("Clean up R pipeline jobs");
-        cleanPipelineItem(R_SCRIPTS[1]);
+        // TODO: 36040: Unable to download PDF for R report run as pipeline job
+        // verifyReportPdfDownload("study", 4500d);
+    }
+
+    private void verifyReportPdfDownload(String schema, double expectedSize)
+    {
+        File reportPdf = clickAndWaitForDownload(waitForElement(Locator.linkWithText(R_SCRIPT1_PDF)));
+        assertTrue("Report PDF has wrong name: " + reportPdf.getName(),
+                reportPdf.getName().startsWith(schema) && reportPdf.getName().endsWith(".pdf"));
+        assertEquals("Report PDF is the wrong size", expectedSize, reportPdf.length(), expectedSize / 10);
     }
 
     @Test
