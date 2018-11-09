@@ -139,14 +139,7 @@ public class Ext4GridRef extends Ext4CmpRef
     //1-based result for consistency w/ other methods
     protected int getIndexOfColumn(String value, String propName, boolean visibleOnly)
     {
-        Object names = getFnEval("var names = [];" +
-            "for (var i=0;i<this.columns.length;i++){" +
-            "  names.push(this.columns[i]['"+propName+"']);" +
-            "}" +
-            "return names;");
-        _test.log(propName + "s: " + names);
         Long idx = (Long)getFnEval("for (var i=0;i<this.columns.length;i++){if (this.columns[i]['"+propName+"'] == '" + value + "') return " + (visibleOnly ? "this.columns[i].getVisibleIndex()" : "i") + ";}; return -1");
-
 
         return idx.intValue() > -1 ? idx.intValue() + 1 : -1;
     }
