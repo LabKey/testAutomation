@@ -70,6 +70,7 @@ public class Crawler
 
     private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
     private BaseWebDriverTest _test;
+    private final List<String> _warnings = new ArrayList<>();
     private boolean _injectionCheckEnabled = false;
     private final Set<String> _projects = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
 
@@ -269,13 +270,15 @@ public class Crawler
         private final int _uniqueActions;
         private final Duration _crawlTestLength;
         private final int _maxDepth;
+        private final List<String> _warnings;
 
-        public CrawlStats(int maxDepth, int newPages, int uniqueActions, Duration crawlTestLength)
+        public CrawlStats(int maxDepth, int newPages, int uniqueActions, Duration crawlTestLength, List<String> warnings)
         {
             _newPages = newPages;
             _uniqueActions = uniqueActions;
             _crawlTestLength = crawlTestLength;
             _maxDepth = maxDepth;
+            _warnings = new ArrayList<>(warnings);
         }
 
         public int getMaxDepth()
@@ -296,6 +299,11 @@ public class Crawler
         public Duration getCrawlTestLength()
         {
             return _crawlTestLength;
+        }
+
+        public List<String> getWarnings()
+        {
+            return _warnings;
         }
     }
 
@@ -727,8 +735,11 @@ public class Crawler
         int linkCount = 0;
         int currentDepth = 0;
         int maxDepth = 0;
-        Timer crawlTimer = new Timer(_maxCrawlTime);
+        final Timer crawlTimer = new Timer(_maxCrawlTime);
         List<UrlToCheck> urlsToCheck = new ArrayList<>(_startingUrls);
+
+        TestLogger.log("Crawl depth : " + currentDepth);
+        TestLogger.increaseIndent();
 
         // Loop through links in list until its empty or time runs out
         while (!urlsToCheck.isEmpty() && !crawlTimer.isTimedOut())
@@ -755,7 +766,7 @@ public class Crawler
             TestLogger.decreaseIndent();
         }
 
-        return new CrawlStats(maxDepth, linkCount, _actionsVisited.size(), crawlTimer.elapsed());
+        return new CrawlStats(maxDepth, linkCount, _actionsVisited.size(), crawlTimer.elapsed(), _warnings);
     }
 
     private List<UrlToCheck> crawlLink(UrlToCheck urlToCheck)
@@ -784,6 +795,9 @@ public class Crawler
             }
 
             URL currentPageUrl = _test.getURL();
+
+            if (_test.getDriver().getTitle().isBlank())
+                _warnings.add("Action does not specify title: " + actionId.toString());
 
             // Find all the links at the site
             if (_needToGetProjectMenuLinks && depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))

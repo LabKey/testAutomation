@@ -606,6 +606,7 @@ public class Runner extends TestSuite
         Duration totalCrawlTime = Duration.ZERO;
         int totalUniquePages = 0;
         int totalUniqueActions = 0;
+        Set<String> crawlWarnings = new HashSet<>();
         boolean crawl = false;
 
         for (Map.Entry<Test, Long> entry : _testStats.entrySet())
@@ -652,11 +653,13 @@ public class Runner extends TestSuite
 
                 totalCrawlTime = totalCrawlTime.plus(crawlStats.getCrawlTestLength());
                 totalUniquePages += crawlStats.getNewPages();
-                totalUniqueActions = crawlStats.getUniqueActions();
+                totalUniqueActions = Math.max(crawlStats.getUniqueActions(), totalUniqueActions);
+                crawlWarnings.addAll(crawlStats.getWarnings());
             }
         }
         if (crawl)
         {
+            System.out.println();
             System.out.println(getFixedWidthString("Total Crawler Statistics: ", "", width));
 
             String[] statTitles = {"TotCrawlTime", "TotPages", "TotActions"};
@@ -666,6 +669,15 @@ public class Runner extends TestSuite
             int columnWidth = 13;
             System.out.println(getRowString(statTitles, columnWidth));
             System.out.println(getRowString(stats, columnWidth));
+            if (!crawlWarnings.isEmpty())
+            {
+                System.out.println();
+                System.out.println(getFixedWidthString("Crawler Warnings: ", "", width));
+                for (String warning : crawlWarnings)
+                {
+                    System.out.println("  " + warning);
+                }
+            }
         }
         if (!TeamCityUtils.getBuildStatistics().isEmpty())
         {
