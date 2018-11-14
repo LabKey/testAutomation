@@ -380,6 +380,7 @@ modules/triggerTestModule/resources/queries/exp.data/DataClassTest.js -text
 modules/triggerTestModule/resources/queries/lists/Employees.js -text
 modules/triggerTestModule/resources/queries/study/Demographics.js -text
 modules/triggerTestModule/resources/scripts/TriggerTestModule/EmployeeLib.js -text
+/skipfish_example -text
 src/org/labkey/junit/rules/TestWatcher.java -text
 src/org/labkey/junit/runner/WebTestProperties.java -text
 src/org/labkey/remoteapi/admin/GetModulesCommand.java -text
