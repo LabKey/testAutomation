@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.internal.runners.statements.FailOnTimeout;
 import org.junit.rules.RuleChain;
@@ -332,7 +333,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static boolean beforeClassSucceeded = false;
     private static boolean reenableMiniProfiler = false;
     private static long testClassStartTime;
-    private static int testCount;
+    private static long testCount;
     private static int currentTestNumber;
 
     @ClassRule
@@ -345,7 +346,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 testClassStartTime = System.currentTimeMillis();
                 SingletonWebDriver.getInstance().clear();
-                testCount = description.getChildren().size();
+                testCount = description.getChildren().stream().filter(child -> child.getAnnotation(Ignore.class) == null).count();
                 currentTestNumber = 0;
                 beforeClassSucceeded = false;
                 _anyTestFailed = false;
@@ -651,8 +652,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 testStartTimeStamp = System.currentTimeMillis();
 
                 TestLogger.resetLogger();
-                TestLogger.log("// Begin Test Case - " + description.getMethodName() + " \\\\");
-                logToServer("=== Begin Test Case - " + description.getTestClass().getSimpleName() + "." + description.getMethodName());
+                TestLogger.log("// Begin Test Case [" + currentTestNumber + "/" + testCount + "] - " + description.getMethodName() + " \\\\");
+                logToServer("=== Begin Test Case - " + description.getTestClass().getSimpleName() + "[" + currentTestNumber + "/" + testCount + "]." + description.getMethodName());
                 TestLogger.increaseIndent();
             }
 
