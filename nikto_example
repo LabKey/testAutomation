@@ -1,0 +1,6 @@
+#!/bin/bash
+IP=$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
+
+# -id user:pass
+docker run --rm -it k0st/alpine-nikto -host $IP -port 8080 -root /labkey -id matthew:bellew $*
+

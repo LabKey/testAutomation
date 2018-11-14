@@ -380,6 +380,7 @@ modules/triggerTestModule/resources/queries/exp.data/DataClassTest.js -text
 modules/triggerTestModule/resources/queries/lists/Employees.js -text
 modules/triggerTestModule/resources/queries/study/Demographics.js -text
 modules/triggerTestModule/resources/scripts/TriggerTestModule/EmployeeLib.js -text
+/nikto_example -text
 /skipfish_example -text
 src/org/labkey/junit/rules/TestWatcher.java -text
 src/org/labkey/junit/runner/WebTestProperties.java -text
@@ -972,3 +973,4 @@ src/org/labkey/test/util/search/SearchAdminAPIHelper.java -text
 src/org/labkey/test/util/selenium/WebDriverUtils.java -text
 /test.credentials.json.template -text
 /test.properties -text
+/zap_example -text

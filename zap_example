@@ -1,0 +1,3 @@
+#!/bin/bash
+IP=$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
+docker run -v /trunk/server/test:/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t http://$IP:8080/labkey -g gen.conf -r zap_report.html
