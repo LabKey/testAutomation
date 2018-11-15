@@ -63,7 +63,7 @@ public class TestLogger
 
     public static void warn(String str)
     {
-        log(str, System.out);
+        log("WARNING: " + str, System.out);
     }
 
     public static void error(String str)
