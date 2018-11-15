@@ -796,7 +796,7 @@ public class Crawler
 
             URL currentPageUrl = _test.getURL();
 
-            if (_test.getDriver().getTitle().isBlank())
+            if (_test.getDriver().getTitle().isEmpty())
                 _warnings.add("Action does not specify title: " + actionId.toString());
 
             // Find all the links at the site
