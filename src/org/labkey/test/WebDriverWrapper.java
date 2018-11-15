@@ -37,6 +37,7 @@ import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.selenium.EphemeralWebElement;
+import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
@@ -99,6 +100,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -1681,10 +1683,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 if (null != listener)
                     listener.afterPageLoad();
             });
+            if (getDriver().getTitle().isEmpty() && onLabKeyPage())
+            {
+                String action = new Crawler.ControllerActionId(getDriver().getCurrentUrl()).toString();
+                if (!actionsWithWarnings.contains(action))
+                {
+                    actionsWithWarnings.add(action);
+                    TestLogger.warn("Action doesn't define a page title: " + action);
+                }
+            }
         }
 
         return System.currentTimeMillis() - startTime;
     }
+
+    private static final Set<String> actionsWithWarnings = new HashSet<>();
 
     private static final WeakHashMap<WebDriver, Set<PageLoadListener>> _pageLoadListeners = new WeakHashMap<>();
 
