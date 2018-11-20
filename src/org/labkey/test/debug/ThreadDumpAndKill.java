@@ -25,7 +25,6 @@ import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.connect.AttachingConnector;
 import com.sun.jdi.connect.Connector;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
-import com.sun.tools.jdi.SocketAttachingConnector;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -50,9 +49,10 @@ public class ThreadDumpAndKill
             int port = Integer.parseInt(args[0]);
             for (AttachingConnector connector : Bootstrap.virtualMachineManager().attachingConnectors())
             {
-                if (connector instanceof SocketAttachingConnector)
+                // Hack so class will build on JDK 11. TODO: Something less hacky.
+                if ("com.sun.tools.jdi.SocketAttachingConnector".equals(connector.getClass().getName()))
                 {
-                    connect((SocketAttachingConnector)connector, port);
+                    connect(connector, port);
                     System.exit(0);
                 }
             }
@@ -72,7 +72,7 @@ public class ThreadDumpAndKill
         System.exit(1);
     }
 
-    private static void connect(SocketAttachingConnector connector, int port) throws IllegalConnectorArgumentsException, IOException, IncompatibleThreadStateException
+    private static void connect(AttachingConnector connector, int port) throws IllegalConnectorArgumentsException, IOException, IncompatibleThreadStateException
     {
         Map<String, Connector.Argument> arguments = connector.defaultArguments();
         arguments.get("hostname").setValue("localhost");
