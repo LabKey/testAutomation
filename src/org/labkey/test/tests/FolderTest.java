@@ -244,6 +244,17 @@ public class FolderTest extends BaseWebDriverTest
         }
     }
 
+    @Test
+    public void folderTemplateTest()
+    {
+        log("creating a collaboration folder");
+        _containerHelper.createSubfolder(getProjectName(),"Parent Folder","Collaboration");
+
+        log("creating template folder from above folder");
+        _containerHelper.createSubFolderFromTemplateWithTitle(getProjectName(),"Child Folder","/"+getProjectName()+"/Parent Folder","Child Title");
+        assertElementPresent(Locator.tagContainingText("h3","Child Title"));
+    }
+
     @Override public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;

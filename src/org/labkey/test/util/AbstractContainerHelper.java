@@ -209,9 +209,14 @@ public abstract class AbstractContainerHelper
         _test.clickButton("Update Folder");
     }
 
+    public void createSubFolderFromTemplateWithTitle(String project, String child, String template, @Nullable String title)
+    {
+        createSubfolder(project, project, child, "Create From Template Folder", template, null, null, false, title);
+    }
+
     public void createSubFolderFromTemplate(String project, String child, String template, @Nullable String[] objectsToSkip)
     {
-        createSubfolder(project, project, child, "Create From Template Folder", template, objectsToSkip, null, false);
+        createSubfolder(project, project, child, "Create From Template Folder", template, objectsToSkip, null, false, null);
     }
 
     public void createSubfolder(String project, String child, String[] tabsToAdd)
@@ -232,7 +237,7 @@ public abstract class AbstractContainerHelper
 
     public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
     {
-        createSubfolder(project, parent, child, folderType, templateFolder, null, tabsToAdd, inheritPermissions);
+        createSubfolder(project, parent, child, folderType, templateFolder, null, tabsToAdd, inheritPermissions, null);
     }
 
     /**
@@ -243,9 +248,10 @@ public abstract class AbstractContainerHelper
      * @param templateFolder if folderType = "create from Template Folder", this is the template folder used.  Otherwise, ignored
      * @param tabsToAdd module tabs to add iff foldertype=null,  or the copy related checkboxes iff foldertype=create from template
      * @param inheritPermissions should folder inherit permissions from parent?
+     * @param title title of the folder
      */
     @LogMethod
-    public void createSubfolder(@LoggedParam String project, String parent, @LoggedParam String child, @Nullable String folderType, String templateFolder, @Nullable String[] templatePartsToUncheck, @Nullable String[] tabsToAdd, boolean inheritPermissions)
+    public void createSubfolder(@LoggedParam String project, String parent, @LoggedParam String child, @Nullable String folderType, String templateFolder, @Nullable String[] templatePartsToUncheck, @Nullable String[] tabsToAdd, boolean inheritPermissions, @Nullable String title)
     {
         CreateSubFolderPage createSubFolderPage = startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
@@ -255,6 +261,11 @@ public abstract class AbstractContainerHelper
             {
                 _test.log("create from template");
                 createSubFolderPage.createFromTemplateFolder(templateFolder);
+                if(title != null)
+                {
+                    createSubFolderPage.setUseNameAsDisplayTitle();
+                    createSubFolderPage.setTitle(title);
+                }
                 if (templatePartsToUncheck != null)
                 {
                     for(String part : templatePartsToUncheck)

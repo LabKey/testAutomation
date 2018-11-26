@@ -18,11 +18,8 @@ package org.labkey.test.pages.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class CreateSubFolderPage extends LabKeyPage
 {
@@ -95,7 +92,17 @@ public class CreateSubFolderPage extends LabKeyPage
         return this;
     }
 
+    public CreateSubFolderPage setTitle(String title)
+    {
+        setFormElement(newElementCache().titleInput, title);
+        return this;
+    }
 
+    public CreateSubFolderPage setUseNameAsDisplayTitle()
+    {
+        _ext4Helper.checkCheckbox(Locator.ehrCheckboxWithLabel( "Use name as display title"));
+        return this;
+    }
 
     @Override
     protected Elements newElementCache()
@@ -107,8 +114,11 @@ public class CreateSubFolderPage extends LabKeyPage
     {
         final WebElement nameInput = Locator.input("name").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         final WebElement nextButton = Locator.lkButton("Next").refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        final WebElement titleInput = Locator.input("title").findWhenNeeded(this).withTimeout(4000);
 
         // TODO: Add support for "Use name as title" setting
+//        final WebElement useNameAsDisplayTitleCheckBox =  Locator.ehrCheckboxWithLabel( "Use name as display title")
+//                .findWhenNeeded(this).withTimeout(4000);
         // TODO: Add support for configuring the "Folder Type" settings
 
         // See AbstractContainerHelper.createSubfolder for what it supports and replace it
