@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.api.view.WebPartFactory;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.BodyWebPart;
@@ -277,16 +278,26 @@ public class PortalHelper extends WebDriverWrapper
         return new SiteNavBar(getDriver()).isInPageAdminMode();
     }
 
+    /**
+     * @param location either WebPartFactory.LOCATION_BODY or WebPartFactory.LOCATION_RIGHT, the default is LOCATION_BODY
+     */
     @LogMethod(quiet = true)
-    public void addWebPart(@LoggedParam String webPartName)
+    public void addWebPart(@LoggedParam String webPartName, String location)
     {
+        String loc = location == WebPartFactory.LOCATION_RIGHT ? "[contains(@class, 'pull-right')]" : "[contains(@class, 'pull-left')]";
         boolean wasInAdminModeAlready = enterAdminMode();
         waitForElement(Locator.xpath("//option").withText(webPartName));
-        WebElement form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]").findElement(getDriver());
+        WebElement form = Locator.xpath("//form[contains(@action,'addWebPart.view')]" + loc + "[.//option[text()='"+webPartName+"']]").findElement(getDriver());
         selectOptionByText(Locator.tag("select").findElement(form), webPartName);
         doAndWaitForPageToLoad(form::submit);
         if (!wasInAdminModeAlready)
             exitAdminMode();
+    }
+
+    @LogMethod(quiet = true)
+    public void addWebPart(@LoggedParam String webPartName)
+    {
+        addWebPart(webPartName, WebPartFactory.LOCATION_BODY);
     }
 
     @LogMethod(quiet = true)
