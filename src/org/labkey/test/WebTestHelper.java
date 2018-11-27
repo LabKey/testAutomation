@@ -311,7 +311,9 @@ public class WebTestHelper
         {
             if (!containerPath.startsWith("/"))
                 url.append("/");
-            url.append(URIUtil.encodePath(containerPath));
+            url.append(URIUtil.encodePath(containerPath)
+                    .replace("[", "%5B")
+                    .replace("]", "%5D"));
         }
 
         url.append("/");
