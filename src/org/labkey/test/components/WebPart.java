@@ -78,10 +78,11 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPa
 
     public void remove()
     {
-        new SiteNavBar(getDriver()).enterPageAdminMode();
-        clickMenuItem(false, "Remove From Page");
-        waitForStale();
-        new SiteNavBar(getDriver()).exitPageAdminMode();
+        new SiteNavBar(getDriver()).doInAdminMode(() ->
+        {
+            clickMenuItem(false, "Remove From Page");
+            waitForStale();
+        });
     }
 
     public void moveUp()

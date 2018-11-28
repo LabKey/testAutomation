@@ -42,8 +42,6 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.test.components.BodyWebPart;
-import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.api.ProjectMenu;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
@@ -710,11 +708,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             if (bootstrapped)
             {
                 // Tests hit Home portal a lot. Make it load as fast as possible
-                PortalHelper portalHelper = new PortalHelper(this);
-                for (BodyWebPart webPart : portalHelper.getBodyWebParts())
-                    webPart.remove();
-                for (SideWebPart webPart : portalHelper.getSideWebParts())
-                    webPart.remove();
+                new PortalHelper(this).removeAllWebParts();
                 _userHelper.setDisplayName(PasswordUtil.getUsername(), AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername()) + BaseWebDriverTest.INJECT_CHARS_1);
 
                 PipelineStatusTable.goToAllJobsPage(this);

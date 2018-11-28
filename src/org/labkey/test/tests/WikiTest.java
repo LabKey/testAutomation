@@ -87,9 +87,9 @@ public class WikiTest extends BaseWebDriverTest
         WikiHelper wikiHelper = new WikiHelper(this);
 
         goToProjectHome();
-        portalHelper.addWebPart("Wiki");
-        portalHelper.addWebPart("Search");
-        portalHelper.addWebPart("Wiki Table of Contents");
+        portalHelper.addBodyWebPart("Wiki");
+        portalHelper.addBodyWebPart("Search");
+        portalHelper.addSideWebPart("Wiki Table of Contents");
 
         log("test create new html page with a webpart");
         wikiHelper.createNewWikiPage("HTML");

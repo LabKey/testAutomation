@@ -73,8 +73,10 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), "Collaboration");
         _containerHelper.enableModule(getProjectName(), "scriptpad");
 
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Data Views");
+        new PortalHelper(this).doInAdminMode(portalHelper -> {
+            portalHelper.removeAllWebParts();
+            portalHelper.addWebPart("Data Views");
+        });
     }
 
     protected boolean isDocker()

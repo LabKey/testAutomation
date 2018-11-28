@@ -102,12 +102,26 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         userMenu().clickSubMenu(wait, subMenuLabels);
     }
 
-    public void enterPageAdminMode()
+    public void doInAdminMode(Runnable runnable)
     {
-        if (!isInPageAdminMode())
-            adminMenu().clickSubMenu(true, "Page Admin Mode");
+        boolean initiallyInAdminMode = enterPageAdminMode();
 
-        assertTrue("Failed to enter page admin mode", isInPageAdminMode());
+        runnable.run();
+
+        if (!initiallyInAdminMode)
+            exitPageAdminMode();
+    }
+
+    public boolean enterPageAdminMode()
+    {
+        boolean initiallyInAdminMode = isInPageAdminMode();
+        if (!initiallyInAdminMode)
+        {
+            adminMenu().clickSubMenu(true, "Page Admin Mode");
+            assertTrue("Failed to enter page admin mode", isInPageAdminMode());
+        }
+
+        return initiallyInAdminMode;
     }
 
     public void exitPageAdminMode()
@@ -124,7 +138,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         if (!getWrapper().isImpersonating())
             throw new IllegalStateException("Not currently impersonating");
 
-        getWrapper().clickAndWait(Locators.stopImpersonatingBtn.findElement(getDriver()));
+        getWrapper().clickAndWait(Locator.xpath("//a[@class='btn btn-primary' and text()='Stop impersonating']").findElement(getDriver()));
         getWrapper().assertSignedInNotImpersonating();
     }
 
@@ -136,7 +150,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     public SearchResultsPage search(String searchTerm)
     {
         expandSearchBar();
-        getWrapper().setFormElement(elementCache().searchInputElement, searchTerm);
+        getWrapper().setFormElement(elementCache().searchInput, searchTerm);
         getWrapper().clickAndWait(elementCache().searchSubmitInput);
         return new SearchResultsPage(getDriver());
     }
@@ -174,32 +188,23 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         return new SiteNavBar.Elements();
     }
 
-    // TODO: Remove and verify that elements in cache won't go stale
-    @Override
-    protected SiteNavBar.Elements elementCache()
-    {
-        return newElementCache();
-    }
-
     protected class Elements extends Component.ElementCache
     {
-        public WebElement headerBlock = Locator.xpath("//div[@class='labkey-page-header']")
+        public final WebElement headerBlock = Locator.tagWithClass("div", "labkey-page-header")
                 .findWhenNeeded(getDriver())
                 .withTimeout(WebDriverWrapper.WAIT_FOR_PAGE);
 
-        public WebElement navbarNavBlock = Locator.xpath("//ul[@class='navbar-nav-lk']")
+        public final WebElement navbarNavBlock = Locator.byClass("navbar-nav-lk")
                 .findWhenNeeded(headerBlock)
                 .withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
 
-        public WebElement searchContainer = Locators.searchMenuToggle.parent()
+        public final WebElement searchContainer = Locator.byClass("navbar-search")
                 .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public WebElement searchToggle = Locators.searchMenuToggle
+        public final WebElement searchToggle = Locator.id("global-search-trigger")
                 .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public WebElement searchInput = Locators.searchInput
+        public final WebElement searchInput = Locator.input("q")
                 .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public WebElement searchInputElement = Locator.xpath("//div[@id='global-search']//input[@type='text']")
-                .findWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public WebElement searchSubmitInput = Locator.xpath("//div[@id='global-search']//a[@class='btn-search fa fa-search']")
+        public final WebElement searchSubmitInput = Locator.tagWithClass("a", "fa-search")
                 .findWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public final AdminMenu adminMenu = new AdminMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
         public final UserMenu userMenu = new UserMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
@@ -249,7 +254,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
         public AdminMenuFinder(WebDriver driver)
         {
-            super(Locators.adminMenu);
+            super(Locator.id("headerAdminDropdown"));
             _driver = driver;
         }
 
@@ -356,11 +361,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
     public static class Locators
     {
-        private static Locator.XPathLocator exitAdminBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Exit Admin Mode']");
-        private static Locator.XPathLocator stopImpersonatingBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Stop impersonating']");
-        private static Locator.XPathLocator searchMenuToggle = Locator.xpath("//li/a[@id='global-search-trigger']");
-        private static Locator.XPathLocator searchInput = Locator.tagWithClass("input", "search-box").withAttribute("name", "q");
-        public static Locator.XPathLocator userMenu = Locator.id("headerUserDropdown");
-        public static Locator.XPathLocator adminMenu = Locator.id("headerAdminDropdown");
+        private static final Locator.XPathLocator exitAdminBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Exit Admin Mode']");
+        public static final Locator.XPathLocator userMenu = Locator.id("headerUserDropdown");
     }
 }

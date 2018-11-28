@@ -17,7 +17,6 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.api.view.WebPartFactory;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.BodyWebPart;
@@ -32,6 +31,7 @@ import org.openqa.selenium.internal.WrapsDriver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * TODO: Move appropriate functionality into {@link org.labkey.test.pages.PortalBodyPanel} and {@link org.labkey.test.components.WebPart}
@@ -175,25 +175,23 @@ public class PortalHelper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void renameTab(@LoggedParam String tabText, @LoggedParam String newName, @Nullable @LoggedParam String expectedError)
     {
-        boolean wasAlreadyInEditMode = enterAdminMode();
-        PortalTab portalTab = PortalTab.find(tabText, getDriver());
-        portalTab.rename(newName);
+        doInAdminMode(() -> {
+            PortalTab portalTab = PortalTab.find(tabText, getDriver());
+            portalTab.rename(newName);
 
-        if (expectedError != null)
-        {
-            waitForText(expectedError);
-            clickButton("OK", 0);
-            // Close the rename tab window.
-            clickButton("Cancel", 0);
-        }
-        else
-        {
-            waitForElement(Locator.linkWithText(newName));
-            assertElementNotPresent(Locator.linkWithText(tabText));
-        }
-
-        if (wasAlreadyInEditMode)
-            exitAdminMode();
+            if (expectedError != null)
+            {
+                waitForText(expectedError);
+                clickButton("OK", 0);
+                // Close the rename tab window.
+                clickButton("Cancel", 0);
+            }
+            else
+            {
+                waitForElement(Locator.linkWithText(newName));
+                assertElementNotPresent(Locator.linkWithText(tabText));
+            }
+        });
     }
 
     public List<String> getWebPartTitles()
@@ -259,13 +257,19 @@ public class PortalHelper extends WebDriverWrapper
         webPart.clickMenuItem(wait, items);
     }
 
-    public boolean enterAdminMode()
+    private void doInAdminMode(Runnable runnable)
     {
-        SiteNavBar navBar = new SiteNavBar(getDriver());
-        boolean wasInAdminModeAlready = navBar.isInPageAdminMode();
-        if (!wasInAdminModeAlready)
-            navBar.enterPageAdminMode();
-        return wasInAdminModeAlready;
+        new SiteNavBar(getDriver()).doInAdminMode(runnable);
+    }
+
+    public void doInAdminMode(Consumer<PortalHelper> actions)
+    {
+        new SiteNavBar(getDriver()).doInAdminMode(() -> actions.accept(this));
+    }
+
+    public void enterAdminMode()
+    {
+        new SiteNavBar(getDriver()).enterPageAdminMode();
     }
 
     public void exitAdminMode()
@@ -273,43 +277,51 @@ public class PortalHelper extends WebDriverWrapper
         new SiteNavBar(getDriver()).exitPageAdminMode();
     }
 
-    public boolean isInAdminMode()
+    @LogMethod(quiet = true)
+    private void addWebPart(@LoggedParam String webPartName, String formLocation)
     {
-        return new SiteNavBar(getDriver()).isInPageAdminMode();
+        doInAdminMode(() -> {
+            waitForElement(Locator.xpath("//option").withText(webPartName));
+            Locator.XPathLocator formLocator = Locator.tag("form").withAttributeContaining("action", "addWebPart.view");
+            if (formLocation == null)
+                formLocator = formLocator.withDescendant(Locator.tagWithText("option", webPartName));
+            else
+                formLocator = formLocator.withChild(Locator.input("location").withAttribute("value", formLocation));
+            WebElement form = formLocator.findElement(getDriver());
+            selectOptionByText(Locator.tag("select").findElement(form), webPartName);
+            doAndWaitForPageToLoad(form::submit);
+        });
     }
 
-    /**
-     * @param location either WebPartFactory.LOCATION_BODY or WebPartFactory.LOCATION_RIGHT, the default is LOCATION_BODY
-     */
-    @LogMethod(quiet = true)
-    public void addWebPart(@LoggedParam String webPartName, String location)
+    public void addWebPart(String webPartName)
     {
-        String loc = location == WebPartFactory.LOCATION_RIGHT ? "[contains(@class, 'pull-right')]" : "[contains(@class, 'pull-left')]";
-        boolean wasInAdminModeAlready = enterAdminMode();
-        waitForElement(Locator.xpath("//option").withText(webPartName));
-        WebElement form = Locator.xpath("//form[contains(@action,'addWebPart.view')]" + loc + "[.//option[text()='"+webPartName+"']]").findElement(getDriver());
-        selectOptionByText(Locator.tag("select").findElement(form), webPartName);
-        doAndWaitForPageToLoad(form::submit);
-        if (!wasInAdminModeAlready)
-            exitAdminMode();
+        addWebPart(webPartName, null);
     }
 
-    @LogMethod(quiet = true)
-    public void addWebPart(@LoggedParam String webPartName)
+    public void addBodyWebPart(String webPartName)
     {
-        addWebPart(webPartName, WebPartFactory.LOCATION_BODY);
+        addWebPart(webPartName, "!content");
+    }
+
+    public void addSideWebPart(String webPartName)
+    {
+        addWebPart(webPartName, "right");
     }
 
     @LogMethod(quiet = true)
     public void removeWebPart(@LoggedParam String webPartTitle)
     {
-        SiteNavBar navBar =new SiteNavBar(getDriver());
-        boolean wasInAdminMode = navBar.isInPageAdminMode();
-        navBar.enterPageAdminMode();
-        WebPart webPart = new BodyWebPart(getDriver(), webPartTitle);
-        webPart.remove();
-        if (!wasInAdminMode)                // leave the test in the prior state
-            navBar.exitPageAdminMode();
+        new BodyWebPart(getDriver(), webPartTitle).remove();
+    }
+
+    public void removeAllWebParts()
+    {
+        doInAdminMode(() -> {
+            for (BodyWebPart webPart : getBodyWebParts())
+                webPart.remove();
+            for (SideWebPart webPart : getSideWebParts())
+                webPart.remove();
+        });
     }
 
     public void addQueryWebPart(@LoggedParam String schemaName)
@@ -400,10 +412,9 @@ public class PortalHelper extends WebDriverWrapper
         if (direction.isHorizontal())
             throw new IllegalArgumentException("Can't move webpart horizontally.");
 
-        SiteNavBar navBar = new SiteNavBar(getDriver());
-        navBar.enterPageAdminMode();
-        new BodyWebPart<>(getDriver(), webPartTitle).moveWebPart(direction==Direction.DOWN);
-        navBar.exitPageAdminMode();
+        doInAdminMode(() -> {
+            new BodyWebPart<>(getDriver(), webPartTitle).moveWebPart(direction == Direction.DOWN);
+        });
     }
 
     public void openWebpartPermissionWindow(String webpart)
@@ -420,23 +431,21 @@ public class PortalHelper extends WebDriverWrapper
      */
     public void setWebpartPermission(String webpart, String permission, String folder)
     {
-        boolean wasInAdminMode = enterAdminMode();
-        openWebpartPermissionWindow(webpart);
+        doInAdminMode(() -> {
+            openWebpartPermissionWindow(webpart);
 
-        _ext4Helper.selectComboBoxItem("Required Permission:", permission);
+            _ext4Helper.selectComboBoxItem("Required Permission:", permission);
 
-        if(folder==null)
-            _ext4Helper.selectRadioButton("Check Permission On:", "Current Folder");
-        else
-        {
-            _ext4Helper.selectRadioButton("Check Permission On:", "Choose Folder");
-            click(Locator.tagWithText("div", folder));
-        }
-        click(Locator.tagWithText("span", "Save"));
-        _ext4Helper.waitForMaskToDisappear();
-
-        if (!wasInAdminMode)
-            exitAdminMode();
+            if (folder == null)
+                _ext4Helper.selectRadioButton("Check Permission On:", "Current Folder");
+            else
+            {
+                _ext4Helper.selectRadioButton("Check Permission On:", "Choose Folder");
+                click(Locator.tagWithText("div", folder));
+            }
+            click(Locator.tagWithText("span", "Save"));
+            _ext4Helper.waitForMaskToDisappear();
+        });
     }
 
     /**
@@ -446,23 +455,23 @@ public class PortalHelper extends WebDriverWrapper
      */
     public void checkWebpartPermission(String webpart, String expectedPermission, String expectedFolder)
     {
-        new SiteNavBar(getDriver()).enterPageAdminMode();
-        openWebpartPermissionWindow(webpart);
+        doInAdminMode(() -> {
+            openWebpartPermissionWindow(webpart);
 
-        assertFormElementEquals(Locator.name("permission"), expectedPermission);
+            assertFormElementEquals(Locator.name("permission"), expectedPermission);
 
-        if(expectedFolder == null)
-        {
-            assertFormElementEquals(Locator.name("permissionContainer"), "");
-        }
-        else
-        {
-            assertFormElementEquals(Locator.name("permissionContainer"), expectedFolder);
-        }
+            if (expectedFolder == null)
+            {
+                assertFormElementEquals(Locator.name("permissionContainer"), "");
+            }
+            else
+            {
+                assertFormElementEquals(Locator.name("permissionContainer"), expectedFolder);
+            }
 
-        click(Locator.tagWithText("span", "Cancel"));
-        _ext4Helper.waitForMaskToDisappear();
-        new SiteNavBar(getDriver()).exitPageAdminMode();
+            click(Locator.tagWithText("span", "Cancel"));
+            _ext4Helper.waitForMaskToDisappear();
+        });
     }
 
     public enum Direction
