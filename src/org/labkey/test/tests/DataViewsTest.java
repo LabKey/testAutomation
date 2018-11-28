@@ -257,11 +257,6 @@ public class DataViewsTest extends ParticipantListTest
         test._extHelper.waitForExtDialog(viewName);
     }
 
-    public static Locator getEditLinkLocator(String viewName)
-    {
-        return Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(),'" + viewName + "')]/../../../../..//td//div//span[contains(@class, 'edit-views-link')]");
-    }
-
     //Issue 12914: dataset browse web part not displaying data sets alphabetically
     private void assertDataDisplayedAlphabetically()
     {
@@ -438,6 +433,7 @@ public class DataViewsTest extends ParticipantListTest
         assertEquals(subCat1Ordinal, confirmResponse.getCategory(subCategory2.getRowId()).getDisplayOrder());
     }
 
+    @LogMethod
     private void exportImportTest()
     {
         log("Verify round-tripping of study features");
@@ -499,6 +495,7 @@ public class DataViewsTest extends ParticipantListTest
         _ext4Helper.waitForMaskToDisappear();
     }
 
+    @LogMethod
     private void verifyDynamicHeight (String dataViewWebPartName)
     {
         // set Data Views panel height to use a Default (dynamic) height value
@@ -591,7 +588,8 @@ public class DataViewsTest extends ParticipantListTest
     /**
      * Add a sub-category to the selected dataset category
      */
-    private void addSubCategory(String subCategoryName)
+    @LogMethod (quiet = true)
+    private void addSubCategory(@LoggedParam String subCategoryName)
     {
         clickButton("New Subcategory", 0);
         WebElement subCategoryField = Locator.xpath("//input[@name='label']").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
@@ -623,25 +621,26 @@ public class DataViewsTest extends ParticipantListTest
         }
     }
 
+    @LogMethod
     private void createDatasets(String nameBase, int count)
     {
+        _studyHelper.goToManageDatasets();
         for (int x = 0; x < count; x++)
         {
             createDataset(nameBase+x);
         }
     }
 
-    private void createDataset(String name)
+    @LogMethod (quiet = true)
+    private void createDataset(@LoggedParam String name)
     {
-        _studyHelper.goToManageDatasets();
-        waitForText("Create New Dataset");
-        click(Locator.xpath("//a[text()='Create New Dataset']"));
-        waitForElement(Locator.xpath("//input[@name='typeName']"));
+        waitAndClickAndWait(Locator.linkWithText("Create New Dataset"));
         setFormElement(Locator.xpath("//input[@name='typeName']"), name);
         clickButton("Next");
         waitForElement(Locator.xpath("//input[@id='name0-input']"));
-        assertTextNotPresent("XTest");
         setFormElement(Locator.xpath("//input[@id='name0-input']"), "XTest");
         clickButton("Save");
+        clickButton("Manage Datasets");
+        assertElementPresent(Locator.linkWithText(name));
     }
 }
