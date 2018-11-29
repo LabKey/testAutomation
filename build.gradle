@@ -9,6 +9,9 @@ project.dependencies {
     compile "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
     compile "com.sun.xml.bind:jaxb-core:${jaxbVersion}"
     compile "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
+    // 36184: Tests can't find selenium-ie-driver library when running on Windows on TeamCity
+    // Workaround to ensure that the class-loader finds InternetExplorerDriver
+    compile "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
 }
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
