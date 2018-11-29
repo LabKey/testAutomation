@@ -204,7 +204,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
                 .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public final WebElement searchInput = Locator.input("q")
                 .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public final WebElement searchSubmitInput = Locator.tagWithClass("a", "fa-search")
+        public final WebElement searchSubmitInput = Locator.tagWithClass("a", "btn-search")
                 .findWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public final AdminMenu adminMenu = new AdminMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
         public final UserMenu userMenu = new UserMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
