@@ -31,9 +31,9 @@ public class Checkbox extends Component implements FormItem<Boolean>
         _el = element;
     }
 
-    public static SimpleComponentFinder<Checkbox> finder(Locator loc)
+    public static SimpleComponentFinder<Checkbox> Checkbox(Locator loc)
     {
-        return new SimpleComponentFinder<>(loc)
+        return new SimpleComponentFinder<Checkbox>(loc)
         {
             @Override
             protected Checkbox construct(WebElement el)
@@ -43,9 +43,9 @@ public class Checkbox extends Component implements FormItem<Boolean>
         };
     }
 
-    public static FormItemFinder<Checkbox> finder()
+    public static FormItemFinder<Checkbox> Checkbox()
     {
-        return new FormItemFinder<>()
+        return new FormItemFinder<Checkbox>()
         {
             @Override
             protected Checkbox construct(WebElement el)
@@ -59,24 +59,6 @@ public class Checkbox extends Component implements FormItem<Boolean>
                 return "input";
             }
         };
-    }
-
-    /**
-     * @deprecated Use {@link Checkbox#finder(Locator)}
-     */
-    @Deprecated
-    public static SimpleComponentFinder<Checkbox> Checkbox(Locator loc)
-    {
-        return finder(loc);
-    }
-
-    /**
-     * @deprecated Use {@link Checkbox#finder()}
-     */
-    @Deprecated
-    public static FormItemFinder<Checkbox> Checkbox()
-    {
-        return finder();
     }
 
     @Override

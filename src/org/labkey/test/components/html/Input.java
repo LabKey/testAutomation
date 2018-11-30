@@ -36,9 +36,9 @@ public class Input extends WebDriverComponent implements FormItem<String>
         _driver = driver;
     }
 
-    public static SimpleComponentFinder<Input> finder(Locator loc, WebDriver driver)
+    public static SimpleComponentFinder<Input> Input(Locator loc, WebDriver driver)
     {
-        return new SimpleComponentFinder<>(loc)
+        return new SimpleComponentFinder<Input>(loc)
         {
             @Override
             protected Input construct(WebElement el)
@@ -46,15 +46,6 @@ public class Input extends WebDriverComponent implements FormItem<String>
                 return new Input(el, driver);
             }
         };
-    }
-
-    /**
-     * @deprecated Use {@link Input#finder(Locator, WebDriver)}
-     */
-    @Deprecated
-    public static SimpleComponentFinder<Input> Input(Locator loc, WebDriver driver)
-    {
-        return finder(loc, driver);
     }
 
     @Override
