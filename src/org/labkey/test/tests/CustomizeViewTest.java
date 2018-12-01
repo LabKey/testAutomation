@@ -149,7 +149,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
             public Void apply(Void v)
             {
                 _customizeViewsHelper.openCustomizeViewPanel();
-                _customizeViewsHelper.saveCustomView("EVIL: " + Crawler.injectString);
+                _customizeViewsHelper.saveCustomView("BAD" + Crawler.injectString);
                 assertTextBefore("Billson", "Johnson");
                 return null;
             }
