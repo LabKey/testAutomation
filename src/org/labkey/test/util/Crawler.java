@@ -22,7 +22,6 @@ import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
-import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.api.ProjectMenu;
@@ -31,19 +30,26 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.time.Duration;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -54,16 +60,25 @@ public class Crawler
     private final List<ControllerActionId> _actionsExcludedFromInjection;
     private final Collection<String> _adminControllers;
     private final Collection<String> _forbiddenWords;
+    private final boolean _prioritizeAdminPages;
 
     // Replacements to make in HTML source before looking for "forbidden" words.
     private static Map<String, String> _sourceReplacements = new CaseInsensitiveHashMap<>();
+
+    private static LinkedHashMap<String,String> _dictionary = new LinkedHashMap<>();
+    static
+    {
+        Arrays.asList("rowid", "name", "userId", "query.sort", "query.rowid~eq", "query.name~contains", "returnUrl")
+                .forEach(s -> _dictionary.put(s,""));
+    }
+    private static String[] _dictionaryKeys = null;
 
     private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
     private static Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
     private static Set<String> _urlsChecked = new HashSet<>();
     public static ActionProfiler _actionProfiler = new ActionProfiler();
     private boolean _needToGetProjectMenuLinks = true;
-    private int _maxDepth = 3;
+    private int _maxDepth = 4;
     private final ArrayList<UrlToCheck> _startingUrls = new ArrayList<>();
 
     private final Duration _maxCrawlTime;
@@ -71,20 +86,20 @@ public class Crawler
     private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
     private BaseWebDriverTest _test;
     private final List<String> _warnings = new ArrayList<>();
-    private boolean _injectionCheckEnabled = false;
+    private final boolean _injectionCheckEnabled;
     private final Set<String> _projects = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
-
-    public Crawler(BaseWebDriverTest test)
-    {
-        this(test, TestProperties.getCrawlerTimeout());
-    }
 
     public Crawler(BaseWebDriverTest test, Duration crawlTime)
     {
-        this(test, test.getContainerHelper().getCreatedProjects(), crawlTime);
+        this(test, test.getContainerHelper().getCreatedProjects(), crawlTime, false);
     }
 
-    public Crawler(BaseWebDriverTest test, Collection<String> projects, Duration crawlTime)
+    public Crawler(BaseWebDriverTest test, Duration crawlTime, boolean injectionTest)
+    {
+        this(test, test.getContainerHelper().getCreatedProjects(), crawlTime, injectionTest);
+    }
+
+    public Crawler(BaseWebDriverTest test, Collection<String> projects, Duration crawlTime, boolean injectionTest)
     {
         _test = test;
         _maxCrawlTime = crawlTime;
@@ -92,11 +107,25 @@ public class Crawler
         _forbiddenWords = getForbiddenWords();
         _excludedActions = getDefaultExcludedActions();
         _actionsExcludedFromInjection = getExcludedActionsFromInjection();
+        _injectionCheckEnabled = injectionTest;
         for (String project : projects)
         {
             addProject(project);
         }
-        _startingUrls.add(new UrlToCheck(null, "/project/begin.view?", 0));
+        if (projects.isEmpty())
+        {
+            _startingUrls.add(new UrlToCheck(null, "/admin-showAdmin.view#links", 0));
+            _startingUrls.add(new UrlToCheck(null, "/admin-spider.view", 2));
+        }
+        if (injectionTest)
+        {
+            test.getUrlsSeen().stream()
+                .map(url -> new UrlToCheck(null, url, 1))
+                .filter(UrlToCheck::isVisitableURL)
+                .filter(UrlToCheck::isInjectableURL)
+                .forEach(_startingUrls::add);
+        }
+        _prioritizeAdminPages = projects.isEmpty();
     }
 
     protected Set<String> getForbiddenWords()
@@ -109,7 +138,7 @@ public class Crawler
         List<ControllerActionId> list = new ArrayList<>();
         Collections.addAll(list, new ControllerActionId("*", "download"), // Never crawl download links
             new ControllerActionId("admin", "resetErrorMark"),
-            new ControllerActionId("admin", "dbChecker"),
+            new ControllerActionId("admin", "doCheck"),
             new ControllerActionId("admin", "runSystemMaintenance"),
             new ControllerActionId("admin", "deleteFolder"),
             new ControllerActionId("admin", "memTracker"),
@@ -234,12 +263,8 @@ public class Crawler
         {
             _projects.add(project);
             _startingUrls.add(new UrlToCheck(null, WebTestHelper.buildRelativeUrl("project", project, "start"), 0));
+            _startingUrls.add(new UrlToCheck(null, WebTestHelper.buildRelativeUrl("admin", project, "spider"), 2));
         }
-    }
-
-    public void setInjectionCheckEnabled(boolean enabled)
-    {
-        _injectionCheckEnabled = enabled;
     }
 
     protected Collection<String> getAdminControllers()
@@ -334,12 +359,14 @@ public class Crawler
 
     private class UrlToCheck
     {
+        public final float priority;
+
         // Keep track of urls to check for breadth first crawl
         private final URL _origin;
         private final String _urlText;
         private final String _relativeURL;
         private final ControllerActionId _actionId;
-        private int _depth;
+        private final int _depth;
 
         public UrlToCheck(URL origin, String urlText, int depth)
         {
@@ -379,6 +406,17 @@ public class Crawler
 
                 _actionId = new ControllerActionId(_relativeURL);
             }
+
+            int p = _depth;
+            if (underCreatedProject())
+                p--;
+            // demote admin controllers
+            if (null != getActionId() && _adminControllers.contains(getActionId().getController()))
+                p += (_prioritizeAdminPages ? -1 : 1);
+            // demote root directory
+            if (null != getActionId() && StringUtils.isBlank(StringUtils.strip(getActionId().getFolder(),"/")))
+                p += (_prioritizeAdminPages ? -1 : 1);
+            priority = p + random.nextFloat();
         }
 
         public URL getOrigin()
@@ -408,6 +446,9 @@ public class Crawler
 
         public boolean underCreatedProject()
         {
+            if (null == getActionId())
+                return false;
+
             String folder = StringUtils.strip(getActionId().getFolder(), "/");
             StringTokenizer st = new StringTokenizer(folder, "/");
 
@@ -436,6 +477,9 @@ public class Crawler
                 return false;
 
             if (getRelativeURL().contains("mailto:")) //Don't crawl mailto: links
+                return false;
+
+            if (getRelativeURL().contains("javascript:")) //Don't crawl javascript: links
                 return false;
 
             // after navigating past the first N levels of links, we'll only try "new" actions:
@@ -491,7 +535,7 @@ public class Crawler
 
         public ControllerActionId(String rootRelativeURL)
         {
-            rootRelativeURL = stripQueryParams(rootRelativeURL);
+            rootRelativeURL = stripQueryParams(stripHash(rootRelativeURL));
             rootRelativeURL = WebTestHelper.stripContextPath(rootRelativeURL);
 
             if (rootRelativeURL.startsWith("_webdav/"))
@@ -727,6 +771,8 @@ public class Crawler
         _crawlStats.put(_test.getClass().getSimpleName(), crawlStats);
 
         TestLogger.log("Crawl complete. " + crawlStats.getNewPages() + " pages visited, " + _actionsVisited.size() + " unique actions tested by all tests.");
+
+        _dictionary.keySet().forEach(TestLogger::debug);
     }
 
     private CrawlStats crawl()
@@ -736,7 +782,15 @@ public class Crawler
         int currentDepth = 0;
         int maxDepth = 0;
         final Timer crawlTimer = new Timer(_maxCrawlTime);
-        List<UrlToCheck> urlsToCheck = new ArrayList<>(_startingUrls);
+        PriorityQueue<UrlToCheck> urlsToCheck = new PriorityQueue<UrlToCheck>(new Comparator<UrlToCheck>()
+        {
+            @Override
+            public int compare(UrlToCheck u1, UrlToCheck u2)
+            {
+                return Double.compare(u1.priority,u2.priority);
+            }
+        });
+        urlsToCheck.addAll(_startingUrls);
 
         TestLogger.log("Crawl depth : " + currentDepth);
         TestLogger.increaseIndent();
@@ -744,7 +798,8 @@ public class Crawler
         // Loop through links in list until its empty or time runs out
         while (!urlsToCheck.isEmpty() && !crawlTimer.isTimedOut())
         {
-            UrlToCheck urlToCheck = urlsToCheck.remove(0);
+            UrlToCheck urlToCheck = urlsToCheck.poll();
+            assert null != urlsToCheck;
             while (urlToCheck.getDepth() > currentDepth)
             {
                 currentDepth++;
@@ -796,16 +851,13 @@ public class Crawler
 
             URL currentPageUrl = _test.getURL();
 
-            if (_test.getDriver().getTitle().isEmpty())
-                _warnings.add("Action does not specify title: " + actionId.toString());
-
             // Find all the links at the site
             if (_needToGetProjectMenuLinks && depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
             {
                 _needToGetProjectMenuLinks = false;
                 _test.projectMenu().open();
             }
-            String[] linkAddresses = _test.getLinkAddresses();
+            String[] linkAddresses = _test.getLinkAddresses(_injectionCheckEnabled);
 
             checkForForbiddenWords(relativeURL);
 
@@ -813,15 +865,21 @@ public class Crawler
             if (code == 404 && origin == null) // Ignore 404s from the initial set of links
                 return Collections.emptyList();
 
-            // Check that there was no error
-            if (code >= 400)
-                fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
-            List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
-            if (!serverError.isEmpty())
+            // Check that there was no error (unless we are inject testing)
+            if (!_injectionCheckEnabled)
             {
-                String[] errorLines = serverError.get(0).split("\n");
-                fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
+                if (code >= 400)
+                    fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
+                List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
+                if (!serverError.isEmpty())
+                {
+                    String[] errorLines = serverError.get(0).split("\n");
+                    fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
+                }
             }
+
+            if (code == 200 && _test.getDriver().getTitle().isEmpty())
+                _warnings.add("Action does not specify title: " + actionId.toString());
 
             if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
                 testInjection(currentPageUrl);
@@ -880,8 +938,9 @@ public class Crawler
     }
 
     public static final String injectedAlert = "8(";
-    public static final String maliciousScript = "<script>alert(\"" + injectedAlert + "\");</script>";
-    public static final String injectString = "\"'>--></script>" + maliciousScript;
+    public static final String maliciousScript = "alert(\"" + injectedAlert + "\")";
+    public static final String injectString = "-->\">'>'\"</script><script>" + maliciousScript + ";</script>";
+    public static final String injectString2 = "-->\">'>'\"</script><img src=\"xss\" onerror=\"" + maliciousScript + ">";
 
     public static <F, T> T tryInject(BaseWebDriverTest test, Function<F, T> f, F arg)
     {
@@ -901,7 +960,7 @@ public class Crawler
 
             String html = test.getHtmlSource();
 
-            if (html.contains(maliciousScript))
+            if (html.contains(injectString) || html.contains(injectString2))
                 msg = "page contains injected script";
 
             // see ConnectionWrapper.java
@@ -955,43 +1014,92 @@ public class Crawler
 
     private void testInjection(URL start)
     {
-        String base = start.toString();
-        String query = start.getQuery();
+        String base = stripQueryParams(stripHash(start.toString()));
+        String query = StringUtils.trimToEmpty(start.getQuery());
         int q = base.indexOf('?');
         if (q != -1)
             base = base.substring(0,q);
 
-        if (query == null)
-            return;
         if (query.startsWith("?"))
             query = query.substring(1);
-        if (query.length() == 0)
-            return;
 
-        Function<String, Void> urlTester = new Function<String, Void>() {
-            @Override
-            public Void apply(String urlMalicious)
-            {
-                _test.beginAt(urlMalicious);
-                _test.executeScript("return;"); // Trigger UnhandledAlertException
-                return null;
-            }
+        Function<String, Void> urlTester = urlMalicious -> {
+            _test.beginAt(urlMalicious);
+            _test.executeScript("return;"); // Trigger UnhandledAlertException
+            return null;
         };
+
+        List<Map.Entry<String,String>> params = queryStringToEntries(query);
+
+        // add parameters to global dictionary
+        params.forEach(entry -> _dictionary.put(entry.getKey(), entry.getValue()));
 
         ControllerActionId actionId = new ControllerActionId(base);
         List<String> excludedParams = getExcludedParametersFromInjection().get(actionId);
-        String[] parts = StringUtils.split(query,'&');
-        for (int i=0 ; i<parts.length ; i++)
+        List<Map.Entry<String,String>> extendedParams = addDictionaryParams(params);
+        for (int i=0 ; i<extendedParams.size() ; i++)
         {
-            if (excludedParams != null && excludedParams.contains(parts[i].split("=")[0]))
+            Map.Entry<String,String> e = extendedParams.get(i);
+            if (excludedParams != null && excludedParams.contains(e.getKey()))
                 continue;
-            String save = parts[i];
-            parts[i] = save + ( save.contains("=") ? "" : "=") + injectString;
-            String queryMalicious = StringUtils.join(parts, '&');
-            parts[i] = save;
-
+            List<Map.Entry<String,String>> injectParams = new ArrayList<>(extendedParams);
+            String key = injectParams.get(i).getKey();
+            injectParams.remove(i);
+            String xss = (random.nextInt()%2)==0 ? injectString : injectString2;
+            xss = (random.nextInt()%3)==0 ? URLEncoder.encode(xss) : xss;
+            String queryMalicious = key + "=" + xss + "&" + queryStringFromEntries(injectParams);
             String urlMalicious = base + "?" + queryMalicious;
             tryInject(_test, urlTester, urlMalicious);
         }
+        // TODO this blows up jquery document completed handling, which causes pageload to not fire and then timeout
+        /// tryInject(_test, urlTester, base + "?" + query + "#" + injectString);
+    }
+
+    static Random random = new Random();
+
+    List<Map.Entry<String,String>> addDictionaryParams(List<Map.Entry<String,String>>  in)
+    {
+        List<Map.Entry<String,String>> ret = new ArrayList<>(in);
+        if (null == _dictionaryKeys || _dictionaryKeys.length != _dictionary.size())
+            _dictionaryKeys = _dictionary.keySet().toArray(new String[0]);
+        for (int i=0 ; i<5 && ret.size() < 10 ; i++)
+        {
+            // pick a random dictionary key
+            String key = _dictionaryKeys[random.nextInt(_dictionaryKeys.length)];
+            // if we don't have this key already, add it
+            if (!ret.stream().anyMatch(e -> e.getKey().equals(key)))
+                ret.add(new AbstractMap.SimpleImmutableEntry<>(key,_dictionary.get(key)));
+        }
+        return ret;
+    }
+
+    List<Map.Entry<String,String>> queryStringToEntries(String q)
+    {
+        if (StringUtils.isBlank(q))
+            return Collections.emptyList();
+        return Arrays.stream(StringUtils.split(q, '&'))
+                .map(pair -> {
+                    int i = pair.indexOf('=');
+                    String k = i==-1 ? pair : pair.substring(0,i);
+                    String v = i==-1 ? "" : pair.substring(i+1);
+                    return new AbstractMap.SimpleImmutableEntry<>(URLDecoder.decode(k), URLDecoder.decode(v));
+                })
+                .collect(Collectors.toList());
+    };
+
+    String queryStringFromEntries(List<Map.Entry<String,String>> list)
+    {
+        StringBuilder sb = new StringBuilder();
+        String and = "";
+        list.forEach(e ->
+        {
+            if (sb.length()!=0)
+                sb.append('&');
+            sb.append(URLEncoder.encode(e.getKey()));
+            sb.append('=');
+            sb.append(null==e.getValue()?"":URLEncoder.encode(e.getValue()));
+        }
+        );
+        return sb.toString();
     }
 }

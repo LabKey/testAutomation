@@ -118,6 +118,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -502,15 +503,35 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String[] getLinkAddresses()
     {
-        String js =
-                "getLinkAddresses = function () {\n" +
-                        "        var links = window.document.links;\n" +
-                        "        var addresses = new Array();\n" +
-                        "        for (var i = 0; i < links.length; i++)\n" +
-                        "          addresses[i] = links[i].getAttribute('href');\n" +
-                        "        return addresses;\n" +
-                        "};" +
-                        "return getLinkAddresses();";
+        return getLinkAddresses(false);
+    }
+
+    public String[] getLinkAddresses(boolean includeForms)
+    {
+        String js = "getLinkAddresses = function () {\n" +
+                "        var i, j;\n" +
+                "        var links = window.document.links;\n" +
+                "        var addresses = new Array();\n" +
+                "        for (i = 0; i < links.length; i++) {\n" +
+                "          if (links[i].href && links[i].href != '#') addresses.push(links[i].href);\n" +
+                "        }\n" +
+                (!includeForms ? "" :
+                "        var forms = window.document.forms;\n" +
+                "        for (i = 0; i < forms.length ; i++) {\n" +
+                "          var action = forms[i].getAttribute('action');\n" +   // raw attribute value
+                "          if (action === 'begin' || action === '#') continue;\n" +
+                "          action = forms[i].action || window.location.href;\n" +
+                "          if (typeof action !== 'string') continue;\n" +
+                "          if (action.indexOf('?')==-1) action += '?';\n" +
+                "          for (j=0 ; j<forms[i].elements.length ; j++) {\n" +
+                "             if (forms[i].elements[j].name && forms[i].elements[j].name!='X-LABKEY-CSRF') action += '&' + forms[i].elements[j].name + '=' + (forms[i].elements[j].value||'');\n" +
+                "          }\n" +
+                "          addresses.push(action);\n" +
+                "        }\n"
+                ) +
+                "        return addresses;\n" +
+                "};\n" +
+                "return getLinkAddresses();";
         @SuppressWarnings("unchecked")
         List<String> linkArray = (ArrayList<String>) executeScript(js);
         ArrayList<String> links = new ArrayList<>();
@@ -520,7 +541,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
             {
                 link = link.substring(0, link.indexOf("#"));
             }
-            if (link.trim().length() > 0)
+            link = trimToNull(link);
+            if (null != link)
             {
                 links.add(link);
             }
