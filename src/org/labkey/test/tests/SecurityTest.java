@@ -472,7 +472,7 @@ public class SecurityTest extends BaseWebDriverTest
         _userHelper.setDisplayName(NORMAL_USER, newDisplayName);
         assertTextPresent(newDisplayName);
 
-        String injectDisplayName = "displayNameInjection" + INJECT_CHARS_1;
+        String injectDisplayName = "displayName" + INJECT_CHARS_1;
 
         _userHelper.setDisplayName(NORMAL_USER, injectDisplayName);
         assertTextPresent(injectDisplayName);
