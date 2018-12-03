@@ -2,5 +2,5 @@
 IP=$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
 rm -r skipfish.out
 # -A user:pass
-docker run --rm -v $(pwd):/work:rw k0st/alpine-skipfish $* -F localhost=$IP -S /opt/skipfish/dictionaries/medium.wl -o /work/skipfish.out http://$IP:8080/labkey/home/project-begin.view http://$IP:8080/labkey/admin-spider.view
+docker run --rm -v $(pwd):/work:rw k0st/alpine-skipfish -F localhost=$IP -S /opt/skipfish/dictionaries/medium.wl -o /work/skipfish.out -Y $* http://$IP:8080/labkey/home/project-begin.view http://$IP:8080/labkey/admin-spider.view
 xdg-open skipfish.out/index.html
