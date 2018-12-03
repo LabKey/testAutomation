@@ -1352,7 +1352,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void exportFolderAsIndividualFiles(String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders)
     {
         // first locator with this name is "Pipeline root export directory, as individual files
-        prepareForFolderExport(folderName, exportSecurityGroups, exportRoleAssignments, includeSubfolders, false,true, 0);
+        prepareForFolderExport(folderName, exportSecurityGroups, exportRoleAssignments, includeSubfolders, false,false, 0);
         clickButton("Export");
         _fileBrowserHelper.waitForFileGridReady();
     }
