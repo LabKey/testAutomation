@@ -226,7 +226,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     {
         String email = genTestEmail("badGroupNameUser");
 
-        BulkUpdateGroupCommand command = new BulkUpdateGroupCommand("no_punctuation,allowed");
+        BulkUpdateGroupCommand command = new BulkUpdateGroupCommand("nopunctu@tion,allowed");
         command.addMemberUser(email);
         Connection connection = createDefaultConnection(true);
 
