@@ -104,6 +104,7 @@ public class TabTest extends SimpleModuleTest
 
         // Issue 18731 - Couldn't rename container tabs if on container tab page.
         portalHelper.renameTab("Study Container", "Study Container Rename");
+        refresh(); // Tab id doesn't change until refresh
         // It's needed later in the test, so rename it back.
         portalHelper.renameTab("Study Container Rename", "Study Container");
 
@@ -311,8 +312,8 @@ public class TabTest extends SimpleModuleTest
 
         // Verify that subfolders got moved into tabs
         PortalTab studyContainerTab = PortalTab.find(STUDY_FOLDER_TAB_LABEL, getDriver());
-        PortalTab assayContainerTab = PortalTab.find(ASSAY_FOLDER_TAB_LABEL, getDriver());
         studyContainerTab = studyContainerTab.activate();
+        PortalTab assayContainerTab = PortalTab.find(ASSAY_FOLDER_TAB_LABEL, getDriver());
         assertTrue(studyContainerTab.isActive());
         assertFalse(assayContainerTab.isActive());
         projectMenu().open();
@@ -323,7 +324,7 @@ public class TabTest extends SimpleModuleTest
 
         clickAndWait(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
         assertTextPresent("Study Overview");
-        studyContainerTab = PortalTab.finder(getDriver()).withTabText(STUDY_FOLDER_TAB_LABEL).findWhenNeeded();
+        studyContainerTab = PortalTab.finder(getDriver()).withTabText(STUDY_FOLDER_TAB_LABEL).find();
         studyContainerTab.goToTabContainer("Specimen Data");
         assertTextPresent("Vial Search", "Import Specimens");
         clickAndWait(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
