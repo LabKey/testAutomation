@@ -562,7 +562,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         String baseURL = WebTestHelper.getBaseURL();
-        assertTrue("Expected URL to begin with " + baseURL + ", but found " + urlString, urlString.indexOf(baseURL) == 0);
+        if (!urlString.startsWith(baseURL))
+        {
+            TestLogger.warn("Expected URL to begin with " + baseURL + ", but found " + urlString);
+            return null;
+        }
         return urlString.substring(baseURL.length());
     }
 

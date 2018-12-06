@@ -120,6 +120,7 @@ public class Crawler
         if (injectionTest)
         {
             test.getUrlsSeen().stream()
+                .filter(url -> !StringUtils.isBlank(url))
                 .map(url -> new UrlToCheck(null, url, 1))
                 .filter(UrlToCheck::isVisitableURL)
                 .filter(UrlToCheck::isInjectableURL)
