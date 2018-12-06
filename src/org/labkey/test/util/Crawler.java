@@ -150,6 +150,7 @@ public class Crawler
             new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
             new ControllerActionId("admin", "resetQueryStatistics"),
             new ControllerActionId("admin", "queryStackTraces"),
+            new ControllerActionId("admin", "mapNetworkDrive"), // 404 on non-Windows
             new ControllerActionId("admin", "shortURLAdmin"),
             new ControllerActionId("admin", "showAllErrors"),
             new ControllerActionId("admin", "showPrimaryLog"), // Can take very long to load
