@@ -89,6 +89,16 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         permissionsApiAsAppAdmin().addMemberToRole(USER, "Reader", PermissionsHelper.MemberType.user, "home");
     }
 
+    @Test
+    public void testAppAdminCanCreateAndDeleteFolder()
+    {
+        goToHome();
+        impersonate(APP_ADMIN);
+        _containerHelper.createProject("AppAdminTestProject", "Collaboration");
+        _containerHelper.deleteProject("AppAdminTestProject");
+        assertEquals("Container AppAdminTestProject not deleted.", false, _containerHelper.doesContainerExist("AppAdminTestProject"));
+    }
+
     private ApiPermissionsHelper permissionsApiAsAppAdmin()
     {
         return new ApiPermissionsHelper(this, () -> new Connection(WebTestHelper.getBaseURL(), APP_ADMIN, PasswordUtil.getPassword()));
