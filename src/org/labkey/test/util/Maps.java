@@ -16,13 +16,10 @@
 
 package org.labkey.test.util;
 
-import org.labkey.api.annotations.JavaRuntimeVersion;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@JavaRuntimeVersion  // TODO: Now that we require Java 11, change to built-in Map.of() and remove this class
 public class Maps
 {
     public static <K, V> Map<K, V> of()
