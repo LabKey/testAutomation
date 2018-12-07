@@ -208,6 +208,7 @@ public class Crawler
             new ControllerActionId("study-samples", "getSpecimenExcel"),
             new ControllerActionId("study-samples", "download"),
             new ControllerActionId("targetedms", "downloadChromLibrary"),
+            new ControllerActionId("test", "npe"),
             new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("wiki", "download"),
             new ControllerActionId("harvest", "sickSafeTime"),
