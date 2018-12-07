@@ -15,7 +15,7 @@
  */
 package org.labkey.junit.runner;
 
-import org.labkey.api.collections.CaseInsensitiveHashMap;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTest;
 
@@ -108,7 +108,7 @@ public abstract class WebTestProperties
 
             if (null == collection)
             {
-                collection = Collections.newSetFromMap(new org.labkey.remoteapi.collections.CaseInsensitiveHashMap<>());
+                collection = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
                 put(key, collection);
             }
 
