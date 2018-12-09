@@ -120,7 +120,7 @@ public class VagrantUtil
             throw new RuntimeException(e);
         }
 
-        if(!new Integer(0).equals(returnCode))
+        if(!Integer.valueOf(0).equals(returnCode))
         {
             if (returnCode != null)
                 TestLogger.error("Unexpected exit code " + returnCode);

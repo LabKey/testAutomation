@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -526,7 +527,7 @@ public class ListTest extends BaseWebDriverTest
         List<String> expectedColumn = new ArrayList<>(Arrays.asList(TEST_DATA[4]));
         List<String> firstListColumn = secondList.getColumnDataAsText(_listCol4.getName());
         assertEquals("Second query webpart shouldn't have been sorted", expectedColumn, firstListColumn);
-        expectedColumn.sort((a, b) -> new Integer(Integer.parseInt(a)).compareTo(Integer.parseInt(b))); // Parse to check sorting of 10 vs 7, 8, 9
+        expectedColumn.sort(Comparator.comparingInt(Integer::parseInt)); // Parse to check sorting of 10 vs 7, 8, 9
         List<String> secondListColumn = firstList.getColumnDataAsText(_listCol4.getName());
         assertEquals("First query webpart should have been sorted", expectedColumn, secondListColumn);
 

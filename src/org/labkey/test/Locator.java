@@ -358,7 +358,7 @@ public abstract class Locator extends By
                     }
                     else
                     {
-                        if (new Integer(index).equals(_index))
+                        if (Integer.valueOf(index).equals(_index))
                             return Collections.singletonList(el); // Return as soon as we find the desired element
                         index++;
                     }
