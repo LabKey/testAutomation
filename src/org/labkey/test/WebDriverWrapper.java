@@ -16,6 +16,8 @@
 package org.labkey.test;
 
 import com.google.common.base.Function;
+import org.apache.commons.collections4.MultiMap;
+import org.apache.commons.collections4.map.MultiValueMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -1711,19 +1713,27 @@ public abstract class WebDriverWrapper implements WrapsDriver
             });
             if (getDriver().getTitle().isEmpty() && onLabKeyPage())
             {
-                String action = new Crawler.ControllerActionId(getDriver().getCurrentUrl()).toString();
-                if (!actionsWithWarnings.contains(action))
-                {
-                    actionsWithWarnings.add(action);
-                    TestLogger.warn("Action doesn't define a page title: " + action);
-                }
+                Crawler.ControllerActionId action = new Crawler.ControllerActionId(getDriver().getCurrentUrl());
+                String warning = "Action doesn't define a page title";
+                addActionWarning(warning, action);
             }
         }
 
         return System.currentTimeMillis() - startTime;
     }
 
-    private static final Set<String> actionsWithWarnings = new HashSet<>();
+    private static final MultiMap<String, Set<String>> actionWarnings = MultiValueMap.multiValueMap(new HashMap<>(), HashSet::new);
+
+    public static void addActionWarning(String warning, Crawler.ControllerActionId action)
+    {
+        TestLogger.warn(warning + ": " + action);
+        actionWarnings.put(warning, action.toString());
+    }
+
+    public static Map<String, Set<String>> getActionWarnings()
+    {
+        return new HashMap(actionWarnings);
+    }
 
     private static final WeakHashMap<WebDriver, Set<PageLoadListener>> _pageLoadListeners = new WeakHashMap<>();
 

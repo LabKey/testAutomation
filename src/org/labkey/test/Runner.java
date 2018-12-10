@@ -694,6 +694,21 @@ public class Runner extends TestSuite
                 System.out.println(" " + stat + " = " + valueStr);
             }
         }
+        Map<String, Set<String>> actionWarnings = WebDriverWrapper.getActionWarnings();
+        if (!actionWarnings.isEmpty())
+        {
+            System.out.println("---------------------- Test Warnings -----------------------");
+            for (String warning : actionWarnings.keySet())
+            {
+                System.out.println("  " + warning + ":");
+                List<String> actions = new ArrayList<>(actionWarnings.get(warning));
+                Collections.sort(actions);
+                for (String action : actions)
+                {
+                    System.out.println("    " + action);
+                }
+            }
+        }
         System.out.println("------------------------------------------------------------");
         System.out.println(getFixedWidthString("Total duration:", formatDuration(total), width) + "\n");
         System.out.println("Completed " + FastDateFormat.getInstance("yyyy-MM-dd HH:mm").format(new Date()));
