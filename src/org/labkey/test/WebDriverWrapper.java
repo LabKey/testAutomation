@@ -127,6 +127,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.Locator.tag;
 import static org.labkey.test.TestProperties.isChromeDriverLoggingEnabled;
 import static org.labkey.test.TestProperties.isScriptCheckEnabled;
 import static org.labkey.test.WebTestHelper.getBaseURL;
@@ -729,13 +730,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void goToSiteGroups()
     {
-        if (!isElementPresent(Locator.tag("a").withClass("x4-tab-active").withText("Site Groups")))
+        if (!isElementPresent(tag("a").withClass("x4-tab-active").withText("Site Groups")))
             clickAdminMenuItem("Site", "Site Groups");
     }
 
     public void goToSitePermissions()
     {
-        if (!isElementPresent(Locator.tag("a").withClass("x4-tab-active").withText("Site Permissions")))
+        if (!isElementPresent(tag("a").withClass("x4-tab-active").withText("Site Permissions")))
             clickAdminMenuItem("Site", "Site Permissions");
     }
 
