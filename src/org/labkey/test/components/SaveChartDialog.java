@@ -15,102 +15,133 @@
  */
 package org.labkey.test.components;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.LazyWebElement;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public class SaveChartDialog<EC extends Component.ElementCache> extends Component<EC>
+public class SaveChartDialog extends Window<SaveChartDialog.Elements>
 {
-    private  final String DIALOG_XPATH = "//div[contains(@class, 'chart-wizard-dialog')]//div[contains(@class, 'save-chart-panel')]";
+    private static final Locator DIALOG_LOC = Locator.byClass("chart-wizard-dialog").append(Locator.byClass("save-chart-panel"));
+    private final TimeChartWizard reportWizard;
+    private boolean expectNavigateOnSave = false;
 
-    protected WebElement _saveChartDialog;
-    protected BaseWebDriverTest _test;
-
-    public SaveChartDialog(BaseWebDriverTest test)
+    public SaveChartDialog(TimeChartWizard reportWizard)
     {
-        _test = test;
+        super(DIALOG_LOC.waitForElement(reportWizard.getDriver(), 10000), reportWizard.getDriver());
+        this.reportWizard = reportWizard;
+    }
+
+    public SaveChartDialog setReportName(String name)
+    {
+        getWrapper().setFormElement(elementCache().reportName, name);
+        expectNavigateOnSave = true;
+        return this;
+    }
+
+    public SaveChartDialog setReportDescription(String description)
+    {
+        getWrapper().setFormElement(elementCache().reportDescription, description);
+        return this;
+    }
+
+    public SaveChartDialog setThumbnailType(ThumbnailType thumbnail)
+    {
+        switch (thumbnail)
+        {
+            case auto:
+                elementCache().autoThumbnail.check();
+                break;
+            case none:
+                elementCache().noThumbnail.check();
+                break;
+            default:
+                break;
+        }
+        return this;
+    }
+
+    public SaveChartDialog setViewableBy(ViewableBy visibility)
+    {
+        switch (visibility)
+        {
+            case onlyMe:
+                elementCache().onlyMe.check();
+                break;
+            case allReaders:
+                elementCache().allReaders.check();
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown option: " + visibility);
+        }
+        return this;
+    }
+
+    public TimeChartWizard clickCancel()
+    {
+        clickButton("Cancel", true);
+        return reportWizard;
+    }
+
+    public TimeChartWizard clickSave()
+    {
+        if (expectNavigateOnSave)
+        {
+            return new TimeChartWizard(getWrapper()).doAndWaitForUpdate(() -> clickButton("Save"))
+                    .waitForReportRender();
+        }
+        else
+        {
+            Locator.XPathLocator successMsgLoc = Locator.byClass("labkey-message").withText("Report saved successfully.");
+            WebElement successMsg = getWrapper().doAndWaitForElementToRefresh(() -> clickButton("Save", true), successMsgLoc, getWrapper().shortWait());
+            getWrapper().shortWait().until(ExpectedConditions.invisibilityOf(successMsg));
+            return reportWizard.waitForReportRender();
+        }
+    }
+
+    public Window clickSaveExpectingError()
+    {
+        clickButton("Save", false);
+        return new Window.WindowFinder(getDriver()).withTitle("Error").waitFor();
+    }
+
+    public String clickSaveWithoutRequiredFields()
+    {
+        clickButton("Save", false);
+        return waitForInvalid().getAttribute("name");
+    }
+
+    public WebElement waitForInvalid()
+    {
+        return Locator.tagWithClass("input", "x4-form-invalid-field").waitForElement(this, 10000);
     }
 
     @Override
-    public WebElement getComponentElement()
-    {
-        return _saveChartDialog;
-    }
-
-    public boolean isDialogVisible()
-    {
-        return elements().dialog.isDisplayed();
-    }
-
-    public void waitForDialog()
-    {
-        waitForDialog(false);
-    }
-
-    public void waitForDialog(boolean saveAs)
-    {
-        _test.waitForElement(Locator.xpath(DIALOG_XPATH + "//div[text()='" + (saveAs ? "Save as" : "Save") + "']"));
-    }
-
-    public void setReportName(String name)
-    {
-        _test.setFormElement(elements().reportName, name);
-    }
-
-    public void setReportDescription(String description)
-    {
-        _test.setFormElement(elements().reportDescription, description);
-    }
-
-    public void setThumbnailType(boolean auto)
-    {
-        if (auto)
-            elements().autoThumbnail.click();
-        else
-            elements().noThumbnail.click();
-    }
-
-    public void clickCancel()
-    {
-        Window w = new Window(elements().dialog, _test.getDriver());
-        w.clickButton("Cancel", 0);
-    }
-
-    public void clickSave()
-    {
-        clickSave(false);
-    }
-
-    public void clickSave(boolean expectReload)
-    {
-        Window w = new Window(elements().dialog, _test.getDriver());
-        w.clickButton("Save", expectReload ? _test.WAIT_FOR_PAGE : 0);
-    }
-
-    public void waitForInvalid()
-    {
-        _test.waitForElement(Locator.xpath(DIALOG_XPATH + "//input[contains(@class, 'x4-form-invalid-field')]"));
-    }
-
-    public Elements elements()
+    protected Elements newElementCache()
     {
         return new Elements();
     }
 
-    class Elements extends ElementCache
+    protected class Elements extends Window.ElementCache
     {
-        protected SearchContext getContext()
-        {
-            return getComponentElement();
-        }
+        private final WebElement reportName = new LazyWebElement(Locator.xpath("//td//label[text()='Report Name:']/parent::td/following-sibling::td//input"), this);
+        private final WebElement reportDescription = new LazyWebElement(Locator.xpath("//td//label[text()='Report Description:']/parent::td/following-sibling::td//textarea"), this);
+        private final RadioButton noThumbnail = new RadioButton.RadioButtonFinder().withLabel("None").findWhenNeeded(this);
+        private final RadioButton autoThumbnail = new RadioButton.RadioButtonFinder().withLabel("Auto-generate").findWhenNeeded(this);
+        private final RadioButton allReaders = new RadioButton.RadioButtonFinder().withLabel("All readers").findWhenNeeded(this);
+        private final RadioButton onlyMe = new RadioButton.RadioButtonFinder().withLabel("Only me").findWhenNeeded(this);
+    }
 
-        public WebElement dialog = new LazyWebElement(Locator.xpath(DIALOG_XPATH), _test.getDriver());
-        public WebElement reportName = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//td//label[text()='Report Name:']/parent::td/following-sibling::td//input"), _test.getDriver());
-        public WebElement reportDescription = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//td//label[text()='Report Description:']/parent::td/following-sibling::td//textarea"), _test.getDriver());
-        public WebElement noThumbnail = new LazyWebElement(Locator.xpath("//input[@type='button' and ../label[text()='None']]"), _test.getDriver());
-        public WebElement autoThumbnail = new LazyWebElement(Locator.xpath("//input[@type='button' and ../label[text()='Auto-generate']]"), _test.getDriver());
+    public enum ViewableBy
+    {
+        allReaders, onlyMe
+    }
+
+    public enum ThumbnailType
+    {
+        auto, none
     }
 }

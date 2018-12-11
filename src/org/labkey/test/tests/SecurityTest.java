@@ -26,6 +26,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
@@ -40,6 +41,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.UIUserHelper;
+import org.openqa.selenium.WebElement;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
@@ -56,8 +58,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 import static org.labkey.test.pages.ConfigureDbLoginPage.PasswordStrength;
 
@@ -421,14 +425,13 @@ public class SecurityTest extends BaseWebDriverTest
     protected void guestTest()
     {
         goToProjectHome();
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Author");
-        _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
-        _permissionsHelper.exitPermissionsUI();
+        ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+        permissionsHelper.setSiteGroupPermissions("All Site Users", "Author");
+        permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Messages");
-        assertElementPresent(Locator.lkButton("New"));
+        waitForElement(Locator.lkButton("New"));
         pushLocation();
         signOut();
         popLocation();
@@ -826,7 +829,11 @@ public class SecurityTest extends BaseWebDriverTest
             clickAndWait(Locator.linkWithText("Sign In"));
         }
         assertTitleContains("Sign In");
-        assertElementNotPresent(Locator.button("Register"));
+        WebElement link = Locator.button("Register").findElementOrNull(getDriver());
+        assertFalse("Self-registration button is visible", link != null && link.isDisplayed());
+
+        beginAt(buildURL("login", "register"));
+        assertElementPresent(Locators.labkeyError.withText("Registration is not enabled"));
 
         // cleanup: sign admin back in
         signIn();

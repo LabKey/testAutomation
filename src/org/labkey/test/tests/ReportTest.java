@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.util.LogMethod;
 
 public abstract class ReportTest extends StudyBaseTest
@@ -95,9 +96,8 @@ public abstract class ReportTest extends StudyBaseTest
 
     protected ChartTypeDialog clickAddChart(String schemaName, String queryName)
     {
-        goToManageViews();
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Chart"));
-        ChartQueryDialog queryDialog = new ChartQueryDialog(getDriver());
+        ManageViewsPage manageViewsPage = goToManageViews();
+        ChartQueryDialog queryDialog = manageViewsPage.clickAddChart();
         queryDialog.selectSchema(schemaName).selectQuery(queryName);
         return queryDialog.clickOk();
     }

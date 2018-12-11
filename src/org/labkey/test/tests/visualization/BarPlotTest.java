@@ -27,9 +27,8 @@ import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.LookAndFeelBarPlot;
-import org.labkey.test.components.LookAndFeelScatterPlot;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 
@@ -60,6 +59,12 @@ public class BarPlotTest extends GenericChartsTest
     private final String MAX_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n1e+7\n2e+7\n3e+7\n4e+7\n5e+7\n6e+7\n7e+7\n8e+7\n9e+7\n1e+8\n1.1e+8\n1.2e+8\nTypes\nStudy: Cohort\nMax of Double";
     private final String MEAN_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n2e+6\n4e+6\n6e+6\n8e+6\n1e+7\n1.2e+7\n1.4e+7\n1.6e+7\n1.8e+7\n2e+7\nTypes\nStudy: Cohort\nMean of Double";
     private final String MEDIAN_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n0.05\n0.1\n0.15\n0.2\n0.25\n0.3\n0.35\n0.4\n0.45\n0.5\n0.55\n0.6\nTypes\nStudy: Cohort\nMedian of Double";
+
+    @Override
+    protected LookAndFeelBarPlot clickChartLayoutButton()
+    {
+        return clickChartLayoutButton(LookAndFeelBarPlot.class);
+    }
 
     @LogMethod
     protected void testPlots()
@@ -106,8 +111,7 @@ public class BarPlotTest extends GenericChartsTest
         svgDefaultWidth = getAttribute(Locator.css("svg"), "width");
 
         log("Change some of the look and feel settings.");
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelBarPlot(getDriver());
+        lookAndFeelDialog = clickChartLayoutButton();
         lookAndFeelDialog.setPlotTitle(TRICKY_CHART_TITLE)
                 .setFillColor(COLOR_RED)
                 .setLineColor(COLOR_BLUE)
@@ -122,9 +126,7 @@ public class BarPlotTest extends GenericChartsTest
         Assert.assertEquals("X-Axis label is not as expected.", PREG_TEST_RESULTS, strTemp);
 
         log("Apply the changes made.");
-        lookAndFeelDialog.clickApply();
-
-        shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css("svg")));
+        TimeChartWizard chartWizard = lookAndFeelDialog.clickApply();
 
         log("Validate that the changes made are reflected in the bar plot.");
         Assert.assertEquals("Plot width not as expected.", "750", getAttribute(Locator.css("svg"), "width"));
@@ -135,18 +137,15 @@ public class BarPlotTest extends GenericChartsTest
         Assert.assertEquals("Stroke-width not as expected.", "5", getAttribute(Locator.css("svg a.bar-individual rect.bar-rect"), "stroke-width"));
 
         log("Add a y-axis value");
-        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog = chartWizard.clickChartTypeButton();
         chartTypeDialog.setYAxis(BP_DIASTOLIC)
                 .clickApply();
-
-        shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css("svg")));
 
         log("Validate that the plot text now shows the y-axis values.");
         assertSVG(SECOND_BAR_PLOT_SVG_TEXT);
 
         log("Change some more of the look and feel.");
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelBarPlot(getDriver());
+        lookAndFeelDialog = clickChartLayoutButton();
         lookAndFeelDialog.setFillColor(COLOR_GREEN)
                 .setLineColor(COLOR_RED)
                 .setPlotWidth("")
@@ -169,7 +168,6 @@ public class BarPlotTest extends GenericChartsTest
 
         log("Save the plot.");
         savePlot(BAR_PLOT_SAVE_NAME, "This is a bar plot from the simple bar plot test.");
-
     }
 
     @LogMethod
@@ -200,8 +198,7 @@ public class BarPlotTest extends GenericChartsTest
         assertSVG(GROUPED_BAR_PLOT_SVG_TEXT);
 
         log("Validate that the label for the x-axis is as expected.");
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelBarPlot(getDriver());
+        lookAndFeelDialog = clickChartLayoutButton();
         lookAndFeelDialog.clickXAxisTab();
         strTemp = lookAndFeelDialog.getXAxisLabel();
         Assert.assertEquals("X-Axis label is not as expected.", SKIN, strTemp);
@@ -234,8 +231,7 @@ public class BarPlotTest extends GenericChartsTest
         goToProjectHome();
         clickFolder(getFolderName());
         clickTab("Clinical and Assay Data");
-        waitForElement(Locator.linkWithText(DATA_SOURCE_1));
-        click(Locator.linkWithText(DATA_SOURCE_1));
+        waitAndClickAndWait(Locator.linkWithText(DATA_SOURCE_1));
 
         dataRegionTable = new DataRegionTable("Dataset", getDriver());
         plotRegion = dataRegionTable.getColumnPlotRegion();
@@ -257,6 +253,7 @@ public class BarPlotTest extends GenericChartsTest
 
         log("Click on the bar plot and validate that we are redirected to the plot wizard.");
         clickAndWait(plotRegion.getPlots().get(0), WAIT_FOR_PAGE);
+        TimeChartWizard chartWizard = new TimeChartWizard(this).waitForReportRender();
 
         URL currentUrl = getURL();
         log("Current url path: " + currentUrl.getPath());
@@ -264,7 +261,7 @@ public class BarPlotTest extends GenericChartsTest
 
         waitForElement(Locator.css("svg"));
 
-        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog = chartWizard.clickChartTypeButton();
 
         strTemp = chartTypeDialog.getXCategories();
         Assert.assertTrue("Categories field did not contain the expected value. Expected '" + COL_TEXT_BAR + "'. Found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_BAR.toLowerCase()));
@@ -274,8 +271,7 @@ public class BarPlotTest extends GenericChartsTest
 
         chartTypeDialog.clickCancel();
 
-        clickChartLayoutButton();
-        chartLayoutDialog = new LookAndFeelBarPlot(getDriver());
+        chartLayoutDialog = clickChartLayoutButton();
 
         strTemp = chartLayoutDialog.getPlotTitle();
         Assert.assertTrue("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(DATA_SOURCE_1.toLowerCase()));
@@ -319,13 +315,12 @@ public class BarPlotTest extends GenericChartsTest
         goToProjectHome();
         clickFolder(getFolderName());
         clickTab("Clinical and Assay Data");
-        waitForElement(Locator.linkWithText(DATA_SOURCE_1));
-        click(Locator.linkWithText(DATA_SOURCE_1));
+        waitAndClickAndWait(Locator.linkWithText(DATA_SOURCE_1));
 
         dataRegionTable = new DataRegionTable("Dataset", getDriver());
 
         log("Create a quick chart and validate that we are redirected to the wizard.");
-        dataRegionTable.createQuickChart(COL_NAME_BAR);
+        TimeChartWizard chartWizard = dataRegionTable.createQuickChart(COL_NAME_BAR);
 
         URL currentUrl = getURL();
         log("Current url path: " + currentUrl.getPath());
@@ -333,7 +328,7 @@ public class BarPlotTest extends GenericChartsTest
 
         waitForElement(Locator.css("svg"));
 
-        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog = chartWizard.clickChartTypeButton();
 
         strTemp = chartTypeDialog.getXCategories();
         Assert.assertTrue("Categories field did not contain the expected value. Expected '" + COL_TEXT_BAR + "'. Found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_BAR.toLowerCase()));
@@ -343,8 +338,7 @@ public class BarPlotTest extends GenericChartsTest
 
         chartTypeDialog.clickCancel();
 
-        clickChartLayoutButton();
-        chartLayoutDialog = new LookAndFeelBarPlot(getDriver());
+        chartLayoutDialog = clickChartLayoutButton();
 
         strTemp = chartLayoutDialog.getPlotTitle();
         Assert.assertTrue("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(DATA_SOURCE_1.toLowerCase()));
@@ -358,22 +352,19 @@ public class BarPlotTest extends GenericChartsTest
     @LogMethod
     private void doAxisManualRangeBarPlotTest()
     {
-        LookAndFeelScatterPlot lookAndFeelDialog;
+        LookAndFeelBarPlot lookAndFeelDialog;
 
-        goToProjectHome();
-        clickFolder(getFolderName());
-        openSavedPlotInEditMode(BAR_PLOT_SAVE_NAME);
+        navigateToFolder(getProjectName(), getFolderName());
+        TimeChartWizard reportWizard = openSavedPlotInEditMode(BAR_PLOT_SAVE_NAME);
         assertSVG(SECOND_BAR_PLOT_SVG_TEXT);
 
         // set y-axis manual range, make sure we can use negative manual range values
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        lookAndFeelDialog = clickChartLayoutButton();
         lookAndFeelDialog.setYAxisRangeMinMax("-50", "-40").clickApply();
         assertSVG(THIRD_BAR_PLOT_SVG_TEXT);
 
         // set y-axis manual range max only, and make sure decimals are allowed
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        lookAndFeelDialog = clickChartLayoutButton();
         lookAndFeelDialog.setYAxisRangeMinMax(null, "3000.5").clickApply();
         assertSVG(FOURTH_BAR_PLOT_SVG_TEXT);
 
@@ -389,9 +380,8 @@ public class BarPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("Types"));
         DataRegionTable table = new DataRegionTable("Dataset", this);
         table.setFilter("Boolean", "Is Not Blank", null);
-        table.createQuickChart("dbl");
-        clickButton("Chart Type", 0);
-        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
+        TimeChartWizard chartWizard = table.createQuickChart("dbl");
+        ChartTypeDialog chartTypeDialog = chartWizard.clickChartTypeButton();
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Bar).clickApply();
 
         log("Validate that the default aggregate method is Sum.");

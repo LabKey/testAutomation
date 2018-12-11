@@ -25,16 +25,25 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelBoxPlot;
 import org.labkey.test.components.SaveChartDialog;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 @Category({DailyC.class, Reports.class, Charting.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class BoxPlotTest extends GenericChartsTest
 {
+    @Override
+    protected LookAndFeelBoxPlot clickChartLayoutButton()
+    {
+        return clickChartLayoutButton(LookAndFeelBoxPlot.class);
+    }
+
     @LogMethod
     protected void testPlots()
     {
@@ -63,37 +72,28 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_MV_1);
 
         log("Set Plot Title");
-        clickChartLayoutButton();
-        lookAndFeelBoxPlot = new LookAndFeelBoxPlot(getDriver());
-        lookAndFeelBoxPlot.setPlotTitle(CHART_TITLE)
+        lookAndFeelBoxPlot = clickChartLayoutButton();
+        TimeChartWizard chartWizard = lookAndFeelBoxPlot.setPlotTitle(CHART_TITLE)
                 .clickYAxisTab()
                 .setYAxisScale(LookAndFeelBoxPlot.ScaleType.Log)
                 .setYAxisLabel("TestYAxis")
                 .clickApply();
 
-        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog = chartWizard.clickChartTypeButton();
         chartTypeDialog.setYAxis("2.Body temperature", true);
-        chartTypeDialog.clickApply();
-
-        log("Set X Axis");
-        chartTypeDialog = clickChartTypeButton();
         chartTypeDialog.setXAxis("Mouse Group: " + MOUSE_GROUP_CATEGORY);
         chartTypeDialog.clickApply();
 
-        clickChartLayoutButton();
-        lookAndFeelBoxPlot = new LookAndFeelBoxPlot(getDriver());
-        lookAndFeelBoxPlot.setXAxisLabel("TestXAxis")
+        lookAndFeelBoxPlot = clickChartLayoutButton();
+        chartWizard = lookAndFeelBoxPlot.setXAxisLabel("TestXAxis")
                 .clickApply();
 
         assertSVG(BOX_PLOT_MV_2);
 
-        clickButton("Save", 0);
-        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
-        saveChartDialog.waitForDialog();
+        SaveChartDialog saveChartDialog = chartWizard.clickSave();
 
         //Verify name requirement
-        saveChartDialog.clickSave();
-        saveChartDialog.waitForInvalid();
+        assertEquals("Save without required field", "reportName", saveChartDialog.clickSaveWithoutRequiredFields());
 
         //Test cancel button
         saveChartDialog.setReportName("TestReportName");
@@ -119,9 +119,8 @@ public class BoxPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("RCH-1: Reactogenicity-Day 1"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("RCHtempc", "Is Less Than", "39");
-        datasetTable.goToReport("Create Chart");
+        chartTypeDialog = datasetTable.createChart();
 
-        chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box)
                 .setYAxis("2.Body temperature")
                 .clickApply();
@@ -138,8 +137,7 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_DR_2);
 
         //Enable point click function for this box plot
-        clickChartLayoutButton();
-        lookAndFeelBoxPlot = new LookAndFeelBoxPlot(getDriver());
+        lookAndFeelBoxPlot = clickChartLayoutButton();
         lookAndFeelBoxPlot.clickDeveloperTab()
                 .clickDeveloperEnable()
                 .clickApply();

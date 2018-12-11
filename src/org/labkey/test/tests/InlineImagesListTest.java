@@ -203,7 +203,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
 
         log("Hover over the thumbnail for the png and make sure the pop-up is as expected.");
         mouseOver(Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"));
-        shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
+        longWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
         String src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
         assertTrue("Wrong image in popup: " + src, src.contains(LRG_PNG_FILE.getName()));
         assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());

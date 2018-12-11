@@ -16,6 +16,7 @@
 package org.labkey.test.pages.reports;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.LogMethod;
@@ -35,10 +36,17 @@ public class ManageViewsPage extends LabKeyPage
         BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,reportType);
     }
 
+    public ChartQueryDialog clickAddChart()
+    {
+        clickAndWait(Locator.linkContainingText("Add Chart"));
+        return new ChartQueryDialog(getDriver());
+    }
+
     @LogMethod
     public void deleteReport(String reportName)
     {
-        final Locator report = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName);
+        // td[3] is the chart type column, shouldn't be a link or anything
+        final Locator report = Locator.tag("tr").withClass("x4-grid-row").containing(reportName).childTag("td").position(3);
 
         // select the report and click the delete button
         waitForElement(report, 10000);

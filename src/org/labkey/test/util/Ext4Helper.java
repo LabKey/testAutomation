@@ -500,7 +500,9 @@ public class Ext4Helper
     @LogMethod(quiet = true)
     public void checkGridRowCheckbox(String cellText, int index)
     {
-        findGridRowCheckbox(cellText, index).check();
+        Checkbox box = findGridRowCheckbox(cellText, index);
+        _test.scrollIntoView(box.getComponentElement());
+        box.check();
     }
 
     @LogMethod(quiet = true)

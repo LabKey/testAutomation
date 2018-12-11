@@ -24,7 +24,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -108,8 +109,13 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     protected void waitForClose(Integer waitSeconds)
     {
+        List<WebElement> elements = new ArrayList<>();
+        elements.add(getComponentElement());
+        WebElement modalBackdrop = Locator.byClass("modal-backdrop").findElementOrNull(getDriver());
+        if (modalBackdrop != null)
+            elements.add(modalBackdrop);
         new WebDriverWait(getDriver(), waitSeconds)
-                .until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
+                .until(ExpectedConditions.invisibilityOfAllElements(elements));
     }
 
     protected ElementCache newElementCache()

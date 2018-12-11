@@ -328,7 +328,7 @@ public class SampleSetTest extends BaseWebDriverTest
         Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
         clickButton("Submit");
 
-        clickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
+        waitAndClickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
 
         // These two regions are used throughout the remaining jumps comparing parent/child sets
         DataRegionTable childMaterialsRegion = new DataRegionTable("childMaterials", this.getDriver());

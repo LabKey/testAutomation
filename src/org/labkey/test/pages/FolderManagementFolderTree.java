@@ -190,14 +190,15 @@ public class FolderManagementFolderTree
         {
             case top:
                 y = 5;
-                offset = -1;
+                offset = -1 * (Integer.parseInt(toEl.getAttribute("height")) / 2 + 1);
                 break;
             case bottom:
-                y = toEl.getSize().getHeight() - 5;
-                offset = 1;
+                y = Integer.parseInt(toEl.getAttribute("height")) - 5;
+                offset = Integer.parseInt(toEl.getAttribute("height")) / 2 + 1;
                 break;
             case middle:
-                y = toEl.getSize().getHeight() / 2;
+                y = Integer.parseInt(toEl.getAttribute("height")) / 2;
+                offset = -1 * (Integer.parseInt(toEl.getAttribute("height")) / 2 + 1);
                 break;
             default:
                 throw new IllegalArgumentException("Unexpected position: " + pos.toString());
@@ -217,9 +218,22 @@ public class FolderManagementFolderTree
         Actions builder = new Actions(_test.getDriver());
         builder.clickAndHold(fromEl).build().perform();
         _test.waitForElement(dragBubble);
+
+        // The bubble text only shows up if the app detects the mouse crossing from one element to another.
+        // Unfortunately this happens so fast the transition is not detected, so trying to force it by moving
+        // to the right and below the target element, waiting, and then moving back.
+
+        builder.moveToElement(toEl, toEl.getSize().getWidth()/2, y)
+                .moveByOffset(toEl.getSize().getWidth() * 2, toEl.getSize().getHeight() * 2) // A little extra move helps trigger the correct hover target
+                .build().perform();
+        _test.log("Drag bubble text: " + _test.getText(dragBubble));
+
+        _test.sleep(500);
+
         builder.moveToElement(toEl, toEl.getSize().getWidth()/2, y)
                 .moveByOffset(1, offset) // A little extra move helps trigger the correct hover target
                 .build().perform();
+
         _test.waitForElement(dragBubble.containing(hoverText));
         builder.release().build().perform();
     }

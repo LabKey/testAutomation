@@ -75,8 +75,14 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
         {
             super.getWrappedElement().isEnabled(); // Check for staleness
         }
-        catch (StaleElementReferenceException refind)
+        catch (NoSuchElementException | StaleElementReferenceException refind)
         {
+
+            // Geckodriver sometimes thros NoSuchElementException for stale elements. Check for those.
+            if (refind instanceof NoSuchElementException && !refind.getMessage().startsWith("Web element reference not seen before:"))
+            {
+                throw refind;
+            }
             boolean refound = false;
             try
             {

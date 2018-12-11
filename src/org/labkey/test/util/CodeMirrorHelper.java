@@ -30,58 +30,41 @@ public class CodeMirrorHelper
 
     public void setCodeMirrorValue(String id, String value)
     {
-        String script =
-                "setCodeMirrorValue = function(id, value) {\n" +
-                        "    try {\n" +
-                        "        if (LABKEY.CodeMirror && LABKEY.CodeMirror[id]) {\n" +
-                        "            var eal = LABKEY.CodeMirror[id];\n" +
-                        "            eal.setValue(value);\n" +
-                        "        }\n" +
-                        "        else {\n" +
-                        "            throw 'Unable to find code mirror instance.';\n" +
-                        "        }\n" +
-                        "    } catch (e) {\n" +
-                        "        throw 'setCodeMirrorValue() threw an exception: ' + e.message;\n" +
-                        "    }\n" +
-                        "};\n" +
-                        "setCodeMirrorValue(arguments[0], arguments[1]);";
+        String script = getCodeMirrorPrefix() +
+                "getCodeMirrorInstance(arguments[0]).setValue(arguments[1]);";
         wrapper.executeScript(script, id, value);
     }
 
     public String getCodeMirrorValue(String id)
     {
-        String script =
-                "var getCodeMirrorValue = function(id) {\n" +
-                        "    try {\n" +
-                        "        if (LABKEY.CodeMirror && LABKEY.CodeMirror[id]) {\n" +
-                        "            var eal = LABKEY.CodeMirror[id];\n" +
-                        "            return eal.getValue();\n" +
-                        "        }\n" +
-                        "        else {\n" +
-                        "            throw 'Unable to find code mirror instance.';\n" +
-                        "        }\n" +
-                        "    } catch (e) {\n" +
-                        "        throw 'getCodeMirrorValue() threw an exception: ' + e.message;\n" +
-                        "    }\n" +
-                        "};\n" +
-                        "return getCodeMirrorValue(arguments[0]);";
-        return (String) wrapper.executeScript(script, id);
+        String script = getCodeMirrorPrefix() +
+                "return getCodeMirrorInstance(arguments[0]).getValue();";
+        return wrapper.executeScript(script, String.class, id);
     }
 
-    public int getLineCount()
+    public int getLineCount(String id)
     {
-        Locator lastLineLoc = Locator.css(".CodeMirror-code > div:last-of-type .CodeMirror-linenumber");
-        int lineCount = 0;
-        int lastLineNum = Integer.parseInt(wrapper.getText(lastLineLoc));
+        String script = getCodeMirrorPrefix() +
+                "var cm = getCodeMirrorInstance(arguments[0]);\n" +
+                "return cm.lineCount();";
+        return wrapper.executeScript(script, Long.class, id).intValue();
+    }
 
-        while (lineCount < lastLineNum)
-        {
-            lineCount = lastLineNum;
-            WebElement codeEditorDiv = Locator.css(".CodeMirror-scroll").findElement(wrapper.getDriver());
-            wrapper.executeScript("arguments[0].scrollTop = arguments[0].scrollHeight;", codeEditorDiv);
-            lastLineNum = Integer.parseInt(wrapper.getText(lastLineLoc));
-        }
-
-        return lineCount;
+    private String getCodeMirrorPrefix()
+    {
+        String prefix =
+                "var getCodeMirrorInstance = function(id) {\n" +
+                        "    try {\n" +
+                        "        if (LABKEY.CodeMirror && LABKEY.CodeMirror[id]) {\n" +
+                        "            return LABKEY.CodeMirror[id];\n" +
+                        "        }\n" +
+                        "        else {\n" +
+                        "            throw 'Unable to find code mirror instance ' + id;\n" +
+                        "        }\n" +
+                        "    } catch (e) {\n" +
+                        "        throw 'Error attempting to get code mirror instance: ' + e.message;\n" +
+                        "    }\n" +
+                        "};\n";
+        return prefix;
     }
 }

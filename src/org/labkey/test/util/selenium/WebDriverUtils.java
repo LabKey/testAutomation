@@ -21,7 +21,9 @@ import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.WrapsDriver;
+import org.openqa.selenium.WrapsElement;
+import org.openqa.selenium.interactions.Locatable;
 
 import java.util.List;
 
@@ -70,5 +72,26 @@ public abstract class WebDriverUtils
         {
             ((JavascriptExecutor)_webDriver).executeScript("window.scrollBy(" + x.toString() +", " + y.toString() + ");");
         }
+    }
+
+    /**
+     * Extract a WebDriver instance from an arbitrarily wrapped object
+     * @param peeling Object that wraps a WebDriver. Typically a Component, SearchContext, or WebElement
+     * @return WebDriver instance or null if none is found
+     */
+    public static WebDriver extractWrappedDriver(Object peeling)
+    {
+        while (peeling instanceof WrapsElement)
+        {
+            peeling = ((WrapsElement) peeling).getWrappedElement();
+        }
+        while (peeling instanceof WrapsDriver)
+        {
+            peeling = ((WrapsDriver) peeling).getWrappedDriver();
+        }
+        if (peeling instanceof WebDriver)
+            return (WebDriver) peeling;
+        else
+            return null;
     }
 }

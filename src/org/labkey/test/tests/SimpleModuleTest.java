@@ -49,6 +49,7 @@ import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -591,13 +592,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(thumbnail);
 
         log("Hover over the thumbnail and make sure the pop-up is as expected.");
-        mouseOver(thumbnail);
+        fireEvent(thumbnail, SeleniumEvent.mouseover);
         //mouseOver(Locator.xpath("//img[contains(@src, '" + thumbnailImage + "')]"));
         shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
         Locator popup = Locator.tag("div").withAttribute("id", "helpDiv").descendant("img").withAttributeContaining("src", popupImage).
                 withAttributeContaining("style", popupWidth != null ? "width:" + popupWidth : "max-width:300px");
         String src = popup.findElement(getDriver()).getAttribute("src");
-        mouseOut();
+        fireEvent(thumbnail, SeleniumEvent.mouseout);
+        Locator.tagWithClass("th", "labkey-selectors").findElement(getDriver()).click(); // safe out-click in the first header cell
         shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("#helpDiv")));
 
         assertTrue("Wrong image in popup: " + src, src.contains(popupImage));
@@ -981,17 +983,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void verifyReportThumbnail(String reportTitle)
+    private void verifyReportThumbnail(@LoggedParam String reportTitle)
     {
         File expectedThumbnailFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + reportTitle + THUMBNAIL_FILENAME);
         String expectedThumbnail = TestFileUtils.getFileContents(expectedThumbnailFile);
 
-        waitForElement(Locator.xpath("//a[text()='"+reportTitle+"']"));
-        mouseOver(Locator.xpath("//a[text()='"+reportTitle+"']"));
-        Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
-        waitForElement(thumbnail);
-        String thumbnailData;
-        thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
+        WebElement reportLink = waitForElement(Locator.xpath("//a[text()='" + reportTitle + "']"));
+        mouseOver(reportLink);
+        WebElement thumbnail = waitForElement(Locator.xpath("//div[@class='thumbnail']/img").notHidden());
+        String thumbnailData = WebTestHelper.getHttpResponse(thumbnail.getAttribute("src")).getResponseBody();
 
         int lengthToCompare = 5000;
         int diff = StringUtils.getLevenshteinDistance(expectedThumbnail.substring(0, lengthToCompare), thumbnailData.substring(0, lengthToCompare));

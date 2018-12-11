@@ -15,28 +15,28 @@
  */
 package org.labkey.test.pages.study;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;
+import org.openqa.selenium.WrapsDriver;
 
 /**
  * Created by susanh on 9/26/15.
  */
 public class ManageParticipantGroupsPage extends LabKeyPage
 {
-    public ManageParticipantGroupsPage(BaseWebDriverTest test)
+    public ManageParticipantGroupsPage(WrapsDriver test)
     {
         super(test);
     }
 
     public boolean isEditEnabled()
     {
-        return _test.isElementPresent(Locator.linkContainingText("Edit Selected").enabled());
+        return isElementPresent(Locator.linkContainingText("Edit Selected").enabled());
     }
 
     public boolean isDeleteEnabled()
     {
-        return _test.isElementPresent(Locator.linkContainingText("Delete Selected").enabled());
+        return isElementPresent(Locator.linkContainingText("Delete Selected").enabled());
     }
 
     public void selectGroup(String name)

@@ -559,7 +559,10 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Submit");
         waitForText(DataRegionTable.getImportBulkDataText());
         assertTextPresent("View Design");
-        clickAndWait(Locator.linkWithSpan("This is my single list web part title"), WAIT_FOR_PAGE);
+        new DataRegionTable.DataRegionFinder(getDriver()).index(2).waitFor();
+        Locator loc = Locator.linkWithSpan("This is my single list web part title");
+        scrollIntoView(loc);
+        clickAndWait(loc, WAIT_FOR_PAGE);
         assertTextPresent("Colors", "Views");
 
         log("Add List -- " + LIST3_NAME_OWNERS);
@@ -924,7 +927,7 @@ public class ListTest extends BaseWebDriverTest
         dragAndDrop(Locator.xpath("//div[text()='Is Greater Than 5']"), Locator.xpath("//div[text()='Is Greater Than 7']"));
         assertTextBefore("Is Greater Than 7", "Is Greater Than 5");
 
-        clickButton("Save", 0);
+        _listHelper.clickSave();
         clickButton("Done", defaultWaitForPage);
 
         // Verify conditional format of boolean column

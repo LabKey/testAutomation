@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Flow;
+import org.labkey.test.util.DataRegionTable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -74,11 +75,11 @@ public class FlowAnalysisResolverTest extends BaseFlowTest
 
         assertTextPresent("All 4 selected", "1 FCS files");
         clickButton("Finish");
-        waitForText("Experiment Run Graph");
-        assertTextPresent(FCS_FILE, 4);
+        DataRegionTable dataRegion = new DataRegionTable.DataRegionFinder(getDriver()).withName("query").waitFor();
+        assertEquals("Links to " + FCS_FILE, 4, Locator.linkWithText(FCS_FILE).findElements(dataRegion).size());
 
         // verify attachments present
-        assertTextPresent("readme.txt");
+        assertElementPresent(Locator.linkWithText("readme.txt"));
     }
 
     private String getMatchedFileForName(String name)

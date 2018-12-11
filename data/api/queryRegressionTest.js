@@ -4,8 +4,7 @@
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
 
-// Designed to be run by JavaScriptExecutor#executeAsyncScript
-var callback = arguments[arguments.length - 1]; // See WebDriver documentation
+var testNumber = arguments[0];
 
 var success = function(index, msg) {
     return '' + index + ')SUCCESS: ' + msg + '\n';
@@ -14,9 +13,9 @@ var failure = function(index, msg) {
     return '' + index + ')FAILURE: ' + msg + '\n';
 };
 
-var testResults = [];
+var testResult;
 var testFunctions = [
-        function() // testResults[0]
+        function() // testNumber = 0
         {
             LABKEY.Query.executeSql({
                 schemaName : 'lists',
@@ -26,7 +25,7 @@ var testFunctions = [
             });
         },
 
-        function() // testResults[1]
+        function() // testNumber = 1
         {
             LABKEY.Query.executeSql({
                 schemaName : 'lists',
@@ -37,7 +36,7 @@ var testFunctions = [
             });
         },
 
-        function() // testResults[2]
+        function() // testNumber = 2
         {
             LABKEY.Query.executeSql({
                 schemaName : 'lists',
@@ -48,7 +47,8 @@ var testFunctions = [
             });
         },
 
-        function()
+        // TODO: 35526: Ext4.Ajax.request doesn't trigger callbacks when invoked by Geckodriver
+        function() // testNumber = 3
         {
             Ext4.Ajax.request({
                 url     : LABKEY.ActionURL.buildURL('query', 'selectRows'),
@@ -78,30 +78,38 @@ var testFunctions = [
         function()
         {
             var html = '';
-            if (testResults[0].rowCount !== undefined && testResults[0].rowCount == 125)
-                html += success(0, 'executeSql 0 returned 125 rows');
-            else
-                html += failure(0, 'executeSql 0 returned ' + testResults[0].rowCount + ' rows, expected 125.  Error value = ' + testResults[0].exception);
-
-            if (testResults[1].rows !== undefined && testResults[1].rows.length == 93)
-                html += success(1, 'executeSql 1 returned 93 rows');
-            else
-                html += failure(1, 'executeSql 1 failed to return 93 rows.  Error value = ' + testResults[1].exception);
-
-            if (testResults[2].rows !== undefined && testResults[2].rows.length == 10)
-                html += success(2, 'executeSql 2 returned 10 rows');
-            else
-                html += failure(2, 'executeSql 2 returned ' + testResults[2].rowCount + ' rows, expected 10.  Error value = ' + testResults[2].exception);
-
-            if (testResults[2].formatVersion && testResults[2].formatVersion == 9.1)
-                html += success(2, 'executeSql 2 returned with requested v9.1');
-            else
-                html += failure(2, 'executeSql 2 failed to return v9.1. Version value = ' + testResults[3].formatVersion);
-
-            if (testResults[3].rows !== undefined && testResults[3].rows.length == 96)
-                html += success(3, "selectRows 3 returned 96 rows with mixed sort parameters");
-            else
-                html += failure(3, "selectRows 3 failed with mixed sort parameters. Error value = '" + testResults[3].exception);
+            switch (testNumber) {
+                case 0:
+                    if (testResult.rowCount !== undefined && testResult.rowCount == 125)
+                        html += success(0, 'executeSql 0 returned 125 rows');
+                    else
+                        html += failure(0, 'executeSql 0 returned ' + testResult.rowCount + ' rows, expected 125.  Error value = ' + testResult.exception);
+                    break;
+                case 1:
+                    if (testResult.rows !== undefined && testResult.rows.length == 93)
+                        html += success(1, 'executeSql 1 returned 93 rows');
+                    else
+                        html += failure(1, 'executeSql 1 failed to return 93 rows.  Error value = ' + testResult.exception);
+                    break;
+                case 2:
+                    if (testResult.rows !== undefined && testResult.rows.length == 10)
+                        html += success(2, 'executeSql 2 returned 10 rows');
+                    else
+                        html += failure(2, 'executeSql 2 returned ' + testResult.rowCount + ' rows, expected 10.  Error value = ' + testResult.exception);
+                    if (testResult.formatVersion && testResult.formatVersion == 9.1)
+                        html += success(2, 'executeSql 2 returned with requested v9.1');
+                    else
+                        html += failure(2, 'executeSql 2 failed to return v9.1. Version value = ' + testResult.formatVersion);
+                    break;
+                case 3: // TODO: Not working through Geckodriver
+                    if (testResult.rows !== undefined && testResult.rows.length == 96)
+                        html += success(3, "selectRows 3 returned 96 rows with mixed sort parameters");
+                    else
+                        html += failure(3, "selectRows 3 failed with mixed sort parameters. Error value = '" + testResult.exception);
+                    break;
+                default:
+                    throw "No such test, select [0-3]: " + testNumber;
+            }
 
             callback(html);
         }
@@ -109,20 +117,37 @@ var testFunctions = [
 
 var executeNext = function()
 {
-    var currentFn = testFunctions[testResults.length];
-    currentFn();
+    var currentFn;
+    if (testResult) { // Validate result if present
+        currentFn = testFunctions[testFunctions.length - 1];
+        window.console.log("Starting test #" + testNumber);
+    }
+    else{
+        currentFn = testFunctions[testNumber];
+        window.console.log("Test #" + testNumber + " finished.");
+    }
+
+
+    try
+    {
+        currentFn();
+    }
+    catch (e)
+    {
+        callback('ERROR: ' + e.message);
+    }
 };
 
 var failureHandler = function(errorInfo, responseObj, options)
 {
-    testResults[testResults.length] = errorInfo;
+    testResult = errorInfo;
     executeNext();
 };
 
 var successHandler = function(data, responseObj, options)
 {
-    testResults[testResults.length] = data;
+    testResult = data;
     executeNext();
 };
 
-executeNext();
+LABKEY.requiresExt4ClientAPI(executeNext);

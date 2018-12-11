@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.LogMethod;
@@ -115,7 +116,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         _rReportHelper.clickSourceTab();
 
         int expectedLineCount = reportSource.split("\n").length;
-        assertEquals("Incorrect number of lines present in code editor.", expectedLineCount, new CodeMirrorHelper(this).getLineCount());
+        assertEquals("Incorrect number of lines present in code editor.", expectedLineCount, new CodeMirrorHelper(this).getLineCount("script-report-editor"));
 
         return saveAndVerifyKnitrReport(reportName, reportContains, reportNotContains);
     }

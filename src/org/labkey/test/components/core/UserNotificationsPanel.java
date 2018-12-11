@@ -25,6 +25,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.pages.core.UserNotificationsPage;
 import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -61,7 +62,9 @@ public class UserNotificationsPanel extends WebDriverComponent<UserNotifications
     {
         test.click(inboxIcon);
         test.waitForElement(Locators.pageSignal("notificationPanelShown"), 2000);
-        return new UserNotificationsPanel(test.getDriver());
+        UserNotificationsPanel userNotificationsPanel = new UserNotificationsPanel(test.getDriver());
+        test.shortWait().until(LabKeyExpectedConditions.animationIsDone(userNotificationsPanel.getComponentElement()));
+        return userNotificationsPanel;
     }
 
     @Override

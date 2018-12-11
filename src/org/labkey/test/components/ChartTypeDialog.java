@@ -15,14 +15,15 @@
  */
 package org.labkey.test.components;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
-public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends ChartWizardDialog <EC>
+public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCache>
 {
     public ChartTypeDialog(WebDriver driver)
     {
@@ -60,6 +61,8 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
             case Line:
                 elementCache().plotTypeLine.click();
                 break;
+            default:
+                throw new IllegalArgumentException("Unknown chart type: " + chartType.name());
         }
 
         return this;
@@ -315,11 +318,13 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
 
     private ChartTypeDialog setValue(WebElement target, String columnName, String columnGridCls)
     {
-        elementCache().getColumn(columnName, columnGridCls).click();
+        WebElement column = elementCache().getColumn(columnName, columnGridCls);
+        getWrapper().scrollIntoView(column);
+        column.click();
         getWrapper().waitFor(() -> {
             return target.isDisplayed();
         }, "Target element is not displayed", 5000);
-        target.click();
+        getWrapper().actionClick(target); // The drop text may be obscured, just need to click the location
         getWrapper().waitForFormElementToNotEqual(target.findElement(By.xpath("//div[contains(@class, 'field-selection-text')]")), columnName);
         return this;
     }
@@ -446,26 +451,21 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         return this;
     }
 
-    public void clickApply()
+    public TimeChartWizard clickApply()
     {
-        clickApply(10000);
+        return clickApply(10000);
     }
 
-    // If waitTime is set to -1 it means you expected the mask to not go away. That is you expected an error.
-    // An example would be not setting all of the required fields. In that case the color of the text of the required field would
-    // change and the mask would not go away.
-    public void clickApply(int waitTime)
+    public TimeChartWizard clickApply(int waitTime)
     {
-        clickButton("Apply", 0);
+        WebDriverWait webDriverWait = new WebDriverWait(getDriver(), waitTime / 1000);
+        return new TimeChartWizard(getWrapper()).doAndWaitForUpdate(() -> clickButton("Apply", true), webDriverWait);
+    }
 
-        // If not equal to -1 then the apply should work.
-        if(waitTime != -1)
-        {
-            waitForClose();
-            getWrapper().sleep(1000);
-            getWrapper()._ext4Helper.waitForMaskToDisappear(waitTime);
-        }
-
+    public ChartTypeDialog clickApplyWithError()
+    {
+        clickButton("Apply", false);
+        return this;
     }
 
     // Should be something like 'Box' or 'Scatter'
@@ -512,9 +512,9 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     }
 
     @Override
-    protected EC newElementCache()
+    protected ElementCache newElementCache()
     {
-        return (EC) new ElementCache();
+        return new ElementCache();
     }
 
     class ElementCache extends ChartWizardDialog.ElementCache

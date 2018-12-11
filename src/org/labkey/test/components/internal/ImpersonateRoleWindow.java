@@ -17,6 +17,7 @@ package org.labkey.test.components.internal;
 
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class ImpersonateRoleWindow extends ImpersonateWindow
 {
@@ -28,7 +29,11 @@ public class ImpersonateRoleWindow extends ImpersonateWindow
     public ImpersonateRoleWindow selectRoles(String... roles)
     {
         for (String role : roles)
-            Ext4GridRef.locateExt4GridCell(role).waitForElement(this, 1000).click();
+        {
+            WebElement gridCheckbox = Ext4GridRef.locateExt4GridCell(role).waitForElement(this, 1000);
+            getWrapper().scrollIntoView(gridCheckbox);
+            gridCheckbox.click();
+        }
 
         return this;
     }

@@ -31,6 +31,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.admin.CreateSubFolderPage;
 import org.labkey.test.pages.admin.SetFolderPermissionsPage;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -192,7 +193,16 @@ public abstract class AbstractContainerHelper
             }
             catch (NoSuchElementException missingModule)
             {
-                fail(moduleName + " module was not found. Check that the module is installed and you are on a supported database.");
+                String supportedDbMessage = "";
+                if (_test instanceof PostgresOnlyTest)
+                {
+                    supportedDbMessage = " " + _test.getClass().getSimpleName() + " is flagged as Postgres only.";
+                }
+                else if (_test instanceof SqlserverOnlyTest)
+                {
+                    supportedDbMessage = " " + _test.getClass().getSimpleName() + " is flagged as SQL Server only.";
+                }
+                fail(moduleName + " module was not found. Check that the module is installed and the server is on a supported database." + supportedDbMessage);
             }
         }
         _test.clickButton("Update Folder");
@@ -312,7 +322,8 @@ public abstract class AbstractContainerHelper
             for (String tabname : tabsToAdd)
                 _test.checkCheckbox(Locator.checkboxByTitle(tabname));
 
-            _test.submit();
+            WebElement form = Locators.bodyPanel().append("//form").findElement(_test.getDriver());
+            _test.doAndWaitForPageToLoad(form::submit);
             if ("None".equals(folderType))
             {
                 for (String tabname : tabsToAdd)
@@ -320,6 +331,7 @@ public abstract class AbstractContainerHelper
             }
 
             // verify that we're in the new folder:
+            _test.waitForElement(Locators.bodyTitle(child));
             _test.assertElementPresent(Locators.bodyTitle(child));
         }
     }

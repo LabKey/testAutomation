@@ -16,7 +16,6 @@
 
 package org.labkey.test;
 
-import com.google.common.base.Predicate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +54,7 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.search.SearchResultsPage;
@@ -69,6 +69,7 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.remote.service.DriverService;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -113,6 +114,7 @@ import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.TestProperties.isViewCheckSkipped;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
+import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.components.PropertiesEditor.PhiSelectType;
@@ -435,6 +437,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             Statement createFailOnTimeoutStatement(Statement statement, Class<?> testClass)
             {
+                // No class timeout when running through IntelliJ
+                if ("true".equals(System.getProperty("intellij.debug.agent")))
+                    return statement;
+
                 long minutes;
                 ClassTimeout timeout = testClass.getAnnotation(ClassTimeout.class);
                 if (timeout != null)
@@ -1253,7 +1259,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         // Download full action coverage table and add to TeamCity artifacts.
-        File download = doAndWaitForDownload(() -> getDriver().get(WebTestHelper.buildURL("admin", "exportActions")));
+        beginAt(buildURL("admin", "actions", Maps.of("tabId", "details")));
+        File download = clickAndWaitForDownload(Locator.lkButton("Export").waitForElement(shortWait()));
         File actionCoverageFile = new File(TestProperties.getDumpDir(), "ActionCoverage.tsv");
         try
         {
@@ -1779,7 +1786,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         try
         {
-            longWait().until((Predicate<WebDriver>) webDriver ->
+            longWait().until(webDriver ->
             {
                 if (titleName == null && searchResults.getResultCount().equals(expectedResults) ||
                         titleName != null && isElementPresent(Locator.linkContainingText(titleName)))
@@ -1814,7 +1821,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             schemaWithParents.append(separator).append(schemaPart);
             separator = ".";
 
-            Locator.XPathLocator loc = Locator.schemaTreeNode(schemaPart);
+            Locator.XPathLocator loc = Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaPart).precedingSibling("img").withClass("x4-tree-icon");
 
             //first load of schemas might a few seconds
             shortWait().until(ExpectedConditions.elementToBeClickable(loc));
@@ -1836,12 +1843,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 log(log.getMessage());
             }
             doAndWaitForPageSignal(() -> {
-                click(loc);
-                mouseOut();
+                WebElement folderIcon = loc.findElement(getDriver());
+                // Moving to desired tree node should dismiss tooltip from previously clicked folder
+                new Actions(getDriver()).moveToElement(folderIcon).perform();
+                click(folderIcon);
                 }, "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
-            mouseOut(); // Dismiss tooltip
-            waitForElementToDisappear(Locator.tagWithClass("div", "x4-tip").notHidden(), WAIT_FOR_PAGE);
         }
     }
 
@@ -1849,11 +1856,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
-        Locator loc = Locator.tagWithClass("span", "labkey-link").withText(queryName).notHidden();
-        waitAndClick(loc);
-        // NOTE: consider abstracting this.
-        waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
-        waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]//a[contains(text(), '" + schemaName + "." + queryName + "')]/.."), 30000);
+        WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        mouseOver(queryLink); // Move away from schema tree to dismiss tooltip
+        queryLink.click();
+        waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
     }
 
     public void clickFkExpando(String schemaName, String queryName, String columnName)

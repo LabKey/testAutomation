@@ -54,6 +54,11 @@ abstract class BaseUpdatePage<PAGE> extends LabKeyPage<BaseUpdatePage.ElementCac
         return getThis();
     }
 
+    public WikiRendererType getRenderAs()
+    {
+        return Enum.valueOf(WikiRendererType.class, elementCache().rendererSelect.get().name());
+    }
+
     public PAGE addAttachments(File... files)
     {
         for (File file : files)
@@ -66,6 +71,12 @@ abstract class BaseUpdatePage<PAGE> extends LabKeyPage<BaseUpdatePage.ElementCac
     public PAGE removeAttachment(int index)
     {
         elementCache().filePicker.removeAttachment(index);
+        return getThis();
+    }
+
+    public PAGE setExpires(String dateString)
+    {
+        setFormElement(elementCache().expiresInput, dateString);
         return getThis();
     }
 
@@ -90,12 +101,13 @@ abstract class BaseUpdatePage<PAGE> extends LabKeyPage<BaseUpdatePage.ElementCac
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        protected Input titleInput = Input(Locator.id("title"), getDriver()).findWhenNeeded(this);
+        protected Input titleInput = Input(Locator.name("title"), getDriver()).findWhenNeeded(this);
         protected Input bodyInput = Input(Locator.id("body"), getDriver()).findWhenNeeded(this);
 
-        protected EnumSelect<WikiRendererType> rendererSelect = EnumSelect(Locator.id("wiki-input-window-change-format-to"), WikiRendererType.class).findWhenNeeded(this);
+        protected EnumSelect<WikiRendererType> rendererSelect = EnumSelect(Locator.name("rendererType"), WikiRendererType.class).findWhenNeeded(this);
 
         protected FilePicker filePicker = new FilePicker(getDriver());
+        protected WebElement expiresInput = Locator.name("expires").findWhenNeeded(this);
         protected WebElement submitButton = Locator.lkButton("Submit").findWhenNeeded(this);
         protected WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
     }

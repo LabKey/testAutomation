@@ -144,7 +144,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         log("Hover over the thumbnail and make sure the pop-up is as expected.");
         mouseOver(Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"));
-        shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
+        longWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
         String src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'downloadFileLink')]").findElement(getDriver()).getAttribute("src");
         assertEquals("Bad response from run field pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
 

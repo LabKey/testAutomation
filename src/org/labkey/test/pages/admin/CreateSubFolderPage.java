@@ -38,7 +38,7 @@ public class CreateSubFolderPage extends LabKeyPage
     public SetFolderPermissionsPage clickNext()
     {
         scrollIntoView(newElementCache().nextButton);
-        newElementCache().nextButton.click();
+        clickAndWait(newElementCache().nextButton);
         return new SetFolderPermissionsPage(getDriver());
     }
 

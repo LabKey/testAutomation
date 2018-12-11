@@ -37,11 +37,10 @@ public abstract class ChartWizardDialog<EC extends ChartWizardDialog.ElementCach
 
     public void clickCancel()
     {
-        clickButton("Cancel", 0);
-        waitForClose();
+        clickButton("Cancel", true);
     }
 
-    class ElementCache extends Window.Elements
+    class ElementCache extends Window.ElementCache
     {
         public ElementCache()
         {

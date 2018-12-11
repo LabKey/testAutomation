@@ -26,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.SaveChartDialog;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
@@ -261,7 +262,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.id("customThumbnail"));
         setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), TEST_THUMBNAIL);
         _ext4Helper.clickWindowButton(WEIGHT_OVER_TIME, "Save", 0, 0);
-        waitForTextToDisappear("Saving...");
+        _ext4Helper.waitForMaskToDisappear();
 
         deleteCustomThumbnail(WEIGHT_OVER_TIME);
         verifyThumbnail(WEIGHT_OVER_TIME, THUMBNAIL_DATA);
@@ -292,7 +293,6 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         _rReportHelper.ensureRConfig();
         _containerHelper.createProject(PROJECT_NAME, "Study");
         importStudyFromZip(TEST_STUDY);
-        goToDataViews();
     }
 
     protected void getCurrentCoreRevNumber()
@@ -313,17 +313,12 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     protected void toggleThumbnailType(String chart, boolean useAutoThumbnail)
     {
         clickAndWait(Locator.linkWithText(chart));
-        waitForElement(Locator.css("svg"));
-        clickButton("Edit");
-        waitForElement(Locator.css("svg"));
-        waitForTextToDisappear("Loading Data...");
-        clickButton("Save", 0);
+        TimeChartWizard chartWizard = new TimeChartWizard(this).waitForReportRender();
+        chartWizard.clickEdit();
+        SaveChartDialog saveChartDialog = chartWizard.clickSave();
 
-        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
-        saveChartDialog.waitForDialog();
-        saveChartDialog.setThumbnailType(useAutoThumbnail);
+        saveChartDialog.setThumbnailType(SaveChartDialog.ThumbnailType.auto);
         saveChartDialog.clickSave();
-        sleep(2500); // sleep while the save success message shows
     }
 
     @LogMethod
@@ -332,18 +327,17 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText(report));
         clickAndWait(Locator.linkWithText(report));
         _rReportHelper.clickSourceTab();
-        doAndWaitForPageToLoad(() -> _rReportHelper.saveReport(null));
+        _rReportHelper.saveReport(null, false, getDefaultWaitForPage());
     }
 
 
     @LogMethod
     protected void setThumbnailSRC(String chart)
     {
-        waitForElement(Locator.linkWithText(chart));
-        mouseOver(Locator.linkWithText(chart));
-        Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
-        waitForElement(thumbnail);
-        THUMBNAIL_DATA = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
+        WebElement reportLink = waitForElement(Locator.linkWithText(chart));
+        mouseOver(reportLink);
+        WebElement thumbnail = waitForElement(Locator.xpath("//div[@class='thumbnail']/img").notHidden());
+        THUMBNAIL_DATA = WebTestHelper.getHttpResponse(thumbnail.getAttribute("src")).getResponseBody();
     }
 
     @LogMethod
@@ -382,18 +376,18 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
-        assertTrue("Thumbnail Revision number is not correct", checkRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img"), currentRevNum));
+        assertEquals("Thumbnail Revision number is not correct", String.valueOf(currentRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
         setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), thumbnail);
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
-        waitForTextToDisappear("Saving...");
+        _ext4Helper.waitForMaskToDisappear();
         // go back and check revision number real quick
         DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
-        assertTrue("Thumbnail Revision number is not correct", checkRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img"), nextRevNum));
+        assertEquals("Thumbnail Revision number is not correct", String.valueOf(nextRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
-        waitForTextToDisappear("Saving...");
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     protected void deleteCustomThumbnail(String chart){
@@ -404,7 +398,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("thumbnail-remove")).click();
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
-        waitForTextToDisappear("Saving...");
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     protected void deleteCustomIcon(String chart){
@@ -415,38 +409,21 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("icon-remove")).click();
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
-        waitForTextToDisappear("Saving...");
+        _ext4Helper.waitForMaskToDisappear();
     }
-    protected boolean checkRevisionNumber(Locator loc, int num)
-    {
-        waitForElement(loc);
-        String uri = loc.findElement(getDriver()).getAttribute("src");
 
-        String query;
+    protected String getRevisionNumber(Locator loc)
+    {
+        String url = waitForElement(loc).getAttribute("src");
+
         try
         {
-            query = new URL(uri).getQuery();
+            return WebTestHelper.parseUrlQuery(new URL(url)).get("revision");
         }
         catch (MalformedURLException e)
         {
             throw new RuntimeException(e);
         }
-
-        //if (query.contains("&"))
-        //{
-        for (String param : query.split("&"))
-        {
-            String[] data = param.split("=");
-            if(data[0].equals("revision"))
-                return (num == Integer.parseInt(data[1]));
-        }
-        //}
-        /*else {
-            String[] data = query.split("=");
-            if(data[0].equals("revision"))
-                return (num == Integer.parseInt(data[1]));
-        }*/
-        return false;
     }
 
     @LogMethod
@@ -458,7 +435,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         ICON_DATA = getIconDataFromPropertiesPanel();
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
-        waitForTextToDisappear("Saving...");
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     @LogMethod
@@ -484,7 +461,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
 
         ICON_DATA = iconData;
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
-        waitForTextToDisappear("Saving...");
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     private String getIconDataFromPropertiesPanel()
@@ -513,37 +490,16 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.id("customIcon"));
         setFormElement(Locator.xpath("//input[@id='customIcon-button-fileInputEl']"), icon);
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
-        waitForTextToDisappear("Saving...");
+        _ext4Helper.waitForMaskToDisappear();
         // go back and check revision number real quick
         DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customIcon"));
-        assertTrue("Icon Revision number is not correct", checkRevisionNumber(Locator.xpath("//div[contains(@class, 'icon')]//img"), customRevNum));
+        assertEquals("Icon Revision number is not correct", String.valueOf(customRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'icon')]//img")));
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
-        waitForTextToDisappear("Saving...");
+        _ext4Helper.waitForMaskToDisappear();
     }
-
-    /*@LogMethod
-    protected File getExportFolderZip()
-    {
-        goToProjectHome();
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Export"));
-        clickButton("Export", 0);
-
-        waitFor(new BaseWebDriverTest.Checker() {
-            @Override
-            public boolean check()
-            {
-                File[] exportFiles = getDownloadDir().listFiles();
-                return (exportFiles != null && exportFiles.length > 0);
-            }
-        }, "failed to export study", WAIT_FOR_JAVASCRIPT);
-
-        File[] exportFiles = getDownloadDir().listFiles();
-        return exportFiles[0];
-    }*/
 
     @LogMethod
     protected void importFolder(File importZip)

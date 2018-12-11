@@ -148,6 +148,11 @@ public abstract class TestProperties
         return System.getProperty("cloud.pipeline.bucket");
     }
 
+    public static boolean isWebDriverLoggingEnabled()
+    {
+        return "true".equals(System.getProperty("webtest.webdriver.logging"));
+    }
+
     public static String ensureGeckodriverExeProperty()
     {
         final String key = GECKO_DRIVER_EXE_PROPERTY;
@@ -182,11 +187,6 @@ public abstract class TestProperties
         }
 
         return System.getProperty(key);
-    }
-
-    public static boolean isChromeDriverLoggingEnabled()
-    {
-        return "true".equals(System.getProperty("enable.chromedriver.logging"));
     }
 
     public static String ensureChromedriverExeProperty()
@@ -239,18 +239,26 @@ public abstract class TestProperties
         return System.getProperty("additional.pipeline.tools");
     }
 
+    private static File dumpDir = null;
     public static File getDumpDir()
     {
-        File dumpDir = null;
-        String outputDir = System.getProperty("failure.output.dir");
-        if (outputDir != null)
-            dumpDir = new File(outputDir);
-        if (dumpDir == null || !dumpDir.exists())
-            dumpDir = new File(System.getProperty("java.io.tmpdir"));
-        if (!dumpDir.exists())
+        if (dumpDir == null)
         {
-            throw new RuntimeException("Couldn't determine directory for placement of output files. " +
-                    "Tried system properties failure.output.dir and java.io.tmpdir");
+            String outputDir = System.getProperty("failure.output.dir");
+            if (outputDir != null)
+            {
+                dumpDir = new File(outputDir);
+                if (!dumpDir.exists())
+                    dumpDir = new File(TestFileUtils.getLabKeyRoot(), outputDir);
+            }
+            if (dumpDir == null || !dumpDir.exists())
+                dumpDir = new File(System.getProperty("java.io.tmpdir"));
+            if (!dumpDir.exists())
+            {
+                dumpDir = null;
+                throw new RuntimeException("Couldn't determine directory for placement of output files. " +
+                        "Tried system properties failure.output.dir and java.io.tmpdir");
+            }
         }
         return dumpDir;
     }

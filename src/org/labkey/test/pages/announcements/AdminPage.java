@@ -80,6 +80,73 @@ public class AdminPage extends LabKeyPage<AdminPage.ElementCache>
         return new AdminPage(getDriver());
     }
 
+    public AdminPage setBoardName(String name)
+    {
+        setFormElement(elementCache().boardName, name);
+        return this;
+    }
+
+    public AdminPage setConversationName(String name)
+    {
+        setFormElement(elementCache().conversationName, name);
+        return this;
+    }
+
+    public AdminPage canEditTitle(boolean checked)
+    {
+        elementCache().canEditTitle.set(checked);
+        return this;
+    }
+
+    public AdminPage includeMemberList(boolean checked)
+    {
+        elementCache().includeMemberList.set(checked);
+        return this;
+    }
+
+    public AdminPage includeStatus(boolean checked)
+    {
+        elementCache().includeStatus.set(checked);
+        return this;
+    }
+
+    public AdminPage includeExpires(boolean checked)
+    {
+        elementCache().includeExpires.set(checked);
+        return this;
+    }
+
+    public AdminPage includeAssignedTo(boolean checked)
+    {
+        elementCache().includeAssignedTo.set(checked);
+        return this;
+    }
+
+    public AdminPage includeFormatPicker(boolean checked)
+    {
+        elementCache().includeFormatPicker.set(checked);
+        return this;
+    }
+
+    public AdminPage selectDefaultAssignedTo(String userName)
+    {
+        elementCache().defaultAssignedToSelect.set(userName);
+        return this;
+    }
+
+    public AdminPage setSecurity(boolean on)
+    {
+        if (on)
+        {
+            elementCache().securityOn.click();
+        }
+        else
+        {
+            elementCache().securityOff.click();
+        }
+        return this;
+    }
+
     protected AdminPage.ElementCache newElementCache()
     {
         return new AdminPage.ElementCache();
@@ -108,6 +175,7 @@ public class AdminPage extends LabKeyPage<AdminPage.ElementCache>
         Checkbox includeAssignedTo = Checkbox(Locator.checkboxByName("assignedTo")).findWhenNeeded(this);
         OptionSelect<OptionSelect.SelectOption> defaultAssignedToSelect = OptionSelect.OptionSelect(Locator.tagWithName("select", "defaultAssignedTo")).findWhenNeeded(this);
         Checkbox includeGroups = Checkbox(Locator.checkboxByName("includeGroups")).findWhenNeeded(this);
+        Checkbox includeFormatPicker = Checkbox(Locator.checkboxByName("formatPicker")).findWhenNeeded(this);
 
         protected WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
         protected WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);

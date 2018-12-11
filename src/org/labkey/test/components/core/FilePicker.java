@@ -55,7 +55,12 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
 
     public FilePicker addAttachment(File file)
     {
-        elementCache().pickerLink.click();
+        getWrapper().waitFor(()-> elementCache().pickerLink.getAttribute("href") != null, 2000);
+
+        // work-around issue where clicking the pickerLink doesn't take
+        String script = elementCache().pickerLink.getAttribute("href");
+        getWrapper().executeScript(script);     // should be "javascript:addFilePicker('filePickerTable', 'filePickerLink')
+
         elementCache().findLastAttachmentInput().set(file);
         return this;
     }
@@ -112,7 +117,7 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
     {
         protected FileInput findLastAttachmentInput()
         {
-            return new FileInput(Locator.tag("tbody").childTag("tr").last().append(Locator.tag("input")).findElement(this), getDriver());
+            return new FileInput(Locators.attachmentInput.waitForElement(this, 2000), getDriver());
         }
 
         protected List<WebElement> findRemoveLinks()
@@ -122,5 +127,10 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
 
         // Note: pickerLink is outside of pickerTable (usually sibling)
         protected WebElement pickerLink = Locator.id(getLinkId()).findWhenNeeded(getDriver());
+    }
+
+    public static class Locators
+    {
+        static public Locator attachmentInput = Locator.tag("tbody").childTag("tr").last().append(Locator.tag("input"));
     }
 }

@@ -15,13 +15,15 @@
  */
 package org.labkey.test.components;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
@@ -355,22 +357,16 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return this;
     }
 
-    public ChartLayoutDialog clickDeveloperDisable(boolean clickYes)
+    public ChartLayoutDialog disableDeveloperMode()
+    {
+        return clickDeveloperDisable().clickYes();
+    }
+
+    public DeveloperConfirmation clickDeveloperDisable()
     {
         clickDeveloperTab();
         getWrapper().clickButton("Disable", 0);
-        getWrapper()._extHelper.waitForExtDialog("Confirmation...");
-
-        if(clickYes)
-        {
-            getWrapper().clickButton("Yes", 0);
-        }
-        else
-        {
-            getWrapper().clickButton("No", 0);
-        }
-
-        return this;
+        return new DeveloperConfirmation(getDriver());
     }
 
     public ChartLayoutDialog clickDeveloperSourceTab()
@@ -406,27 +402,21 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return getWrapper()._extHelper.getCodeMirrorValue("point-click-fn-textarea");
     }
 
-    public void clickApply()
+    public TimeChartWizard clickApply()
     {
-        clickApply(10000);
+        return clickApply(10000);
     }
 
-    public void clickApply(int waitTime)
+    public TimeChartWizard clickApply(int waitTime)
     {
-        getWrapper().clickButton("Apply", 0);
-        getWrapper().sleep(1000);
-
+        WebDriverWait webDriverWait = new WebDriverWait(getDriver(), waitTime / 1000);
+        return new TimeChartWizard(getWrapper()).doAndWaitForUpdate(() -> clickButton("Apply", true), webDriverWait);
     }
 
-    public void clickApplyWithError()
+    public String clickApplyWithError()
     {
-        getWrapper().clickButton("Apply", 0);
-        getWrapper().sleep(1000);
-    }
-
-    public void clickCancel()
-    {
-        getWrapper().clickButton("Cancel", 0);
+        clickButton("Apply", false);
+        return org.labkey.test.Locators.labkeyError.waitForElement(this, 10000).getText();
     }
 
     @Override
@@ -490,5 +480,25 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
     {
         Hexagon,
         Square
+    }
+
+    public class DeveloperConfirmation extends Window
+    {
+        public DeveloperConfirmation(WebDriver driver)
+        {
+            super(new WindowFinder(driver).withTitle("Confirmation..."));
+        }
+
+        public ChartLayoutDialog clickYes()
+        {
+            clickButton("Yes", true);
+            return ChartLayoutDialog.this;
+        }
+
+        public ChartLayoutDialog clickNo()
+        {
+            clickButton("No", true);
+            return ChartLayoutDialog.this;
+        }
     }
 }

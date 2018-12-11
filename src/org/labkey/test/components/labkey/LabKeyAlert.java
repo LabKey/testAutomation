@@ -20,7 +20,6 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.security.Credentials;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -86,12 +85,6 @@ public class LabKeyAlert extends ModalDialog implements Alert
 
     @Override
     public void sendKeys(String keysToSend) { }
-
-    @Override
-    public void setCredentials(Credentials credentials) { }
-
-    @Override
-    public void authenticateUsing(Credentials credentials) { }
 
     public static class ExtraLocators {
         static public Locator.XPathLocator functionBody = Locator.tagWithClass("div", "modal-fn-body");

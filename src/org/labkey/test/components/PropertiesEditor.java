@@ -33,6 +33,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
@@ -284,7 +285,8 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         {
             if (!isSelected())
             {
-                spacer.click();
+                getWrapper().scrollIntoView(spacer);
+                new Actions(getDriver()).moveToElement(spacer).click().perform();
                 WebDriverWrapper.waitFor(this::isSelected, "Failed to select field row", 1000);
             }
             return this;
@@ -323,7 +325,8 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         public FieldRow setLabel(String label)
         {
-            labelInput.set(label);
+            // Don't cache, this becomes stale when row is deselected
+            Input(Locator.tag("input").attributeStartsWith("name", "ff_label"), getDriver()).findWhenNeeded(this).set(label);
             return this;
         }
 
@@ -407,9 +410,8 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         private final WebElement statusIndicator = Locator.tag("div").attributeStartsWith("id", "partstatus_").childTag("span").refindWhenNeeded(this);
         private final WebElement deleteButton = Locator.tag("div").attributeStartsWith("id", "partdelete_").findWhenNeeded(this);
-        private final Input labelInput = Input(Locator.tag("input").attributeStartsWith("name", "ff_label"), getDriver()).findWhenNeeded(this);
         private final WebElement fieldTypeTrigger = Locator.tag("input").attributeStartsWith("name", "ff_type").append(Locator.xpath("/../../td/div")).findWhenNeeded(this);
-        private final WebElement spacer = Locator.css("td:first-child").findWhenNeeded(this);
+        private final WebElement spacer = Locator.css("td:nth-of-type(9)").findWhenNeeded(this);    // space between type input and tabs; last td
     }
 
     public class FieldPropertyDock extends Component

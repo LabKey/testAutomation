@@ -88,7 +88,9 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     public void navigateToProject(String projectName)
     {
         open();
-        getWrapper().clickAndWait(elementCache().findProjectLink(projectName, false));
+        WebElement projectLink = elementCache().findProjectLink(projectName, false);
+        getWrapper().scrollIntoView(projectLink);
+        getWrapper().clickAndWait(projectLink);
     }
 
     /* Will navigate to a folder or subfolder of the specified project */
@@ -123,7 +125,9 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
             expandFolderTreeNode(folderTreeNode);
         }
 
-        return getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(folderLink));
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(folderLink));
+        getWrapper().mouseOver(folderLink);
+        return folderLink;
     }
 
     private WebElement expandAllUnder(WebElement parent)

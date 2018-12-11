@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018 LabKey Corporation
+ * Copyright (c) 2012-2017 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
  */
 package org.labkey.test.util.ext4cmp;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -75,7 +75,7 @@ public class Ext4GridRef extends Ext4CmpRef
     public static Locator locateExt4GridCell(int rowIdx, int cellIndex, String parentId)
     {
         Locator row = Ext4GridRef.locateExt4GridRow(rowIdx, parentId);
-        return Locator.xpath("(" + ((Locator.XPathLocator) row).toXpath() + "//td[contains(@class, 'x4-grid-cell')])[" + cellIndex + "]").append(Locator.tagWithClass("div", "x4-grid-cell-inner"));
+        return Locator.xpath("(" + ((Locator.XPathLocator) row).toXpath() + "//td[contains(@class, 'x4-grid-cell')])[" + cellIndex + "]");
     }
 
     //1-based rowIdx
@@ -153,45 +153,39 @@ public class Ext4GridRef extends Ext4CmpRef
         // NOTE: sometimes this editor is picky about appearing
         // for now, solve this by repeating.  however, it would be better to resolve this issue.
         // one theory is that we need to shift focus prior to the doubleclick
-        WebElement cellInput = null;
-        int i = 0;
-        while (cellInput == null)
+        WebElement el = null;
+        final int maxRetries = 4;
+        for (int i = 1; el == null && i <= maxRetries; i++)
         {
-            cellInput = startEditing(rowIdx, colName);
-            assert i < 4 : "Unable to trigger editor after " + i + " attempts";
-            i++;
+            try
+            {
+                el = startEditing(rowIdx, colName);
+            }
+            catch (WebDriverException retry)
+            {
+                if (i == maxRetries)
+                    throw retry;
+            }
         }
+        Assert.assertNotNull("Unable to trigger editor after " + maxRetries + " attempts", el);
 
-        if (!value.equals(""))
-            _test.setFormElement(cellInput, value);
-        else
-        {
-            _test.log("Locator : " + cellInput);
-            WebElement inputTrigger = Locator.xpath("../following-sibling::td").withClass("x4-trigger-cell").findElement(cellInput);
-            inputTrigger.click();
-
-        }
+        Locator moreSpecific = Locator.id(el.getAttribute("id"));
+        _test.setFormElement(moreSpecific, value);
 
         //if the editor is still displayed, try to close it
-        if (cellInput.isDisplayed())
+        if (el.isDisplayed())
         {
             completeEdit();
         }
 
-        assertFalse("Grid input should not be visible", cellInput.isDisplayed());
+        assertFalse("Grid input should not be visible", el.isDisplayed());
         waitForGridEditorToDisappear();
-    }
-
-    public void waitForGridEditor()
-    {
-        _test.waitFor(() ->  getActiveGridEditor() != null,
-                "Unable to find element", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForGridEditorToDisappear()
     {
         _test.waitFor(() -> getActiveGridEditor() == null,
-                "Unable to find element", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                "Grid editor did not disappear", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public int getRowCount()
@@ -218,24 +212,14 @@ public class Ext4GridRef extends Ext4CmpRef
 
     public WebElement getActiveGridEditor()
     {
-        //TODO: we need a more specific selector
-        String selector = "div.x4-grid-editor input";
+        Locator.XPathLocator activeEditorLocator = Locator.id(_id).append(Locator.tagWithClass("input", "x4-form-focus"));
+        return activeEditorLocator.findElementOrNull(_test.getDriver());
+    }
 
-        List<WebElement> visible = new ArrayList<>();
-        for (WebElement element : _test.getDriver().findElements(By.cssSelector(selector)))
-        {
-            if (element.isDisplayed())
-            {
-                visible.add(element);
-            }
-        }
-
-        if (visible.size() > 1)
-        {
-            throw new RuntimeException("Incorrect number of grid cells found: " + visible.size());
-        }
-
-        return visible.size() == 1 ? visible.get(0) : null;
+    public WebElement waitForActiveGridEditor(int timeout)
+    {
+        WebDriverWrapper.waitFor(() -> getActiveGridEditor() != null, timeout);
+        return getActiveGridEditor();
     }
 
     public Locator getTbarButton(String label)
@@ -256,26 +240,29 @@ public class Ext4GridRef extends Ext4CmpRef
         WebElement el = getActiveGridEditor();
         if (el == null)
         {
-            Locator cell = Ext4GridRef.locateExt4GridCell(rowIdx, cellIdx, _id);
+            WebElement cell;
+            WebElement grid = null;
+            Locator cellLoc = Ext4GridRef.locateExt4GridCell(rowIdx, cellIdx, _id);
             // NOTE: this should ultimately get improved or removed.  there are intermittent
             // failures involving the cell not being found.  whenever i put breakpoints below,
             // the element does exist.  for now, just try twice, but this should get replaced with
             // something more reliable
             try
             {
-                _test.waitForElement(cell);
+                grid = Locator.id(_id).findElement(_test.getDriver());
+                cell = cellLoc.waitForElement(grid, 10000);
             }
             catch (NoSuchElementException e)
             {
-                _test.log("grid present: " + _test.isElementPresent(Locator.id(_id)));
+                _test.log("grid present: " + (grid != null));
                 _test.log("row present: " + _test.isElementPresent(Ext4GridRef.locateExt4GridRow(rowIdx, _id)));
-                _test.log("cell present: " + _test.isElementPresent(Ext4GridRef.locateExt4GridCell(rowIdx, cellIdx, _id)));
-                _test.sleep(200);
+                _test.sleep(300);
 
-                if (_test.isElementPresent(Ext4GridRef.locateExt4GridCell(rowIdx, cellIdx, _id)))
+                grid = Locator.id(_id).findElement(_test.getDriver());
+                cell = cellLoc.findElementOrNull(grid);
+                if (cell != null)
                 {
                     _test.log("cell was present on second try");
-                    //test.waitForElement(cell);
                 }
                 else
                 {
@@ -285,30 +272,16 @@ public class Ext4GridRef extends Ext4CmpRef
 
             _test.scrollIntoView(cell); // aligns to bottom
             _test.scrollBy(0, 100); // bumps up a few rows, above any footers or scrollbars
+            new Actions(_test.getDriver()).moveToElement(cell).build().perform();
             if (_clicksToEdit > 1)
                 _test.doubleClick(cell);
             else
-                _test.click(cell);
+                cell.click();
 
-            _test.sleep(200);
-            el = getActiveGridEditor();
+            el = waitForActiveGridEditor(1000);
         }
 
         return el;
-    }
-
-    //1-based
-    public WebElement startEditingJS(int rowIdx, String colName)
-    {
-        Integer colIdx = getIndexOfColumn(colName, false);
-        completeEdit();
-
-        Boolean didStart = (Boolean)getFnEval("return this.editingPlugin.startEdit(" + (rowIdx-1) + ", " + (colIdx-1) + ");");
-        assertTrue("Unable to start grid edit", didStart);
-
-        waitForGridEditor();
-
-        return getActiveGridEditor();
     }
 
     public void cancelEdit()

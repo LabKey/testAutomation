@@ -27,9 +27,9 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
-import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebElement;
 
@@ -105,27 +105,25 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(DATASET));
 
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
-        datasetTable.goToReport( "Create Chart");
+        chartTypeDialog = datasetTable.createChart();
 
-        chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box);
         assertFalse("List contains value '" + UNTAGGED_MEASURE + "', it should not be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_MEASURE));
         assertFalse("List contains value '" + UNTAGGED_DIMENSION + "', it should not be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_DIMENSION));
         chartTypeDialog.setYAxis(TAGGED_MEASURE);
-        chartTypeDialog.clickApply();
+        TimeChartWizard chartWizard = chartTypeDialog.clickApply();
         currentSvg = Locator.css("svg").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         assertTrue(currentSvg.getText().contains(TAGGED_MEASURE));
 
-        clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog = chartWizard.clickChartTypeButton();
         chartTypeDialog.setXAxis(TAGGED_DIMENSION);
-        chartTypeDialog.clickApply();
+        chartWizard = chartTypeDialog.clickApply();
         currentSvg = Locator.css("svg").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         assertTrue(currentSvg.getText().contains(TAGGED_DIMENSION));
 
-        saveChart("restricted chart");
+        chartWizard.saveReport("restricted chart");
     }
 
     @Test
@@ -141,27 +139,25 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(DATASET));
 
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
-        datasetTable.goToReport( "Create Chart");
+        chartTypeDialog = datasetTable.createChart();
 
-        chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box);
         assertTrue("List does not contains value '" + UNTAGGED_MEASURE + "', it should be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_MEASURE));
         assertTrue("List does not contains value '" + UNTAGGED_DIMENSION + "', it should be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_DIMENSION));
         chartTypeDialog.setYAxis(TAGGED_MEASURE);
-        chartTypeDialog.clickApply();
+        TimeChartWizard chartWizard = chartTypeDialog.clickApply();
         currentSvg = Locator.css("svg").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         assertTrue(currentSvg.getText().contains(TAGGED_MEASURE));
 
-        clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog = chartWizard.clickChartTypeButton();
         chartTypeDialog.setXAxis(TAGGED_DIMENSION);
-        chartTypeDialog.clickApply();
+        chartWizard = chartTypeDialog.clickApply();
         currentSvg = Locator.css("svg").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         assertTrue(currentSvg.getText().contains(TAGGED_DIMENSION));
 
-        saveChart("unrestricted chart");
+        chartWizard.saveReport("unrestricted chart");
     }
 
     private void enableColumnRestricting()
@@ -176,15 +172,6 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         goToProjectSettings();
         uncheckCheckbox(Locator.name("restrictedColumnsEnabled"));
         clickButton("Save");
-    }
-
-    private void saveChart(String name)
-    {
-        clickButton("Save", 0);
-        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
-        saveChartDialog.waitForDialog();
-        saveChartDialog.setReportName(name);
-        saveChartDialog.clickSave();
     }
 
     @Override

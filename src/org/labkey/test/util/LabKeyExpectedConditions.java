@@ -16,10 +16,10 @@
 package org.labkey.test.util;
 
 import org.labkey.test.Locator;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -32,42 +32,28 @@ public abstract class LabKeyExpectedConditions
      * An expectation for checking that an element has stopped moving
      *
      * @param loc the container element which should have css style, "position: static"
-     * @return true when animation is complete
+     * @return element when animation is complete
      */
-    public static ExpectedCondition<Boolean> animationIsDone(final Locator loc) {
-        return new ExpectedCondition<Boolean>() {
+    public static ExpectedCondition<WebElement> animationIsDone(final By loc) {
+        return new ExpectedCondition<WebElement>() {
             @Override
-            public Boolean apply(WebDriver driver)
+            public WebElement apply(WebDriver driver)
             {
-                Point firstPosition;
-                Point secondPosition;
-                Dimension firstDimension;
-                Dimension secondDimension;
-                WebElement el = loc.findElement(driver);
                 try
                 {
-                    firstDimension = el.getSize();
-                    firstPosition = el.getLocation();
-                    Thread.sleep(100);
-                    secondDimension = el.getSize();
-                    secondPosition = el.getLocation();
+                    WebElement el = loc.findElement(driver);
+                    return animationIsDone(el).apply(driver);
                 }
-                catch (StaleElementReferenceException | NoSuchElementException recheck)
+                catch (StaleElementReferenceException recheck)
                 {
-                    return false;
+                    return null;
                 }
-                catch (InterruptedException fail)
-                {
-                    throw new IllegalStateException(fail);
-                }
-
-                return secondPosition.equals(firstPosition) && secondDimension.equals(firstDimension);
             }
 
             @Override
             public String toString()
             {
-                return "animation of element: " + loc.getLoggableDescription();
+                return "animation of element: " + loc.toString();
             }
         };
     }
@@ -76,12 +62,12 @@ public abstract class LabKeyExpectedConditions
      * Another expectation for checking that an element has stopped moving
      *
      * @param el the element who's position changes
-     * @return true when animation is complete
+     * @return the element when animation is complete
      */
-    public static ExpectedCondition<Boolean> animationIsDone(final WebElement el) {
-        return new ExpectedCondition<Boolean>() {
+    public static ExpectedCondition<WebElement> animationIsDone(final WebElement el) {
+        return new ExpectedCondition<WebElement>() {
             @Override
-            public Boolean apply(WebDriver driver)
+            public WebElement apply(WebDriver driver)
             {
                 Point firstPosition;
                 Point secondPosition;
@@ -100,7 +86,10 @@ public abstract class LabKeyExpectedConditions
                     throw new IllegalStateException(fail);
                 }
 
-                return secondPosition.equals(firstPosition) && secondDimension.equals(firstDimension);
+                if (secondPosition.equals(firstPosition) && secondDimension.equals(firstDimension))
+                    return el;
+                else
+                    return null;
             }
 
             @Override
@@ -137,24 +126,6 @@ public abstract class LabKeyExpectedConditions
             public String toString()
             {
                 return "element to be enabled: " + loc.getLoggableDescription();
-            }
-        };
-    }
-
-    public static ExpectedCondition<WebElement> elementPresent(final Locator loc, final SearchContext context) {
-        return new ExpectedCondition<WebElement>()
-        {
-            @Override
-            public WebElement apply(WebDriver ignoreDriver)
-            {
-                return loc.findElementOrNull(context);
-            }
-
-            @Override
-            public String toString()
-            {
-                return "element '" + loc.getLoggableDescription() + "'" +
-                        "to be present in context: " + context.toString();
             }
         };
     }

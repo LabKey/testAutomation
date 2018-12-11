@@ -105,6 +105,11 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
 
     protected class ElementCache extends BaseIssuePage.ElementCache
     {
+        public ElementCache()
+        {
+            Locator.byClass("currentIssue").waitForElement(this, 10000);
+        }
+
         protected WebElement searchButton = Locator.tagWithAttribute("a", "data-original-title", "Search").findWhenNeeded(this);
         protected WebElement newIssueLink = Locator.lkButton("New Issue").findWhenNeeded(this);
         protected WebElement returnLink = Locator.linkWithText("return to grid").findWhenNeeded(this); //gone in newUI

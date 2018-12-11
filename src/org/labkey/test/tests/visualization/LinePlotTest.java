@@ -18,6 +18,7 @@ package org.labkey.test.tests.visualization;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
@@ -27,10 +28,10 @@ import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelLinePlot;
 import org.labkey.test.components.SaveChartDialog;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -44,6 +45,12 @@ import static org.junit.Assert.assertTrue;
 public class LinePlotTest extends GenericChartsTest
 {
     protected static final String DEVELOPER_USER = "developer_user1@report.test";
+
+    @Override
+    protected LookAndFeelLinePlot clickChartLayoutButton()
+    {
+        return clickChartLayoutButton(LookAndFeelLinePlot.class);
+    }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -99,45 +106,27 @@ public class LinePlotTest extends GenericChartsTest
         assertSVG(LINE_PLOT_MV_1);
 
         log("Set Plot Title and the Y-Axis");
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelLinePlot(getDriver());
-        lookAndFeelDialog.setPlotTitle(CHART_TITLE)
+        lookAndFeelDialog = clickChartLayoutButton();
+        TimeChartWizard chartWizard = lookAndFeelDialog.setPlotTitle(CHART_TITLE)
                 .setYAxisLabel("TestYAxis")
                 .clickApply();
 
-        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog = chartWizard.clickChartTypeButton();
         chartTypeDialog.removeYAxis();
-        boolean success = false;
-        int attempts = 0;
-        while (attempts < 5 && !success)
-        {
-            try
-            {
-                chartTypeDialog.setYAxis(MEASURE_2_BODY_TEMP, true)
-                        .clickApply();
-                success = true;
-            }
-            catch (WebDriverException e)
-            {
-                attempts++;
-            }
-        }
+        chartTypeDialog.setYAxis(MEASURE_2_BODY_TEMP, true)
+                .clickApply();
 
         log("Set X Axis");
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelLinePlot(getDriver());
-        lookAndFeelDialog.setXAxisLabel("TestXAxis")
+        lookAndFeelDialog = clickChartLayoutButton();
+        chartWizard = lookAndFeelDialog.setXAxisLabel("TestXAxis")
                 .clickApply();
 
         assertSVG(LINE_PLOT_MV_2);
 
-        clickButton("Save", 0);
-        saveChartDialog = new SaveChartDialog(this);
-        saveChartDialog.waitForDialog();
+        saveChartDialog = chartWizard.clickSave();
 
         //Verify name requirement
-        saveChartDialog.clickSave();
-        saveChartDialog.waitForInvalid();
+        assertEquals("Save without required field", "reportName", saveChartDialog.clickSaveWithoutRequiredFields());
 
         //Test cancel button
         saveChartDialog.setReportName("TestReportName");
@@ -149,7 +138,7 @@ public class LinePlotTest extends GenericChartsTest
         assertEquals("Line count is wrong", 2, layers.size());
 
         //confirm series creates separate lines
-        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog = chartWizard.clickChartTypeButton();
         chartTypeDialog.setSeries(MEASURE_MOUSE_ID)
                 .clickApply();
 
@@ -169,15 +158,15 @@ public class LinePlotTest extends GenericChartsTest
         log("test multiple yaxis in line plot");
         navigateToFolder(getProjectName(), getFolderName());
         chartTypeDialog = clickAddChart("study", QUERY_APX_1);
-        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Line)
+        TimeChartWizard chartWizard = chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Line)
                 .setXAxis(MEASURE_1_WEIGHT)
                 .setYAxis(MEASURE_4_PULSE)
-                .setYAxis(MEASURE_5_RESPIRATIONS,true)
+                .setYAxis(MEASURE_5_RESPIRATIONS, true)
                 .clickApply();
         assertSVG(LINE_PLOT_MULTI_YAXIS_1);
 
         log("test left and right side of y axis");
-        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog = chartWizard.clickChartTypeButton();
         chartTypeDialog.setYAxisSide(1,ChartTypeDialog.YAxisSide.Right)
                 .clickApply();
         assertSVG(LINE_PLOT_MULTI_YAXIS_2);
@@ -224,9 +213,8 @@ public class LinePlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("APXpulse", "Is Less Than", "100");
-        datasetTable.goToReport("Create Chart");
+        chartTypeDialog = datasetTable.createChart();
 
-        chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Line)
                 .setYAxis("1. Weight")
                 .setXAxis("4. Pulse")
@@ -259,12 +247,10 @@ public class LinePlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("Types"));
 
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
-        datasetTable.createQuickChart("dbl");
-
-        _ext4Helper.waitForMaskToDisappear();
+        TimeChartWizard chartWizard = datasetTable.createQuickChart("dbl");
 
         log("Set X Axis");
-        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog = chartWizard.clickChartTypeButton();
         chartTypeDialog.setXAxis("Integer", true)
                 .setChartType(ChartTypeDialog.ChartType.Line)
                 .clickApply();
@@ -280,7 +266,6 @@ public class LinePlotTest extends GenericChartsTest
     @LogMethod
     private void doCustomizeLinePlotTest()
     {
-
         LookAndFeelLinePlot lookAndFeelDialog;
         List<WebElement> points;
 
@@ -298,8 +283,7 @@ public class LinePlotTest extends GenericChartsTest
             assertEquals("The point was not the expected color.", COLOR_POINT_DEFAULT, el.getAttribute("fill"));
         }
 
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelLinePlot(getDriver());
+        lookAndFeelDialog = clickChartLayoutButton();
 
         lookAndFeelDialog
                 .setPlotHeight("500")
@@ -315,8 +299,7 @@ public class LinePlotTest extends GenericChartsTest
         assertEquals("Point at (70, 67) did not have the expected fill opacity.", "0.9", points.get(14).getAttribute("fill-opacity"));
 
         //confirm the hide data points feature
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelLinePlot(getDriver());
+        lookAndFeelDialog = clickChartLayoutButton();
         lookAndFeelDialog
                 .clickHideDataPoints()
                 .clickApply();
@@ -332,7 +315,6 @@ public class LinePlotTest extends GenericChartsTest
         log("Svg text: " + getSVGText());
 
         savePlot(LINE_PLOT_NAME_DR + " Colored", LINE_PLOT_DESC_DR + " Colored", true);
-
     }
 
     @LogMethod
@@ -365,8 +347,7 @@ public class LinePlotTest extends GenericChartsTest
 
         log("Check Line Plot Point Click Function (Developer Only)");
         // open the developer panel and verify that it is disabled by default
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelLinePlot(getDriver());
+        lookAndFeelDialog = clickChartLayoutButton();
         lookAndFeelDialog.clickDeveloperTab();
         assertElementPresent(Ext4Helper.Locators.ext4Button("Enable"));
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Disable"));
@@ -388,18 +369,17 @@ public class LinePlotTest extends GenericChartsTest
         click(Ext4Helper.Locators.ext4Button("OK"));
 
         // open developer panel and test JS function validation
-        Locator errorLoc = Locator.tagWithClass("span", "labkey-error");
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelLinePlot(getDriver());
-        lookAndFeelDialog.clickDeveloperTab()
+        lookAndFeelDialog = clickChartLayoutButton();
+        String errorMsg = lookAndFeelDialog.clickDeveloperTab()
                 .setDeveloperSourceContent("")
                 .clickApplyWithError();
-        assertElementPresent(errorLoc.withText("Error: the value provided does not begin with a function declaration."));
-        lookAndFeelDialog.setDeveloperSourceContent("function(){")
+        assertEquals("Wrong error message", "Error: the value provided does not begin with a function declaration.", errorMsg);
+        errorMsg = lookAndFeelDialog.setDeveloperSourceContent("function(){")
                 .clickApplyWithError();
-        assertElementPresent(errorLoc.containing("Error parsing the function:"));
-        lookAndFeelDialog.clickDeveloperDisable(true);
-        assertElementNotPresent(errorLoc.containing("Error"));
+        String expectedError = "Error parsing the function:";
+        assertTrue("Did not find expected error message \"" + expectedError + "\". Found: " + errorMsg, errorMsg.contains(expectedError));
+        lookAndFeelDialog.disableDeveloperMode();
+        assertElementNotPresent(Locators.labkeyError);
         // test use-case to navigate to query page on click
         String function = TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
         lookAndFeelDialog.clickDeveloperEnable()
@@ -416,11 +396,11 @@ public class LinePlotTest extends GenericChartsTest
         impersonate(DEVELOPER_USER);
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(LINE_PLOT_NAME_MV + " PointClickFn"));
-        clickAndWait(Ext4Helper.Locators.ext4Button("Edit"), WAIT_FOR_PAGE);
+        TimeChartWizard chartWizard = new TimeChartWizard(this).waitForReportRender();
+        chartWizard.clickEdit();
         waitForText(CHART_TITLE);
         pushLocation();
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelLinePlot(getDriver());
+        lookAndFeelDialog = clickChartLayoutButton();
         assertFalse("Found the 'Developer' tab on the the Look and Feel dialog. It should not be there for this user.", lookAndFeelDialog.getAvailableTabs().contains("Developer"));
         lookAndFeelDialog.clickCancel();
         doAndWaitForPageToLoad(() -> fireEvent(svgCircleLoc, SeleniumEvent.click));
@@ -431,11 +411,9 @@ public class LinePlotTest extends GenericChartsTest
         impersonate(DEVELOPER_USER);
         popLocation();
         waitForText(CHART_TITLE);
-        clickChartLayoutButton();
-        lookAndFeelDialog = new LookAndFeelLinePlot(getDriver());
+        lookAndFeelDialog = clickChartLayoutButton();
         assertTrue("Did not find the 'Developer' tab on the the Look and Feel dialog. It should be there for this user.", lookAndFeelDialog.getAvailableTabs().contains("Developer"));
         lookAndFeelDialog.clickCancel();
         stopImpersonating();
     }
-
 }

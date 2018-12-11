@@ -20,6 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -40,7 +41,7 @@ public class ParticipantReportTest extends ReportTest
     private static final String PARTICIPANT_REPORT_DESCRIPTION = "Participant report created by ReportTest";
     private static final String PARTICIPANT_REPORT2_NAME = "Test Participant Report 2";
     private static final String PARTICIPANT_REPORT2_DESCRIPTION = "Another participant report created by ReportTest";
-    private static final String ADD_MEASURE_TITLE = "Add Measure";
+    private static final String ADD_MEASURE_TITLE = "Add Measure...";
     private static final String PARTICIPANT_REPORT3_NAME = "Group Filter Report";
     private static final String PARTICIPANT_GROUP_ONE = "TEST_GROUP_1";
     private static final String PARTICIPANT_GROUP_TWO = "TEST_GROUP_2";
@@ -320,13 +321,15 @@ public class ParticipantReportTest extends ReportTest
                 .clickSubMenu(true, "Mouse Report");
         // select some measures from a dataset
         clickButton("Choose Measures", 0);
-        _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
-        waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
+        Window chooseMeasureWindow = new Window.WindowFinder(getDriver()).withTitle(ADD_MEASURE_TITLE).waitFor();
+        Locator.tagWithClass("tr", "x4-grid-row").waitForElement(chooseMeasureWindow, 1000);
 
-        _ext4Helper.selectGridItem("label", "17a. Preg. test result", -1, "measuresGridPanel", true);
+        String columnHeader = "17a. Preg. test result";
+        _ext4Helper.selectGridItem("label", columnHeader, -1, "measuresGridPanel", true);
         _ext4Helper.selectGridItem("label", "1.Adverse Experience (AE)", -1, "measuresGridPanel", true);
 
-        click(Ext4Helper.Locators.ext4Button("Select"));
+        chooseMeasureWindow.clickButton("Select", true);
+        Locator.tagWithClass("th", "lk-report-column-header").withText(columnHeader).waitForElement(getDriver(), 10000);
 
         //Deselect All
         Locator filterExpander = Locator.xpath("(//img[contains(@class, 'x4-tool-expand-right')])[1]");

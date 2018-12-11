@@ -27,9 +27,11 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.LookAndFeelPieChart;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.TextSearcher;
+import org.openqa.selenium.WebElement;
 
 import java.net.URL;
 
@@ -41,6 +43,12 @@ public class PieChartTest extends GenericChartsTest
 
     private final String PIE_CHART_SAVE_NAME = "Simple Pie Chart Test";
     private final String PIE_CHART_CATEGORY = "1.Adverse Experience (AE)";
+
+    @Override
+    protected LookAndFeelPieChart clickChartLayoutButton()
+    {
+        return clickChartLayoutButton(LookAndFeelPieChart.class);
+    }
 
     @LogMethod
     protected void testPlots()
@@ -77,13 +85,11 @@ public class PieChartTest extends GenericChartsTest
                 .setCategories(PIE_CHART_CATEGORY)
                 .clickApply();
 
-        sleep(3000);  // TODO Is there a better trigger?
-
         log("Validate that the text values of the pie chart are as expected.");
         svgText = getSVGText();
         log("svg text: '" + svgText + "'");
         Assert.assertTrue("SVG did not contain expected title: '" + PIE_CHART_CATEGORY + "'", svgText.contains(PIE_CHART_CATEGORY));
-        Assert.assertTrue("SVG did not contain expected pie label ordering", svgText.contains("FeverVomitingDecreased WBCSkin irritation at injection site right deltoid"));
+        assertTextPresentInThisOrder(new TextSearcher(svgText), "Fever", "Vomiting", "Decreased WBC", "Skin irritation at injection site right deltoid");
 
         log("Validate that the correct number of % values are shown.");
         percentCount = StringUtils.countMatches(svgText, "%");
@@ -91,10 +97,9 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertTrue("Percentages in svg not as expected. Expected '(AE)18%11%5%5%5%5%Fever'", svgText.contains("(AE)18%11%5%5%5%5%Fever"));
 
         log("Now change the chart layout, also validate that the layout dialog is pre-populated as expected.");
-        clickChartLayoutButton();
-        pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
+        pieChartLookAndFeel = clickChartLayoutButton();
         strTemp = pieChartLookAndFeel.getSubTitle();
-        Assert.assertTrue("Value in Subtitle text box not as expected. Expected '" + PIE_CHART_CATEGORY + "'", strTemp.equals(PIE_CHART_CATEGORY));
+        Assert.assertEquals("Value in Subtitle text box not as expected.", PIE_CHART_CATEGORY, strTemp);
 
         log("Remove the percentages, and change the gradient.");
         if (pieChartLookAndFeel.showPercentagesChecked())
@@ -103,8 +108,6 @@ public class PieChartTest extends GenericChartsTest
         // Changing gradient just to make sure no errors are generated. Didn't have time to validate that color had change in the pie chart.
         pieChartLookAndFeel.setGradientColor(COLOR_RED)
                 .clickApply();
-
-        sleep(3000);  // TODO Is there a better trigger?
 
         // Move mouse to make sure it is not over a pie wedge (and would generate a % in a pop-up text).
         mouseOver(Locator.pageHeader("Chart Wizard"));
@@ -115,8 +118,7 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertEquals("There should be no '%' values in the svg, found " + percentCount, 0, percentCount);
 
         log("Now add percentages back and change the limit when they are visible.");
-        clickChartLayoutButton();
-        pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
+        pieChartLookAndFeel = clickChartLayoutButton();
         if (!pieChartLookAndFeel.showPercentagesChecked())
             pieChartLookAndFeel.clickShowPercentages();
         pieChartLookAndFeel.setHidePercentageWhen("7");
@@ -131,8 +133,6 @@ public class PieChartTest extends GenericChartsTest
                 .setPercentagesColor(COLOR_BLACK)
                 .clickApply();
 
-        sleep(3000);  // TODO Is there a better trigger?
-
         log("Just a quick change.");
 
         svgText = getSVGText();
@@ -142,8 +142,7 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertTrue("Percentages in svg not as expected. Expected '(AE)18%11%Fever", svgText.contains("(AE)18%11%Fever"));
 
         log("Ok last bit of changing for the Pie Chart.");
-        clickChartLayoutButton();
-        pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
+        pieChartLookAndFeel = clickChartLayoutButton();
         pieChartLookAndFeel.setPlotTitle(PLOT_TITLE)
                 .setInnerRadiusPercentage(0)
                 .setOuterRadiusPercentage(75)
@@ -151,8 +150,6 @@ public class PieChartTest extends GenericChartsTest
                 .setPlotHeight("500")
                 .setColorPalette("alternate")
                 .clickApply();
-
-        sleep(3000);  // Is there a better trigger?
 
         svgText = getSVGText();
         log("Last svgText: '" + svgText + "'");
@@ -168,7 +165,6 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertEquals("Height of svg not expected.", "500", svgHeight);
 
         savePlot(PIE_CHART_SAVE_NAME, PIE_CHART_SAVE_DESC);
-
     }
 
     @LogMethod
@@ -191,7 +187,7 @@ public class PieChartTest extends GenericChartsTest
         navigateToFolder(getProjectName(), getFolderName());
         clickTab("Clinical and Assay Data");
         waitForElement(Locator.linkWithText(DATA_SOURCE_1));
-        click(Locator.linkWithText(DATA_SOURCE_1));
+        clickAndWait(Locator.linkWithText(DATA_SOURCE_1));
 
         dataRegionTable = new DataRegionTable("Dataset", getDriver());
 
@@ -208,22 +204,20 @@ public class PieChartTest extends GenericChartsTest
 
         log("Click on the pie chart and validate that we are redirected to the plot wizard.");
         clickAndWait(plotRegion.getPlots().get(0), WAIT_FOR_PAGE);
+        TimeChartWizard chartWizard = new TimeChartWizard(this).waitForReportRender();
 
         URL currentUrl = getURL();
         log("Current url path: " + currentUrl.getPath());
         Assert.assertTrue("It doesn't look like we navigated to the expected page.", currentUrl.getPath().toLowerCase().contains("visualization-genericchartwizard.view"));
 
-        waitForElement(Locator.css("svg"));
-
-        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog = chartWizard.clickChartTypeButton();
 
         strTemp = chartTypeDialog.getCategories();
         Assert.assertTrue("Categories field did not contain the expected value. Expected '" + COL_TEXT_PIE + "'. Found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_PIE.toLowerCase()));
 
         chartTypeDialog.clickCancel();
 
-        clickChartLayoutButton();
-        pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
+        pieChartLookAndFeel = clickChartLayoutButton();
 
         strTemp = pieChartLookAndFeel.getPlotTitle();
         Assert.assertTrue("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(DATA_SOURCE_1.toLowerCase()));
@@ -247,5 +241,15 @@ public class PieChartTest extends GenericChartsTest
         waitForElement(Locator.linkWithText(PIE_CHART_SAVE_NAME));
         clickAndWait(Locator.linkWithText(PIE_CHART_SAVE_NAME), WAIT_FOR_PAGE);
         export(EXPORTED_SCRIPT_CHECK_TYPE, EXPORTED_SCRIPT_CHECK_XAXIS, null);
+    }
+
+    @Override
+    public String getSVGText(int svgIndex)
+    {
+        WebElement pieChartLabel = Locator.css("svg g").withAttributeContaining("id", "labelGroup").waitForElement(getDriver(), 10000);
+        //Wait for pie chart to animate
+        //noinspection ResultOfMethodCallIgnored
+        waitFor(() -> pieChartLabel.getAttribute("style").contains("opacity: 1"), 10000);
+        return super.getSVGText(svgIndex);
     }
 }

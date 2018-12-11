@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -27,6 +28,7 @@ import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.api.exp.query.ExpRunTable.Column.Input;
 
 @Category({BVT.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
@@ -88,8 +90,10 @@ public class ParticipantListTest extends StudyBaseTest
             clickButton("Manage Categories", 0);
             _extHelper.waitForExtDialog("Manage Categories");
             clickButton("New Category", 0);
-            WebElement formField = Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-            setFormElement(formField, category);
+            doubleClick(Locator.tagWithClass("div", "x4-grid-cell-inner").withText("New Category").parent().waitForElement(getDriver(), 4000));
+            WebElement formField = Locator.xpath("//input[contains(@id, 'textfield') and @name='label' and contains(@class, 'default-form-focus')]")
+                    .notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+            setFormElementJS(formField, category);
             fireEvent(formField, SeleniumEvent.blur);
             waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//div").withText(category));
             clickButton("Done", 0);

@@ -1067,6 +1067,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertEquals("Failed to enable email recording", HttpStatus.SC_OK, getHttpResponse(WebTestHelper.buildURL("dumbster", "setRecordEmail", Maps.of("record", "true"))).getResponseCode());
     }
 
+    public EmailRecordTable goToEmailRecord()
+    {
+        goToModule("Dumbster");
+        return new EmailRecordTable(getDriver());
+    }
+
     @LogMethod(quiet = true)
     public void enableSecondaryAuthentication()
     {
@@ -1239,7 +1245,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void goToHome()
     {
-        beginAt("/project/home/begin.view");
+        beginAt(WebTestHelper.buildURL("project", "home", "begin"));
+        waitFor(this::onLabKeyPage, "Home project didn't seem to load. JavaScript 'LABKEY' namespace not found.", 10000);
     }
 
     /**

@@ -31,6 +31,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.study.DatasetFacetPanel;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.NoSuchElementException;
@@ -910,7 +911,9 @@ public class DataRegionTable extends DataRegion
     @LogMethod (quiet = true)
     public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter)
     {
-        setFilter(columnName, filterType, filter, isAsync() ? 0 : getUpdateTimeout());
+        int waitMillis = isAsync() ? 0 : getUpdateTimeout();
+        setUpFilter(columnName, filterType, filter, false);
+        doAndWaitForUpdate(() -> getWrapper().clickButton("OK", waitMillis));
     }
 
     /**
@@ -1230,10 +1233,10 @@ public class DataRegionTable extends DataRegion
     }
 
     @LogMethod
-    public void createQuickChart(String columnName)
+    public TimeChartWizard createQuickChart(String columnName)
     {
         clickColumnMenu(columnName, true, "Quick Chart");
-        getWrapper().waitForElement(Locator.css("svg"));
+        return new TimeChartWizard(getWrapper()).waitForReportRender();
     }
 
     // ======== Side facet panel =========

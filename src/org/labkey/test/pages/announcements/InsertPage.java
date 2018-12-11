@@ -15,9 +15,11 @@
  */
 package org.labkey.test.pages.announcements;
 
+import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class InsertPage extends BaseUpdatePage<InsertPage>
 {
@@ -37,9 +39,43 @@ public class InsertPage extends BaseUpdatePage<InsertPage>
         return new InsertPage(driver.getDriver());
     }
 
+    public InsertPage selectPreviewTab()
+    {
+        elementCache().previewTab.click();
+        return this;
+    }
+
+    public InsertPage selectSourceTab()
+    {
+        elementCache().sourceTab.click();
+        return this;
+    }
+
     @Override
     protected InsertPage getThis()
     {
         return this;
+    }
+
+    @Override
+    protected ElementCache elementCache()
+    {
+        return (ElementCache) super.elementCache();
+    }
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends BaseUpdatePage<InsertPage>.ElementCache
+    {
+        WebElement sourceTab = Locator.tagWithClassContaining("li", "nav-item")
+                .withChild(Locator.tagWithClass("a", "nav-link").withText("Source"))
+                .findWhenNeeded(this);
+        WebElement previewTab = Locator.tagWithClassContaining("li", "nav-item")
+                .withChild(Locator.tagWithClass("a", "nav-link").withText("Preview"))
+                .findWhenNeeded(this);
     }
 }

@@ -32,6 +32,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.assertEquals;
@@ -183,7 +184,7 @@ public class DataViewsTest extends ParticipantListTest
         setFormElement(Locator.name("description"), NEW_DESCRIPTION);
         saveDatasetProperties(EDITED_DATASET);
         mouseOver(Locator.linkWithText(EDITED_DATASET));
-        waitForElement(Locator.css(".data-views-tip-content"));
+        waitForElement(Locator.css(".data-views-tip-panel"));
         clickAndWait(Locator.linkWithText(EDITED_DATASET));
         assertTextPresent(NEW_DESCRIPTION);
 
@@ -255,6 +256,7 @@ public class DataViewsTest extends ParticipantListTest
         test.waitAndClick(editLink);
         
         test._extHelper.waitForExtDialog(viewName);
+        test.mouseOver(Locator.css("a")); // Dismiss tooltip
     }
 
     //Issue 12914: dataset browse web part not displaying data sets alphabetically
@@ -543,8 +545,10 @@ public class DataViewsTest extends ParticipantListTest
         RadioButton().withLabel("Custom").find(getDriver()).check();
 
         // specify a custom height
-        setFormElement(Locator.name("height"), String.valueOf(NEW_CUSTOM_HEIGHT));
-        fireEvent(Locator.name("height"), SeleniumEvent.blur);
+        WebElement heightInput = Locator.name("height").withoutAttribute("disabled").waitForElement(getDriver(), 1000);
+        setFormElement(heightInput, String.valueOf(NEW_CUSTOM_HEIGHT));
+        heightInput.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_UP);
+        fireEvent(heightInput, SeleniumEvent.blur);
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
 

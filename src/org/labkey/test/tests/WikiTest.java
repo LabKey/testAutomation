@@ -27,8 +27,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
@@ -205,28 +203,10 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void setInlineEditorContent(String editorId, String content)
     {
-        WebElement frame = waitForElement(Locator.id(editorId + "_ifr"));
-
-        // switch to the tinymce iframe
-        getDriver().switchTo().frame(frame);
-
-        // locate the tinymce body element
-        Locator l = Locator.id("tinymce");
-
-        // send keypress to the element
-        WebElement el = l.findElement(getDriver());
-
-        // select all then delete previous content (can't seem to get "select all" via Ctrl-A to work)
-        el.sendKeys(Keys.HOME);
-        for (int i = 0; i < 10; i++)
-            el.sendKeys(Keys.chord(Keys.SHIFT, Keys.DOWN));
-        el.sendKeys(Keys.BACK_SPACE);
-
-        // enter new content + newline
-        el.sendKeys(content);
-
-        // switch back to parent window
-        getDriver().switchTo().defaultContent();
+        executeScript("if (!tinyMCE) {throw 'tinyMCE API is not available'}" +
+                "editor = tinyMCE.getInstanceById(arguments[0]);" +
+                "if (!editor) {throw 'No tinyMCE instance: ' + arguments[0];}" +
+                "editor.setContent(arguments[1]);", editorId, content);
     }
 
     @Override

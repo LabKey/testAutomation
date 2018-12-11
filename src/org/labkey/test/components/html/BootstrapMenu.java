@@ -154,6 +154,7 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
             throw new IllegalArgumentException("Specify menu item(s)");
 
         WebElement item = openMenuTo(subMenuLabels);
+        getWrapper().scrollIntoView(item);
 
         getWrapper().clickAndWait(item, timeout);
     }

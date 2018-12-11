@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.labkey.FormItemFinder;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebElement;
 
 public class Checkbox extends Component implements FormItem<Boolean>
@@ -106,6 +107,8 @@ public class Checkbox extends Component implements FormItem<Boolean>
 
     public void toggle()
     {
+        if (!isEnabled())
+            throw new ElementNotInteractableException("Element is not enabled: " + getComponentElement());
         _el.click();
     }
 

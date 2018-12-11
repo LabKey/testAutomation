@@ -29,7 +29,7 @@ import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.WrapsDriver;
+import org.openqa.selenium.WrapsDriver;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class ListHelper extends LabKeySiteWrapper
     public void submitImportTsv_success()
     {
         clickButton("Submit");
-        waitForElement(Locator.css(".labkey-data-region"));
+        waitForElement(Locator.css(".labkey-data-region"), 30000);
     }
 
     // null means any error
@@ -393,7 +393,7 @@ public class ListHelper extends LabKeySiteWrapper
     public void clickSave()
     {
         WebElement saveButton = Locator.lkButton("Save").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        scrollIntoView(saveButton); // After clicking save, sometimes the page scrolls so that the project menu is under the mouse
+        scrollToTop(); // After clicking save, sometimes the page scrolls so that the project menu is under the mouse
         saveButton.click();
         waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);

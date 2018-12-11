@@ -29,8 +29,10 @@ import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -230,18 +232,17 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region-legacy").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
 
         log("Verify different graph sizes");
-        Locator nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph");
 
         detailHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Large");
-        Number graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
-        assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
+        Number graphHeight = waitForNabGraph().getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Large)", 600, graphHeight);
 
         detailHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Medium");
-        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        graphHeight = waitForNabGraph().getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
 
         detailHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Small");
-        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        graphHeight = waitForNabGraph().getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
 
         if (verifySamplesPerGraph)
@@ -287,7 +288,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         log("Verify customizations are applied to print page");
         clickAndWait(Locator.linkContainingText("Print"));
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region-legacy").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
-        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        graphHeight = waitForNabGraph().getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
 
         if (verifySamplesPerGraph)
@@ -303,6 +304,12 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
             log("Verify data identifiers");
             detailHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, null);
         }
+    }
+
+    private WebElement waitForNabGraph()
+    {
+        WebElement nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph").waitForElement(getDriver(), 10000);
+        return shortWait().until(LabKeyExpectedConditions.animationIsDone(nabGraph));
     }
 
     private void verifyResolverTypes()

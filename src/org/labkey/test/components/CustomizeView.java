@@ -481,6 +481,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             {
                 try
                 {
+                    new WebDriverUtils.ScrollUtil(getDriver()).scrollIntoView(el);
                     builder.moveToElement(el).click().build().perform();
                 }
                 catch (StaleElementReferenceException ignore) {}

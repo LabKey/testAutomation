@@ -15,7 +15,6 @@
  */
 package org.labkey.test;
 
-import com.google.common.base.Function;
 import org.apache.commons.collections4.MultiMap;
 import org.apache.commons.collections4.map.MultiValueMap;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +55,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.HasCapabilities;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
@@ -66,16 +66,17 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.WrapsDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -83,6 +84,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -116,6 +120,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,6 +135,7 @@ import static org.junit.Assert.fail;
 import static org.labkey.test.Locator.tag;
 import static org.labkey.test.TestProperties.isChromeDriverLoggingEnabled;
 import static org.labkey.test.TestProperties.isScriptCheckEnabled;
+import static org.labkey.test.TestProperties.isWebDriverLoggingEnabled;
 import static org.labkey.test.WebTestHelper.getBaseURL;
 import static org.labkey.test.WebTestHelper.stripContextPath;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
@@ -187,7 +193,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             {
                 try
                 {
-                    newWebDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), DesiredCapabilities.chrome());
+                    newWebDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
                 }
                 catch (MalformedURLException e)
                 {
@@ -221,11 +227,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 }
                 if (oldWebDriver == null)
                 {
-                    TestProperties.ensureChromedriverExeProperty();
-                    if (isChromeDriverLoggingEnabled())
-                        enableChromeDriverLogging(downloadDir);
+                    log("Using chromedriver: " + TestProperties.ensureChromedriverExeProperty());
+                    configureChromeDriverLogging(downloadDir);
                     ChromeOptions options = new ChromeOptions();
-                    Dictionary<String, Object> prefs = new Hashtable<>();
+                    Map<String, Object> prefs = new HashMap<>();
 
                     prefs.put("download.prompt_for_download", "false");
                     prefs.put("download.default_directory", downloadDir.getAbsolutePath());
@@ -241,10 +246,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     options.addArguments("ignore-certificate-errors");
                     options.addArguments("disable-infobars");
 
-                    DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-                    capabilities.setCapability(ChromeOptions.CAPABILITY, options);
                     newDriverService = ChromeDriverService.createDefaultService();
-                    newWebDriver = new ChromeDriver((ChromeDriverService) newDriverService, capabilities);
+                    newWebDriver = new ChromeDriver((ChromeDriverService) newDriverService, options);
                 }
                 break;
             }
@@ -259,6 +262,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 }
                 if (oldWebDriver == null)
                 {
+                    log("Using geckodriver: " + TestProperties.ensureGeckodriverExeProperty());
+                    configureGeckoDriverLogging(downloadDir);
                     final FirefoxProfile profile = new FirefoxProfile();
                     profile.setPreference("app.update.auto", false);
                     profile.setPreference("extensions.update.autoUpdate", false);
@@ -271,10 +276,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("browser.download.dir", downloadDir.getAbsolutePath());
                     profile.setPreference("browser.download.manager.showAlertOnComplete", false);
                     profile.setPreference("browser.download.manager.showWhenStarting", false);
+                    profile.setPreference("browser.download.panel.shown", false);
                     profile.setPreference("browser.helperApps.alwaysAsk.force", false);
                     profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
                             "application/vnd.ms-excel," + // .xls
                                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," + // .xlsx
+                                    "application/vnd.openxmlformats-officedocument.presentationml.presentation," + // .pptx (power point)
+                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document," +
                                     "application/octet-stream," +
                                     "application/pdf," +
                                     "application/zip," +
@@ -290,16 +298,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "text/tab-separated-values," +
                                     "text/csv");
                     profile.setPreference("pdfjs.disabled", true); // disable Firefox's built-in PDF viewer
+                    profile.setPreference("pdfjs.enabledCache.state", false);
 
                     profile.setPreference("browser.ssl_override_behavior", 0);
 
                     profile.setAcceptUntrustedCertificates(true);
                     profile.setAssumeUntrustedCertificateIssuer(false);
-                    profile.setEnableNativeEvents(useNativeEvents());
 
-
-                    DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+                    FirefoxOptions capabilities = new FirefoxOptions();
                     capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+                    capabilities.setLogLevel(FirefoxDriverLogLevel.WARN);
+                    capabilities.addPreference("--log", "WARN");
 
                     String browserPath = System.getProperty("selenium.firefox.binary", "");
                     if (browserPath.length() > 0)
@@ -309,11 +318,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     }
                     try
                     {
-                        newWebDriver = new FirefoxDriver(capabilities);
+                        newWebDriver = new FirefoxDriver(new FirefoxOptions(capabilities));
                     }
                     catch (WebDriverException rethrow)
                     {
-                        throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. Ensure that you are not using a version newer than 45.", rethrow);
+                        throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. Ensure that you are using Firefox 57 or newer (latest ESR is recommended).", rethrow);
                     }
                 }
                 break;
@@ -336,25 +345,48 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    private void enableChromeDriverLogging(File downloadDir)
+    private void configureChromeDriverLogging(File downloadDir)
     {
-        if (downloadDir.getParentFile().exists() || downloadDir.getParentFile().mkdirs())
+        if (isWebDriverLoggingEnabled())
         {
-            String logFileName = new SimpleDateFormat("'chromedriver_'HHmmss'.log'").format(new Date());
-            final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
-            log("Saving chromedriver log to: " + logPath);
-            System.setProperty(CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
-            System.setProperty(CHROME_DRIVER_LOG_PROPERTY, logPath);
-        }
-        else
-        {
-            log("Failed to create directory for chromedriver log: " + downloadDir.getParentFile().getAbsolutePath());
+            if (downloadDir.getParentFile().exists() || downloadDir.getParentFile().mkdirs())
+            {
+                String logFileName = new SimpleDateFormat("'chromedriver_'HHmmss'.log'").format(new Date());
+                final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
+                log("Saving chromedriver log to: " + logPath);
+                System.setProperty(CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
+                System.setProperty(CHROME_DRIVER_LOG_PROPERTY, logPath);
+            }
+            else
+            {
+                log("Failed to create directory for chromedriver log: " + downloadDir.getParentFile().getAbsolutePath());
+            }
         }
     }
 
-    protected boolean useNativeEvents()
+    private void configureGeckoDriverLogging(File downloadDir)
     {
-        return false;
+        if (isWebDriverLoggingEnabled())
+        {
+            if (downloadDir.getParentFile().exists() || downloadDir.getParentFile().mkdirs())
+            {
+                String logFileName = new SimpleDateFormat("'geckodriver_'HHmmss'.log'").format(new Date());
+                final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
+                log("Saving geckodriver log to: " + logPath);
+                System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, logPath);
+                return;
+            }
+            else
+            {
+                log("Failed to create directory for geckodriver log: " + downloadDir.getParentFile().getAbsolutePath());
+            }
+        }
+        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
+    }
+
+    public boolean isFirefox()
+    {
+        return getDriver().getClass().isAssignableFrom(FirefoxDriver.class);
     }
 
     public Object executeScript(String script, Object... arguments)
@@ -1372,9 +1404,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * Verifies that at least one of the strings is present in the page html source
+     * Checks whether any of the texts are present in the page source
      */
-    public void assertOneOfTheseTextsPresent(String... texts)
+    public boolean isAnyTextPresent(String... texts)
     {
         final MutableBoolean found = new MutableBoolean(false);
 
@@ -1385,14 +1417,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 if (htmlSource.contains(text))
                     found.setTrue();
 
-                return !found.getValue();
+                return !found.getValue(); // stop searching if any value is found
             }
         };
         TextSearcher searcher = new TextSearcher(this);
         searcher.searchForTexts(handler, Arrays.asList(texts));
 
-        if (!found.getValue())
-            fail("Did not find any of the following values on current page " + Arrays.toString(texts));
+        return found.getValue();
+    }
+
+    /**
+     * Verifies that at least one of the strings is present in the page html source
+     */
+    public void assertOneOfTheseTextsPresent(String... texts)
+    {
+        assertTrue("Did not find any of the following values on current page " + Arrays.toString(texts), isAnyTextPresent(texts));
     }
 
     /**
@@ -1804,14 +1843,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (previousElement != null)
             wait.until(ExpectedConditions.stalenessOf(previousElement));
 
-        return wait.until(new ExpectedCondition<WebElement>()
-        {
-            @Override
-            public WebElement apply(WebDriver input)
-            {
-                return elementFinder.get();
-            }
-        });
+        return wait.until(wd -> elementFinder.get());
     }
 
     public WebElement doAndWaitForElementToRefresh(Runnable func, Locator loc, SearchContext context, WebDriverWait wait)
@@ -2014,21 +2046,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         try
         {
-            return shortWait().until(new ExpectedCondition<WebElement>()
-            {
-                @Override
-                public WebElement apply(@Nullable WebDriver webDriver)
+            return shortWait().until(webDriver -> {
+                for (Locator loc : locators)
                 {
-                    for (Locator loc : locators)
+                    try
                     {
-                        try
-                        {
-                            return loc.findElement(webDriver);
-                        }
-                        catch (NoSuchElementException ignore) {}
+                        return loc.findElement(webDriver);
                     }
-                    return null;
+                    catch (NoSuchElementException ignore) {}
                 }
+                return null;
             });
         }
         catch (TimeoutException notFound)
@@ -2344,6 +2371,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         executeScript("window.scrollTo(" + x.toString() +", " + y.toString() + ");");
     }
 
+    public void scrollToTop()
+    {
+        executeScript("window.scrollTo(0,0);");
+    }
+
     public void scrollBy(Integer x, Integer y)
     {
         executeScript("window.scrollBy(" + x.toString() +", " + y.toString() + ");");
@@ -2484,8 +2516,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void mouseOver(WebElement el)
     {
+        scrollIntoView(el);
         Actions builder = new Actions(getDriver());
-        builder.moveToElement(el).build().perform();
+        builder.moveToElement(el)
+                // Add a little wiggle to make sure tooltips notice
+                .moveByOffset(5, 0)
+                .moveByOffset(-10, 0)
+                .moveByOffset(-5, 0)
+                .perform();
     }
 
     public int getElementIndex(Locator.XPathLocator l)
@@ -2936,7 +2974,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
-            input.clear();
+            String osName = System.getProperty("os.name");
+            if(osName.toLowerCase().contains("mac"))
+                input.sendKeys(Keys.chord(Keys.COMMAND, "a"));
+            else
+                input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+
+            input.sendKeys(Keys.DELETE);
             input.sendKeys(text);
         }
         else
@@ -2944,9 +2988,49 @@ public abstract class WebDriverWrapper implements WrapsDriver
             setFormElementJS(input, text);
         }
 
-        String elementClass = input.getAttribute("class");
-        if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
-            fireEvent(input, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
+        try
+        {
+            String elementClass = input.getAttribute("class");
+            if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
+                fireEvent(input, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
+        }
+        catch(StaleElementReferenceException stale)
+        {
+            log("input element is stale, not going to try and fire blur event.");
+        }
+    }
+
+    public void actionClick(WebElement el)
+    {
+        new Actions(getDriver()).moveToElement(el).click().perform();
+    }
+
+    public void actionClear(WebElement input)
+    {
+        String osName = System.getProperty("os.name");
+        Keys cmdKey = osName.toLowerCase().contains("mac") ? Keys.COMMAND : Keys.CONTROL;
+        new Actions(getDriver())
+            .keyDown(cmdKey)
+            .sendKeys(input, "a")                        // select all
+            .keyUp(cmdKey)
+            .sendKeys(Keys.DELETE)                              // clear the input
+            .perform();
+    }
+
+    public void actionPaste(WebElement input, String text)
+    {
+        String osName = System.getProperty("os.name");
+        Keys cmdKey = osName.toLowerCase().contains("mac") ? Keys.COMMAND : Keys.CONTROL;
+
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        StringSelection sel = new StringSelection(text);
+        c.setContents(sel, sel);
+
+        new Actions(getDriver())
+            .keyDown(cmdKey)
+            .sendKeys(input, "v")       // paste the contents of the clipboard into the input
+            .keyUp(cmdKey)
+            .perform();
     }
 
     private static final List<String> html5InputTypes = Arrays.asList("color", "date", "datetime-local", "email", "month", "number", "range", "search", "tel", "time", "url", "week");
@@ -3003,7 +3087,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private void setHtml5DateInput(WebElement el, Date date)
     {
-        String formFormat = "MMddyyyy";
+        // TODO: Firefox requires ISO date format (yyyy-MM-dd)
+        String formFormat = isFirefox() ? "yyyy-MM-dd" : "MMddyyyy";
         SimpleDateFormat formFormatter = new SimpleDateFormat(formFormat);
         String formDate = formFormatter.format(date);
 
@@ -3062,8 +3147,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
             styleString = el.getAttribute("style");
             log("Remove class so that WebDriver can interact with concealed form element");
             executeScript("arguments[0].setAttribute('class', '');arguments[0].setAttribute('style', '');", el);
+            shortWait().until(ExpectedConditions.elementToBeClickable(el)); // Takes a moment for DOM to update
         }
 
+        executeScript("arguments[0].value = '';", el);
         el.sendKeys(FileUtil.getAbsoluteCaseSensitiveFile(file).getAbsolutePath());
 
         if (!cssString.isEmpty() || !styleString.isEmpty())
@@ -3364,7 +3451,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getHtmlSource()
     {
-        return getDriver().getPageSource();
+        try
+        {
+            return getDriver().getPageSource();
+        }
+        catch (JavascriptException retry)
+        {
+            // TypeError: document.documentElement is null
+            return getDriver().getPageSource();
+        }
     }
 
     public boolean isExtTreeNodeSelected(String nodeCaption)

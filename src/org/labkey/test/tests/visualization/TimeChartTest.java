@@ -19,16 +19,15 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.tests.ReportTest;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public abstract class TimeChartTest extends ReportTest
 {
@@ -152,26 +151,6 @@ public abstract class TimeChartTest extends ReportTest
         clickAndWait(Locator.linkWithText("Manage Participant Groups"));
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _studyHelper.deleteCustomParticipantGroup(GROUP3_NAME, "Participant");
-    }
-
-    protected void openSaveMenu()
-    {
-        clickButtonByIndex("Save", 0, 0);
-        waitForText("Viewable By");
-    }
-
-    protected void saveReport(boolean expectReload)
-    {
-        clickAndWait(findButton("Save", 1), expectReload ? WAIT_FOR_PAGE : 0);
-        if (!expectReload)
-        {
-            waitForElement(Locator.tagWithClass("div", "x4-window").containing("Report saved successfully."));
-            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        }
-        waitFor(() -> isTextPresent("Please select at least one") || // group/participant
-                       isTextPresent("No data found") ||
-                       isElementPresent(Locator.css("svg")),
-                "Time chart failed to appear after saving", WAIT_FOR_JAVASCRIPT);
     }
 
     protected void waitForCharts(int count)

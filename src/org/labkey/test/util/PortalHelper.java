@@ -27,7 +27,7 @@ import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.PortalTab;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.WrapsDriver;
+import org.openqa.selenium.WrapsDriver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +48,11 @@ public class PortalHelper extends WebDriverWrapper
     public PortalHelper(WebDriver driver)
     {
         this(() -> driver);
+    }
+
+    public static void doInAdminMode(WebDriver driver, Consumer<PortalHelper> actions)
+    {
+        new PortalHelper(driver).doInAdminMode(actions);
     }
 
     @Override

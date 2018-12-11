@@ -80,13 +80,12 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         log("Test changing from date-based to visit-based time chart.");
         clickFolder(VISIT_FOLDER_NAME);
         ChartTypeDialog chartTypeDialog = clickAddChart("study", "APX-1 (APX-1: Abbreviated Physical Exam)");
-        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
+        TimeChartWizard timeChartWizard = chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
                 .setYAxis("1. Weight")
                 .clickApply();
         waitForElement(Locator.css("svg").containing("Days Since Contact Date"));
 
         log("Change to Visit-based for x-axis");
-        TimeChartWizard timeChartWizard = new TimeChartWizard(this);
         chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Visit).clickApply();
         waitForElementToDisappear(Locator.css("svg").containing("Days Since Contact Date"));
@@ -96,13 +95,12 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         log("Check visit data.");
         assertElementPresent(Ext4Helper.Locators.ext4Button("Chart Type"));
         assertElementPresent(Ext4Helper.Locators.ext4Button("Chart Layout"));
-        clickButton("View Data", 0);
+        DataRegionTable table = timeChartWizard.clickViewData();
         waitForElement(Locator.paginationText(19));
         // verify that other toolbar buttons have been hidden
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Chart Type"));
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Chart Layout"));
 
-        DataRegionTable table = DataRegionTable.findDataRegion(this);
         List<String> displayOrders = table.getColumnDataAsText("Display Order");
         for (String str : displayOrders)
             assertEquals("Display order should default to zero.", "0", str);
@@ -126,10 +124,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Visit).clickApply();
         waitForElement(Locator.css("svg").containing("6 week Post-V#2"));
 
-        openSaveMenu();
-        setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME);
-        setFormElement(Locator.name("reportDescription"), REPORT_DESCRIPTION);
-        saveReport(true);
+        timeChartWizard.saveReport(VISIT_REPORT_NAME, REPORT_DESCRIPTION);
         waitForElement(Locator.css("svg").containing(VISIT_CHART_TITLE));
     }
 
@@ -155,14 +150,13 @@ public class TimeChartVisitBasedTest extends TimeChartTest
 
         log("Create a Time Chart from the measure in the new query");
         DataRegionTable query = new DataRegionTable("query", getDriver());
-        query.goToReport("Create Chart");
+        query.createChart();
         // note: the 'My APX Query' query should already be selected
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
+        TimeChartWizard timeChartWizard = chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
                 .setYAxis("2. Body Temp")
                 .clickApply();
         waitForText("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.");
-        TimeChartWizard timeChartWizard = new TimeChartWizard(this);
         chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Visit).clickApply();
         waitForCharts(1);
@@ -170,15 +164,13 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         _ext4Helper.clickParticipantFilterGridRowText("999320016", 0);
         waitForElement(Locator.css("svg").containing("4 wk Post-V#2/V#3")); // last visit from ptid 999320016
         assertTextPresent("2. Body Temp: ", 18); // point hover text label
-        clickButton("View Data", 0);
+        timeChartWizard.clickViewData();
         waitForElement(Locator.paginationText(9));
         assertTextNotPresent("801.0", "G1: 6wk/G2: 2wk"); // sequenceNum filtered out by default view filter
         clickButton("View Chart(s)", 0);
         waitForElement(Locator.css("svg").containing("My APX Query"));
 
-        openSaveMenu();
-        setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME + " 2");
-        saveReport(true);
+        timeChartWizard.saveReport(VISIT_REPORT_NAME + " 2");
         waitForElement(Locator.css("svg").containing("My APX Query"));
     }
 

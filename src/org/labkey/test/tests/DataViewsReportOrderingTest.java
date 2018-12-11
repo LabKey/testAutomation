@@ -26,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -70,10 +71,8 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
     @Test
     public void testReportOrdering()
     {
+        final List<String> categories = Arrays.asList("Exams", "Tests");
         // test by user the Reorder Reports window to reverse the list of reports for each category that has reports
-
-        // Getting a random js error failure on TeamCity that is benign. Going to pause javascript error checking.
-        pauseJsErrorChecker();
 
         // navigate to Data Views web part
         clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
@@ -83,14 +82,13 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
 
         // bring up the Reorder Reports popup
         waitAndClick(Locator.linkContainingText("Reorder Reports And Charts"));
+        waitForElements(Locator.byClass("dvcategory"), categories.size());
 
         // use the ReorderReportsWindow component to reverse the order of the reports in each category
         ReorderReportsWindow reorderReportsWindow = new ReorderReportsWindow(getDriver());
         HashMap<String, List<String>> categorReportsOriginalOrder = new HashMap<>();
-        List<WebElement> categories = reorderReportsWindow.getCategories();
-        for (WebElement category : categories)
+        for (String categoryText : categories)
         {
-            String categoryText = category.getText();
             List<String> reports = reorderReportsWindow.getReportsForCategory(categoryText);
             String[] reportsA = new String[reports.size()];
             reportsA = reports.toArray(reportsA);
@@ -161,13 +159,13 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
 
         public List<WebElement> getCategories()
         {
-            return findElements(Locator.xpath("//tr/td/div/span").withClass("x4-tree-node-text"));
+            return Locator.xpath("//tr/td/div/span").withClass("x4-tree-node-text").findElements(this);
         }
 
         public List<String> getReportsForCategory(String category)
         {
             selectCategory(category);
-            List<WebElement> reportWebElements = findElements(Locator.xpath("//tr/td/div").withClass("x4-grid-cell-inner").withoutClass("x4-grid-cell-inner-treecolumn"));
+            List<WebElement> reportWebElements = Locator.xpath("//tr/td/div").withClass("x4-grid-cell-inner").withoutClass("x4-grid-cell-inner-treecolumn").findElements(this);
             List<String> reportStrings = new ArrayList<>();
             for (WebElement reportWebElement : reportWebElements)
             {
@@ -178,8 +176,15 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
 
         public void selectCategory(String category)
         {
-            Actions builder = new Actions(getWrapper().getDriver());
-            builder.click(findElement(Locator.xpath("//tr/td/div/span").withClass("x4-tree-node-text").withText(category))).build().perform();
+            try
+            {
+                WebElement categoryEl = Locator.xpath("//tr/td/div/span").withClass("x4-tree-node-text").withText(category).findElement(this);
+                categoryEl.click();
+            }
+            catch (NoSuchElementException e)
+            {
+                throw new NoSuchElementException("Category not found: " + category, e);
+            }
         }
 
         public void done()

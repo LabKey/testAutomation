@@ -30,14 +30,16 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.pages.InsertPage;
 import org.labkey.test.pages.admin.PermissionsPage;
+import org.labkey.test.pages.announcements.AdminPage;
+import org.labkey.test.pages.announcements.InsertPage;
+import org.labkey.test.pages.announcements.RespondPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.support.ui.Select;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -172,23 +174,24 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Update");
         clickButton("Done");
 
-        // TODO: Convert to test.pages.announcements.AdminPage
         log("Customize message board");
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
-        checkCheckbox(Locator.checkboxByName("expires"));
-        clickButton("Save");
+        new AdminPage(getDriver())
+                .includeExpires(true)
+                .save();
 
         verifyAdmin();
         clickProject(PROJECT_NAME);
 
         log("Check message works in Wiki");
-        // TODO: Convert to test.pages.announcements.InsertPage
         _portalHelper.clickWebpartMenuItem("Messages", true, "New");
-        selectOptionByText(Locator.name("rendererType"), "Wiki Page");
-        setFormElement(Locator.name("title"), MSG1_TITLE);
-        setFormElement(Locator.name("expires"), EXPIRES1);
-        setFormElement(Locator.id("body"), "1 <b>first message testing</b>");
-        clickButton("Submit", longWaitForPage);
+        new org.labkey.test.pages.announcements.InsertPage(getDriver())
+                .setRenderAs(WikiHelper.WikiRendererType.RADEOX) // "Wiki Page"
+                .setTitle(MSG1_TITLE)
+                .setBody("<b>first message testing</b>")
+                .setExpires(EXPIRES1)
+                .submit();
+
         assertTextPresent(MSG1_TITLE);
         clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(EXPIRES1, "<b>first message testing</b>");
@@ -197,25 +200,21 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Create message using markdown");
         clickButton( "New");
-        Select select = new Select(Locator.name("rendererType").findElement(getDriver()));
-        assertTrue("default selection should be 'Markdown'", select.getFirstSelectedOption().getText().equals("Markdown"));
-        assertElementPresent(Locator.tagWithClassContaining("li", "nav-item")
-            .withChild(Locator.tagWithClass("a", "nav-link").withText("Source")));
-        Locator previewPaneTab = Locator.tagWithClassContaining("li", "nav-item")
-                .withChild(Locator.tagWithClass("a", "nav-link").withText("Preview"));
-        assertElementPresent(previewPaneTab);
-        setFormElement(Locator.name("title"), "Markdown is a thing now");
-        setFormElement(Locator.id("body"), "# Holy Header, Batman!\n" +
-                "**bold as bold can possibly be**\n" +
-                "\n" +
-                "```var foo = bar.fooValue;```\n" +
-                "\n" +
-                "## List of things I don't like \n" +
-                "+ hair clogs\n" +
-                "+ stinky feet\n" +
-                "+ internet trolls");
+        InsertPage markdownPage = new org.labkey.test.pages.announcements.InsertPage(getDriver());
+        assertEquals("default selection should be 'Markdown'",markdownPage.getRenderAs(), WikiHelper.WikiRendererType.MARKDOWN);
+        markdownPage.setTitle("Markdown is a thing now")
+                .setBody("# Holy Header, Batman!\n" +
+                        "**bold as bold can possibly be**\n" +
+                        "\n" +
+                        "```var foo = bar.fooValue;```\n" +
+                        "\n" +
+                        "## List of things I don't like \n" +
+                        "+ hair clogs\n" +
+                        "+ stinky feet\n" +
+                        "+ internet trolls");
+
         // now look at the preview pane
-        previewPaneTab.findWhenNeeded(getDriver()).click();
+        markdownPage.selectPreviewTab();
         waitForElement(Locator.tagWithText("h2", "List of things I don't like"), 2000);
         assertElementPresent(Locator.tagWithText("li", "hair clogs"));
         assertElementPresent(Locator.tagWithText("li", "stinky feet"));
@@ -237,10 +236,11 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check that HTML message works");
         clickButton("New");
-        selectOptionByText(Locator.name("rendererType"), "HTML");
-        setFormElement(Locator.name("title"), MSG1_TITLE);
-        setFormElement(Locator.id("body"), HTML_BODY);
-        clickButton("Submit");
+        new org.labkey.test.pages.announcements.InsertPage(getDriver())
+                .setRenderAs(WikiHelper.WikiRendererType.HTML)
+                .setTitle(MSG1_TITLE)
+                .setBody(HTML_BODY)
+                .submit();
         assertElementPresent(Locator.tag("div").withClass("message-text").withPredicate("starts-with(normalize-space(), '1 x')"));
         assertElementPresent(Locator.linkWithText(HTML_BODY_WEBPART_TEST));
 
@@ -252,11 +252,11 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent(MSG1_BODY);
 
         log("Add response");
-        clickRespondButton();
-        setFormElement(Locator.name("title"), RESP1_TITLE);
-        setFormElement(Locator.name("expires"), EXPIRES2);
-        setFormElement(Locator.id("body"), RESP1_BODY);
-        clickButton("Submit", longWaitForPage);
+        clickRespondButton()
+            .setTitle(RESP1_TITLE)
+            .setExpires(EXPIRES2)
+            .setBody(RESP1_BODY)
+            .submit();
 
         log("Make sure response was entered correctly");
         assertTextPresent(
@@ -265,12 +265,12 @@ public class MessagesLongTest extends BaseWebDriverTest
                 RESP1_BODY);
 
         log("Add second response with attachment, make sure it was entered and recognized");
-        clickRespondButton();
-        setFormElement(Locator.id("body"), RESP2_BODY);
-        click(Locator.linkContainingText("Attach a file"));
         File attachmentFile = TestFileUtils.getSampleData("fileTypes/pdf_sample.pdf");
-        setFormElement(Locator.name("formFiles[00]"), attachmentFile);
-        clickButton("Submit", longWaitForPage);
+        clickRespondButton()
+            .setBody(RESP2_BODY)
+            .addAttachments(attachmentFile)
+            .submit();
+
         assertTextPresent(RESP2_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
         assertElementPresent(Locator.id("table1").append(Locator.tag("td").withText("(2" + NBSP + "responses)")));
@@ -297,24 +297,26 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check if the customized names work");
 
-        // TODO: Convert to test.pages.announcements.AdminPage
         clickProject(PROJECT_NAME);
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
-        setFormElement(Locator.name("boardName"), "Notes");
-        setFormElement(Locator.name("conversationName"), "Thread");
-        clickButton("Save");
+        new AdminPage(getDriver())
+                .setBoardName("Notes")
+                .setConversationName("Thread")
+                .save();
+
         assertTextPresent("Notes", "thread");
-        // TODO: Convert to test.pages.announcements.AdminPage
         _portalHelper.clickWebpartMenuItem("Notes", true, "Admin");
-        setFormElement(Locator.name("boardName"), "Messages");
-        setFormElement(Locator.name("conversationName"), "Message");
-        clickButton("Save");
+        new AdminPage(getDriver())
+                .setBoardName("Messages")
+                .setConversationName("Message")
+                .save();
 
         log("Check if sorting works");
-        // TODO: Convert to test.pages.announcements.InsertPage
         _portalHelper.clickWebpartMenuItem("Messages", true, "New");
-        setFormElement(Locator.name("title"), MSG2_TITLE);
-        clickButton("Submit", longWaitForPage);
+        new InsertPage(getDriver())
+                .setTitle(MSG2_TITLE)
+                .submit();
+
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(MSG2_TITLE);
@@ -332,14 +334,15 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Edit other customize options");
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("Admin"));
-        uncheckCheckbox(Locator.checkboxByName("titleEditable"));
-        checkCheckbox(Locator.checkboxByName("memberList"));
-        checkCheckbox(Locator.checkboxByName("status"));
-        uncheckCheckbox(Locator.checkboxByName("expires"));
-        checkCheckbox(Locator.checkboxByName("assignedTo"));
-        uncheckCheckbox(Locator.checkboxByName("formatPicker"));
-        selectOptionByText(Locator.name("defaultAssignedTo"), _userHelper.getDisplayNameForEmail(USER1));
-        clickButton("Save");
+        new AdminPage(getDriver())
+                .canEditTitle(false)
+                .includeMemberList(true)
+                .includeStatus(true)
+                .includeExpires(false)
+                .includeAssignedTo(true)
+                .includeFormatPicker(false)
+                .selectDefaultAssignedTo(_userHelper.getDisplayNameForEmail(USER1))
+                .save();
 
         log("Check if status and expires work");
         clickButton("New");
@@ -544,9 +547,10 @@ public class MessagesLongTest extends BaseWebDriverTest
     }
 
 
-    private void clickRespondButton()
+    private RespondPage clickRespondButton()
     {
         clickButton("Respond");
+        return new RespondPage(getDriver());
     }
 
     //Expects an empty email record

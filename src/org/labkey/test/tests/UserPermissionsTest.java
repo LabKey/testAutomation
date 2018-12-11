@@ -202,8 +202,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Remove permission from folder to verify unviewability
         log("Check for disallowed folder links");
-        click(Locator.linkWithText("Stop Impersonating"));
-        acceptAlert();
+        stopImpersonating();
         navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();

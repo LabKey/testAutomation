@@ -23,10 +23,12 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
@@ -152,7 +154,7 @@ public class TabTest extends SimpleModuleTest
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Sets", "Assay List", "Messages");
 
         //there is a selector for the assay controller and tab2
-        clickAndWait(Locator.linkWithText("New Assay Design"));
+        clickAndWait(Locator.lkButton("New Assay Design"));
         verifyTabSelected("Tab 2");
 
         //this is a controller selector
@@ -166,7 +168,7 @@ public class TabTest extends SimpleModuleTest
         //this is a regex selector
         clickFolder(FOLDER_NAME);
         portalHelper.addWebPart("Sample Sets");
-        clickAndWait(Locator.linkWithText("Import Sample Set"));
+        clickAndWait(Locator.lkButton("Import Sample Set"));
         verifyTabSelected("Tab 1");
 
         // Test Container tabs
@@ -174,8 +176,8 @@ public class TabTest extends SimpleModuleTest
         assertTextPresent("Assay List");
         PortalTab studyContainerTab = portalHelper.activateTab(STUDY_FOLDER_TAB_LABEL);
         assertTextPresent("Study Overview");
-        clickAndWait(Locator.linkWithText("Create Study"));
-        clickAndWait(Locator.linkWithText("Create Study"));
+        clickAndWait(Locator.lkButton("Create Study"));
+        clickAndWait(Locator.lkButton("Create Study"));
         assertTextPresent("Manage Study", "Study Container", "Overview", "Specimen Data");
         studyContainerTab.goToTabContainer("Specimen Data");
         assertTextPresent("Vial Search", "Specimens");
@@ -212,14 +214,7 @@ public class TabTest extends SimpleModuleTest
         waitForText("The Wiki web part displays a single wiki page.");
         // revert type
         goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
-        waitForText(STUDY_FOLDER_TAB_NAME);
-        clickButton("Revert", 0);
-        _extHelper.waitForExtDialog("Revert Folder(s)");
-        click(Ext4Helper.Locators.ext4Button("Yes"));
-        _extHelper.waitForExtDialog("Revert Folder");
-        click(Ext4Helper.Locators.ext4Button("OK"));
-        clickTab("Study Container");
-        waitForText("Study tracks data in");
+        revertFolder(STUDY_FOLDER_TAB_NAME);
 
         // Revert via parent container
         goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
@@ -232,14 +227,7 @@ public class TabTest extends SimpleModuleTest
         waitForText("The Wiki web part displays a single wiki page.");
         clickTab("Tab 1");
         goToFolderManagement();
-        waitForText(STUDY_FOLDER_TAB_NAME);
-        clickButton("Revert", 0);
-        _extHelper.waitForExtDialog("Revert Folder(s)");
-        click(Ext4Helper.Locators.ext4Button("Yes"));
-        _extHelper.waitForExtDialog("Revert Folders");
-        click(Ext4Helper.Locators.ext4Button("OK"));
-        clickTab("Study Container");
-        waitForText("Study tracks data in");
+        revertFolder(STUDY_FOLDER_TAB_NAME);
 
         // Delete tab folder
         log("Container tab enhancements: delete tab folder type, recreate");
@@ -268,8 +256,8 @@ public class TabTest extends SimpleModuleTest
         click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("A customized web part");
         clickTab("Study Container");
-        clickAndWait(Locator.linkWithText("Create Study"));     // Create study
-        clickAndWait(Locator.linkWithText("Create Study"));
+        clickAndWait(Locator.lkButton("Create Study"));     // Create study
+        clickAndWait(Locator.lkButton("Create Study"));
 
         // Create the list again so we can pass query validation.
         log("Create list in subfolder to prevent query validation failure");
@@ -278,6 +266,19 @@ public class TabTest extends SimpleModuleTest
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
                 new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
+    }
+
+    private void revertFolder(String folderName) {
+        waitForText(folderName);
+        WebElement revertButton = Ext4Helper.Locators.ext4Button("Revert").findElement(getDriver());
+        shortWait().until(LabKeyExpectedConditions.animationIsDone(revertButton));
+        revertButton.click();
+        _extHelper.waitForExtDialog("Revert Folder(s)");
+        click(Ext4Helper.Locators.ext4Button("Yes"));
+        _extHelper.waitForExtDialog("Revert Folder");
+        click(Ext4Helper.Locators.ext4Button("OK"));
+        clickTab("Study Container");
+        waitForText("Study tracks data in");
     }
 
     @LogMethod
@@ -296,8 +297,8 @@ public class TabTest extends SimpleModuleTest
         clickFolder(COLLAB_FOLDER);
         clickFolder(STUDY_FOLDER_TAB_NAME);
         assertTextPresent("Study Overview");
-        clickAndWait(Locator.linkWithText("Create Study"));
-        clickAndWait(Locator.linkWithText("Create Study"));
+        clickAndWait(Locator.lkButton("Create Study"));
+        clickAndWait(Locator.lkButton("Create Study"));
         clickFolder(ASSAY_FOLDER_TAB_NAME);
         portalHelper.addWebPart(EXTRA_ASSAY_WEBPART);
 

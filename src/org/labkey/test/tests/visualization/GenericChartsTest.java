@@ -15,18 +15,23 @@
  */
 package org.labkey.test.tests.visualization;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ChartLayoutDialog;
-import org.labkey.test.components.ChartTypeDialog;
-import org.labkey.test.components.SaveChartDialog;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.tests.ReportTest;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public abstract class GenericChartsTest extends ReportTest
 {
@@ -63,80 +68,68 @@ public abstract class GenericChartsTest extends ReportTest
         for (int i = 0; i < _plots.size(); i++)
         {
             log("Verify " + _plots.get(i));
-            Locator loc = Locator.linkWithText(_plots.get(i));
-            waitForElement(loc);
-            mouseOver(loc);
-            Locator.XPathLocator tipWindow = Locator.tag("div").withClass("data-views-tip-content").notHidden().containing(_plotDescriptions.get(i));
-            waitForElement(tipWindow);
+            WebElement plotLink = waitForElement(Locator.linkWithText(_plots.get(i)));
+            mouseOver(plotLink);
+            WebElement tipWindow = waitForElement(Locator.tag("div").withClass("data-views-tip-content").notHidden());
+            String tipText = tipWindow.getText();
+            String expectedDescription = _plotDescriptions.get(i);
+            if (expectedDescription != null)
+            {
+                assertTrue("Plot tooltip. Expected: " + expectedDescription + "\n Actual: " + tipText,
+                        tipText.contains(expectedDescription));
+            }
+            else
+            {
+                assertFalse("Expected no description in plot tooltip. Actual: " + tipText,
+                        tipText.contains("Description"));
+            }
             mouseOver(Locator.css("a")); // Just to dismiss the dialog
-            waitForElementToDisappear(tipWindow);
+            shortWait().until(ExpectedConditions.invisibilityOf(tipWindow));
         }
     }
 
     protected abstract void testPlots();
 
     @LogMethod
-    protected void savePlot(String name, String description)
+    protected void savePlot(@NotNull String name, @Nullable String description)
     {
         savePlot(name, description, false);
     }
 
     @LogMethod
-    protected void savePlot(String name, String description, boolean saveAs)
+    protected void savePlot(@NotNull String name, @Nullable String description, boolean saveAs)
     {
-        WebElement saveButton = saveAs ? findButton("Save As") : findButton("Save");
-        saveButton.click();
+        TimeChartWizard reportWizard = new TimeChartWizard(this);
 
-        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
-        saveChartDialog.waitForDialog(saveAs);
-        saveChartDialog.setReportName(name);
-        saveChartDialog.setReportDescription(description);
-        saveChartDialog.clickSave(saveAs);
-        sleep(2500); // sleep while the save success message shows
+        if (saveAs)
+            reportWizard.saveReportAs(name, description);
+        else
+            reportWizard.saveReport(name, description);
+
         waitForText(name);
-        waitFor(() ->
-                !(Boolean) executeScript("var p = Ext4.getCmp('generic-report-panel-1'); " +
-                        "if (p) return p.isDirty(); " +
-                        "else return false;"),
-                "Page still dirty", WAIT_FOR_JAVASCRIPT);
-
         _plots.add(name);
         _plotDescriptions.add(description);
     }
 
-    @LogMethod
-    protected void savePlot()
+    protected abstract ChartLayoutDialog clickChartLayoutButton();
+
+    protected <LayoutDialog extends ChartLayoutDialog> LayoutDialog clickChartLayoutButton(Class<LayoutDialog> clazz)
     {
-        clickButton("Save", 0);
-        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
-        saveChartDialog.waitForDialog();
-        saveChartDialog.clickSave();
-        sleep(2500); // sleep while the save success message shows
+        return new TimeChartWizard(this).clickChartLayoutButton(clazz);
     }
 
-    protected ChartLayoutDialog clickChartLayoutButton()
-    {
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
-        return new ChartLayoutDialog(getDriver());
-    }
-
-    protected ChartTypeDialog clickChartTypeButton()
-    {
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Type").enabled()).click();
-        return new ChartTypeDialog(getDriver());
-    }
-
-    protected void openSavedPlotInEditMode(String savedPlotName)
+    protected TimeChartWizard openSavedPlotInEditMode(String savedPlotName)
     {
         click(Locator.linkContainingText("Clinical and Assay Data"));
         clickReportGridLink(savedPlotName);
-        _ext4Helper.waitForMaskToDisappear();
+        TimeChartWizard chartWizard = new TimeChartWizard(this);
+        chartWizard.waitForReportRender();
 
         // verify that we originally are in view mode and can switch to edit mode
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
-        clickButton("Edit", WAIT_FOR_PAGE);
-        _ext4Helper.waitForMaskToDisappear();
+        chartWizard.clickEdit();
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
+        return chartWizard;
     }
 
     protected void export(String type, String xAxis, String yAxis)
@@ -156,10 +149,10 @@ public abstract class GenericChartsTest extends ReportTest
         waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 
         log("Validate that the script is as expected.");
-        Assert.assertTrue("Script did not contain expected text: '" + type + "' ", exportScript.toLowerCase().contains(type.toLowerCase()));
-        Assert.assertTrue("Script did not contain expected text: '" + xAxis + "' ", exportScript.toLowerCase().contains(xAxis.toLowerCase()));
+        assertTrue("Script did not contain expected text: '" + type + "' ", exportScript.toLowerCase().contains(type.toLowerCase()));
+        assertTrue("Script did not contain expected text: '" + xAxis + "' ", exportScript.toLowerCase().contains(xAxis.toLowerCase()));
         if (yAxis != null)
-            Assert.assertTrue("Script did not contain expected text: '" + yAxis + "' ", exportScript.toLowerCase().contains(yAxis.toLowerCase()));
+            assertTrue("Script did not contain expected text: '" + yAxis + "' ", exportScript.toLowerCase().contains(yAxis.toLowerCase()));
 
         goToProjectHome();
     }

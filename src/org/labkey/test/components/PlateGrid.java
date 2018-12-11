@@ -16,7 +16,6 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -25,103 +24,98 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PlateGrid
+public class PlateGrid extends WebDriverComponent
 {
-    public final String EXCLUDED_PLATE_SUMMARY_XPATH = "//h3[text()='$']/../..//table[contains(@class, 'plate-summary')]";
+    private static final String EXCLUDED_PLATE_SUMMARY_XPATH = "//h3[text()='$']/../..//table[contains(@class, 'plate-summary')]";
 
-    private WebDriver _driver;
-    private WebElement[][] _gridValues;
+    private final WebDriver _driver;
+    private final WebElement _plateGridEl;
+    private List<List<WebElement>> _gridValues;
     private Map<String, Integer> _rowsIndex;
     private Map<String, Integer> _colsIndex;
-    private String _plateGridXpath;
 
-    private int ROW_OFFSET = 1;
-    private int COL_OFFSET = 1;
+    private PlateGrid(WebDriver driver, Locator.XPathLocator plateGridLocator)
+    {
+        _driver = driver;
+        _plateGridEl = plateGridLocator.waitForElement(driver, 10000);
+        doInit();
+    }
 
     public PlateGrid(WebDriver driver, String plateId)
     {
-        _driver = driver;
-        doInit(EXCLUDED_PLATE_SUMMARY_XPATH.replace("$", plateId));
+        this(driver, Locator.xpath(EXCLUDED_PLATE_SUMMARY_XPATH.replace("$", plateId)));
     }
 
     public PlateGrid(WebDriver driver)
     {
-        _driver = driver;
-        doInit("//table[contains(@class, 'plate-summary')]");
+        this(driver, Locator.tagWithClass("table", "plate-summary"));
     }
 
-    private void doInit(String xPath)
+    private void doInit()
     {
-        int rows, cols;
-
-        _plateGridXpath = xPath;
-
         // If there is a header the ROW_OFFSET needs to be adjusted.
-        ROW_OFFSET = Locator.findElements(_driver, Locator.xpath(_plateGridXpath + "//th")).size() + ROW_OFFSET;
+        int rowOffset = Locator.tag("th").findElements(this).size() + 1;
 
-        rows = Locator.findElements(_driver, Locator.xpath(_plateGridXpath)).get(0).findElements(By.tagName("tr")).size() - ROW_OFFSET;
-        cols = Locator.findElements(_driver, Locator.xpath(_plateGridXpath)).get(0).findElements(By.tagName("tr")).get(1).findElements(By.tagName("td")).size() - COL_OFFSET;
+        List<WebElement> rows = Locator.tag("tr").findElements(this);
+        // Remove header row(s)
+        rows.subList(0, rowOffset).clear();
 
-        _gridValues = new WebElement[cols][rows];
+        _gridValues = new ArrayList<>();
+        for (WebElement row : rows)
+        {
+            List<WebElement> cols = Locator.tag("td").findElements(row);
+            cols.subList(0, 1).clear();
+            _gridValues.add(cols);
+        }
 
         char rowName = 'A';
         _rowsIndex = new HashMap<>();
-        for(int i=0; i<rows; i++)
+        for (int i = 0; i < rows.size(); i++)
         {
             _rowsIndex.put(Character.toString(rowName), i);
             rowName++;
         }
 
+        final int columnCount = _gridValues.get(0).size();
         _colsIndex = new HashMap<>();
-        for(int j=0; j<cols; j++)
+        for(int j = 0; j < columnCount; j++)
         {
             _colsIndex.put(Integer.toString(j+1), j);
         }
-
-        _gridValues = populateGrid();
     }
 
-    private WebElement[][] populateGrid()
+    @Override
+    protected WebDriver getDriver()
     {
-        int rowCount, columnCount;
-        List<WebElement> rows = Locator.findElements(_driver, Locator.xpath(_plateGridXpath)).get(0).findElements(By.tagName("tr"));
-        rowCount = rows.size() - ROW_OFFSET;
-        columnCount = Locator.findElements(_driver, Locator.xpath(_plateGridXpath)).get(0).findElements(By.tagName("tr")).get(1).findElements(By.tagName("td")).size() - COL_OFFSET;
+        return _driver;
+    }
 
-        WebElement[][] plateGrid = new WebElement[rowCount][columnCount];
-
-        for(int row = ROW_OFFSET; row < rows.size(); row++)
-        {
-            List<WebElement> cols = rows.get(row).findElements(By.tagName("td"));
-            for(int col = COL_OFFSET; col < cols.size(); col++ )
-            {
-                plateGrid[row- ROW_OFFSET][col- COL_OFFSET] = cols.get(col);
-            }
-        }
-
-        return plateGrid;
+    @Override
+    public WebElement getComponentElement()
+    {
+        return _plateGridEl;
     }
 
     public WebElement getCellElement(String row, String col)
     {
 
-        return _gridValues[_rowsIndex.get(row)][_colsIndex.get(col)];
+        return _gridValues.get(_rowsIndex.get(row)).get(_colsIndex.get(col));
     }
 
     public String getCellValue(String row, String col)
     {
-        return _gridValues[_rowsIndex.get(row)][_colsIndex.get(col)].getText();
+        return getCellElement(row, col).getText();
     }
 
     public boolean isCellExcluded(String row, String col)
     {
-        String classValue = _gridValues[_rowsIndex.get(row)][_colsIndex.get(col)].getAttribute("class");
+        String classValue = getCellElement(row, col).getAttribute("class");
         return classValue.toLowerCase().contains("excluded");
     }
 
     public List<WebElement> getExcludedCells()
     {
-        return Locator.findElements(_driver, Locator.xpath(_plateGridXpath + "//td[contains(@class, 'excluded')]"));
+        return Locator.tagWithClass("td", "excluded").findElements(this);
     }
 
     public List<String> getExcludedValues()
@@ -136,5 +130,4 @@ public class PlateGrid
 
         return values;
     }
-
 }

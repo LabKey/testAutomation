@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -289,8 +290,19 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public void goToReport(boolean waitForRefresh, String... menuTexts)
     {
+        clickReportMenu(waitForRefresh, menuTexts);
+    }
+
+    public void clickReportMenu(boolean waitForRefresh, String... menuTexts)
+    {
         BootstrapMenu menu = getReportMenu();
         menu.clickSubMenu(waitForRefresh,  menuTexts);
+    }
+
+    public ChartTypeDialog createChart()
+    {
+        clickReportMenu(true, "Create Chart");
+        return new ChartTypeDialog(getDriver());
     }
 
     @NotNull

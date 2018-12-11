@@ -209,12 +209,9 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
         assertEquals("Scatter", chartTypeDialog.getChartTypeTitle());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box);
-        doAndWaitForElementToRefresh(() -> chartTypeDialog.clickApply(), Locator.css("svg"), shortWait());
-        _ext4Helper.waitForMaskToDisappear();
-        clickButton("Save", 0);
-        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
-        saveChartDialog.waitForDialog();
-        doAndWaitForPageSignal(() -> saveChartDialog.clickSave(), "genericChartDirty");
+        TimeChartWizard chartWizard = chartTypeDialog.clickApply();
+        SaveChartDialog saveChartDialog = chartWizard.clickSave();
+        saveChartDialog.clickSave();
 
         clickTab("Clinical and Assay Data");
         waitForText("Tests");

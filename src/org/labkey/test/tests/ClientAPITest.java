@@ -58,10 +58,12 @@ import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -654,7 +656,9 @@ public class ClientAPITest extends BaseWebDriverTest
     public void maxRowsTest()
     {
         setSourceFromFile("maxRows.js");
-        waitForText (5000, "maxRows Test");
+        String paginationText = Locator.byClass("xtb-text").withText()
+                .waitForElements(getDriver(), WAIT_FOR_JAVASCRIPT).get(2).getText();
+        assertEquals("Wrong pagination for ext grid", "Displaying 1 - 2 of 6", paginationText);
         assertTextPresent("Janeson");
         assertTextNotPresent("Johnson");
     }
@@ -920,15 +924,20 @@ public class ClientAPITest extends BaseWebDriverTest
     public void queryRegressionTest()
     {
         String script = TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/queryRegressionTest.js"));
-        String scriptResult = (String)((JavascriptExecutor) getDriver()).executeAsyncScript(script);
-        String[] testResults = scriptResult.split("\n");
-
-        for (String result : testResults)
+        List<String> testResults = new ArrayList<>();
+        // TODO: 35526: Ext4.Ajax.request doesn't trigger callbacks when invoked by Geckodriver
+        int testCount = getDriver().getClass().isAssignableFrom(FirefoxDriver.class) ? 3 : 4;
+        for (int i = 0; i < testCount; i++)
         {
-            log(result);
+            log("JavaScript test case #" + i);
+            List<String> testResult = Arrays.asList(((String) executeAsyncScript(script, i)).trim().split("\n"));
+            testResults.addAll(testResult);
+            for (String line : testResult)
+                log(line);
         }
-        assertFalse(scriptResult.contains("ERROR"));
-        assertEquals("Wrong number of results", 5, testResults.length);
+        String scriptResult = String.join("\n", testResults);
+        assertFalse(scriptResult, scriptResult.contains("ERROR"));
+        assertEquals("Wrong number of results", testCount + 1, testResults.size());
     }
 
     private static final String EMAIL_SENDER = "sender@clientapi.test";

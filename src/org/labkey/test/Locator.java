@@ -16,15 +16,17 @@
 
 package org.labkey.test;
 
-import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.ReclickingWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.SearchContext;
@@ -32,16 +34,18 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.WrapsDriver;
+import org.openqa.selenium.WrapsDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public abstract class Locator extends By
 {
@@ -292,15 +296,9 @@ public abstract class Locator extends By
     protected static <T> T extractInputFromFluentWait(FluentWait<T> wait)
     {
         MutableObject<T> wrappedContext = new MutableObject<>();
-        wait.until(new Function<T, Boolean>()
-        {
-            @Override
-            public Boolean apply(T input)
-            {
-                wrappedContext.setValue(input);
-                return true;
-            }
-
+        wait.until(input -> {
+            wrappedContext.setValue(input);
+            return true;
         });
         return wrappedContext.getValue();
     }
@@ -430,7 +428,7 @@ public abstract class Locator extends By
 
     public WebElement waitForElement(final SearchContext context, final int msTimeout)
     {
-        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(msTimeout, TimeUnit.MILLISECONDS);
+        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(Duration.ofMillis(msTimeout));
 
         return waitForElement(wait);
     }
@@ -462,7 +460,7 @@ public abstract class Locator extends By
 
     public void waitForElementToDisappear(final SearchContext context, final int msTimeout)
     {
-        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(msTimeout, TimeUnit.MILLISECONDS);
+        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(Duration.ofMillis(msTimeout));
 
         waitForElementToDisappear(wait);
     }
@@ -679,6 +677,11 @@ public abstract class Locator extends By
         return tag("a").withAttributeContaining("href", url);
     }
 
+    public static XPathLocator linkWithId(String id)
+    {
+        return tag("a").withAttributeContaining("id", id);
+    }
+
     public static XPathLocator linkWithSpan(String text)
     {
         return tag("a").append(tag("span").containing(text));
@@ -839,11 +842,6 @@ public abstract class Locator extends By
     {
         // Supports permission types from a variety of modules.
         return permissionButton(groupName, role).append(tag("span").withClass("closeicon"));
-    }
-
-    public static XPathLocator schemaTreeNode(String schemaName)
-    {
-        return tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaName);
     }
 
     public static XPathLocator permissionsTreeNode(String folderName)
@@ -1327,11 +1325,13 @@ public abstract class Locator extends By
 
         public XPathLocator withClass(String cssClass)
         {
+            cssClass = Locator.normalizeCssClass(cssClass);
             return this.withPredicate("contains(concat(' ',normalize-space(@class),' '), " + xq(" " + cssClass + " ") + ")");
         }
 
         public XPathLocator withoutClass(String cssClass)
         {
+            cssClass = Locator.normalizeCssClass(cssClass);
             return this.withoutPredicate("contains(concat(' ',normalize-space(@class),' '), " + xq(" " + cssClass + " ") + ")");
         }
 
@@ -1580,11 +1580,13 @@ public abstract class Locator extends By
 
         public CssLocator withClass(String cssClass)
         {
+            cssClass = Locator.normalizeCssClass(cssClass);
             return append("." + cssClass);
         }
 
         public CssLocator withoutClass(String cssClass)
         {
+            cssClass = Locator.normalizeCssClass(cssClass);
             return append(":not(." + cssClass + ")");
         }
 
@@ -1621,7 +1623,7 @@ public abstract class Locator extends By
     {
         private String _linkText;
 
-        public LinkLocator(String linkText)
+        public LinkLocator(@NotNull String linkText)
         {
             super(tag("a").withText(linkText).toXpath());
             _linkText = linkText;
@@ -1630,11 +1632,40 @@ public abstract class Locator extends By
         @Override
         public List<WebElement> findElements(SearchContext context)
         {
-            List<WebElement> elements = super.findElements(context);
+            List<WebElement> elements;
+            try
+            {
+                String w3CLinkText = getW3CLinkText(context);
+                if (w3CLinkText.equals(_linkText))
+                    elements = super.findElements(context);
+                else
+                    return new LinkLocator(w3CLinkText).findElements(context);
+            }
+            catch (InvalidSelectorException retry)
+            {
+                // By.linkText doesn't allow all possible link texts. e.g. "[All]"
+                return new XPathLocator(getLoc()).findElements(context);
+            }
             if (elements.size() == 0 && !_linkText.equals(_linkText.toUpperCase()))
                 return (new LinkLocator(_linkText.toUpperCase())).findElements(context);
             else
                 return elements;
+        }
+
+        /**
+         * Geckodriver follows spec more closely than some tests expect. Need to trim whitespace to find links by text.
+         * <a href='https://www.w3.org/TR/webdriver1/#link-text'>WebDriver Spec</a>
+         * @return Link text appropriate to the current WebDriver instance (if able to be determined)
+         */
+        private String getW3CLinkText(SearchContext context)
+        {
+            // We need to do this every time because many Locators are defined statically
+            WebDriver webDriver = WebDriverUtils.extractWrappedDriver(context);
+            if (webDriver instanceof FirefoxDriver)
+            {
+                return _linkText.replaceAll(NBSP, " ").trim();
+            }
+            return _linkText;
         }
 
         @Override
@@ -1647,5 +1678,10 @@ public abstract class Locator extends By
         {
             return By.linkText(_linkText);
         }
+    }
+
+    private static String normalizeCssClass(String cssClass)
+    {
+        return StringUtils.strip(cssClass, " .");
     }
 }

@@ -43,7 +43,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class, Hosting.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 20 )
+@BaseWebDriverTest.ClassTimeout(minutes = 25 )
 public class FolderTest extends BaseWebDriverTest
 {
     private static String secondProject = "FolderTestProject2";

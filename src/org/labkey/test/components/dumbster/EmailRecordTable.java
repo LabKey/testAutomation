@@ -93,12 +93,12 @@ public class EmailRecordTable extends Table
      */
     public void clickSubject(String subject)
     {
-        getWrapper().click(Locator.linkWithText(subject));
+        Locator.linkWithText(subject).findElement(this).click();
     }
 
     public void clickSubjectAtIndex(String subject, int index)
     {
-        getWrapper().click(Locator.linkWithText(subject).index(index));
+        Locator.linkWithText(subject).index(index).findElement(this).click();
     }
 
     public void clickMessage(EmailMessage message)

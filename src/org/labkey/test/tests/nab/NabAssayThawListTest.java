@@ -274,12 +274,14 @@ public class NabAssayThawListTest extends AbstractAssayTest
 
         log("Test a General assay background importing data from a list.");
 
-        PortalHelper portalHelper = new PortalHelper(this);
-
         clickProject(ASSAY_BACKGROUND_IMPORT_PROJECT);
 
         log("Create new General assay");
-        portalHelper.addWebPart("Assay List");
+        PortalHelper.doInAdminMode(getDriver(), portalHelper ->
+        {
+            portalHelper.addWebPart("Assay List");
+            portalHelper.addWebPart("Lists");
+        });
 
         _assayHelper.createAssayAndEdit("General", ASSAY_NAME)
                 .setDescription("Validating fix for issue 26774.")
@@ -288,34 +290,31 @@ public class NabAssayThawListTest extends AbstractAssayTest
 
         log("Create a list with data coming from the test file.");
 
-        portalHelper.addWebPart("Lists");
-        portalHelper.clickAndWait(Locator.linkWithText("Manage Lists"));
-
         _listHelper.createListFromFile(ASSAY_BACKGROUND_IMPORT_PROJECT, LIST_NAME, STUDY_ZIP);
 
         log("go back to home.");
         goToProjectHome(ASSAY_BACKGROUND_IMPORT_PROJECT);
 
         log("Now import the data from the list into the assay.");
-        portalHelper.clickAndWait(Locator.linkWithText(ASSAY_NAME));
-        portalHelper.clickButton(("Import Data"), "Batch Properties");
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        clickButton(("Import Data"), "Batch Properties");
 
-        portalHelper.checkRadioButton(Locator.radioButtonById("RadioBtn-Lookup"));
-        portalHelper.waitForText("Use an existing sample list");
-        portalHelper.checkRadioButton(Locator.radioButtonById("RadioBtn-ThawListType-List"));
-        portalHelper.waitForText("Schema:");
+        checkRadioButton(Locator.radioButtonById("RadioBtn-Lookup"));
+        waitForText("Use an existing sample list");
+        checkRadioButton(Locator.radioButtonById("RadioBtn-ThawListType-List"));
+        waitForText("Schema:");
 
         _ext4Helper.selectComboBoxItem(Locator.id("thawListSchemaName"), "lists");
         waitForElement(Locator.css(".query-loaded-marker"));
         _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), LIST_NAME);
 
-        portalHelper.clickButton("Next", "Run Properties");
+        clickButton("Next", "Run Properties");
 
-        portalHelper.checkRadioButton(Locator.radioButtonById("Fileupload"));
-        portalHelper.waitForElement(Locator.xpath("//input[@name='__primaryFile__']"));
-        portalHelper.setFormElement(Locator.xpath("//input[@name='__primaryFile__']"), STUDY_ZIP);
+        checkRadioButton(Locator.radioButtonById("Fileupload"));
+        waitForElement(Locator.xpath("//input[@name='__primaryFile__']"));
+        setFormElement(Locator.xpath("//input[@name='__primaryFile__']"), STUDY_ZIP);
 
-        portalHelper.clickButton("Save and Finish", "Data Pipeline");
+        clickButton("Save and Finish", "Data Pipeline");
 
         log("Validate that the pipeline job completed successfully.");
         waitForPipelineJobsToComplete(1, "Assay import job", false);
