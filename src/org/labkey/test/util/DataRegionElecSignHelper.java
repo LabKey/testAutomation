@@ -61,8 +61,7 @@ public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelp
         getWrapper().setFormElement(Locator.input("reason"), reason);
         getWrapper().setFormElement(Locator.input("email"), _userName);
         getWrapper().setFormElement(Locator.input("password"), _userPassword);
-        getWrapper().click(submit);
-        getWrapper().waitForElementToDisappear(submit);
+        getWrapper().clickAndWait(submit);
         getWrapper().waitForText("Details");        // We should be on Details page for the newly signed snapshot
 
     }
