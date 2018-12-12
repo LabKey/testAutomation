@@ -141,15 +141,21 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         return this;
     }
 
-    public PipelineTriggerWizard setMove(String value)
+    public PipelineTriggerWizard setContainerMove(String value)
     {
-        elementCache().moveInput.set(value);
+        elementCache().containerMoveInput.set(value);
+        return this;
+    }
+
+    public PipelineTriggerWizard setSubdirectoryMove(String value)
+    {
+        elementCache().subdirectoryMoveInput.set(value);
         return this;
     }
 
     public boolean isMoveEnabled()
     {
-        return elementCache().moveInput.getComponentElement().getAttribute("disabled") == null;
+        return elementCache().containerMoveInput.getComponentElement().getAttribute("disabled") == null;
     }
 
     public PipelineTriggerWizard setCopy(String value)
@@ -234,7 +240,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         Checkbox recursiveCheckbox = new Checkbox(Locator.tagWithName("input", "recursive").findWhenNeeded(this));
         Input filePatternInput =  new Input(Locator.tagWithName("input", "filePattern").findWhenNeeded(this), getDriver());
         Input quietInput =  new Input(Locator.tagWithName("input", "quiet").findWhenNeeded(this), getDriver());
-        Input moveInput =  new Input(Locator.tagWithName("input", "move").findWhenNeeded(this), getDriver());
+        Input containerMoveInput =  new Input(Locator.tagWithName("input", "containerMove").findWhenNeeded(this), getDriver());
+        Input subdirectoryMoveInput = new Input(Locator.tagWithName("input", "directoryMove").findWhenNeeded(this), getDriver());
         Input copyInput =  new Input(Locator.tagWithName("input", "copy").findWhenNeeded(this), getDriver());
         Input paramFunctionInput =  new Input(Locator.tagWithName("textarea", "parameterFunction").findWhenNeeded(this), getDriver());
         WebElement addCustomParam = Locator.linkContainingText("add custom parameter").findWhenNeeded(this);
