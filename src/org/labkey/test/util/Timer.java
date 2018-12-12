@@ -22,6 +22,7 @@ public class Timer
 {
     private final Instant _startTime;
     private final Duration _timeout;
+    private boolean _cancelled = false;
 
     public Timer(Duration timeout)
     {
@@ -39,8 +40,13 @@ public class Timer
         return _timeout.minus(elapsed());
     }
 
+    public void cancel()
+    {
+        _cancelled = true;
+    }
+
     public boolean isTimedOut()
     {
-        return timeRemaining().isNegative();
+        return _cancelled || timeRemaining().isNegative();
     }
 }

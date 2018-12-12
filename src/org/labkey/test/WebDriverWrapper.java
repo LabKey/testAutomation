@@ -50,6 +50,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.Timer;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
@@ -99,6 +100,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1811,16 +1813,57 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public String doAndWaitForPageSignal(Runnable func, String signalName, WebDriverWait wait)
     {
-        String value;
         try
         {
-            value = doAndWaitForElementToRefresh(func, Locators.pageSignal(signalName), wait).getAttribute("value");
+            return doAndWaitForElementToRefresh(func, Locators.pageSignal(signalName), wait).getAttribute("value");
         }
         catch (StaleElementReferenceException multiSignaled)
         {
-            value = Locators.pageSignal(signalName).findElement(getDriver()).getAttribute("value");
+            throw new RuntimeException("Signal went stale. Use 'doAndWaitForRepeatedPageSignal' for page signals that repeat", multiSignaled);
         }
-        return value;
+    }
+
+    public String doAndWaitForRepeatedPageSignal(Runnable func, String signalName)
+    {
+        return doAndWaitForRepeatedPageSignal(func, signalName, Duration.ofMillis(500));
+    }
+
+    /**
+     * Wait for signaling element created by LABKEY.Utils.signalWebDriverTest
+     * For signals that may be fired in rapid succession
+     * @param func Function that will trigger the desired signal to appear on the page
+     * @param signalName Should match the signal name defined in LABKEY.Utils.signalWebDriverTest
+     * @param quietPeriod Wait this long for signal to stop firing
+     * @return The 'value' of the signal
+     */
+    public String doAndWaitForRepeatedPageSignal(Runnable func, String signalName, Duration quietPeriod)
+    {
+        String signalId = null;
+        WebElement signalEl = doAndWaitForElementToRefresh(func, Locators.pageSignal(signalName), shortWait());
+        Timer timer = new Timer(Duration.ofMillis(WAIT_FOR_JAVASCRIPT));
+        while (!timer.isTimedOut())
+        {
+            try
+            {
+                String nextSignalId = signalEl.getAttribute("id");
+                if (nextSignalId.equals(signalId))
+                {
+                    timer.cancel();
+                }
+                else
+                {
+                    signalId = nextSignalId;
+                    sleep(quietPeriod.toMillis());
+                }
+            }
+            catch (StaleElementReferenceException ignore) { }
+            finally
+            {
+                signalEl = Locators.pageSignal(signalName).findElement(getDriver());
+            }
+        }
+
+        return signalEl.getAttribute("value");
     }
 
     /**
