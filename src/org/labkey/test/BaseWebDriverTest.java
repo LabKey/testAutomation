@@ -54,7 +54,6 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.search.SearchResultsPage;
@@ -323,7 +322,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public String getLastPageText()
     {
-        return _lastPageText != null ? _lastPageText : getDriver().getPageSource();
+        return _lastPageText != null ? _lastPageText : getHtmlSource();
     }
 
     public URL getLastPageURL()

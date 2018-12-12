@@ -508,7 +508,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             return Integer.parseInt(m.group(1));
 
         //Now check the Tomcat page. This is going to be unreliable over time (known to work for Tomcat 7.0 - 9.0)
-        m = TOMCAT_ERROR_PATTERN.matcher(getDriver().getPageSource());
+        m = TOMCAT_ERROR_PATTERN.matcher(getHtmlSource());
         if (m.find())
             return Integer.parseInt(m.group(1));
 
@@ -853,7 +853,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         //IE and Firefox have different notions of empty.
         //IE returns html for all pages even empty text...
-        String text = getDriver().getPageSource();
+        String text = getHtmlSource();
         if (null == text || text.trim().length() == 0)
             return true;
 
