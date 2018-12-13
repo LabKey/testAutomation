@@ -122,6 +122,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -156,6 +158,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private Stack<String> _locationStack = new Stack<>();
     private String _savedLocation = null;
+
+    static
+    {
+        // Eliminate noise from org.openqa.selenium.remote.ProtocolHandshake and org.openqa.selenium.interactions.Actions
+        if (!isWebDriverLoggingEnabled())
+            Logger.getLogger("org.openqa.selenium").setLevel(Level.WARNING);
+    }
 
     public WebDriverWrapper()
     {
@@ -321,7 +330,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     }
                     catch (WebDriverException rethrow)
                     {
-                        throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. Ensure that you are using Firefox 57 or newer (latest ESR is recommended).", rethrow);
+                        throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. Ensure that you are using Firefox 62 or newer.", rethrow);
                     }
                 }
                 break;
