@@ -1504,6 +1504,23 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void setPipelineRoot(String rootPath, boolean inherit)
     {
+        _setPipelineRoot(rootPath, inherit);
+
+        waitForElement(Locators.labkeyMessage.withText("The pipeline root was set to '" + rootPath + "'"));
+
+        getArtifactCollector().addArtifactLocation(new File(rootPath));
+
+        log("Finished setting pipeline to: " + rootPath);
+    }
+
+    public String setPipelineRootExpectingError(String rootPath)
+    {
+        _setPipelineRoot(rootPath, false);
+        return Locators.labkeyError.waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).getText();
+    }
+
+    private void _setPipelineRoot(String rootPath, boolean inherit)
+    {
         log("Set pipeline to: " + rootPath);
         goToDataPipeline()
                 .clickSetup();
@@ -1527,10 +1544,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         setFormElement(Locator.id("pipeProjectRootPath"), rootPath);
 
         clickButton("Save");
-
-        getArtifactCollector().addArtifactLocation(new File(rootPath));
-
-        log("Finished setting pipeline to: " + rootPath);
     }
 
     public void setPipelineRootToDefault()

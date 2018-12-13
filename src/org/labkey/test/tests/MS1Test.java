@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
@@ -116,8 +117,8 @@ public class MS1Test extends BaseWebDriverTest
 
         //test invalid path
         String path = _pipelinePathMain.getAbsolutePath();
-        setPipelineRoot(path + "-invalid");
-        assertTextPresent("-invalid' does not exist");
+        String errorMessage = setPipelineRootExpectingError(path + "-invalid");
+        assertTrue(errorMessage.contains("-invalid' does not exist"));
 
         //set to valid path
         setPipelineRoot(path);

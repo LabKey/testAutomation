@@ -20,6 +20,7 @@ public abstract class Locators
     public static final Locator documentRoot = Locator.css(":root");
     public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
     public static final Locator.XPathLocator labkeyError = Locator.byClass("labkey-error");
+    public static final Locator.XPathLocator labkeyMessage = Locator.byClass("labkey-message");
     public static final Locator.XPathLocator alertWarning = Locator.byClass("alert").withClass("alert-warning");
     public static final Locator signInLink = Locator.tagWithAttributeContaining("a", "href", "login.view");
     public static final Locator.XPathLocator folderTab = Locator.tagWithClass("div", "lk-nav-tabs-ct").append(Locator.tagWithClass("ul", "lk-nav-tabs")).childTag("li");
