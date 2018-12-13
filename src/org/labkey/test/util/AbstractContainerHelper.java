@@ -26,7 +26,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.admin.CreateSubFolderPage;
 import org.labkey.test.pages.admin.SetFolderPermissionsPage;
@@ -301,13 +300,14 @@ public abstract class AbstractContainerHelper
 
         if (_test.isElementPresent(Ext4Helper.Locators.ext4Button("Finish")))
         {
-            _test.clickButton("Finish", _test.defaultWaitForPage);
-            _test.waitFor(()-> _test.getURL().toString().contains(parent + "/" + child), WebDriverWrapper.WAIT_FOR_JAVASCRIPT );
+            _test.clickButton("Finish");
+            String expectedContainer = "/" + parent + "/" + child;
+            assertTrue("Did not end up in new folder: " + expectedContainer, _test.getCurrentContainerPath().endsWith(expectedContainer));
         }
         else
         {
             // There may be additional steps based on folder type
-            _test.clickButton("Next", _test.defaultWaitForPage);
+            _test.clickButton("Next");
         }
 
         //unless we need additional tabs, we end here.
