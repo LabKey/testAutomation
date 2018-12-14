@@ -1291,6 +1291,15 @@ public class DataRegionTable extends DataRegion
         getWrapper().waitAndClick(Locator.linkWithText("Ok"));  //results popup
     }
 
+    public void deleteSelectedRows()
+    {
+        doAndWaitForUpdate(() ->
+        {
+            clickHeaderButton("Delete");
+            getWrapper().acceptAlert();
+        });
+    }
+
     public int getCheckedCount()
     {
         return api().executeScript("getChecked().length;", Long.class).intValue();
