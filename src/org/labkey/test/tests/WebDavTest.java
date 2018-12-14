@@ -146,6 +146,9 @@ public class WebDavTest extends BaseWebDriverTest
     @Test
     public void testWebfiles() throws Exception
     {
+        if (isCloudTest())
+            return;         // Don't test webfiles for S3
+
         setEnableWebfiles(true);
 
         Set<String> expectedWebFiles = new HashSet<>();
