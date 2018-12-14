@@ -181,6 +181,7 @@ public class Crawler
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "showPeptide"),
             new ControllerActionId("ms2", "showProtein"), // TODO: 16617: MS1Test imports don't match provided FASTA file
+            new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-status", "showList"), // Is likely to contain 404 links
             new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
             new ControllerActionId("project", "togglePageAdminMode"),
