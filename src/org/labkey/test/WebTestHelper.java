@@ -57,9 +57,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -117,9 +122,48 @@ public class WebTestHelper
         InstallCert.install("localhost", _webPort, keystorePassword.toCharArray());
     }
 
+    public static String getServerHost()
+    {
+        try
+        {
+            return new URL(getTargetServer()).getHost();
+        }
+        catch (MalformedURLException e)
+        {
+            throw new RuntimeException("Target server property  is not a valid URL", e);
+        }
+    }
+
     public static boolean isLocalServer()
     {
-        return !getTargetServer().contains(".") || getTargetServer().contains("127.0.0.1");
+        return isLocalHost(getServerHost());
+    }
+
+    private static boolean isLocalHost(String serverHost)
+    {
+        InetAddress addr;
+        try
+        {
+            addr = InetAddress.getByName(serverHost);
+        }
+        catch (UnknownHostException e)
+        {
+            return false;
+        }
+
+        // Check if the address is a valid special local or loop back
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress())
+            return true;
+
+        // Check if the address is defined on any interface
+        try
+        {
+            return NetworkInterface.getByInetAddress(addr) != null;
+        }
+        catch (SocketException e)
+        {
+            return false;
+        }
     }
 
     public static Integer getWebPort()

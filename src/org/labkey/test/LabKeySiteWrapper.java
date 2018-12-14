@@ -90,7 +90,6 @@ import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.getBaseURL;
 import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
-import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.WebTestHelper.logToServer;
 
 /**
@@ -846,8 +845,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void checkErrors()
     {
-        if (!isLocalServer())
-            return;
         if (isGuestModeTest())
             return;
 
@@ -903,7 +900,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void resetErrors()
     {
-        if (isGuestModeTest() || !isLocalServer())
+        if (isGuestModeTest())
             return;
 
         SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "resetErrorMark"), PasswordUtil.getUsername(), PasswordUtil.getPassword());

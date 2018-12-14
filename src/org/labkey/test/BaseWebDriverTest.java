@@ -115,7 +115,6 @@ import static org.labkey.test.TestProperties.isViewCheckSkipped;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
-import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.components.PropertiesEditor.PhiSelectType;
 import static org.labkey.test.components.PropertiesEditor.PhiSelectType.NotPHI;
@@ -1029,8 +1028,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void checkLeaks()
     {
-        if (!isLocalServer())
-            return;
         if (isLeakCheckSkipped())
             return;
         if (isGuestModeTest())
