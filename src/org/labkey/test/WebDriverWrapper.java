@@ -3023,13 +3023,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
-            String osName = System.getProperty("os.name");
-            if(osName.toLowerCase().contains("mac"))
-                input.sendKeys(Keys.chord(Keys.COMMAND, "a"));
-            else
-                input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-
-            input.sendKeys(Keys.DELETE);
+            input.clear();
             input.sendKeys(text);
         }
         else

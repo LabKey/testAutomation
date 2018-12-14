@@ -26,7 +26,11 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
 import org.labkey.test.util.WorkbookHelper.WorkbookFolderType;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,19 +79,14 @@ public class WorkbookTest extends BaseWebDriverTest
 
         _containerHelper.createProject(PROJECT_NAME, null);
         portalHelper.addWebPart("Workbooks");
-        int[] ids = createWorkbooks(PROJECT_NAME, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, ASSAY_WORKBOOK_NAME,
+        List<Integer> ids = createWorkbooks(PROJECT_NAME, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, ASSAY_WORKBOOK_NAME,
                 ASSAY_WORKBOOK_DESCRIPTION, DEFAULT_WORKBOOK_NAME, DEFAULT_WORKBOOK_DESCRIPTION);
-        //id's generated when workbooks are created should be sequential
-        int lastid = 0;
-        for(int i=0; i>ids.length; i++)
-        {
-            assertEquals("non-sequential name for workbook found",ids[i],lastid + 1);
-        }
+        assertEquals("id's generated when workbooks are created should be sequential", Arrays.asList(1, 2, 3), ids);
 
         // Edit Workbook Name
         waitAndClick(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
-        waitForElement(Locator.xpath("//input[@value='" + DEFAULT_WORKBOOK_NAME + "']"));
-        setFormElement(Locator.xpath("//input[@value='" + DEFAULT_WORKBOOK_NAME + "']"), "Renamed" + DEFAULT_WORKBOOK_NAME);
+        WebElement nameInput = waitForElement(Locator.xpath("//input[@value='" + DEFAULT_WORKBOOK_NAME + "']"));
+        nameInput.sendKeys(Keys.DELETE, "Renamed" + DEFAULT_WORKBOOK_NAME);
 
         // Change the focus to trigger a save
         click(Locator.id("wb-description"));
@@ -148,29 +147,29 @@ public class WorkbookTest extends BaseWebDriverTest
         assertEquals("workbook added to new project did not have id=1", id, 1);
     }
 
-    private int[] createWorkbooks(String projectName, String fileWorkbookName, String fileWorkbookDescription,
+    private List<Integer> createWorkbooks(String projectName, String fileWorkbookName, String fileWorkbookDescription,
                                   String assayWorkbookName, String assayWorkbookDescription,
                                   String defaultWorkbookName, String defaultWorkbookDescription)
     {
-        int[] names = new int[3];
+        List<Integer> ids = new ArrayList<>();
         WorkbookHelper workbookHelper = new WorkbookHelper(this);
-        names[0] = workbookHelper.createFileWorkbook(projectName, fileWorkbookName, fileWorkbookDescription);
+        ids.add(workbookHelper.createFileWorkbook(projectName, fileWorkbookName, fileWorkbookDescription));
 
         // Create Assay Workbook
-        names[1] = workbookHelper.createWorkbook(projectName, assayWorkbookName, assayWorkbookDescription, WorkbookFolderType.ASSAY_WORKBOOK);
+        ids.add(workbookHelper.createWorkbook(projectName, assayWorkbookName, assayWorkbookDescription, WorkbookFolderType.ASSAY_WORKBOOK));
         assertElementPresent(Locator.linkWithText("Experiment Runs"));
         assertEquals(assayWorkbookName, workbookHelper.getEditableTitleText());
         assertEquals(assayWorkbookDescription, workbookHelper.getEditableDescriptionText());
         assertElementNotPresent(Locator.linkWithText(assayWorkbookName)); // Should not appear in folder tree.
 
         // Create Default Workbook
-        names[2] = workbookHelper.createWorkbook(projectName, defaultWorkbookName, defaultWorkbookDescription, WorkbookFolderType.DEFAULT_WORKBOOK);
+        ids.add(workbookHelper.createWorkbook(projectName, defaultWorkbookName, defaultWorkbookDescription, WorkbookFolderType.DEFAULT_WORKBOOK));
         assertElementPresent(Locator.linkWithText("Files"));
         assertElementPresent(Locator.linkWithText("Experiment Runs"));
         assertEquals(defaultWorkbookName, workbookHelper.getEditableTitleText());
         assertEquals(defaultWorkbookDescription, workbookHelper.getEditableDescriptionText());
         assertElementNotPresent(Locator.linkWithText(defaultWorkbookName)); // Should not appear in folder tree.
-        return names;
+        return ids;
     }
 
     @Override
