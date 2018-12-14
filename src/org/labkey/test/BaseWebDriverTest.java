@@ -85,6 +85,7 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -1506,7 +1507,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         _setPipelineRoot(rootPath, inherit);
 
-        waitForElement(Locators.labkeyMessage.withText("The pipeline root was set to '" + rootPath + "'"));
+        waitForElement(Locators.labkeyMessage.withText("The pipeline root was set to '" + Paths.get(rootPath).normalize().toString() + "'"));
 
         getArtifactCollector().addArtifactLocation(new File(rootPath));
 
