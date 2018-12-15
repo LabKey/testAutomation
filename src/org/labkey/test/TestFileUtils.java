@@ -146,10 +146,6 @@ public abstract class TestFileUtils
         if (_buildDir == null)
         {
             _buildDir = new File(getLabKeyRoot(), "build/modules/test"); // Gradle
-            if (!_buildDir.exists())
-            {
-                _buildDir = new File(getLabKeyRoot(), "server/test/build"); // Ant
-            }
         }
         return _buildDir;
     }
