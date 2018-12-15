@@ -301,21 +301,21 @@ public class DataReportsTest extends ReportTest
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement(Locator.name("program"), java);
         setFormElement(Locator.name("arguments"), "-cp " + new File(TestFileUtils.getTestBuildDir(), "classes/java/uiTest") + " org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
-        submit(Locator.tagWithName("form", "reportDesigner"));
+        clickAndWait(Locator.lkButton("Submit"));
         assertElementPresent(Locator.tag("pre").containing("Female"));
 
         log("Verify tsv report");
         setFormElement(Locator.name("program"), java);
         setFormElement(Locator.name("arguments"), "-cp " + new File(TestFileUtils.getTestBuildDir(), "classes/java/uiTest") + " org.labkey.test.util.Echo ${DATA_FILE}");
         selectOptionByValue(Locator.name("fileExtension"), "tsv");
-        submit(Locator.tagWithName("form", "reportDesigner"));
+        clickAndWait(Locator.lkButton("Submit"));
         assertElementPresent(Locator.tag("td").withClass("labkey-header").containing("DEMsex"));
         assertElementPresent(Locator.tag("td").containing("Female"));
 
         log("Verify saved tsv report");
         setFormElement(Locator.name("label"), "tsv");
         selectOptionByText(Locator.name("showWithDataset"), "DEM-1: Demographics");
-        submit(Locator.tagWithName("form", "saveReport"));
+        clickAndWait(Locator.lkButton("Save"));
         clickAndWait(Locator.linkWithText(getFolderName()));
         clickAndWait(Locator.linkWithText("tsv"));
         assertElementPresent(Locator.tag("td").withClass("labkey-header").containing("DEMsex"));
