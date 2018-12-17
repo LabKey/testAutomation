@@ -25,6 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.selenium.LazyWebElement;
@@ -420,20 +421,19 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             _driver.click(itemXPath.append("//i[contains(@class, 'labkey-tool-add')]"));
         }
 
-        // XXX: why doesn't 'clauseIndex' work?
         Locator.XPathLocator clauseXPath = itemXPath.append("//tr[@clauseindex]");
-        int clauseIndex = clauseXPath.findElements(getDriver()).size() -1;
+        List<WebElement> filterClauses = clauseXPath.findElements(getDriver());
+        WebElement clauseRow = filterClauses.get(filterClauses.size() - 1);
 
-        Locator.XPathLocator newClauseXPath = itemXPath.append("//tr[@clauseindex='" + clauseIndex + "']");
-        _driver.assertElementPresent(newClauseXPath);
+        ComboBox filterTypeCombo = new ComboBox.ComboBoxFinder(getDriver()).withIdPrefix("labkey-filterOpCombo").find(clauseRow);
+        filterTypeCombo.selectComboBoxItem(filter_type);
+        _driver.fireEvent(clauseRow, BaseWebDriverTest.SeleniumEvent.blur);
 
-        _driver._ext4Helper.selectComboBoxItem(newClauseXPath, filter_type);
-        _driver.fireEvent(newClauseXPath, BaseWebDriverTest.SeleniumEvent.blur);
-
-        if ( !(filter.compareTo("") == 0) )
+        if (!StringUtils.isBlank(filter))
         {
-            _driver.setFormElement(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), filter);
-            _driver.fireEvent(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), BaseWebDriverTest.SeleniumEvent.blur);
+            WebElement valueInput = Locator.css(".item-value input").findElement(clauseRow);
+            _driver.setFormElement(valueInput, filter);
+            _driver.fireEvent(valueInput, BaseWebDriverTest.SeleniumEvent.blur);
         }
         _driver.click(Locator.xpath("//div[contains(@class, 'labkey-customview-title')]"));
     }

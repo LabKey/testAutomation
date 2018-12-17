@@ -135,23 +135,25 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     {
         if (isOpen())
         {
-            TestLogger.log("ComboBox already open");
+            TestLogger.debug("ComboBox already open");
             return;
         }
 
+        getWrapper().mouseOver(elementCache().arrowTrigger);
         elementCache().arrowTrigger.click();
 
         try
         {
-            waitFor(this::isOpen, 1000);
+            waitFor(this::isOpen, "Didn't open", 1000);
             getWrapper().waitForElement(comboListItem());
         }
         catch (TimeoutException | NoSuchElementException retry)
         {
-            elementCache().arrowTrigger.click(); // try again if combo-box doesn't open
+            closeComboList();
+            elementCache().arrowTrigger.click(); // try again if combo-box didn't open
+            getWrapper().waitForElement(comboListItem());
         }
 
-        getWrapper().waitForElement(comboListItem());
         // Ext4 combo boxes may have a loading mask
         getWrapper().waitForElementToDisappear(
                 Locator.byClass(getCssPrefix() + "boundlist").notHidden()
