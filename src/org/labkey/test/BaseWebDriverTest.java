@@ -738,8 +738,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         };
 
-         return RuleChain.outerRule(_lock).around(_logger).around(testTimeout()).around(_failWatcher).around(_watcher);
-//        return RuleChain.outerRule(_logger).around(testTimeout()).around(_failWatcher).around(_watcher);
+        Timeout timeoutRule = "true".equals(System.getProperty("intellij.debug.agent")) ? Timeout.millis(0) : testTimeout();
+        return RuleChain.outerRule(_lock).around(_logger).around(timeoutRule).around(_failWatcher).around(_watcher);
+//        return RuleChain.outerRule(_logger).around(timeoutRule).around(_failWatcher).around(_watcher);
     }
 
     /**
