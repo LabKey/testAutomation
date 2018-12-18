@@ -114,10 +114,7 @@ public class WorkbookTest extends BaseWebDriverTest
         // Delete a workbook
         DataRegionTable workbooks = new DataRegionTable("query", this);
         workbooks.checkCheckbox(2);
-        doAndWaitForPageToLoad(() -> {
-            workbooks.clickHeaderButton("Delete");
-            assertAlert("Are you sure you want to delete the selected row?");
-        });
+        workbooks.deleteSelectedRows();
         waitForTextToDisappear("Renamed" + DEFAULT_WORKBOOK_NAME);
 
         // Test Workbook APIs

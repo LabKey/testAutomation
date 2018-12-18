@@ -47,11 +47,7 @@ public class ManageListsGrid extends DataRegionTable
 
     public LabKeyPage deleteSelectedLists()
     {
-        getWrapper().doAndWaitForPageToLoad(() ->
-        {
-            clickHeaderButton("Delete");
-            getWrapper().acceptAlert();
-        });
+        deleteSelectedRows();
         return new LabKeyPage(getDriver());
     }
 

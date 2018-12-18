@@ -147,7 +147,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         _listHelper.submitImportTsv_success();
         validateSingleColumnData();
 
-        deleteListData(3);
+        deleteListData();
 
         log("Test inserting a single new row");
         DataRegion(getDriver()).find().clickInsertNewRow();
@@ -158,7 +158,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assertNoLabKeyErrors();
         assertTextPresent("Sid", "male", "N");
 
-        deleteListData(1);
+        deleteListData();
 
         log("Test separate MVIndicator column");
         DataRegion(getDriver()).find().clickImportBulkData();
@@ -171,15 +171,11 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         validateTwoColumnData("query", "name");
     }
 
-    private void deleteListData(int rowCount)
+    private void deleteListData()
     {
         DataRegionTable dt = new DataRegionTable("query", getDriver());
-        checkCheckbox(Locator.checkboxByName(".toggle"));
-        doAndWaitForPageToLoad(() ->
-        {
-            dt.clickHeaderButton("Delete");
-            assertAlert("Are you sure you want to delete the selected row" + (rowCount == 1 ? "?" : "s?"));
-        });
+        dt.checkAllOnPage();
+        dt.deleteSelectedRows();
     }
 
     @Test

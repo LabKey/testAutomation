@@ -208,11 +208,8 @@ public class ListTest extends BaseWebDriverTest
         // delete existing rows
         log("Test deleting rows");
         DataRegionTable table = new DataRegionTable("query", getDriver());
-        checkCheckbox(Locator.checkboxByName(".toggle"));
-        doAndWaitForPageToLoad(() -> {
-            table.clickHeaderButton("Delete");
-            assertAlert("Are you sure you want to delete the selected rows?");
-        });
+        table.checkAllOnPage();
+        table.deleteSelectedRows();
         // load test data
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), LIST_DATA2);
