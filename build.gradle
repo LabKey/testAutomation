@@ -19,20 +19,8 @@ if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
     BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":remoteapi:labkey-api-jdbc")
 }
 
+
 if (project.hasProperty("teamcity"))
 {
-    sourceSets {
-        debug {
-            java {
-                srcDirs = ['src/org/labkey/test/debug']
-            }
-        }
-    }
-
-    dependencies {
-        debugCompile files("${System.properties['java.home']}/../lib/tools.jar")
-    }
-
-   // This plugin depends on the debugClasses task for ensureShutdown used on TeamCity
    apply plugin: 'org.labkey.teamCity'
 }
