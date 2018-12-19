@@ -166,7 +166,7 @@ public class DataViewsTest extends ParticipantListTest
         _extHelper.waitForExtDialog("Manage Categories");
         clickButton("New Category", 0);
         WebElement newCategoryField = Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        setFormElement(newCategoryField, NEW_CATEGORY);
+        setFormElementJS(newCategoryField, NEW_CATEGORY);
         fireEvent(newCategoryField, SeleniumEvent.blur);
         waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//div").withText(NEW_CATEGORY));
         clickButton("Done", 0);
@@ -596,10 +596,10 @@ public class DataViewsTest extends ParticipantListTest
     private void addSubCategory(@LoggedParam String subCategoryName)
     {
         clickButton("New Subcategory", 0);
-        WebElement subCategoryField = Locator.xpath("//input[@name='label']").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        setFormElement(subCategoryField, subCategoryName);
+        WebElement subCategoryField = Locator.input("label").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        setFormElementJS(subCategoryField, subCategoryName);
         fireEvent(subCategoryField, SeleniumEvent.blur);
-        waitForElement(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(subCategoryName));
+        waitForElement(Locator.tagWithClass("div", "x4-grid-cell-inner").withText(subCategoryName));
     }
 
     private void openEditPanel(String itemName)
