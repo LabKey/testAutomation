@@ -55,7 +55,7 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
         _ext4Helper.selectComboBoxItem(visitElements().existingVisitLoc, visitLabel);
 
         Window addVisitWindow = new Window(isVisitBased ? "Add Visit" : "Add Timepoint", getDriver());
-        doAndWaitForElementToRefresh(() -> addVisitWindow.clickButton("Select", 0), visitElements().addVisitIconLoc, shortWait());
+        doAndWaitForElementToRefresh(() -> addVisitWindow.clickButton("Select", true), visitElements().addVisitIconLoc, shortWait());
         removeFocusAndWait();
     }
 
@@ -71,7 +71,7 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
             setFormElement(visitElements().getNewVisitMaxField(), rangeMax.toString());
 
         Window addVisitWindow = new Window("Add Visit", getDriver());
-        doAndWaitForElementToRefresh(() -> addVisitWindow.clickButton("Submit", 0), visitElements().addVisitIconLoc, shortWait());
+        doAndWaitForElementToRefresh(() -> addVisitWindow.clickButton("Submit", true), visitElements().addVisitIconLoc, shortWait());
         removeFocusAndWait();
     }
 

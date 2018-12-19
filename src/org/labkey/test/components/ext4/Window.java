@@ -65,12 +65,15 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
 
     public void clickButton(String buttonText)
     {
-        getWrapper().clickAndWait(elementCache().findButton(buttonText));
+        clickButton(buttonText, getWrapper().getDefaultWaitForPage());
     }
 
     public void clickButton(String buttonText, int msWait)
     {
-        getWrapper().clickAndWait(elementCache().findButton(buttonText), msWait);
+        WebElement button = elementCache().findButton(buttonText);
+        getWrapper().shortWait().withMessage("button to be enabled: " + buttonText)
+                .until(webDriver -> !button.getAttribute("class").contains("disabled"));
+        getWrapper().clickAndWait(button, msWait);
     }
 
     public void clickButton(String buttonText, boolean expectClose)
