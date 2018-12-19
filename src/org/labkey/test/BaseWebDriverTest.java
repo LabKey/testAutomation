@@ -2094,7 +2094,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             log("Waiting for completion of specimen archives");
 
             clickFolder(_studyFolderName);
-            clickAndWait(Locator.linkWithText("Manage Files"));
+            goToDataPipeline();
 
             waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import", _expectError);
 
