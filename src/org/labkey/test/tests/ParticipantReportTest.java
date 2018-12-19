@@ -22,7 +22,6 @@ import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -332,8 +331,7 @@ public class ParticipantReportTest extends ReportTest
         Locator.tagWithClass("th", "lk-report-column-header").withText(columnHeader).waitForElement(getDriver(), 10000);
 
         //Deselect All
-        Locator filterExpander = Locator.xpath("(//img[contains(@class, 'x4-tool-expand-right')])[1]");
-        waitAndClick(filterExpander);
+        expandReportFilterWindow();
         waitForElement(Locator.css(".initSelectionComplete"));
         _ext4Helper.deselectAllParticipantFilter();
         click(Locator.xpath("//a[./span[@title = 'Edit']]"));
@@ -404,7 +402,7 @@ public class ParticipantReportTest extends ReportTest
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 116 Results"));
 
         //Deselect All
-        click(filterExpander);
+        expandReportFilterWindow();
         waitForElement(Locator.css(".initSelectionComplete"));
         _ext4Helper.deselectAllParticipantFilter();
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
@@ -582,7 +580,9 @@ public class ParticipantReportTest extends ReportTest
     private void expandReportFilterWindow()
     {
         assertElementPresent(Locator.css(".report-filter-window.x4-collapsed"));
-        click(Locator.css(".report-filter-window .x4-tool-expand-right"));
+        WebElement expander = shortWait().until(ExpectedConditions
+                .elementToBeClickable(Locator.css(".report-filter-window .x4-tool-expand-right")));
+        expander.click();
         waitForElement(Locator.css(".report-filter-window .x4-tool-collapse-left"));
         assertElementNotPresent(Locator.css(".report-filter-window.x4-collapsed"));
     }
