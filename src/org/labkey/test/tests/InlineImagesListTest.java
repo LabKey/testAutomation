@@ -202,6 +202,9 @@ public class InlineImagesListTest extends BaseWebDriverTest
         assertElementPresent("Did not find the expected text for " + PDF_FILE.getName(), Locator.xpath("//a[contains(text(), '" + PDF_FILE.getName() + "')]"), 2);
 
         log("Hover over the thumbnail for the png and make sure the pop-up is as expected.");
+        // Mouse over the logo, migh help with the following mouse over the image.
+        mouseOver(Locator.tagWithAttributeContaining("img", "src", "logo.image"));
+        sleep(500);
         mouseOver(Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"));
         longWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
         String src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
@@ -282,6 +285,9 @@ public class InlineImagesListTest extends BaseWebDriverTest
         assertElementPresent("Did not find the expected text for " + PDF_FILE.getName(), Locator.xpath("//a[contains(text(), '" + PDF_FILE.getName() + "')]"), 1);
 
         log("Hover over the thumbnail and make sure the pop-up is as expected.");
+        // Mouse over the logo, migh help with the following mouse over the image.
+        mouseOver(Locator.tagWithAttributeContaining("img", "src", "logo.image"));
+        sleep(500);
         mouseOver(Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"));
         shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
         src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
