@@ -150,27 +150,9 @@ public class Ext4GridRef extends Ext4CmpRef
     {
         completeEdit();
 
-        // NOTE: sometimes this editor is picky about appearing
-        // for now, solve this by repeating.  however, it would be better to resolve this issue.
-        // one theory is that we need to shift focus prior to the doubleclick
-        WebElement el = null;
-        final int maxRetries = 4;
-        for (int i = 1; el == null && i <= maxRetries; i++)
-        {
-            try
-            {
-                el = startEditing(rowIdx, colName);
-            }
-            catch (WebDriverException retry)
-            {
-                if (i == maxRetries)
-                    throw retry;
-            }
-        }
-        Assert.assertNotNull("Unable to trigger editor after " + maxRetries + " attempts", el);
+        WebElement el = startEditing(rowIdx, colName);
 
-        Locator moreSpecific = Locator.id(el.getAttribute("id"));
-        _test.setFormElement(moreSpecific, value);
+        _test.setFormElement(el, value);
 
         //if the editor is still displayed, try to close it
         if (el.isDisplayed())
@@ -182,9 +164,15 @@ public class Ext4GridRef extends Ext4CmpRef
         waitForGridEditorToDisappear();
     }
 
+    public  void clickArrowOnGrid(@LoggedParam int rowIdx, @LoggedParam String colName)
+    {
+        WebElement el = startEditing(rowIdx, colName);
+        Locator.xpath("../../td").withClass("x4-trigger-cell").findElement(el).click();
+    }
+
     public void waitForGridEditorToDisappear()
     {
-        _test.waitFor(() -> getActiveGridEditor() == null,
+        WebDriverWrapper.waitFor(() -> getActiveGridEditor() == null,
                 "Grid editor did not disappear", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
@@ -200,19 +188,19 @@ public class Ext4GridRef extends Ext4CmpRef
 
     public void waitForRowCount(final int count)
     {
-        _test.waitFor(() -> getRowCount() == count,
+        WebDriverWrapper.waitFor(() -> getRowCount() == count,
                 "Expected row count did not appear", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForSelected(final int count)
     {
-        _test.waitFor(() -> getSelectedCount() == count,
+        WebDriverWrapper.waitFor(() -> getSelectedCount() == count,
                 "Expected selected row count did not appear", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public WebElement getActiveGridEditor()
     {
-        Locator.XPathLocator activeEditorLocator = Locator.id(_id).append(Locator.tagWithClass("input", "x4-form-focus"));
+        Locator.XPathLocator activeEditorLocator = Locator.id(_id).append(Locator.tagWithClass("input", "x4-form-focus")).notHidden();
         return activeEditorLocator.findElementOrNull(_test.getDriver());
     }
 
@@ -232,8 +220,32 @@ public class Ext4GridRef extends Ext4CmpRef
         _test.waitAndClick(getTbarButton(label));
     }
 
-    //uses 1-based coordinates
     public WebElement startEditing(int rowIdx, String colName)
+    {
+        // NOTE: sometimes this editor is picky about appearing
+        // for now, solve this by repeating.  however, it would be better to resolve this issue.
+        // one theory is that we need to shift focus prior to the doubleclick
+        WebElement el = null;
+        final int maxRetries = 4;
+        for (int i = 1; el == null && i <= maxRetries; i++)
+        {
+            try
+            {
+                el = tryStartEditing(rowIdx, colName);
+            }
+            catch (WebDriverException retry)
+            {
+                if (i == maxRetries)
+                    throw retry;
+            }
+        }
+        Assert.assertNotNull("Unable to trigger editor after " + maxRetries + " attempts", el);
+
+        return el;
+    }
+
+    //uses 1-based coordinates
+    private WebElement tryStartEditing(int rowIdx, String colName)
     {
         int cellIdx = getIndexOfColumn(colName, true);  //NOTE: Ext 4.2.1 seems to not render hidden columns, unlike previous ext versions
 
