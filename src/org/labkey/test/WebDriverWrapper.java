@@ -3023,7 +3023,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
-            input.clear();
+            setFormElementJS(input, ""); // Clear unfocuses the element which causes some inputs to disappear. (https://www.w3.org/TR/webdriver/#element-clear)
             input.sendKeys(text);
         }
         else
