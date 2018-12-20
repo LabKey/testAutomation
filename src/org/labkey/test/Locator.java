@@ -152,6 +152,12 @@ public abstract class Locator extends By
         {
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        public Locator describedAs(String description)
+        {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**
