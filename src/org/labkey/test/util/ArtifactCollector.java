@@ -29,7 +29,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.chrome.ChromeDriver;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -245,12 +244,9 @@ public class ArtifactCollector
 
         String docType = (String)_driver.executeScript("" +
                 "if (document.doctype == null)\n" +
-                "  return 'txt';\n" +
+                "  return 'html';\n" + // Chrome and Firefox wrap text files in html
                 "else\n" +
                 "  return document.doctype.name;");
-
-        if (_driver.getDriver() instanceof ChromeDriver && docType.equals("txt"))
-            docType = "html"; // Chrome wraps displayed text files in HTML
 
         File htmlFile = new File(dir, baseName + "." + docType);
 
