@@ -48,8 +48,11 @@ public class TimeChartWizard extends LabKeyPage
     public TimeChartWizard waitForReportRender()
     {
         _ext4Helper.waitForMaskToDisappear();
-        waitFor(() -> isElementPresent(Locator.css("svg"))
-                        || isAnyTextPresent("Please select at least one"/* group/participant */, "No data found", "Error rendering chart:"),
+        waitFor(() -> isElementPresent(Locator.css("svg")) ||
+                        isAnyTextPresent("Please select at least one"/* group/participant */,
+                                "No data found",
+                                "Error rendering chart:",
+                                "The source dataset, list, or query may have been deleted."),
                 "Report view did not load", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         return this;
     }
