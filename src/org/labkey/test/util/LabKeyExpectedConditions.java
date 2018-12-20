@@ -35,7 +35,7 @@ public abstract class LabKeyExpectedConditions
      * @return element when animation is complete
      */
     public static ExpectedCondition<WebElement> animationIsDone(final By loc) {
-        return new ExpectedCondition<WebElement>() {
+        return new ExpectedCondition<>() {
             @Override
             public WebElement apply(WebDriver driver)
             {
@@ -65,7 +65,7 @@ public abstract class LabKeyExpectedConditions
      * @return the element when animation is complete
      */
     public static ExpectedCondition<WebElement> animationIsDone(final WebElement el) {
-        return new ExpectedCondition<WebElement>() {
+        return new ExpectedCondition<>() {
             @Override
             public WebElement apply(WebDriver driver)
             {
@@ -101,7 +101,7 @@ public abstract class LabKeyExpectedConditions
     }
 
     public static ExpectedCondition<WebElement> elementIsEnabled(final Locator loc) {
-        return new ExpectedCondition<WebElement>()
+        return new ExpectedCondition<>()
         {
             @Override
             public WebElement apply(WebDriver driver)
@@ -132,7 +132,7 @@ public abstract class LabKeyExpectedConditions
 
     public static ExpectedCondition<Boolean> clickUntilStale(final WebElement element)
     {
-        return new ExpectedCondition<Boolean>()
+        return new ExpectedCondition<>()
         {
             ExpectedCondition<Boolean> staleCheck = ExpectedConditions.stalenessOf(element);
 
