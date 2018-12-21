@@ -17,10 +17,8 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -35,9 +33,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelper;
@@ -53,6 +52,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -125,39 +125,31 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void setupProject()
+    public static void setupProject() throws IOException
     {
         FolderExportTest init = (FolderExportTest) getCurrentTest();
 
         init.doSetup();
     }
 
-    private void doSetup()
+    private void doSetup() throws IOException
     {
         RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
         _containerHelper.createProject(getProjectName(), null);
 
         createUsersAndGroupsWithPermissions();
-    }
 
-    @Before
-    public void preTest()
-    {
-        goToProjectHome();
-    }
-
-    @Test
-    public void testImport() throws Exception
-    {
         new File(dataDir, folderZip).delete();
         ZipUtil zipFolder = new ZipUtil(new File(dataDir, folderArchive), dataDir);
         zipFolder.zipIt();
+    }
 
+    @Test
+    public void testImport()
+    {
         verifyImportFromZip();
-        verifyImportFromPipelineZip();
-        verifyImportFromPipelineExpanded();
-        verifyCreateFolderFromTemplate();
+        verifyCreateFolderFromTemplate(); // Uses importFromZip as template
     }
 
     @Test
@@ -312,22 +304,24 @@ public class FolderExportTest extends BaseWebDriverTest
     {
         _containerHelper.createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[]{"Grid Views"});
         verifyExpectedWebPartsPresent();
-        verifySubfolderImport(3, true);
+        verifySubfolderImport(folderFromTemplate, true);
         verifyFolderExportAsExpected(folderFromTemplate);
     }
 
-    private void verifyImportFromPipelineZip()
+    @Test
+    public void testImportFromPipelineZip()
     {
-        verifyImportFromPipeline(folderZip, folderFromPipelineZip, 1);
+        verifyImportFromPipeline(folderZip, folderFromPipelineZip);
     }
 
-    private void verifyImportFromPipelineExpanded()
+    @Test
+    public void testImportFromPipelineExpanded()
     {
-        verifyImportFromPipeline(folderArchive + "/folder.xml", folderFromPipelineExport, 2);
+        verifyImportFromPipeline(folderArchive + "/folder.xml", folderFromPipelineExport);
     }
 
     @LogMethod
-    private void verifyImportFromPipeline(String fileImport, String folderName, int subfolderIndex)
+    private void verifyImportFromPipeline(String fileImport, String folderName)
     {
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), folderName, "Collaboration", null);
         setPipelineRoot(dataDir.getAbsolutePath());
@@ -335,7 +329,7 @@ public class FolderExportTest extends BaseWebDriverTest
 
         setPipelineRootToDefault(); // Export to default location
         clickFolder(folderName);
-        verifyFolderImportAsExpected(subfolderIndex);
+        verifyFolderImportAsExpected(folderName);
         verifyFolderExportAsExpected(folderName);
     }
 
@@ -395,33 +389,36 @@ public class FolderExportTest extends BaseWebDriverTest
     @Test
     public void verifyProjectExportWithGroups()
     {
-        verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, getExpectedXML("groupsFolder.xml"), true, true, false);
+        goToProjectHome();
+        verifyFolderExportWithPermissionsAsExpected(null, getExpectedXML("groupsFolder.xml"), true, true, false);
     }
 
     @Test
     public void verifyProjectExportWithRoleAssignments()
     {
-        verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, getExpectedXML("rolesFolder.xml"), true, false, true);
+        goToProjectHome();
+        verifyFolderExportWithPermissionsAsExpected(null, getExpectedXML("rolesFolder.xml"), true, false, true);
     }
 
     @Test
     public void verifyProjectExportWithGroupsAndRoleAssignments()
     {
-        verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, getExpectedXML("rolesAndGroupsFolder.xml"), true, true, true);
+        goToProjectHome();
+        verifyFolderExportWithPermissionsAsExpected(null, getExpectedXML("rolesAndGroupsFolder.xml"), true, true, true);
     }
 
     @Test
     public void verifySubfolderExportWithRoleAssignments()
     {
-        clickFolder(folderWithPermissions);
-        verifyFolderExportWithPermissionsAsExpected(folderWithPermissions, true, getExpectedXML("subfolderRoleAssignmentsExport.xml"), false, false, true);
+        goToProjectHome();
+        verifyFolderExportWithPermissionsAsExpected(folderWithPermissions, getExpectedXML("subfolderRoleAssignmentsExport.xml"), false, false, true);
     }
 
     @Test
     public void verifySubfolderExportWithInheritance()
     {
-        clickFolder(folderInheritingPermissions);
-        verifyFolderExportWithPermissionsAsExpected(folderInheritingPermissions, true, getExpectedXML("subfolderInheritedAssignments.xml"), false, false, true);
+        goToProjectHome();
+        verifyFolderExportWithPermissionsAsExpected(folderInheritingPermissions, getExpectedXML("subfolderInheritedAssignments.xml"), false, false, true);
     }
 
     private String getExpectedXML(String fileName)
@@ -441,10 +438,9 @@ public class FolderExportTest extends BaseWebDriverTest
 
         clickFolder(folderFromZip);
         importFolderFromZip(new File(dataDir, folderZip));
-        beginAt(getCurrentRelativeURL()); //work around linux issue
         waitForPipelineJobsToComplete(1, "Folder import", false);
         clickFolder(folderFromZip);
-        verifyFolderImportAsExpected(0);
+        verifyFolderImportAsExpected(folderFromZip);
         verifyFolderExportAsExpected(folderFromZip);
     }
 
@@ -477,17 +473,17 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void verifyFolderExportWithPermissionsAsExpected(@NotNull String folderName, boolean isSubfolder, @Nullable String expectedXml, boolean includeSubfolders, boolean exportGroups, boolean exportAssignments)
+    private void verifyFolderExportWithPermissionsAsExpected(@Nullable String folderName, @Nullable String expectedXml, boolean includeSubfolders, boolean exportGroups, boolean exportAssignments)
     {
         exportFolderAsIndividualFiles(folderName, exportGroups, exportAssignments, includeSubfolders);
 
         // verify some of the folder export items by selecting them in the file browser
         _fileBrowserHelper.selectFileBrowserItem("export/folder.xml");
         File fileRoot;
-        if (isSubfolder)
+        if (folderName != null)
             fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName() + File.separator + folderName);
         else
-            fileRoot = TestFileUtils.getDefaultFileRoot(folderName);
+            fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         File folderXmlFile = new File(fileRoot, "export" + File.separator + "folder.xml");
         FolderDocument exportedFolderDocument;
         try
@@ -555,7 +551,7 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void verifyFolderImportAsExpected(int subfolderIndex)
+    private void verifyFolderImportAsExpected(String importedFolderName)
     {
         verifyExpectedWebPartsPresent();
         assertElementPresent(Locator.css(".study-properties").withText("Demo Study tracks data in 12 datasets over 26 time points. Data is present for 6 Participants."));
@@ -589,34 +585,30 @@ public class FolderExportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Notifications"));
         waitForText("Default settings");
 
-        _ext4Helper.openComboList(Ext4Helper.Locators.formItemWithLabel(MessagesLongTest.MESSAGES_DEFAULT_COMBO));
-        isElementPresent(Locator.xpath("//li[text()='All conversations' and contains(@class, 'x4-boundlist-selected')]"));
+        String messagesDefault = new ComboBox.ComboBoxFinder(getDriver()).withLabel(MessagesLongTest.MESSAGES_DEFAULT_COMBO).find(getDriver()).getValue();
+        assertEquals("Wrong default value for message notification emails.", "All conversations", messagesDefault);
 
-        _ext4Helper.openComboList(Ext4Helper.Locators.formItemWithLabel(MessagesLongTest.FILES_DEFAULT_COMBO));
-        isElementPresent(Locator.xpath("//li[text()='Daily digest' and contains(@class, 'x4-boundlist-selected')]"));
+        String fileDefault = new ComboBox.ComboBoxFinder(getDriver()).withLabel(MessagesLongTest.FILES_DEFAULT_COMBO).find(getDriver()).getValue();
+        assertEquals("Wrong default value for file notification emails.", "Daily digest", fileDefault);
 
-        verifySubfolderImport(subfolderIndex, false);
+        verifySubfolderImport(importedFolderName, false);
     }
 
     @LogMethod
-    private void verifySubfolderImport(int subfolderIndex, boolean fromTemplate)
+    private void verifySubfolderImport(String importedFolderName, boolean fromTemplate)
     {
         log("verify child containers were imported");
-        openFolderMenu();
-        clickAndWait(Locator.linkWithText("Subfolder1").index(subfolderIndex));
-        assertTextPresent("My Test Container Tab Query");
-        openFolderMenu();
-        clickAndWait(Locator.linkWithText("_hidden").index(subfolderIndex));
-        assertTextPresentInThisOrder("Lists", "Hidden Folder List");
-        openFolderMenu();
-        clickAndWait(Locator.linkWithText("Subfolder2").index(subfolderIndex));
 
+        beginAtSubfolder(importedFolderName, "Subfolder1/_hidden");
+        assertTextPresentInThisOrder("Lists", "Hidden Folder List");
+
+        beginAtSubfolder(importedFolderName, "Subfolder2");
         int expectedPtidCount = fromTemplate ? 0 : 2;
         assertElementPresent(Locator.css(".study-properties").withText("Study Label for Subfolder2 tracks data in 1 dataset over 1 visit. Data is present for " + expectedPtidCount + " Monkeys."));
 
         log("verify container tabs were imported");
-        openFolderMenu();
-        clickAndWait(Locator.linkWithText("Subfolder1").index(subfolderIndex));
+        beginAtSubfolder(importedFolderName, "Subfolder1");
+        assertTextPresent("My Test Container Tab Query");
         assertElementPresent(Locator.linkWithText("Assay Container"));
         assertElementPresent(Locator.linkWithText("Tab 2"));
         assertElementPresent(Locator.linkWithText("Study Container"));
@@ -625,6 +617,11 @@ public class FolderExportTest extends BaseWebDriverTest
         assertTextPresentInThisOrder("A customized web part", "Experiment Runs", "Assay List");
         clickAndWait(Locator.linkWithText("Study Container"));
         assertElementPresent(Locator.css(".study-properties").withText("Study Container Tab Study tracks data in 0 datasets over 0 visits. Data is present for 0 Participants."));
+    }
+
+    private void beginAtSubfolder(String importedFolderName, String subfolderName)
+    {
+        beginAt(WebTestHelper.buildURL("project", getProjectName() + "/" + importedFolderName + "/" + subfolderName, "start"));
     }
 
     @Override
