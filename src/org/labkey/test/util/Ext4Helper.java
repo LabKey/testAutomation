@@ -608,7 +608,9 @@ public class Ext4Helper
         String script =
                 "ext4ComponentQuery = function (selector, parentId) {\n" +
                 "    var res = null;\n" +
-                "    if (parentId)\n" +
+                "    if (!Ext4)\n" +
+                "        return null;\n" +
+                "    else if (parentId)\n" +
                 "        res = Ext4.getCmp(parentId).query(selector);\n" +
                 "    else\n" +
                 "        res = Ext4.ComponentQuery.query(selector);\n" +
