@@ -259,15 +259,12 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.checkboxByTitle("Pipeline"));
         clickButton("Update Folder");
-        PortalHelper portalHelper = new PortalHelper(getDriver());
-        portalHelper.addWebPart("Data Pipeline");
-        portalHelper.addWebPart("Datasets");
-        portalHelper.addWebPart("Specimens");
-        portalHelper.addWebPart("Views");
-        // Set a magic variable to prevent the data region from refreshing out from under us, which causes problems
-        // in IE testing
-        executeScript("LABKEY.disablePipelineRefresh = true;");
-        clickButton("Setup", defaultWaitForPage);
+        new PortalHelper(getDriver()).doInAdminMode(portalHelper -> {
+            portalHelper.addWebPart("Data Pipeline");
+            portalHelper.addWebPart("Datasets");
+            portalHelper.addWebPart("Specimens");
+            portalHelper.addWebPart("Views");
+        });
         setPipelineRoot(pipelinePath);
     }
 
