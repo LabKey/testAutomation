@@ -128,7 +128,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     {
         if (isInPageAdminMode())
         {
-            getWrapper().clickAndWait(Locators.exitAdminBtn.refindWhenNeeded(getDriver()));
+            getWrapper().clickAndWait(Locators.exitAdminBtn);
             assertFalse("Failed to exit page admin mode", isInPageAdminMode());
         }
     }
