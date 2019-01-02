@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<provider xmlns="http://labkey.org/study/assay/xml">
+  <name>Simple2</name>
+  <description>Simple2 file-based assay (used in Biologics testing)</description>
+</provider>

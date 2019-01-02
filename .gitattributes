@@ -159,6 +159,9 @@ modules/miniassay/resources/assay/simple/views/batch.html -text
 modules/miniassay/resources/assay/simple/views/result.html -text
 modules/miniassay/resources/assay/simple/views/run.html -text
 modules/miniassay/resources/assay/simple/views/upload.html -text
+modules/miniassay/resources/assay/simple2/config.xml -text
+modules/miniassay/resources/assay/simple2/domains/result.xml -text
+modules/miniassay/resources/assay/simple2/domains/run.xml -text
 modules/miniassay/resources/queries/assay/LegacyAssayDataQueryName.sql -text
 modules/miniassay/resources/queries/assay/LegacyAssayRunQueryName.sql -text
 modules/miniassay/resources/queries/assay/My[!!-~]Simple[!!-~]Assay[!!-~]Batches/AssayDesignBatches.qview.xml -text

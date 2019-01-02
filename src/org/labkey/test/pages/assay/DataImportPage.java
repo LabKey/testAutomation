@@ -38,9 +38,23 @@ public class DataImportPage extends LabKeyPage<DataImportPage.Elements>
         clickButton("Submit");
     }
 
+    public void uploadFile(File dataFile)
+    {
+        setFormElement(Locator.id("upload-run-field-file"), dataFile);
+        Locator.tagWithAttributeContaining("a", "onclick", "saveBatch();return false;")
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
+        waitForElement(Locator.linkWithText(dataFile.getName()));   // the link will be in a dataRegion below
+    }
+
     public File downloadTemplate()
     {
         return clickAndWaitForDownload(elementCache().downloadTemplateButton);
+    }
+
+    public DataImportPage setField(String fieldId, String value)
+    {
+        setFormElement(Locator.id(fieldId), value);
+        return this;
     }
 
     @Override

@@ -96,6 +96,8 @@ function saveBatch()
 
 function init()
 {
+  checkSampleSetExists();
+
   new Ext.form.TextField({
     enableKeyEvents: true,
     listeners: {
@@ -226,6 +228,26 @@ function renderRunsWebPart()
   if (webpart) webpart.render();
 }
 
+// Assume the test sample set exists for the purposes of the ModuleAssayTest
+// automated test, but if the sample set doesn't exist skip adding input
+// samples when uploading data.  The BiologicsAssayTest uses this assay
+// without creating the test sample set.
+var TEST_SAMPLE_SET_NAME = "Test Sample Set";
+var testSampleSetExists = true;
+
+function checkSampleSetExists() {
+  LABKEY.Query.selectRows({
+    schemaName: "exp",
+    queryName: "SampleSets",
+    filterArray: [ LABKEY.Filter.create("Name", TEST_SAMPLE_SET_NAME) ],
+    success: function (data) {
+      if (data && data.rowCount === 0) {
+        testSampleSetExists = false;
+      }
+    }
+  });
+}
+
 function handleDataUpload(f, action)
 {
   if (!action || !action.result) {
@@ -242,19 +264,21 @@ function handleDataUpload(f, action)
   var run = new LABKEY.Exp.Run();
   run.name = data.name || "[New]";
 
-  run.materialInputs = run.materialInputs || [];
-  run.materialInputs[0] = {
-    name: "MyNewMaterialInput_" + LABKEY.page.batch.name + "_" + run.name,
-    properties: { Barcode: "xyzzy" },
-    sampleSet: { name: "Test Sample Set" }
-  };
+  if (testSampleSetExists) {
+    run.materialInputs = run.materialInputs || [];
+    run.materialInputs[0] = {
+      name: "MyNewMaterialInput_" + LABKEY.page.batch.name + "_" + run.name,
+      properties: { Barcode: "xyzzy" },
+      sampleSet: { name: TEST_SAMPLE_SET_NAME }
+    };
 
-  run.materialOutputs = run.materialOutputs || [];
-  run.materialOutputs[0] = {
-    name: "MyNewMaterialOutput_" + LABKEY.page.batch.name + "_" + run.name,
-    properties: { Barcode: "xyzzy" },
-    sampleSet: { name: "Test Sample Set" }
-  };
+    run.materialOutputs = run.materialOutputs || [];
+    run.materialOutputs[0] = {
+      name: "MyNewMaterialOutput_" + LABKEY.page.batch.name + "_" + run.name,
+      properties: { Barcode: "xyzzy" },
+      sampleSet: { name: TEST_SAMPLE_SET_NAME }
+    };
+  }
 
   run.dataInputs = run.dataInputs || [];
   run.dataInputs[0] = data;

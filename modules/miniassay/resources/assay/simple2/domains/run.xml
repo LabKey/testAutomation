@@ -1,0 +1,10 @@
+<ap:domain xmlns:exp="http://cpas.fhcrc.org/exp/xml"
+           xmlns:ap="http://labkey.org/study/assay/xml">
+  <exp:Description>This is my run domain.</exp:Description>
+  <exp:PropertyDescriptor>
+    <exp:Name>DoubleRun</exp:Name>
+    <exp:RangeURI>http://www.w3.org/2001/XMLSchema#double</exp:RangeURI>
+    <exp:DefaultType>EditableDefault</exp:DefaultType>
+    <exp:DefaultValue>2.0</exp:DefaultValue>
+  </exp:PropertyDescriptor>
+</ap:domain>
