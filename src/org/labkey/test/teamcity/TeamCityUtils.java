@@ -47,20 +47,15 @@ public class TeamCityUtils
 
     public static void reportBuildStatisticValue(String key, Number value)
     {
-        reportBuildStatisticValue(key, value, true);
+        reportBuildStatisticValue(key, value, false);
     }
 
-    public static void reportBuildStatisticValue(String key, Number value, boolean combine)
+    public static void reportBuildStatisticValue(String key, Number value, boolean aggregate)
     {
-        List<Number> allValues = storeBuildStatistic(key, value);
-        if (combine && allValues.size() > 1)
-        {
-            value = allValues.stream().mapToDouble(Number::doubleValue).sum() / allValues.size();
-        }
-        else if (allValues.size() > 1)
-        {
-            TestLogger.log("WARNING: Overwriting previous build statistic [" + key + "]: " + allValues.get(0) + " => " + value);
-        }
+        if (aggregate)
+            value = storeAggregatedBuildStatistic(key, value);
+        else
+            storeBuildStatistic(key, value);
 
         String valString = new DecimalFormat("#.######").format(value);
         if (valString.contains("."))
@@ -71,7 +66,16 @@ public class TeamCityUtils
         reportBuildStatisticValue(key, valString);
     }
 
-    private static List<Number> storeBuildStatistic(String key, Number value)
+    private static void storeBuildStatistic(String key, Number value)
+    {
+        if (buildStatistics.containsKey(key))
+        {
+            TestLogger.log("WARNING: Overwriting previous build statistic [" + key + "]: " + buildStatistics.get(key).get(0) + " => " + value);
+        }
+        buildStatistics.put(key, Collections.singletonList(value));
+    }
+
+    private static Number storeAggregatedBuildStatistic(String key, Number value)
     {
         final List<Number> statisticValues;
         if (buildStatistics.containsKey(key))
@@ -84,7 +88,8 @@ public class TeamCityUtils
             buildStatistics.put(key, statisticValues);
         }
         statisticValues.add(value);
-        return statisticValues;
+
+        return statisticValues.stream().mapToDouble(Number::doubleValue).sum() / statisticValues.size();
     }
 
     // https://confluence.jetbrains.com/display/TCD18/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-ReportingBuildStatistics
