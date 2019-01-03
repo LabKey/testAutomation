@@ -39,6 +39,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.UIUserHelper;
 import org.openqa.selenium.WebElement;
@@ -75,7 +76,7 @@ public class SecurityTest extends BaseWebDriverTest
     protected static final String BOGUS_USER_TEMPLATE = "bogus@bogus@bogus";
     protected static final String PROJECT_ADMIN_USER = "admin_securitytest@security.test";
     protected static final String NORMAL_USER = "user_securitytest@security.test";
-    protected static final String[] PASSWORDS= {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
+    protected static final String[] PASSWORDS = {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
     protected static final String NORMAL_USER_PASSWORD = PASSWORDS[0];
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin_securitytest@security.test";
@@ -112,11 +113,10 @@ public class SecurityTest extends BaseWebDriverTest
         // Make sure the feature is turned off.
         Connection cn = createDefaultConnection(false);
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
-
     }
 
     @Test
-    public void testSteps()
+    public void testSteps() throws IOException
     {
         enableEmailRecorder();
 
@@ -464,7 +464,6 @@ public class SecurityTest extends BaseWebDriverTest
 
         signIn();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
-
     }
 
     @LogMethod
@@ -571,7 +570,7 @@ public class SecurityTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void tokenAuthenticationTest()
+    protected void tokenAuthenticationTest() throws IOException
     {
         beginAt("/project/SecurityVerifyProject/begin.view?");
         String homePageUrl = removeUrlParameters(getURL().toString());  // Absolute URL for redirect, get rid of '?'
@@ -606,6 +605,11 @@ public class SecurityTest extends BaseWebDriverTest
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 32783);
 
+        // Ensure we can POST to verify token action without CSRF token, #36450
+        // Ideally, we'd POST the token in the body, but our SimpleHttpRequest doesn't support parameters
+        xml = postToUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
+        assertSuccessAuthenticationToken(xml, token, email, 32783);
+
         beginAt(baseUrl + "invalidateToken.view?labkeyToken=" + token + "&returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
         assertEquals("Redirected to wrong URL", homePageUrl, removeUrlParameters(getURL().toString()));
@@ -634,6 +638,16 @@ public class SecurityTest extends BaseWebDriverTest
     }
 
 
+    @LogMethod
+    public String postToUrl(String url) throws IOException
+    {
+        log("Posting to " + url);
+        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.getBaseURL() + url, "POST");
+        SimpleHttpResponse response = request.getResponse();
+
+        return response.getResponseBody();
+    }
+
     protected void assertFailureAuthenticationToken(String xml)
     {
         assertTrue(xml.startsWith("<TokenAuthentication success=\"false\" message=\"Unknown token\"/>"));
@@ -643,12 +657,13 @@ public class SecurityTest extends BaseWebDriverTest
     protected void assertSuccessAuthenticationToken(String xml, String token, String email, int permissions)
     {
         String correct = "<TokenAuthentication success=\"true\" token=\"" + token + "\" email=\"" + email + "\" permissions=\"" + permissions + "\"/>";
-        assertTrue(xml.startsWith(correct));
+        assertTrue(xml, xml.startsWith(correct));
     }
 
 
     private String retrieveFromUrl(String relativeUrl)
     {
+        log("Retrieving from " + relativeUrl);
         String newline = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder();
         URL url;
