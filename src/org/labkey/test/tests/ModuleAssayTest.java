@@ -282,7 +282,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         log("Visit result details page");
         clickAndWait(dataTable.detailsLink(0));
         assertElementContains(Locator.id("SampleId_div"), "Monkey 1");
-        assertElementContains(Locator.id("TimePoint_div"), "2008/11/01 11:22:33");
+        assertElementContains(Locator.id("TimePoint_div"), "2008-11-01 11:22:33");
         assertElementContains(Locator.id("DoubleData_div"), String.valueOf(3.2));
         assertElementContains(Locator.id("HiddenData_div"), _useTransform ? "super secret! transformed" : "super secret!");
 
