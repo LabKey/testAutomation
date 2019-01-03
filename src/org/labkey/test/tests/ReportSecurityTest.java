@@ -109,6 +109,9 @@ public class ReportSecurityTest extends ReportTest
     {
         // Turn on experimental feature that adds back the "Create Chart View (deprecated)" menu item. See #33938.
         ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "ExperimentalDeprecatedChartView");
+        // Turn on experimental feature to use JFree instead of JS for chart view rendering.
+        // Conversion of chart view to new plot requires user having permission to underlying queryview, which the report user lacks.
+        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "ExperimentalRenderDeprecatedChartView");
 
         // create charts
         navigateToFolder(getProjectName(), getFolderName());
@@ -187,5 +190,7 @@ public class ReportSecurityTest extends ReportTest
         dt.goToView("default");
         assertTextPresent("User does not have read permission on this dataset.");
         stopImpersonating();
+
+        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "ExperimentalRenderDeprecatedChartView");
     }
 }
