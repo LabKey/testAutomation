@@ -152,7 +152,8 @@ public class Ext4GridRef extends Ext4CmpRef
 
         WebElement el = startEditing(rowIdx, colName);
 
-        _test.setFormElement(el, value);
+        _test.setFormElementJS(el, "");
+        el.sendKeys(value);
 
         //if the editor is still displayed, try to close it
         if (el.isDisplayed())

@@ -2994,6 +2994,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         setFormElement(el, text);
     }
 
+    /**
+     * Clears and sets the text of the specified input element.
+     * Warning: Clear unfocuses the element which causes some inputs to disappear.
+     * <a href="https://www.w3.org/TR/webdriver/#element-clear>WebDriver Docs</a>
+     * Use {@link WebElement#sendKeys(CharSequence...)} for such inputs.
+     */
     public void setFormElement(WebElement el, String text)
     {
         String inputType = el.getAttribute("type");
@@ -3023,7 +3029,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
-            setFormElementJS(input, ""); // Clear unfocuses the element which causes some inputs to disappear. (https://www.w3.org/TR/webdriver/#element-clear)
+            input.clear();
             input.sendKeys(text);
         }
         else
@@ -3130,7 +3136,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private void setHtml5DateInput(WebElement el, Date date)
     {
-        // TODO: Firefox requires ISO date format (yyyy-MM-dd)
+        // Firefox requires ISO date format (yyyy-MM-dd)
         String formFormat = isFirefox() ? "yyyy-MM-dd" : "MMddyyyy";
         SimpleDateFormat formFormatter = new SimpleDateFormat(formFormat);
         String formDate = formFormatter.format(date);
