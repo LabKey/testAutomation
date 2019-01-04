@@ -16,12 +16,10 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.labkey.api.util.FileUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -421,11 +419,6 @@ public class RReportHelper
     public String getRScriptOutput(String scriptContents) throws IOException
     {
         return TestFileUtils.getProcessOutput(getRScriptExecutable(), "-e", scriptContents);
-    }
-
-    public String getRScriptOutput(File script) throws IOException
-    {
-        return TestFileUtils.getProcessOutput(getRScriptExecutable(), FileUtil.getAbsoluteCaseSensitiveFile(script).getAbsolutePath());
     }
 
     public void saveReport(String name, boolean isSaveAs, int wait)

@@ -17,7 +17,6 @@ package org.labkey.test.teamcity;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.api.util.FileUtil;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.Maps;
@@ -119,7 +118,7 @@ public class TeamCityUtils
         if (file != null && file.exists())
         {
             String labkeyRoot = new File(TestFileUtils.getLabKeyRoot()).getAbsolutePath();
-            String filePath = FileUtil.getAbsoluteCaseSensitiveFile(file).getAbsolutePath();
+            String filePath = file.getAbsoluteFile().toPath().normalize().toString();
             if (filePath.startsWith(labkeyRoot))
             {
                 // relativize path to labkey project root

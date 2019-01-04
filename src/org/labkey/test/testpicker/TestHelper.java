@@ -16,7 +16,6 @@
 
 package org.labkey.test.testpicker;
 
-import org.labkey.api.util.FileUtil;
 import org.labkey.test.SuiteBuilder;
 import org.labkey.test.TestConfig;
 import org.labkey.test.TestFileUtils;
@@ -230,7 +229,7 @@ public class TestHelper
         JLabel labkeyRootName = new JLabel("LabKey Root:");
 
         File rootFile = new File(DEFAULT_ROOT);
-        String rootPath = FileUtil.getAbsoluteCaseSensitiveFile(rootFile).getAbsolutePath();
+        String rootPath = rootFile.getAbsolutePath();
         _root = new JTextField(rootPath);
         optionsText.add(labkeyRootName, gbcShort);
         optionsText.add(_root, gbcLong);

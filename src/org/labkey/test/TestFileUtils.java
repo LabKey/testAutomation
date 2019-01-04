@@ -35,7 +35,6 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
-import org.labkey.api.util.FileUtil;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.util.TestLogger;
 
@@ -121,13 +120,13 @@ public abstract class TestFileUtils
                     throw new IllegalStateException("Specified LabKey root exists [" + _labkeyRoot + "] but isn't the root of a LabKey enlistment. Configure this by passing VM arg labkey.root={yourroot}");
                 }
 
-                _labkeyRoot = FileUtil.getAbsoluteCaseSensitiveFile(_labkeyRoot);
+                _labkeyRoot = _labkeyRoot.getAbsoluteFile().toPath().normalize().toFile();
 
                 TestLogger.log("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
             }
             else
             {
-                _labkeyRoot = FileUtil.getAbsoluteCaseSensitiveFile(new File(""));
+                _labkeyRoot = new File("").getAbsoluteFile();
                 if (_labkeyRoot.getName().equals("test") && _labkeyRoot.getParentFile().getName().equals("server"))
                     _labkeyRoot = _labkeyRoot.getParentFile().getParentFile(); // Working directory is in '{labkey.root}/server'; otherwise is in enlistment root
                 else if (_labkeyRoot.getName().equals("server"))
@@ -216,10 +215,8 @@ public abstract class TestFileUtils
 
     public static String getProcessOutput(File executable, String... args) throws IOException
     {
-        executable = FileUtil.getAbsoluteCaseSensitiveFile(executable);
-
         ProcessBuilder pb = new ProcessBuilder();
-        pb.command(ArrayUtils.addAll(new String[]{executable.getAbsolutePath()}, args));
+        pb.command(ArrayUtils.addAll(new String[]{executable.toPath().normalize().toAbsolutePath().toString()}, args));
         pb.redirectErrorStream(true);
         Process p = pb.start();
 

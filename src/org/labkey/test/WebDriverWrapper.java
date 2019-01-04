@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
-import org.labkey.api.util.FileUtil;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.RadioButton;
@@ -3200,7 +3199,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         executeScript("arguments[0].value = '';", el);
-        el.sendKeys(FileUtil.getAbsoluteCaseSensitiveFile(file).getAbsolutePath());
+        el.sendKeys(file.toPath().normalize().toAbsolutePath().toString());
 
         if (!cssString.isEmpty() || !styleString.isEmpty())
         {

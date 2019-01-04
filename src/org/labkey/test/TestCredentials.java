@@ -16,7 +16,6 @@
 package org.labkey.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.labkey.api.util.FileUtil;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.credentials.Credentials;
 import org.labkey.test.credentials.Server;
@@ -32,7 +31,7 @@ public class TestCredentials
 
     public static void setCredentialsFile(File credentialsFile)
     {
-        TestCredentials.credentialsFile = credentialsFile;
+        TestCredentials.credentialsFile = credentialsFile.getAbsoluteFile().toPath().normalize().toFile();
         credentials = null;
 
         if (!credentialsFile.exists())
@@ -47,7 +46,7 @@ public class TestCredentials
     {
         if (null == credentialsFile)
         {
-            setCredentialsFile(FileUtil.getAbsoluteCaseSensitiveFile(new File(System.getProperty("test.credentials.file", TestFileUtils.getLabKeyRoot() + "/server/test/test.credentials.json"))));
+            setCredentialsFile(new File(System.getProperty("test.credentials.file", TestFileUtils.getLabKeyRoot() + "/server/test/test.credentials.json")));
         }
         return credentialsFile;
     }
