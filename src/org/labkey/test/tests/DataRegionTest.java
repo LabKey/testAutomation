@@ -16,9 +16,9 @@
 
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.util.Pair;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
@@ -56,24 +56,24 @@ public class DataRegionTest extends AbstractQWPTest
     private static final int TOTAL_ROWS;
 
     private static final List<Pair<String, String>> QWP_TAB_SIGNALS =
-            Arrays.asList(new Pair<>("Show default view for query", "testQueryOnly"),
-                    new Pair<>("Filter by Tag equals blue", "testFilterArray"),
-                    new Pair<>("Sort by Tag", "testSort"),
-                    new Pair<>("Hide buttons", "testHideButtons"),
-                    new Pair<>("Hide Edit and Details columns", "testHideColumns"),
-                    new Pair<>("Set Paging to 3 with config", "testPagingConfig"),
-                    new Pair<>("Set Paging to 2 with API", "testSetPaging"),
-                    new Pair<>("Parameterized Queries", "testParameterizedQueries"),
-                    new Pair<>("Regression #25337", "test25337"),
-                    new Pair<>("Change Page Offset", "testPageOffset"),
-                    new Pair<>("Keep Removable Filters", "testRemovableFilters"),
-                    new Pair<>("Collapse filter clauses", "testMultiClausesFilter"),
-                    new Pair<>("Filter field case insensitive", "testCaseInsensitiveFilterField"),
-                    new Pair<>("Hide Paging Count", "testHidePagingCount"),
-                    new Pair<>("Show All Rows", "testShowAllTotalRows"),
-                    new Pair<>("Use getBaseFilters", "testGetBaseFilters"),
-                    new Pair<>("Filter on \"Sort\" column", "testFilterOnSortColumn"),
-                    new Pair<>("Use onRender via ButtonBarOptions", "testButtonBarConfig")
+            Arrays.asList(Pair.of("Show default view for query", "testQueryOnly"),
+                    Pair.of("Filter by Tag equals blue", "testFilterArray"),
+                    Pair.of("Sort by Tag", "testSort"),
+                    Pair.of("Hide buttons", "testHideButtons"),
+                    Pair.of("Hide Edit and Details columns", "testHideColumns"),
+                    Pair.of("Set Paging to 3 with config", "testPagingConfig"),
+                    Pair.of("Set Paging to 2 with API", "testSetPaging"),
+                    Pair.of("Parameterized Queries", "testParameterizedQueries"),
+                    Pair.of("Regression #25337", "test25337"),
+                    Pair.of("Change Page Offset", "testPageOffset"),
+                    Pair.of("Keep Removable Filters", "testRemovableFilters"),
+                    Pair.of("Collapse filter clauses", "testMultiClausesFilter"),
+                    Pair.of("Filter field case insensitive", "testCaseInsensitiveFilterField"),
+                    Pair.of("Hide Paging Count", "testHidePagingCount"),
+                    Pair.of("Show All Rows", "testShowAllTotalRows"),
+                    Pair.of("Use getBaseFilters", "testGetBaseFilters"),
+                    Pair.of("Filter on \"Sort\" column", "testFilterOnSortColumn"),
+                    Pair.of("Use onRender via ButtonBarOptions", "testButtonBarConfig")
                     );
 
     static

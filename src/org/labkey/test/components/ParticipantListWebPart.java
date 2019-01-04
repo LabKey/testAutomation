@@ -15,7 +15,7 @@
  */
 package org.labkey.test.components;
 
-import org.labkey.api.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -82,17 +82,17 @@ public class ParticipantListWebPart extends BodyWebPart<ParticipantListWebPart.E
 
         if (message.equals(String.format("No matching %s.", _participantNounPlural))||
                 message.startsWith(String.format("No %s IDs contain", _participantNounSingular)))
-            return new Pair<>(0, null);
+            return Pair.of(0, null);
 
         Pattern messagePattern = Pattern.compile("Found (\\d+) " + _participantNounRegex + " of (\\d+)");
         Matcher messageMatcher = messagePattern.matcher(message);
         if (messageMatcher.find())
-            return new Pair<>(Integer.parseInt(messageMatcher.group(1)), Integer.parseInt(messageMatcher.group(3)));
+            return Pair.of(Integer.parseInt(messageMatcher.group(1)), Integer.parseInt(messageMatcher.group(3)));
 
         messagePattern = Pattern.compile("Showing all (\\d+) " + _participantNounRegex);
         messageMatcher = messagePattern.matcher(message);
         if (messageMatcher.find())
-            return new Pair<>(null, Integer.parseInt(messageMatcher.group(1)));
+            return Pair.of(null, Integer.parseInt(messageMatcher.group(1)));
 
         throw new IllegalStateException("Unable to parse participant count: \n" + message);
     }

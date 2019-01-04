@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.api.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -27,7 +27,7 @@ import static org.junit.Assert.fail;
 
 public abstract class AbstractQWPTest extends BaseWebDriverTest
 {
-    private static final Pair<String, String> QWP_SCHEMA_LISTING = new Pair<>("List out all queries in schema", "testSchemaOnly");
+    private static final Pair<String, String> QWP_SCHEMA_LISTING = Pair.of("List out all queries in schema", "testSchemaOnly");
 
     abstract protected List<Pair<String, String>> getTabSignalsPairs();
 
@@ -42,13 +42,13 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
         clickButton("Populate test data");
         sleep(1000);
 
-        log("Testing " + QWP_SCHEMA_LISTING.first);
-        click(Locator.linkWithText(QWP_SCHEMA_LISTING.first));
+        log("Testing " + QWP_SCHEMA_LISTING.getLeft());
+        click(Locator.linkWithText(QWP_SCHEMA_LISTING.getLeft()));
 
-        String alert = waitForSignalOrAlert(3000, QWP_SCHEMA_LISTING.second);
+        String alert = waitForSignalOrAlert(3000, QWP_SCHEMA_LISTING.getRight());
         if (alert != null)
-            fail(QWP_SCHEMA_LISTING.first + " failed: " + alert);
-        waitForElement(Locator.css("span.labkey-wp-title-text").withText(QWP_SCHEMA_LISTING.first));
+            fail(QWP_SCHEMA_LISTING.getLeft() + " failed: " + alert);
+        waitForElement(Locator.css("span.labkey-wp-title-text").withText(QWP_SCHEMA_LISTING.getLeft()));
 
         getTabSignalsPairs().stream().forEach(this::testQWPTab);
 
@@ -80,11 +80,11 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
 
     private void testQWPTab(Pair<String, String> titleSignalPair)
     {
-        log("Testing " + titleSignalPair.first);
-        click(Locator.linkWithText(titleSignalPair.first));
-        String alert = waitForSignalOrAlert(10000, titleSignalPair.second);
+        log("Testing " + titleSignalPair.getLeft());
+        click(Locator.linkWithText(titleSignalPair.getLeft()));
+        String alert = waitForSignalOrAlert(10000, titleSignalPair.getRight());
         if (alert != null)
-            fail(titleSignalPair.first + " failed: " + alert);
+            fail(titleSignalPair.getLeft() + " failed: " + alert);
 
         waitForElement(Locator.css(".labkey-data-region"));
     }
