@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -45,6 +46,8 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
@@ -150,9 +153,9 @@ public class SampleSetTest extends BaseWebDriverTest
         Map<String, Object> rowC =  samples.getRows().stream().filter((a)-> a.get("Name").equals("C")).collect(Collectors.toList()).get(0);
         Map<String, Object> rowD =  samples.getRows().stream().filter((a)-> a.get("Name").equals("D")).collect(Collectors.toList()).get(0);
 
-        assertTrue ("Row A shouldn't have a parent", rowA.get("Run")==(null));
+        assertNull("Row A shouldn't have a parent", rowA.get("Run"));
         assertEquals("Rows B and C should both derive from A and get the same run", rowB.get("Run"), rowC.get("Run"));
-        assertTrue("RowD should have a parent", rowD.get("Run")!= null);
+        assertNotNull("RowD should have a parent", rowD.get("Run"));
         assertNotEquals("RowD should not equal B", rowD.get("Run"), rowB.get("Run"));
         assertNotEquals("RowD should not equal C", rowD.get("Run"), rowC.get("Run"));
     }
@@ -170,16 +173,12 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
-        PortalHelper portalHelper = new PortalHelper(this);
-
         clickProject(PROJECT_NAME);
         clickButton("Import Sample Set");
         setFormElement(Locator.id("name"), PROJECT_SAMPLE_SET_NAME);
         checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
-        waitForFormElementToEqual(Locator.id("idCol1"), "0"); // "KeyCol"
-        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
+        selectParentColumn("Parent");
         clickButton("Submit");
 
         clickFolder(FOLDER_NAME);
@@ -288,17 +287,13 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Import Sample Set");
         setFormElement(Locator.name("name"), FOLDER_CHILDREN_SAMPLE_SET_NAME);
         setFormElement(Locator.name("data"), AMBIGUOUS_CHILD_SAMPLE_SET_TSV);
-        fireEvent(Locator.name("data"), SeleniumEvent.change);
-        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
+        selectParentColumn("Parent");
         clickButton("Submit");
         assertTextPresent("Failed to find sample parent: Found 2 values matching: SampleSetBVT4");
 
         // Try again with a qualified sample name
         setFormElement(Locator.name("data"), CHILD_SAMPLE_SET_TSV);
-        fireEvent(Locator.name("data"), SeleniumEvent.change);
-        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
+        selectParentColumn("Parent");
         clickButton("Submit");
         assertTextPresent("SampleSetBVTChildA");
 
@@ -318,14 +313,12 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Import Sample Set");
         setFormElement(Locator.name("name"), FOLDER_CHILDREN_SAMPLE_SET_NAME);
         setFormElement(Locator.name("data"), GRANDCHILD_SAMPLE_SET_TSV);
-        fireEvent(Locator.name("data"), SeleniumEvent.change);
-        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
+        selectParentColumn("Parent");
         clickButton("Submit");
 
         assertTextPresent("A sample set with that name already exists");
         setFormElement(Locator.name("name"), FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
-        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
+        selectParentColumn("Parent");
         clickButton("Submit");
 
         waitAndClickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
@@ -411,9 +404,7 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.id("name"), CASE_INSENSITIVE_SAMPLESET);
         checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
-        waitForFormElementToEqual(Locator.id("idCol1"), "0"); // "KeyCol"
-        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
+        selectParentColumn("Parent");
         clickButton("Submit");
 
         clickProject(PROJECT_NAME);
@@ -421,9 +412,7 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.id("name"), LOWER_CASE_SAMPLESET);
         checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
-        waitForFormElementToEqual(Locator.id("idCol1"), "0"); // "KeyCol"
-        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
+        selectParentColumn("Parent");
         clickButton("Submit");
         waitForElement(Locator.tagWithClass("div", "labkey-error").containing("A sample set with that name already exists."));
         clickProject(PROJECT_NAME);
@@ -479,6 +468,14 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTrue("Path didn't contain " + attachment.getName() + ", but was: " + path, path.contains(attachment.getName()));
     }
 
+    private void selectParentColumn(String parentCol)
+    {
+        fireEvent(Locator.name("data"), SeleniumEvent.blur);
+        waitForFormElementToEqual(Locator.id("idCol1"), "0"); // "KeyCol"
+        waitForElement(Locator.css("select#parentCol > option").withText(parentCol));
+        selectOptionByText(Locator.id("parentCol"), parentCol);
+    }
+
     private void exportGridWithAttachment(int numOfRows, int exportColumn, String... expectedFilePaths)
     {
         DataRegionTable list;
@@ -508,11 +505,11 @@ public class SampleSetTest extends BaseWebDriverTest
             {
                 if (filePath.length() == 0)
                 {
-                    assertTrue("Value of attachment column for row " + row + " not exported as expected. Expected an empty cell Actual: " + exportedColumn.get(row).trim().toLowerCase(), exportedColumn.get(row).trim().length() == 0);
+                    assertEquals("Value of attachment column for row " + row + " not exported as expected.", "", exportedColumn.get(row).trim());
                 }
                 else
                 {
-                    assertTrue("Value of attachment column for row " + row + " not exported as expected. Expected: " + filePath + " Actual: " + exportedColumn.get(row).trim().toLowerCase(), exportedColumn.get(row).trim().toLowerCase().contains(filePath));
+                    assertThat("Value of attachment column for row " + row + " not exported as expected.", exportedColumn.get(row).trim().toLowerCase(), CoreMatchers.containsString(filePath));
                 }
                 row++;
             }
