@@ -18,7 +18,6 @@ package org.labkey.test.tests.remoteapi;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.security.PrincipalType;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.BulkUpdateGroupCommand;
@@ -30,6 +29,7 @@ import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PermissionsHelper.PrincipalType;
 
 import java.util.ArrayList;
 import java.util.Arrays;

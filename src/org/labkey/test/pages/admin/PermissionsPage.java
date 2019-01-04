@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages.admin;
 
-import org.labkey.api.security.PrincipalType;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -26,6 +25,7 @@ import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PermissionsHelper.PrincipalType;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;

@@ -17,7 +17,6 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.labkey.api.security.PrincipalType;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;

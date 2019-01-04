@@ -17,7 +17,6 @@ package org.labkey.test.tests;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.security.PrincipalType;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
@@ -41,6 +40,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PermissionsHelper.PrincipalType;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;

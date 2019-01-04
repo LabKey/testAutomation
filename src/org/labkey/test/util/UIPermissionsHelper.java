@@ -15,9 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.api.security.PrincipalType;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.PermissionsEditor;

@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.labkey.api.security.PrincipalType;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.GetRolesCommand;
@@ -195,5 +194,49 @@ public abstract class PermissionsHelper
         _driver.log("asserting that member " + member + " is not in group " + projectName + "/" + groupName + "...");
         if (isUserInGroup(member, groupName, projectName, principalType))
             fail("member " + member + " was found in group " + projectName + "/" + groupName);
+    }
+
+    /**
+     * Duplicated from org.labkey.api.security.PrincipalType
+     */
+    public enum PrincipalType
+    {
+        USER('u', "User"),
+        GROUP('g', "Group"),
+        ROLE('r', "Role"),
+        MODULE('m', "Module Group"),
+        SERVICE('s', "Service");
+
+        private final char _typeChar;
+        private final String _description;
+
+        PrincipalType(char type, String description)
+        {
+            _typeChar = type;
+            _description = description;
+        }
+
+        public char getTypeChar()
+        {
+            return _typeChar;
+        }
+
+        public String getDescription()
+        {
+            return _description;
+        }
+
+        public static PrincipalType forChar(char type)
+        {
+            switch (type)
+            {
+                case 'u': return USER;
+                case 'g': return GROUP;
+                case 'r': return ROLE;
+                case 'm': return MODULE;
+                case 's': return SERVICE;
+                default : return null;
+            }
+        }
     }
 }
