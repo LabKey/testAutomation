@@ -17,13 +17,13 @@ package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.data.ColumnHeaderType;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Hosting;
+import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
 
 import java.io.File;
 import java.util.Arrays;

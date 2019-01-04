@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.api.data.ColumnHeaderType;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -217,6 +216,44 @@ public abstract class AbstractDataRegionExportOrSignHelper extends WebDriverComp
         protected WebElement findExportButton(String buttonText)
         {
             return Locator.lkButton(buttonText).findElement(findActiveTab());
+        }
+    }
+
+    /**
+     * Pared down from org.labkey.api.data.ColumnHeaderType
+     */
+    public enum ColumnHeaderType
+    {
+        None("None", "No column headers are exported; only data values are exported."),
+        Caption("Caption", "The column titles as currently displayed on the grid."),
+
+        // The DisplayColumn name mangles special characters and removes spaces
+        // making it almost worthless for export and import.
+        Name("Name", "Property name; Deprecated"),
+
+        // Use ColumnInfo name -- usually just the FieldKey -- and use "." for lookup separators without FieldKey escaping.
+        DisplayFieldKey("Field Name", "The official name of the field, without escaping for special characters"),
+
+        // Use the ColumnInfo's FieldKey with FieldKey escaping. Useful for import/export round-tripping, but can lead to ugly names.
+        FieldKey("Field Key", "The column name rendered with FieldKey encoding; unambiguous and canonical, useful for exporting and re-importing.");
+
+        private final String _optionText;
+        private final String _description;
+
+        ColumnHeaderType(String optionText, String description)
+        {
+            _optionText = optionText;
+            _description = description;
+        }
+
+        public String getOptionText()
+        {
+            return _optionText;
+        }
+
+        public String getDescription()
+        {
+            return _description;
         }
     }
 }
