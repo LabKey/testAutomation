@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.util.PageFlowUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
@@ -646,7 +645,7 @@ public class FilterTest extends BaseWebDriverTest
 
     private String createSearchFilterJS(Object value)
     {
-        return "LABKEY.Filter.create('*', " + PageFlowUtil.jsString(value.toString()) + ", LABKEY.Filter.Types.Q)";
+        return "LABKEY.Filter.create('*', " + EscapeUtil.jsString(value.toString()) + ", LABKEY.Filter.Types.Q)";
     }
 
     @LogMethod

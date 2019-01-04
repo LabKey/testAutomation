@@ -23,7 +23,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.security.PrincipalType;
-import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.XmlBeansUtil;
 import org.labkey.folder.xml.FolderDocument;
 import org.labkey.security.xml.GroupsType;
@@ -424,7 +423,7 @@ public class FolderExportTest extends BaseWebDriverTest
     private String getExpectedXML(String fileName)
     {
         File file = new File(dataDir, fileName);
-        String xml = PageFlowUtil.getFileContentsAsString(file);
+        String xml = TestFileUtils.getFileContents(file);
         xml = xml.replaceAll("USER_NAME", PasswordUtil.getUsername());
         return xml;
     }
