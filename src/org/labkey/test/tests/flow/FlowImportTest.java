@@ -18,7 +18,6 @@ package org.labkey.test.tests.flow;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.util.DateUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -29,6 +28,7 @@ import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -94,7 +94,8 @@ public class FlowImportTest extends BaseFlowTest
         for (String date : fileDates)
         {
             assertTrue("expect each field in FileDate column to have a value, is [" + date + "]", !date.isEmpty());
-            DateUtil.parseDateTime(date, "YYYY-MM-DD HH:mm");   // make sure the resulting value parses to a date
+            // make sure the resulting value parses to a date
+            new SimpleDateFormat("YYYY-MM-DD HH:mm").parse(date);
         }
         // UNDONE: Check '118795.fcs' FCSAnalysis well has a fake FCSFile that has an original FCSFile data input.
         // UNDONE: Check FCSFiles.Original column
