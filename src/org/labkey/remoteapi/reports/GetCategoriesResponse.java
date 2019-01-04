@@ -15,12 +15,8 @@
  */
 package org.labkey.remoteapi.reports;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.labkey.api.data.ContainerManager;
-import org.labkey.api.reports.model.ViewCategory;
 import org.labkey.remoteapi.CommandResponse;
-
 
 import java.util.ArrayList;
 import java.util.List;
