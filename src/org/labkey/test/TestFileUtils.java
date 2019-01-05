@@ -39,6 +39,7 @@ import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.util.TestLogger;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -311,6 +312,56 @@ public abstract class TestFileUtils
             }
             return files;
         }
+    }
+
+    public static List<File> unzipToDirectory(File sourceZip, File unzipDir) throws IOException
+    {
+        List<File> files = new ArrayList<>();
+
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceZip));
+             BufferedInputStream is = new BufferedInputStream(zis))
+        {
+            ZipEntry entry;
+
+            while (null != (entry = zis.getNextEntry()))
+            {
+                File destFile = new File(unzipDir, entry.getName());
+
+                if (!destFile.getCanonicalPath().startsWith(unzipDir.getCanonicalPath() + File.separator)) {
+                    throw new IOException("Zip entry is outside of the target dir: " + entry.getName());
+                }
+
+                if (entry.isDirectory())
+                {
+                    destFile.mkdirs();
+                    if (!destFile.isDirectory())
+                    {
+                        throw new IOException("Failed to create directory: " + destFile.getName());
+                    }
+                    continue;
+                }
+
+                destFile.getParentFile().mkdirs();
+                if (destFile.exists())
+                {
+                    throw new IOException("File already exists: " + destFile.getName());
+                }
+                if (!destFile.createNewFile())
+                {
+                    throw new IOException("Failed to extract file: " + destFile.getName());
+                }
+
+                try (BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(destFile)))
+                {
+                    IOUtils.copy(is, os);
+                }
+
+                files.add(destFile);
+                zis.closeEntry();
+            }
+        }
+
+        return files;
     }
 
     /** Untar an input file into an output file.
