@@ -20,7 +20,6 @@ import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.collections.CaseInsensitiveHashSet;
 import org.labkey.remoteapi.ApiKeyCredentialsProvider;
 import org.labkey.remoteapi.BasicAuthCredentialsProvider;
 import org.labkey.remoteapi.CommandException;
@@ -47,9 +46,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -116,8 +117,8 @@ public class ApiKeyTest extends BaseWebDriverTest
         {
             GetSchemasCommand cmd = new GetSchemasCommand();
             GetSchemasResponse resp = cmd.execute(cn, getProjectName());
-            List<String> schemaNames = resp.getSchemaNames();
-            Set<String> missingSchemas = new CaseInsensitiveHashSet(Arrays.asList("pipeline", "lists", "core"));
+            List<String> schemaNames = resp.getSchemaNames().stream().map(String::toLowerCase).collect(Collectors.toList());
+            Set<String> missingSchemas = new HashSet<>(Arrays.asList("pipeline", "lists", "core"));
             missingSchemas.removeAll(schemaNames);
             assertTrue("Some expected schemas missing. Schemas missing: " + missingSchemas, missingSchemas.isEmpty());
         }
@@ -189,8 +190,8 @@ public class ApiKeyTest extends BaseWebDriverTest
         try
         {
             GetQueryDetailsResponse respqd = cmdqd.execute(cn, getProjectName());
-            CaseInsensitiveHashSet columnNames = new CaseInsensitiveHashSet();
-            respqd.getColumns().forEach(col -> columnNames.add(col.getName()));
+            Set<String> columnNames = new HashSet<>();
+            respqd.getColumns().forEach(col -> columnNames.add(col.getName().toLowerCase()));
             assertFalse(CRYPT_COLUMN + " column shouldn't be accessible", columnNames.contains(CRYPT_COLUMN));
         }
         catch (CommandException e)

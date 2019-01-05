@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.collections.CaseInsensitiveHashSet;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -54,9 +53,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -473,7 +474,7 @@ public class IssuesTest extends BaseWebDriverTest
         final int[] requiredFieldPos = {0,1,2,3,4,5,6,8,9};
         final String[] requiredFieldLabels = {"title", "assignedto", "type", "area", "milestone",
                 "notifylist", "customername", "contractnumber"};
-        Set<String> expectedErrors = new CaseInsensitiveHashSet();
+        Set<String> expectedErrors = new HashSet<>();
 
         _containerHelper.createSubfolder(getProjectName(), subFolder);
         _issuesHelper.createNewIssuesList("required-fields", _containerHelper);
@@ -501,7 +502,8 @@ public class IssuesTest extends BaseWebDriverTest
             expectedErrors.add(String.format("Missing value for required property: %s", label));
         }
 
-        Set<String> errors = new CaseInsensitiveHashSet(getTexts(Locators.labkeyError.findElements(getDriver())));
+        Set<String> errors = getTexts(Locators.labkeyError.findElements(getDriver())).stream().map(String::toLowerCase).collect(Collectors.toSet());
+        expectedErrors = expectedErrors.stream().map(String::toLowerCase).collect(Collectors.toSet());
         errors.remove("*"); // From "Fields marked with an asterisk * are required."
         Assert.assertEquals("Wrong errors", expectedErrors, errors);
         clickButton("Cancel");
