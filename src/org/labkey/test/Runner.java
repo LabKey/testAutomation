@@ -630,10 +630,11 @@ public class Runner extends TestSuite
 
             System.out.println(getFixedWidthString(testName, durationAndPercent, width));
 
-            for (Map.Entry<TestPerfAspect.TestSection, Long> stats : TestPerfAspect.getPerfStats(testName).entrySet())
-            {
-                System.out.println("\t" + stats.getKey() + "\t" + formatDuration(stats.getValue()));
-            }
+            // TODO: TestPerfAspect isn't working correctly now that we don't use @AfterClass
+//            for (Map.Entry<TestPerfAspect.TestSection, Long> stats : TestPerfAspect.getPerfStats(testName).entrySet())
+//            {
+//                System.out.println("\t" + stats.getKey() + "\t" + formatDuration(stats.getValue()));
+//            }
 
             if (Crawler.getCrawlStats().containsKey(testName))
             {
