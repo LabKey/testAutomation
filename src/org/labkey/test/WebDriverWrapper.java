@@ -36,9 +36,9 @@ import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.pages.study.ManageStudyPage;
+import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
@@ -760,11 +760,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new ProjectSettingsPage(getDriver());
     }
 
-    public DataRegionTable goToSiteUsers()
+    public ShowUsersPage goToSiteUsers()
     {
         if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Site Users")))
             clickAdminMenuItem("Site", "Site Users");
-        return new DataRegionTable("Users", this);
+        return new ShowUsersPage(getDriver());
     }
 
     public void goToSiteGroups()
