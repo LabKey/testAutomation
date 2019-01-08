@@ -66,6 +66,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -499,7 +500,7 @@ public class WebTestHelper
                 .build();
 
         ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                .setCharset(Charset.forName("UTF-8"))
+                .setCharset(StandardCharsets.UTF_8)
                 .build();
 
         SSLConnectionSocketFactory socketFactory;
