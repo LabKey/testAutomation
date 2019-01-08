@@ -70,7 +70,6 @@ public class HiddenEmailTest extends BaseWebDriverTest
         super.doCleanup(afterTest);
 
         _userHelper.deleteUsers(false, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);
-        new ApiPermissionsHelper(this).deleteGroup(TEST_GROUP, afterTest);
     }
 
     @Override
