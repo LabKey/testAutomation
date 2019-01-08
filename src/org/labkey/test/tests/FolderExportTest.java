@@ -17,12 +17,12 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlOptions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.util.XmlBeansUtil;
 import org.labkey.folder.xml.FolderDocument;
 import org.labkey.security.xml.GroupsType;
 import org.labkey.security.xml.roleAssignment.RoleAssignmentsType;
@@ -485,9 +485,11 @@ public class FolderExportTest extends BaseWebDriverTest
             fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         File folderXmlFile = new File(fileRoot, "export" + File.separator + "folder.xml");
         FolderDocument exportedFolderDocument;
+
+        XmlOptions defaultParseOptions = new XmlOptions().setLoadLineNumbers();
         try
         {
-            exportedFolderDocument = FolderDocument.Factory.parse(folderXmlFile, XmlBeansUtil.getDefaultParseOptions());
+            exportedFolderDocument = FolderDocument.Factory.parse(folderXmlFile, defaultParseOptions);
         }
         catch (XmlException | IOException e)
         {
@@ -497,7 +499,7 @@ public class FolderExportTest extends BaseWebDriverTest
         FolderDocument expectedFolderDocument;
         try
         {
-            expectedFolderDocument = FolderDocument.Factory.parse(expectedXml, XmlBeansUtil.getDefaultParseOptions());
+            expectedFolderDocument = FolderDocument.Factory.parse(expectedXml, defaultParseOptions);
         }
         catch (XmlException e)
         {
