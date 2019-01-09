@@ -12,6 +12,8 @@ project.dependencies {
     // 36184: Tests can't find selenium-ie-driver library when running on Windows on TeamCity
     // Workaround to ensure that the class-loader finds InternetExplorerDriver
     compile "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
+    compile "org.mock-server:mockserver-netty:${mockserverVersion}"
+    
 }
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
