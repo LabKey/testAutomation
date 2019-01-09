@@ -380,6 +380,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         EmailRecordTable emailRecordTable = new EmailRecordTable(getDriver());
         WebElement resetLink = Locator.tagWithText("a", emailSubject).append("/..//a[contains(@href, 'setPassword.view')]").findElement(emailRecordTable);
+        scrollIntoView(resetLink);
         clickAndWait(resetLink, WAIT_FOR_PAGE);
 
         setFormElement(Locator.id("password"), password);
