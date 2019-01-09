@@ -24,7 +24,6 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -79,7 +78,6 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -119,7 +117,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1680,22 +1677,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
     private void waitForPageToLoad(WebElement toBeStale, int millis)
     {
         _testTimeout = true;
-        new WebDriverWait(getDriver(), millis / 1000).until(new Function<WebDriver, Boolean>()
-        {
-            private final ExpectedCondition<Boolean> staleCheck = ExpectedConditions.stalenessOf(toBeStale);
-
-            @Override
-            public Boolean apply(WebDriver input)
-            {
-                return staleCheck.apply(input);
-            }
-
-            @Override
-            public String toString()
-            {
-                return "waiting for browser to navigate";
-            }
-        });
+        new WebDriverWait(getDriver(), millis / 1000)
+                .withMessage("waiting for browser to navigate")
+                .until(ExpectedConditions.stalenessOf(toBeStale));
         waitForOnReady("jQuery");
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
@@ -2121,27 +2105,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (locators.length > 0)
         {
-            return shortWait().until(new Function<SearchContext, List<WebElement>>()
-            {
-                @Override
-                public List<WebElement> apply(@Nullable SearchContext context)
+            return shortWait().withMessage("elements to appear").until(context -> {
+                List<WebElement> allElements = new ArrayList<>();
+                for (Locator loc : locators)
                 {
-                    List<WebElement> allElements = new ArrayList<>();
-                    for (Locator loc : locators)
-                    {
-                        List<WebElement> elements = loc.findElements(context);
-                        if (elements.isEmpty())
-                            return null;
-                        allElements.addAll(elements);
-                    }
-                    return allElements;
+                    List<WebElement> elements = loc.findElements(context);
+                    if (elements.isEmpty())
+                        return null;
+                    allElements.addAll(elements);
                 }
-
-                @Override
-                public String toString()
-                {
-                    return "elements to appear";
-                }
+                return allElements;
             });
         }
         return null;
