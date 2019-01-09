@@ -51,6 +51,7 @@ public class HiddenEmailTest extends BaseWebDriverTest
 {
     private static final String TEST_GROUP = "HiddenEmail Test group";
     private static final String ADMIN_USER = "admin@usertable.test";
+    private static final String USER_INFO_VIEWER = "user_info_viewer@usertable.test";
     private static final String IMPERSONATED_USER = "impersonated_user@usertable.test";
     private static final String CHECKED_USER = "checked_user@usertable.test";
     private static final String EMAIL_TEST_LIST = "My Users";
@@ -69,7 +70,7 @@ public class HiddenEmailTest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
 
-        _userHelper.deleteUsers(false, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);
+        _userHelper.deleteUsers(false, USER_INFO_VIEWER, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);
     }
 
     @Override
@@ -95,9 +96,11 @@ public class HiddenEmailTest extends BaseWebDriverTest
         }
 
         _userHelper.createUser(ADMIN_USER, true, true);
+        _userHelper.createUser(USER_INFO_VIEWER, true, true);
         _userHelper.createUser(IMPERSONATED_USER, true, true);
         _userHelper.createUser(CHECKED_USER, true, true);
         setInitialPassword(ADMIN_USER, PasswordUtil.getPassword());
+        setInitialPassword(USER_INFO_VIEWER, PasswordUtil.getPassword());
         setInitialPassword(IMPERSONATED_USER, PasswordUtil.getPassword());
 
         _containerHelper.createProject(getProjectName(), null);
@@ -107,8 +110,9 @@ public class HiddenEmailTest extends BaseWebDriverTest
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this,
                 () -> new Connection(WebTestHelper.getBaseURL(), ADMIN_USER, PasswordUtil.getPassword()));
 
-        apiPermissionsHelper.createPermissionsGroup(TEST_GROUP, IMPERSONATED_USER, CHECKED_USER);
+        apiPermissionsHelper.createPermissionsGroup(TEST_GROUP, USER_INFO_VIEWER, IMPERSONATED_USER, CHECKED_USER);
         apiPermissionsHelper.setPermissions(TEST_GROUP, "Reader");
+        apiPermissionsHelper.setSiteAdminRoleUserPermissions(USER_INFO_VIEWER, "See User Details");
 
         impersonate(ADMIN_USER);
         {
@@ -128,7 +132,6 @@ public class HiddenEmailTest extends BaseWebDriverTest
             clickButton("Submit");
         }
         stopImpersonating();
-        setHiddenEmailPermissions();
     }
 
     @Test
@@ -144,6 +147,15 @@ public class HiddenEmailTest extends BaseWebDriverTest
         DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
         assertElementPresent(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CHECKED_USER)));
         assertTextNotPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
+
+        stopImpersonating();
+        impersonate(USER_INFO_VIEWER);
+        goToProjectHome();
+
+        log("Verify that user table info can be seen with permission");
+        clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
+        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
     }
 
     @Test
@@ -157,6 +169,15 @@ public class HiddenEmailTest extends BaseWebDriverTest
         DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
         assertElementPresent(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CHECKED_USER)));
         assertTextNotPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
+
+        stopImpersonating();
+        impersonate(USER_INFO_VIEWER);
+        goToProjectHome();
+
+        log("Verify that user table info can be seen with permission");
+        clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
+        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
     }
 
     @Test
@@ -165,6 +186,9 @@ public class HiddenEmailTest extends BaseWebDriverTest
         List<Map<String, String>> adminResponse = getAutoCompleteResponse(ADMIN_USER, getProjectName());
         assertThat("Sanity check failed for auto-complete API as admin",
                 adminResponse.toString(), containsString(CHECKED_USER));
+        List<Map<String, String>> viewerResponse = getAutoCompleteResponse(USER_INFO_VIEWER, getProjectName());
+        assertThat("Auto-complete API should return email adresses for user with permission",
+                viewerResponse.toString(), containsString(CHECKED_USER));
         List<Map<String, String>> maskedResponse = getAutoCompleteResponse(IMPERSONATED_USER, getProjectName());
         assertThat("Auto-complete API should not return email address without permission",
                 maskedResponse.toString(), allOf(
@@ -224,19 +248,6 @@ public class HiddenEmailTest extends BaseWebDriverTest
         _customizeViewsHelper.saveCustomView(HIDDEN_COL_VIEW, true);
 
         assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING); // Ensure subsequent check is valid
-    }
-
-    @LogMethod
-    private void setHiddenEmailPermissions()
-    {
-        // Set user permissions for hidden emails
-        goToSiteGroups();
-        _ext4Helper.clickExt4Tab("Permissions");
-        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        _permissionsHelper.removeSiteGroupPermission("All Site Users", "See Email Addresses");
-        assertElementNotPresent(Locator.permissionButton(TEST_GROUP, "See Email Addresses"));
-        assertElementNotPresent(Locator.permissionButton(IMPERSONATED_USER, "See Email Addresses"));
-        clickButton("Save and Finish");
     }
 
     @Override
