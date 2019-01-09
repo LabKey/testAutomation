@@ -35,6 +35,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.IOException;
 import java.util.List;
@@ -164,6 +165,7 @@ public class HiddenEmailTest extends BaseWebDriverTest
         createUsersTableView();
 
         impersonate(IMPERSONATED_USER);
+        ExecuteQueryPage.beginAt(this, "core", "Users");
 
         log("Verify that emails cannot be seen in query webpart");
         DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
@@ -172,12 +174,32 @@ public class HiddenEmailTest extends BaseWebDriverTest
 
         stopImpersonating();
         impersonate(USER_INFO_VIEWER);
+        ExecuteQueryPage.beginAt(this, "core", "Users");
+
+        log("Verify that user table info can be seen with permission");
+        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
+    }
+
+    @Test
+    public void testUserVisibilityViaContactsWebPart()
+    {
+        goToProjectHome();
+
+        new PortalHelper(this).addBodyWebPart("Contacts");
+
+        impersonate(IMPERSONATED_USER);
+
+        log("Verify that user infor cannot be seen in contacts webpart");
+        assertElementPresent(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CHECKED_USER)));
+        assertTextNotPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING, TEST_GROUP);
+
+        stopImpersonating();
+        impersonate(USER_INFO_VIEWER);
         goToProjectHome();
 
         log("Verify that user table info can be seen with permission");
-        clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
-        assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
+        assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING, TEST_GROUP);
     }
 
     @Test
