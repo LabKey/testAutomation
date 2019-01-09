@@ -48,7 +48,7 @@ import static org.junit.Assert.assertThat;
 
 @Category({DailyB.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
-public class HiddenEmailTest extends BaseWebDriverTest
+public class UserDetailsPermissionTest extends BaseWebDriverTest
 {
     private static final String TEST_GROUP = "HiddenEmail Test group";
     private static final String ADMIN_USER = "admin@usertable.test";
@@ -83,7 +83,7 @@ public class HiddenEmailTest extends BaseWebDriverTest
     @BeforeClass
     public static void setup()
     {
-        HiddenEmailTest initTest = (HiddenEmailTest) getCurrentTest();
+        UserDetailsPermissionTest initTest = (UserDetailsPermissionTest) getCurrentTest();
         initTest.doSetup();
     }
 

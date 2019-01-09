@@ -746,7 +746,6 @@ src/org/labkey/test/tests/GenericMeasurePickerTest.java -text
 src/org/labkey/test/tests/GpatAssayTest.java -text
 src/org/labkey/test/tests/GroupTest.java -text
 src/org/labkey/test/tests/HTTPApiTest.java -text
-src/org/labkey/test/tests/HiddenEmailTest.java -text
 src/org/labkey/test/tests/InlineImagesAssayTest.java -text
 src/org/labkey/test/tests/InlineImagesListTest.java -text
 src/org/labkey/test/tests/JUnitDRTTest.java -text
@@ -818,6 +817,7 @@ src/org/labkey/test/tests/TimelineTest.java -text
 src/org/labkey/test/tests/TourTest.java -text
 src/org/labkey/test/tests/TriggerScriptTest.java -text
 src/org/labkey/test/tests/UniprotAnnotationTest.java -text
+src/org/labkey/test/tests/UserDetailsPermissionTest.java -text
 src/org/labkey/test/tests/UserPermissionsTest.java -text
 src/org/labkey/test/tests/UserTest.java -text
 src/org/labkey/test/tests/ViabilityTest.java -text
