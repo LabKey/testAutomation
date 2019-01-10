@@ -98,6 +98,7 @@ modules/ETLtest/resources/ETLs/projects_delete.xml -text
 modules/ETLtest/resources/ETLs/projects_initial.xml -text
 modules/ETLtest/resources/ETLs/projects_merge.xml -text
 modules/ETLtest/resources/ETLs/remote.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/remoteConnectionTargetMerge.xml -text
 modules/ETLtest/resources/ETLs/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
 modules/ETLtest/resources/ETLs/remote_noTruncate.xml -text svneol=unset#application/xml
 modules/ETLtest/resources/ETLs/saveStateMidJobWithSleep.xml -text svneol=unset#application/xml
