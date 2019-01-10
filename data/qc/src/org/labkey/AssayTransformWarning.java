@@ -7,8 +7,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 public class AssayTransformWarning extends AbstractAssayValidator
 {
@@ -54,17 +55,21 @@ public class AssayTransformWarning extends AbstractAssayValidator
         {
             if (getRunProperties().containsKey(Props.runDataFile.name()))
             {
-                File inputFile = new File(getRunProperty(Props.runDataUploadedFile));
+                List<String> inputFileNames = Arrays.asList(getRunProperty(Props.runDataUploadedFile).split(";"));
+                List<File> inputFiles = inputFileNames.stream().map(File::new).collect(Collectors.toList());
                 File transformFile = new File(getTransformFile().get(getRunProperty(Props.runDataFile)));
 
                 try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
                 {
-                    try (BufferedReader reader = new BufferedReader(new FileReader(inputFile)))
+                    for (File inputFile : inputFiles)
                     {
-                        String line;
-                        while ((line = reader.readLine()) != null)
+                        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile)))
                         {
-                            writer.println(line);
+                            String line;
+                            while ((line = reader.readLine()) != null)
+                            {
+                                writer.println(line);
+                            }
                         }
                     }
                 }
