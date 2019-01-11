@@ -99,6 +99,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -856,13 +857,35 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             try
             {
+                boolean inIFrame = Locator.css(":root").findElement(getDriver()).getSize().getHeight() > 0;
+                if (inIFrame)
+                {
+                    if (isFirefox()) // As of 2.45, Chromedriver screenshots are not restricted to currently focused iFrame
+                    {
+                        getArtifactCollector().dumpPageSnapshot(testName + "-iframe", null, false); // Snapshot of iFrame
+                    }
+                    try
+                    {
+                        getDriver().switchTo().defaultContent();
+                    }
+                    catch (UnhandledAlertException alert)
+                    {
+                        TestLogger.warn("Alert was triggered by iframe: " + alert.getAlertText());
+                    }
+                }
                 getArtifactCollector().dumpPageSnapshot(testName, null); // Snapshot of current window
-                Set<String> windowHandles = getDriver().getWindowHandles();
-                windowHandles.remove(getDriver().getWindowHandle()); // All except current window
-                for (String windowHandle : windowHandles)
+                String failureWindow = getDriver().getWindowHandle();
+                Set<String> otherWindowHandles = getDriver().getWindowHandles().stream()
+                        .filter(handle -> !handle.equals(failureWindow)).collect(Collectors.toSet());
+                for (String windowHandle : otherWindowHandles)
                 {
                     getDriver().switchTo().window(windowHandle);
                     getArtifactCollector().dumpPageSnapshot(testName + "-" + windowHandle, "otherWindows");
+                }
+                if (!otherWindowHandles.isEmpty())
+                {
+                    // Leave browser in fail state for local investigation
+                    getDriver().switchTo().window(failureWindow);
                 }
             }
             catch (RuntimeException | Error e)

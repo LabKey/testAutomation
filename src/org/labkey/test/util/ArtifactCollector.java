@@ -136,6 +136,11 @@ public class ArtifactCollector
 
     public void dumpPageSnapshot(String testName, @Nullable String subdir)
     {
+        dumpPageSnapshot(testName, subdir, true);
+    }
+
+    public void dumpPageSnapshot(String testName, @Nullable String subdir, boolean includeFullScreen)
+    {
         File dumpDir = ensureDumpDir();
         if (subdir != null && subdir.length() > 0)
         {
@@ -146,7 +151,8 @@ public class ArtifactCollector
 
         String baseName = screenshotBaseName(testName);
 
-        dumpFullScreen(dumpDir, baseName);
+        if (includeFullScreen)
+            dumpFullScreen(dumpDir, baseName);
         dumpScreen(dumpDir, baseName);
         dumpHtml(dumpDir, baseName);
     }
