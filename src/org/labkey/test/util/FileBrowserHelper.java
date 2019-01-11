@@ -305,6 +305,11 @@ public class FileBrowserHelper extends WebDriverWrapper
                 clickFileBrowserButton(BrowserAction.REFRESH));
     }
 
+    public List<String> getFileList()
+    {
+        return getTexts(Locators.gridRow().childTag("td").position(3).findElements(getDriver()));
+    }
+
     public void createFolder(String folderName)
     {
         clickFileBrowserButton(BrowserAction.NEW_FOLDER);

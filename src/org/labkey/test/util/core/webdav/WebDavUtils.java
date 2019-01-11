@@ -17,7 +17,6 @@ package org.labkey.test.util.core.webdav;
 
 import com.github.sardine.Sardine;
 import org.apache.commons.lang3.StringUtils;
-import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -70,16 +69,11 @@ public class WebDavUtils
 
     public static class WebDavUrlFactory
     {
-        protected final String baseUrl;
+        private final String baseUrl;
 
         protected WebDavUrlFactory(String baseUrl)
         {
             this.baseUrl = StringUtils.stripEnd(baseUrl, "/") + "/";
-        }
-
-        protected WebDavUrlFactory(String containerPath, String webDavDir)
-        {
-            this(buildBaseWebDavUrl(containerPath, webDavDir));
         }
 
         public String getPath(String relativePath)
@@ -88,27 +82,13 @@ public class WebDavUtils
         }
     }
 
-    public static class WebDavLocalUrlFactory extends WebDavUrlFactory
+    public static WebDavUrlFactory webDavUrlFactory(String containerPath)
     {
-        public WebDavLocalUrlFactory(String containerPath)
-        {
-            super(buildBaseWebDavUrl(containerPath, "@files"));
-        }
+        return new WebDavUrlFactory(buildBaseWebDavUrl(containerPath, "@files"));
     }
 
-    public static class WebDavCloudUrlFactory extends WebDavUrlFactory
+    public static WebDavUrlFactory webFilesUrlFactory(String containerPath)
     {
-        public WebDavCloudUrlFactory(String containerPath)
-        {
-            super(buildBaseWebDavUrl(containerPath, "@cloud/" + TestProperties.getCloudPipelineBucketName()));
-        }
-    }
-
-    public static class WebFilesUrlFactory extends WebDavUrlFactory
-    {
-        public WebFilesUrlFactory(String containerPath)
-        {
-            super(buildBaseWebfilesUrl(containerPath));
-        }
+        return new WebDavUrlFactory(buildBaseWebfilesUrl(containerPath));
     }
 }

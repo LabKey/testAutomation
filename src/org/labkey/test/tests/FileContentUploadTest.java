@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -53,7 +54,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -262,6 +265,34 @@ public class FileContentUploadTest extends BaseWebDriverTest
         {
             throw new RuntimeException("Failed to send file digest", e);
         }
+    }
+
+    /**
+     * Issue 36008: Folder name containing '%' character is not uploaded with the correct encoding in file browser
+     */
+    @Test
+    public void testFolderNameCharacters()
+    {
+        goToModule("FileContent");
+        List<String> stringsToCheck = folderSubstringsToVerify();
+        Set<String> expectedFolders = new HashSet<>();
+
+        for (String check : stringsToCheck)
+        {
+            String folderName = "test_" + check + "_tset";
+            log("Creating folder: " + folderName);
+            expectedFolders.add(folderName);
+            _fileBrowserHelper.createFolder(folderName);
+        }
+
+        Set<String> folders = new HashSet<>(_fileBrowserHelper.getFileList());
+        assertEquals("Didn't create expected folders", expectedFolders, folders);
+    }
+
+    @NotNull
+    protected List<String> folderSubstringsToVerify()
+    {
+        return Arrays.asList("#", "%", "[", "]", "{", "}", "%ab", "%20", "\u2603", "&", "'", "\u00E4\u00F6\u00FC\u00C5");
     }
 
     @LogMethod
