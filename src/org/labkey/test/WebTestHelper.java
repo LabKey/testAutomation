@@ -65,7 +65,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -280,11 +279,16 @@ public class WebTestHelper
         return getServerProperty("databaseVersion");
     }
 
-    public static String getBaseURL()
+    public static String getBaseUrlWithoutContextPath()
     {
         String portPortion = 80 == getWebPort() ? "" : ":" + getWebPort();
 
-        return getTargetServer() + portPortion + getContextPath();
+        return getTargetServer() + portPortion;
+    }
+
+    public static String getBaseURL()
+    {
+        return getBaseUrlWithoutContextPath() + getContextPath();
     }
 
     public static String getContextPath()
