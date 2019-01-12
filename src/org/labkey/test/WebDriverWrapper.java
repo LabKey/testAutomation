@@ -926,7 +926,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public Connection createDefaultConnection(boolean reuseSession)
     {
-        Connection connection = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection connection = WebTestHelper.getRemoteApiConnection();
         if (reuseSession)
         {
             Cookie cookie = getDriver().manage().getCookieNamed("JSESSIONID");
