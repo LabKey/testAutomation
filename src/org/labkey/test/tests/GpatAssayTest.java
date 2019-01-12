@@ -17,6 +17,10 @@ package org.labkey.test.tests;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -27,6 +31,7 @@ import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,7 +49,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     private static final String ALIASED_ASSAY_3 = "trial01columns3.tsv";
     private static final String ALIASED_ASSAY_4 = "trial01columns4.tsv";
     private static final String GPAT_ASSAY_FNA = "trial03.fna";
-    private static final String ASSAY_NAME_XLS = "XLS Assay";
+    private static final String ASSAY_NAME_XLS = "XLS Assay " + TRICKY_CHARACTERS;
     private static final String ASSAY_NAME_XLSX = "XLSX Assay";
     private static final String ASSAY_NAME_TSV = "TSV Assay";
     private static final String ASSAY_NAME_FNA = "FASTA Assay";
@@ -109,6 +114,25 @@ public class GpatAssayTest extends BaseWebDriverTest
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLS));
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.tagWithClass("*", "labkey-column-header").withText("Role")); // excluded column
+
+        try
+        {
+            // Issue 36077: SelectRows: SchemaKey decoding of public schema name causes request failure
+            Connection cn = createDefaultConnection(false);
+            SelectRowsCommand selectCmd = new SelectRowsCommand("assay.General." + ASSAY_NAME_XLS, "Runs");
+            selectCmd.setRequiredVersion(17.1);
+            SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
+            assertEquals(1, selectResp.getRowCount().intValue());
+        }
+        catch (CommandException e)
+        {
+            throw new RuntimeException(e.getResponseText());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
 
         log("Import XLSX GPAT assay");
         clickProject(getProjectName());
