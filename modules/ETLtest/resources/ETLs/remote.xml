@@ -15,7 +15,6 @@
         <destination schemaName="study" queryName="etl target" targetOption="truncate"/>
     </transform>
 </transforms>
-<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
     <schedule>
         <poll interval="15s" />
     </schedule>
