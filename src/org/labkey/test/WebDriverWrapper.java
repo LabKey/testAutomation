@@ -1678,6 +1678,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         _testTimeout = true;
         new WebDriverWait(getDriver(), millis / 1000)
+                .ignoring(WebDriverException.class)
                 .withMessage("waiting for browser to navigate")
                 .until(ExpectedConditions.stalenessOf(toBeStale));
         waitForOnReady("jQuery");
