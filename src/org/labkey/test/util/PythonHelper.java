@@ -16,6 +16,7 @@ package org.labkey.test.util;
  * limitations under the License.
  */
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -31,17 +32,43 @@ import java.util.regex.Pattern;
 public class PythonHelper
 {
     private String pythonHomeEnv = "PYTHON_HOME";
-    BaseWebDriverTest _test;
-    File pythonExecutable = null;
+    private final BaseWebDriverTest _test;
+    private File pythonExecutable = null;
 
     public PythonHelper(BaseWebDriverTest test)
     {
         _test = test;
     }
 
+    public void selectPython2()
+    {
+        setPythonHomeEnv("PYTHON2_HOME");
+    }
+
+    public void selectPython3()
+    {
+        setPythonHomeEnv("PYTHON3_HOME");
+    }
+
     public void setPythonHomeEnv(String pythonHomeEnv)
     {
-        this.pythonHomeEnv = pythonHomeEnv;
+        if (!this.pythonHomeEnv.equals(pythonHomeEnv))
+        {
+            this.pythonHomeEnv = pythonHomeEnv;
+            pythonExecutable = null;
+        }
+    }
+
+    public String executePythonScript(File scriptFile, String... args)
+    {
+        try
+        {
+            return TestFileUtils.getProcessOutput(getPythonExecutable(), ArrayUtils.addAll(new String[]{scriptFile.getAbsolutePath()}, args));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @LogMethod

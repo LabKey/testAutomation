@@ -221,8 +221,11 @@ public abstract class TestFileUtils
         pb.redirectErrorStream(true);
         Process p = pb.start();
 
-        // Different platforms output version info differently; just combine all std/err output
-        return StringUtils.trim(getStreamContentsAsString(p.getInputStream()));
+        try (InputStream inputStream = p.getInputStream())
+        {
+            // Different platforms output version info differently; just combine all std/err output
+            return StringUtils.trim(getStreamContentsAsString(inputStream));
+        }
     }
 
     public static File getTestTempDir()
