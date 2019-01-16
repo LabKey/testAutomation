@@ -13,8 +13,13 @@ project.dependencies {
     // 36184: Tests can't find selenium-ie-driver library when running on Windows on TeamCity
     // Workaround to ensure that the class-loader finds InternetExplorerDriver
     compile "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
-    
 }
+
+String schemasProjectPath = BuildUtils.getProjectPath(gradle, "schemasProjectPath", ":schemas")
+if (project.findProject(schemasProjectPath) != null)
+    BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: schemasProjectPath, depVersion: project.labkeyVersion)
+BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getProjectPath(gradle, "apiProjectPath", ":server:api"), depVersion: project.labkeyVersion)
+BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getProjectPath(gradle, "remoteApiProjectPath", ":remoteapi:java"), depVersion: project.labkeyVersion)
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 {
