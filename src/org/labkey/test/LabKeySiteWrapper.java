@@ -171,22 +171,18 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
-     * Just hit the logout action to sign out or stop impersonating
+     * Call the LogoutApi to sign out
      */
     public void simpleSignOut()
     {
-        beginAt(buildURL("login", "logout"));
+        signOutHTTP();
+        goToHome();
     }
 
     @LogMethod
     public void signOut(@Nullable String termsText)
     {
         log("Signing out");
-        if (isImpersonating())
-        {
-            simpleSignOut(); // LogoutAction will stop impersonation and we can't always count on SiteNavBar being present when this is called
-            acceptTermsOfUse(termsText, true);
-        }
         simpleSignOut();
         acceptTermsOfUse(termsText, true);
         waitForElement(Locators.signInLink);
@@ -231,7 +227,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (!onLabKeyPage() || isOnServerErrorPage())
             goToHome();
         if (isImpersonating())
-            simpleSignOut();
+            stopImpersonating(false);
         if (!isSignedInAsPrimaryTestUser())
         {
             if (isSignedIn())
@@ -488,7 +484,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (!isSignedIn())
             simpleSignIn();
         else if (!isUserSystemAdmin() && isImpersonating())
-            simpleSignOut();
+            stopImpersonating(false);
         Locator projectMenu = ProjectMenu.Locators.menuProjectNav;
         if (!isElementPresent(projectMenu))
         {
