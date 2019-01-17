@@ -43,6 +43,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.UnitTests;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
+import org.labkey.test.util.LogMethod;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -115,6 +116,7 @@ public class JUnitTest extends TestSuite
     }
 
     // Use WebDriver to ensure we're upgraded
+    @LogMethod
     private static void upgradeHelper()
     {
         // TODO: remove upgrade helper from JUnitTest and run before suite starts.
@@ -221,8 +223,19 @@ public class JUnitTest extends TestSuite
                         catch (Throwable t)
                         {
                             upgradeError = t;
+                            t.printStackTrace();
                         }
-                        TestSuite testSuite = _suite(accept, attempt + 1, true);
+                        TestSuite testSuite;
+                        try
+                        {
+                            testSuite = _suite(accept, attempt + 1, true);
+                        }
+                        catch (Exception retryException)
+                        {
+                            retryException.printStackTrace();
+                            testSuite = new TestSuite();
+                            testSuite.addTest(new Runner.ErrorTest("", retryException));
+                        }
 
                         if (upgradeError != null)
                         {
