@@ -94,14 +94,14 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     {
         selectUpload();
         setUploadFileLocation(filePath);
-        click(elementCache().submitBtn);
+        elementCache().submitBtn.click();
     }
 
     public void pasteData(String tsv,boolean expectSuccess, String error)
     {
         selectCopyPaste();
         setText(tsv);
-        click(elementCache().submitBtn);
+        elementCache().submitBtn.click();
     }
 
     public void submit()

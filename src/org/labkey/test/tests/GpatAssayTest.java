@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -28,14 +29,17 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({Assays.class, DailyB.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -48,12 +52,24 @@ public class GpatAssayTest extends BaseWebDriverTest
     private static final String ALIASED_ASSAY_2 = "trial01columns2.tsv";
     private static final String ALIASED_ASSAY_3 = "trial01columns3.tsv";
     private static final String ALIASED_ASSAY_4 = "trial01columns4.tsv";
-    private static final String GPAT_ASSAY_FNA = "trial03.fna";
+    private static final String GPAT_ASSAY_FNA_1 = "trial03.fna";
+    private static final String GPAT_ASSAY_FNA_2 = "trial04.fna";
     private static final String ASSAY_NAME_XLS = "XLS Assay " + TRICKY_CHARACTERS;
     private static final String ASSAY_NAME_XLSX = "XLSX Assay";
     private static final String ASSAY_NAME_TSV = "TSV Assay";
     private static final String ASSAY_NAME_FNA = "FASTA Assay";
+    private static final String ASSAY_NAME_FNA_MULTIPLE = "FASTA Assay - Multiple file upload";
 
+    @BeforeClass
+    public static void doSetup()
+    {
+        GpatAssayTest init = (GpatAssayTest) getCurrentTest();
+        init._containerHelper.createProject(init.getProjectName(), "Assay");
+        PortalHelper portalHelper = new PortalHelper(init.getDriver());
+        portalHelper.addWebPart("Pipeline Files");
+        init.setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/GPAT");
+        init.goToProjectHome();
+    }
 
     @Override
     public List<String> getAssociatedModules()
@@ -82,12 +98,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
-        _containerHelper.createProject(getProjectName(), "Assay");
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Pipeline Files");
-        setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/GPAT");
-        clickProject(getProjectName());
-
+        goToProjectHome();
         log("Import XLS GPAT assay");
         _fileBrowserHelper.importFile(GPAT_ASSAY_XLS, "Create New General Assay Design");
         waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
@@ -236,23 +247,78 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertEquals("date", getFormElement(Locator.name("Date")));
         clickButton("Cancel");
 
-        log("Import FASTA GPAT assay");
-        clickProject(getProjectName());
-        _fileBrowserHelper.importFile(GPAT_ASSAY_FNA, "Create New General Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
-        setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_FNA);
-        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
-
-        clickButton("Begin import");
-        clickButton("Next", defaultWaitForPage);
-        clickButton("Save and Finish", defaultWaitForPage);
-        waitAndClick(Locator.linkWithText(GPAT_ASSAY_FNA));
-
+        importFastaGpatAssay(GPAT_ASSAY_FNA_1, ASSAY_NAME_FNA);
+        log("Verify data after the GPAT assay upload");
+        clickAndWait(Locator.linkWithText(GPAT_ASSAY_FNA_1));
         waitForText("Sequence");
         assertTextPresent(
                 "Header", "HCJDRSZ07IVO6P", "HCJDRSZ07IL1GX", "HCJDRSZ07H5SPZ",
                 "CACCAGACAGGTGTTATGGTGTGTGCCTGTAATCCCAGCTACTTGGGAGGGAGCTCAGGT");
     }
+
+    private void importFastaGpatAssay(String fileName, String assayName)
+    {
+        log("Import FASTA GPAT assay");
+        goToProjectHome();
+        _fileBrowserHelper.importFile(fileName, "Create New General Assay Design");
+        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
+        setFormElement(Locator.name("AssayDesignerName"), assayName);
+        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
+
+        clickButton("Begin import");
+        clickButton("Next", defaultWaitForPage);
+        clickButton("Save and Finish", defaultWaitForPage);
+    }
+
+    @Test
+    public void testMultipleFileUploadInAssayRun()
+    {
+        String path1 = "/sampledata/GPAT/trial01a.xlsx";
+        String path2 = "/sampledata/GPAT/trial01b.xlsx";
+        String path3 = "/sampledata/GPAT/trial01c.xlsx";
+        String fileName = "trial01a";
+
+        importFastaGpatAssay(GPAT_ASSAY_FNA_2, ASSAY_NAME_FNA_MULTIPLE);
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(ASSAY_NAME_FNA_MULTIPLE));
+        clickButton("Import Data");
+        clickButton("Next");
+
+        log("Check radio button for multiple upload");
+        checkRadioButton(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
+
+        uploadAssayFile(path1, 0);
+        addNewFile();
+        uploadAssayFile(path2, 1);
+        addNewFile();
+        uploadAssayFile(path3, 2);
+
+        clickButton("Save and Finish");
+
+        log("Verifying the upload");
+        clickAndWait(Locator.linkContainingText(fileName));
+        DataRegionTable table = new DataRegionTable("Data", getDriver());
+        table.assertPaginationText(1, 100, 603);
+
+    }
+
+    private void uploadAssayFile(String path, int fileNumber)
+    {
+        log("Upload the file" + path);
+        File guavaFile = new File(TestFileUtils.getLabKeyRoot() + path);
+        String fileLoc = "__primaryFile__";
+        if (fileNumber > 0)
+            fileLoc += fileNumber;
+        assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
+        setFormElement(Locator.name(fileLoc), guavaFile);
+    }
+
+    private void addNewFile()
+    {
+        log("Clicking +  to add new file");
+        click(Locator.xpath("//a[contains(@class, 'labkey-file-add-icon-enabled')]"));
+    }
+
 
     private void waitForGwtDialog(String caption)
     {
