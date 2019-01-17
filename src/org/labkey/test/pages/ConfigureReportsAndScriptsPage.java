@@ -77,6 +77,8 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         if (_ext4Helper.isChecked(defaultCheckbox))
         {
             log(engineName + " is already the site default engine");
+            click(Locator.linkWithText("Cancel"));
+            _ext4Helper.waitForMaskToDisappear();
             return;
         }
         log("Change site default engine to " + engineName);
@@ -158,39 +160,6 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         }
     }
 
-    @LogMethod
-    public void deleteAllREngines(boolean sandboxed)
-    {
-        WebElement engineRow = selectFirstREngine(sandboxed);
-        WebElement defaultR = null;
-
-        while (engineRow != null)
-        {
-            if (engineRow.getText().contains("default : true"))
-            {
-                defaultR = engineRow;
-                List<WebElement> elements = getREngineLoc(sandboxed).findElements(getDriver());
-                if (elements.size() < 2)
-                {
-                    engineRow = null;
-                }
-                else
-                {
-                    engineRow = elements.get(1);
-                }
-            }
-            else
-            {
-                deleteSelectedEngine(engineRow);
-                engineRow = selectFirstREngine(sandboxed);
-            }
-        }
-
-        // delete default engine last
-        if (defaultR != null)
-            deleteSelectedEngine(defaultR);
-    }
-
     public void deleteAllDockerEngines()
     {
         List<String> dockerEngineNames = new ArrayList<>();
@@ -223,21 +192,37 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
             deleteEngine(defaultDockerR);
     }
 
-    public void deleteAllNonSandboxedREngines()
-    {
-        deleteAllREngines(false);
-    }
-
-    public void deleteAllSandboxedREngines()
-    {
-        deleteAllREngines(true);
-    }
-
     @LogMethod
     public void deleteAllREngines()
     {
-        deleteAllNonSandboxedREngines();
-        deleteAllSandboxedREngines();
+        WebElement engineRow = selectFirstREngine();
+        WebElement defaultR = null;
+
+        while (engineRow != null)
+        {
+            if (engineRow.getText().contains("default : true"))
+            {
+                defaultR = engineRow;
+                List<WebElement> elements = Locators.enginesGridRowForLanguage("R").findElements(getDriver());
+                if (elements.size() < 2)
+                {
+                    engineRow = null;
+                }
+                else
+                {
+                    engineRow = elements.get(1);
+                }
+            }
+            else
+            {
+                deleteSelectedEngine(engineRow);
+                engineRow = selectFirstREngine();
+            }
+        }
+
+        // delete default engine last
+        if (defaultR != null)
+            deleteSelectedEngine(defaultR);
     }
 
     @LogMethod(quiet = true)
@@ -265,7 +250,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         clickButton("Yes", 0);
         waitForElementToDisappear(Locators.enginesGridRowForName(engineName));
         waitForEnginesGrid();
-        sleep(2000); //wait for store and view update
+        sleep(5000); //wait for store and view update
     }
 
     private WebElement selectEngineNamed(String engineName)
@@ -278,9 +263,9 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     }
 
     @Nullable
-    private WebElement selectFirstREngine(boolean sandboxed)
+    private WebElement selectFirstREngine()
     {
-        Locator engineLoc = getREngineLoc(sandboxed);
+        Locator engineLoc = Locators.enginesGridRowForLanguage("R");
         WebElement engineRow = engineLoc.findElementOrNull(getDriver());
         if (engineRow != null)
             engineRow.click();

@@ -230,8 +230,6 @@ public class RReportHelper
         }
         else
         {
-            scripts.deleteAllDockerEngines();
-
             _test.refresh(); // Avoid menu alignment issue on TeamCity
 
             if (scripts.isEnginePresent(localEngineName))
@@ -243,6 +241,7 @@ public class RReportHelper
                     TestLogger.log(localEngineName + " is already configured using: " + rExecutable.getAbsolutePath());
                     rVersion = getRVersion(rExecutable);
                     _test.clickButton("Cancel", 0);
+                    scripts.setSiteDefault(localEngineName);
                     return rVersion;
                 }
                 else // Reset R scripting engine on TeamCity
@@ -257,6 +256,7 @@ public class RReportHelper
             EngineConfig config = new EngineConfig(getRExecutable());
             config.setVersion(rVersion);
             scripts.addEngine(EngineType.R, config);
+            scripts.setSiteDefault(localEngineName);
         }
         return rVersion;
     }

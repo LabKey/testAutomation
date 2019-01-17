@@ -40,6 +40,9 @@ public class RConfigTest extends BaseWebDriverTest
     private String SECONDARY_ENGINE_NAME = "R Scripting Engine 2";
     private String DISABLED_ENGINE_NAME = "Disabled Engine";
 
+    private static final String DEFAULT_PARENT_LABEL = "Reports : R Scripting Engine\nPipeline Jobs : R Scripting Engine";
+    private static final String SECONDARY_PARENT_LABEL = "Reports : R Scripting Engine 2\nPipeline Jobs : R Scripting Engine 2";
+
     private String FOLDER_NAME = "subfolder";
 
     private RReportHelper _RReportHelper = new RReportHelper(this);
@@ -76,10 +79,7 @@ public class RConfigTest extends BaseWebDriverTest
 
         EngineConfig config = new EngineConfig(_RReportHelper.getRExecutable());
 
-        if (!scripts.isEnginePresent(DEFAULT_ENGINE_NAME))
-        {
-            _RReportHelper.ensureRConfig(false);
-        }
+        _RReportHelper.ensureRConfig(false);
 
         if (!scripts.isEnginePresent(SECONDARY_ENGINE_NAME))
         {
@@ -121,7 +121,7 @@ public class RConfigTest extends BaseWebDriverTest
         goToFolderManagement().goToRConfigTab();
 
         log("Verify folder is inheriting the correct parent R configuration");
-        Assert.assertEquals("Folder is not inheriting the correct parent R configuration", DEFAULT_ENGINE_NAME, getText(Locator.id("parentConfig")));
+        Assert.assertEquals("Folder is not inheriting the correct parent R configuration",DEFAULT_PARENT_LABEL, getText(Locator.id("parentConfigLabel")));
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue("overrideDefault", "parent"));
         assertAttributeContains(Locator.id("saveBtn"), "class", "labkey-disabled-button");
 
@@ -132,8 +132,9 @@ public class RConfigTest extends BaseWebDriverTest
 
         log("Set folder level R configuration override");
         checkRadioButton(Locator.radioButtonByNameAndValue("overrideDefault", "override"));
-        assertAttributeContains(Locator.id("saveBtn"), "class", "labkey-disabled-button");
-        selectOptionByText(Locator.name("engineRowId"), SECONDARY_ENGINE_NAME);
+        assertAttributeNotContains(Locator.id("saveBtn"), "class", "labkey-disabled-button");
+        selectOptionByText(Locator.name("reportEngine"), SECONDARY_ENGINE_NAME);
+        selectOptionByText(Locator.name("pipelineEngine"), SECONDARY_ENGINE_NAME);
         assertAttributeNotContains(Locator.id("saveBtn"), "class", "labkey-disabled-button");
         clickButton("Save", "Override Default R Configuration");
         clickButton("Yes");
@@ -141,7 +142,7 @@ public class RConfigTest extends BaseWebDriverTest
         log("Verify subfolder is inheriting the correct parent R configuration");
         navigateToFolder(getProjectName(), FOLDER_NAME);
         goToFolderManagement().goToRConfigTab();
-        Assert.assertEquals("Subfolder is not inheriting the correct parent R configuration", SECONDARY_ENGINE_NAME, getText(Locator.id("parentConfig")));
+        Assert.assertEquals("Subfolder is not inheriting the correct parent R configuration", SECONDARY_PARENT_LABEL, getText(Locator.id("parentConfigLabel")));
     }
 
     @Test
@@ -175,7 +176,7 @@ public class RConfigTest extends BaseWebDriverTest
         log("Verify site default has switched in folder management page");
         goToProjectHome();
         goToFolderManagement().goToRConfigTab();
-        Assert.assertEquals("Folder is not inheriting the correct parent R configuration", SECONDARY_ENGINE_NAME, getText(Locator.id("parentConfig")));
+        Assert.assertEquals("Folder is not inheriting the correct parent R configuration", SECONDARY_PARENT_LABEL, getText(Locator.id("parentConfigLabel")));
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue("overrideDefault", "parent"));
     }
 
