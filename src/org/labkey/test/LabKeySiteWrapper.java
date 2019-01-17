@@ -25,6 +25,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
@@ -821,14 +822,23 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     .setRedirectStrategy(redirectStrategy) /* Clear cookies so that we don't actually log out */
                     .setDefaultCookieStore(null).build())
             {
-                method = new HttpPost(getBaseURL() + "/login/logout.view");
                 List<NameValuePair> args = new ArrayList<>();
                 args.add(new BasicNameValuePair("login", PasswordUtil.getUsername()));
                 args.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
-                ((HttpPost) method).setEntity(new UrlEncodedFormEntity(args));
-                response = redirectClient.execute(method, WebTestHelper.getBasicHttpContext());
+
+                // Login to get CSRF token
+                HttpUriRequest loginMethod = new HttpPost(getBaseURL() + "/login/loginApi.view");
+                ((HttpPost) loginMethod).setEntity(new UrlEncodedFormEntity(args));
+                HttpClientContext httpContext = WebTestHelper.getBasicHttpContext();
+                response = redirectClient.execute(loginMethod, httpContext);
                 status = response.getStatusLine().getStatusCode();
-                assertEquals("Unexpected response", HttpStatus.SC_OK, status);
+                assertEquals("Unexpected response to login", HttpStatus.SC_OK, status);
+
+                // Logout to verify redirect
+                HttpUriRequest logoutMethod = new HttpPost(getBaseURL() + "/login/logout.view");
+                response = redirectClient.execute(logoutMethod, httpContext);
+                status = response.getStatusLine().getStatusCode();
+                assertEquals("Unexpected response to logout", HttpStatus.SC_OK, status);
                 // TODO: check login, once http-equiv redirect is sorted out
                 assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             }
