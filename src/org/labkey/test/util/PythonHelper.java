@@ -17,6 +17,8 @@ package org.labkey.test.util;
  */
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -26,37 +28,18 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PythonHelper
 {
-    private String pythonHomeEnv = "PYTHON_HOME";
     private final BaseWebDriverTest _test;
     private File pythonExecutable = null;
 
     public PythonHelper(BaseWebDriverTest test)
     {
         _test = test;
-    }
-
-    public void selectPython2()
-    {
-        setPythonHomeEnv("PYTHON2_HOME");
-    }
-
-    public void selectPython3()
-    {
-        setPythonHomeEnv("PYTHON3_HOME");
-    }
-
-    public void setPythonHomeEnv(String pythonHomeEnv)
-    {
-        if (!this.pythonHomeEnv.equals(pythonHomeEnv))
-        {
-            this.pythonHomeEnv = pythonHomeEnv;
-            pythonExecutable = null;
-        }
     }
 
     public String executePythonScript(File scriptFile, String... args)
@@ -74,19 +57,18 @@ public class PythonHelper
     @LogMethod
     public String ensurePythonConfig()
     {
-        _test.log("Check if Python already is configured");
-
         ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
         String defaultScriptName = "Python Scripting Engine";
         if (scripts.isEnginePresent("Python"))
         {
-            _test.log("Python engine already configured");
+            TestLogger.log("Python engine already configured");
             if (!TestProperties.isTestRunningOnTeamCity())
             {
                 scripts.editEngine(defaultScriptName);
                 pythonExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath-inputEl")));
-                return getPythonVersion(pythonExecutable);
+                TestLogger.log("Using existing Python engine: " + pythonExecutable.getAbsolutePath());
+                return assertPythonVersion(pythonExecutable);
             }
             else // Reset Python scripting engine on TeamCity
                 scripts.deleteEngine(defaultScriptName);
@@ -103,23 +85,36 @@ public class PythonHelper
         return pythonVersion;
     }
 
-    private File getPythonExecutable()
+    protected String getVersionPrefix()
     {
-        if (pythonExecutable != null)
-            return pythonExecutable;
+        return "2.";
+    }
 
+    protected String getPythonHome()
+    {
+        return "PYTHON_HOME";
+    }
+
+    protected String getPythonExeName()
+    {
+        return "python";
+    }
+
+    private String assertPythonVersion(File pythonExecutable)
+    {
+        String pythonVersion = getPythonVersion(pythonExecutable);
+        Assert.assertThat("Unwanted Python version: " + pythonExecutable.getAbsolutePath() + "\nSet '" + getPythonHome() + "' to the bin directory of the required version", pythonVersion, CoreMatchers.startsWith(getVersionPrefix()));
+        return pythonVersion;
+    }
+
+    private File getPythonExecutable(String pythonHomeEnv)
+    {
         String pythonHome = System.getenv(pythonHomeEnv);
         if (pythonHome != null)
         {
             _test.log(pythonHomeEnv + " is set to: " + pythonHome + " searching for the Python application");
             File pythonHomeDir = new File(pythonHome);
-            FileFilter pythonFilenameFilter = new FileFilter()
-            {
-                public boolean accept(File file)
-                {
-                    return ("python.exe".equalsIgnoreCase(file.getName()) || "python".equalsIgnoreCase(file.getName())) && file.canExecute();
-                }
-            };
+            FileFilter pythonFilenameFilter = file -> Arrays.asList(getPythonExeName() + ".exe", getPythonExeName()).contains(file.getName().toLowerCase()) && file.canExecute();
             File[] files = pythonHomeDir.listFiles(pythonFilenameFilter);
 
             if (files == null || files.length == 0)
@@ -144,15 +139,24 @@ public class PythonHelper
                 }
             }
         }
+        return null;
+    }
 
-        _test.log("Environment info: " + System.getenv());
-
-        if (null == pythonHome)
+    public final File getPythonExecutable()
+    {
+        if (pythonExecutable == null)
         {
-            _test.log("");   // Blank line helps make the following message more readable
-            _test.log(pythonHomeEnv + " environment variable is not set.  Set " + pythonHomeEnv + " to your Python bin directory to enable automatic configuration.");
+            pythonExecutable = getPythonExecutable(getPythonHome());
+            if (pythonExecutable == null)
+            {
+                _test.log("Environment info: " + System.getenv());
+                _test.log("");   // Blank line helps make the following message more readable
+                _test.log(getPythonHome() + " environment variable is not set correctly.  Set " + pythonExecutable + " to your Python bin directory to enable automatic configuration.");
+                throw new RuntimeException("Python is not configured on this system.");
+            }
+            assertPythonVersion(pythonExecutable);
         }
-        throw new RuntimeException("Python is not configured on this system.");
+        return pythonExecutable;
     }
 
     private String getPythonVersion(File python)

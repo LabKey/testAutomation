@@ -929,6 +929,7 @@ src/org/labkey/test/util/PipelineToolsHelper.java -text
 src/org/labkey/test/util/PortalHelper.java -text
 src/org/labkey/test/util/PostgresOnlyTest.java -text
 src/org/labkey/test/util/ProteinRegionTable.java -text
+src/org/labkey/test/util/Python3Helper.java -text
 src/org/labkey/test/util/PythonHelper.java -text
 src/org/labkey/test/util/QCAssayScriptHelper.java -text
 src/org/labkey/test/util/RReportHelper.java -text
