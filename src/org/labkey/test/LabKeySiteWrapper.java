@@ -629,6 +629,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             String upgradeText = "Please wait, this page will automatically update with progress information.";
             boolean performingUpgrade = isTextPresent(upgradeText);
 
+            RuntimeException redirectCheckError = null;
+
             if (performingUpgrade)
             {
                 try
@@ -637,7 +639,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 }
                 catch (IOException fail)
                 {
-                    throw new RuntimeException(fail);
+                    // Delay throwing failure so that upgrade can finish
+                    redirectCheckError = new RuntimeException(fail);
                 }
 
                 int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
@@ -714,6 +717,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             }
 
             checkErrors(); // Check for errors from bootstrap/upgrade
+
+            if (redirectCheckError != null)
+                throw redirectCheckError;
         }
     }
 
