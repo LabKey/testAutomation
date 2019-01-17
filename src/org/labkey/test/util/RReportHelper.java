@@ -263,41 +263,51 @@ public class RReportHelper
 
     public void ensureFolderREngine(String engineName)
     {
+        ensureFolderREngine(engineName, engineName);
+    }
+
+    public void ensureFolderREngine(String reportEngineName, String pipelineEngineName)
+    {
         _test.goToFolderManagement().goToRConfigTab();
         Locator inheritRadio = Locator.radioButtonByNameAndValue("overrideDefault", "parent");
         Locator overrideRadio = Locator.radioButtonByNameAndValue("overrideDefault", "override");
 
-        boolean isEngineSiteDefault = engineName.equals(_test.getText(Locator.id("parentConfig")));
+        if (_test.isChecked(inheritRadio))
+            _test.checkRadioButton(overrideRadio);
 
-        if (isEngineSiteDefault)
+        assertTrue(reportEngineName + " engine does not exist.", _test.isElementPresent(Locator.tagWithText("option", reportEngineName)));
+        assertTrue(pipelineEngineName + " engine does not exist.", _test.isElementPresent(Locator.tagWithText("option", pipelineEngineName)));
+
+        Locator overrideReportEngineSelect = Locator.name("reportEngine");
+        Locator overridePipelineEngineSelect = Locator.name("pipelineEngine");
+        boolean changed = false;
+        if (reportEngineName.equals(_test.getSelectedOptionText(overrideReportEngineSelect).trim()))
         {
-            if (_test.isChecked(inheritRadio))
-            {
-                _test.log(engineName + " site default engine is already inherited by folder");
-                return;
-            }
-            _test.log("Use site default engine " + engineName + " as folder's engine.");
-            _test.checkRadioButton(inheritRadio);
+            _test.log(reportEngineName + "engine is already selected as default Report engine for folder");
         }
         else
         {
-            if (_test.isChecked(inheritRadio))
-                _test.checkRadioButton(overrideRadio);
-
-            assertTrue(engineName + " engine does not exist.", _test.isElementPresent(Locator.tagWithText("option", engineName)));
-
-            Locator overrideEngineSelect = Locator.name("engineRowId");
-            if (engineName.equals(_test.getSelectedOptionText(overrideEngineSelect).trim()))
-            {
-                _test.log(engineName + "engine is already selected as default for folder");
-                return;
-            }
-            _test.log("Change folder's engine to " + engineName);
-            _test.selectOptionByText(overrideEngineSelect, engineName);
+            changed = true;
+            _test.log("Change folder's Report engine to " + reportEngineName);
+            _test.selectOptionByText(overrideReportEngineSelect, reportEngineName);
         }
 
-        _test.clickButton("Save", "Override Default R Configuration");
-        _test.clickButton("Yes");
+        if (pipelineEngineName.equals(_test.getSelectedOptionText(overridePipelineEngineSelect).trim()))
+        {
+            _test.log(pipelineEngineName + "engine is already selected as default Pipeline engine for folder");
+        }
+        else
+        {
+            changed = true;
+            _test.log("Change folder's Pipeline engine to " + pipelineEngineName);
+            _test.selectOptionByText(overridePipelineEngineSelect, pipelineEngineName);
+        }
+
+        if (changed)
+        {
+            _test.clickButton("Save", "Override Default R Configuration");
+            _test.clickButton("Yes");
+        }
     }
 
     public void resetFolderREngine()
