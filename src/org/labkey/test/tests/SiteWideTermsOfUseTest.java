@@ -234,9 +234,8 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
 
     protected void signOutWithSiteWideTerms(String termsText, boolean acceptTerms)
     {
-
         log("Signing out");
-        beginAt("/login/logout.view");
+        simpleSignOut();
 
         if (acceptTerms)
         {
