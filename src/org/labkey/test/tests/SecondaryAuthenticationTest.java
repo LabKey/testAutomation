@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -101,7 +102,7 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
             clickAndWait(Locator.input("TestSecondary"));
 
             //get current relative URL after Sign In
-            String relativeURLAfterSignIn = getCurrentRelativeURL();
+            String relativeURLAfterSignIn = StringUtils.stripEnd(getCurrentRelativeURL(), "?");
 
             //user should be redirected to the same URL they were on, before Sign In.
             assertEquals("After successful secondary authentication, user should be redirected to the same URL they were on before Sign In",
