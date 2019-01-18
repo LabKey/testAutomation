@@ -37,7 +37,6 @@ import org.junit.rules.Timeout;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
-import org.labkey.api.reader.TabLoader;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.junit.rules.TestWatcher;
 import org.labkey.remoteapi.Command;
@@ -2360,13 +2359,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         WebElement exportIcon = iconLoc.findElement(getDriver());
         mouseOver(chartLoc); // mouse over to make sure icon is visible
         return doAndWaitForDownload(exportIcon::click);
-    }
-
-    public List<Map<String, Object>> loadTsv(File tsv)
-    {
-        TabLoader loader = new TabLoader(tsv, true);
-        loader.setInferTypes(false);
-        return loader.load();
     }
 
     protected void flash(WebElement element)
