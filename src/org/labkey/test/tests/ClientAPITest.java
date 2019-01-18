@@ -657,7 +657,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         setSourceFromFile("maxRows.js");
         String paginationText = Locator.byClass("xtb-text").containing("Displaying")
-                .waitForElements(getDriver(), WAIT_FOR_JAVASCRIPT).get(2).getText();
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).getText();
         assertEquals("Wrong pagination for ext grid", "Displaying 1 - 2 of 6", paginationText);
         assertTextPresent("Janeson");
         assertTextNotPresent("Johnson");
