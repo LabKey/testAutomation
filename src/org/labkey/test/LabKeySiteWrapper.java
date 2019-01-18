@@ -26,6 +26,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
@@ -75,6 +76,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -828,25 +830,31 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     .setRedirectStrategy(redirectStrategy) /* Clear cookies so that we don't actually log out */
                     .setDefaultCookieStore(null).build())
             {
-                List<NameValuePair> args = new ArrayList<>();
-                args.add(new BasicNameValuePair("login", PasswordUtil.getUsername()));
-                args.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
+                List<NameValuePair> loginParams = new ArrayList<>();
+                loginParams.add(new BasicNameValuePair("email", PasswordUtil.getUsername()));
+                loginParams.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
 
                 // Login to get CSRF token
-                HttpUriRequest loginMethod = new HttpPost(getBaseURL() + "/login/loginApi.view");
-                ((HttpPost) loginMethod).setEntity(new UrlEncodedFormEntity(args));
+                HttpPost loginMethod = new HttpPost(getBaseURL() + "/login/loginApi.api");
+                loginMethod.setEntity(new UrlEncodedFormEntity(loginParams));
                 HttpClientContext httpContext = WebTestHelper.getBasicHttpContext();
                 response = redirectClient.execute(loginMethod, httpContext);
                 status = response.getStatusLine().getStatusCode();
-                assertEquals("Unexpected response to login", HttpStatus.SC_OK, status);
+                assertEquals("Unexpected response to login: \n" + TestFileUtils.getStreamContentsAsString(response.getEntity().getContent()), HttpStatus.SC_OK, status);
+                EntityUtils.consume(response.getEntity());
 
+                List<NameValuePair> logoutParams = new ArrayList<>();
+                Optional<Cookie> csrfToken = httpContext.getCookieStore().getCookies().stream().filter(c -> c.getName().equals("X-LABKEY-CSRF")).findAny();
+                csrfToken.ifPresent(cookie -> logoutParams.add(new BasicNameValuePair("X-LABKEY-CSRF", cookie.getValue())));
                 // Logout to verify redirect
-                HttpUriRequest logoutMethod = new HttpPost(getBaseURL() + "/login/logout.view");
+                HttpPost logoutMethod = new HttpPost(getBaseURL() + "/login/logout.view");
+                logoutMethod.setEntity(new UrlEncodedFormEntity(logoutParams));
                 response = redirectClient.execute(logoutMethod, httpContext);
                 status = response.getStatusLine().getStatusCode();
-                assertEquals("Unexpected response to logout", HttpStatus.SC_OK, status);
+                assertEquals("Unexpected response to logout: \n" + TestFileUtils.getStreamContentsAsString(response.getEntity().getContent()), HttpStatus.SC_OK, status);
                 // TODO: check login, once http-equiv redirect is sorted out
                 assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
+                EntityUtils.consume(response.getEntity());
             }
         }
         finally
