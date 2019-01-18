@@ -47,7 +47,7 @@ public abstract class BaseDesignerPage<EC extends BaseDesignerPage.ElementCache>
 
     protected void doAndExpectClean(Runnable func)
     {
-        if (!Boolean.valueOf(doAndWaitForPageSignal(func, DESIGNER_DIRTY_SIGNAL)))
+        if (!Boolean.valueOf(doAndWaitForRepeatedPageSignal(func, DESIGNER_DIRTY_SIGNAL)))
             return;
         waitForElement(Locators.pageSignal(DESIGNER_DIRTY_SIGNAL, "false"));
     }
