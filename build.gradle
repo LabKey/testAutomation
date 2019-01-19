@@ -15,11 +15,11 @@ project.dependencies {
     compile "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
 }
 
-String schemasProjectPath = BuildUtils.getProjectPath(gradle, "schemasProjectPath", ":schemas")
+String schemasProjectPath = BuildUtils.getSchemasProjectPath(gradle)
 if (project.findProject(schemasProjectPath) != null)
     BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: schemasProjectPath, depVersion: project.labkeyVersion)
-BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getProjectPath(gradle, "apiProjectPath", ":server:api"), depVersion: project.labkeyVersion)
-BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getProjectPath(gradle, "remoteApiProjectPath", ":remoteapi:java"), depVersion: project.labkeyVersion)
+BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getApiProjectPath(gradle), depVersion: project.labkeyVersion)
+BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle), depVersion: project.labkeyVersion)
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 {
