@@ -571,7 +571,7 @@ public class ParticipantReportTest extends ReportTest
         _ext4Helper.clickParticipantFilterGridRowText(SPECIMEN_GROUP_TWO, 0);
         waitForText("Found 1 enrolled mouse of 138.");
 
-        setFormElement(Locator.id("participantsDiv1.filter"), PTIDS_ONE[0]);
+        setFormElement(Locator.css(".lk-participants-list-table input[name=filter]"), PTIDS_ONE[0]);
         waitForText("No mouse IDs contain \"" + PTIDS_ONE[0] + "\".");
         _ext4Helper.selectAllParticipantFilter();
         waitForText("Found 1 enrolled mouse of 138.");
