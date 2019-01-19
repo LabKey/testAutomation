@@ -2542,9 +2542,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         Actions builder = new Actions(getDriver());
         builder.moveToElement(el)
                 // Add a little wiggle to make sure tooltips notice
-                .moveByOffset(5, 0)
-                .moveByOffset(-10, 0)
-                .moveByOffset(-5, 0)
+                .moveByOffset(2, 0)
+                .moveByOffset(-4, 0)
+                .moveByOffset(2, 0)
                 .perform();
     }
 
