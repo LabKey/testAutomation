@@ -1196,15 +1196,6 @@ public class ClientAPITest extends BaseWebDriverTest
         verifyAutocompletionResponse(cn, "security", "completeUser", true, false);
         verifyAutocompletionResponse(cn, "security", "completeUserRead", true, true);
         verifyAutocompletionResponse(cn, "announcements", "completeUser", true, true);
-        // Probably overkill to stop impersonating on the connection as it's about to go out of scope, but just to be safe...
-        try
-        {
-            new Command("login", "logout").execute(cn, "/" + getProjectName());
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException("Stop Impersonating error", e);
-        }
     }
 
     private Connection getConnection(boolean validPassword)

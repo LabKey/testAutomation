@@ -528,7 +528,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             }
             try
             {
-                SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("project", "home", "begin"));
+                String startPage = buildURL("project", "home", "start");
+                SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(startPage);
                 if (httpResponse.getResponseCode() >= 400)
                 {
                     log("Waiting for server: " + httpResponse.getResponseCode());
@@ -540,7 +541,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     log("Response: " + httpResponse.getResponseCode());
                 }
                 getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
-                getDriver().get(buildURL("login", "logout"));
+                getDriver().get(startPage);
 
                 try
                 {
