@@ -39,7 +39,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @Category({Assays.class, DailyB.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -273,9 +272,9 @@ public class GpatAssayTest extends BaseWebDriverTest
     @Test
     public void testMultipleFileUploadInAssayRun()
     {
-        String path1 = "/sampledata/GPAT/trial01a.xlsx";
-        String path2 = "/sampledata/GPAT/trial01b.xlsx";
-        String path3 = "/sampledata/GPAT/trial01c.xlsx";
+        File file1 = TestFileUtils.getSampleData("GPAT/trial01a.xlsx");
+        File file2 = TestFileUtils.getSampleData("GPAT/trial01b.xlsx");
+        File file3 = TestFileUtils.getSampleData("GPAT/trial01c.xlsx");
         String fileName = "trial01a";
 
         importFastaGpatAssay(GPAT_ASSAY_FNA_2, ASSAY_NAME_FNA_MULTIPLE);
@@ -287,11 +286,11 @@ public class GpatAssayTest extends BaseWebDriverTest
         log("Check radio button for multiple upload");
         checkRadioButton(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
 
-        uploadAssayFile(path1, 0);
+        uploadAssayFile(file1, 0);
         addNewFile();
-        uploadAssayFile(path2, 1);
+        uploadAssayFile(file2, 1);
         addNewFile();
-        uploadAssayFile(path3, 2);
+        uploadAssayFile(file3, 2);
 
         clickButton("Save and Finish");
 
@@ -302,14 +301,11 @@ public class GpatAssayTest extends BaseWebDriverTest
 
     }
 
-    private void uploadAssayFile(String path, int fileNumber)
+    private void uploadAssayFile(File guavaFile, int fileNumber)
     {
-        log("Upload the file" + path);
-        File guavaFile = new File(TestFileUtils.getLabKeyRoot() + path);
         String fileLoc = "__primaryFile__";
         if (fileNumber > 0)
             fileLoc += fileNumber;
-        assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
         setFormElement(Locator.name(fileLoc), guavaFile);
     }
 
