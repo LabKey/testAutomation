@@ -96,7 +96,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     public enum Visibility
     {
-        ParentFolder, // an only see log events in parent
+        ParentFolder, // can only see log events in parent
         ChildFolder, // can only see log event in children
         All, // can see all events
         None // can see no events
