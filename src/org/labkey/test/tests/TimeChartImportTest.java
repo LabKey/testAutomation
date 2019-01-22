@@ -54,7 +54,6 @@ public class TimeChartImportTest extends StudyBaseTest
 {
     private static final File MULTI_FOLDER_ZIP = TestFileUtils.getSampleData("studies/TimeChartTesting.folder.zip");
     private static final String EXPORT_TEST_FOLDER = "exportTestFolder";
-    private static ArrayList<TimeChartInfo> EXPORTED_CHARTS;
     private static final String DATE_STUDY_FOLDER_NAME = "Date Based Study";
     private static ArrayList<TimeChartInfo> DATE_CHARTS;
     private static final String VISIT_STUDY_FOLDER_NAME = "Visit Based Study";
@@ -64,7 +63,6 @@ public class TimeChartImportTest extends StudyBaseTest
     public static void doSetup() throws Exception
     {
         TimeChartImportTest initTest = (TimeChartImportTest)getCurrentTest();
-
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest.importFolderFromZip(MULTI_FOLDER_ZIP);
         initTest._containerHelper.createSubfolder(initTest.getProjectName(), EXPORT_TEST_FOLDER, "Collaboration");
@@ -82,16 +80,8 @@ public class TimeChartImportTest extends StudyBaseTest
 
     private void populateChartConfigs()
     {
-        EXPORTED_CHARTS = new ArrayList<>();
         VISIT_CHARTS = new ArrayList<>();
         DATE_CHARTS = new ArrayList<>();
-
-        EXPORTED_CHARTS.add(new TimeChartInfo(
-                "One Measure: visit based plot per participant", 17, 47, false,
-                new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n32.0\n32.5\n33.0\n33.5\n34.0\n34.5\n35.0\n35.5\n36.0\n36.5\n37.0\nAbbr Phy Exam\n999320016\nVisit Label\nTemperature: body\n999320016"
-                }
-        ));
 
         VISIT_CHARTS.add(new TimeChartInfo(
                 "One Measure: visit based plot per participant", 17, 47, false,
@@ -254,7 +244,6 @@ public class TimeChartImportTest extends StudyBaseTest
         PortalHelper portalHelper = new PortalHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
 
-        // TODO: this test does not test the d3 renderer for exported charts. We should fix this.
         log("Export Time Chart as Script and paste into Wiki");
         goToProjectHome();
         clickFolder(VISIT_STUDY_FOLDER_NAME);
@@ -274,7 +263,23 @@ public class TimeChartImportTest extends StudyBaseTest
         wikiHelper.setWikiBody(exportScript);
         wikiHelper.saveWikiPage();
 
-        verifyTimeChartInfo(EXPORTED_CHARTS.get(0), false);
+        TimeChartInfo exportedChartInfo = new TimeChartInfo("timeChartExportTest", info.getCountSVGs(), info.getGridCount(), false,
+            new String[]{"1 week Post-V#1\n1 week Post-V#1\n1 week Post-V#1\n1 week Post-V#1\n"
+                    + "Int. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n"
+                    + "Grp1:F/U/Grp2:V#2\nGrp1:F/U/Grp2:V#2\nGrp1:F/U/Grp2:V#2\nGrp1:F/U/Grp2:V#2\n"
+                    + "G1: 6wk/G2: 2wk\nG1: 6wk/G2: 2wk\nG1: 6wk/G2: 2wk\nG1: 6wk/G2: 2wk\n"
+                    + "6 week Post-V#2\n6 week Post-V#2\n6 week Post-V#2\n6 week Post-V#2\n"
+                    + "G1: V#2/G2: V#3\nG1: V#2/G2: V#3\nG1: V#2/G2: V#3\nG1: V#2/G2: V#3\n"
+                    + "Int. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n"
+                    + "Int. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n"
+                    + "6 wk Post-V#2/V#3\n6 wk Post-V#2/V#3\n6 wk Post-V#2/V#3\n6 wk Post-V#2/V#3\n"
+                    + "32.0\n32.5\n33.0\n33.5\n34.0\n34.5\n35.0\n35.5\n36.0\n36.5\n37.0\n"
+                    + "Abbr Phy Exam\n999320016\nVisit Label\nTemperature: body\n"
+                    + "999320016,\n1weekPost-V#1,\n2.BodyTemp:37.1\n"
+                    + "999320016,\n2weekPost-V#1,\n2.BodyTemp:36\n"
+                    + "999320016,\nInt.Vis.%{S.1.1}.%{S.2.1},2.BodyTemp:32\n"
+                    + "999320016"});
+        verifyTimeChartInfo(exportedChartInfo, false);
     }
 
     private String getExportScript()
