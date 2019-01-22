@@ -49,6 +49,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({DailyA.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -168,6 +169,140 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.id("name"), samplesetName);
         setFormElement(Locator.name("data"), sampleText);
         clickButton("Submit");
+    }
+
+    @Test
+    public void testCreateSampleSetNoExpression()
+    {
+        String sampleSetName = "SimpleCreateNoExp";
+        List<String> fieldNames = Arrays.asList("StringValue", "IntValue");
+        log("Create a new sample set with a name and no name expression");
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        click(Locator.tagWithClassContaining("i", "fa-plus"));
+        log("Verify the name field is required");
+        clickButton("Create");
+        assertTextPresent("You must supply a name for the sample set.");
+
+        setFormElement(Locator.id("name"), sampleSetName);
+        clickButton("Create");
+
+        log("Add fields to the sample set");
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").find();
+        fieldProperties.addField(new FieldDefinition(fieldNames.get(0)).setType(FieldDefinition.ColumnType.String));
+        fieldProperties.addField(new FieldDefinition(fieldNames.get(1)).setType(FieldDefinition.ColumnType.Integer));
+        clickButton("Save");
+
+        log("Go to the sample set and verify its fields");
+        click(Locator.linkWithText(sampleSetName));
+        List<String> names = getSampleSetFields();
+        for (String name : fieldNames)
+            assertTrue("'" + name + "' should be one of the fields", names.contains(name));
+
+        log("Add a single row to the sample set");
+//        Map<String, String> fieldMap =
+        DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents")
+                .clickInsertNewRow();
+        setFormElement(Locator.name("quf_Name"), "S-1");
+        setFormElement(Locator.name("quf_StringValue"), "Ess");
+        setFormElement(Locator.name("quf_IntValue"), "1");
+        clickButton("Submit");
+
+        log("Verify values were saved");
+        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        Map<String, String> rowData = drt.getRowDataAsMap(0);
+        assertEquals("Name not as expected", "S-1", rowData.get("Name"));
+        assertEquals(fieldNames.get(0) + " not as expected", "Ess", rowData.get(fieldNames.get(0)));
+        assertEquals(fieldNames.get(1) + "not as expected", "1", rowData.get(fieldNames.get(1)));
+
+        log ("Add multiple rows via simple (default) import mechanism");
+        drt.clickHeaderMenu("Insert data", "Simple bulk data import");
+        String text = "Name\t" + fieldNames.get(0) + "\t" + fieldNames.get(1) + "\n" +
+                "S-2\tTee\t2\n" +
+                "S-3\tEwe\t3";
+        setFormElement(Locator.name("text"), text);
+        clickButton("Submit");
+        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        assertEquals("Number of samples not as expected", 3, drt.getDataRowCount());
+
+        int index = drt.getRowIndex("Name", "S-2");
+        assertTrue("Should have row with second sample name", index >= 0);
+        rowData = drt.getRowDataAsMap(index);
+        assertEquals(fieldNames.get(0) + " for second sample not as expected", "Tee", rowData.get(fieldNames.get(0)));
+        assertEquals(fieldNames.get(1) + " for second sample not as expected", "2", rowData.get(fieldNames.get(1)));
+
+        log("Try to create a sample set with the same name.");
+        click(Locator.linkWithText("Sample Sets"));
+        click(Locator.tagWithClassContaining("i", "fa-plus"));
+        setFormElement(Locator.id("name"), sampleSetName);
+        clickButton("Create");
+        assertTextPresent("A sample set with that name already exists.");
+
+        clickButton("Cancel");
+        drt = DataRegion(this.getDriver()).find();
+        assertEquals("Data region should be sample sets listing", "SampleSet", drt.getDataRegionName());
+    }
+
+    @Test
+    public void testCreateSampleSetWithExpression()
+    {
+        String sampleSetName = "SimpleCreateWithExp";
+        List<String> fieldNames = Arrays.asList("StringValue", "FloatValue");
+
+        log("Create a new sample set with a name and name expression");
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        click(Locator.tagWithClassContaining("i", "fa-plus"));
+        setFormElement(Locator.id("name"), sampleSetName);
+        setFormElement(Locator.id("nameExpression"), "${" + fieldNames.get(0) + "}-${batchRandomId}-${randomId}");
+        clickButton("Create");
+
+        log("Add fields to the sample set");
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").find();
+        fieldProperties.addField(new FieldDefinition(fieldNames.get(0)).setType(FieldDefinition.ColumnType.String));
+        fieldProperties.addField(new FieldDefinition(fieldNames.get(1)).setType(FieldDefinition.ColumnType.Double));
+        clickButton("Save");
+
+        log("Go to the sample set and verify its fields");
+        click(Locator.linkWithText(sampleSetName));
+        List<String> names = getSampleSetFields();
+        for (String name : fieldNames)
+            assertTrue("'" + name + "' should be one of the fields", names.contains(name));
+
+        log("Add data without supplying the name");
+        DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents")
+                .clickInsertNewRow();
+        setFormElement(Locator.name("quf_" + fieldNames.get(0)), "Vee");
+        setFormElement(Locator.name("quf_" + fieldNames.get(1)), "1.6");
+        clickButton("Submit");
+
+        log("Verify values are as expected with name expression saved");
+        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        Map<String, String> rowData = drt.getRowDataAsMap(0);
+        assertTrue("Name not as expected", rowData.get("Name").startsWith("Vee-"));
+        assertEquals(fieldNames.get(0) + " not as expected", "Vee", rowData.get(fieldNames.get(0)));
+        assertEquals(fieldNames.get(1) + "not as expected", "1.6", rowData.get(fieldNames.get(1)));
+
+        log("Add data with name provided");
+        DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents")
+                .clickInsertNewRow();
+        setFormElement(Locator.name("quf_Name"), "NoExpression");
+        clickButton("Submit");
+        log("Verify values are as expected with name expression saved");
+        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        rowData = drt.getRowDataAsMap(0);
+        assertEquals("Name not as expected", "NoExpression", rowData.get("Name"));
+
+        log ("Add multiple rows via simple (default) import mechanism");
+        drt.clickHeaderMenu("Insert data", "Simple bulk data import");
+        String text = fieldNames.get(0) + "\t" + fieldNames.get(1) + "\n" +
+                "Dubya\t2.1\n" +
+                "Ex\t44.2";
+        setFormElement(Locator.name("text"), text);
+        clickButton("Submit");
+        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        assertEquals("Number of samples not as expected", 4, drt.getDataRowCount());
+
+        assertTrue("Should have row with first imported value", drt.getRowIndex(fieldNames.get(0), "Dubya") >= 0);
+        assertTrue("Should have row with second imported value", drt.getRowIndex(fieldNames.get(0), "Ex") >= 0);
     }
 
     @Test
@@ -434,6 +569,12 @@ public class SampleSetTest extends BaseWebDriverTest
         exportGridWithAttachment(3, 4, "experiment-1.xar.xml", "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx");
         deleteAttachmentColumn();
         exportGridWithAttachment(3, 4, "", "", "");
+    }
+
+    private List<String> getSampleSetFields()
+    {
+        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        return drt.getColumnNames();
     }
 
     private void insertNewWithFileAttachmentTest()
