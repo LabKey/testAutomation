@@ -62,7 +62,7 @@ public abstract class BaseDesignerPage<EC extends BaseDesignerPage.ElementCache>
 
     public LabKeyPage saveAndClose()
     {
-        mashButton("Save & Close");
+        clickButton("Save & Close");
         return null;
     }
 
