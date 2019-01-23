@@ -16,9 +16,9 @@ public class Python3Helper extends PythonHelper
     }
 
     @Override
-    protected String getPythonHome()
+    protected String getPythonExeEnv()
     {
-        return "PYTHON3_HOME";
+        return "PYTHON3";
     }
 
     @Override

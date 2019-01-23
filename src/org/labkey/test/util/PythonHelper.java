@@ -26,9 +26,7 @@ import org.labkey.test.TestProperties;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,9 +88,9 @@ public class PythonHelper
         return "2.";
     }
 
-    protected String getPythonHome()
+    protected String getPythonExeEnv()
     {
-        return "PYTHON_HOME";
+        return "PYTHON";
     }
 
     protected String getPythonExeName()
@@ -103,58 +101,35 @@ public class PythonHelper
     private String assertPythonVersion(File pythonExecutable)
     {
         String pythonVersion = getPythonVersion(pythonExecutable);
-        Assert.assertThat("Unwanted Python version: " + pythonExecutable.getAbsolutePath() + "\nSet '" + getPythonHome() + "' to the bin directory of the required version", pythonVersion, CoreMatchers.startsWith(getVersionPrefix()));
+        Assert.assertThat("Unwanted Python version: " + pythonExecutable.getAbsolutePath() + "\nSet '" + getPythonExeEnv() + "' environment variable to the appropriate python executable",
+                pythonVersion, CoreMatchers.startsWith(getVersionPrefix()));
         return pythonVersion;
-    }
-
-    private File getPythonExecutable(String pythonHomeEnv)
-    {
-        String pythonHome = System.getenv(pythonHomeEnv);
-        if (pythonHome != null)
-        {
-            _test.log(pythonHomeEnv + " is set to: " + pythonHome + " searching for the Python application");
-            File pythonHomeDir = new File(pythonHome);
-            FileFilter pythonFilenameFilter = file -> Arrays.asList(getPythonExeName() + ".exe", getPythonExeName()).contains(file.getName().toLowerCase()) && file.canExecute();
-            File[] files = pythonHomeDir.listFiles(pythonFilenameFilter);
-
-            if (files == null || files.length == 0)
-            {
-                files = new File(pythonHome, "bin").listFiles(pythonFilenameFilter);
-            }
-
-            if (files != null)
-            {
-                if (files.length == 1)
-                {
-                    pythonExecutable = files[0];
-                    return pythonExecutable;
-                }
-                else if (files.length > 1)
-                {
-                    _test.log("Found too many Python executables:");
-                    for (File file : files)
-                    {
-                        _test.log("\t" + file.getAbsolutePath());
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     public final File getPythonExecutable()
     {
         if (pythonExecutable == null)
         {
-            pythonExecutable = getPythonExecutable(getPythonHome());
-            if (pythonExecutable == null)
+            String exePath = System.getenv(getPythonExeEnv());
+            File exeFile;
+            if (exePath == null)
+                exeFile = new File("/usr/bin", getPythonExeName()); // Fallback to make it easier to run on Mac or Linux
+            else
+                exeFile = new File(exePath);
+
+            if (!exeFile.exists())
             {
-                _test.log("Environment info: " + System.getenv());
-                _test.log("");   // Blank line helps make the following message more readable
-                _test.log(getPythonHome() + " environment variable is not set correctly.  Set " + pythonExecutable + " to your Python bin directory to enable automatic configuration.");
-                throw new RuntimeException("Python is not configured on this system.");
+                TestLogger.log("Environment info: " + System.getenv());
+                TestLogger.log("");   // Blank line helps make the following message more readable
+                String message;
+                if (exePath == null)
+                    message = getPythonExeEnv() + " environment variable is not set. It should point at the appropriate python executable.";
+                else
+                    message = getPythonExeEnv() + "=" + exePath + ". File does not exist.";
+                throw new RuntimeException(message);
             }
-            assertPythonVersion(pythonExecutable);
+            assertPythonVersion(exeFile);
+            pythonExecutable = exeFile;
         }
         return pythonExecutable;
     }
