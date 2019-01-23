@@ -21,10 +21,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 
 @Category({DailyC.class, Reports.class})
@@ -107,44 +108,18 @@ public class ReportSecurityTest extends ReportTest
     @LogMethod
     protected void doReportSecurity()
     {
-        // Turn on experimental feature that adds back the "Create Chart View (deprecated)" menu item. See #33938.
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "ExperimentalDeprecatedChartView");
-        // Turn on experimental feature to use JFree instead of JS for chart view rendering.
-        // Conversion of chart view to new plot requires user having permission to underlying queryview, which the report user lacks.
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "ExperimentalRenderDeprecatedChartView");
+        final String CHART_NAME = "line chart";
 
-        // create charts
+        // create chart
         navigateToFolder(getProjectName(), getFolderName());
+        ChartTypeDialog chartTypeDialog = clickAddChart("study", "APX-1 (APX-1: Abbreviated Physical Exam)");
+        TimeChartWizard chartWizard = chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Line)
+                .setXAxis("1. Weight")
+                .setYAxis("4. Pulse")
+                .clickApply();
 
-        clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
-        DataRegionTable dt = new DataRegionTable("Dataset", getDriver());
-        dt.goToReport("Create Chart View (deprecated)");
-        waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
-        selectOptionByText(Locator.name("columnsX"), "1. Weight");
-        selectOptionByText(Locator.name("columnsY"), "4. Pulse");
-        fireEvent(Locator.name("columnsY"), SeleniumEvent.change);
-        checkCheckbox(Locator.name("participantChart"));
-        clickButton("Save", 0);
-        sleep(2000);
-
-        setFormElement(Locator.name("reportName"), "participant chart");
-        clickButton("OK", 0);
-
-        dt.goToView("default");
-        dt.goToReport("Create Chart View (deprecated)");
-        waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
-
-        // create a non-participant chart
-        selectOptionByText(Locator.name("columnsX"), "1. Weight");
-        selectOptionByText(Locator.name("columnsY"), "4. Pulse");
-        fireEvent(Locator.name("columnsY"), SeleniumEvent.change);
-        clickButton("Save", 0);
-        sleep(2000);
-
-        setFormElement(Locator.name("reportName"), "non participant chart");
-        setFormElement(Locator.name("description"), "a private chart");
-        checkCheckbox(Locator.checkboxByName("shareReport"));
-        clickButton("OK", 0);
+        chartWizard.saveReport(CHART_NAME);
+        waitForText(CHART_NAME);
 
         // create grid view
         clickFolder(getFolderName());
@@ -153,19 +128,15 @@ public class ReportSecurityTest extends ReportTest
         BootstrapMenu.find(getDriver(), "Add Report")
                 .clickSubMenu(true, "Grid View");
 
-        //clickAddReport("Grid View");
         setFormElement(Locator.name("label"), TEST_GRID_VIEW);
         selectOptionByText(Locator.id("datasetSelection"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create View");
-
-        // Re-hide "Create Chart View (deprecated)" menu item
-        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "ExperimentalDeprecatedChartView");
 
         // test security
         navigateToFolder(getProjectName(), "My Study");
 
         goToManageViews();
-        clickReportPermissionsLink("participant chart");
+        clickReportPermissionsLink(CHART_NAME);
         click(Locator.id("useCustom"));
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickButton("Save");
@@ -181,16 +152,15 @@ public class ReportSecurityTest extends ReportTest
         navigateToFolder(getProjectName(), "My Study");
 
         assertElementNotPresent(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
-        clickAndWait(Locator.linkWithText("participant chart"));
+        clickAndWait(Locator.linkWithText(CHART_NAME));
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(TEST_GRID_VIEW));
         assertTextPresent("999320016");
         pushLocation();
+        DataRegionTable dt = new DataRegionTable("Dataset", getDriver());
         dt.goToView("default");
         assertTextPresent("User does not have read permission on this dataset.");
         stopImpersonating();
-
-        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "ExperimentalRenderDeprecatedChartView");
     }
 }
