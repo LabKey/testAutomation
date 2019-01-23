@@ -97,6 +97,8 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         _containerHelper.createProject("AppAdminTestProject", "Collaboration");
         _containerHelper.deleteProject("AppAdminTestProject");
         assertEquals("Container AppAdminTestProject not deleted.", false, _containerHelper.doesContainerExist("AppAdminTestProject"));
+        goToHome();
+        stopImpersonating();
     }
 
     private ApiPermissionsHelper permissionsApiAsAppAdmin()
