@@ -579,7 +579,7 @@ public class ParticipantReportTest extends ReportTest
 
     private void expandReportFilterWindow()
     {
-        assertElementPresent(Locator.css(".report-filter-window.x4-collapsed"));
+        waitForElement(Locator.css(".report-filter-window.x4-collapsed"));
         WebElement expander = shortWait().until(ExpectedConditions
                 .elementToBeClickable(Locator.css(".report-filter-window .x4-tool-expand-right")));
         expander.click();
