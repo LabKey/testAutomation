@@ -64,8 +64,14 @@ public class TimeChartWizard extends LabKeyPage
 
     public TimeChartWizard doAndWaitForUpdate(Runnable runnable, WebDriverWait wait)
     {
-        WebElement svg = doAndWaitForElementToRefresh(runnable, Locator.tag("svg"), wait);
-        wait.until(LabKeyExpectedConditions.animationIsDone(svg));
+        WebElement svg = Locator.tag("svg").findElementOrNull(getDriver());
+        runnable.run();
+        if (svg != null)
+            wait.until(ExpectedConditions.stalenessOf(svg));
+        waitForReportRender();
+        svg = Locator.tag("svg").findElementOrNull(getDriver());
+        if (svg != null)
+            wait.until(LabKeyExpectedConditions.animationIsDone(svg));
         _ext4Helper.waitForMaskToDisappear();
         clearCache();
         return this;
@@ -210,7 +216,9 @@ public class TimeChartWizard extends LabKeyPage
 
     public TimeChartWizard clickEdit()
     {
-        doAndWaitForUpdate(() -> clickAndWait(Ext4Helper.Locators.ext4Button("Edit")));
+        WebElement editButton = Ext4Helper.Locators.ext4Button("Edit").findElement(getDriver());
+        doAndWaitForUpdate(() -> clickAndWait(editButton));
+        shortWait().until(ExpectedConditions.stalenessOf(editButton));
         return this;
     }
 
