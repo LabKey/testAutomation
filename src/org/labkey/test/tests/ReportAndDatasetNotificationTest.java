@@ -232,7 +232,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         waitAndClickAndWait(linkDetails);
         clickButton("Edit Report", "Update Link Report");
         setFormElement(Locator.name("linkUrl"), "http://www.labkey.org");
-        clickButton("Save");
+        mashButton("Save");
 
         clickTab("Clinical and Assay Data");
         waitForText("Tests");
@@ -244,7 +244,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         setFormElement(Locator.id("uploadFile-button-fileInputEl"), ATTACHMENT_REPORT2_FILE);
         Ext4FileFieldRef ref1 = Ext4FileFieldRef.create(this);
         ref1.setToFile(ATTACHMENT_REPORT2_FILE);
-        clickButton("Save");
+        mashButton("Save");
 
         // add content modified column
         clickTab("Clinical and Assay Data");
@@ -277,7 +277,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         openReport(R_NAME);
         waitAndClick(Ext4Helper.Locators.tab("Source"));
         _ext4Helper.checkCheckbox("Show source tab to all users");
-        clickButton("Save");
+        mashButton("Save");
 
         clickTab("Clinical and Assay Data");
         waitForText("Tests");
@@ -299,7 +299,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickAndWait(linkDetails);
         clickButton("Edit Report", "Update Link Report");
         _ext4Helper.checkCheckbox("Target:");
-        clickButton("Save");
+        mashButton("Save");
 
         clickTab("Clinical and Assay Data");
         waitForText("Tests");
@@ -311,7 +311,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickAndWait(linkDetails);
         clickButton("Edit Report", "Update Attachment Report");
         _ext4Helper.checkCheckbox("Shared:");
-        clickButton("Save");
+        mashButton("Save");
 
         clickTab("Clinical and Assay Data");
         openCustomizePanel("Data Views");
