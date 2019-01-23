@@ -80,6 +80,11 @@ public abstract class AbstractContainerHelper
         _createdProjects.add(projectName);
     }
 
+    public final void createProject(String projectName)
+    {
+        createProject(projectName, null);
+    }
+
     public final void createSubfolder(String parentPath, String folderName)
     {
         createSubfolder(parentPath, folderName, "None");
