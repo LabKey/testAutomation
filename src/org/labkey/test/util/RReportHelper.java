@@ -246,7 +246,7 @@ public class RReportHelper
                 }
                 else // Reset R scripting engine on TeamCity
                 {
-                    scripts.deleteEngine(localEngineName);
+                    scripts.deleteAllREngines();
                     _test.refresh(); // Avoid menu alignment issue on TeamCity
                 }
             }

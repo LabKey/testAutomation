@@ -82,6 +82,7 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
 
         // bring up the Reorder Reports popup
         waitAndClick(Locator.linkContainingText("Reorder Reports And Charts"));
+        waitForElementToDisappear(Locator.tagWithClass("div", "x4-masked-relative"));
         waitForElements(Locator.byClass("dvcategory"), categories.size());
 
         // use the ReorderReportsWindow component to reverse the order of the reports in each category
