@@ -16,7 +16,7 @@
 package org.labkey.test;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.labkey.api.reader.Readers;
+import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.TestLogger;
 
 import java.io.File;
