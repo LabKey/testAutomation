@@ -122,6 +122,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.junit.Assert.assertEquals;
@@ -3152,15 +3153,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
         fireEvent(el, SeleniumEvent.change);
     }
 
-    public void setFormElement(Locator loc, File file)
+    public void setInput(Locator loc, List<File> files)
     {
         WebElement el = loc.waitForElement(new WebDriverWait(getDriver(), 5));
-        setFormElement(el, file);
+        setInput(el, files);
     }
 
-    public void setFormElement(WebElement el, File file)
+    public void setInput(WebElement el, List<File> files)
     {
-        assertTrue("File not found: " + file.toString(), file.exists());
+        for (File file : files)
+            assertTrue("File not found: " + file.toString(), file.exists());
         String cssString = "";
         String styleString = "";
         if (!el.isDisplayed())
@@ -3173,7 +3175,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         executeScript("arguments[0].value = '';", el);
-        el.sendKeys(file.toPath().normalize().toAbsolutePath().toString());
+        List<String> filePaths = files.stream().map(File::getAbsolutePath).collect(Collectors.toList());
+        String fileNames = String.join("\n", filePaths);
+        log(fileNames);
+        el.sendKeys(fileNames);
 
         if (!cssString.isEmpty() || !styleString.isEmpty())
         {
@@ -3183,6 +3188,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             catch (StaleElementReferenceException ignore) {}
         }
+    }
+
+    public void setFormElement(Locator loc, File file)
+    {
+        WebElement el = loc.waitForElement(new WebDriverWait(getDriver(), 5));
+        setFormElement(el, file);
+    }
+
+    public void setFormElement(WebElement el, File file)
+    {
+        setInput(el, Collections.singletonList(file));
     }
 
     public void setFormElements(String tagName, String formElementName, String[] values)

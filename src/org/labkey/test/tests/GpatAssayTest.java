@@ -35,6 +35,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,11 +54,13 @@ public class GpatAssayTest extends BaseWebDriverTest
     private static final String ALIASED_ASSAY_4 = "trial01columns4.tsv";
     private static final String GPAT_ASSAY_FNA_1 = "trial03.fna";
     private static final String GPAT_ASSAY_FNA_2 = "trial04.fna";
+    private static final String GPAT_ASSAY_FNA_3 = "trial05.fna";
     private static final String ASSAY_NAME_XLS = "XLS Assay " + TRICKY_CHARACTERS;
     private static final String ASSAY_NAME_XLSX = "XLSX Assay";
     private static final String ASSAY_NAME_TSV = "TSV Assay";
     private static final String ASSAY_NAME_FNA = "FASTA Assay";
     private static final String ASSAY_NAME_FNA_MULTIPLE = "FASTA Assay - Multiple file upload";
+    private static final String ASSAY_NAME_FNA_MULTIPLE_SINGLE_INPUT = "FASTA Assay - Multiple file single input upload";
 
     @BeforeClass
     public static void doSetup()
@@ -301,12 +304,48 @@ public class GpatAssayTest extends BaseWebDriverTest
 
     }
 
+    // this test only works in Chrome
+    @Test
+    public void testMultipleFileUploadSingleRowInAssayRun()
+    {
+        List<File> files = new ArrayList<>();
+        files.add(TestFileUtils.getSampleData("GPAT/trial01b.xlsx"));
+        files.add(TestFileUtils.getSampleData("GPAT/trial01a.xlsx"));
+        files.add(TestFileUtils.getSampleData("GPAT/trial01c.xlsx"));
+
+        String fileName = "trial01b";
+
+        importFastaGpatAssay(GPAT_ASSAY_FNA_3, ASSAY_NAME_FNA_MULTIPLE_SINGLE_INPUT);
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(ASSAY_NAME_FNA_MULTIPLE_SINGLE_INPUT));
+        clickButton("Import Data");
+        clickButton("Next");
+
+        log("Check radio button for multiple upload");
+        checkRadioButton(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
+
+        uploadAssayFiles(files);  // write all paths to the same input field
+
+        clickButton("Save and Finish");
+
+        log("Verifying the upload");
+        clickAndWait(Locator.linkContainingText(fileName));
+        DataRegionTable table = new DataRegionTable("Data", getDriver());
+        table.assertPaginationText(1, 100, 603);
+
+    }
+
     private void uploadAssayFile(File guavaFile, int fileNumber)
     {
         String fileLoc = "__primaryFile__";
         if (fileNumber > 0)
             fileLoc += fileNumber;
         setFormElement(Locator.name(fileLoc), guavaFile);
+    }
+
+    private void uploadAssayFiles(List<File> guavaFiles)
+    {
+        setInput(Locator.name("__primaryFile__"), guavaFiles);
     }
 
     private void addNewFile()
