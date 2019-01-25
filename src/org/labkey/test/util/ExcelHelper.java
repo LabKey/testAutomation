@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.format.CellGeneralFormatter;
 import org.apache.poi.ss.formula.FormulaParseException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -34,7 +33,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -46,15 +44,13 @@ public abstract class ExcelHelper
     public static final String SUB_TYPE_BIFF5 = "x-tika-msoffice";
     public static final String SUB_TYPE_BIFF8 = "vnd.ms-excel";
 
-    public static Workbook create(File file) throws IOException, InvalidFormatException
+    public static Workbook create(File file) throws IOException
     {
         try (FileInputStream fIn = new FileInputStream(file))
         {
             return WorkbookFactory.create(fIn);
         }
     }
-
-
 
     private static CellStyle getCustomCellStyle(Workbook workbook, Map<String, CellStyle> customStyles, DataFormat dataFormat, String formatString)
     {
@@ -216,5 +212,15 @@ public abstract class ExcelHelper
             rowData.add(getCellStringValue(cell));
         }
         return rowData;
+    }
+
+    public static List<List<String>> getFirstNRows(Sheet sheet, int n)
+    {
+        List<List<String>> rows = new ArrayList<>();
+        for (int i = 0; i < n; i++)
+        {
+            rows.add(getRowData(sheet, i));
+        }
+        return rows;
     }
 }
