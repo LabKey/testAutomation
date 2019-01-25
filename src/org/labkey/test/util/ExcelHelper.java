@@ -111,7 +111,7 @@ public abstract class ExcelHelper
 
             if ("General".equals(cell.getCellStyle().getDataFormatString()))
             {
-                switch (cell.getCellTypeEnum())
+                switch (cell.getCellType())
                 {
                     case BOOLEAN:
                         return formatter.format(cell.getBooleanCellValue());
@@ -119,7 +119,7 @@ public abstract class ExcelHelper
                         return formatter.format(cell.getNumericCellValue());
                     case FORMULA:
                     {
-                        if (cell.getCachedFormulaResultTypeEnum() == CellType.STRING)
+                        if (cell.getCachedFormulaResultType() == CellType.STRING)
                         {
                             return cell.getStringCellValue();
                         }
@@ -143,7 +143,7 @@ public abstract class ExcelHelper
             }
             else if (isCellNumeric(cell) && DateUtil.isCellDateFormatted(cell) && cell.getDateCellValue() != null)
                 return formatter.format(cell.getDateCellValue());
-            else if (cell.getCellTypeEnum() == CellType.FORMULA && cell.getCachedFormulaResultTypeEnum() == CellType.STRING)
+            else if (cell.getCellType() == CellType.FORMULA && cell.getCachedFormulaResultType() == CellType.STRING)
                 return cell.getStringCellValue();
             else
                 // This seems to be the best way to get the value that's shown in Excel
@@ -157,10 +157,10 @@ public abstract class ExcelHelper
     {
         if (cell != null)
         {
-            CellType type = cell.getCellTypeEnum();
+            CellType type = cell.getCellType();
             if (type == CellType.FORMULA)
             {
-                type = cell.getCachedFormulaResultTypeEnum();
+                type = cell.getCachedFormulaResultType();
             }
 
             return type == CellType.BLANK || type == CellType.NUMERIC;
