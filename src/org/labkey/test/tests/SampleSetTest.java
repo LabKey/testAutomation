@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.hamcrest.CoreMatchers;
@@ -655,7 +654,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 row++;
             }
         }
-        catch (IOException | InvalidFormatException e)
+        catch (IOException e)
         {
             throw new RuntimeException(e);
         }
