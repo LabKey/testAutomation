@@ -17,7 +17,7 @@ package org.labkey.test.teamcity;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.api.writer.PrintWriters;
+import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.TestLogger;

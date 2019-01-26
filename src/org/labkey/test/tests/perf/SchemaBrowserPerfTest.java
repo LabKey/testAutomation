@@ -17,11 +17,12 @@ package org.labkey.test.tests.perf;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.writer.PrintWriters;
+import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Perf;
 import org.labkey.test.util.ListHelper;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;

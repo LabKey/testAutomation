@@ -15,7 +15,7 @@
  */
 package org.labkey.test.io;
 
-import org.labkey.api.reader.Readers;
+import org.labkey.serverapi.reader.Readers;
 
 import java.io.BufferedReader;
 import java.io.File;

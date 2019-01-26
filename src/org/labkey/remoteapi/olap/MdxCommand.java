@@ -17,10 +17,10 @@ package org.labkey.remoteapi.olap;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.labkey.api.reader.Readers;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
+import org.labkey.serverapi.reader.Readers;
 
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;

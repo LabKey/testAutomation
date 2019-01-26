@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests.perf;
 
-import org.labkey.api.writer.PrintWriters;
+import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 

@@ -15,9 +15,9 @@
  */
 package org.labkey.serverapi.collections;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
-import org.labkey.api.util.Pair;
 
 import java.io.Serializable;
 import java.util.AbstractMap;
@@ -241,7 +241,7 @@ public class ArrayListMap<K, V> extends AbstractMap<K, V> implements Serializabl
             if (i < _row.size())
             {
                 if (_row.get(i) != DOES_NOT_CONTAINKEY)
-                    r.add(new Pair<>(e.getKey(), (V)_row.get(i)));
+                    r.add(Pair.of(e.getKey(), (V) _row.get(i)));
             }
         }
         return r;

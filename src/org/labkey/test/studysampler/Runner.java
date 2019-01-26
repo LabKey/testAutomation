@@ -18,8 +18,8 @@ package org.labkey.test.studysampler;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.io.IOUtils;
-import org.labkey.api.reader.Readers;
-import org.labkey.api.writer.PrintWriters;
+import org.labkey.serverapi.reader.Readers;
+import org.labkey.serverapi.writer.PrintWriters;
 
 import java.io.BufferedReader;
 import java.io.File;

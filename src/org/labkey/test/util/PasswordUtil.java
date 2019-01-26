@@ -16,8 +16,8 @@
 
 package org.labkey.test.util;
 
-import org.labkey.api.writer.PrintWriters;
 import org.labkey.remoteapi.NetrcFileParser;
+import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.WebTestHelper;
 
 import java.io.File;

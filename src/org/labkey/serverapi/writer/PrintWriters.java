@@ -1,7 +1,5 @@
 package org.labkey.serverapi.writer;
 
-import org.labkey.serverapi.reader.StringUtilsLabKey;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 public class PrintWriters
 {
@@ -40,12 +39,12 @@ public class PrintWriters
     {
         public StandardPrintWriter(OutputStream out)
         {
-            super(new BufferedWriter(new OutputStreamWriter(out, StringUtilsLabKey.DEFAULT_CHARSET)));
+            super(new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
         }
 
         public StandardPrintWriter(File file) throws FileNotFoundException
         {
-            super(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StringUtilsLabKey.DEFAULT_CHARSET)));
+            super(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)));
         }
     }
 }

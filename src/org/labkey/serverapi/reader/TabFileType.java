@@ -3,6 +3,7 @@ package org.labkey.serverapi.reader;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -29,7 +30,7 @@ class TabFileType extends FileType
     @Override
     public boolean isHeaderMatch(@NotNull byte[] header)
     {
-        String s = new String(header, StringUtilsLabKey.DEFAULT_CHARSET); // TODO: Detect encoding
+        String s = new String(header, StandardCharsets.UTF_8); // TODO: Detect encoding
 
         String[] lines = StringUtils.split(s, "\n\r");
         if (lines.length == 0)

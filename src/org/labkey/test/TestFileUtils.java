@@ -35,7 +35,7 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
-import org.labkey.api.writer.PrintWriters;
+import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.util.TestLogger;
 
 import java.io.BufferedInputStream;
