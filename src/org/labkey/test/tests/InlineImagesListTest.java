@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
@@ -265,7 +264,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
             assertTrue("Height of row 3 not in expected range (" + ROW_HEIGHT_SMALL_LBOUND + " to " + ROW_HEIGHT_SMALL_UBOUND + "). Actual height: " + sheet.getRow(3).getHeight(), (sheet.getRow(3).getHeight() > ROW_HEIGHT_SMALL_LBOUND) && (sheet.getRow(3).getHeight() < ROW_HEIGHT_SMALL_UBOUND));
 
         }
-        catch (IOException | InvalidFormatException e)
+        catch (IOException e)
         {
             throw new RuntimeException(e);
         }

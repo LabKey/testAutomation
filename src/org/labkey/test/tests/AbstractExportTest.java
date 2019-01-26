@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Assume;
@@ -384,7 +383,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
             List<String> exportedColumn = ExcelHelper.getColumnData(sheet, getTestColumnIndex());
             assertColumnContentsEqual(expectedExportColumn, exportedColumn);
         }
-        catch (IOException | InvalidFormatException e)
+        catch (IOException e)
         {
             throw new RuntimeException(e);
         }
