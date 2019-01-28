@@ -196,7 +196,7 @@ public class WebDavTest extends BaseWebDriverTest
         assertEquals("Content for _webdav/" + filesRootName + " is not as expected", new HashSet<>(Arrays.asList(filesRootName, conflictFolderName, projectFileName)), names);
 
         goToProjectHome();
-        _containerHelper.deleteFolder(getProjectName(), conflictFolderName);
+        _containerHelper.deleteFolder(getProjectName(), conflictFolderName, WAIT_FOR_PAGE * 3);
 
         waitForIdle();
         log("Verify deleting file from _webfiles");
