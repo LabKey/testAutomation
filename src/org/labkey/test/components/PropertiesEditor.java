@@ -784,10 +784,10 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
     public enum PhiSelectType
     {
-        NotPHI("Not PHI", org.labkey.api.data.PHI.NotPHI.ordinal(), null),
-        Limited("Limited PHI", org.labkey.api.data.PHI.Limited.ordinal(), "Limited PHI Reader"),
-        PHI("Full PHI", org.labkey.api.data.PHI.PHI.ordinal(), "Full PHI Reader"),
-        Restricted("Restricted PHI", org.labkey.api.data.PHI.Restricted.ordinal(), "Restricted PHI Reader");
+        NotPHI("Not PHI", org.labkey.serverapi.data.PHI.NotPHI.ordinal(), null),
+        Limited("Limited PHI", org.labkey.serverapi.data.PHI.Limited.ordinal(), "Limited PHI Reader"),
+        PHI("Full PHI", org.labkey.serverapi.data.PHI.PHI.ordinal(), "Full PHI Reader"),
+        Restricted("Restricted PHI", org.labkey.serverapi.data.PHI.Restricted.ordinal(), "Restricted PHI Reader");
 
         String _text;
         int _rank;

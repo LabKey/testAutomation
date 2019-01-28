@@ -19,7 +19,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
-import org.labkey.test.components.html.Input;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -28,7 +27,7 @@ import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.labkey.api.exp.query.ExpRunTable.Column.Input;
+
 
 @Category({BVT.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)

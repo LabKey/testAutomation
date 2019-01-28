@@ -406,6 +406,7 @@ src/org/labkey/remoteapi/security/RemoveAssignmentCommand.java -text
 src/org/labkey/serverapi/collections/ArrayListMap.java -text
 src/org/labkey/serverapi/collections/RowMap.java -text
 src/org/labkey/serverapi/collections/RowMapFactory.java -text
+src/org/labkey/serverapi/data/PHI.java -text
 src/org/labkey/serverapi/reader/AbstractDataLoaderFactory.java -text
 src/org/labkey/serverapi/reader/AbstractDocumentParser.java -text
 src/org/labkey/serverapi/reader/CloseableFilteredIterator.java -text
