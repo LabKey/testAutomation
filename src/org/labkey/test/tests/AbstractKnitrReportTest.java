@@ -189,7 +189,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         clickProject(getProjectName());
         _ext4Helper.waitForMaskToDisappear();
         waitAndClickAndWait(Locator.linkWithText("kable"));
-        _ext4Helper.waitForMaskToDisappear();
+        _ext4Helper.waitForMaskToDisappear(2 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.id("mtcars_table_wrapper"));
     }
 }
