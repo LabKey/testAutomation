@@ -52,25 +52,11 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
     protected int _scanAheadLineCount = 1000; // number of lines to scan trying to infer data types
     // CONSIDER: explicit flags for hasHeaders, inferHeaders, skipLines etc.
     protected int _skipLines = -1;      // -1 means infer headers
-    private boolean _inferTypes = true;
     private boolean _includeBlankLines = false;
     protected boolean _throwOnErrors = false;
     // true if the results can be scrolled by the DataIterator created in .getDataIterator()
     protected Boolean _scrollable = null;
     protected boolean _preserveEmptyString = false;
-
-
-
-
-    public void setInferTypes(boolean infer)
-    {
-        _inferTypes = infer;
-    }
-
-    public boolean getInferTypes()
-    {
-        return _inferTypes;
-    }
 
     public boolean isThrowOnErrors()
     {

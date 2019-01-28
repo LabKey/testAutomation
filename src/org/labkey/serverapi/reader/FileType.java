@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,15 +21,10 @@ public class FileType implements Serializable
 {
     private static final Detector DETECTOR = new DefaultDetector(MimeTypes.getDefaultMimeTypes());
 
-    // For serialization
-    protected FileType()
-    {
-    }
-
     /**
      * handle TPP's native use of .xml.gz
      **/
-    public static enum gzSupportLevel
+    public enum gzSupportLevel
     {
         NO_GZ,      // we don't support gzip for this filetype
         SUPPORT_GZ, // we support gzip for this filetype, but it's not the norm
@@ -69,62 +63,6 @@ public class FileType implements Serializable
     private boolean _caseSensitiveOnCaseSensitiveFileSystems = false;
 
     /**
-     * true if the different file extensions are just transformed versions of the same data (such as .raw and .mzXML)
-     * and therefore if multiple are present only the first should be considered for actions in the UI.
-     * false if they are independent and should all be considered actionable
-     */
-    private boolean _extensionsMutuallyExclusive = true;
-
-    /**
-     * Constructor to use when type is assumed to be a file, but a call to isDirectory()
-     * is not necessary.
-     *
-     * @param supportGZ for handling of TPP's transparent use of .xml.gz
-     * @param suffix    usually the file extension, but may be some other suffix to
-     *                  uniquely identify a file type
-     */
-    public FileType(String suffix, gzSupportLevel supportGZ)
-    {
-        this(Arrays.asList(suffix), suffix, supportGZ);
-    }
-
-    /**
-     * Constructor to use when type is assumed to be a file, but a call to isDirectory()
-     * is not necessary.
-     *
-     * @param suffix usually the file extension, but may be some other suffix to
-     *               uniquely identify a file type
-     */
-    public FileType(String suffix)
-    {
-        this(Arrays.asList(suffix), suffix);
-    }
-
-    /**
-     * Constructor to use when a call to isDirectory() is necessary to differentiate this
-     * file type.
-     *
-     * @param suffix usually the file extension, but may be some other suffix to
-     *               uniquely identify a file type
-     * @param dir    true when the type must be a directory
-     */
-    public FileType(String suffix, boolean dir)
-    {
-        this(Arrays.asList(suffix), suffix, dir, gzSupportLevel.NO_GZ);
-    }
-
-    /**
-     * @param suffixes      list of what are usually the file extensions (but may be some other suffix to
-     *                      uniquely identify a file type), in priority order. The first suffix that matches a file will be used
-     *                      and files that match the rest of the suffixes will be ignored
-     * @param defaultSuffix the canonical suffix, will be used when creating new files from scratch
-     */
-    public FileType(List<String> suffixes, String defaultSuffix)
-    {
-        this(suffixes, defaultSuffix, false, gzSupportLevel.NO_GZ);
-    }
-
-    /**
      * @param suffixes      list of what are usually the file extensions (but may be some other suffix to
      *                      uniquely identify a file type), in priority order. The first suffix that matches a file will be used
      *                      and files that match the rest of the suffixes will be ignored
@@ -134,44 +72,6 @@ public class FileType implements Serializable
     public FileType(List<String> suffixes, String defaultSuffix, List<String> contentTypes)
     {
         this(suffixes, defaultSuffix, false, gzSupportLevel.NO_GZ, contentTypes);
-    }
-
-    /**
-     * @param suffixes      list of what are usually the file extensions (but may be some other suffix to
-     *                      uniquely identify a file type), in priority order. The first suffix that matches a file will be used
-     *                      and files that match the rest of the suffixes will be ignored
-     * @param defaultSuffix the canonical suffix, will be used when creating new files from scratch
-     * @param dir           true when the type must be a directory
-     */
-    public FileType(List<String> suffixes, String defaultSuffix, boolean dir)
-    {
-        this(suffixes, defaultSuffix, dir, gzSupportLevel.NO_GZ);
-    }
-
-    /**
-     * @param suffixes      list of what are usually the file extensions (but may be some other suffix to
-     *                      uniquely identify a file type), in priority order. The first suffix that matches a file will be used
-     *                      and files that match the rest of the suffixes will be ignored
-     * @param defaultSuffix the canonical suffix, will be used when creating new files from scratch
-     * @param dir           true when the type must be a directory
-     * @param supportGZ     for handling TPP's transparent use of .xml.gz
-     */
-    public FileType(List<String> suffixes, String defaultSuffix, boolean dir, gzSupportLevel supportGZ)
-    {
-        this(suffixes, defaultSuffix, dir, supportGZ, null);
-    }
-
-
-    /**
-     * @param suffixes      list of what are usually the file extensions (but may be some other suffix to
-     *                      uniquely identify a file type), in priority order. The first suffix that matches a file will be used
-     *                      and files that match the rest of the suffixes will be ignored
-     * @param defaultSuffix the canonical suffix, will be used when creating new files from scratch
-     * @param doSupportGZ   for handling TPP's transparent use of .xml.gz
-     */
-    public FileType(List<String> suffixes, String defaultSuffix, gzSupportLevel doSupportGZ)
-    {
-        this(suffixes, defaultSuffix, false, doSupportGZ, null);
     }
 
     /**
@@ -221,16 +121,6 @@ public class FileType implements Serializable
         return name;
     }
 
-    /** Uses the preferred suffix, useful when there's not a directory of existing files to reference */
-    /**
-     * if _preferGZ is set, will use preferred suffix.gz since TPP treats .gz as native format,
-     * unless non-gz file exists
-     */
-    public String getDefaultName(String basename)
-    {
-        return tryName(null, basename + _defaultSuffix);
-    }
-
     /**
      * turn support for gzipped files on and off
      */
@@ -239,36 +129,6 @@ public class FileType implements Serializable
         _supportGZ = Boolean.valueOf(doSupportGZ != gzSupportLevel.NO_GZ);
         _preferGZ = Boolean.valueOf(doSupportGZ == gzSupportLevel.PREFER_GZ);
         return _supportGZ.booleanValue();
-    }
-
-    /**
-     * add a new supported suffix, return new list length
-     */
-    public int addSuffix(String newsuffix)
-    {
-        List<String> s = new ArrayList<>(_suffixes.size() + 1);
-        for (String suffix : _suffixes)
-        {
-            s.add(suffix);
-        }
-        s.add(newsuffix);
-        _suffixes = s;
-        return _suffixes.size();
-    }
-
-    /**
-     * add a new filetype to reject, return new list length
-     */
-    public int addAntiFileType(FileType anti)
-    {
-        List<FileType> s = new ArrayList<>(_antiTypes.size() + 1);
-        for (FileType a : _antiTypes)
-        {
-            s.add(a);
-        }
-        s.add(anti);
-        _antiTypes = s;
-        return _antiTypes.size();
     }
 
     // used to avoid, for example, mistaking protxml ".pep-prot.xml" for pepxml ".xml" file
@@ -308,41 +168,6 @@ public class FileType implements Serializable
         return getName(parentDir, basename);
     }
 
-    /**
-     * Looks for a file in the parentDir that matches, in priority order. If one is found, returns its file name.
-     * If nothing matches, uses the defaultSuffix to build a file name.
-     */
-    public File getFile(File parentDir, String basename)
-    {
-        return new File(parentDir, getName(parentDir, basename));
-    }
-
-    /**
-     * @return the index of the first suffix that matches. Useful when looking through a directory of files and
-     * determining which is the preferred file for this FileType.
-     */
-    public int getIndexMatch(File file)
-    {
-        if (!isAntiFileType(file.getName(), null))  // avoid, for example, mistaking .pep-prot.xml for .xml
-        {
-            for (int i = 0; i < _suffixes.size(); i++)
-            {
-                String s = toLowerIfCaseInsensitive(_suffixes.get(i));
-                if (toLowerIfCaseInsensitive(file.getName()).endsWith(s))
-                {
-                    return i;
-                }
-                // TPP treats .xml.gz as a native format
-                if (_supportGZ.booleanValue() && toLowerIfCaseInsensitive(file.getName()).endsWith(s + ".gz"))
-                {
-                    return i;
-                }
-            }
-        }
-
-        throw new IllegalArgumentException("No match found for " + file + " with " + toString());
-    }
-
     private String toLowerIfCaseInsensitive(String s)
     {
         if (s == null)
@@ -354,61 +179,6 @@ public class FileType implements Serializable
             return s;
         }
         return s.toLowerCase();
-    }
-
-    /**
-     * Finds the best suffix based on priority order, strips it off, and returns the remainder. If there is no matching
-     * suffix, returns the original file name.
-     */
-    public String getBaseName(File file)
-    {
-        if (isAntiFileType(file.getName(), null) || !isType(file))
-            return file.getName();
-
-        String suffix = null;
-        for (String s : _suffixes)
-        {
-            // run the entire list in order to assure strongest match
-            // consider .msprefix.mzxml vs .mzxml for example
-            if (toLowerIfCaseInsensitive(file.getName()).endsWith(toLowerIfCaseInsensitive(s)))
-            {
-                if ((null == suffix) || (s.length() > suffix.length()))
-                {
-                    suffix = s;
-                }
-            }
-            else if (_supportGZ.booleanValue()) // TPP treats .xml.gz as a native read format
-            {
-                String sgz = s + ".gz";
-                if (file.getName().endsWith(sgz))
-                {
-                    if ((null == suffix) || (sgz.length() > suffix.length()))
-                    {
-                        suffix = sgz;
-                    }
-                }
-            }
-        }
-        assert suffix != null : "Could not find matching suffix even though types match";
-        return file.getName().substring(0, file.getName().length() - suffix.length());
-    }
-
-    public File newFile(File parent, String basename)
-    {
-        return new File(parent, getName(parent, basename));
-    }
-
-    public boolean isType(File file)
-    {
-        return isType(file, null, null);
-    }
-
-    public boolean isType(File file, String contentType, byte[] header)
-    {
-        if ((file == null) || (_dir != null && _dir.booleanValue() != file.isDirectory()))
-            return false;
-
-        return isType(file.getName(), contentType, header);
     }
 
     /**
@@ -491,23 +261,6 @@ public class FileType implements Serializable
         }
     }
 
-    public boolean isMatch(String name, String basename)
-    {
-        for (String suffix : _suffixes)
-        {
-            if (name.equalsIgnoreCase(basename + suffix))
-            {
-                return true;
-            }
-            // TPP treats .xml.gz as a native format
-            if (_supportGZ.booleanValue() && name.equals(basename + suffix + ".gz"))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Checks if the file header matches. This is useful for FileTypes that share an
      * extension, e.g. "txt" or "xml", or when the filename or extension isn't available.
@@ -536,16 +289,6 @@ public class FileType implements Serializable
         return !(_suffixes != null ? !_suffixes.equals(fileType._suffixes) : fileType._suffixes != null);
     }
 
-    public String getDefaultSuffix()
-    {
-        return _defaultSuffix;
-    }
-
-    public List<String> getSuffixes()
-    {
-        return Collections.unmodifiableList(_suffixes);
-    }
-
     public int hashCode()
     {
         int result;
@@ -562,87 +305,5 @@ public class FileType implements Serializable
         return (_dir == null || !_dir.booleanValue() ? _suffixes.toString() : _suffixes + "/");
     }
 
-    @NotNull
-    public static List<FileType> findTypes(@NotNull List<FileType> types, @NotNull List<File> files)
-    {
-        ArrayList<FileType> foundTypes = new ArrayList<>();
-        // This O(n*m), but these are usually very short lists.
-        for (FileType type : types)
-        {
-            for (File file : files)
-            {
-                if (type.isType(file))
-                {
-                    foundTypes.add(type);
-                    break;
-                }
-            }
-        }
-        return foundTypes;
-    }
-
-    /**
-     * true if the different file extensions are just transformed versions of the same data (such as .raw and .mzXML)
-     * and therefore if multiple are present only the first should be considered for actions in the UI.
-     * false if they are independent and should all be considered actionable
-     */
-    public boolean isExtensionsMutuallyExclusive()
-    {
-        return _extensionsMutuallyExclusive;
-    }
-
-    /**
-     * @param extensionsMutuallyExclusive true if the different file extensions are just transformed versions of the
-     *                                    same data (such as .raw and .mzXML) and therefore if multiple are present only the first should be
-     *                                    considered for actions in the UI.
-     *                                    false if they are independent and should all be considered actionable
-     */
-    public void setExtensionsMutuallyExclusive(boolean extensionsMutuallyExclusive)
-    {
-        _extensionsMutuallyExclusive = extensionsMutuallyExclusive;
-    }
-
-    /**
-     * @return a FileType that will only match on the default suffix for this FileType
-     */
-    public FileType getDefaultFileType()
-    {
-        if (_suffixes.size() > 0)
-        {
-            FileType ft = new FileType(_defaultSuffix);
-            ft._dir = _dir;
-            ft._supportGZ = _supportGZ.booleanValue();
-            ft._preferGZ = _preferGZ.booleanValue();
-            return ft;
-        }
-        else
-        {
-            return this;
-        }
-    }
-
-    public String getDefaultRole()
-    {
-        if (_defaultSuffix.contains("."))
-        {
-            return _defaultSuffix.substring(_defaultSuffix.indexOf(".") + 1);
-        }
-        return _defaultSuffix;
-    }
-
-    public boolean isCaseSensitiveOnCaseSensitiveFileSystems()
-    {
-        return _caseSensitiveOnCaseSensitiveFileSystems;
-    }
-
-    public void setCaseSensitiveOnCaseSensitiveFileSystems(boolean caseSensitiveOnCaseSensitiveFileSystems)
-    {
-        _caseSensitiveOnCaseSensitiveFileSystems = caseSensitiveOnCaseSensitiveFileSystems;
-    }
-
-    public List<String> getContentTypes()
-    {
-        return _contentTypes;
-    }
 }
 

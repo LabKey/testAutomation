@@ -11,22 +11,9 @@ import java.util.Map;
 
 public abstract class AbstractDataLoaderFactory extends AbstractDocumentParser implements DataLoaderFactory
 {
-    private boolean _indexable;
-
     public AbstractDataLoaderFactory()
     {
-        this(false);
-    }
-
-    public AbstractDataLoaderFactory(boolean indexable)
-    {
-        _indexable = indexable;
-    }
-
-    @Override
-    public boolean indexable()
-    {
-        return _indexable;
+        super();
     }
 
     @NotNull

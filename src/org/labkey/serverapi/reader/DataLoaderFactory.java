@@ -13,6 +13,4 @@ public interface DataLoaderFactory
     @NotNull DataLoader createLoader(File file, boolean hasColumnHeaders) throws IOException;
 
     @NotNull FileType getFileType();
-
-    boolean indexable();
 }

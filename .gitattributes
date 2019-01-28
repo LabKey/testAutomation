@@ -422,7 +422,6 @@ src/org/labkey/serverapi/reader/ReaderFactory.java -text
 src/org/labkey/serverapi/reader/Readers.java -text
 src/org/labkey/serverapi/reader/TabFileType.java -text
 src/org/labkey/serverapi/reader/TabLoader.java -text
-src/org/labkey/serverapi/reader/Type.java -text
 src/org/labkey/serverapi/writer/PrintWriters.java -text
 src/org/labkey/test/AssayAPITest.java -text
 src/org/labkey/test/BaseBlueGreenTest.java -text

@@ -46,17 +46,6 @@ public class ColumnDescriptor
         return name + ":" + clazz.getSimpleName();
     }
 
-    public String getRangeURI()
-    {
-        Type type = Type.getTypeByClass(clazz);
-
-        if (null == type)
-            throw new IllegalArgumentException("Unknown class for column: " + clazz);
-
-        return type.getXsdType();
-    }
-
-
     public String getColumnName()
     {
         return name;

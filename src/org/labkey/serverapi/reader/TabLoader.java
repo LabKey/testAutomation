@@ -93,7 +93,6 @@ public class TabLoader extends DataLoader
         {
 
             DataLoader loader = super.createLoader(file, hasColumnHeaders);
-            loader.setInferTypes(false);
             return loader;
         }
 
@@ -103,7 +102,6 @@ public class TabLoader extends DataLoader
         public DataLoader createLoader(InputStream is, boolean hasColumnHeaders) throws IOException
         {
             DataLoader loader = super.createLoader(is, hasColumnHeaders);
-            loader.setInferTypes(false);
             return loader;
         }
 
@@ -505,11 +503,6 @@ public class TabLoader extends DataLoader
     public void setParseQuotes(boolean parseQuotes)
     {
         _parseQuotes = parseQuotes;
-    }
-
-    public void setUnescapeBackslashes(boolean unescapeBackslashes)
-    {
-        _unescapeBackslashes = unescapeBackslashes;
     }
 
     @Override
