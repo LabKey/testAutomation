@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,12 +45,19 @@ public abstract class ExcelHelper
     public static final String SUB_TYPE_BIFF5 = "x-tika-msoffice";
     public static final String SUB_TYPE_BIFF8 = "vnd.ms-excel";
 
+    private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
     public static Workbook create(File file) throws IOException
     {
         try (FileInputStream fIn = new FileInputStream(file))
         {
             return WorkbookFactory.create(fIn);
         }
+    }
+
+    public static SimpleDateFormat getDateTimeFormat()
+    {
+        return DATE_TIME_FORMAT;
     }
 
     private static CellStyle getCustomCellStyle(Workbook workbook, Map<String, CellStyle> customStyles, DataFormat dataFormat, String formatString)
@@ -142,7 +150,7 @@ public abstract class ExcelHelper
                 return cell.getStringCellValue();
             }
             else if (isCellNumeric(cell) && DateUtil.isCellDateFormatted(cell) && cell.getDateCellValue() != null)
-                return formatter.format(cell.getDateCellValue());
+                return DATE_TIME_FORMAT.format(cell.getDateCellValue());
             else if (cell.getCellType() == CellType.FORMULA && cell.getCachedFormulaResultType() == CellType.STRING)
                 return cell.getStringCellValue();
             else
