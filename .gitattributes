@@ -126,7 +126,6 @@ modules/ETLtest/webapp/WEB-INF/ETLtest/etltestContext.xml -text
 modules/build.gradle -text
 modules/chartingapi/module.properties -text
 modules/chartingapi/resources/views/begin.html -text
-modules/chartingapi/resources/views/chartTest.html -text
 modules/chartingapi/resources/views/chartTest2.html -text
 modules/chartingapi/resources/views/chartTest2.view.xml -text
 modules/chartingapi/resources/views/customPlotWrappers.html -text

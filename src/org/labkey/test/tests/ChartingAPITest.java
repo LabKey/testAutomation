@@ -119,18 +119,9 @@ public class ChartingAPITest extends BaseWebDriverTest
     }
 
     @Test
-    public void chartTest()
-    {
-        String chartHtml = goToChartingTestPage("chartTest");
-
-        if (!chartHtml.contains("<img") && !chartHtml.contains("<IMG"))
-            fail("Test div does not contain an image:\n" + chartHtml);
-    }
-
-    @Test
     public void chartAPITest() throws Exception
     {
-        goToChartingTestPage("chartTest2");
+        goToChartingTestPage("chartTest");
         verifyChartAPIPlots(new String[]{
             "Line Plot - no y-scale defined",
             "Line Plot - y-scale defined, no legend, no shape aes",
