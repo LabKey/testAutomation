@@ -113,7 +113,7 @@ function toggleRecorder(checkbox)
 
     Ext4.Ajax.request({
         url : LABKEY.ActionURL.buildURL('dumbster', 'setRecordEmail') + '?record=' + checked,
-        method : 'GET',
+        method : 'POST',
         success: onUpdateSuccess,
         failure: onUpdateFailure
     });

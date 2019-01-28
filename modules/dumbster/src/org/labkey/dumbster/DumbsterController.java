@@ -17,10 +17,10 @@
 package org.labkey.dumbster;
 
 import com.dumbster.smtp.SmtpMessage;
-import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.ApiResponse;
 import org.labkey.api.action.ApiSimpleResponse;
 import org.labkey.api.action.ExportAction;
+import org.labkey.api.action.MutatingApiAction;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
 import org.labkey.api.data.Container;
@@ -48,7 +48,6 @@ import java.util.Map;
  */
 public class DumbsterController extends SpringActionController
 {
-    @SuppressWarnings({"unchecked"})
     private static final DefaultActionResolver _actionResolver = new DefaultActionResolver(DumbsterController.class);
 
     public DumbsterController()
@@ -79,7 +78,7 @@ public class DumbsterController extends SpringActionController
     }
 
     @RequiresPermission(AdminPermission.class)
-    public class SetRecordEmailAction extends ApiAction<RecordEmailForm>
+    public class SetRecordEmailAction extends MutatingApiAction<RecordEmailForm>
     {
         public ApiResponse execute(RecordEmailForm form, BindException errors)
         {
@@ -88,9 +87,8 @@ public class DumbsterController extends SpringActionController
 
             if (form.isRecord())
             {
-
                 if (!DumbsterManager.get().start())
-                    return new ApiSimpleResponse("error", "Error starting mail recorder.  Check log for more information.");
+                    return new ApiSimpleResponse("error", "Error starting mail recorder. Check log for more information.");
             }
             else
             {
