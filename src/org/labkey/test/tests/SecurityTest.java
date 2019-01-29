@@ -375,12 +375,9 @@ public class SecurityTest extends BaseWebDriverTest
         goToSiteUsers();
         filterUsersForEmail(username);
         clickAndWait(Locator.linkContainingText(_userHelper.getDisplayNameForEmail(username)));
-        doAndWaitForPageToLoad(() ->
-        {
-            clickButtonContainingText("Reset Password", 0);
-            acceptAlert();
-        });
-        clickButton("Done");
+        clickButton("Reset Password");
+        assertTextPresent("You are about to clear the user's current password");
+        clickAndWait(Locator.lkButton("OK"));
 
         String url = getPasswordResetUrl(username);
 
