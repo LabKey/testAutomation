@@ -28,14 +28,5 @@ if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 
 if (project.hasProperty("teamcity"))
 {
-    // remove this when we release gradlePlugin that does not reference this
-    sourceSets {
-        debug {
-            java {
-                srcDirs = ['src/org/labkey/test/debug']
-            }
-        }
-    }
-
     apply plugin: 'org.labkey.teamCity'
 }
