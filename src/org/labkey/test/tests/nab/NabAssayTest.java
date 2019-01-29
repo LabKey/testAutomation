@@ -725,7 +725,7 @@ public class NabAssayTest extends AbstractAssayTest
 
         assertTextPresent("&lt; 20", 10);
 
-        String nabData = getText(Locators.bodyPanel());
+        String nabData = getText(Locator.xpath("//div[contains(@class, 'panel-default')]/parent::div"));
         assertTrue(nabData.contains("461"));      // Four parameter IC50
         assertTrue(nabData.contains("0.043"));    // 4PL AUC/PosAUC
         assertFalse(nabData.contains("561"));      // Five Parameter IC50
@@ -733,7 +733,7 @@ public class NabAssayTest extends AbstractAssayTest
         assertFalse(nabData.contains("0.077"));    // Five PL AUC
 
         assayHelper.clickDetailsLink("Change Graph Options", "Curve Type", "Five Parameter");
-        nabData = getText(Locators.bodyPanel());
+        nabData = getText(Locator.xpath("//div[contains(@class, 'panel-default')]/parent::div"));
         assertTrue(nabData.contains("561"));      // Five Parameter IC50
         assertTrue(nabData.contains("0.077"));    // Five PL AUC
         assertTrue(nabData.contains("0.081"));    // Five PL posAUC
@@ -741,7 +741,7 @@ public class NabAssayTest extends AbstractAssayTest
         assertFalse(nabData.contains("461"));      // Four parameter IC50
 
         assayHelper.clickDetailsLink("Change Graph Options", "Curve Type", "Polynomial");
-        nabData = getText(Locators.bodyPanel());
+        nabData = getText(Locator.xpath("//div[contains(@class, 'panel-default')]/parent::div"));
         assertTrue(nabData.contains("503"));      // Polynomial IC50:
         assertTrue(nabData.contains("0.054"));    // Polynomial AUC:
         assertTrue(nabData.contains("0.055"));    // Polynomial posAUC:
