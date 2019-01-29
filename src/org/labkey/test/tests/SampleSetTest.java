@@ -52,7 +52,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({DailyA.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 9)
+@BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class SampleSetTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleSetTestProject";
@@ -187,7 +187,7 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Create");
 
         log("Add fields to the sample set");
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").find();
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
         fieldProperties.addField(new FieldDefinition(fieldNames.get(0)).setType(FieldDefinition.ColumnType.String));
         fieldProperties.addField(new FieldDefinition(fieldNames.get(1)).setType(FieldDefinition.ColumnType.Integer));
         clickButton("Save");
@@ -256,7 +256,7 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Create");
 
         log("Add fields to the sample set");
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").find();
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
         fieldProperties.addField(new FieldDefinition(fieldNames.get(0)).setType(FieldDefinition.ColumnType.String));
         fieldProperties.addField(new FieldDefinition(fieldNames.get(1)).setType(FieldDefinition.ColumnType.Double));
         clickButton("Save");
@@ -324,7 +324,7 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Create");
 
         log("Add fields to the sample set");
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").find();
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
         fieldProperties.addField(new FieldDefinition(fieldNames.get(0)).setType(FieldDefinition.ColumnType.String));
         clickButton("Save");
 
