@@ -18,7 +18,6 @@ project.dependencies {
 String schemasProjectPath = BuildUtils.getSchemasProjectPath(gradle)
 if (project.findProject(schemasProjectPath) != null)
     BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: schemasProjectPath, depVersion: project.labkeyVersion)
-BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getApiProjectPath(gradle), depVersion: project.labkeyVersion)
 BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle), depVersion: project.labkeyVersion)
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
