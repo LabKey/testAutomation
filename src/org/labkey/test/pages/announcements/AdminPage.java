@@ -84,10 +84,11 @@ public class AdminPage extends LabKeyPage<AdminPage.ElementCache>
     private void confirmOptionSelected(WebElement moderatorReviewOption)
     {
         int tries = 1;
-        while(!moderatorReviewOption.isSelected() && tries < 5)
+        while(!moderatorReviewOption.isSelected() && tries <= 5)
         {
             moderatorReviewOption.click();
             sleep(500);
+            tries++;
         }
 
         if(!moderatorReviewOption.isSelected())
