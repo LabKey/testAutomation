@@ -51,10 +51,18 @@ public abstract class GenericChartsTest extends ReportTest
         importStudy();
         waitForPipelineJobsToComplete(1, "study import", false);
 
-        // Create category with 3 groups
-        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_A, "Mouse", MOUSE_GROUP_CATEGORY, true, true, "999320016,999320518,999320529,999320557");
-        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_B, "Mouse", MOUSE_GROUP_CATEGORY, false, true, "999320565,999320576,999320582,999320609");
-        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_C, "Mouse", MOUSE_GROUP_CATEGORY, false, true, "999320624,999320646,999320652,999320671");
+        if (shouldCreateParticipantGroups())
+        {
+            // Create category with 3 groups
+            _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_A, "Mouse", MOUSE_GROUP_CATEGORY, true, true, "999320016,999320518,999320529,999320557");
+            _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_B, "Mouse", MOUSE_GROUP_CATEGORY, false, true, "999320565,999320576,999320582,999320609");
+            _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_C, "Mouse", MOUSE_GROUP_CATEGORY, false, true, "999320624,999320646,999320652,999320671");
+        }
+    }
+
+    protected boolean shouldCreateParticipantGroups()
+    {
+        return false;
     }
 
     @LogMethod

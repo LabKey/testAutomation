@@ -39,6 +39,12 @@ import static org.junit.Assert.assertEquals;
 public class BoxPlotTest extends GenericChartsTest
 {
     @Override
+    protected boolean shouldCreateParticipantGroups()
+    {
+        return true;
+    }
+
+    @Override
     protected LookAndFeelBoxPlot clickChartLayoutButton()
     {
         return clickChartLayoutButton(LookAndFeelBoxPlot.class);

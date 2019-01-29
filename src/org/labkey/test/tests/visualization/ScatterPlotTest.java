@@ -67,8 +67,14 @@ public class ScatterPlotTest extends GenericChartsTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsersIfPresent(DEVELOPER_USER);
+        _userHelper.deleteUsers(false, DEVELOPER_USER);
         super.doCleanup(afterTest);
+    }
+
+    @Override
+    protected boolean shouldCreateParticipantGroups()
+    {
+        return true;
     }
 
     @LogMethod
