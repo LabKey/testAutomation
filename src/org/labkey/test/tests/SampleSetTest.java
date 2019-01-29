@@ -34,6 +34,7 @@ import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -302,6 +303,93 @@ public class SampleSetTest extends BaseWebDriverTest
 
         assertTrue("Should have row with first imported value", drt.getRowIndex(fieldNames.get(0), "Dubya") >= 0);
         assertTrue("Should have row with second imported value", drt.getRowIndex(fieldNames.get(0), "Ex") >= 0);
+    }
+
+    private void selectInsertOption(String value, int index)
+    {
+        List<WebElement> buttons = Locator.radioButtonByNameAndValue("insertOption", value).findElements(this.getDriver());
+        buttons.get(index).click();
+    }
+
+    @Test
+    public void testImportTypeOptions()
+    {
+        String sampleSetName = "ImportErrors";
+        List<String> fieldNames = Arrays.asList("StringValue");
+
+        log("Create a new sample set with a name");
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        click(Locator.tagWithClassContaining("i", "fa-plus"));
+        setFormElement(Locator.id("name"), sampleSetName);
+        clickButton("Create");
+
+        log("Add fields to the sample set");
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").find();
+        fieldProperties.addField(new FieldDefinition(fieldNames.get(0)).setType(FieldDefinition.ColumnType.String));
+        clickButton("Save");
+
+        log("Go to the sample set and add some data");
+        click(Locator.linkWithText(sampleSetName));
+        DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents")
+                .clickInsertNewRow();
+        setFormElement(Locator.name("quf_Name"), "Name1");
+        setFormElement(Locator.name("quf_" + fieldNames.get(0)), "Bee");
+        clickButton("Submit");
+
+        log("Try to import overlapping data with TSV");
+        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        drt.clickHeaderMenu("Insert data", "Simple bulk data import");
+        String header = "Name\t" + fieldNames.get(0) + "\n";
+        String overlap =  "Name1\tToBee\n";
+        String newData = "Name2\tSee\n";
+        setFormElement(Locator.name("text"), header + overlap + newData);
+        clickButton("Submit", "Can't insert; material already exists");
+
+        log("Switch to 'Insert and Update'");
+        selectInsertOption("MERGE", 1);
+        clickButton("Submit");
+
+        log("Validate data was updated and new data added");
+        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        assertEquals("Number of samples not as expected", 2, drt.getDataRowCount());
+
+        int index = drt.getRowIndex("Name", "Name1");
+        assertTrue("Should have row with first sample name", index >= 0);
+        Map<String, String> rowData = drt.getRowDataAsMap(index);
+        assertEquals(fieldNames.get(0) + " for sample 'Name1' not as expected", "ToBee", rowData.get(fieldNames.get(0)));
+
+        index = drt.getRowIndex("Name", "Name2");
+        assertTrue("Should have a row with the second sample name", index >= 0);
+        rowData = drt.getRowDataAsMap(index);
+        assertEquals(fieldNames.get(0) + " for sample 'Name2' not as expected", "See", rowData.get(fieldNames.get(0)));
+
+        log("Try to import overlapping data from file");
+        drt.clickHeaderMenu("Insert data", "Simple bulk data import");
+        click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleSet.xls").getAbsolutePath());
+        clickButton("Submit", "Can't insert; material already exists");
+
+        log ("Switch to 'Insert and Update'");
+        selectInsertOption("MERGE", 0);
+        clickButton("Submit");
+        log ("Validate data was updated and new data added");
+        assertEquals("Number of samples not as expected", 3, drt.getDataRowCount());
+
+        index = drt.getRowIndex("Name", "Name1");
+        assertTrue("Should have row with first sample name", index >= 0);
+        rowData = drt.getRowDataAsMap(index);
+        assertEquals(fieldNames.get(0) + " for sample 'Name1' not as expected", "NotTwoBee", rowData.get(fieldNames.get(0)));
+
+        index = drt.getRowIndex("Name", "Name2");
+        assertTrue("Should have a row with the second sample name", index >= 0);
+        rowData = drt.getRowDataAsMap(index);
+        assertEquals(fieldNames.get(0) + " for sample 'Name2' not as expected", "Sea", rowData.get(fieldNames.get(0)));
+
+        index = drt.getRowIndex("Name", "Name3");
+        assertTrue("Should have a row with the thrid sample name", index >= 0);
+        rowData = drt.getRowDataAsMap(index);
+        assertEquals(fieldNames.get(0) + " for sample 'Namee' not as expected", "Dee", rowData.get(fieldNames.get(0)));
+
     }
 
     @Test
