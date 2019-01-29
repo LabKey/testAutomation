@@ -2,9 +2,9 @@ package org.labkey.serverapi.reader;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.test.util.TestLogger;
 
 import java.io.File;
 import java.io.InputStream;
@@ -128,7 +128,7 @@ public class MimeMap implements FileNameMap
         }
         catch (Exception e)
         {
-            Logger.getLogger(MimeMap.class).error("unexpected error", e);
+            TestLogger.error("unexpected error", e);
         }
     }
 

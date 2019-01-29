@@ -5,10 +5,10 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.serverapi.collections.ArrayListMap;
 import org.labkey.serverapi.collections.RowMapFactory;
+import org.labkey.test.util.TestLogger;
 
 import java.io.Closeable;
 import java.io.File;
@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -26,26 +25,7 @@ import java.util.Set;
 // Abstract class for loading columnar data from file sources: TSVs, Excel files, etc.
 public abstract class DataLoader implements Iterable<Map<String, Object>>, Loader, Closeable
 {
-    // if a conversion error occurs, the original field value is returned
-    public static final Object ERROR_VALUE_USE_ORIGINAL = new Object();
-    private static final Logger _log = Logger.getLogger(DataLoader.class);
-
-    /**
-     * Defines order of column type preferences.
-     * We'll try each one in turn, falling back
-     * to the more general as necessary
-     **/
-    private final static Class[] CONVERT_CLASSES = new Class[]
-            {
-                    Date.class,
-                    Integer.class,
-                    Double.class,
-                    Boolean.class,
-                    String.class
-            };
-
     protected File _file = new File("Resource");
-
 
     protected ColumnDescriptor[] _columns;
     private boolean _initialized = false;
@@ -148,7 +128,6 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
     {
         if (_scrollable == null)
         {
-            _log.warn("DataLoader scrollability not explicitly set.  Assuming DataLoader is scrollable, but the default may change in the future.");
             _scrollable = true;
         }
         return _scrollable;
@@ -392,7 +371,6 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
             }
             catch (IOException e)
             {
-                _log.error("unexpected io error", e);
                 throw new RuntimeException(e);
             }
         }
@@ -462,7 +440,7 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
                 }
 
                 if (null != _file)
-                    _log.error("failed loading file " + _file.getName() + " at line: " + _lineNum + " " + e, e);
+                    TestLogger.error("failed loading file " + _file.getName() + " at line: " + _lineNum + " " + e, e);
             }
 
             // Return null to signals there are no more rows

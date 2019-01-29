@@ -61,6 +61,11 @@ public class TestLogger
         // TODO: Log at debug level if/when we convert to Log4J or similar
     }
 
+    public static void warn(String str, Throwable t)
+    {
+        log("WARNING: " + str, System.out, t);
+    }
+
     public static void warn(String str)
     {
         log("WARNING: " + str, System.out);
@@ -71,12 +76,23 @@ public class TestLogger
         log(str, System.err);
     }
 
+    public static void error(String str, Throwable t)
+    {
+        log(str, System.err, t);
+    }
+
     public static void log(String str)
     {
         if (!suppressLogging)
         {
             log(str, System.out);
         }
+    }
+
+    private static void log(String str, PrintStream out, Throwable t)
+    {
+        log(str, out);
+        t.printStackTrace(out);
     }
 
     private static void log(String str, PrintStream out)
