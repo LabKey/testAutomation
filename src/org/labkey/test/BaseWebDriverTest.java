@@ -1891,7 +1891,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
         WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        mouseOver(queryLink); // Move away from schema tree to dismiss tooltip
+        mouseOver(Locator.byClass(".x4-tab-button")); // Move away from schema tree to dismiss tooltip
         queryLink.click();
         waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
     }
