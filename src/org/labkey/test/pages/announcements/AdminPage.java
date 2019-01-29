@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages.announcements;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -64,20 +65,34 @@ public class AdminPage extends LabKeyPage<AdminPage.ElementCache>
 
     public AdminPage setModeratorReviewAll()
     {
-        elementCache().moderatorReviewAll.click();
+        confirmOptionSelected(elementCache().moderatorReviewAll);
         return new AdminPage(getDriver());
     }
 
     public AdminPage setModeratorReviewInitial()
     {
-        elementCache().moderatorReviewInitial.click();
+        confirmOptionSelected(elementCache().moderatorReviewInitial);
         return new AdminPage(getDriver());
     }
 
     public AdminPage setModeratorReviewNone()
     {
-        elementCache().moderatorReviewNone.click();
+        confirmOptionSelected(elementCache().moderatorReviewNone);
         return new AdminPage(getDriver());
+    }
+
+    private void confirmOptionSelected(WebElement moderatorReviewOption)
+    {
+        int tries = 1;
+        while(!moderatorReviewOption.isSelected() && tries < 5)
+        {
+            moderatorReviewOption.click();
+            sleep(500);
+        }
+
+        if(!moderatorReviewOption.isSelected())
+            Assert.fail("Was not able to select the Moderator Review option");
+
     }
 
     public AdminPage setBoardName(String name)
