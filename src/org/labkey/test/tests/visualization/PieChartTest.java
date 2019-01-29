@@ -109,13 +109,10 @@ public class PieChartTest extends GenericChartsTest
         pieChartLookAndFeel.setGradientColor(COLOR_RED)
                 .clickApply();
 
-        // Move mouse to make sure it is not over a pie wedge (and would generate a % in a pop-up text).
-        mouseOver(Locator.pageHeader("Chart Wizard"));
-
-        svgText = getSVGText();
+        svgText = StringUtils.stripEnd(getSVGText(), "%"); // Ignore '%' from tooltip text
         log("svg text: '" + svgText + "'");
         percentCount = StringUtils.countMatches(svgText, "%");
-        Assert.assertEquals("There should be no '%' values in the svg, found " + percentCount, 0, percentCount);
+        Assert.assertEquals("There should be no '%' values in the svg.", 0, percentCount);
 
         log("Now add percentages back and change the limit when they are visible.");
         pieChartLookAndFeel = clickChartLayoutButton();
