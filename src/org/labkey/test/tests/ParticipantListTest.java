@@ -25,6 +25,8 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -80,14 +82,14 @@ public class ParticipantListTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("Change Properties"));
 
-        int dsCount = getElementCount(Locator.xpath("//tr[@data-datasetid]"));
-        assertEquals("Unexpected number of Datasets.", 48, dsCount);
+        List<WebElement> dsRows = Locator.tag("tr").withAttribute("data-datasetid").findElements(getDriver());
+        assertEquals("Unexpected number of Datasets.", 48, dsRows.size());
 
+        clickButton("Manage Categories", 0);
+        _extHelper.waitForExtDialog("Manage Categories");
         // create new categories, then assign them out
         for (String category : CATEGORIES)
         {
-            clickButton("Manage Categories", 0);
-            _extHelper.waitForExtDialog("Manage Categories");
             clickButton("New Category", 0);
             doubleClick(Locator.tagWithClass("div", "x4-grid-cell-inner").withText("New Category").parent().waitForElement(getDriver(), 4000));
             WebElement formField = Locator.xpath("//input[contains(@id, 'textfield') and @name='label' and contains(@class, 'default-form-focus')]")
@@ -95,20 +97,23 @@ public class ParticipantListTest extends StudyBaseTest
             setFormElementJS(formField, category);
             fireEvent(formField, SeleniumEvent.blur);
             waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//div").withText(category));
-            clickButton("Done", 0);
-            _extHelper.waitForExtDialogToDisappear("Manage Categories");
         }
+        clickButton("Done", 0);
+        _extHelper.waitForExtDialogToDisappear("Manage Categories");
 
         // assign them to each dataset
-        for (int i = 0; i < dsCount; i++)
+        for (int i = 0; i < dsRows.size(); i++)
         {
+            int categoryIndex = i / 10;
+            String category = CATEGORIES[categoryIndex];
             Locator.XPathLocator combo = Locator.xpath("//div[contains(@id, '-viewcategory')]//table").withClass("x4-form-item").index(i);
             scrollIntoView(combo, true);
-            _ext4Helper.selectComboBoxItem(combo, CATEGORIES[i / 10]);
+            _ext4Helper.selectComboBoxItem(combo, category);
+            //TODO: Set categories via API (tricky because the DatasetVisibilityAction sets all attributes for all datasets at once)
         }
 
         // Set last dataset to not be visible. (ignore the hidden inputs starting with '@')
-        uncheckCheckbox(Locator.xpath("//input[not(starts-with(@name, '@')) and contains(@name, 'visible')]").index(dsCount-1));
+        uncheckCheckbox(Locator.xpath("//input[not(starts-with(@name, '@')) and contains(@name, 'visible')]").index(dsRows.size()-1));
         clickButton("Save");
     }
 
