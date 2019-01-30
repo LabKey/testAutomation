@@ -289,6 +289,11 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
+    public File downloadSelectedFiles()
+    {
+        return doAndWaitForDownload(() -> clickFileBrowserButton(BrowserAction.DOWNLOAD));
+    }
+
     public void deleteSelectedFiles()
     {
         doAndWaitForFileListRefresh(() ->

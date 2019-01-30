@@ -83,7 +83,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         _fileBrowserHelper.selectFileBrowserItem(file2.getName());
         expectedFiles.add(file2.getName());
 
-        File download = clickAndWaitForDownload(FileBrowserHelper.BrowserAction.DOWNLOAD.button());
+        File download = _fileBrowserHelper.downloadSelectedFiles();
         assertEquals(getZipDownloadFileName(), download.getName());
 
         List<String> filesInZip = TestFileUtils.getFilesInZipArchive(download);
@@ -116,7 +116,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         expectedFiles.add(folderPath + file2.getName());
 
         _fileBrowserHelper.selectFileBrowserItem("/" + folderName);
-        File download = clickAndWaitForDownload(FileBrowserHelper.BrowserAction.DOWNLOAD.button());
+        File download = _fileBrowserHelper.downloadSelectedFiles();
         assertEquals(getZipDownloadFileName(), download.getName());
 
         List<String> filesInZip = TestFileUtils.getFilesInZipArchive(download);
