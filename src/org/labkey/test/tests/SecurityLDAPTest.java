@@ -19,10 +19,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.InDevelopment;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -63,7 +61,7 @@ public class SecurityLDAPTest extends BaseWebDriverTest
         deleteUsersIfPresent(LDAP_USER);
         try
         {
-            int getResponse = WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=AutoCreateAccounts&enabled=true").getResponseCode();
+            int getResponse = setAuthenticationParameter("AutoCreateAccounts", true);
             assertEquals("failed to set authentication param to enable ldap user auto-create via http get", 200, getResponse);
         }
         catch (Exception e){
@@ -93,7 +91,7 @@ public class SecurityLDAPTest extends BaseWebDriverTest
         deleteUsersIfPresent(LDAP_USER);
         try
         {
-            int getResponse = WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=AutoCreateAccounts&enabled=false").getResponseCode();
+            int getResponse = setAuthenticationParameter("AutoCreateAccounts", false);
             assertEquals("failed to set authentication param to disable ldap user auto-create via http get", 200, getResponse);
         }
         catch (Exception e){

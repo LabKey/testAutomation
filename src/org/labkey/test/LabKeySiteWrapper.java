@@ -1095,33 +1095,35 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void enableSecondaryAuthentication()
     {
-        Connection cn = createDefaultConnection(true);
-        Command command = new Command("login", "enable");
-        command.setParameters(new HashMap<>(Maps.of("provider", "Test Secondary Authentication")));
-        try
-        {
-            command.execute(cn, null);
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException("Failed to enable Secondary Authentication", e);
-        }
+        setAuthenticationProvider("Test Secondary Authentication", "true");
     }
 
     @LogMethod(quiet = true)
     public void disableSecondaryAuthentication()
     {
+        setAuthenticationProvider("Test Secondary Authentication", "false");
+    }
+
+    @LogMethod(quiet = true)
+    public void setAuthenticationProvider(String provider, String enabled)
+    {
         Connection cn = createDefaultConnection(true);
-        Command command = new Command("login", "disable");
-        command.setParameters(new HashMap<>(Maps.of("provider", "Test Secondary Authentication")));
+        Command command = new PostCommand("login", "setProviderEnabled");
+        command.setParameters(new HashMap<>(Maps.of("provider", provider, "enabled", enabled)));
         try
         {
             command.execute(cn, null);
         }
         catch (IOException | CommandException e)
         {
-            throw new RuntimeException("Failed to disable Secondary Authentication", e);
+            throw new RuntimeException("Failed to disable " + provider, e);
         }
+    }
+
+    @LogMethod(quiet = true)
+    public int setAuthenticationParameter(String parameter, boolean enabled)
+    {
+        return WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=" + parameter + "&enabled=" + enabled, "POST").getResponseCode();
     }
 
     public ProjectMenu projectMenu()

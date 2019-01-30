@@ -25,7 +25,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.dumbster.EmailRecordTable;
@@ -190,7 +189,7 @@ public class UserTest extends BaseWebDriverTest
         enableEmailRecorder();
 
         log("Turn on support for self service email.");
-        int getResponse = WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfServiceEmailChanges&enabled=true").getResponseCode();
+        int getResponse = setAuthenticationParameter("SelfServiceEmailChanges", true);
         assertEquals("Failed to set authentication param to enable self service email via http get", 200, getResponse);
 
         log("Create a new user.");

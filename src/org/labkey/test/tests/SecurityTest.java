@@ -63,7 +63,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.buildURL;
-import static org.labkey.test.WebTestHelper.getHttpResponse;
 import static org.labkey.test.pages.ConfigureDbLoginPage.PasswordStrength;
 
 @Category(BVT.class)
@@ -801,8 +800,7 @@ public class SecurityTest extends BaseWebDriverTest
         String selfRegUserEmail = "selfreg@test.labkey.local";
         _userHelper.deleteUsers(false, selfRegUserEmail);
 
-        // TODO: Add a helper to set authentication parameters (and check response, etc.)
-        int getResponse = getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=true", PasswordUtil.getUsername(), PasswordUtil.getPassword()).getResponseCode();
+        int getResponse = setAuthenticationParameter("SelfRegistration", true);
         assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse );
         signOut();
 
@@ -831,7 +829,7 @@ public class SecurityTest extends BaseWebDriverTest
     public void loginSelfRegistrationDisabledTest()
     {
         // prep: ensure self register is disabled
-        int getResponse = getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=false", PasswordUtil.getUsername(), PasswordUtil.getPassword()).getResponseCode();
+        int getResponse = setAuthenticationParameter("SelfRegistration", false);
         assertEquals("failed to set authentication param to disable self register via http get", 200, getResponse);
         signOut();
 
