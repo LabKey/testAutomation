@@ -447,41 +447,6 @@ public class UserTest extends BaseWebDriverTest
         clickAndWait(Locator.lkButton("Submit"));
     }
 
-    @Test
-    public void testSimplePasswordReset()
-    {
-        _userHelper.createUser(PASSWORD_RESET_USER);
-        enableEmailRecorder();
-
-        goToSiteUsers();
-        clickAndWait(Locator.linkWithText(_userHelper.getDisplayNameForEmail(PASSWORD_RESET_USER)));
-        doAndWaitForPageToLoad(() -> {
-            clickButtonContainingText("Reset Password", 0);
-            assertAlertContains("You are about to clear the user's current password");
-        });
-        clickAndWait(Locator.linkWithText("Done"));
-        // View reset password email.
-        goToProjectHome();
-        goToModule("Dumbster");
-        click(Locator.linkContainingText("Reset Password Notification")); // Expand message.
-
-        clickAndWait(Locator.linkContainingText("setPassword")); // Set Password URL
-        assertTextPresent(PASSWORD_RESET_USER);
-        setFormElement(Locator.id("password"), TEST_PASSWORD);
-        setFormElement(Locator.id("password2"), TEST_PASSWORD);
-
-        clickButton("Set Password");
-
-        clickUserMenuItem("Sign Out");
-        clickAndWait(Locator.linkWithText("Sign In"));
-        setFormElement(Locator.id("email"), PASSWORD_RESET_USER);
-        setFormElement(Locator.id("password"), TEST_PASSWORD);
-        clickButton("Sign In");
-        assertSignedInNotImpersonating();
-        assertTextPresent(PASSWORD_RESET_USER);
-        assertTextNotPresent("Sign In");
-    }
-
     private void checkRequiredField(String name, boolean select)
     {
         PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
