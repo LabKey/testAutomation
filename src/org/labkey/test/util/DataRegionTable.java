@@ -39,7 +39,6 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -516,7 +515,7 @@ public class DataRegionTable extends DataRegion
 
     public Map<String, String> getRowDataAsMap(int row)
     {
-        Map<String, String> rowMap = new LinkedCaseInsensitiveMap<>();
+        Map<String, String> rowMap = new CaseInsensitiveHashMap<>();
         for (String colName : getColumnNames())
         {
             rowMap.put(colName, getDataAsText(row, colName));
