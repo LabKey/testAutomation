@@ -70,7 +70,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         if (apiException == null)
             fail("App Admin was able to assign Site Admin role");
 
-        assertEquals("Wrong error", "You do not have permission to modify the Site Admin role", apiException.getMessage());
+        assertEquals("Wrong error", "You do not have permission to modify the Site Admin role or permission", apiException.getMessage());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         if (apiException == null)
             fail("App Admin was able to assign Platform Developer role");
 
-        assertEquals("Wrong error", "You do not have permission to modify the Platform Developer role", apiException.getMessage());
+        assertEquals("Wrong error", "You do not have permission to modify the Platform Developer role or permission", apiException.getMessage());
     }
 
     @Test
