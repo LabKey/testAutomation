@@ -95,9 +95,17 @@ public class JSONHelper
         }
     }
 
+    // TODO: Remove reference to JSONObject in transitive dependency
     private String prettyJSON(JSONObject o)
     {
-        return new org.json.JSONObject(o).toString(2);
+        try
+        {
+            return new org.json.JSONObject(o).toString(2);
+        }
+        catch (org.json.JSONException e)
+        {
+            return o.toJSONString();
+        }
     }
 
     public boolean compareMap(Map map1, Map map2)

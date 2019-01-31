@@ -20,14 +20,15 @@ project.dependencies {
     compile "org.jetbrains:annotations:${annotationsVersion}"
     compile "org.mock-server:mockserver-netty:${mockserverVersion}"
     
+    // LabKey XML schemas are used to decode exported folder XMLs and test case XMLs
+    // Don't include local version so that running tests doesn't require building :server:api
+    compile ("org.labkey:api:${labkeySchemasTestVersion}:schemas") { transitive = false }
+
     // 36184: Tests can't find selenium-ie-driver library when running on Windows on TeamCity
     // Workaround to ensure that the class-loader finds InternetExplorerDriver
     compile "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
 }
 
-String schemasProjectPath = BuildUtils.getSchemasProjectPath(gradle)
-if (project.findProject(schemasProjectPath) != null)
-    BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: schemasProjectPath, depVersion: project.labkeyVersion)
 BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle), depVersion: project.labkeyVersion)
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
