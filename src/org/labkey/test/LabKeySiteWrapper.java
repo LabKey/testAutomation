@@ -1093,21 +1093,21 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     @LogMethod(quiet = true)
-    public void enableSecondaryAuthentication()
+    public static void enableSecondaryAuthentication()
     {
-        setAuthenticationProvider("Test Secondary Authentication", "true");
+        setAuthenticationProvider("Test Secondary Authentication", true);
     }
 
     @LogMethod(quiet = true)
-    public void disableSecondaryAuthentication()
+    public static void disableSecondaryAuthentication()
     {
-        setAuthenticationProvider("Test Secondary Authentication", "false");
+        setAuthenticationProvider("Test Secondary Authentication", false);
     }
 
     @LogMethod(quiet = true)
-    public void setAuthenticationProvider(String provider, String enabled)
+    public static void setAuthenticationProvider(String provider, boolean enabled)
     {
-        Connection cn = createDefaultConnection(true);
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         Command command = new PostCommand("login", "setProviderEnabled");
         command.setParameters(new HashMap<>(Maps.of("provider", provider, "enabled", enabled)));
         try
@@ -1116,14 +1116,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         catch (IOException | CommandException e)
         {
-            throw new RuntimeException("Failed to disable " + provider, e);
+            throw new RuntimeException("Failed to " + (enabled ? "enable" : "disable") + " login provider: " + provider, e);
         }
     }
 
     @LogMethod(quiet = true)
     public int setAuthenticationParameter(String parameter, boolean enabled)
     {
-        return WebTestHelper.getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=" + parameter + "&enabled=" + enabled, "POST").getResponseCode();
+        return WebTestHelper.getHttpResponse(WebTestHelper.buildURL("login", "setAuthenticationParameter", Map.of("parameter", parameter, "enabled", String.valueOf(enabled))), "POST").getResponseCode();
     }
 
     public ProjectMenu projectMenu()

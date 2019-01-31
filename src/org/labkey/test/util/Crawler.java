@@ -171,8 +171,6 @@ public class Crawler
             new ControllerActionId("issues", "download"),
             new ControllerActionId("list", "download"),
             new ControllerActionId("login", "logout"),
-            new ControllerActionId("login", "enable"),      // TODO: These should be post actions (product issue)
-            new ControllerActionId("login", "disable"),      // TODO: These should be post actions (product issue)
             new ControllerActionId("login", "setAuthenticationParameter"),
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("login", "createToken"),
