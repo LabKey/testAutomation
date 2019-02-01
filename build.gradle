@@ -15,6 +15,7 @@ project.dependencies {
     compile "org.apache.commons:commons-lang3:${commonsLang3Version}"
     compile "org.apache.commons:commons-math3:${commonsMath3Version}"
     compile "org.apache.poi:poi:${poiVersion}"
+    compile "org.apache.poi:poi-ooxml:${poiVersion}"
     compile "org.apache.xmlbeans:xmlbeans:${xmlbeansVersion}"
     compile "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
     compile "org.jetbrains:annotations:${annotationsVersion}"
