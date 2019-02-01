@@ -91,7 +91,6 @@ public class ParticipantListTest extends StudyBaseTest
         for (String category : CATEGORIES)
         {
             clickButton("New Category", 0);
-            doubleClick(Locator.tagWithClass("div", "x4-grid-cell-inner").withText("New Category").parent().waitForElement(getDriver(), 4000));
             WebElement formField = Locator.xpath("//input[contains(@id, 'textfield') and @name='label' and contains(@class, 'default-form-focus')]")
                     .notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
             setFormElementJS(formField, category);
