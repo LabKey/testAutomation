@@ -1093,21 +1093,21 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     @LogMethod(quiet = true)
-    public static void enableSecondaryAuthentication()
+    public void enableSecondaryAuthentication()
     {
         setAuthenticationProvider("Test Secondary Authentication", true);
     }
 
     @LogMethod(quiet = true)
-    public static void disableSecondaryAuthentication()
+    public void disableSecondaryAuthentication()
     {
         setAuthenticationProvider("Test Secondary Authentication", false);
     }
 
     @LogMethod(quiet = true)
-    public static void setAuthenticationProvider(String provider, boolean enabled)
+    public void setAuthenticationProvider(String provider, boolean enabled)
     {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
+        Connection cn = createDefaultConnection(true);
         Command command = new PostCommand("login", "setProviderEnabled");
         command.setParameters(new HashMap<>(Maps.of("provider", provider, "enabled", enabled)));
         try
