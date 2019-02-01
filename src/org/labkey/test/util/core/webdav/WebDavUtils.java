@@ -67,28 +67,27 @@ public class WebDavUtils
         }
     }
 
-    public static class WebDavUrlFactory
+    /**
+     * @deprecated Moved to {@link org.labkey.test.util.core.webdav.WebDavUrlFactory}
+     * TODO: remove in 19.2
+     */
+    @Deprecated(forRemoval = true)
+    public static class WebDavUrlFactory extends org.labkey.test.util.core.webdav.WebDavUrlFactory
     {
-        private final String baseUrl;
-
         protected WebDavUrlFactory(String baseUrl)
         {
-            this.baseUrl = StringUtils.stripEnd(baseUrl, "/") + "/";
-        }
-
-        public String getPath(String relativePath)
-        {
-            return baseUrl + StringUtils.stripStart(relativePath, "/");
+            super(baseUrl);
         }
     }
 
+    /**
+     * @deprecated Moved to {@link org.labkey.test.util.core.webdav.WebDavUrlFactory#webDavUrlFactory(String)}
+     * Leave in place to ease merges from panoramaweb18.3
+     * TODO: remove in 19.2
+     */
+    @Deprecated(forRemoval = true)
     public static WebDavUrlFactory webDavUrlFactory(String containerPath)
     {
         return new WebDavUrlFactory(buildBaseWebDavUrl(containerPath, "@files"));
-    }
-
-    public static WebDavUrlFactory webFilesUrlFactory(String containerPath)
-    {
-        return new WebDavUrlFactory(buildBaseWebfilesUrl(containerPath));
     }
 }

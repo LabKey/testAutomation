@@ -26,8 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.core.webdav.WebDavUtils;
-import org.labkey.test.util.core.webdav.WebDavUtils.WebDavUrlFactory;
+import org.labkey.test.util.core.webdav.WebDavUrlFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +71,7 @@ public class WebDavPerfTest extends BaseWebDriverTest
     {
         final int fileCount = 1000;
         final String subfolder = "manyFilesTestFolder";
-        WebDavUrlFactory davUrl = WebDavUtils.webDavUrlFactory(getProjectName() + "/" + subfolder);
+        WebDavUrlFactory davUrl = WebDavUrlFactory.webDavUrlFactory(getProjectName() + "/" + subfolder);
 
         _containerHelper.createSubfolder(getProjectName(), subfolder);
         final Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());

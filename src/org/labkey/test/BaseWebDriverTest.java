@@ -59,6 +59,7 @@ import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
+import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -1519,6 +1520,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return Integer.parseInt(executeScript(js).toString());
     }
 
+    /**
+     * @deprecated Only use for testing pipeline functionality.
+     * Setting a custom pipeline root is unnecessarily restrictive for most tests.
+     * Consider using {@link WebDavUploadHelper#uploadDirectoryContents(java.io.File)} for a similar result
+     */
+    @Deprecated
     public void setPipelineRoot(String rootPath)
     {
         setPipelineRoot(rootPath, false);

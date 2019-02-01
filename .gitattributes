@@ -981,6 +981,8 @@ src/org/labkey/test/util/WikiHelper.java -text
 src/org/labkey/test/util/WindowsOnlyTest.java -text
 src/org/labkey/test/util/WorkbookHelper.java -text
 src/org/labkey/test/util/ZipUtil.java -text
+src/org/labkey/test/util/core/webdav/WebDavUploadHelper.java -text
+src/org/labkey/test/util/core/webdav/WebDavUrlFactory.java -text
 src/org/labkey/test/util/core/webdav/WebDavUtils.java -text
 src/org/labkey/test/util/di/DataIntegrationHelper.java -text
 src/org/labkey/test/util/ext4cmp/Ext4CmpRef.java -text
