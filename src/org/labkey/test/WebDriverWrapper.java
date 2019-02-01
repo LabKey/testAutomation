@@ -1819,7 +1819,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String doAndWaitForRepeatedPageSignal(Runnable func, String signalName)
     {
-        return doAndWaitForRepeatedPageSignal(func, signalName, Duration.ofMillis(500));
+        return doAndWaitForRepeatedPageSignal(func, signalName, Duration.ofSeconds(2));
     }
 
     /**
