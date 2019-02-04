@@ -20,7 +20,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -64,33 +63,15 @@ public class SampleSetTest extends BaseWebDriverTest
     private static final String LINEAGE_FOLDER = "LineageSampleSetFolder";
     private static final String LINEAGE_SAMPLE_SET_NAME = "LineageSampleSet";
     private static final String PROJECT_SAMPLE_SET_NAME = "ProjectSampleSet";
+    private static final String PROJECT_PARENT_SAMPLE_SET_NAME = "ProjectParentSampleSet";
     private static final String FOLDER_SAMPLE_SET_NAME = "FolderSampleSet";
+    private static final String PARENT_SAMPLE_SET_NAME = "ParentSampleSet";
     private static final String FOLDER_CHILDREN_SAMPLE_SET_NAME = "FolderChildrenSampleSet";
     private static final String FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME = "FolderGrandchildrenSampleSet";
-    private static final String CASE_INSENSITIVE_SAMPLESET = "CaseInsensitiveSampleSet";
-    private static final String LOWER_CASE_SAMPLESET = "caseinsensitivesampleset";
+    private static final String CASE_INSENSITIVE_SAMPLE_SET = "CaseInsensitiveSampleSet";
+    private static final String LOWER_CASE_SAMPLE_SET = "caseinsensitivesampleset";
 
     protected static final String PIPELINE_PATH = "/sampledata/xarfiles/expVerify";
-    private static final String AMBIGUOUS_CHILD_SAMPLE_SET_TSV = "Name\tPMaterials/Inputs\tOtherProp\n" +
-            "SampleSetBVTChildA\tSampleSetBVT11\t1.1\n" +
-            "SampleSetBVTChildB\tSampleSetBVT4\t2.2\n";
-
-    private static final String CHILD_SAMPLE_SET_TSV = "Name\tMaterials/Inputs\tOtherProp\n" +
-            "SampleSetBVTChildA\tSampleSetBVT11\t1.1\n" +
-            "SampleSetBVTChildB\tFolderSampleSet.SampleSetBVT4\t2.2\n";
-
-    private static final String REPARENTED_CHILD_SAMPLE_SET_TSV = "Name\tMaterials/Inputs\tOtherProp\n" +
-            "SampleSetBVTChildA\tSampleSetBVT13\t1.111\n" +
-            "SampleSetBVTChildB\tFolderSampleSet.SampleSetBVT14\t2.222\n";
-
-    private static final String GRANDCHILD_SAMPLE_SET_TSV = "Name\tMaterials/Inputs\tOtherProp\n" +
-            "SampleSetBVTGrandchildA\tSampleSetBVTChildA,SampleSetBVTChildB\t11.11\n";
-
-    private static final String PROJECT_INVALID_SUBFOLDER_REFERENCE_SAMPLE_SET_TSV = "Key Col\tParent\n" +
-            "ProjectS1\tSampleSetBVTChildA\n";
-
-    private static final String PROJECT_VALID_SUBFOLDER_REFERENCE_SAMPLE_SET_TSV = "Key Col\tParent\n" +
-            "ProjectS1\t/SampleSetTestProject/SampleSetTestFolder.FolderChildrenSampleSet.SampleSetBVTChildA\n";
 
     public List<String> getAssociatedModules()
     {
@@ -300,7 +281,7 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Submit", "Can't insert; material already exists");
 
         log("Switch to 'Insert and Update'");
-        sampleHelper.selectInsertOption("MERGE", 1);
+        sampleHelper.selectImportOption(SampleSetHelper.MERGE_DATA_OPTION, 1);
         clickButton("Submit");
 
         log("Validate data was updated and new data added");
@@ -480,45 +461,56 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
 
-    @Test @Ignore("Needs to be converted to use Materials/Inputs instead of parent column")
+    @Test
     public void testParentChild()
     {
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
 
-        clickButton("Import Sample Set");
-        setFormElement(Locator.name("name"), FOLDER_CHILDREN_SAMPLE_SET_NAME);
-        setFormElement(Locator.name("data"), AMBIGUOUS_CHILD_SAMPLE_SET_TSV);
-//        selectParentColumn("Parent");
-        clickButton("Submit");
-        assertTextPresent("Failed to find sample parent: Found 2 values matching: SampleSetBVT4");
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        log("Create parent sample set");
+        sampleHelper.createSampleSet(PARENT_SAMPLE_SET_NAME, null,
+                Map.of("IntCol",  FieldDefinition.ColumnType.Integer),
+                "Name\tIntCol\n" +
+                        "SampleSetBVT11\t101\n" +
+                        "SampleSetBVT4\t102\n" +
+                        "SampleSetBVT12\t102\n" +
+                        "SampleSetBVT13\t103\n" +
+                        "SampleSetBVT14\t104");
 
-        // Try again with a qualified sample name
-        setFormElement(Locator.name("data"), CHILD_SAMPLE_SET_TSV);
-//        selectParentColumn("Parent");
-        clickButton("Submit");
-        assertTextPresent("SampleSetBVTChildA");
+        log("Create child sample set");
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        sampleHelper.createSampleSet(FOLDER_CHILDREN_SAMPLE_SET_NAME, null,
+                Map.of("OtherProp", FieldDefinition.ColumnType.Double),
+                "Name\tMaterialInputs/" + PARENT_SAMPLE_SET_NAME + "\tOtherProp\n" +
+                        "SampleSetBVTChildA\tSampleSetBVT11\t1.1\n" +
+                        "SampleSetBVTChildB\tSampleSetBVT4\t2.2\n"
+                );
 
 
         // Make sure that the parent got wired up
-        clickAndWait(Locator.linkWithText("SampleSetBVT4"));
+        log("Verify parent references");
+        DataRegionTable table = sampleHelper.getSamplesDataRegionTable();
+        table.openCustomizeGrid();
+        _customizeViewsHelper.showHiddenItems();
+        _customizeViewsHelper.addColumn(new String[]{"Inputs", "Materials", PARENT_SAMPLE_SET_NAME});
+        _customizeViewsHelper.clickViewGrid();
+        waitAndClickAndWait(Locator.linkWithText("SampleSetBVT4"));
+
         // Check out the run
         clickAndWait(Locator.linkWithText("Derive sample from SampleSetBVT4"));
         assertElementPresent(Locator.linkWithText("SampleSetBVT4"));
         assertElementPresent(Locator.linkWithText("SampleSetBVTChildB"));
 
-        // Make a grandchild set, but first try to insert as a duplicate set name
+        // Make a grandchild set
+        log("Create a grandparent sample set");
         clickTab("Experiment");
         clickAndWait(Locator.linkWithText("Sample Sets"));
-        clickButton("Import Sample Set");
-        setFormElement(Locator.name("name"), FOLDER_CHILDREN_SAMPLE_SET_NAME);
-        setFormElement(Locator.name("data"), GRANDCHILD_SAMPLE_SET_TSV);
-//        selectParentColumn("Parent");
-        clickButton("Submit");
+        sampleHelper.setInWebPart(false);
 
-        assertTextPresent("A sample set with that name already exists");
-        setFormElement(Locator.name("name"), FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
-//        selectParentColumn("Parent");
-        clickButton("Submit");
+        sampleHelper.createSampleSet(FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME, null,
+                Map.of("OtherProp", FieldDefinition.ColumnType.Double),
+                "Name\tMaterialInputs/" + FOLDER_CHILDREN_SAMPLE_SET_NAME + "\tOtherProp\n" +
+                        "SampleSetBVTGrandchildA\tSampleSetBVTChildA,SampleSetBVTChildB\t11.11\n");
 
         waitAndClickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
 
@@ -555,11 +547,13 @@ public class SampleSetTest extends BaseWebDriverTest
         childMaterialsRegion.clearFilter("Name");
         assertTextPresent("SampleSetBVTChildA", "SampleSetBVTGrandchildA");
 
+        log("Change parents for the child samples");
         clickAndWait(Locator.linkWithText(FOLDER_CHILDREN_SAMPLE_SET_NAME));
-        clickButton("Import More Samples");
-        checkRadioButton(Locator.radioButtonById("insertOrUpdateChoice"));
-        setFormElement(Locator.name("data"), REPARENTED_CHILD_SAMPLE_SET_TSV);
-        clickButton("Submit");
+        String REPARENTED_CHILD_SAMPLE_SET_TSV = "Name\tMaterialInputs/" + PARENT_SAMPLE_SET_NAME + "\tOtherProp\n" +
+                "SampleSetBVTChildA\tSampleSetBVT13\t1.111\n" +
+                "SampleSetBVTChildB\tSampleSetBVT14\t2.222\n";
+
+        sampleHelper.bulkImport(REPARENTED_CHILD_SAMPLE_SET_TSV, SampleSetHelper.MERGE_DATA_OPTION);
 
         clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
         assertTextPresent("2.222");
@@ -573,21 +567,27 @@ public class SampleSetTest extends BaseWebDriverTest
         childMaterialsRegion.clearFilter("Name");
         assertElementNotPresent(Locator.linkWithText("SampleSetBVT14"));
         assertElementPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
+    }
 
-        // Verify that we can reference samples in other containers by including a folder path
+    @Test
+    public void testParentInProjectSampleSet()
+    {
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
         clickProject(PROJECT_NAME);
-        clickAndWait(Locator.linkWithText(PROJECT_SAMPLE_SET_NAME));
-        clickButton("Import More Samples");
-        checkRadioButton(Locator.radioButtonById("insertOrUpdateChoice"));
-        setFormElement(Locator.name("data"), PROJECT_INVALID_SUBFOLDER_REFERENCE_SAMPLE_SET_TSV);
-        clickButton("Submit");
-        assertTextPresent("Could not find parent material with name 'SampleSetBVTChildA'.");
-        setFormElement(Locator.name("data"), PROJECT_VALID_SUBFOLDER_REFERENCE_SAMPLE_SET_TSV);
-        clickButton("Submit");
+        sampleHelper.createSampleSet(PROJECT_PARENT_SAMPLE_SET_NAME, null,
+                Map.of("Field1", FieldDefinition.ColumnType.String),
+                "Name\tField1\n" +
+                        "ProjectS1\tsome value\n");
+
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        sampleHelper.createSampleSet("ChildOfProject", null,
+                Map.of("IntCol",  FieldDefinition.ColumnType.Integer),
+                "Name\tMaterialInputs/" + PROJECT_PARENT_SAMPLE_SET_NAME + "\n" +
+                        "COP1\tProjectS1\n");
+
         // Verify it got linked up correctly
-        clickAndWait(Locator.linkWithText("ProjectS1"));
-        assertElementPresent(Locator.linkWithText("SampleSetBVT13"));
-        assertElementPresent(Locator.linkWithText("SampleSetBVTChildA"));
+        clickAndWait(Locator.linkWithText("COP1"));
+        assertElementPresent(Locator.linkWithText("ProjectS1"));
     }
 
     @Test
@@ -597,14 +597,14 @@ public class SampleSetTest extends BaseWebDriverTest
 
         // make sure we are case-sensitive when creating samplesets -- regression coverage for issue 33743
         clickProject(PROJECT_NAME);
-        sampleHelper.createSampleSet(CASE_INSENSITIVE_SAMPLESET);
+        sampleHelper.createSampleSet(CASE_INSENSITIVE_SAMPLE_SET);
 
         clickProject(PROJECT_NAME);
-        sampleHelper.createSampleSet(LOWER_CASE_SAMPLESET);
+        sampleHelper.createSampleSet(LOWER_CASE_SAMPLE_SET);
         waitForElement(Locator.tagWithClass("div", "labkey-error").containing("A sample set with that name already exists."));
         clickProject(PROJECT_NAME);
-        assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLESET));
-        assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLESET));
+        assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_SET));
+        assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLE_SET));
     }
 
     @Test

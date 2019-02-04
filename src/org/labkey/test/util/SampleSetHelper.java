@@ -23,6 +23,8 @@ public class SampleSetHelper
     private BaseWebDriverTest _test;
     private boolean _inWebPart = true;
     private Map<String, FieldDefinition.ColumnType> _fields;
+    public static final String IMPORT_DATA_OPTION = "IMPORT";
+    public static final String MERGE_DATA_OPTION = "MERGE";
 
     public SampleSetHelper(BaseWebDriverTest test)
     {
@@ -32,6 +34,11 @@ public class SampleSetHelper
     public SampleSetHelper(BaseWebDriverTest test, boolean inWebPart)
     {
         _test = test;
+        _inWebPart = inWebPart;
+    }
+
+    public void setInWebPart(boolean inWebPart)
+    {
         _inWebPart = inWebPart;
     }
 
@@ -109,7 +116,7 @@ public class SampleSetHelper
         return this;
     }
 
-    public SampleSetHelper selectInsertOption(String value, int index)
+    public SampleSetHelper selectImportOption(String value, int index)
     {
         List<WebElement> buttons = Locator.radioButtonByNameAndValue("insertOption", value).findElements(_test.getDriver());
         buttons.get(index).click();
@@ -183,21 +190,37 @@ public class SampleSetHelper
 
     public void bulkImport(File dataFile)
     {
-        DataRegionTable drt = getSamplesDataRegionTable();
-        _test.log("Adding data from file");
-        drt.clickHeaderMenu("Insert data", BULK_IMPORT_MENU_TEXT);
-        _test.click(Locators.fileUpload);
-        _test.setFormElement(Locator.tagWithName("input", "file"), dataFile);
-        _test.clickButton("Submit");
+        bulkImport(dataFile, IMPORT_DATA_OPTION);
+    }
+
+    public void bulkImport(File dataFile, String importOption)
+    {
+        if (dataFile != null)
+        {
+            DataRegionTable drt = getSamplesDataRegionTable();
+            _test.log("Adding data from file");
+            drt.clickHeaderMenu("Insert data", BULK_IMPORT_MENU_TEXT);
+            _test.click(Locators.fileUpload);
+            selectImportOption(importOption, 0);
+            _test.setFormElement(Locator.tagWithName("input", "file"), dataFile);
+            _test.clickButton("Submit");
+        }
     }
 
     public void bulkImport(String tsvData)
     {
+        bulkImport(tsvData, IMPORT_DATA_OPTION);
+    }
+
+    public void bulkImport(String tsvData, String importOption)
+    {
         if (tsvData.length() > 0)
         {
+
             DataRegionTable drt = getSamplesDataRegionTable();
             _test.log("Adding tsv data via bulk import");
             drt.clickHeaderMenu("Insert data", BULK_IMPORT_MENU_TEXT);
+            selectImportOption(importOption, 1);
             _test.setFormElement(Locator.name("text"), tsvData);
             _test.clickButton("Submit");
         }
