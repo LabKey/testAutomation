@@ -30,6 +30,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SampleSetHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -75,11 +76,8 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         portalHelper.addWebPart("Assay List");
 
         //import a sample set
-        clickButton("Import Sample Set");
-        setFormElement(Locator.id("name"), SAMPLE_SET_NAME);
-        checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
-        setFormElement(Locator.name("file"), SAMPLE_SET);
-        clickButton("Submit");
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null, null,  SAMPLE_SET);
 
         _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, FOLDER_TYPE_STUDY);
 

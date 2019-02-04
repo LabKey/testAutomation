@@ -29,11 +29,13 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SampleSetHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,17 +136,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         portalHelper.addWebPart("Sample Sets");
 
         log("adding sample set with file column");
-        String vialSetsData = "Name\tcolor\n" +
-                "ed\tgreen\n";
-        DataRegionTable sampleSetsTable = new DataRegionTable("SampleSet", getDriver());
-        sampleSetsTable.clickHeaderButtonByText("Import Sample Set");
-        setFormElement(Locator.xpath("//input[@id='name']"), SAMPLESET_NAME);
-        setFormElement(Locator.xpath("//textarea[@id='textbox']"), vialSetsData);
 
-        // set id row
-        selectOptionByText(Locator.xpath("//select[@id='idCol1']"), "Name");
-        // leave parent empty
-        clickButton("Submit");
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(SAMPLESET_NAME, null, Map.of("color", FieldDefinition.ColumnType.String), Collections.singletonList(Map.of("Name", "ed", "color", "green")));
 
         // add a 'file' column
         log("editing fields in Vial Groups");

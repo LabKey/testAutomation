@@ -23,11 +23,14 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SampleSetHelper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
@@ -93,13 +96,8 @@ public class MicroarrayTest extends BaseWebDriverTest
         log("Create Sample Set");
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Sample Sets");
-        clickButton("Import Sample Set");
-        setFormElement(Locator.id("name"), SAMPLE_SET);
-        setFormElement(Locator.name("data"), SAMPLE_SET_ROWS);
-        fireEvent(Locator.name("data"), SeleniumEvent.change);
-        waitForFormElementToEqual(Locator.id("idCol1"), "0");
-        clickButton("Submit");
-        DataRegion(getDriver()).withName("Material").waitFor();
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(SAMPLE_SET, null, Map.of("Barcode", FieldDefinition.ColumnType.String), SAMPLE_SET_ROWS);
 
         // First try importing the runs individually
         goToDashboard();

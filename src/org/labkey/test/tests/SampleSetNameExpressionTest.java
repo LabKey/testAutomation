@@ -21,13 +21,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SampleSetHelper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
@@ -72,16 +74,18 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
     @Test
     public void testSimpleNameExpression()
     {
-        clickButton("Import Sample Set");
-        setFormElement(Locator.id("name"), "SimpleNameExprTest");
-        setFormElement(Locator.name("data"), "A\tB\tC\n" +
-                "a\tb\tc\n" +
-                "a\tb\tc\n" +
-                "a\tb\tc\n");
-        checkRadioButton(Locator.radioButtonById("nameFormat_nameExpression"));
         String nameExpression = "${A}-${B}.${randomId}";
-        setFormElement(Locator.inputById("nameExpression"), nameExpression);
-        clickButton("Submit");
+        String data = "A\tB\tC\n" +
+                "a\tb\tc\n" +
+                "a\tb\tc\n" +
+                "a\tb\tc\n";
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet("SimpleNameExprTest", nameExpression,
+                Map.of("A", FieldDefinition.ColumnType.String,
+                        "B", FieldDefinition.ColumnType.String,
+                        "C", FieldDefinition.ColumnType.String),
+                data
+                );
 
         // Verify SampleSet details
         assertTextPresent(nameExpression);
@@ -97,10 +101,8 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
     @Test
     public void testInputsExpression()
     {
-        clickButton("Import Sample Set");
-        setFormElement(Locator.id("name"), "InputsExpressionTest");
-        setFormElement(Locator.name("data"),
-                "Name\tB\tMaterialInputs/InputsExpressionTest\n" +
+        String nameExpression = "${Inputs:first:defaultValue('SS')}_${batchRandomId}";
+        String data = "Name\tB\tMaterialInputs/InputsExpressionTest\n" +
 
                 // Name provided
                 "Bob\tb\t\n" +
@@ -110,14 +112,11 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
                 "\tb\tBob,Susie\n" +
 
                 // Name generated and uses defaultValue('SS')
-                "\tb\t\n");
+                "\tb\t\n";
 
-        checkRadioButton(Locator.radioButtonById("nameFormat_nameExpression"));
-        String nameExpression = "${Inputs:first:defaultValue('SS')}_${batchRandomId}";
-        setFormElement(Locator.inputById("nameExpression"), nameExpression);
-        clickButton("Submit");
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet("InputsExpressionTest", nameExpression, Map.of("B", FieldDefinition.ColumnType.String), data);
 
-        // Verify SampleSet details
         assertTextPresent(nameExpression);
 
         DataRegionTable materialTable = new DataRegionTable("Material", this);

@@ -34,11 +34,13 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
+import org.labkey.test.util.SampleSetHelper;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
@@ -188,10 +190,8 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickProject(PROJECT_NAME);
 
         portalHelper.addWebPart("Sample Sets");
-        clickButton("Import Sample Set");
-        setFormElement(Locator.name("name"), SAMPLE_SET);
-        setFormElement(Locator.name("data"), SAMPLE_SET_ROWS);
-        clickButton("Submit");
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(SAMPLE_SET, null, Map.of("Barcode", FieldDefinition.ColumnType.String), SAMPLE_SET_ROWS);
     }
 
     @Test

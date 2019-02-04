@@ -958,6 +958,7 @@ src/org/labkey/test/util/ReflectionUtils.java -text
 src/org/labkey/test/util/RelativeUrl.java -text
 src/org/labkey/test/util/RemoteConnectionHelper.java -text
 src/org/labkey/test/util/ReportDataRegion.java -text
+src/org/labkey/test/util/SampleSetHelper.java -text
 src/org/labkey/test/util/ScatterPlotReportHelper.java -text
 src/org/labkey/test/util/SchemaHelper.java -text
 src/org/labkey/test/util/SearchHelper.java -text

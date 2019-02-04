@@ -165,12 +165,6 @@ public class TabTest extends SimpleModuleTest
         goToModule("Pipeline");
         verifyTabSelected("Tab 2");
 
-        //this is a regex selector
-        clickFolder(FOLDER_NAME);
-        portalHelper.addWebPart("Sample Sets");
-        clickAndWait(Locator.lkButton("Import Sample Set"));
-        verifyTabSelected("Tab 1");
-
         // Test Container tabs
         portalHelper.activateTab("Assay Container");
         assertTextPresent("Assay List");

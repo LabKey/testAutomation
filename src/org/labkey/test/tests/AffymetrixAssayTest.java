@@ -28,9 +28,13 @@ import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SampleSetHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Category({DailyA.class, Assays.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
@@ -103,19 +107,18 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(this);
 
         log("Create Sample Set");
-        String sampleData = "hyb_name\n";
+
+        List<Map<String, String>> data = new ArrayList<>();
 
         for (int i = 1; i <= 96; i++)
         {
-            sampleData += "Sample" + i + "\n";
+            data.add(Map.of("Name", "Sample" + i));
         }
 
         goToProjectHome();
         portalHelper.addWebPart("Sample Sets");
-        clickButton("Import Sample Set");
-        setFormElement(Locator.name("name"), SAMPLE_SET_NAME);
-        setFormElement(Locator.name("data"), sampleData);
-        clickButton("Submit");
+        SampleSetHelper sampleSetHelper = new SampleSetHelper(this);
+        sampleSetHelper.createSampleSet(SAMPLE_SET_NAME, null, Collections.emptyMap(), data);
     }
 
     @LogMethod

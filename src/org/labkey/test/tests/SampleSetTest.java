@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -34,11 +35,14 @@ import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SampleSetHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,19 +71,19 @@ public class SampleSetTest extends BaseWebDriverTest
     private static final String LOWER_CASE_SAMPLESET = "caseinsensitivesampleset";
 
     protected static final String PIPELINE_PATH = "/sampledata/xarfiles/expVerify";
-    private static final String AMBIGUOUS_CHILD_SAMPLE_SET_TSV = "Name\tParent\tOtherProp\n" +
+    private static final String AMBIGUOUS_CHILD_SAMPLE_SET_TSV = "Name\tPMaterials/Inputs\tOtherProp\n" +
             "SampleSetBVTChildA\tSampleSetBVT11\t1.1\n" +
             "SampleSetBVTChildB\tSampleSetBVT4\t2.2\n";
 
-    private static final String CHILD_SAMPLE_SET_TSV = "Name\tParent\tOtherProp\n" +
+    private static final String CHILD_SAMPLE_SET_TSV = "Name\tMaterials/Inputs\tOtherProp\n" +
             "SampleSetBVTChildA\tSampleSetBVT11\t1.1\n" +
             "SampleSetBVTChildB\tFolderSampleSet.SampleSetBVT4\t2.2\n";
 
-    private static final String REPARENTED_CHILD_SAMPLE_SET_TSV = "Name\tParent\tOtherProp\n" +
+    private static final String REPARENTED_CHILD_SAMPLE_SET_TSV = "Name\tMaterials/Inputs\tOtherProp\n" +
             "SampleSetBVTChildA\tSampleSetBVT13\t1.111\n" +
             "SampleSetBVTChildB\tFolderSampleSet.SampleSetBVT14\t2.222\n";
 
-    private static final String GRANDCHILD_SAMPLE_SET_TSV = "Name\tParent\tOtherProp\n" +
+    private static final String GRANDCHILD_SAMPLE_SET_TSV = "Name\tMaterials/Inputs\tOtherProp\n" +
             "SampleSetBVTGrandchildA\tSampleSetBVTChildA,SampleSetBVTChildB\t11.11\n";
 
     private static final String PROJECT_INVALID_SUBFOLDER_REFERENCE_SAMPLE_SET_TSV = "Key Col\tParent\n" +
@@ -127,13 +131,18 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void doLineageDerivationTest()
     {
-        String sampleText = "KeyCol\tIntCol\tStringCol\n" +
+        String sampleText = "Name\tIntCol\tStringCol\n" +
                 "Sample12ab\t1012\talpha\n" +
                 "Sample13c4\t1023\tbeta\n" +
                 "Sample14d5\t1024\tgamma\n" +
                 "Sampleabcd\t1035\tepsilon\n" +
                 "Sampledefg\t1046\tzeta";
-        importSampleSet(PROJECT_NAME, LINEAGE_FOLDER, LINEAGE_SAMPLE_SET_NAME, sampleText);
+        projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(LINEAGE_SAMPLE_SET_NAME, null,
+                Map.of("IntCol", FieldDefinition.ColumnType.Integer,
+                        "StringCol", FieldDefinition.ColumnType.String),
+                sampleText);
 
         // at this point, we're in the LINEAGE_FOLDER, on the Experiment tab, looking at the sample sets properties and Sample Set contents webparts.
         // now we add more samples,
@@ -161,84 +170,50 @@ public class SampleSetTest extends BaseWebDriverTest
         assertNotEquals("RowD should not equal C", rowD.get("Run"), rowC.get("Run"));
     }
 
-    private void importSampleSet(String project, String folder, String samplesetName, String sampleText)
-    {
-        projectMenu().navigateToFolder(project, folder);
-
-        clickButton("Import Sample Set");
-        setFormElement(Locator.id("name"), samplesetName);
-        setFormElement(Locator.name("data"), sampleText);
-        clickButton("Submit");
-    }
-
     @Test
     public void testCreateSampleSetNoExpression()
     {
         String sampleSetName = "SimpleCreateNoExp";
-        List<String> fieldNames = Arrays.asList("StringValue", "IntValue");
+        Map<String, FieldDefinition.ColumnType> fields = Map.of("StringValue", FieldDefinition.ColumnType.String, "IntValue", FieldDefinition.ColumnType.Integer);
         log("Create a new sample set with a name and no name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        click(Locator.tagWithClassContaining("i", "fa-plus"));
+
+        SampleSetHelper sampleSetHelper = new SampleSetHelper(this);
+        sampleSetHelper.goToCreateNewSampleSet();
         log("Verify the name field is required");
         clickButton("Create");
         assertTextPresent("You must supply a name for the sample set.");
+        clickButton("Cancel");
 
-        setFormElement(Locator.id("name"), sampleSetName);
-        clickButton("Create");
-
-        log("Add fields to the sample set");
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-        fieldProperties.addField(new FieldDefinition(fieldNames.get(0)).setType(FieldDefinition.ColumnType.String));
-        fieldProperties.addField(new FieldDefinition(fieldNames.get(1)).setType(FieldDefinition.ColumnType.Integer));
-        clickButton("Save");
-
-        log("Go to the sample set and verify its fields");
-        click(Locator.linkWithText(sampleSetName));
-        List<String> names = getSampleSetFields();
-        for (String name : fieldNames)
-            assertTrue("'" + name + "' should be one of the fields", names.contains(name));
+        sampleSetHelper.createSampleSet(sampleSetName)
+                .addFields(fields)
+                .goToSampleSet(sampleSetName)
+                .verifyFields();
 
         log("Add a single row to the sample set");
-//        Map<String, String> fieldMap =
-        DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents")
-                .clickInsertNewRow();
-        setFormElement(Locator.name("quf_Name"), "S-1");
-        setFormElement(Locator.name("quf_StringValue"), "Ess");
-        setFormElement(Locator.name("quf_IntValue"), "1");
-        clickButton("Submit");
+        Map<String, String> fieldMap = Map.of("Name", "S-1", "StringValue", "Ess", "IntValue", "1");
+        sampleSetHelper.insertRow(fieldMap);
 
         log("Verify values were saved");
-        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
-        Map<String, String> rowData = drt.getRowDataAsMap(0);
-        assertEquals("Name not as expected", "S-1", rowData.get("Name"));
-        assertEquals(fieldNames.get(0) + " not as expected", "Ess", rowData.get(fieldNames.get(0)));
-        assertEquals(fieldNames.get(1) + "not as expected", "1", rowData.get(fieldNames.get(1)));
+        sampleSetHelper.verifyDataValues(Collections.singletonList(fieldMap));
 
-        log ("Add multiple rows via simple (default) import mechanism");
-        drt.clickHeaderMenu("Insert data", "Simple bulk data import");
-        String text = "Name\t" + fieldNames.get(0) + "\t" + fieldNames.get(1) + "\n" +
-                "S-2\tTee\t2\n" +
-                "S-3\tEwe\t3";
-        setFormElement(Locator.name("text"), text);
-        clickButton("Submit");
-        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
-        assertEquals("Number of samples not as expected", 3, drt.getDataRowCount());
+        List<Map<String, String>> data = new ArrayList<>();
+        data.add(Map.of("Name", "S-2", "StringValue", "Tee", "IntValue", "2"));
+        data.add(Map.of("Name", "S-3", "StringValue", "Ewe", "IntValue", "3"));
+        sampleSetHelper.bulkImport(data);
 
-        int index = drt.getRowIndex("Name", "S-2");
-        assertTrue("Should have row with second sample name", index >= 0);
-        rowData = drt.getRowDataAsMap(index);
-        assertEquals(fieldNames.get(0) + " for second sample not as expected", "Tee", rowData.get(fieldNames.get(0)));
-        assertEquals(fieldNames.get(1) + " for second sample not as expected", "2", rowData.get(fieldNames.get(1)));
+        assertEquals("Number of samples not as expected", 3, sampleSetHelper.getSampleCount());
+
+        sampleSetHelper.verifyDataValues(data);
 
         log("Try to create a sample set with the same name.");
         click(Locator.linkWithText("Sample Sets"));
-        click(Locator.tagWithClassContaining("i", "fa-plus"));
-        setFormElement(Locator.id("name"), sampleSetName);
-        clickButton("Create");
+        sampleSetHelper = new SampleSetHelper(this, false);
+        sampleSetHelper.createSampleSet(sampleSetName, null);
         assertTextPresent("A sample set with that name already exists.");
 
         clickButton("Cancel");
-        drt = DataRegion(this.getDriver()).find();
+        DataRegionTable drt = DataRegion(this.getDriver()).find();
         assertEquals("Data region should be sample sets listing", "SampleSet", drt.getDataRegionName());
     }
 
@@ -247,59 +222,43 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         String sampleSetName = "SimpleCreateWithExp";
         List<String> fieldNames = Arrays.asList("StringValue", "FloatValue");
-
+        Map<String, FieldDefinition.ColumnType> fields = Map.of(fieldNames.get(0), FieldDefinition.ColumnType.String, fieldNames.get(1), FieldDefinition.ColumnType.Double);
+        SampleSetHelper sampleSetHelper = new SampleSetHelper(this);
         log("Create a new sample set with a name and name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        click(Locator.tagWithClassContaining("i", "fa-plus"));
-        setFormElement(Locator.id("name"), sampleSetName);
-        setFormElement(Locator.id("nameExpression"), "${" + fieldNames.get(0) + "}-${batchRandomId}-${randomId}");
-        clickButton("Create");
-
-        log("Add fields to the sample set");
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-        fieldProperties.addField(new FieldDefinition(fieldNames.get(0)).setType(FieldDefinition.ColumnType.String));
-        fieldProperties.addField(new FieldDefinition(fieldNames.get(1)).setType(FieldDefinition.ColumnType.Double));
-        clickButton("Save");
-
-        log("Go to the sample set and verify its fields");
-        click(Locator.linkWithText(sampleSetName));
-        List<String> names = getSampleSetFields();
-        for (String name : fieldNames)
-            assertTrue("'" + name + "' should be one of the fields", names.contains(name));
+        sampleSetHelper.createSampleSet(sampleSetName, "${" + fieldNames.get(0) + "}-${batchRandomId}-${randomId}")
+                .addFields(fields)
+                .goToSampleSet(sampleSetName)
+                .verifyFields();
 
         log("Add data without supplying the name");
-        DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents")
-                .clickInsertNewRow();
-        setFormElement(Locator.name("quf_" + fieldNames.get(0)), "Vee");
-        setFormElement(Locator.name("quf_" + fieldNames.get(1)), "1.6");
-        clickButton("Submit");
+        Map<String, String> fieldMap = Map.of(fieldNames.get(0), "Vee", fieldNames.get(1), "1.6");
+        sampleSetHelper.insertRow(fieldMap);
 
         log("Verify values are as expected with name expression saved");
-        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
-        Map<String, String> rowData = drt.getRowDataAsMap(0);
+        DataRegionTable drt = sampleSetHelper.getSamplesDataRegionTable();
+        int index = drt.getRowIndex(fieldNames.get(0), "Vee");
+        assertTrue("Did not find row containing data", index >= 0);
+        Map<String, String> rowData = drt.getRowDataAsMap(index);
         assertTrue("Name not as expected", rowData.get("Name").startsWith("Vee-"));
         assertEquals(fieldNames.get(0) + " not as expected", "Vee", rowData.get(fieldNames.get(0)));
         assertEquals(fieldNames.get(1) + "not as expected", "1.6", rowData.get(fieldNames.get(1)));
 
         log("Add data with name provided");
-        DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents")
-                .clickInsertNewRow();
-        setFormElement(Locator.name("quf_Name"), "NoExpression");
-        clickButton("Submit");
-        log("Verify values are as expected with name expression saved");
-        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
-        rowData = drt.getRowDataAsMap(0);
-        assertEquals("Name not as expected", "NoExpression", rowData.get("Name"));
+        sampleSetHelper.insertRow(Map.of("Name", "NoExpression"));
+
+        log("Verify values are as expected with name value saved");
+        drt = sampleSetHelper.getSamplesDataRegionTable();
+        index = drt.getRowIndex("Name", "NoExpression");
+        assertTrue("Did not find row with inserted name", index >= 0);
 
         log ("Add multiple rows via simple (default) import mechanism");
-        drt.clickHeaderMenu("Insert data", "Simple bulk data import");
-        String text = fieldNames.get(0) + "\t" + fieldNames.get(1) + "\n" +
-                "Dubya\t2.1\n" +
-                "Ex\t44.2";
-        setFormElement(Locator.name("text"), text);
-        clickButton("Submit");
-        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
-        assertEquals("Number of samples not as expected", 4, drt.getDataRowCount());
+        List<Map<String, String>> data = new ArrayList<>();
+        data.add(Map.of(fieldNames.get(0), "Dubya", fieldNames.get(1), "2.1"));
+        data.add(Map.of(fieldNames.get(0), "Ex", fieldNames.get(1), "4.2"));
+        sampleSetHelper.bulkImport(data);
+
+        assertEquals("Number of samples not as expected", 4, sampleSetHelper.getSampleCount());
 
         assertTrue("Should have row with first imported value", drt.getRowIndex(fieldNames.get(0), "Dubya") >= 0);
         assertTrue("Should have row with second imported value", drt.getRowIndex(fieldNames.get(0), "Ex") >= 0);
@@ -319,14 +278,8 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Create a new sample set with a name");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        click(Locator.tagWithClassContaining("i", "fa-plus"));
-        setFormElement(Locator.id("name"), sampleSetName);
-        clickButton("Create");
-
-        log("Add fields to the sample set");
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-        fieldProperties.addField(new FieldDefinition(fieldNames.get(0)).setType(FieldDefinition.ColumnType.String));
-        clickButton("Save");
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(sampleSetName, null, Map.of("StringValue", FieldDefinition.ColumnType.String));
 
         log("Go to the sample set and add some data");
         click(Locator.linkWithText(sampleSetName));
@@ -337,7 +290,8 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("Try to import overlapping data with TSV");
-        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+
+        DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
         drt.clickHeaderMenu("Insert data", "Simple bulk data import");
         String header = "Name\t" + fieldNames.get(0) + "\n";
         String overlap =  "Name1\tToBee\n";
@@ -346,11 +300,11 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Submit", "Can't insert; material already exists");
 
         log("Switch to 'Insert and Update'");
-        selectInsertOption("MERGE", 1);
+        sampleHelper.selectInsertOption("MERGE", 1);
         clickButton("Submit");
 
         log("Validate data was updated and new data added");
-        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        drt = sampleHelper.getSamplesDataRegionTable();
         assertEquals("Number of samples not as expected", 2, drt.getDataRowCount());
 
         int index = drt.getRowIndex("Name", "Name1");
@@ -395,24 +349,26 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
+        Map<String, FieldDefinition.ColumnType> sampleSetFields = Map.of("IntCol", FieldDefinition.ColumnType.Integer,
+                "StringCol", FieldDefinition.ColumnType.String,
+                "DateCol", FieldDefinition.ColumnType.DateTime,
+                "BoolCol", FieldDefinition.ColumnType.Boolean);
+        File sampleSetFile = TestFileUtils.getSampleData("sampleSet.xlsx");
+
         clickProject(PROJECT_NAME);
-        clickButton("Import Sample Set");
-        setFormElement(Locator.id("name"), PROJECT_SAMPLE_SET_NAME);
-        checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
-        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
-        selectParentColumn("Parent");
-        clickButton("Submit");
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(PROJECT_SAMPLE_SET_NAME, null, sampleSetFields, sampleSetFile);
 
         clickFolder(FOLDER_NAME);
-        clickButton("Import Sample Set");
-        setFormElement(Locator.id("name"), FOLDER_SAMPLE_SET_NAME);
-        setFormElement(Locator.name("data"), "KeyCol-Folder\tIntCol-Folder\tStringCol-Folder\n" +
-                "SampleSetBVT11\t101\taa\n" +
-                "SampleSetBVT4\t102\tbb\n" +
-                "SampleSetBVT12\t102\tbb\n" +
-                "SampleSetBVT13\t103\tcc\n" +
-                "SampleSetBVT14\t104\tdd");
-        clickButton("Submit");
+        sampleHelper.createSampleSet(FOLDER_SAMPLE_SET_NAME, null,
+                Map.of("IntCol-Folder",  FieldDefinition.ColumnType.Integer,
+                       "StringCol-Folder", FieldDefinition.ColumnType.String),
+                "Name\tIntCol-Folder\tStringCol-Folder\n" +
+                        "SampleSetBVT11\t101\taa\n" +
+                        "SampleSetBVT4\t102\tbb\n" +
+                        "SampleSetBVT12\t102\tbb\n" +
+                        "SampleSetBVT13\t103\tcc\n" +
+                        "SampleSetBVT14\t104\tdd");
 
         // Do some manual derivation
         clickAndWait(Locator.linkWithText("Sample Sets"));
@@ -448,8 +404,8 @@ public class SampleSetTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("targetSampleSetId"), "FolderSampleSet in /SampleSetTestProject/SampleSetTestFolder");
         clickButton("Next");
 
-        setFormElement(Locator.name("outputSample1_KeyColFolder"), "SampleSetBVT15");
-        setFormElement(Locator.name("outputSample2_KeyColFolder"), "SampleSetBVT16");
+        setFormElement(Locator.name("outputSample1_Name"), "SampleSetBVT15");
+        setFormElement(Locator.name("outputSample2_Name"), "SampleSetBVT16");
         checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
         setFormElement(Locator.name("outputSample1_IntColFolder"), "500a");
         setFormElement(Locator.name("outputSample1_StringColFolder"), "firstOutput");
@@ -472,7 +428,7 @@ public class SampleSetTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("targetSampleSetId"), "ProjectSampleSet in /SampleSetTestProject");
         clickButton("Next");
 
-        setFormElement(Locator.name("outputSample1_KeyCol"), "200");
+        setFormElement(Locator.name("outputSample1_Name"), "200");
         setFormElement(Locator.name("outputSample1_IntCol"), "600");
         setFormElement(Locator.name("outputSample1_StringCol"), "String");
         setFormElement(Locator.name("outputSample1_DateCol"), "BadDate");
@@ -502,25 +458,46 @@ public class SampleSetTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Sample Sets"));
         clickButton("Show All Materials");
         assertTextPresent("ProjectSampleSet", "200");
+    }
 
-        // Try to derive samples using the parent column
-        clickTab("Experiment");
-        clickAndWait(Locator.linkWithText("Sample Sets"));
+    @Test
+    public void testAuditLog()
+    {
+        String sampleSetName = "TestAuditLogSampleSet";
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        SampleSetHelper helper = new SampleSetHelper(this);
+        helper.createSampleSet(sampleSetName, null, Map.of(
+                "First", FieldDefinition.ColumnType.String,
+                "Second", FieldDefinition.ColumnType.Integer),
+                "Name\tFirst\tSecond\n" +
+                        "Audit-1\tsome\t100");
+
+        goToModule("Query");
+        viewQueryData("auditLog", "SampleSetAuditEvent");
+        assertTextPresent(
+                "Samples inserted or updated in: " + sampleSetName);
+
+    }
+
+
+    @Test @Ignore("Needs to be converted to use Materials/Inputs instead of parent column")
+    public void testParentChild()
+    {
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+
         clickButton("Import Sample Set");
         setFormElement(Locator.name("name"), FOLDER_CHILDREN_SAMPLE_SET_NAME);
         setFormElement(Locator.name("data"), AMBIGUOUS_CHILD_SAMPLE_SET_TSV);
-        selectParentColumn("Parent");
+//        selectParentColumn("Parent");
         clickButton("Submit");
         assertTextPresent("Failed to find sample parent: Found 2 values matching: SampleSetBVT4");
 
         // Try again with a qualified sample name
         setFormElement(Locator.name("data"), CHILD_SAMPLE_SET_TSV);
-        selectParentColumn("Parent");
+//        selectParentColumn("Parent");
         clickButton("Submit");
         assertTextPresent("SampleSetBVTChildA");
 
-        fileAttachmentTest();
-        clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
 
         // Make sure that the parent got wired up
         clickAndWait(Locator.linkWithText("SampleSetBVT4"));
@@ -535,12 +512,12 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Import Sample Set");
         setFormElement(Locator.name("name"), FOLDER_CHILDREN_SAMPLE_SET_NAME);
         setFormElement(Locator.name("data"), GRANDCHILD_SAMPLE_SET_TSV);
-        selectParentColumn("Parent");
+//        selectParentColumn("Parent");
         clickButton("Submit");
 
         assertTextPresent("A sample set with that name already exists");
         setFormElement(Locator.name("name"), FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
-        selectParentColumn("Parent");
+//        selectParentColumn("Parent");
         clickButton("Submit");
 
         waitAndClickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
@@ -597,14 +574,6 @@ public class SampleSetTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText("SampleSetBVT14"));
         assertElementPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
 
-        // Verify that the event was audited
-        goToModule("Query");
-        viewQueryData("auditLog", "SampleSetAuditEvent");
-        assertTextPresent(
-                "Samples inserted or updated in: " + FOLDER_SAMPLE_SET_NAME,
-                "Samples inserted or updated in: " + FOLDER_CHILDREN_SAMPLE_SET_NAME,
-                "Samples inserted or updated in: " + FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
-
         // Verify that we can reference samples in other containers by including a folder path
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(PROJECT_SAMPLE_SET_NAME));
@@ -619,53 +588,43 @@ public class SampleSetTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("ProjectS1"));
         assertElementPresent(Locator.linkWithText("SampleSetBVT13"));
         assertElementPresent(Locator.linkWithText("SampleSetBVTChildA"));
+    }
+
+    @Test
+    public void testCaseSensitivity()
+    {
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
 
         // make sure we are case-sensitive when creating samplesets -- regression coverage for issue 33743
         clickProject(PROJECT_NAME);
-        clickButton("Import Sample Set");
-        setFormElement(Locator.id("name"), CASE_INSENSITIVE_SAMPLESET);
-        checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
-        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
-        selectParentColumn("Parent");
-        clickButton("Submit");
+        sampleHelper.createSampleSet(CASE_INSENSITIVE_SAMPLESET);
 
         clickProject(PROJECT_NAME);
-        clickButton("Import Sample Set");
-        setFormElement(Locator.id("name"), LOWER_CASE_SAMPLESET);
-        checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
-        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
-        selectParentColumn("Parent");
-        clickButton("Submit");
+        sampleHelper.createSampleSet(LOWER_CASE_SAMPLESET);
         waitForElement(Locator.tagWithClass("div", "labkey-error").containing("A sample set with that name already exists."));
         clickProject(PROJECT_NAME);
         assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLESET));
         assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLESET));
     }
 
-    final File experimentFilePath = new File(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");
-
-    private void fileAttachmentTest()
+    @Test
+    public void fileAttachmentTest()
     {
-        enableFileInput();
+        File experimentFilePath = new File(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+
+        String sampleSetName = "FileAttachmentSampleSet";
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(sampleSetName, null,
+                Map.of("OtherProp", FieldDefinition.ColumnType.String,
+                        "FileAttachment", FieldDefinition.ColumnType.File),
+                "Name\tOtherProp\n" +
+                        "FA-1\tOne\n" +
+                        "FA-2\tTwo\n");
 
         setFileAttachment(0, experimentFilePath);
         setFileAttachment(1, new File(TestFileUtils.getLabKeyRoot() +  "/sampledata/sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
-        insertNewWithFileAttachmentTest();
 
-        // Added these last two test to check for regressions with exporting a grid with a file attachment column and deleting a file attachment column.
-        exportGridWithAttachment(3, 4, "experiment-1.xar.xml", "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx");
-        deleteAttachmentColumn();
-        exportGridWithAttachment(3, 4, "", "", "");
-    }
-
-    private List<String> getSampleSetFields()
-    {
-        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
-        return drt.getColumnNames();
-    }
-
-    private void insertNewWithFileAttachmentTest()
-    {
         DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
         drt.clickInsertNewRow();
         setFormElement(Locator.name("quf_Name"), "SampleSetInsertedManually");
@@ -673,16 +632,23 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Submit");
         //a double upload causes the file to be appended with a count
         assertTextPresent("experiment-1.xar.xml");
-    }
+        int attachIndex = drt.getColumnIndex("File Attachment");
 
-    private void enableFileInput()
-    {
-        String fileField = "FileAttachment";
+        // Added these last two test to check for regressions with exporting a grid with a file attachment column and deleting a file attachment column.
+        exportGridWithAttachment(3, attachIndex, "experiment-1.xar.xml", "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx");
+
+        log("Remove the attachment columns and validate that everything still works.");
         waitAndClickAndWait(Locator.lkButton("Edit Fields"));
         PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-        fieldProperties.addField(new FieldDefinition(fileField).setType(FieldDefinition.ColumnType.File).setLabel(fileField).setDescription(fileField));
-        clickButton("Save");
+        fieldProperties.selectField("FileAttachment").markForDeletion();
+
+        // Can't use _listHelper.clickSave, it waits for a "Edit Design" button and a "Done" button.
+        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);
+        waitForElement(Locator.lkButton("Edit Fields"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+
+        exportGridWithAttachment(3, attachIndex, "", "", "");
     }
+
 
     private void setFileAttachment(int index, File attachment)
     {
@@ -694,14 +660,6 @@ public class SampleSetTest extends BaseWebDriverTest
         String path = drt.getDataAsText(index, "File Attachment");
         assertNotNull("Path shouldn't be null", path);
         assertTrue("Path didn't contain " + attachment.getName() + ", but was: " + path, path.contains(attachment.getName()));
-    }
-
-    private void selectParentColumn(String parentCol)
-    {
-        fireEvent(Locator.name("data"), SeleniumEvent.blur);
-        waitForFormElementToEqual(Locator.id("idCol1"), "0"); // "KeyCol"
-        waitForElement(Locator.css("select#parentCol > option").withText(parentCol));
-        selectOptionByText(Locator.id("parentCol"), parentCol);
     }
 
     private void exportGridWithAttachment(int numOfRows, int exportColumn, String... expectedFilePaths)
@@ -749,18 +707,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     }
 
-    private void deleteAttachmentColumn()
-    {
-        log("Remove the attachment columns and validate that everything still works.");
-        waitAndClickAndWait(Locator.lkButton("Edit Fields"));
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-        fieldProperties.selectField(2).markForDeletion();
-
-        // Can't use _listHelper.clickSave, it waits for a "Edit Desing" button and a "Done" button.
-        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);
-        waitForElement(Locator.lkButton("Edit Fields"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-    }
 
     @Override
     public BrowserType bestBrowser()
