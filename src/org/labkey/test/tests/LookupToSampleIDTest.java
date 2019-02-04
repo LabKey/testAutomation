@@ -87,11 +87,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
 
         //import more to sample set while in subfolder
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
-        clickButton("Import More Samples");
-        checkRadioButton(Locator.radioButtonById("insertOrUpdateChoice"));
-        checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
-        setFormElement(Locator.name("file"), SAMPLE_SET_SUB_FOLDER);
-        clickButton("Submit");
+        sampleHelper.bulkImport(SAMPLE_SET_SUB_FOLDER, SampleSetHelper.MERGE_DATA_OPTION);
     }
 
     @Before

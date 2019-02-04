@@ -132,10 +132,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 "B\tA\n" +      // B and C both derive from A, so should get the same Run
                 "C\tA\n" +      // D derives from B, so should get its own run
                 "D\tB\n";
-        clickButton("Import More Samples");
-        setFormElement(Locator.name("data"), deriveSamples);
-        checkRadioButton(Locator.radioButtonById("insertOnlyChoice"));
-        clickButton("Submit");
+        sampleHelper.bulkImport(deriveSamples);
 
         log("foo");
         SelectRowsResponse samples = executeSelectRowCommand("samples", LINEAGE_SAMPLE_SET_NAME, ContainerFilter.Current, getProjectName()+"/"+LINEAGE_FOLDER, null);
