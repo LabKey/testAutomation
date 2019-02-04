@@ -24,6 +24,7 @@ import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -95,7 +96,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void doSetup() throws Exception
+    public static void doSetup()
     {
         FileContentUploadTest initTest = (FileContentUploadTest)getCurrentTest();
 
@@ -254,7 +255,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @LogMethod(quiet = true)
     private void sendFileDigest()
     {
-        Command<CommandResponse> command = new Command<>("filecontent", "sendShortDigest");
+        Command<CommandResponse> command = new PostCommand<>("filecontent", "sendShortDigest");
         Connection connection = WebTestHelper.getRemoteApiConnection();
 
         try
