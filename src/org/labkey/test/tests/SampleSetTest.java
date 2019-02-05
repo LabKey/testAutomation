@@ -42,8 +42,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -619,6 +621,12 @@ public class SampleSetTest extends BaseWebDriverTest
                         "FA-1\tOne\n" +
                         "FA-2\tTwo\n");
 
+        Set<String> expectedHeaders = new HashSet<>();
+        expectedHeaders.add("Name");
+        expectedHeaders.add("Flag");
+        expectedHeaders.add("Other Prop");
+        expectedHeaders.add("File Attachment");
+
         setFileAttachment(0, experimentFilePath);
         setFileAttachment(1, new File(TestFileUtils.getLabKeyRoot() +  "/sampledata/sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
 
@@ -632,7 +640,7 @@ public class SampleSetTest extends BaseWebDriverTest
         int attachIndex = drt.getColumnIndex("File Attachment");
 
         // Added these last two test to check for regressions with exporting a grid with a file attachment column and deleting a file attachment column.
-        exportGridWithAttachment(3, attachIndex, "experiment-1.xar.xml", "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx");
+        exportGridWithAttachment(3, expectedHeaders, attachIndex, "experiment-1.xar.xml", "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx");
 
         log("Remove the attachment columns and validate that everything still works.");
         waitAndClickAndWait(Locator.lkButton("Edit Fields"));
@@ -643,7 +651,9 @@ public class SampleSetTest extends BaseWebDriverTest
         waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);
         waitForElement(Locator.lkButton("Edit Fields"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        exportGridWithAttachment(3, attachIndex, "", "", "");
+        expectedHeaders.remove("File Attachment");
+
+        exportGridVerifyRowCountAndHeader(3, expectedHeaders);
     }
 
 
@@ -659,15 +669,13 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTrue("Path didn't contain " + attachment.getName() + ", but was: " + path, path.contains(attachment.getName()));
     }
 
-    private void exportGridWithAttachment(int numOfRows, int exportColumn, String... expectedFilePaths)
+    private Sheet exportGridVerifyRowCountAndHeader(int numRows, Set<String> expectedHeaders)
     {
         DataRegionTable list;
         DataRegionExportHelper exportHelper;
         File exportedFile;
         Workbook workbook;
         Sheet sheet;
-        List<String> exportedColumn;
-        int row;
 
         log("Export the grid to excel.");
         list = new DataRegionTable("Material", this.getDriver());
@@ -679,29 +687,43 @@ public class SampleSetTest extends BaseWebDriverTest
             workbook = ExcelHelper.create(exportedFile);
             sheet = workbook.getSheetAt(0);
 
-            assertEquals("Wrong number of rows exported to " + exportedFile.getName(), numOfRows, sheet.getLastRowNum());
-
-            log("Validate that the value for the attachment columns is as expected.");
-            exportedColumn = ExcelHelper.getColumnData(sheet, exportColumn);
-            row = 1;
-            for (String filePath : expectedFilePaths)
+            assertEquals("Wrong number of rows exported to " + exportedFile.getName(), numRows, sheet.getLastRowNum());
+            if (expectedHeaders != null)
             {
-                if (filePath.length() == 0)
-                {
-                    assertEquals("Value of attachment column for row " + row + " not exported as expected.", "", exportedColumn.get(row).trim());
-                }
-                else
-                {
-                    assertThat("Value of attachment column for row " + row + " not exported as expected.", exportedColumn.get(row).trim().toLowerCase(), CoreMatchers.containsString(filePath));
-                }
-                row++;
+                Set<String> actualHeaders = new HashSet<>(ExcelHelper.getRowData(sheet, 0));
+                assertEquals("Column headers not as expected", expectedHeaders, actualHeaders);
             }
+
+            return sheet;
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private void exportGridWithAttachment(int numOfRows, Set<String> expectedHeaders, int exportColumn, String... expectedFilePaths)
+    {
+        Sheet sheet = exportGridVerifyRowCountAndHeader(numOfRows, expectedHeaders);
+        List<String> exportedColumn;
+        int row;
+
+        log("Validate that the value for the attachment columns is as expected.");
+        exportedColumn = ExcelHelper.getColumnData(sheet, exportColumn);
+        row = 1;
+        for (String filePath : expectedFilePaths)
+        {
+            if (filePath.length() == 0)
+            {
+                assertEquals("Value of attachment column for row " + row + " not exported as expected.", "", exportedColumn.get(row).trim());
+            }
+            else
+            {
+                assertThat("Value of attachment column for row " + row + " not exported as expected.", exportedColumn.get(row).trim().toLowerCase(), CoreMatchers.containsString(filePath));
+            }
+            row++;
+        }
     }
 
 
