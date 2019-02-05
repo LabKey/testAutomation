@@ -38,12 +38,24 @@ public class Input extends WebDriverComponent implements FormItem<String>
 
     public static SimpleComponentFinder<Input> Input(Locator loc, WebDriver driver)
     {
-        return new SimpleComponentFinder<Input>(loc)
+        return new SimpleComponentFinder<>(loc)
         {
             @Override
             protected Input construct(WebElement el)
             {
                 return new Input(el, driver);
+            }
+        };
+    }
+
+    public static SimpleComponentFinder<FileInput> FileInput(Locator loc, WebDriver driver)
+    {
+        return new SimpleComponentFinder<>(loc)
+        {
+            @Override
+            protected FileInput construct(WebElement el)
+            {
+                return new FileInput(el, driver);
             }
         };
     }
