@@ -19,10 +19,13 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.fail;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
@@ -407,7 +410,26 @@ public class ExtHelper
     public void selectComboBoxItem(WebElement comboEl, @LoggedParam String selection)
     {
         WebElement comboArrow = Locator.css(".x-form-arrow-trigger").findElement(comboEl);
-        comboArrow.click();
+        try
+        {
+            comboArrow.click();
+        }
+        catch (ElementClickInterceptedException retry)
+        {
+            // Possibly an ext-el-mask. Wait for it to disappear.
+            Pattern idPattern = Pattern.compile("because another element <.*id=\"([0-9a-zA-Z-_]+)\".*obscures it");
+            Matcher matcher = idPattern.matcher(retry.getMessage());
+            if (matcher.matches())
+            {
+                String id = matcher.group(1);
+                _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.id(id)));
+                comboArrow.click();
+            }
+            else
+            {
+                throw retry;
+            }
+        }
         Locator.XPathLocator comboListItemLoc = Locators.comboListItem().withText(selection);
         WebElement comboListItem = comboListItemLoc.findWhenNeeded(_test.getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         _test.scrollIntoView(comboListItem);
