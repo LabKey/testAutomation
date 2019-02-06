@@ -599,7 +599,8 @@ public class DataViewsTest extends ParticipantListTest
         WebElement subCategoryField = Locator.input("label").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         setFormElementJS(subCategoryField, subCategoryName);
         fireEvent(subCategoryField, SeleniumEvent.blur);
-        waitForElement(Locator.tagWithClass("div", "x4-grid-cell-inner").withText(subCategoryName));
+        click(Locator.xpath("//div/span[text()='Manage Subcategories']")); // Really make sure that focus has changed.
+        waitForElementToBeVisible(Locator.tagWithClass("div", "x4-grid-cell-inner").withText(subCategoryName));
     }
 
     private void openEditPanel(String itemName)

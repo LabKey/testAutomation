@@ -94,6 +94,7 @@ public class ParticipantListTest extends StudyBaseTest
                     .notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
             setFormElementJS(formField, category);
             fireEvent(formField, SeleniumEvent.blur);
+            click(Locator.xpath("//div/span[text()='Manage Categories']")); // Really make sure that focus has changed.
             waitForElementToBeVisible(Locator.tagWithText("div", category));
         }
         clickButton("Done", 0);
