@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -95,7 +96,7 @@ public class ParticipantListTest extends StudyBaseTest
                     .notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
             setFormElementJS(formField, category);
             fireEvent(formField, SeleniumEvent.blur);
-            waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//div").withText(category));
+            waitForElementToBeVisible(Locator.tagWithText("div", category));
         }
         clickButton("Done", 0);
         _extHelper.waitForExtDialogToDisappear("Manage Categories");
