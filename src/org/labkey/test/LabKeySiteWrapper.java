@@ -1104,10 +1104,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         setAuthenticationProvider("Test Secondary Authentication", false);
     }
 
-    @LogMethod(quiet = true)
     public void setAuthenticationProvider(String provider, boolean enabled)
     {
-        Connection cn = createDefaultConnection(true);
+        setAuthenticationProvider(provider, enabled, createDefaultConnection(true));
+    }
+
+    @LogMethod(quiet = true)
+    public void setAuthenticationProvider(@LoggedParam String provider, @LoggedParam boolean enabled, Connection cn)
+    {
         Command command = new PostCommand("login", "setProviderEnabled");
         command.setParameters(new HashMap<>(Maps.of("provider", provider, "enabled", enabled)));
         try
