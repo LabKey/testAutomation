@@ -125,7 +125,7 @@ public class MethodLoggingAspect
                             TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
                     elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
             TestLogger.decreaseIndent();
-            TestLogger.log(logPrefix + method + argString + " [" + elapsedStr + "]"); // Only log on successful return
+            TestLogger.log(logPrefix + method + argString + " <" + elapsedStr + ">"); // Only log on successful return
         }
     }
 
