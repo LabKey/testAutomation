@@ -869,32 +869,38 @@ public class Crawler
             if (code == 404 && origin == null) // Ignore 404s from the initial set of links
                 return Collections.emptyList();
 
-            // Check that there was no error (unless we are inject testing)
-            if (!_injectionCheckEnabled)
+            // Check that there was no error
+            if (code >= 400)
+                fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
+            List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
+            if (!serverError.isEmpty())
             {
-                if (code >= 400)
-                    fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
-                List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
-                if (!serverError.isEmpty())
-                {
-                    String[] errorLines = serverError.get(0).split("\n");
-                    fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
-                }
+                String[] errorLines = serverError.get(0).split("\n");
+                fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
             }
 
             if (code == 200 && _test.getDriver().getTitle().isEmpty())
                 _warnings.add("Action does not specify title: " + actionId.toString());
 
-            if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
-                testInjection(currentPageUrl);
-
             List<UrlToCheck> newUrlsToCheck = new ArrayList<>();
             for (String url : linkAddresses)
             {
-                UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
-                if (candidateUrl.isVisitableURL())
-                    newUrlsToCheck.add(candidateUrl);
+                try
+                {
+                    UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
+                    if (candidateUrl.isVisitableURL())
+                        newUrlsToCheck.add(candidateUrl);
+                }
+                catch (IllegalArgumentException badUrl)
+                {
+                    origin = null; // Don't grab screenshot for origin page
+                    throw new AssertionError("Unable to parse link: " + url, badUrl);
+                }
             }
+
+            if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
+                testInjection(currentPageUrl);
+
             return newUrlsToCheck;
         }
         catch (RuntimeException | AssertionError rethrow)
