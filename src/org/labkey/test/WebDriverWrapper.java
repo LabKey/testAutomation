@@ -541,21 +541,27 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    public String[] getLinkAddresses()
+    public List<String> getLinkAddresses()
     {
         return getLinkAddresses(false);
     }
 
-    public String[] getLinkAddresses(boolean includeForms)
+    public List<String> getFormAddresses()
+    {
+        return getLinkAddresses(true);
+    }
+
+    private List<String> getLinkAddresses(boolean includeForms)
     {
         String js = "getLinkAddresses = function () {\n" +
                 "        var i, j;\n" +
-                "        var links = window.document.links;\n" +
                 "        var addresses = new Array();\n" +
+                (!includeForms ?
+                "        var links = window.document.links;\n" +
                 "        for (i = 0; i < links.length; i++) {\n" +
                 "          if (links[i].href && links[i].href != '#') addresses.push(links[i].href);\n" +
-                "        }\n" +
-                (!includeForms ? "" :
+                "        }\n"
+                : // includeForms
                 "        var forms = window.document.forms;\n" +
                 "        for (i = 0; i < forms.length ; i++) {\n" +
                 "          var action = forms[i].getAttribute('action');\n" +   // raw attribute value
@@ -588,7 +594,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
         }
 
-        return links.toArray(new String[links.size()]);
+        return links;
     }
 
     public String getCurrentRelativeURL()

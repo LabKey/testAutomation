@@ -18,6 +18,7 @@ package org.labkey.test.util;
 
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
@@ -372,6 +373,7 @@ public class Crawler
         private final String _relativeURL;
         private final ControllerActionId _actionId;
         private final int _depth;
+        private boolean _isFromForm = false;
 
         public UrlToCheck(URL origin, String urlText, int depth)
         {
@@ -422,6 +424,16 @@ public class Crawler
             if (null != getActionId() && StringUtils.isBlank(StringUtils.strip(getActionId().getFolder(),"/")))
                 p += (_prioritizeAdminPages ? -1 : 1);
             priority = p + random.nextFloat();
+        }
+
+        public boolean isFromForm()
+        {
+            return _isFromForm;
+        }
+
+        public void setFromForm(boolean fromForm)
+        {
+            _isFromForm = fromForm;
         }
 
         public URL getOrigin()
@@ -829,7 +841,7 @@ public class Crawler
         return new CrawlStats(maxDepth, linkCount, _actionsVisited.size(), crawlTimer.elapsed(), _warnings);
     }
 
-    private List<UrlToCheck> crawlLink(UrlToCheck urlToCheck)
+    private List<UrlToCheck> crawlLink(final UrlToCheck urlToCheck)
     {
         String relativeURL = urlToCheck.getRelativeURL();
         ControllerActionId actionId = new ControllerActionId(relativeURL);
@@ -856,22 +868,25 @@ public class Crawler
 
             URL currentPageUrl = _test.getURL();
 
+            int code = _test.getResponseCode();
+            if (code == 404 && origin == null) // Ignore 404s from the initial set of links
+                return Collections.emptyList();
+
             // Find all the links at the site
             if (_needToGetProjectMenuLinks && depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
             {
                 _needToGetProjectMenuLinks = false;
                 _test.projectMenu().open();
             }
-            String[] linkAddresses = _test.getLinkAddresses(_injectionCheckEnabled);
+
+            List<String> linkAddresses = _test.getLinkAddresses();
+            List<String> formAddresses = _test.getFormAddresses();
+            linkAddresses.addAll(formAddresses);
 
             checkForForbiddenWords(relativeURL);
 
-            int code = _test.getResponseCode();
-            if (code == 404 && origin == null) // Ignore 404s from the initial set of links
-                return Collections.emptyList();
-
             // Check that there was no error
-            if (code >= 400)
+            if (code >= 400 && (!urlToCheck.isFromForm() || code != HttpStatus.SC_METHOD_NOT_ALLOWED)) // Expect many forms to respond with 405
                 fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
             List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
             if (!serverError.isEmpty())
@@ -890,7 +905,10 @@ public class Crawler
                 {
                     UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
                     if (candidateUrl.isVisitableURL())
+                    {
+                        candidateUrl.setFromForm(formAddresses.contains(url));
                         newUrlsToCheck.add(candidateUrl);
+                    }
                 }
                 catch (IllegalArgumentException badUrl)
                 {
