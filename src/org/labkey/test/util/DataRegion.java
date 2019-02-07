@@ -416,20 +416,27 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
     {
         final String regionJS = "LABKEY.DataRegions['" + getDataRegionName().replaceAll("'", "\\\\'") + "']";
 
-        public void executeScript(String methodWithArgs)
+        public void executeScript(String methodWithArgs, Object... args)
         {
-            executeScript(methodWithArgs, null);
+            executeScript(methodWithArgs, null, args);
         }
 
-        public <T> T executeScript(String methodWithArgs, Class<T> expectedResultType)
+        public <T> T executeScript(String methodWithArgs, Class<T> expectedResultType, Object... args)
         {
-            return getWrapper().executeScript((expectedResultType != null ? "return " : "") + regionJS + "." + methodWithArgs, expectedResultType);
+            return getWrapper().executeScript((expectedResultType != null ? "return " : "") + regionJS + "." + methodWithArgs, expectedResultType, args);
         }
 
-        public void callMethod(String apiMethod, String... args)
+        public void callMethod(String apiMethodName, Object... args)
         {
-            String dataRegionMethod = apiMethod + "(" + String.join(", ", args) + ");";
-            executeScript(dataRegionMethod);
+            StringBuilder argString = new StringBuilder();
+            for (int i = 0; i < args.length; i++)
+            {
+                if (i > 0)
+                    argString.append(", ");
+                argString.append("arguments[").append(i).append("]");
+            }
+            String dataRegionMethod = apiMethodName + "(" + argString + ");";
+            executeScript(dataRegionMethod, args);
         }
     }
 
@@ -450,10 +457,10 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
         private DataRegionApiExpectingRefresh() { }
 
         @Override
-        public <T> T executeScript(String methodWithArgs, Class<T> expectedResultType)
+        public <T> T executeScript(String methodWithArgs, Class<T> expectedResultType, Object... args)
         {
             MutableObject<T> result = new MutableObject<>();
-            doAndWaitForUpdate(() -> result.setValue(super.executeScript(methodWithArgs, expectedResultType)));
+            doAndWaitForUpdate(() -> result.setValue(super.executeScript(methodWithArgs, expectedResultType, args)));
             return result.getValue();
         }
     }
