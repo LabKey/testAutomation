@@ -163,6 +163,7 @@ public class Crawler
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("dumbster", "begin"),
             new ControllerActionId("experiment", "showFile"),
+            new ControllerActionId("filetransfer", "auth"), // redirects to external site
             new ControllerActionId("flow-compensation", "download"),
             new ControllerActionId("flow-editscript", "download"),
             new ControllerActionId("flow-run", "download"),
