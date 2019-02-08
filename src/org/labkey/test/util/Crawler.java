@@ -886,7 +886,7 @@ public class Crawler
             checkForForbiddenWords(relativeURL);
 
             // Check that there was no error
-            if (code >= 400 && (!urlToCheck.isFromForm() || code != HttpStatus.SC_METHOD_NOT_ALLOWED)) // Expect many forms to respond with 405
+            if (!isBadResponse(code, urlToCheck, origin))
                 fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
             List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
             if (!serverError.isEmpty())
@@ -951,10 +951,29 @@ public class Crawler
         if (origin == null) // Ignore 404s from the initial set of links
             return true;
 
-        List<ControllerActionId> actionsWithExpected404s = Arrays.asList(new ControllerActionId("admin", "spider"));
-        ControllerActionId originAction = new ControllerActionId(origin.toString());
+        return isAdminSpiderAction(origin);
+    }
 
-        return actionsWithExpected404s.contains(originAction);
+    private static final ControllerActionId spiderAction = new ControllerActionId("admin", "spider");
+    public static boolean isAdminSpiderAction(URL url)
+    {
+        ControllerActionId originAction = new ControllerActionId(url.toString());
+
+        return spiderAction.equals(originAction);
+    }
+
+    public static boolean isBadResponse(int code, UrlToCheck urlToCheck, URL origin)
+    {
+        if (code < 400)
+            return false;
+
+        if (code == HttpStatus.SC_METHOD_NOT_ALLOWED)
+        {
+            return !(urlToCheck.isFromForm() // Expect most forms to reject GETs
+                    || isAdminSpiderAction(origin)); // Similarly, spider page lists many POST-only actions
+        }
+
+        return true;
     }
 
     protected void checkForForbiddenWords(String relativeURL)
