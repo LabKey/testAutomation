@@ -869,7 +869,7 @@ public class Crawler
             URL currentPageUrl = _test.getURL();
 
             int code = _test.getResponseCode();
-            if (code == 404 && origin == null) // Ignore 404s from the initial set of links
+            if (code == 404 && shouldIgnore404(origin))
                 return Collections.emptyList();
 
             // Find all the links at the site
@@ -944,6 +944,17 @@ public class Crawler
             else
                 throw new RuntimeException(relativeURL + "\nTriggered an exception." + (origin != null ? "\nOriginating page: " + origin.toString() : ""), rethrow);
         }
+    }
+
+    public static boolean shouldIgnore404(URL origin)
+    {
+        if (origin == null) // Ignore 404s from the initial set of links
+            return true;
+
+        List<ControllerActionId> actionsWithExpected404s = Arrays.asList(new ControllerActionId("admin", "spider"));
+        ControllerActionId originAction = new ControllerActionId(origin.toString());
+
+        return actionsWithExpected404s.contains(originAction);
     }
 
     protected void checkForForbiddenWords(String relativeURL)
