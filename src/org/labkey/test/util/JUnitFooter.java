@@ -52,6 +52,12 @@ public class JUnitFooter extends BaseWebDriverTest
     }
 
     @Override
+    protected void checkLinks()
+    {
+        // skip
+    }
+
+    @Override
     public void checkErrors()
     {
         // Skip. Need a way to ignore expected errors.

@@ -78,6 +78,12 @@ public class JUnitHeader extends BaseWebDriverTest
         logToServer("=== Starting Server-side JUnit Tests ===");
     }
 
+    @Override
+    protected void checkLinks()
+    {
+        // skip
+    }
+
     @Override public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
