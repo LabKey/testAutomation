@@ -886,7 +886,7 @@ public class Crawler
             checkForForbiddenWords(relativeURL);
 
             // Check that there was no error
-            if (!isBadResponse(code, urlToCheck, origin))
+            if (isBadResponse(code, urlToCheck, origin))
                 fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
             List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
             if (!serverError.isEmpty())
