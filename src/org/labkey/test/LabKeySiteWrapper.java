@@ -1033,7 +1033,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public boolean isMiniProfilerEnabled()
     {
         Connection cn = createDefaultConnection(false);
-        Command command = new Command("mini-profiler", "enabled");
+        Command command = new Command("mini-profiler", "isEnabled");
         try
         {
             CommandResponse r = command.execute(cn, null);
@@ -1060,7 +1060,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void setMiniProfilerEnabled(boolean enabled)
     {
         Connection cn = createDefaultConnection(false);
-        PostCommand setEnabled = new PostCommand("mini-profiler", "enabled");
+        PostCommand setEnabled = new PostCommand("mini-profiler", "enable");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("enabled", enabled);
         setEnabled.setJsonObject(jsonObject);
