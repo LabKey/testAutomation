@@ -410,7 +410,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(attachmentFile.getName()));
 
         log("Validate that the Message Board Daily Digest is sent.");
-        getDriver().navigate().to(WebTestHelper.getBaseURL() + "/announcements/home/sendDailyDigest.view?");
+        invokeApiAction("home", "announcements", "sendDailyDigest.api", "Failed to send messages daily digest");
+        goToHome();
         goToModule("Dumbster");
         assertTextPresent("New posts to /" + PROJECT_NAME, 2);
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));

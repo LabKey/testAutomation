@@ -90,7 +90,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickButton("Save");
 
         log("Send notification and check email in dumbster");
-        beginAt("/reports/" + getProjectName() + "/sendDailyDigest.view");
+        sendDailyDigest();
         clickFolder(getFolderName());
         goToModule("Dumbster");
         click(Locator.linkContainingText("Report/Dataset Change Notification"));
@@ -117,12 +117,11 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         verifyContentModified();
 
         log("Send notification and check email in dumbster");
-        beginAt("/reports/" + getProjectName() + "/sendDailyDigest.view");
+        sendDailyDigest();
         clickFolder(getFolderName());
         goToModule("Dumbster");
         new EmailRecordTable(getDriver()).clickSubject("Report/Dataset Change Notification");
         assertTextPresent(TIMECHART_NAME, R_NAME, LINKREPORT_NAME, PLOT_NAME);
-
     }
 
     private static final String TIMECHART_NAME = "Mean Cohort Lymph Levels";
@@ -420,5 +419,10 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         assertElementPresent(Locator.xpath("//tr").withClass("x4-grid-tree-node-expanded").append("/td/div").withText(category));
         click(Locator.xpath("//div").withText(category).append("/img").withClass("x4-tree-expander"));
         waitForElementToDisappear(dataViewRow.index(dataViewCount - 1), WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void sendDailyDigest()
+    {
+        invokeApiAction(getProjectName(), "reports", "sendDailyDigest.api", "Failed to send reports daily digest");
     }
 }

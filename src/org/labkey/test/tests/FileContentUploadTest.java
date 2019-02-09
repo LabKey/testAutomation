@@ -20,11 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.Command;
-import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -48,7 +43,6 @@ import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.Timer;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -255,17 +249,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @LogMethod(quiet = true)
     private void sendFileDigest()
     {
-        Command<CommandResponse> command = new PostCommand<>("filecontent", "sendShortDigest");
-        Connection connection = WebTestHelper.getRemoteApiConnection();
-
-        try
-        {
-            command.execute(connection, getProjectName());
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException("Failed to send file digest", e);
-        }
+        invokeApiAction(getProjectName(), "filecontent", "sendShortDigest", "Failed to send file digest");
     }
 
     /**

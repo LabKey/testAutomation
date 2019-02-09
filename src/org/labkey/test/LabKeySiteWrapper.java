@@ -1124,6 +1124,23 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
+    // Simple helper to invoke an API action that takes no parameters via POST
+    @LogMethod(quiet = true)
+    protected void invokeApiAction(String folderPath, String controllerName, String actionName, String failureMessage)
+    {
+        Command<CommandResponse> command = new PostCommand<>(controllerName, actionName);
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+
+        try
+        {
+            command.execute(connection, folderPath);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(failureMessage, e);
+        }
+    }
+
     @LogMethod(quiet = true)
     public int setAuthenticationParameter(String parameter, boolean enabled)
     {
