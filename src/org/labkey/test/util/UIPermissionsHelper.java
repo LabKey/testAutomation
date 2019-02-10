@@ -433,7 +433,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         _driver.checkCheckbox(Locator.checkboxByNameAndValue("delete", userName));
         _driver.doAndWaitForPageToLoad(() -> {
             _driver.clickButton("Update Group Membership", 0);
-            _driver.assertAlert("Permanently remove selected users from this group?");
+            _driver.assertAlert("Are you sure you want to permanently remove the selected user from this group?");
         }, BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 }

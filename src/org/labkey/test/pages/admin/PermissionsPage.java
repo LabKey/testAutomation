@@ -442,7 +442,7 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         checkCheckbox(Locator.checkboxByNameAndValue("delete", userName));
         doAndWaitForPageToLoad(() -> {
             clickButton("Update Group Membership", 0);
-            assertAlert("Permanently remove selected users from this group?");
+            assertAlert("Are you sure you want to permanently remove the selected user from this group?");
         }, WAIT_FOR_PAGE);
         return this;
     }

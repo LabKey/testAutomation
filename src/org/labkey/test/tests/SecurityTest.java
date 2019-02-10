@@ -411,7 +411,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertTextPresent(NORMAL_USER);
         checkCheckbox(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
         clickButton("Update Group Membership", 0);
-        assertAlert("Permanently remove selected users from this group?");
+        assertAlert("Are you sure you want to permanently remove the selected user from this group?");
         sleep(1000);
         assertElementNotPresent(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
         goToProjectHome();
