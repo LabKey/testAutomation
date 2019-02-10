@@ -925,8 +925,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (isGuestModeTest())
             return;
 
-        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "resetErrorMark"), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        assertEquals("Failed to reset server errors: [" + httpResponse.getResponseBody().split("\n")[0] + "].", HttpStatus.SC_OK, httpResponse.getResponseCode());
+        invokeApiAction(null, "admin", "resetErrorMark", "Failed to reset server errors");
     }
 
     @LogMethod
@@ -1126,7 +1125,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     // Simple helper to invoke an API action that takes no parameters via POST
     @LogMethod(quiet = true)
-    protected void invokeApiAction(String folderPath, String controllerName, String actionName, String failureMessage)
+    protected void invokeApiAction(@Nullable String folderPath, String controllerName, String actionName, String failureMessage)
     {
         Command<CommandResponse> command = new PostCommand<>(controllerName, actionName);
         Connection connection = WebTestHelper.getRemoteApiConnection();
