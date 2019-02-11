@@ -217,6 +217,9 @@ public class Crawler
             new ControllerActionId("harvest", "formatInvoice"),
             new ControllerActionId("targetedms", "downloadDocument"),
 
+                // Actions that error with no parameters. Generally linked from admin-spider.view
+                new ControllerActionId("user", "changeEmail"), // NotFoundException from changeEmail.jsp
+
                 // Actions that error from Admin->GoToModule->MoreModules when module is not enabled
                 new ControllerActionId("nlp", "begin"),
                 new ControllerActionId("biologics", "begin"),
