@@ -915,8 +915,11 @@ public class Crawler
                 }
                 catch (IllegalArgumentException badUrl)
                 {
-                    origin = null; // Don't grab screenshot for origin page
-                    throw new AssertionError("Unable to parse link: " + url, badUrl);
+                    if (!formAddresses.contains(url)) // forms might have strange target action (e.g. '../formulations')
+                    {
+                        origin = null; // Don't grab screenshot for origin page
+                        throw new AssertionError("Unable to parse link: " + url, badUrl);
+                    }
                 }
             }
 
