@@ -377,7 +377,7 @@ public class IssuesTest extends BaseWebDriverTest
     public void badUserNotifyList()
     {
         String badUsername = "junk";
-        String errorMessage = String.format("Failed to add user %s: Invalid user display name", badUsername);
+        String errorMessage = String.format("Invalid user '%s'", badUsername);
 
         // NOTE: re using issue but in idempotent manner!
         clickAndWait(Locator.linkWithText(ISSUE_TITLE_0));
