@@ -187,6 +187,30 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
     }
 
+    @Test
+    public void testConfigureReturnURL()
+    {
+        String host = "google.com";
+        goToAdminConsole().clickExternalRedirectURLS();
+
+        log("Verifying host cannot be blank ");
+        clickButton("Save");
+        assertElementPresent(Locator.css(".labkey-error").withText("External Redirect URL must not be blank."));
+
+        log("Setting the host URL");
+        setFormElement(Locator.name("newExternalRedirectURL"), host);
+        clickButton("Save");
+
+        log("Verifying url got added correctly");
+        assertEquals(host, getFormElement(Locator.name("existingExternalURL1")));
+
+        log("Verifying cannot be duplicate");
+        setFormElement(Locator.name("newExternalRedirectURL"), host);
+        clickButton("Save");
+        assertElementPresent(Locator.css(".labkey-error").withText("\'" + host + "\' already exists. Duplicate hosts not allowed."));
+
+    }
+
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("admin");
