@@ -272,7 +272,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Try to import overlapping data with TSV");
 
         DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
-        drt.clickHeaderMenu("Insert data", "Simple bulk data import");
+        drt.clickHeaderMenu("Insert data", SampleSetHelper.BULK_IMPORT_MENU_TEXT);
         String header = "Name\t" + fieldNames.get(0) + "\n";
         String overlap =  "Name1\tToBee\n";
         String newData = "Name2\tSee\n";
@@ -298,7 +298,7 @@ public class SampleSetTest extends BaseWebDriverTest
         assertEquals(fieldNames.get(0) + " for sample 'Name2' not as expected", "See", rowData.get(fieldNames.get(0)));
 
         log("Try to import overlapping data from file");
-        drt.clickHeaderMenu("Insert data", "Simple bulk data import");
+        drt.clickHeaderMenu("Insert data", SampleSetHelper.BULK_IMPORT_MENU_TEXT);
         click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleSet.xls").getAbsolutePath());
         clickButton("Submit", "Can't insert; material already exists");
@@ -322,7 +322,7 @@ public class SampleSetTest extends BaseWebDriverTest
         index = drt.getRowIndex("Name", "Name3");
         assertTrue("Should have a row with the thrid sample name", index >= 0);
         rowData = drt.getRowDataAsMap(index);
-        assertEquals(fieldNames.get(0) + " for sample 'Namee' not as expected", "Dee", rowData.get(fieldNames.get(0)));
+        assertEquals(fieldNames.get(0) + " for sample 'Name' not as expected", "Dee", rowData.get(fieldNames.get(0)));
 
     }
 

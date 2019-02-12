@@ -19,7 +19,7 @@ public class SampleSetHelper
 {
     private static final String SAMPLE_SETS_WEB_PART_TITLE = "Sample Sets";
     private static final String SAMPLES_DATA_WEB_PART_TITLE = "Sample Set Contents";
-    private static final String BULK_IMPORT_MENU_TEXT = "Simple bulk data import";
+    public static final String BULK_IMPORT_MENU_TEXT = "Import bulk data";
     private BaseWebDriverTest _test;
     private boolean _inWebPart = true;
     private Map<String, FieldDefinition.ColumnType> _fields;
@@ -103,6 +103,11 @@ public class SampleSetHelper
     }
 
 
+    public SampleSetHelper setNameExpression(String nameExpression)
+    {
+        _test.setFormElement(Locator.id("nameExpression"), nameExpression);
+        return this;
+    }
 
     public SampleSetHelper setNameAndExpression(String name, @Nullable String nameExpression)
     {
@@ -207,6 +212,11 @@ public class SampleSetHelper
         }
     }
 
+    public void setTsvData(String tsvData)
+    {
+        _test.setFormElement(Locator.name("text"), tsvData);
+    }
+
     public void bulkImport(String tsvData)
     {
         bulkImport(tsvData, IMPORT_DATA_OPTION);
@@ -221,7 +231,7 @@ public class SampleSetHelper
             _test.log("Adding tsv data via bulk import");
             drt.clickHeaderMenu("Insert data", BULK_IMPORT_MENU_TEXT);
             selectImportOption(importOption, 1);
-            _test.setFormElement(Locator.name("text"), tsvData);
+            setTsvData(tsvData);
             _test.clickButton("Submit");
         }
     }
@@ -240,7 +250,7 @@ public class SampleSetHelper
                 rows.add(String.join("\t", dataMap.values()));
             });
 
-            _test.setFormElement(Locator.name("text"), String.join("\n", rows));
+            setTsvData(String.join("\n", rows));
             _test.clickButton("Submit");
         }
     }
