@@ -23,8 +23,10 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.SampleSetHelper;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
@@ -33,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -223,15 +226,23 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         goToSchemaBrowser();
     }
 
-    protected void uploadSampleDescriptions(String sampleFilePath, String [] idCols, String[] keywordCols)
+    protected void uploadSampleDescriptions(String sampleFilePath, Map<String, FieldDefinition.ColumnType> fields, String[] idCols, String[] keywordCols)
     {
         log("** Uploading sample set");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Upload Sample Descriptions"));
-        setFormElement(Locator.name("data"), TestFileUtils.getFileContents(sampleFilePath));
-        click(Locator.name("idColumn1")); //need to trigger an event to populate the columns
-        for (int i = 0; i < idCols.length; i++)
-            selectOptionByText(Locator.name("idColumn" + (i+1)), idCols[i]);
+        SampleSetHelper helper = new SampleSetHelper(this);
+        StringBuilder nameExpression = new StringBuilder();
+        for (String idCol : idCols)
+        {
+            nameExpression.append("-${").append(idCol).append("}");
+        }
+        helper.setNameExpression(nameExpression.toString().substring(1));
+        clickButton("Create");
+
+        helper.addFields(fields);
+        clickAndWait(Locator.linkWithText("Upload More Samples"));
+        helper.setTsvData(TestFileUtils.getFileContents(sampleFilePath));
         clickButton("Submit");
 
         log("** Join sample set with FCSFile keywords");

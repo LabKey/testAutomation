@@ -31,6 +31,7 @@ import org.labkey.test.components.flow.FlowReportsWebpart;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.flow.reports.QCReportEditorPage;
 import org.labkey.test.pages.flow.reports.ReportEditorPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -45,8 +46,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -494,7 +497,20 @@ public class FlowTest extends BaseFlowTest
     @LogMethod
     protected void configureSampleSetAndMetadata()
     {
-        uploadSampleDescriptions("/sampledata/flow/8color/sample-set.tsv", new String[]{"Exp Name", "Well Id"}, new String[]{"EXPERIMENT NAME", "WELL ID"});
+        Map<String, FieldDefinition.ColumnType> fields = new HashMap<>();
+        fields.put("Exp Name", FieldDefinition.ColumnType.String);
+        fields.put("Well Id", FieldDefinition.ColumnType.String);
+        fields.put("Sample Order", FieldDefinition.ColumnType.Integer);
+        fields.put("Sample", FieldDefinition.ColumnType.String);
+        fields.put("PTID", FieldDefinition.ColumnType.String);
+        fields.put("Visit", FieldDefinition.ColumnType.Integer);
+        fields.put("Stim", FieldDefinition.ColumnType.String);
+        fields.put("Comp", FieldDefinition.ColumnType.String);
+        fields.put("Replicate", FieldDefinition.ColumnType.Integer);
+        fields.put("Thaw Date", FieldDefinition.ColumnType.DateTime);
+        fields.put("Comment", FieldDefinition.ColumnType.String);
+
+        uploadSampleDescriptions("/sampledata/flow/8color/sample-set.tsv", fields, new String[]{"Exp Name", "Well Id"}, new String[]{"EXPERIMENT NAME", "WELL ID"});
         setProtocolMetadata(null, "Sample PTID", null, "Sample Visit", true);
 
         goToFlowDashboard();
