@@ -147,18 +147,13 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         fieldProperties.addField(new FieldDefinition("File").setType(FieldDefinition.ColumnType.File));
         clickButton("Save");
 
-        DataRegionTable samplesTable = new DataRegionTable("Material", getDriver());
-        samplesTable.clickImportBulkData();
-
         StringBuilder sb = new StringBuilder("Name\tcolor\tfile\n");
         for (File file : DATAFILE_DIRECTORY.listFiles())
         {
             String newRow = file.getName() + "\tred\t\"" + file.getPath() + "\"\n";
             sb.append(newRow);
         }
-        checkRadioButton(Locator.radioButtonById("insertIgnoreChoice"));
-        setFormElement(Locator.xpath("//textarea[@id='textbox']"), sb.toString());
-        clickButton("Submit");
+        sampleHelper.bulkImport(sb.toString());
     }
 
     @Before
