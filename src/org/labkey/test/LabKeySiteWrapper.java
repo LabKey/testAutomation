@@ -178,7 +178,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      */
     public void simpleSignOut()
     {
-        signOutHTTP();
+        signOutHTTP(false);
         goToHome();
     }
 
@@ -197,10 +197,15 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         signOut(null);
     }
 
-    public void signOutHTTP()
+    /** Use API to sign out or stop impersonating. */
+    private void signOutHTTP(boolean stopImpersonating)
     {
-        String logOutUrl = WebTestHelper.buildURL("login", "logout");
-        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(logOutUrl, "POST");
+        String url;
+        if (stopImpersonating)
+            url = WebTestHelper.buildURL("login", "stopImpersonating.api");
+        else
+            url = WebTestHelper.buildURL("login", "logout");
+        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(url, "POST");
         logOutRequest.copySession(getDriver());
 
         try
@@ -1274,12 +1279,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
+     * NOTE: we can't always count on SiteNavBar being present when this is called so we use login-stopImpersonating.api
      * Stop impersonating user
      * @param goHome go to Server Home or return to page where impersonation started
      */
     public void stopImpersonating(Boolean goHome)
     {
-        navBar().stopImpersonating();
+        signOutHTTP(true);
         if (goHome)
             goToHome();
     }
