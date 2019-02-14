@@ -238,6 +238,11 @@ public class SampleSetHelper
 
     public void bulkImport(List<Map<String, String>> data)
     {
+        bulkImport(data, IMPORT_DATA_OPTION);
+    }
+
+    public void bulkImport(List<Map<String, String>> data, String importOption)
+    {
         if (data.size() > 0)
         {
             _test.log ("Adding " + data.size() + " rows via bulk import");
@@ -247,9 +252,15 @@ public class SampleSetHelper
             List<String> rows = new ArrayList<>();
             rows.add(String.join("\t", data.get(0).keySet()));
             data.forEach(dataMap -> {
-                rows.add(String.join("\t", dataMap.values()));
+                StringBuilder row = new StringBuilder();
+                data.get(0).keySet().forEach(key -> {
+                    row.append(dataMap.get(key));
+                    row.append("\t");
+                });
+                rows.add(row.substring(0, row.lastIndexOf("\t")));
             });
 
+            selectImportOption(importOption, 1);
             setTsvData(String.join("\n", rows));
             _test.clickButton("Submit");
         }

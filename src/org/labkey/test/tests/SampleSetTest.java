@@ -19,20 +19,27 @@ package org.labkey.test.tests;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.openqa.selenium.WebElement;
@@ -42,6 +49,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +65,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({DailyA.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 10)
+@BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class SampleSetTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleSetTestProject";
@@ -327,7 +335,382 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps()
+    public void testReservedFieldNames()
+    {
+
+        log("Validate that 'Name', 'Description' and 'Flag' can not be used as field names.");
+
+        clickProject(PROJECT_NAME);
+
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet("InvalidFieldNames");
+
+        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getWrappedDriver()).withTitle("Field Properties").waitFor();
+        fieldProperties.addField(new FieldDefinition("Name").setType(FieldDefinition.ColumnType.String));
+
+        waitForElementToBeVisible(Locator.xpath("//input[@title=\"'Name' is reserved\"]"));
+
+        // Reuse the same text field again.
+        setFormElement(Locator.tagWithName("input", "ff_name0"), "Description");
+        waitForElementToBeVisible(Locator.xpath("//input[@title=\"'Description' is reserved\"]"));
+
+        setFormElement(Locator.tagWithName("input", "ff_name0"), "Flag");
+        waitForElementToBeVisible(Locator.xpath("//input[@title=\"'Flag' is reserved\"]"));
+
+        clickButton("Cancel");
+
+        log("Looks like all reserved filed names were caught.");
+    }
+
+    @Test
+    public void testUpdateAndDeleteWithCommentsAndFlags()
+    {
+        final String SAMPLE_SET_NAME = "UpdateAndDeleteFields";
+        final String SAMPLE_NAME_TO_DELETE = "ud01";
+        final String SAMPLE_FLAG_UPDATE = "ud02";
+        final String FLAG_UPDATE = "Updated Flag Value";
+        final String SAMPLE_DESC_UPDATE = "ud03";
+        final String DESC_UPDATE = "This is the updated description";
+        final String SAMPLE_UPDATE_BOTH = "ud04";
+        final String FLAG_UPDATE_1 = "New Flag Value";
+        final String DESC_UPDATE_1 = "New description when one did not exist before.";
+        final String FLAG_UPDATE_2 = "Flag Value Updated After Add";
+        final String DESC_UPDATE_2 = "Updated description after adding a description.";
+
+        StringBuilder errorLog = new StringBuilder();
+
+        log("Validate that update and delete works correctly with the Comment and Flag fields.");
+
+        clickProject(PROJECT_NAME);
+
+        // Map.of creates an immutable collection I want to be able to update these data/collection items.
+        Map<String, String> descriptionUpdate = new HashMap<>();
+        descriptionUpdate.put("Name", SAMPLE_DESC_UPDATE);
+        descriptionUpdate.put("Field01", "cc");
+        descriptionUpdate.put("Description", "Here is the second description.");
+        descriptionUpdate.put("Flag", "");
+
+        Map<String, String> flagUpdate = new HashMap<>();
+        flagUpdate.put("Name", SAMPLE_FLAG_UPDATE);
+        flagUpdate.put("Field01", "bb");
+        flagUpdate.put("Description", "");
+        flagUpdate.put("Flag", "Flag Value 2");
+
+        Map<String, String> updateBoth = new HashMap<>();
+        updateBoth.put("Name", SAMPLE_UPDATE_BOTH);
+        updateBoth.put("Field01", "dd");
+        updateBoth.put("Description", "");
+        updateBoth.put("Flag", "");
+
+        List<Map<String, String>> sampleData = new ArrayList<>();
+
+        sampleData.add(Map.of("Name", SAMPLE_NAME_TO_DELETE, "Field01", "aa", "Description", "This is description number 1.", "Flag", "Flag Value 1"));
+        sampleData.add(flagUpdate);
+        sampleData.add(descriptionUpdate);
+        sampleData.add(updateBoth);
+
+        // Some extra samples not really sure I will need them.
+        sampleData.add(Map.of("Name", "ud05", "Field01", "ee", "Description", "This is description for sample 5.", "Flag", "Flag Value 5"));
+        sampleData.add(Map.of("Name", "ud06", "Field01", "ff", "Description", "This is description for sample 6.", "Flag", "Flag Value 6"));
+
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null,
+                Map.of("Field01",  FieldDefinition.ColumnType.String),
+                sampleData);
+
+        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/SampleSetTestProject","UpdateAndDeleteFields", Arrays.asList("Name", "Flag/Comment", "Field01", "Description"));
+
+        Assert.assertTrue("Newly inserted Sample Set data not as expected. Stopping the test here.", areDataListEqual(resultsFromDB, sampleData));
+
+        // Change the view so screen shot on failure is helpful.
+        sampleHelper = new SampleSetHelper(this);
+        DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
+        CustomizeView cv = drtSamples.openCustomizeGrid();
+        cv.addColumn("Description");
+        cv.saveCustomView();
+
+        log("Delete a record that has a description and an flag/comment");
+        int rowIndex = drtSamples.getIndexWhereDataAppears(SAMPLE_NAME_TO_DELETE, "Name");
+        drtSamples.checkCheckbox(rowIndex);
+        drtSamples.clickHeaderButton("Delete");
+        waitForElementToBeVisible(Locator.lkButton("Confirm Delete"));
+        clickAndWait(Locator.lkButton("Confirm Delete"));
+
+        // Remove the same row from the Sample Set input data.
+        int testDataIndex = getSampleIndexFromTestInput(SAMPLE_NAME_TO_DELETE, sampleData);
+        sampleData.remove(testDataIndex);
+
+        log("Check that the Sample has been removed.");
+
+        // Not going to use asserts (and possibly fail on first test), will try all the scenarios and then check at the end.
+        String errorMsg = "Sample Set data is not as expected after a delete.";
+        if(!checkExpectedAgainstDB(sampleData, errorMsg))
+        {
+            errorLog.append("Failure with 'delete sample' test.\n");
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        log("Now update a sample's description.");
+        sampleHelper = new SampleSetHelper(this);
+
+        testDataIndex = getSampleIndexFromTestInput(SAMPLE_DESC_UPDATE, sampleData);
+        sampleData.get(testDataIndex).replace("Description", DESC_UPDATE);
+
+        updateSampleSet(sampleData.get(testDataIndex));
+
+        errorMsg = "Sample Set data is not as expected after a update of Description.";
+        if(!checkExpectedAgainstDB(sampleData, errorMsg))
+        {
+            errorLog.append("Failure with 'update description' test.\n");
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        log("Now delete the sample's description.");
+        sampleHelper = new SampleSetHelper(this);
+
+        sampleData.get(testDataIndex).replace("Description", "");
+
+        updateSampleSet(sampleData.get(testDataIndex));
+
+        errorMsg = "Sample Set data is not as expected after deleting the Description.";
+        if(!checkExpectedAgainstDB(sampleData, errorMsg))
+        {
+            errorLog.append("Failure with 'delete description' test.\n");
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        log("Let's repeat it all again for a sample's flag/comment.");
+        sampleHelper = new SampleSetHelper(this);
+
+        testDataIndex = getSampleIndexFromTestInput(SAMPLE_FLAG_UPDATE, sampleData);
+        sampleData.get(testDataIndex).replace("Flag", FLAG_UPDATE);
+
+        updateSampleSet(sampleData.get(testDataIndex));
+
+        errorMsg = "Sample Set data is not as expected after a update of Flag/Comment.";
+        if(!checkExpectedAgainstDB(sampleData, errorMsg))
+        {
+            errorLog.append("Failure with 'update flag/comment' test.\n");
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        log("Now delete the sample's Flag/Comment.");
+        sampleHelper = new SampleSetHelper(this);
+
+        sampleData.get(testDataIndex).replace("Flag", "");
+
+        updateSampleSet(sampleData.get(testDataIndex));
+
+        errorMsg = "Sample Set data is not as expected after deleting the Flag/Comment.";
+        if(!checkExpectedAgainstDB(sampleData, errorMsg))
+        {
+            errorLog.append("Failure with 'delete flag/comment' test.\n");
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        log("Finally update and delete both flag and description for a sample.");
+        sampleHelper = new SampleSetHelper(this);
+
+        testDataIndex = getSampleIndexFromTestInput(SAMPLE_UPDATE_BOTH, sampleData);
+        sampleData.get(testDataIndex).replace("Flag", FLAG_UPDATE_1);
+        sampleData.get(testDataIndex).replace("Description", DESC_UPDATE_1);
+
+        updateSampleSet(sampleData.get(testDataIndex));
+
+        errorMsg = "Sample Set data is not as expected after a adding a Description and a Flag/Comment to an existing sample.";
+        if(!checkExpectedAgainstDB(sampleData, errorMsg))
+        {
+            errorLog.append("Failure with 'adding a description and flag/comment' test.\n");
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        log("Now update both values.");
+
+        sampleData.get(testDataIndex).replace("Flag", FLAG_UPDATE_2);
+        sampleData.get(testDataIndex).replace("Description", DESC_UPDATE_2);
+
+        updateSampleSet(sampleData.get(testDataIndex));
+
+        errorMsg = "Sample Set data is not as expected after a updating both a Description and a Flag/Comment.";
+        if(!checkExpectedAgainstDB(sampleData, errorMsg))
+        {
+            errorLog.append("Failure with 'updating both a description and flag/comment' test.\n");
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        log("Now delete both the Description and Flag/Comment from the sample.");
+        sampleHelper = new SampleSetHelper(this);
+
+        sampleData.get(testDataIndex).replace("Flag", "");
+        sampleData.get(testDataIndex).replace("Description", "");
+
+        updateSampleSet(sampleData.get(testDataIndex));
+
+        errorMsg = "Sample Set data is not as expected after deleting the Description and Flag/Comment.";
+        if(!checkExpectedAgainstDB(sampleData, errorMsg))
+        {
+            errorLog.append("Failure with 'deleting both a description and flag/comment' test.\n");
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        if(errorLog.length() > 0)
+            Assert.fail(errorLog.toString());
+
+        log("All done.");
+    }
+
+    private void updateSampleSet(Map<String, String> updatedFields)
+    {
+        List<Map<String, String>> updateSampleData = new ArrayList<>();
+        updateSampleData.add(updatedFields);
+
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+
+    }
+
+    private boolean checkExpectedAgainstDB(List<Map<String, String>> expectedData, String errorMsg)
+    {
+        List<Map<String, String>> resultsFromDB;
+
+        resultsFromDB = getSampleDataFromDB("/SampleSetTestProject","UpdateAndDeleteFields", Arrays.asList("Name", "Flag/Comment", "Field01", "Description"));
+
+        if(!areDataListEqual(resultsFromDB, expectedData))
+        {
+            log("\n*************** ERROR ***************");
+            log(errorMsg);
+            log("*************** ERROR ***************\n");
+
+            return false;
+        }
+
+        return true;
+
+    }
+
+    protected boolean areDataListEqual(List<Map<String, String>> list01, List<Map<String, String>> list02)
+    {
+        return areDataListEqual(list01, list02, true);
+    }
+    protected boolean areDataListEqual(List<Map<String, String>> list01, List<Map<String, String>> list02, boolean logMismatch)
+    {
+        if( list01.size() != list02.size())
+            return false;
+
+        // Order the two lists so compare can be done by index and not by searching the two lists.
+        Collections.sort(list01, (Map<String, String> o1, Map<String, String> o2)->
+                {
+                    return o1.get("Name").compareTo(o2.get("Name"));
+                }
+        );
+
+        Collections.sort(list02, (Map<String, String> o1, Map<String, String> o2)->
+                {
+                    return o1.get("Name").compareTo(o2.get("Name"));
+                }
+        );
+
+        for(int i = 0; i < list01.size(); i++)
+        {
+            if(!list01.get(i).equals(list02.get(i)))
+            {
+                if(logMismatch)
+                {
+                    log("Found a mismatch in the lists.");
+                    log("list01(" + i + "): " + list01.get(i));
+                    log("list02(" + i + "): " + list02.get(i));
+                }
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected int getSampleIndexFromTestInput(String sampleName, List<Map<String, String>> testData)
+    {
+        int index;
+        for(index = 0; index < testData.size(); index++)
+        {
+            if(testData.get(index).get("Name").toString().equalsIgnoreCase(sampleName))
+                break;
+        }
+
+        if(index < testData.size())
+            return index;
+
+        Assert.fail("Ummm... I couldn't find a sample with the name '" + sampleName + "' in the test data, are you sure it should be there?");
+
+        // Need this otherwise I get a red squiggly.
+        return -1;
+
+    }
+
+    protected List<Map<String, String>> getSampleDataFromDB(String folderPath, String sampleSetName, List<String> fields)
+    {
+        List<Map<String, String>> results = new ArrayList<>(6);
+        Map<String, String> tempRow;
+
+        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleSetName);
+        cmd.setColumns(fields);
+
+        try
+        {
+            SelectRowsResponse response = cmd.execute(cn, folderPath);
+
+            for (Map<String, Object> row : response.getRows())
+            {
+
+                tempRow = new HashMap<>();
+
+                for(String key : row.keySet())
+                {
+
+                    if (fields.contains(key))
+                    {
+
+                        String tmpFlag = key;
+
+                        if(key.equalsIgnoreCase("Flag/Comment"))
+                            tmpFlag = "Flag";
+
+                        if (null == row.get(key))
+                        {
+                            tempRow.put(tmpFlag, "");
+                        }
+                        else
+                        {
+                            tempRow.put(tmpFlag, row.get(key).toString());
+                        }
+
+                    }
+
+                }
+
+                results.add(tempRow);
+
+            }
+
+        }
+        catch(CommandException | IOException excp)
+        {
+            Assert.fail(excp.getMessage());
+        }
+
+        return results;
+    }
+
+    @Test
+    public void testCreateAndDeriveSamples()
     {
         Map<String, FieldDefinition.ColumnType> sampleSetFields = Map.of("IntCol", FieldDefinition.ColumnType.Integer,
                 "StringCol", FieldDefinition.ColumnType.String,
