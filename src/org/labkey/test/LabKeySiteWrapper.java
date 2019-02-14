@@ -205,11 +205,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     /** Use API to sign out or stop impersonating. */
     private void signOutHTTP(boolean stopImpersonating)
     {
+        String containerPath = this.getCurrentContainerPath();
         String url;
         if (stopImpersonating)
-            url = WebTestHelper.buildURL("login", "stopImpersonating.api");
+            url = WebTestHelper.buildURL("login", containerPath, "stopImpersonating.api");
         else
-            url = WebTestHelper.buildURL("login", "logout");
+            url = WebTestHelper.buildURL("login", containerPath, "logout");
         SimpleHttpRequest logOutRequest = new SimpleHttpRequest(url, "POST");
         logOutRequest.copySession(getDriver());
 
