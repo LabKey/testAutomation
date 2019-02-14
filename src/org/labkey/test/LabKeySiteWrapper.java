@@ -197,6 +197,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         signOut(null);
     }
 
+    public void signOutHTTP()
+    {
+        signOutHTTP(false);
+    }
+
     /** Use API to sign out or stop impersonating. */
     private void signOutHTTP(boolean stopImpersonating)
     {
