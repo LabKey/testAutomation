@@ -3,6 +3,8 @@ package org.labkey.test.util.core.webdav;
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 import org.jetbrains.annotations.NotNull;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.TestLogger;
 
@@ -59,12 +61,14 @@ public class WebDavUploadHelper
         _fileFilter = fileFilter;
     }
 
-    public List<File> uploadDirectoryContents(@NotNull File directory)
+    @LogMethod
+    public List<File> uploadDirectoryContents(@NotNull @LoggedParam File directory)
     {
         return uploadDirectoryContents("", directory);
     }
 
-    public List<File> uploadDirectory(@NotNull File directory)
+    @LogMethod
+    public List<File> uploadDirectory(@NotNull @LoggedParam File directory)
     {
         return uploadDirectoryContents(directory.getName(), directory);
     }
@@ -72,13 +76,15 @@ public class WebDavUploadHelper
     private List<File> uploadDirectoryContents(String uploadPrefix, File directory)
     {
         Map<File, String> filesToUpload = getFilesToUpload(uploadPrefix, directory, 0);
+        if (filesToUpload.isEmpty())
+            throw new IllegalArgumentException("No matching files found to upload: " + directory.getAbsolutePath());
         uploadFiles(filesToUpload);
         return new ArrayList<>(filesToUpload.keySet());
     }
 
     private Map<File, String> getFilesToUpload(String uploadPrefix, File directory, int depth)
     {
-        if (depth > _maxDepth || _maxDepth < 0)
+        if (_maxDepth >= 0 && depth > _maxDepth)
             return Collections.emptyMap();
 
         if (!directory.isDirectory())
