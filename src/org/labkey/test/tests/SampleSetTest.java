@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -338,7 +339,9 @@ public class SampleSetTest extends BaseWebDriverTest
     public void testReservedFieldNames()
     {
 
-        log("Validate that 'Name', 'Description' and 'Flag' can not be used as field names.");
+        log("Validate that reservered values cannot be used as field names.");
+
+        List<String> reserveredNames = Arrays.asList("Name", "Description", "Flag", "RowId", "SampleSet", "Folder", "Run", "Inputs", "Outputs");
 
         clickProject(PROJECT_NAME);
 
@@ -346,16 +349,27 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleHelper.createSampleSet("InvalidFieldNames");
 
         PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getWrappedDriver()).withTitle("Field Properties").waitFor();
-        fieldProperties.addField(new FieldDefinition("Name").setType(FieldDefinition.ColumnType.String));
 
-        waitForElementToBeVisible(Locator.xpath("//input[@title=\"'Name' is reserved\"]"));
+        fieldProperties.addField();
 
-        // Reuse the same text field again.
-        setFormElement(Locator.tagWithName("input", "ff_name0"), "Description");
-        waitForElementToBeVisible(Locator.xpath("//input[@title=\"'Description' is reserved\"]"));
+        StringBuilder errorMsg = new StringBuilder();
 
-        setFormElement(Locator.tagWithName("input", "ff_name0"), "Flag");
-        waitForElementToBeVisible(Locator.xpath("//input[@title=\"'Flag' is reserved\"]"));
+        reserveredNames.forEach(value -> {
+            setFormElement(Locator.tagWithName("input", "ff_name0"), value);
+            try
+            {
+                waitForElementToBeVisible(Locator.xpath("//input[@title=\"'" + value + "' is reserved\"]"));
+            }
+            catch (NoSuchElementException nse)
+            {
+                errorMsg.append(value);
+                errorMsg.append(" is not marked as a reserved field name.");
+                errorMsg.append("\n");
+            }
+        });
+
+        if(errorMsg.length() > 0)
+            Assert.fail(errorMsg.toString());
 
         clickButton("Cancel");
 
