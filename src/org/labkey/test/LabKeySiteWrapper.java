@@ -178,7 +178,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      */
     public void simpleSignOut()
     {
-        signOutHTTP(false);
+        signOutHTTP();
         goToHome();
     }
 
@@ -199,19 +199,25 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void signOutHTTP()
     {
-        signOutHTTP(false);
+        String logOutUrl = WebTestHelper.buildURL("login", "logout");
+        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(logOutUrl, "POST");
+        logOutRequest.copySession(getDriver());
+
+        try
+        {
+            SimpleHttpResponse response = logOutRequest.getResponse();
+            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
-    /** Use API to sign out or stop impersonating. */
-    private void signOutHTTP(boolean stopImpersonating)
+    private void stopImpersonatingHTTP()
     {
-        String containerPath = this.getCurrentContainerPath();
-        String url;
-        if (stopImpersonating)
-            url = WebTestHelper.buildURL("login", containerPath, "stopImpersonating.api");
-        else
-            url = WebTestHelper.buildURL("login", containerPath, "logout");
-        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(url, "POST");
+        String stopImpersonatingUrl = WebTestHelper.buildURL("login", "stopImpersonating.api");
+        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(stopImpersonatingUrl, "POST");
         logOutRequest.copySession(getDriver());
 
         try
@@ -1285,13 +1291,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
-     * NOTE: we can't always count on SiteNavBar being present when this is called so we use login-stopImpersonating.api
      * Stop impersonating user
      * @param goHome go to Server Home or return to page where impersonation started
      */
     public void stopImpersonating(Boolean goHome)
     {
-        signOutHTTP(true);
+        navBar().stopImpersonating();
         if (goHome)
             goToHome();
     }
