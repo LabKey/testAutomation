@@ -15,9 +15,12 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Checkbox;
@@ -30,6 +33,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,7 +51,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     private static final String FILE_LIST_SIGNAL_NAME = "file-list-updated";
     public static final Locator fileGridCell = Locator.tagWithClass("div", "labkey-filecontent-grid").append(Locator.tagWithClass("div", "x4-grid-cell-inner"));
 
-    WrapsDriver _driver;
+    private final WrapsDriver _driver;
 
     public FileBrowserHelper(WrapsDriver driver)
     {
@@ -63,6 +67,16 @@ public class FileBrowserHelper extends WebDriverWrapper
     public WebDriver getWrappedDriver()
     {
         return _driver.getWrappedDriver();
+    }
+
+    private WebDriverWait uploadWait(File file)
+    {
+        long fileSizeMb = file.length() / (1024 * 1024);
+        long uploadTimeout = Math.max(10, fileSizeMb); // 1 second per MB, minimum of 10 seconds to upload a file.
+        if (TestProperties.isCloudPipelineEnabled())
+            uploadTimeout = uploadTimeout * 3; // Triple time to upload to a cloud file root
+
+        return new WebDriverWait(getDriver(), uploadTimeout);
     }
 
     @LogMethod(quiet = true)
@@ -153,9 +167,16 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
-    private void doAndWaitForFileListRefresh(Runnable func)
+    private String doAndWaitForFileListRefresh(Runnable func)
     {
-        doAndWaitForElementToRefresh(() -> doAndWaitForPageSignal(func, FILE_LIST_SIGNAL_NAME), this::waitForGrid, shortWait());
+        return doAndWaitForFileListRefresh(func, shortWait());
+    }
+
+    private String doAndWaitForFileListRefresh(Runnable func, WebDriverWait wait)
+    {
+        Mutable<String> signal = new MutableObject<>();
+        doAndWaitForElementToRefresh(() -> signal.setValue(doAndWaitForPageSignal(func, FILE_LIST_SIGNAL_NAME, wait)), this::waitForGrid, wait);
+        return signal.getValue();
     }
 
     private WebElement waitForGrid()
@@ -446,7 +467,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         if (description != null)
             setFormElement(Locator.name("description"), description);
 
-        String signalValue = doAndWaitForPageSignal(() -> {
+        String signalValue = doAndWaitForFileListRefresh(() -> {
             clickButton("Upload", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
             if (replace)
@@ -455,7 +476,7 @@ public class FileBrowserHelper extends WebDriverWrapper
                 assertTrue("Unexpected confirmation message.", confirmation.getBody().contains("Would you like to replace it?"));
                 confirmation.clickButton("Yes", true);
             }
-        }, FILE_LIST_SIGNAL_NAME, longWait());
+        }, uploadWait(file));
         int fileCount = Integer.parseInt(signalValue);
         assertEquals("Wrong number of files after upload", initialCount + (replace ? 0 : 1), fileCount);
         Locator uploadedFile = fileGridCell.withText(file.getName());
