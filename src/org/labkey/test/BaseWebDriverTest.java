@@ -116,7 +116,6 @@ import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.TestProperties.isViewCheckSkipped;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
-import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.components.PropertiesEditor.PhiSelectType;
 import static org.labkey.test.components.PropertiesEditor.PhiSelectType.NotPHI;
@@ -1281,15 +1280,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         // Download full action coverage table and add to TeamCity artifacts.
-        beginAt(buildURL("admin", "actions", Maps.of("tabId", "details")));
-        File downloadActions = clickAndWaitForDownload(Locator.lkButton("Export").waitForElement(shortWait()));
+        File downloadActions = downloadFromUrl("admin-exportActions.view");
         File actionCoverageFile = new File(TestProperties.getDumpDir(), "ActionCoverage.tsv");
         replaceArtifact(downloadActions, actionCoverageFile, "exported action coverage");
 
+        if (BROWSER_TYPE == BrowserType.CHROME)
+            refresh(); // Chrome blocks sequential downloads from javascript
+
         // Download list of mutation warnings and add to TeamCity artifacts.
-        File downloadWarnings = doAndWaitForDownload(() -> {
-            beginAt(buildURL("admin", "exportMutationWarnings"));
-        });
+        File downloadWarnings = downloadFromUrl("admin-exportMutationWarnings.view");
         File exportMutationsFile = new File(TestProperties.getDumpDir(), "MutationWarnings.txt");
         replaceArtifact(downloadWarnings, exportMutationsFile, "exported mutation warnings");
     }

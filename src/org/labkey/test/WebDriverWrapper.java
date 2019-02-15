@@ -1962,6 +1962,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return doAndWaitForDownload(func, 1)[0];
     }
 
+    public File downloadFromUrl(String url)
+    {
+        return doAndWaitForDownload(() -> {
+            executeScript("document.location = arguments[0]", url);
+        });
+    }
+
     // Pattern matcher for UUID
     // https://stackoverflow.com/questions/136505/searching-for-uuids-in-text-with-regex
     private static final Pattern TEMP_FILE_PATTERN = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.tmp");
