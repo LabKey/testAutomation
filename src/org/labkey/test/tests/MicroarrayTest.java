@@ -113,7 +113,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"));
         waitForElement(Locator.xpath("//option[contains(text(), 'Second')]"));
         setFormElement(Locator.name("runIntegerField"), "115468001");
-        clickButton("Save and Import Next File");
+        clickButton("Save and Import Another Run");
 
         log("Import second run");
         waitForElement(Locator.xpath("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"));
