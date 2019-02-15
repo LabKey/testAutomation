@@ -79,7 +79,7 @@
                 <!-- TODO: Use new InputDatas and InputSamples for auto-derivation -->
             </dat:columns>
         </table>
-        <initialData importIdentity="true">
+        <initialData>
             <file>/data/samples.tsv</file>
         </initialData>
         <options>

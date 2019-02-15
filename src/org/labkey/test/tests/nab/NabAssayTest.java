@@ -271,7 +271,7 @@ public class NabAssayTest extends AbstractAssayTest
                         virusId("5433211").
                         curveFitMethod("Five Parameter").
                         ptids(new String[]{"ptid 1 C", "ptid 2 C", "ptid 3 C", "ptid 4 C", "ptid 5 C"}).
-                        dates(new String[]{"20134-09-05", "2014/2/28", "2014/2/28", "bad-date", "2014/2/28"}).
+                        dates(new String[]{"299999-09-05", "2014/2/28", "2014/2/28", "bad-date", "2014/2/28"}).
                         initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
@@ -279,7 +279,9 @@ public class NabAssayTest extends AbstractAssayTest
                         build()).doImport();
 
         assertElementPresent(Locators.labkeyError.containing("Date must be of type Date and Time. Value \"bad-date\" could not be converted."), 1);
-        assertElementPresent(Locators.labkeyError.containing("Only dates between January 1, 1753 and December 31, 9999 are accepted."), 1);
+//        These dates are SQL Server specific
+//        assertElementPresent(Locators.labkeyError.containing("Only dates between January 1, 1753 and December 31, 9999 are accepted."), 1);
+        assertElementPresent(Locators.labkeyError.containing("Only dates between "), 1);
         clickButton("Cancel");
 
         // retry the import with a valid date

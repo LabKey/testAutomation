@@ -286,7 +286,7 @@ public class SampleSetTest extends BaseWebDriverTest
         String overlap =  "Name1\tToBee\n";
         String newData = "Name2\tSee\n";
         setFormElement(Locator.name("text"), header + overlap + newData);
-        clickButton("Submit", "Can't insert; material already exists");
+        clickButton("Submit", "duplicate key");
 
         log("Switch to 'Insert and Update'");
         sampleHelper.selectImportOption(SampleSetHelper.MERGE_DATA_OPTION, 1);
@@ -310,7 +310,7 @@ public class SampleSetTest extends BaseWebDriverTest
         drt.clickHeaderMenu("Insert data", SampleSetHelper.BULK_IMPORT_MENU_TEXT);
         click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleSet.xls").getAbsolutePath());
-        clickButton("Submit", "Can't insert; material already exists");
+        clickButton("Submit", "duplicate key");
 
         log ("Switch to 'Insert and Update'");
         selectInsertOption("MERGE", 0);

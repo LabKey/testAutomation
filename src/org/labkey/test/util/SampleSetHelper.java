@@ -174,7 +174,7 @@ public class SampleSetHelper
 
     public int getSampleCount()
     {
-       return getSamplesDataRegionTable().getDataRowCount();
+        return getSamplesDataRegionTable().getDataRowCount();
     }
 
     private List<String> getSampleSetFields()
