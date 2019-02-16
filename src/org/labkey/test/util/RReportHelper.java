@@ -306,6 +306,7 @@ public class RReportHelper
         if (changed)
         {
             _test.clickButton("Save", "Override Default R Configuration");
+            _test.sleep(1000);
             _test.clickButton("Yes");
         }
     }
