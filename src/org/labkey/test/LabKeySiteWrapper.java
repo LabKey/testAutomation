@@ -214,7 +214,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    private void stopImpersonatingHTTP()
+    public void stopImpersonatingHTTP()
     {
         String stopImpersonatingUrl = WebTestHelper.buildURL("login", "stopImpersonating.api");
         SimpleHttpRequest logOutRequest = new SimpleHttpRequest(stopImpersonatingUrl, "POST");
