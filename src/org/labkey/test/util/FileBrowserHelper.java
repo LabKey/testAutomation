@@ -72,7 +72,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     private WebDriverWait uploadWait(File file)
     {
         long fileSizeMb = file.length() / (1024 * 1024);
-        long uploadTimeout = Math.max(10, fileSizeMb); // 1 second per MB, minimum of 10 seconds to upload a file.
+        long uploadTimeout = Math.max(20, fileSizeMb); // 1 second per MB, minimum of 20 seconds to upload a file.
         if (TestProperties.isCloudPipelineEnabled())
             uploadTimeout = uploadTimeout * 3; // Triple time to upload to a cloud file root
 
