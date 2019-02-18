@@ -57,6 +57,7 @@ import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -75,6 +76,7 @@ import java.util.StringJoiner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestFileUtils.getLabKeyRoot;
@@ -450,10 +452,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
         insertCmd.getRows().addAll(Arrays.asList(
                 Maps.of("Name", "Red", "Hex", "#FF0000"),
                 Maps.of("Name", "Green", "Hex", "#00FF00"),
-                Maps.of("Name", "Blue", "Hex", "#0000FF")
+                Maps.of("Name", "Blue", "Hex", "#0000FF"),
+                Maps.of("Name", "Black", "Hex", "#000000"),
+                Maps.of("Name", "White", "Hex", "#FFFFFF"),
+                Maps.of("Name", "Purple", "Hex", "#4A235A"),
+                Maps.of("Name", "Brown", "Hex", "#6E2C00"),
+                Maps.of("Name", "Gold", "Hex", "#FAD7A0"),
+                Maps.of("Name", "Silver", "Hex", "#E5E8E8")
         ));
         insertResp = insertCmd.execute(cn, getProjectName());
-        assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
+        assertEquals("Expected to insert 9 rows.", 9, insertResp.getRowsAffected().intValue());
 
         log("** Inserting vechicles...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Vehicles");
@@ -1432,6 +1440,83 @@ public class SimpleModuleTest extends BaseWebDriverTest
                 .clickViewData();
         assertTextPresent("My Custom View", "Hello Dataset", "Visit");
         assertTextNotPresent("Participant Identifier");
+    }
+
+    private void editMetadata(String schemaName, String tableName, String operations, String colunmName, String value, String operator)
+    {
+        goToSchemaBrowser();
+        selectQuery(schemaName, tableName);
+        waitForText("edit metadata");
+        clickAndWait(Locator.linkWithText("edit metadata"));
+        // wait for the domain editor to appear:
+        clickButton("Edit Source", defaultWaitForPage);
+        _ext4Helper.clickExt4Tab("XML Metadata");
+
+        String XML_METADATA = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
+                "  <table tableName=\"" + tableName + "\" tableDbType=\"TABLE\">\n" +
+                "    <columns>\n" +
+                "      <column columnName=\"" + colunmName + "\">\n" +
+                "        <datatype>varchar</datatype>\n" +
+                "        <fk> \n" +
+                "           <fkColumnName >Name</fkColumnName > \n" +
+                "            <fkTable >Colors</fkTable > \n" +
+                "            <fkDbSchema >vehicle</fkDbSchema > \n" +
+                "            <filters > \n" +
+                "               <filterGroup operation=\"" + operations + "\" > \n" +
+                "               <filter column=\"Name\" value=\"" + value + "\" operator=\"" + operator + "\" /> \n" +
+                "               </filterGroup > \n" +
+                "            </filters > \n" +
+                "          </fk > \n" +
+                "      </column>\n" +
+                "    </columns>\n" +
+                "  </table>\n" +
+                "</tables>\n";
+
+        setCodeEditorValue("metadataText", XML_METADATA);
+        clickButton("Save & Finish");
+
+    }
+
+    @LogMethod
+    private  void doTestFkLookupFilter()
+    {
+        String schemaName = "vehicle";
+        String tableName = "Vehicles";
+        goToSchemaBrowser();
+        viewQueryData("vehicle","Vehicles");
+
+        log("Editing metadata xml to add the fitered forgien key for insert operation");
+        editMetadata(schemaName,tableName,"insert", "Color","Green!","eq");
+
+        log("Adding a valid row");
+        DataRegionTable table = new DataRegionTable("query",getDriver());
+        table.clickInsertNewRow();
+        setFormElement(Locator.name("quf_ModelId"),"Camry");
+        setFormElement(Locator.name("quf_Color"),"Green!");
+        setFormElement(Locator.name("quf_ModelYear"),"2019");
+        setFormElement(Locator.name("quf_Milage"),"20");
+        setFormElement(Locator.name("quf_LastService"),"01/01/2019");
+        clickButton("Submit");
+
+        log("Adding a invalid row");
+        try
+        {
+            table.clickInsertNewRow();
+            setFormElement(Locator.name("quf_Color"), "Black!");
+        }
+        catch (NoSuchElementException e)
+        {
+            assertEquals("Cannot locate option with value: Black!".trim(),e.getMessage().trim());
+            clickButton("Cancel");
+        }
+
+        log("Editing metadata xml to add the fitered forgien key for update operation");
+        editMetadata(schemaName,tableName,"update", "Color","Bl","contains");
+        table.clickEditRow(0);
+        setFormElement(Locator.name("quf_Color"), "Blue!");
+        clickButton("Submit");
+        assertEquals("Blue!",table.getDataAsText(0,"Color"));
+
     }
 
     @LogMethod
