@@ -44,7 +44,7 @@ public class PipelineCancelTest  extends BaseWebDriverTest
         startImportStudyFromZip(STUDY_ZIP);
 
         log("Cancel import");
-        waitForText("Delaying import");
+        waitForElementToBeVisible(Locator.linkContainingText("Delaying import"));
         clickAndWait(Locator.linkContainingText("Delaying import"));
         clickButton("Cancel");
 
