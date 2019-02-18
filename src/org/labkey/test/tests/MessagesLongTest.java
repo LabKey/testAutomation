@@ -668,9 +668,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementPresent(subscribeButton);
         click(subscribeButton);
         clickAndWait(Locator.tagWithText("a", "thread"));
-        clickAndWait(Locator.linkContainingText("view message"));
         clickAndWait(Locator.linkWithText("unsubscribe"));
-        clickAndWait(Locator.linkContainingText("view message"));
         assertElementPresent(subscribeButton);
 
         click(subscribeButton);
