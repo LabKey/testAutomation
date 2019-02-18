@@ -253,7 +253,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
             {
                 if (isElementPresent(Locator.lkButton("Save and Import Another Run")))
                 {
-                    clickAndWait(Locator.lkButton("Save and Import Next File"));
+                    clickAndWait(Locator.lkButton("Save and Import Another Run"));
                     waitForElement(Locator.tagWithName("input", "instrumentSetting"));
                 }
             }
