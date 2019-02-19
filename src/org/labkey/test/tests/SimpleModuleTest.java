@@ -76,7 +76,6 @@ import java.util.StringJoiner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestFileUtils.getLabKeyRoot;
@@ -1475,18 +1474,41 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         setCodeEditorValue("metadataText", XML_METADATA);
         clickButton("Save & Finish");
-
     }
 
+    private static final String vehicleMetadataJsQuery = "function onFailure(errorInfo, options, responseObj)\n" +
+            "{\n" +
+            "    if (errorInfo && errorInfo.exception)\n" +
+            "        callback(\"Failure: \" + errorInfo.exception);\n" +
+            "    else\n" +
+            "        callback(\"Failure: \" + responseObj.statusText);\n" +
+            "}\n" +
+            "\n" +
+            "function onSuccess(data)\n" +
+            "{\n" +
+            "    if(data)\n" +
+            "        callback(data);\n" +
+            "    else\n" +
+            "        callback(\"No data returned!\");\n" +
+            "}\n" +
+            "\n" +
+            "LABKEY.Query.selectRows({\n" +
+            "            schemaName: 'vehicle',\n" +
+            "            queryName: 'Vehicles',\n" +
+            "            columns: ['Color'],\n" +
+            "            success: onSuccess,\n" +
+            "            failure: onFailure\n" +
+            "        });";
+
     @LogMethod
-    private  void doTestFkLookupFilter()
+    private void doTestFkLookupFilter()
     {
         String schemaName = "vehicle";
         String tableName = "Vehicles";
         goToSchemaBrowser();
         viewQueryData("vehicle","Vehicles");
 
-        log("Editing metadata xml to add the fitered forgien key for insert operation");
+        log("Editing metadata xml to add the filtered foreign key for insert operation");
         editMetadata(schemaName,tableName,"insert", "Color","Green!","eq");
 
         log("Adding a valid row");
@@ -1512,13 +1534,38 @@ public class SimpleModuleTest extends BaseWebDriverTest
             clickButton("Cancel");
         }
 
-        log("Editing metadata xml to add the fitered forgien key for update operation");
-        editMetadata(schemaName,tableName,"update", "Color","Bl","contains");
+        log("Check metadata for insert");
+        Map insertFilterGroup = getColorColumnFilterGroup();
+        Map insertFilterMap = (Map)((List)insertFilterGroup.get("filters")).get(0);
+        assertEquals("Filter column 'Name' for vehicle.Vehicles query not found", "Name", insertFilterMap.get("column"));
+        assertEquals("Filter operator 'eq' for vehicle.Vehicles query not found", "eq", insertFilterMap.get("operator"));
+        assertEquals("Filter value 'Green!' for vehicle.Vehicles query not found!", "Green!", insertFilterMap.get("value"));
+        assertEquals("Filter operation 'insert' for vehicle.Vehicles query not found!", "insert", insertFilterGroup.get("operation"));
+
+        log("Editing metadata xml to add the filtered foreign key for update operation");
+        editMetadata(schemaName,tableName,"update", "Color","Bl", "contains");
         table.clickEditRow(0);
         setFormElement(Locator.name("quf_Color"), "Blue!");
         clickButton("Submit");
-        assertEquals("Blue!",table.getDataAsText(0,"Color"));
+        assertEquals("Blue!", table.getDataAsText(0,"Color"));
 
+        log("Check metadata for update");
+        Map updateFilterGroup = getColorColumnFilterGroup();
+        Map updateFilterMap = (Map)((List)updateFilterGroup.get("filters")).get(0);
+        assertEquals("Filter column 'Name' for vehicle.Vehicles query not found", "Name", updateFilterMap.get("column"));
+        assertEquals("Filter operator 'contains' for vehicle.Vehicles query not found", "contains", updateFilterMap.get("operator"));
+        assertEquals("Filter value 'Blue!' for vehicle.Vehicles query not found!", "Bl", updateFilterMap.get("value"));
+        assertEquals("Filter operation 'update' for vehicle.Vehicles query not found!", "update", updateFilterGroup.get("operation"));
+    }
+
+    private Map getColorColumnFilterGroup()
+    {
+        Map result = (Map)executeAsyncScript(vehicleMetadataJsQuery);
+        Map colorColumnFields = ((List<Map>)(((Map)result.get("metaData")).get("fields"))).get(0);
+
+        assertEquals("Column fields for column 'Color' in vehicle.Vehicles query not found!", colorColumnFields.get("name"), "Color");
+
+        return (Map)((List)((Map)colorColumnFields.get("lookup")).get("filterGroups")).get(0);
     }
 
     @LogMethod
