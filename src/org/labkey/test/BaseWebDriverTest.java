@@ -858,14 +858,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             try
             {
                 boolean inIFrame = Locator.css(":root").findElement(getDriver()).getSize().getHeight() > 0;
-                if (false) // Need a better way to detect when we are in an iFrame. Above method is not reliable
+                if (inIFrame)
                 {
-                    if (isFirefox()) // As of 2.45, Chromedriver screenshots are not restricted to currently focused iFrame
-                    {
-                        getArtifactCollector().dumpPageSnapshot(testName + "-iframe", null, false); // Snapshot of iFrame
-                    }
+                    // TODO: Need a better way to detect when we are in an iFrame. Above method is not reliable
+                    //if (isFirefox()) // As of 2.45, Chromedriver screenshots are not restricted to currently focused iFrame
+                    //{
+                    //    getArtifactCollector().dumpPageSnapshot(testName + "-iframe", null, false); // Snapshot of iFrame
+                    //}
                     try
                     {
+                        // Switch to default content just in case we're in an iFrame
                         getDriver().switchTo().defaultContent();
                     }
                     catch (UnhandledAlertException alert)
