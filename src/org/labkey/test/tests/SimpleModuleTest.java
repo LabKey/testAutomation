@@ -233,6 +233,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestViewEditing();
         doTestRowLevelContainerPath();
         doTestCustomLogin();
+        doTestFkLookupFilter();
     }
 
     @LogMethod
@@ -1506,7 +1507,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
         catch (NoSuchElementException e)
         {
-            assertEquals("Cannot locate option with value: Black!".trim(),e.getMessage().trim());
+            String[] str = e.getMessage().split("\\r?\\n");
+            assertEquals("Cannot locate option with value: Black!".trim(),str[0].trim());
             clickButton("Cancel");
         }
 
