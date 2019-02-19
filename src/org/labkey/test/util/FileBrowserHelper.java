@@ -467,7 +467,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         if (description != null)
             setFormElement(Locator.name("description"), description);
 
-        String signalValue = doAndWaitForFileListRefresh(() -> {
+        String signalValue = doAndWaitForPageSignal(() -> { // Don't wait for full file list refresh yet, may need to set file properties
             clickButton("Upload", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
             if (replace)
@@ -476,7 +476,7 @@ public class FileBrowserHelper extends WebDriverWrapper
                 assertTrue("Unexpected confirmation message.", confirmation.getBody().contains("Would you like to replace it?"));
                 confirmation.clickButton("Yes", true);
             }
-        }, uploadWait(file));
+        }, FILE_LIST_SIGNAL_NAME, uploadWait(file));
         int fileCount = Integer.parseInt(signalValue);
         assertEquals("Wrong number of files after upload", initialCount + (replace ? 0 : 1), fileCount);
         Locator uploadedFile = fileGridCell.withText(file.getName());
