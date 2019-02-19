@@ -39,10 +39,12 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,6 +102,7 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         SampleSetTest init = (SampleSetTest) getCurrentTest();
 
+        // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
     }
 
@@ -119,6 +122,13 @@ public class SampleSetTest extends BaseWebDriverTest
         projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
         portalHelper.addWebPart("Sample Sets");
     }
+
+    // Uncomment this function (after you run once) it will make iterating on tests much easier.
+//    @Override
+//    protected void doCleanup(boolean afterTest)
+//    {
+//        log("Do nothing.");
+//    }
 
     @Test
     public void doLineageDerivationTest()
@@ -466,7 +476,6 @@ public class SampleSetTest extends BaseWebDriverTest
         }
 
         log("Now update a sample's description.");
-        sampleHelper = new SampleSetHelper(this);
 
         testDataIndex = getSampleIndexFromTestInput(SAMPLE_DESC_UPDATE, sampleData);
         sampleData.get(testDataIndex).replace("Description", DESC_UPDATE);
@@ -482,8 +491,6 @@ public class SampleSetTest extends BaseWebDriverTest
         }
 
         log("Now delete the sample's description.");
-        sampleHelper = new SampleSetHelper(this);
-
         sampleData.get(testDataIndex).replace("Description", "");
 
         updateSampleSet(sampleData.get(testDataIndex));
@@ -497,8 +504,6 @@ public class SampleSetTest extends BaseWebDriverTest
         }
 
         log("Let's repeat it all again for a sample's flag/comment.");
-        sampleHelper = new SampleSetHelper(this);
-
         testDataIndex = getSampleIndexFromTestInput(SAMPLE_FLAG_UPDATE, sampleData);
         sampleData.get(testDataIndex).replace("Flag", FLAG_UPDATE);
 
@@ -513,8 +518,6 @@ public class SampleSetTest extends BaseWebDriverTest
         }
 
         log("Now delete the sample's Flag/Comment.");
-        sampleHelper = new SampleSetHelper(this);
-
         sampleData.get(testDataIndex).replace("Flag", "");
 
         updateSampleSet(sampleData.get(testDataIndex));
@@ -528,8 +531,6 @@ public class SampleSetTest extends BaseWebDriverTest
         }
 
         log("Finally update and delete both flag and description for a sample.");
-        sampleHelper = new SampleSetHelper(this);
-
         testDataIndex = getSampleIndexFromTestInput(SAMPLE_UPDATE_BOTH, sampleData);
         sampleData.get(testDataIndex).replace("Flag", FLAG_UPDATE_1);
         sampleData.get(testDataIndex).replace("Description", DESC_UPDATE_1);
@@ -560,8 +561,6 @@ public class SampleSetTest extends BaseWebDriverTest
         }
 
         log("Now delete both the Description and Flag/Comment from the sample.");
-        sampleHelper = new SampleSetHelper(this);
-
         sampleData.get(testDataIndex).replace("Flag", "");
         sampleData.get(testDataIndex).replace("Description", "");
 
@@ -593,20 +592,22 @@ public class SampleSetTest extends BaseWebDriverTest
 
     private boolean checkExpectedAgainstDB(List<Map<String, String>> expectedData, String errorMsg)
     {
+        boolean returnValue;
         List<Map<String, String>> resultsFromDB;
 
         resultsFromDB = getSampleDataFromDB("/SampleSetTestProject","UpdateAndDeleteFields", Arrays.asList("Name", "Flag/Comment", "Field01", "Description"));
 
         if(!areDataListEqual(resultsFromDB, expectedData))
         {
-            log("\n*************** ERROR ***************");
-            log(errorMsg);
-            log("*************** ERROR ***************\n");
+            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
 
-            return false;
+            returnValue = false;
         }
-
-        return true;
+        else
+        {
+            returnValue = true;
+        }
+        return returnValue;
 
     }
 
@@ -721,6 +722,228 @@ public class SampleSetTest extends BaseWebDriverTest
         }
 
         return results;
+    }
+
+    @Test
+    public void testMissingFieldIndicator()
+    {
+        final String SAMPLE_SET_NAME = "MissingValues";
+        final String INDICATOR_ONLY_SAMPLE_NAME = "mv02";
+        final String VALUE_ONLY_SAMPLE_NAME = "mv04";
+        final String BOTH_FIELDS_SAMPLE_NAME = "mv06";
+        final String INCONSISTENT_SAMPLE_NAME = "mv07";
+        final String UPDATE_SAMPLE_NAME = "mv08";
+
+        final String STATIC_FIELD_NAME = "field01";
+        final String MISSING_FIELD_NAME = "field02";
+        final String INDICATOR_FIELD_NAME = MISSING_FIELD_NAME + "_mvindicator";
+
+        StringBuilder errorLog = new StringBuilder();
+
+        log("Validate missing values in a Sample Set.");
+
+        log("First create expected missing value indicators.");
+        clickProject(PROJECT_NAME);
+
+        final String MV_INDICATOR_01 = "Q";
+        final String MV_DESCRIPTION_01 = "Data currently under quality control review.";
+        final String MV_INDICATOR_02 = "N";
+        final String MV_DESCRIPTION_02 = "Required field marked by site as 'data not available'.";
+        final String MV_INDICATOR_03 = "X";
+        final String MV_DESCRIPTION_03 = "Here is a non system one.";
+
+        List<Map<String, String>> missingValueIndicators = new ArrayList<>();
+        missingValueIndicators.add(Map.of("indicator", MV_INDICATOR_01, "description", MV_DESCRIPTION_01));
+        missingValueIndicators.add(Map.of("indicator", MV_INDICATOR_02, "description", MV_DESCRIPTION_02));
+        missingValueIndicators.add(Map.of("indicator", MV_INDICATOR_03, "description", MV_DESCRIPTION_03));
+
+        setupMVIndicators(missingValueIndicators);
+
+        clickProject(PROJECT_NAME);
+
+        int expectedMissingCount = 0;
+        List<Map<String, String>> sampleData = new ArrayList<>();
+
+        Map<String, String> indicatorOnlySample = new HashMap<>();
+        indicatorOnlySample.put("Name", INDICATOR_ONLY_SAMPLE_NAME);
+        indicatorOnlySample.put(STATIC_FIELD_NAME, "bb_mv01");
+        indicatorOnlySample.put(MISSING_FIELD_NAME, "");
+        indicatorOnlySample.put(INDICATOR_FIELD_NAME, "Q");
+        expectedMissingCount++;
+
+        Map<String, String> valueOnlySample = new HashMap<>();
+        valueOnlySample.put("Name", VALUE_ONLY_SAMPLE_NAME);
+        valueOnlySample.put(STATIC_FIELD_NAME, "dd_mv01");
+        valueOnlySample.put(MISSING_FIELD_NAME, "X");
+        valueOnlySample.put(INDICATOR_FIELD_NAME, "");
+        expectedMissingCount++;
+
+        Map<String, String> bothFieldsSample = new HashMap<>();
+        bothFieldsSample.put("Name", BOTH_FIELDS_SAMPLE_NAME);
+        bothFieldsSample.put(STATIC_FIELD_NAME, "ff_mv01");
+        bothFieldsSample.put(MISSING_FIELD_NAME, "N");
+        bothFieldsSample.put(INDICATOR_FIELD_NAME, "N");
+        expectedMissingCount++;
+
+        // This may actually be a redundant test case. It is basically the same as the "both" test case.
+        Map<String, String> inconsistentSample = new HashMap<>();
+        inconsistentSample.put("Name", INCONSISTENT_SAMPLE_NAME);
+        inconsistentSample.put(STATIC_FIELD_NAME, "gg_mv01");
+        inconsistentSample.put(MISSING_FIELD_NAME, "Here is a valid string value.");
+        inconsistentSample.put(INDICATOR_FIELD_NAME, "Q");
+        expectedMissingCount++;
+
+        Map<String, String> updateSample = new HashMap<>();
+        updateSample.put("Name", UPDATE_SAMPLE_NAME);
+        updateSample.put(STATIC_FIELD_NAME, "hh_mv01");
+        updateSample.put(MISSING_FIELD_NAME, "X");
+        updateSample.put(INDICATOR_FIELD_NAME, "X");
+        expectedMissingCount++;
+
+        sampleData.add(Map.of("Name", "mv01", STATIC_FIELD_NAME, "aa_mv01", MISSING_FIELD_NAME, "This value is here.", INDICATOR_FIELD_NAME, ""));
+        sampleData.add(indicatorOnlySample);
+        sampleData.add(Map.of("Name", "mv03", STATIC_FIELD_NAME, "cc_mv01", MISSING_FIELD_NAME, "Just to break things up.", INDICATOR_FIELD_NAME, ""));
+        sampleData.add(valueOnlySample);
+        sampleData.add(Map.of("Name", "mv05", STATIC_FIELD_NAME, "ee_mv01", MISSING_FIELD_NAME, "", INDICATOR_FIELD_NAME, ""));
+        sampleData.add(bothFieldsSample);
+        sampleData.add(inconsistentSample);
+        sampleData.add(updateSample);
+
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null);
+        List<FieldDefinition> fields = new ArrayList<>();
+        fields.add(new FieldDefinition(STATIC_FIELD_NAME)
+                .setType(FieldDefinition.ColumnType.String)
+                .setMvEnabled(false));
+        fields.add(new FieldDefinition(MISSING_FIELD_NAME)
+                .setType(FieldDefinition.ColumnType.String)
+                .setMvEnabled(true));
+
+        sampleHelper.addFields(fields);
+
+        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        sampleHelper = new SampleSetHelper(this);
+
+        sampleHelper.bulkImport(sampleData);
+
+        // Change the view so the missing value indicator is there and for the screen shot is useful on failure.
+        sampleHelper = new SampleSetHelper(this);
+        DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
+        CustomizeView cv = drtSamples.openCustomizeGrid();
+        cv.showHiddenItems();
+        cv.addColumn(INDICATOR_FIELD_NAME);
+        cv.saveCustomView();
+
+        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", STATIC_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+
+        // After doing a bulk upload it looks like the value field is stored as an empty field in the DB.
+        // Need to update the sample data to reflect what is expected from the DB.
+        int testDataIndex = getSampleIndexFromTestInput(VALUE_ONLY_SAMPLE_NAME, sampleData);
+        sampleData.get(testDataIndex).replace(INDICATOR_FIELD_NAME, sampleData.get(testDataIndex).get(MISSING_FIELD_NAME));
+        sampleData.get(testDataIndex).replace(MISSING_FIELD_NAME, "");
+
+        testDataIndex = getSampleIndexFromTestInput(BOTH_FIELDS_SAMPLE_NAME, sampleData);
+        sampleData.get(testDataIndex).replace(MISSING_FIELD_NAME, "");
+
+        testDataIndex = getSampleIndexFromTestInput(INCONSISTENT_SAMPLE_NAME, sampleData);
+        sampleData.get(testDataIndex).replace(MISSING_FIELD_NAME, "");
+
+        testDataIndex = getSampleIndexFromTestInput(UPDATE_SAMPLE_NAME, sampleData);
+        sampleData.get(testDataIndex).replace(MISSING_FIELD_NAME, "");
+
+        Assert.assertTrue("Newly inserted Sample Set data not as expected. Stopping the test here.", areDataListEqual(resultsFromDB, sampleData));
+
+        // Not going to use asserts (and possibly fail on first test), will try all the scenarios and then check at the end.
+        String errorMsg;
+        if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
+        {
+            errorMsg = "Number of missing value UI indicators is not as expected.\nExpected " + expectedMissingCount + " found " + getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]"));
+            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
+
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        log("Now update a sample (give a value in the missing value field) and validate.");
+        final String UPDATED_VALUE = "This should remove the unknown value indicator.";
+        testDataIndex = getSampleIndexFromTestInput(UPDATE_SAMPLE_NAME, sampleData);
+        sampleData.get(testDataIndex).replace(MISSING_FIELD_NAME, UPDATED_VALUE);
+        sampleData.get(testDataIndex).replace(INDICATOR_FIELD_NAME, "");
+
+        // TODO: Need to pass in all of the columns so as not to lose any data. See TODO comment below.
+        List<Map<String, String>> updateSampleData = new ArrayList<>();
+        updateSampleData.add(sampleData.get(testDataIndex));
+        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+
+        // TODO: Need to revisit. When doing a bulk update if a field is missing the update views it as a request to
+        //  set the value to empty. Why not view this as make no changes to the field value? And if we want to set
+        //  the field to empty add the column to the update but give no value.
+        // The commented out code below does this (set only the column I want to update.
+//        Map<String, String> tempSample = new HashMap<>();
+//        tempSample.put("Name", UPDATE_SAMPLE_NAME);
+//        tempSample.put(MISSING_FIELD_NAME, UPDATED_VALUE);
+//
+//        List<Map<String, String>> updateSampleData = new ArrayList<>();
+//        updateSampleData.add(tempSample);
+//
+//        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+
+        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", STATIC_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+
+        if(!areDataListEqual(resultsFromDB, sampleData))
+        {
+            errorMsg = "After updating a value the data in the DB is not as expected.";
+            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
+
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        // Not really sure this is useful, we can remove in the future.
+        log("Validate that the help div is shown when mouse over a missing value.");
+        mouseOver(Locator.linkWithText(MV_INDICATOR_03));
+        sleep(500);
+        if(!isElementVisible(Locator.xpath("//span[@id='helpDivBody'][text()='" + MV_DESCRIPTION_03 + "']")))
+        {
+            errorMsg = "The missing value pop-up helper was shown as expected.\nExpected a div control with the text '" + MV_DESCRIPTION_03 + "'.";
+            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
+
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        // Should I add automation that add a single field?
+        // How about automation that updates an existing field?
+
+        if(errorLog.length() > 0)
+            Assert.fail(errorLog.toString());
+
+        log("All done.");
+    }
+
+    @LogMethod
+    private void setupMVIndicators(List<Map<String, String>> missingValueIndicators)
+    {
+        goToFolderManagement();
+        clickAndWait(Locator.linkWithText("Missing Values"));
+        uncheckCheckbox(Locator.checkboxById("inherit"));
+
+        // Delete all site-level settings
+        for (WebElement deleteButton : Locator.tagWithAttribute("img", "alt", "delete").findElements(getDriver()))
+        {
+            deleteButton.click();
+            shortWait().until(ExpectedConditions.stalenessOf(deleteButton));
+        }
+
+        for(int index = 0; index < missingValueIndicators.size(); index++)
+        {
+            clickButton("Add", 0);
+            WebElement mvInd = Locator.css("#mvIndicatorsDiv input[name=mvIndicators]").index(index).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+            setFormElement(mvInd, missingValueIndicators.get(index).get("indicator"));
+            WebElement mvLabel = Locator.css("#mvIndicatorsDiv input[name=mvLabels]").index(index).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+            setFormElement(mvLabel, missingValueIndicators.get(index).get("description"));
+        }
+        clickButton("Save");
     }
 
     @Test

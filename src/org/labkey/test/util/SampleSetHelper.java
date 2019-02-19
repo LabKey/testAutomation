@@ -158,6 +158,22 @@ public class SampleSetHelper
         return this;
     }
 
+    public SampleSetHelper addFields(List<FieldDefinition> fields)
+    {
+        if(null != fields && !fields.isEmpty())
+        {
+            PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(_test.getDriver()).withTitle("Field Properties").waitFor();
+            fields.forEach(fieldDefinition -> {
+                fieldProperties.addField(fieldDefinition);
+            });
+            _test.clickButton("Save");
+        }
+        else
+            _test.clickButton("Cancel");
+
+        return this;
+    }
+
     public SampleSetHelper verifyFields()
     {
         _test.log("Verify that the fields for the sample set are as expected");
