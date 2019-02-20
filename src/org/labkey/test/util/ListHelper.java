@@ -16,7 +16,6 @@
 
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
@@ -33,8 +32,10 @@ import org.openqa.selenium.WrapsDriver;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -267,12 +268,18 @@ public class ListHelper extends LabKeySiteWrapper
 
         clickSave();
 
+        Set<String> expectedTexts = new HashSet<>();
         for (ListColumn col : cols)
         {
-            assertTextPresent(col.getName());
-            if (!StringUtils.isEmpty(col.getLabel()) && !col.getName().equals(col.getLabel()))
-                assertTextPresent(col.getLabel());
+            expectedTexts.add(col.getName());
+            expectedTexts.add(col.getLabel());
         }
+        expectedTexts.remove("");
+        assertTextPresent(new ArrayList<>(expectedTexts));
+
+        // Take screenshot to assist debugging query insert forms
+        // TODO: Remove once investigation is complete
+        BaseWebDriverTest.getCurrentTest().getArtifactCollector().dumpScreen("_listDesigner");
     }
 
     public void addField(ListColumn col)
