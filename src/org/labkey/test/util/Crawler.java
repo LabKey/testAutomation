@@ -23,6 +23,7 @@ import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.api.ProjectMenu;
@@ -891,7 +892,8 @@ public class Crawler
             checkForForbiddenWords(relativeURL);
 
             // Check that there was no error
-            if (isBadResponse(code, urlToCheck, origin))
+            if (isBadResponse(code, urlToCheck, origin)
+                    && !_test.isElementPresent(Locators.labkeyError.containing("module is not enabled"))) // Some modules return 404 when not enabled
                 fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
             List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
             if (!serverError.isEmpty())
