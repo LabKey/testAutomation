@@ -874,6 +874,7 @@ public class SampleSetTest extends BaseWebDriverTest
         List<Map<String, String>> updateSampleData = new ArrayList<>();
         updateSampleData.add(sampleData.get(testDataIndex));
         sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+        expectedMissingCount--;
 
         // TODO: Need to revisit. When doing a bulk update if a field is missing the update views it as a request to
         //  set the value to empty. Why not view this as make no changes to the field value? And if we want to set
@@ -887,6 +888,15 @@ public class SampleSetTest extends BaseWebDriverTest
 //        updateSampleData.add(tempSample);
 //
 //        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+
+        if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
+        {
+            errorMsg = "After updating a value the number of missing UI indicators is not as expected.\nExpected " + expectedMissingCount + " found " + getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]"));
+            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
+
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
 
         resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", STATIC_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
@@ -912,7 +922,48 @@ public class SampleSetTest extends BaseWebDriverTest
             errorLog.append("\n");
         }
 
-        // Should I add automation that add a single field?
+        log("Now add a single sample via the UI");
+        final String UI_INSERT_SAMPLE_NAME = "mv09";
+        final String UI_STATIC_FIELD_TEXT = "This sample was added from the UI.";
+
+        DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
+        drt.clickHeaderMenu("Insert data", SampleSetHelper.INSERT_NEW_ROW_MENU_TEXT);
+
+        Locator sampleNameElement = Locator.name("quf_Name");
+        Locator sampleStaticFieldElement = Locator.name("quf_" + STATIC_FIELD_NAME);
+        Locator sampleMissingFieldElement = Locator.name("quf_" + MISSING_FIELD_NAME);
+        Locator sampleMissingFieldIndElement = Locator.name("quf_" + INDICATOR_FIELD_NAME);
+        waitForElementToBeVisible(sampleNameElement);
+
+        setFormElement(sampleNameElement, UI_INSERT_SAMPLE_NAME);
+        setFormElement(sampleStaticFieldElement, UI_STATIC_FIELD_TEXT);
+        selectOptionByValue(sampleMissingFieldIndElement, MV_INDICATOR_03);
+        clickButton("Submit");
+        expectedMissingCount++;
+
+        // Add this element to expected sample data.
+        sampleData.add(Map.of("Name", UI_INSERT_SAMPLE_NAME, STATIC_FIELD_NAME, UI_STATIC_FIELD_TEXT, MISSING_FIELD_NAME, "", INDICATOR_FIELD_NAME, MV_INDICATOR_03));
+
+        if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
+        {
+            errorMsg = "After adding a sample with a missing value through the UI the number of missing UI indicators is not as expected.\nExpected " + expectedMissingCount + " found " + getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]"));
+            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
+
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", STATIC_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+
+        if(!areDataListEqual(resultsFromDB, sampleData))
+        {
+            errorMsg = "After adding a sample with a missing value through the UI the data in the DB is not as expected.";
+            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
+
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
         // How about automation that updates an existing field?
 
         if(errorLog.length() > 0)

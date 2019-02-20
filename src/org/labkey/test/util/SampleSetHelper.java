@@ -20,6 +20,7 @@ public class SampleSetHelper
     private static final String SAMPLE_SETS_WEB_PART_TITLE = "Sample Sets";
     private static final String SAMPLES_DATA_WEB_PART_TITLE = "Sample Set Contents";
     public static final String BULK_IMPORT_MENU_TEXT = "Import bulk data";
+    public static final String INSERT_NEW_ROW_MENU_TEXT = "Insert new row";
     private BaseWebDriverTest _test;
     private boolean _inWebPart = true;
     private Map<String, FieldDefinition.ColumnType> _fields;
