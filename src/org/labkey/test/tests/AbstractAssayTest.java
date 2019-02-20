@@ -108,8 +108,8 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
 
         //create a new project for the security tests
         log("Creating security test project");
-        _containerHelper.createProject(TEST_ASSAY_PRJ_SECURITY, null);
-        goToProjectHome(TEST_ASSAY_PRJ_SECURITY);
+        _containerHelper.createProject(getProjectName(), null);
+        goToProjectHome(getProjectName());
 
         log("Setting up groups, users and initial permissions");
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
@@ -123,23 +123,23 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         permissionsHelper.setPermissions(TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_READER);
 
         //add a PI user to that group
-        permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_PI1, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_GRP_PIS);
+        permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_PI1, getProjectName(), TEST_ASSAY_GRP_PIS);
         // give the PI user "CanSeeAuditLog" permission
         permissionsHelper.setSiteAdminRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
 
         //add a lab tech user to the Users group
-        permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_TECH1, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_GRP_USERS);
+        permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_TECH1, getProjectName(), TEST_ASSAY_GRP_USERS);
 
         //add folder structure
         log("Setting up folder structure and folder permissions");
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LABS, "None", null, true);
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, "None", null, true);
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LABS, TEST_ASSAY_FLDR_LAB1, "None", null, true);
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY1, "Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), TEST_ASSAY_FLDR_LABS, "None", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), TEST_ASSAY_FLDR_STUDIES, "None", null, true);
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_LABS, TEST_ASSAY_FLDR_LAB1, "None", null, true);
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY1, "Study", null, true);
         createDefaultStudy();
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY2, "Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY2, "Study", null, true);
         createDefaultStudy();
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY3, "Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY3, "Study", null, true);
         clickButton("Create Study");
         //use date-based study
         click(Locator.xpath("(//input[@name='timepointType'])[1]"));
@@ -153,10 +153,10 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         //setup security on sub-folders:
         // PIs should be Editors on Lab1 and Study1, but not Study2 or Study3
         // Users should be Editors on Lab1, readers on Study2, and nothing on Study3
-        setSubfolderSecurity(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
-        setSubfolderSecurity(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_EDITOR);
-        setSubfolderSecurity(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
-        setSubfolderSecurity(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY3, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_NONE);
+        setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
+        setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_EDITOR);
+        setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
+        setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_STUDY3, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_NONE);
 
         //setup study-level security:
         // TODO: due to bug 3625, the PIs group may not have study-level read permissions
@@ -169,14 +169,14 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         // study-level read permissions. However, we'll still do this just to be safe and it
         // ends up testing the study-level security anyway.
         log("Setting study-level permissions");
-        setStudyPerms(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY1,
+        setStudyPerms(getProjectName(), TEST_ASSAY_FLDR_STUDY1,
                 TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_STUDY_READALL);
 
-        setStudyQCStates(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY1);
+        setStudyQCStates(getProjectName(), TEST_ASSAY_FLDR_STUDY1);
 
         //add the Assay List web part to the lab1 folder so we can upload data later as a labtech
         log("Adding assay list web part to lab1 folder");
-        navigateToFolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LAB1);
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_LAB1);
         portalHelper.addWebPart("Assay List");
     }
 
