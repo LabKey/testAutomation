@@ -86,6 +86,11 @@ public class LabKeyAlert extends ModalDialog implements Alert
     @Override
     public void sendKeys(String keysToSend) { }
 
+    public void clickButton(String buttonText)
+    {
+        getWrapper().clickAndWait(Locator.linkWithText(buttonText));
+    }
+
     public static class ExtraLocators {
         static public Locator.XPathLocator functionBody = Locator.tagWithClass("div", "modal-fn-body");
     }

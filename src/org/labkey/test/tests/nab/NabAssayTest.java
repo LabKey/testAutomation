@@ -28,6 +28,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PlateGrid;
+import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.tests.AbstractAssayTest;
@@ -232,7 +233,9 @@ public class NabAssayTest extends AbstractAssayTest
         doAndWaitForPageToLoad(() ->
         {
             click(Locator.linkWithText("delete"));
-            assertAlert("Permanently delete this plate template?");
+
+            LabKeyAlert modal = new LabKeyAlert(getDriver());
+            modal.clickButton("Yes");
         });
 
         assertTextPresent(PLATE_TEMPLATE_NAME);
