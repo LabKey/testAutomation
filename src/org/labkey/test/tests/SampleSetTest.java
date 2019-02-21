@@ -725,7 +725,7 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testMissingFieldIndicator()
+    public void testMissingFieldIndicatorAndRequiredFields()
     {
         final String SAMPLE_SET_NAME = "MissingValues";
         final String INDICATOR_ONLY_SAMPLE_NAME = "mv02";
@@ -734,15 +734,15 @@ public class SampleSetTest extends BaseWebDriverTest
         final String INCONSISTENT_SAMPLE_NAME = "mv07";
         final String UPDATE_SAMPLE_NAME = "mv08";
 
-        final String STATIC_FIELD_NAME = "field01";
+        final String REQUIRED_FIELD_NAME = "field01";
         final String MISSING_FIELD_NAME = "field02";
         final String INDICATOR_FIELD_NAME = MISSING_FIELD_NAME + "_mvindicator";
 
         StringBuilder errorLog = new StringBuilder();
 
-        log("Validate missing values in a Sample Set.");
+        log("Validate missing values and required fields in a Sample Set.");
 
-        log("First create expected missing value indicators.");
+        log("Create expected missing value indicators.");
         clickProject(PROJECT_NAME);
 
         final String MV_INDICATOR_01 = "Q";
@@ -766,21 +766,21 @@ public class SampleSetTest extends BaseWebDriverTest
 
         Map<String, String> indicatorOnlySample = new HashMap<>();
         indicatorOnlySample.put("Name", INDICATOR_ONLY_SAMPLE_NAME);
-        indicatorOnlySample.put(STATIC_FIELD_NAME, "bb_mv01");
+        indicatorOnlySample.put(REQUIRED_FIELD_NAME, "bb_mv01");
         indicatorOnlySample.put(MISSING_FIELD_NAME, "");
         indicatorOnlySample.put(INDICATOR_FIELD_NAME, "Q");
         expectedMissingCount++;
 
         Map<String, String> valueOnlySample = new HashMap<>();
         valueOnlySample.put("Name", VALUE_ONLY_SAMPLE_NAME);
-        valueOnlySample.put(STATIC_FIELD_NAME, "dd_mv01");
+        valueOnlySample.put(REQUIRED_FIELD_NAME, "dd_mv01");
         valueOnlySample.put(MISSING_FIELD_NAME, "X");
         valueOnlySample.put(INDICATOR_FIELD_NAME, "");
         expectedMissingCount++;
 
         Map<String, String> bothFieldsSample = new HashMap<>();
         bothFieldsSample.put("Name", BOTH_FIELDS_SAMPLE_NAME);
-        bothFieldsSample.put(STATIC_FIELD_NAME, "ff_mv01");
+        bothFieldsSample.put(REQUIRED_FIELD_NAME, "ff_mv01");
         bothFieldsSample.put(MISSING_FIELD_NAME, "N");
         bothFieldsSample.put(INDICATOR_FIELD_NAME, "N");
         expectedMissingCount++;
@@ -788,23 +788,23 @@ public class SampleSetTest extends BaseWebDriverTest
         // This may actually be a redundant test case. It is basically the same as the "both" test case.
         Map<String, String> inconsistentSample = new HashMap<>();
         inconsistentSample.put("Name", INCONSISTENT_SAMPLE_NAME);
-        inconsistentSample.put(STATIC_FIELD_NAME, "gg_mv01");
+        inconsistentSample.put(REQUIRED_FIELD_NAME, "gg_mv01");
         inconsistentSample.put(MISSING_FIELD_NAME, "Here is a valid string value.");
         inconsistentSample.put(INDICATOR_FIELD_NAME, "Q");
         expectedMissingCount++;
 
         Map<String, String> updateSample = new HashMap<>();
         updateSample.put("Name", UPDATE_SAMPLE_NAME);
-        updateSample.put(STATIC_FIELD_NAME, "hh_mv01");
+        updateSample.put(REQUIRED_FIELD_NAME, "hh_mv01");
         updateSample.put(MISSING_FIELD_NAME, "X");
         updateSample.put(INDICATOR_FIELD_NAME, "X");
         expectedMissingCount++;
 
-        sampleData.add(Map.of("Name", "mv01", STATIC_FIELD_NAME, "aa_mv01", MISSING_FIELD_NAME, "This value is here.", INDICATOR_FIELD_NAME, ""));
+        sampleData.add(Map.of("Name", "mv01", REQUIRED_FIELD_NAME, "aa_mv01", MISSING_FIELD_NAME, "This value is here.", INDICATOR_FIELD_NAME, ""));
         sampleData.add(indicatorOnlySample);
-        sampleData.add(Map.of("Name", "mv03", STATIC_FIELD_NAME, "cc_mv01", MISSING_FIELD_NAME, "Just to break things up.", INDICATOR_FIELD_NAME, ""));
+        sampleData.add(Map.of("Name", "mv03", REQUIRED_FIELD_NAME, "cc_mv01", MISSING_FIELD_NAME, "Just to break things up.", INDICATOR_FIELD_NAME, ""));
         sampleData.add(valueOnlySample);
-        sampleData.add(Map.of("Name", "mv05", STATIC_FIELD_NAME, "ee_mv01", MISSING_FIELD_NAME, "", INDICATOR_FIELD_NAME, ""));
+        sampleData.add(Map.of("Name", "mv05", REQUIRED_FIELD_NAME, "ee_mv01", MISSING_FIELD_NAME, "", INDICATOR_FIELD_NAME, ""));
         sampleData.add(bothFieldsSample);
         sampleData.add(inconsistentSample);
         sampleData.add(updateSample);
@@ -812,12 +812,14 @@ public class SampleSetTest extends BaseWebDriverTest
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         sampleHelper.createSampleSet(SAMPLE_SET_NAME, null);
         List<FieldDefinition> fields = new ArrayList<>();
-        fields.add(new FieldDefinition(STATIC_FIELD_NAME)
+        fields.add(new FieldDefinition(REQUIRED_FIELD_NAME)
                 .setType(FieldDefinition.ColumnType.String)
-                .setMvEnabled(false));
+                .setMvEnabled(false)
+                .setRequired(true));
         fields.add(new FieldDefinition(MISSING_FIELD_NAME)
                 .setType(FieldDefinition.ColumnType.String)
-                .setMvEnabled(true));
+                .setMvEnabled(true)
+                .setRequired(false));
 
         sampleHelper.addFields(fields);
 
@@ -834,7 +836,7 @@ public class SampleSetTest extends BaseWebDriverTest
         cv.addColumn(INDICATOR_FIELD_NAME);
         cv.saveCustomView();
 
-        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", STATIC_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
         // After doing a bulk upload it looks like the value field is stored as an empty field in the DB.
         // Need to update the sample data to reflect what is expected from the DB.
@@ -898,7 +900,7 @@ public class SampleSetTest extends BaseWebDriverTest
             errorLog.append("\n");
         }
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", STATIC_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
         if(!areDataListEqual(resultsFromDB, sampleData))
         {
@@ -930,7 +932,7 @@ public class SampleSetTest extends BaseWebDriverTest
         drt.clickHeaderMenu("Insert data", SampleSetHelper.INSERT_NEW_ROW_MENU_TEXT);
 
         Locator sampleNameElement = Locator.name("quf_Name");
-        Locator sampleStaticFieldElement = Locator.name("quf_" + STATIC_FIELD_NAME);
+        Locator sampleStaticFieldElement = Locator.name("quf_" + REQUIRED_FIELD_NAME);
         Locator sampleMissingFieldElement = Locator.name("quf_" + MISSING_FIELD_NAME);
         Locator sampleMissingFieldIndElement = Locator.name("quf_" + INDICATOR_FIELD_NAME);
         waitForElementToBeVisible(sampleNameElement);
@@ -942,7 +944,7 @@ public class SampleSetTest extends BaseWebDriverTest
         expectedMissingCount++;
 
         // Add this element to expected sample data.
-        sampleData.add(Map.of("Name", UI_INSERT_SAMPLE_NAME, STATIC_FIELD_NAME, UI_STATIC_FIELD_TEXT, MISSING_FIELD_NAME, "", INDICATOR_FIELD_NAME, MV_INDICATOR_03));
+        sampleData.add(Map.of("Name", UI_INSERT_SAMPLE_NAME, REQUIRED_FIELD_NAME, UI_STATIC_FIELD_TEXT, MISSING_FIELD_NAME, "", INDICATOR_FIELD_NAME, MV_INDICATOR_03));
 
         if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
         {
@@ -953,11 +955,68 @@ public class SampleSetTest extends BaseWebDriverTest
             errorLog.append("\n");
         }
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", STATIC_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
         if(!areDataListEqual(resultsFromDB, sampleData))
         {
             errorMsg = "After adding a sample with a missing value through the UI the data in the DB is not as expected.";
+            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
+
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        log("Validate that the required field check works as expected.");
+        updateSampleData = new ArrayList<>();
+        updateSampleData.add(Map.of("Name", "mv10", REQUIRED_FIELD_NAME, "", MISSING_FIELD_NAME, "There should be no value in the required field.", INDICATOR_FIELD_NAME, ""));
+        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.IMPORT_DATA_OPTION, 0);
+
+        boolean errorMsgShown;
+        try
+        {
+            waitForElementToBeVisible(Locator.xpath("//div[contains(@class, 'labkey-error')][contains(text(),'Missing value for required property')]"));
+            errorMsgShown = true;
+            clickButton("Cancel");
+        }
+        catch(NoSuchElementException nse)
+        {
+            errorMsgShown = false;
+        }
+
+        if(!errorMsgShown)
+        {
+            errorMsg = "No error message was shown when a required field is missing.";
+            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
+
+            errorLog.append(errorMsg);
+            errorLog.append("\n");
+        }
+
+        log("Now validate that adding a single row from the UI has the same behavior.");
+        final String UI_MISSING_REQ_SAMPLE_NAME = "mv10";
+        final String UI_MISSING_FIELD_TEXT = "This should generate an error.";
+        drt = sampleHelper.getSamplesDataRegionTable();
+        drt.clickHeaderMenu("Insert data", SampleSetHelper.INSERT_NEW_ROW_MENU_TEXT);
+        waitForElementToBeVisible(sampleNameElement);
+
+        setFormElement(sampleNameElement, UI_MISSING_REQ_SAMPLE_NAME);
+        setFormElement(sampleMissingFieldElement, UI_MISSING_FIELD_TEXT);
+        clickButton("Submit", 0);
+
+        try
+        {
+            waitForElementToBeVisible(Locator.xpath("//span[contains(@class, 'help-block')]/font[@class='labkey-error'][text()='This field is required']"));
+            errorMsgShown = true;
+            clickButton("Cancel");
+        }
+        catch(NoSuchElementException nse)
+        {
+            errorMsgShown = false;
+        }
+
+        if(!errorMsgShown)
+        {
+            errorMsg = "No error message was shown when a required field is missing in the UI.";
             log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
 
             errorLog.append(errorMsg);

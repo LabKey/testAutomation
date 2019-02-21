@@ -255,10 +255,20 @@ public class SampleSetHelper
 
     public void bulkImport(List<Map<String, String>> data)
     {
-        bulkImport(data, IMPORT_DATA_OPTION);
+        bulkImport(data, IMPORT_DATA_OPTION, null);
+    }
+
+    public void bulkImport(List<Map<String, String>> data, int waitTime)
+    {
+        bulkImport(data, IMPORT_DATA_OPTION, waitTime);
     }
 
     public void bulkImport(List<Map<String, String>> data, String importOption)
+    {
+        bulkImport(data, importOption, null);
+    }
+
+    public void bulkImport(List<Map<String, String>> data, String importOption, @Nullable Integer waitTime)
     {
         if (data.size() > 0)
         {
@@ -279,7 +289,13 @@ public class SampleSetHelper
 
             selectImportOption(importOption, 1);
             setTsvData(String.join("\n", rows));
-            _test.clickButton("Submit");
+
+            // If an error is expected after clicking submit the page won't navigate. A 0 waitTime will avoid the "Page didn't navigate" error.
+            if(null != waitTime)
+                _test.clickButton("Submit", waitTime);
+            else
+                _test.clickButton("Submit");
+
         }
     }
 
