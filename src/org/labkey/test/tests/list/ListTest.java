@@ -725,6 +725,7 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, keyCol, columns);
         clickButton("Done");
         clickAndWait(Locator.linkWithText(listName));
+        waitForElement(Locator.xpath("//table[@lk-region-name='query']"));
         assertTextPresent(dummyBase);
         assertTextNotPresent("An unexpected error");
         Map<String, String> row = new HashMap<>();
