@@ -875,54 +875,56 @@ public class Crawler
             URL currentPageUrl = _test.getURL();
 
             int code = _test.getResponseCode();
-            if (code == 404 && shouldIgnore404(origin))
-                return Collections.emptyList();
-
-            // Find all the links at the site
-            if (_needToGetProjectMenuLinks && depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
-            {
-                _needToGetProjectMenuLinks = false;
-                _test.projectMenu().open();
-            }
-
-            List<String> linkAddresses = _test.getLinkAddresses();
-            List<String> formAddresses = _test.getFormAddresses();
-            linkAddresses.addAll(formAddresses);
 
             checkForForbiddenWords(relativeURL);
-
-            // Check that there was no error
-            if (isBadResponse(code, urlToCheck, origin)
-                    && !_test.isElementPresent(Locators.labkeyError.containing("module is not enabled"))) // Some modules return 404 when not enabled
-                fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
-            List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
-            if (!serverError.isEmpty())
-            {
-                String[] errorLines = serverError.get(0).split("\n");
-                fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
-            }
-
-            if (code == 200 && _test.getDriver().getTitle().isEmpty())
-                _warnings.add("Action does not specify title: " + actionId.toString());
-
             List<UrlToCheck> newUrlsToCheck = new ArrayList<>();
-            for (String url : linkAddresses)
+
+            if (!isIgnoredError(code, urlToCheck, origin))
             {
-                try
+                // Check that there was no error
+                if (code >= 400)
                 {
-                    UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
-                    if (candidateUrl.isVisitableURL())
-                    {
-                        candidateUrl.setFromForm(formAddresses.contains(url));
-                        newUrlsToCheck.add(candidateUrl);
-                    }
+                    fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
                 }
-                catch (IllegalArgumentException badUrl)
+                List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
+                if (!serverError.isEmpty())
                 {
-                    if (!formAddresses.contains(url)) // forms might have strange target action (e.g. '../formulations')
+                    String[] errorLines = serverError.get(0).split("\n");
+                    fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
+                }
+
+                // Find all the links at the site
+                if (_needToGetProjectMenuLinks && depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
+                {
+                    _needToGetProjectMenuLinks = false;
+                    _test.projectMenu().open();
+                }
+
+                List<String> linkAddresses = _test.getLinkAddresses();
+                List<String> formAddresses = _test.getFormAddresses();
+                linkAddresses.addAll(formAddresses);
+
+                if (code == 200 && _test.getDriver().getTitle().isEmpty())
+                    _warnings.add("Action does not specify title: " + actionId.toString());
+
+                for (String url : linkAddresses)
+                {
+                    try
                     {
-                        origin = null; // Don't grab screenshot for origin page
-                        throw new AssertionError("Unable to parse link: " + url, badUrl);
+                        UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
+                        if (candidateUrl.isVisitableURL())
+                        {
+                            candidateUrl.setFromForm(formAddresses.contains(url));
+                            newUrlsToCheck.add(candidateUrl);
+                        }
+                    }
+                    catch (IllegalArgumentException badUrl)
+                    {
+                        if (!formAddresses.contains(url)) // forms might have strange target action (e.g. '../formulations')
+                        {
+                            origin = null; // Don't grab screenshot for origin page
+                            throw new AssertionError("Unable to parse link: " + url, badUrl);
+                        }
                     }
                 }
             }
@@ -956,14 +958,6 @@ public class Crawler
         }
     }
 
-    public static boolean shouldIgnore404(URL origin)
-    {
-        if (origin == null) // Ignore 404s from the initial set of links
-            return true;
-
-        return isAdminSpiderAction(origin);
-    }
-
     private static final ControllerActionId spiderAction = new ControllerActionId("admin", "spider");
     public static boolean isAdminSpiderAction(URL url)
     {
@@ -972,18 +966,23 @@ public class Crawler
         return spiderAction.equals(originAction);
     }
 
-    public static boolean isBadResponse(int code, UrlToCheck urlToCheck, URL origin)
+    private boolean isIgnoredError(int code, UrlToCheck urlToCheck, URL origin)
     {
-        if (code < 400)
-            return false;
-
-        if (code == HttpStatus.SC_METHOD_NOT_ALLOWED)
+        if (code == HttpStatus.SC_NOT_FOUND) // 404
         {
-            return !(urlToCheck.isFromForm() // Expect most forms to reject GETs
-                    || isAdminSpiderAction(origin)); // Similarly, spider page lists many POST-only actions
+            if (origin == null || isAdminSpiderAction(origin))
+                return true; // Ignore 404s from the initial set of links
+            if (_test.isElementPresent(Locators.labkeyError.containing("module is not enabled")))
+                return true; // Some modules return 404 when not enabled
         }
 
-        return true;
+        if (code == HttpStatus.SC_METHOD_NOT_ALLOWED) // 405
+        {
+            return urlToCheck.isFromForm() // Expect most forms to reject GETs
+                    || isAdminSpiderAction(origin); // Similarly, spider page lists many POST-only actions
+        }
+
+        return false;
     }
 
     protected void checkForForbiddenWords(String relativeURL)
