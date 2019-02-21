@@ -3291,6 +3291,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         boolean selected = el.isSelected();
         if (check != selected)
             el.click();
+
+        Assert.assertEquals("Failed to set checkbox to requested state.", el.isSelected(), check);
+
     }
 
     public void setCheckbox(Locator checkBoxLocator, boolean check)
