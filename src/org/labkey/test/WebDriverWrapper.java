@@ -1132,6 +1132,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
         alert.accept();
     }
 
+    public void assertAlertIgnoreCaseAndSpaces(String msg)
+    {
+        Alert alert = waitForAlert();
+        String alertTxt, expectedTxt;
+        alertTxt = alert.getText().replace(" ", "");
+        expectedTxt = msg.replace(" ", "");
+        if(!alertTxt.equalsIgnoreCase(expectedTxt))
+            Assert.fail("Wrong alert text. Expected '" + msg + "' Actual '" + alert.getText() + "'.");
+        alert.accept();
+    }
+
     public void assertAlertContains(String partialMessage)
     {
         Alert alert = waitForAlert();
@@ -3292,7 +3303,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (check != selected)
             el.click();
 
-        Assert.assertEquals("Failed to set checkbox to requested state.", el.isSelected(), check);
+        Assert.assertEquals("Failed to set checkbox to requested state.", check, el.isSelected());
 
     }
 
