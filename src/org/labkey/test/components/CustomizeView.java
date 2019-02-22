@@ -350,7 +350,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             _driver.scrollIntoView(fieldRow, false);
             if (!fieldRow.getAttribute("class").contains("expanded"))
             {
-                _driver.waitForElementToBeVisible(Locator.css(".x4-tree-expander"));
                 Locator.css(".x4-tree-expander").findElement(fieldRow).click();
             }
             Locator.tag("tr").withClass("x4-grid-tree-node-expanded").withAttribute("data-recordid", nodePath).waitForElement(getComponentElement(), 10000);
