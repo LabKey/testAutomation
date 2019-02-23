@@ -31,6 +31,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class})
@@ -74,7 +77,7 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
     @Test
     public void testSimpleNameExpression()
     {
-        String nameExpression = "${A}-${B}.${randomId}";
+        String nameExpression = "${A}-${B}.${genId}.${batchRandomId}.${randomId}";
         String data = "A\tB\tC\n" +
                 "a\tb\tc\n" +
                 "a\tb\tc\n" +
@@ -92,10 +95,16 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
 
         DataRegionTable materialTable = new DataRegionTable("Material", this);
         List<String> names = materialTable.getColumnDataAsText("Name");
-        for (String name : names)
-        {
-            assertTrue(name.startsWith("a-b."));
-        }
+
+        log("generated sample names:");
+        names.forEach(this::log);
+
+        assertEquals(3, names.size());
+
+        String batchRandomId = names.get(0).split("\\.")[2];
+        assertThat(names.get(0), startsWith("a-b.3." + batchRandomId + "."));
+        assertThat(names.get(1), startsWith("a-b.2." + batchRandomId + "."));
+        assertThat(names.get(2), startsWith("a-b.1." + batchRandomId + "."));
     }
 
     @Test
