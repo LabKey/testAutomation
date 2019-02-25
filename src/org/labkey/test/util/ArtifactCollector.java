@@ -114,7 +114,7 @@ public class ArtifactCollector
     public void publishDumpedArtifacts()
     {
         File dumpDir = ensureDumpDir();
-        publishArtifact(dumpDir, dumpDir.getName());
+        publishArtifact(dumpDir, dumpDir.getName() + ".tar.gz");
     }
 
     public void dumpThreads()
