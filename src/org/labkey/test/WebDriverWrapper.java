@@ -18,6 +18,7 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiMap;
 import org.apache.commons.collections4.map.MultiValueMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -2469,6 +2470,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void clickAndWait(Locator l)
     {
         clickAndWait(l, defaultWaitForPage);
+    }
+
+    public void openLinkInNewWindow(WebElement link)
+    {
+        Keys modifierKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
+        link.sendKeys(Keys.chord(modifierKey, Keys.ENTER));
+        switchToWindow(1);
     }
 
     public static final int WAIT_FOR_EXT_MASK_TO_DISSAPEAR = -1;
