@@ -487,10 +487,10 @@ public class FlowTest extends BaseFlowTest
         assertEquals("Wrong measures in picker", new HashSet<>(expectedMeasures), new HashSet<>(availableMeasures));
         log("Validate that the values 'Compensation Matrix' and 'Run' cannot be assigned to the Y axis.");
         chartTypeDialog.clickColumnValue("Compensation Matrix");
-        assertTrue("You should not be able to set 'Compensation Matrix' to the y-axis.", chartTypeDialog.getYAxisValue().trim().length() == 0);
+        assertEquals("You should not be able to set 'Compensation Matrix' to the y-axis.", 0, chartTypeDialog.getYAxisValue().trim().length());
         chartTypeDialog.clickColumnValue("Run");
-        assertTrue("You should not be able to set 'Run' to the y-axis.", chartTypeDialog.getYAxisValue().trim().length() == 0);
-        chartTypeDialog.clickCancel();
+        assertEquals("You should not be able to set 'Run' to the y-axis.", 0, chartTypeDialog.getYAxisValue().trim().length());
+        doAndWaitForPageToLoad(chartTypeDialog::clickCancel);
     }
 
     // Test sample set and ICS metadata
