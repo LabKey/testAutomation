@@ -1732,6 +1732,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    private void waitForDocument()
+    {
+        waitFor(() -> null != executeScript("" +
+                "try {return document.documentElement;}" +
+                "catch(e) {return null;}"), "Document did not load", getDefaultWaitForPage());
+    }
+
     public long doAndWaitForPageToLoad(Runnable func)
     {
         return doAndWaitForPageToLoad(func, defaultWaitForPage);
@@ -2477,6 +2484,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         Keys modifierKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
         link.sendKeys(Keys.chord(modifierKey, Keys.ENTER));
         switchToWindow(1);
+        waitForDocument();
     }
 
     public static final int WAIT_FOR_EXT_MASK_TO_DISSAPEAR = -1;
@@ -3534,6 +3542,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         catch (JavascriptException retry)
         {
             // TypeError: document.documentElement is null
+            waitForDocument();
             return getDriver().getPageSource();
         }
     }
