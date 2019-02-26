@@ -276,10 +276,6 @@ public class ListHelper extends LabKeySiteWrapper
         }
         expectedTexts.remove("");
         assertTextPresent(new ArrayList<>(expectedTexts));
-
-        // Take screenshot to assist debugging query insert forms
-        // TODO: Remove once investigation is complete
-        BaseWebDriverTest.getCurrentTest().getArtifactCollector().dumpScreen("_listDesigner");
     }
 
     public void addField(ListColumn col)
