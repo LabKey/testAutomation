@@ -20,9 +20,12 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public abstract class AbstractQWPTest extends BaseWebDriverTest
@@ -40,7 +43,9 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
         clickButton("Drop schema and clear test data");
         waitForElement(Locator.button("Populate test data"));
         clickButton("Populate test data");
-        sleep(1000);
+        WebElement populateMessage = Locator.id("populatemessage").waitForElement(shortWait());
+        longWait().until(ExpectedConditions.visibilityOf(populateMessage)).getText();
+        assertEquals("Test data is populated!", populateMessage.getText());
 
         log("Testing " + QWP_SCHEMA_LISTING.getLeft());
         click(Locator.linkWithText(QWP_SCHEMA_LISTING.getLeft()));
