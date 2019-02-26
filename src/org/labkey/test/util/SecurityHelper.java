@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 
+@Deprecated // Redundant class. Use ApiPermissionsHelper or UiPermissionsHelper
 public class SecurityHelper
 {
     protected BaseWebDriverTest _test;
