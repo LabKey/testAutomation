@@ -327,8 +327,10 @@ public class JUnitTest extends TestSuite
                 CommandResponse response = command.execute(connection, "/");
                 Map<String, Object> resultJson = response.getParsedData();
 
-                if (resultJson.get("wasSuccessful") != Boolean.TRUE)
-                    throw new RuntimeException("Bad response from failed test: " + dump(resultJson, true));
+                if (resultJson == null)
+                    throw new AssertionError("Unparsable response from test [" + response.getStatusCode() + "]: " + response.getText());
+                else if (resultJson.get("wasSuccessful") != Boolean.TRUE)
+                    throw new AssertionError("Error response from failed test: " + dump(resultJson, true));
 
                 WebTestHelper.logToServer(getLogTestString("successful", startTime) + ", " + dump(resultJson, false), connection);
                 log(getLogTestString("successful", startTime));
