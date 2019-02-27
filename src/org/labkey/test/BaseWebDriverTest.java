@@ -252,6 +252,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected abstract @Nullable String getProjectName();
 
+    public final @Nullable String getPrimaryTestProject()
+    {
+        return getProjectName();
+    }
+
     @LogMethod
     public void setUp()
     {
