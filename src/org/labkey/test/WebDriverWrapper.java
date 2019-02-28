@@ -3319,10 +3319,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (check != selected)
             el.click();
 
-        // TODO .toggle inputs always return false for isSelected (above code is not accurate in that case)
-        //  becasue of that don't test to see if it has been selected.
-        if(!el.getAttribute("name").equalsIgnoreCase(".toggle"))
-            Assert.assertEquals("Failed to set checkbox to requested state.", check, el.isSelected());
+        // Check to see if the checkbox has really been set to the desired state.
+        try
+        {
+            // TODO .toggle inputs always return false for isSelected (above code is not accurate in that case)
+            //  becasue of that don't test to see if it has been selected.
+            if (!el.getAttribute("name").equalsIgnoreCase(".toggle"))
+            {
+                log("In WebDriverWrapper.setCheckbox checking the value of the checkbox after clicking it.");
+                Assert.assertEquals("Failed to set checkbox to requested state.", check, el.isSelected());
+            }
+        }
+        catch(StaleElementReferenceException stale)
+        {
+            // In some cases the clicking the checkbox causes a refresh and the element goes stale.
+            log("In WebDriverWrapper.setCheckbox the element has gone stale after clicking it.");
+        }
 
     }
 
