@@ -15,13 +15,16 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
@@ -34,6 +37,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class})
@@ -102,6 +107,35 @@ public class WorkbookTest extends BaseWebDriverTest
         refresh();
         assertTextPresent("Renamed" + DEFAULT_WORKBOOK_NAME);
         waitForText("No description provided. Click to add one.");
+
+        //Verify folder menu links
+        SiteNavBar.AdminMenu menu = new SiteNavBar(getDriver()).adminMenu();
+        menu.expand();
+
+        Assert.assertEquals("The current containerPath should have two folder levels", 3, getCurrentContainerPath().split("/").length);
+        Assert.assertThat("URL does not use workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "Manage Views")).getAttribute("href")), containsString(getCurrentContainerPath()));
+        Assert.assertThat("URL does not use workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "Manage Lists")).getAttribute("href")), containsString(getCurrentContainerPath()));
+        Assert.assertThat("URL uses workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "Manage Assays")).getAttribute("href")), not(containsString(getCurrentContainerPath())));
+        menu.openMenuTo("Folder");
+        Assert.assertThat("URL uses workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "Permissions")).getAttribute("href")), not(containsString(getCurrentContainerPath())));
+        Assert.assertThat("URL uses workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "Management")).getAttribute("href")), not(containsString(getCurrentContainerPath())));
+        Assert.assertThat("URL uses workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "Project Users")).getAttribute("href")), not(containsString(getCurrentContainerPath())));
+        menu.collapse();
+
+        menu.expand();
+        menu.openMenuTo("Developer Links");
+        Assert.assertThat("URL does not use workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "Schema Browser")).getAttribute("href")), containsString(getCurrentContainerPath()));
+        menu.collapse();
+
+        menu.expand();
+        menu.openMenuTo("Go To Module");
+        Assert.assertThat("URL does not use workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "Experiment")).getAttribute("href")), containsString(getCurrentContainerPath()));
+        Assert.assertThat("URL does not use workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "FileContent")).getAttribute("href")), containsString(getCurrentContainerPath()));
+        Assert.assertThat("URL does not use workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "Study")).getAttribute("href")), containsString(getCurrentContainerPath()));
+
+        menu.openMenuTo("More Modules");
+        Assert.assertThat("URL does not use workbook", EscapeUtil.decode(getDriver().findElement(Locator.tagWithText("a", "List")).getAttribute("href")), containsString(getCurrentContainerPath()));
+        menu.collapse();
 
         goToProjectHome();
 
