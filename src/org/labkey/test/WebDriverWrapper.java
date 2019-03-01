@@ -3203,31 +3203,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         for (File file : files)
             assertTrue("File not found: " + file.toString(), file.exists());
-        String cssString = "";
-        String styleString = "";
-        if (!el.isDisplayed())
-        {
-            cssString = el.getAttribute("class");
-            styleString = el.getAttribute("style");
-            log("Remove class so that WebDriver can interact with concealed form element");
-            executeScript("arguments[0].setAttribute('class', '');arguments[0].setAttribute('style', '');", el);
-            shortWait().until(ExpectedConditions.elementToBeClickable(el)); // Takes a moment for DOM to update
-        }
 
         executeScript("arguments[0].value = '';", el);
         List<String> filePaths = files.stream().map(File::getAbsolutePath).collect(Collectors.toList());
         String fileNames = String.join("\n", filePaths);
         log(fileNames);
         el.sendKeys(fileNames);
-
-        if (!cssString.isEmpty() || !styleString.isEmpty())
-        {
-            try
-            {
-                executeScript("arguments[0].setAttribute('class', arguments[1]);arguments[0].setAttribute('style', arguments[2])", el, cssString, styleString);
-            }
-            catch (StaleElementReferenceException ignore) {}
-        }
     }
 
     public void setFormElement(Locator loc, File file)
@@ -3322,8 +3303,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         // Check to see if the checkbox has really been set to the desired state.
         try
         {
-            // TODO .toggle inputs always return false for isSelected (above code is not accurate in that case)
-            //  becasue of that don't test to see if it has been selected.
+            // '.toggle' is often an Ext4 checkbox. 'isSelected' doesn't detect its state correctly.
             if (!el.getAttribute("name").equalsIgnoreCase(".toggle"))
             {
                 log("In WebDriverWrapper.setCheckbox checking the value of the checkbox after clicking it.");
