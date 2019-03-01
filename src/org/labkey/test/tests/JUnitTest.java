@@ -70,7 +70,7 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite suite() throws Exception
     {
-        return JUnitTest._suite((p) -> true, 0, false);
+        return JUnitTest._suite((p) -> true);
     }
 
     private static String getWhen(Map<String,Object> test)
@@ -161,10 +161,10 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite _suite(Predicate<Map<String,Object>> accept) throws Exception
     {
-        return _suite(accept, 0, false);
+        return _suite(accept, 0, 0);
     }
 
-    private static TestSuite _suite(Predicate<Map<String,Object>> accept, final int attempt, final boolean performedUpgrade) throws Exception
+    private static TestSuite _suite(Predicate<Map<String,Object>> accept, final int attempt, final int upgradeAttempts) throws Exception
     {
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
@@ -178,8 +178,8 @@ public class JUnitTest extends TestSuite
             }
             catch (IOException ex)
             {
-                if (attempt < 3 && !performedUpgrade)
-                    return _suite(accept, attempt + 1, performedUpgrade);
+                if (attempt < 3 && upgradeAttempts == 0)
+                    return _suite(accept, attempt + 1, upgradeAttempts);
                 else
                 {
                     TestSuite failsuite = new JUnitTest();
@@ -202,7 +202,7 @@ public class JUnitTest extends TestSuite
                         // Server still starting up.  We don't need to use the upgradeHelper to sign in.
                         log("Remote JUnitTest: Server modules starting up (attempt " + attempt + ") ...");
                         Thread.sleep(1000);
-                        return _suite(accept, attempt + 1, false);
+                        return _suite(accept, attempt + 1, upgradeAttempts);
                     }
                     else if (responseBody.contains("<title>Upgrade Status</title>") ||
                         responseBody.contains("<title>Install Modules</title>") ||
@@ -211,7 +211,7 @@ public class JUnitTest extends TestSuite
                         responseBody.contains("This server is being upgraded to a new version of LabKey Server."))
                     {
                         log("Remote JUnitTest: Server needs install or upgrade ...");
-                        if (performedUpgrade)
+                        if (upgradeAttempts > 3)
                             throw new AssertionFailedError("Failed to update or bootstrap on second attempt: " + responseBody);
 
                         // perform upgrade then try to fetch the list again
@@ -228,7 +228,7 @@ public class JUnitTest extends TestSuite
                         TestSuite testSuite;
                         try
                         {
-                            testSuite = _suite(accept, attempt + 1, true);
+                            testSuite = _suite(accept, attempt + 1, upgradeAttempts + 1);
                         }
                         catch (Exception retryException)
                         {
