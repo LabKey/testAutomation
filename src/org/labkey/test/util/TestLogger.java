@@ -59,6 +59,7 @@ public class TestLogger
     public static void debug(String msg)
     {
         // TODO: Log at debug level if/when we convert to Log4J or similar
+        log("DEBUG: " + msg, System.out);
     }
 
     public static void warn(String str, Throwable t)
