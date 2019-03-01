@@ -17,20 +17,31 @@ package org.labkey.test.tests;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @Category({DailyA.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -207,11 +218,50 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
         assertTextPresent("Programmatic Data Transform was run and 2 errors were found",
                 "Programmatic Data Transform was run and 0 errors were found");
+
+
+        APIAssayHelper ah = new APIAssayHelper(this);
+        int assayId = ah.getIdFromAssayName(TRANSFORM_ASSAY, TEST_PROGRAMMATIC_QC_PRJ);
+
+        // assay-importRun.api via dataRows, expect error
+        try
+        {
+            List<Map<String, Object>> dataRows = dataRows(TEST_RUN1_DATA1);
+            ImportRunResponse resp = ah.importAssay(assayId, "importRuns.api with dataRows", dataRows, TEST_PROGRAMMATIC_QC_PRJ, null, null);
+            fail("Expected importRows.api to throw a validation exception");
+        }
+        catch (CommandException e)
+        {
+            log(e.getResponseText());
+            assertEquals("A duplicate PTID was discovered : b", e.getMessage());
+        }
+        catch (IOException e)
+        {
+            fail(e.getMessage());
+        }
+
+        // assay-importRun.api via dataRows, successfully
+        try
+        {
+            List<Map<String, Object>> dataRows = dataRows(TEST_RUN1_DATA2);
+            ImportRunResponse resp = ah.importAssay(assayId, "importRuns.api with dataRows", dataRows, TEST_PROGRAMMATIC_QC_PRJ, null, null);
+            int runId = resp.getRunId();
+            assertTrue("Expected to insert a run", runId > 0);
+
+            beginAt(resp.getSuccessURL());
+            assertTextPresent("monkey", "hamster");
+        }
+        catch (CommandException | IOException e)
+        {
+            fail(e.getMessage());
+        }
     }
 
     private void uploadTransformQCRuns()
     {
         log("uploading transform & QC runs");
+        goToProjectHome(TEST_PROGRAMMATIC_QC_PRJ);
+        clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TRANSFORM_QC_ASSAY));
 
         clickButton("Import Data");
@@ -236,6 +286,68 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("QC Log"));
 
         assertTextPresent("Programmatic QC was run and 1 errors were found");
+
+
+        APIAssayHelper ah = new APIAssayHelper(this);
+        int assayId = ah.getIdFromAssayName(TRANSFORM_QC_ASSAY, TEST_PROGRAMMATIC_QC_PRJ);
+
+        // assay-importRun.api via dataRows, expect error
+        try
+        {
+            List<Map<String, Object>> dataRows = dataRows(TEST_RUN1_DATA2);
+            ImportRunResponse resp = ah.importAssay(assayId, "importRuns.api with dataRows", dataRows, TEST_PROGRAMMATIC_QC_PRJ, null, null);
+            fail("Expected importRows.api to throw a validation exception");
+        }
+        catch (CommandException e)
+        {
+            log(e.getResponseText());
+            assertEquals("The animal column must contain a goat", e.getMessage());
+        }
+        catch (IOException e)
+        {
+            fail(e.getMessage());
+        }
+
+        // assay-importRun.api via dataRows, successfully
+        try
+        {
+            List<Map<String, Object>> dataRows = dataRows(TEST_RUN1_DATA3);
+            ImportRunResponse resp = ah.importAssay(assayId, "importRuns.api with dataRows", dataRows, TEST_PROGRAMMATIC_QC_PRJ, null, null);
+            int runId = resp.getRunId();
+            assertTrue("Expected to insert a run", runId > 0);
+
+            beginAt(resp.getSuccessURL());
+            assertTextPresent("monkey", "hamster", "goat");
+        }
+        catch (CommandException | IOException e)
+        {
+            fail(e.getMessage());
+        }
+    }
+
+
+    // turn the test tsv data into a set of row maps
+    private List<Map<String, Object>> dataRows(String tsv)
+    {
+        List<Map<String, Object>> dataRows = new ArrayList<>();
+
+        String[] tsvRows = tsv.split("\n");
+        String[] headers = tsvRows[0].split("\t");
+        for (int i = 1; i < tsvRows.length; i++)
+        {
+            String[] values = tsvRows[i].split("\t");
+
+            Map<String, Object> rowMap = new HashMap<>();
+            for (int col = 0; col < headers.length; col++)
+            {
+                String header = headers[col];
+                String value = values[col];
+                rowMap.put(header, value);
+            }
+            dataRows.add(rowMap);
+        }
+
+        return dataRows;
     }
 
     public List<String> getAssociatedModules()
