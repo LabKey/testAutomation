@@ -91,6 +91,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String TIME_STUDY_FOLDER = "timeStudyFolder";
     private static final String TIME_STUDY_NAME = "timeStudyName";
     private static final String VISIT_STUDY_FOLDER = "visitStudyFolder";
+    private static final String ASSAY_STUDY_FOLDER = "generalAssayFolder";
     private static final String VISIT_STUDY_NAME = "visitStudyName";
     public final static String LIST_NAME = "People";
     private final static String QUERY_LIST_NAME = "NewPeople";
@@ -185,6 +186,7 @@ public class ClientAPITest extends BaseWebDriverTest
         init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
         init._containerHelper.createSubfolder(PROJECT_NAME, TIME_STUDY_FOLDER);
         init._containerHelper.createSubfolder(PROJECT_NAME, VISIT_STUDY_FOLDER);
+        init._containerHelper.createSubfolder(PROJECT_NAME, ASSAY_STUDY_FOLDER);
 
         init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null);
 
@@ -351,7 +353,7 @@ public class ClientAPITest extends BaseWebDriverTest
     }
 
     @Test
-    public void createStudyDatasetVisitWithWithTimeKeyField()
+    public void createStudyDatasetVisitWithTimeKeyField()
     {
         // this test case attempts to create a time-keyed dataset in a visit-based study folder, which should
         // fail on create.
@@ -693,6 +695,101 @@ public class ClientAPITest extends BaseWebDriverTest
                 "});\n";
         executeAsyncScript(create);
         log(create);
+    }
+
+    @Test
+    public void createAssayUsingDomainAPI()
+    {
+        log("Adding the assay list web part");
+        projectMenu().navigateToFolder(PROJECT_NAME, ASSAY_STUDY_FOLDER);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Assay List");
+        String assayName = "Assay from API";
+
+        log("Creating the assay using save protocol");
+        String SAVEPROTOCOL = "LABKEY.Ajax.request({                        \n" +
+                "   method: 'POST',                                         \n" +
+                "   success: function(data){                                \n" +
+                "       callback('Success!');                               \n" +
+                "   },                                                      \n" +
+                "   failure: function(e){                                   \n" +
+                "       callback(e.exception); },                           \n" +
+                "   url: LABKEY.ActionURL.buildURL('assay', 'saveProtocol.api'), \n" +
+                "   jsonData: {                                                  \n" +
+                "        protocolId: undefined,                                  \n" +
+                "        name: '" + assayName + "',                             \n" +
+                "        providerName: 'General',                             \n" +
+                "        domains: [                                           \n" +
+                "            {                                                \n" +
+                "                name: 'API Batch Fields',                    \n" +
+                "                domainURI: 'urn:lsid:${LSIDAuthority}:AssayDomain-Batch.Folder-${Container.RowId}:Gen-Assay',\n" +
+                "                fields: [                                     \n" +
+                "                    {                                         \n" +
+                "                        name: 'ParticipantVisitResolver',     \n" +
+                "                        description: null,                    \n" +
+                "                        rangeURI: 'http://www.w3.org/2001/XMLSchema#string'\n" +
+                "                    },                                          \n" +
+                "                    {                                           \n" +
+                "                        name: 'TargetStudy',                  \n" +
+                "                        description: null,                    \n" +
+                "                        rangeURI: 'http://www.w3.org/2001/XMLSchema#string'\n" +
+                "                    }                                           \n" +
+                "                ]                                               \n" +
+                "            },                                                  \n" +
+                "            {                                                   \n" +
+                "                name: 'API Run Fields',                       \n" +
+                "                domainURI: 'urn:lsid:${LSIDAuthority}:AssayDomain-Run.Folder-${Container.RowId}:Gen-Assay',\n" +
+                "                fields: []                                      \n" +
+                "            },                                                  \n" +
+                "            {                                                   \n" +
+                "                name: 'API Data Fields',                        \n" +
+                "                domainURI: 'urn:lsid:${LSIDAuthority}:AssayDomain-Data.Folder-${Container.RowId}:Gen-Assay',\n" +
+                "                fields: [                                     \n" +
+                "                    {                                         \n" +
+                "                        name: 'SpecimenID',                   \n" +
+                "                        rangeURI: 'http://www.w3.org/2001/XMLSchema#string'\n" +
+                "                    }                                           \n" +
+                "                  ]                                             \n" +
+                "            }                                                   \n" +
+                "        ]                                                       \n" +
+                "    }                                                           \n" +
+                "})";
+
+        log(SAVEPROTOCOL);
+        executeAsyncScript(SAVEPROTOCOL);
+
+        log("Extracting the protocol ID from URL");
+        navigateToFolder(PROJECT_NAME, ASSAY_STUDY_FOLDER);
+        clickAndWait(Locator.linkWithText(assayName));
+        String protocolID = getCurrentRelativeURL().split("=")[1];
+
+        log("Getting the assay information from the protocolID");
+        String GETPROTOCOL = "LABKEY.Ajax.request({                             \n" +
+                "   method: 'GET',                                              \n" +
+                "    success: function(){ callback('Success!'); },              \n" +
+                "   url: LABKEY.ActionURL.buildURL('assay', 'getProtocol.api'), \n" +
+                "   params : {                                                  \n" +
+                "        protocolId: " + protocolID + "                         \n" +
+                "    }                                                          \n" +
+                "})";
+        log(GETPROTOCOL);
+        String result = (String) executeAsyncScript(GETPROTOCOL);
+        assertEquals("JavaScript API failure.", "Success!", result);
+
+        log("Deleting the assay using delete protocol");
+        String DELETEPROTOCOL = "LABKEY.Ajax.request({                              \n" +
+                "   method: 'POST',                                                 \n" +
+                "   success: function(){ callback('Success!'); },                   \n" +
+                "   url: LABKEY.ActionURL.buildURL('assay', 'deleteProtocol.api'),  \n" +
+                "   jsonData: {                                                     \n" +
+                "        protocolId: " + protocolID + "                             \n" +
+                "    }                                                              \n" +
+                "})";
+
+        log(DELETEPROTOCOL);
+        result = (String) executeAsyncScript(DELETEPROTOCOL);
+        assertEquals("JavaScript API failure.", "Success!", result);
+
     }
 
     @Test
