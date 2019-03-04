@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public abstract class Locator extends By
@@ -321,18 +322,27 @@ public abstract class Locator extends By
 
     public WebElement findElement(SearchContext context)
     {
-        WebElement element = findElementOrNull(context);
-        if (null == element)
-            throw new NoSuchElementException("Unable to find element: " + getFindDescription(context));
-        return element;
+        Optional<WebElement> optionalElement = findOptionalElement(context);
+        return optionalElement.orElseThrow(() ->
+                new NoSuchElementException("Unable to find element: " + getFindDescription(context)));
     }
 
+    /**
+     * @deprecated Use {@link #findOptionalElement(SearchContext)}
+     */
+    @Deprecated
     public WebElement findElementOrNull(SearchContext context)
+    {
+        Optional<WebElement> optionalElement = findOptionalElement(context);
+        return optionalElement.orElse(null);
+    }
+
+    public Optional<WebElement> findOptionalElement(SearchContext context)
     {
         List<WebElement> elements = findElements(context);
         if (elements.isEmpty())
-            return null;
-        return elements.get(0);
+            return Optional.empty();
+        return Optional.of(elements.get(0));
     }
 
     public List<WebElement> findElements(SearchContext context)
@@ -603,7 +613,7 @@ public abstract class Locator extends By
     }
 
     /**
-     * {@link org.labkey.api.util.Button}
+     * org.labkey.api.util.Button
      */
     public static XPathLocator lkButton()
     {
