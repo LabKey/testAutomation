@@ -18,9 +18,9 @@ package org.labkey.test.tests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.PipelineStatusTable;
 
 import java.io.File;
 import java.util.Arrays;
@@ -44,14 +44,12 @@ public class PipelineCancelTest  extends BaseWebDriverTest
         startImportStudyFromZip(STUDY_ZIP);
 
         log("Cancel import");
-        waitForElementToBeVisible(Locator.linkContainingText("Delaying import"));
-        clickAndWait(Locator.linkContainingText("Delaying import"));
+        PipelineStatusTable pipelineStatusTable = new PipelineStatusTable(this);
+        pipelineStatusTable.clickStatusLink(0);
         clickButton("Cancel");
 
         log("Verify cancel succeeded");
-//        waitForText("CANCELLED");
         waitForText("Attempting to cancel");
-//        waitForTextWithRefresh("Interrupting job by sending interrupt request", defaultWaitForPage);
         waitForTextWithRefresh(defaultWaitForPage, "CANCELLED");
 
         goToProjectHome();
