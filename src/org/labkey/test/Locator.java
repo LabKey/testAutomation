@@ -333,8 +333,7 @@ public abstract class Locator extends By
     @Deprecated
     public WebElement findElementOrNull(SearchContext context)
     {
-        Optional<WebElement> optionalElement = findOptionalElement(context);
-        return optionalElement.orElse(null);
+        return findOptionalElement(context).orElse(null);
     }
 
     public Optional<WebElement> findOptionalElement(SearchContext context)

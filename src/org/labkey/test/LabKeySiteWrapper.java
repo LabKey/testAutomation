@@ -231,16 +231,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    public Map<String, Object> signOutJavaScript()
-    {
-        String logout = "LABKEY.Ajax.request({\n" +
-                "url:LABKEY.ActionURL.buildURL('login','logoutAPI.api'),\n" +
-                "method:'POST',\n" +
-                "success:callback,\n" +
-                "failure:callback,})";
-        return (Map<String, Object>)executeAsyncScript(logout);
-    }
-
     @LogMethod
     public void ensureSignedInAsPrimaryTestUser()
     {
@@ -283,8 +273,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected void acceptTermsOfUse(String termsText, boolean clickAgree)
     {
-        WebElement termsCheckbox = Locators.termsOfUseCheckbox().findElementOrNull(getDriver());
-        if (termsCheckbox != null)
+        Optional<WebElement> optionalCheckbox = Locators.termsOfUseCheckbox().findOptionalElement(getDriver());
+        optionalCheckbox.ifPresent(termsCheckbox ->
         {
             if (termsCheckbox.isDisplayed())
             {
@@ -296,7 +286,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 if (clickAgree)
                     clickButton("Agree");
             }
-        }
+        });
     }
 
     @LogMethod
@@ -434,17 +424,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         setFormElement(Locator.id("password2"), newPassword);
 
         clickButton("Set Password");
-
-        if (!isElementPresent(Locator.id("userMenuPopupLink")))
-        {
-            if (isButtonPresent("Submit"))
-                    clickButtonContainingText("Submit", defaultWaitForPage*3);
-            if (isButtonPresent("Done"))
-                clickButton("Done");
-
-            signOut();
-            signIn(username, newPassword);
-        }
     }
 
     @LogMethod protected void changePassword(String oldPassword, @LoggedParam String password)
@@ -487,11 +466,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             goToAdminConsole().clickSystemMaintenance();
 
-            waitFor(()-> Locator.name("enableSystemMaintenance").findElementOrNull(getDriver()) != null, WAIT_FOR_JAVASCRIPT );
-            if (enable)
-                checkCheckbox(Locator.name("enableSystemMaintenance"));
-            else
-                uncheckCheckbox(Locator.name("enableSystemMaintenance"));
+            setCheckbox(waitForElement(Locator.name("enableSystemMaintenance")), enable);
 
             clickButton("Save");
         }
@@ -682,8 +657,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                         sleep(2000);
                         if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
                             throw new RuntimeException("A startup failure occurred.");
-                        WebElement progressBar = Locator.id("status-progress-bar").findElementOrNull(getDriver());
-                        log(bootstrapped ? "Bootstrapping" : "Upgrading" + (progressBar != null ? (": \"" + progressBar.getText() + "\"") : ""));
+                        Optional<WebElement> progressBar = Locator.id("status-progress-bar").findOptionalElement(getDriver());
+                        log(bootstrapped ? "Bootstrapping" : "Upgrading" + (progressBar.map(webElement -> (": \"" + webElement.getText() + "\"")).orElse("")));
                     }
                     catch (WebDriverException ignore)
                     {
@@ -712,11 +687,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 }
                 else
                 {
-                    WebElement header = Locator.css(".labkey-nav-page-header").findElementOrNull(getDriver());
-                    if (header != null && Arrays.asList("Start Modules", "Upgrade Modules").contains(header.getText().trim()))
+                    Optional<WebElement> header = Locator.css(".labkey-nav-page-header").findOptionalElement(getDriver());
+                    if (header.isPresent() && Arrays.asList("Start Modules", "Upgrade Modules").contains(header.get().getText().trim()))
                     {
                         waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
                         clickAndWait(Locator.lkButton("Next"));
+                        Locator.lkButton("Next")
+                                .findOptionalElement(getDriver())
+                                .ifPresent(this::clickAndWait);
                     }
                     else
                     {
@@ -1232,27 +1210,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return (String) executeScript( "return LABKEY.container.title;");
     }
 
-    /**
-     * @deprecated Only used by old UX
-     */
-    @Deprecated
-    private void waitForFolderNavigationReady()
-    {
-        waitForHoverNavigationReady();
-        waitFor(() -> (boolean) executeScript("if (HoverNavigation._folder.webPartName == 'foldernav') return true; else return false;"),
-                "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
-    }
-
-    /**
-     * @deprecated Only used by old UX
-     */
-    @Deprecated
-    private void waitForHoverNavigationReady()
-    {
-        waitFor(() -> (boolean) executeScript("if (window.HoverNavigation) return true; else return false;"),
-                "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
-    }
-
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
         navBar().userMenu().impersonateGroup(group, isSiteGroup);
@@ -1408,12 +1365,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    /**
-     * @deprecated Use {@link #waitForPipelineJobsToComplete(int, boolean)}
-     * This tends to cause tests to blow past pipeline errors because people are unaware of the method above
-     * TODO: Remove in 19.1
-     */
-    @Deprecated
     public List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
     {
         return waitForPipelineJobsToFinish(jobsExpected, Duration.ofSeconds(BaseWebDriverTest.MAX_WAIT_SECONDS));
