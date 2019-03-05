@@ -27,7 +27,6 @@ import org.labkey.remoteapi.security.DeleteContainerCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.pages.core.admin.logger.ManagerPage;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -130,9 +129,6 @@ public class APIContainerHelper extends AbstractContainerHelper
 
     public void deleteContainer(String path, boolean failIfNotFound, int wait) throws TestTimeoutException
     {
-        boolean resetLogger = true;
-        if((WebTestHelper.getWebPort() != 80) && (!WebTestHelper.getContextPath().isEmpty()))
-            Log4jUtils.setLogLevel("org.labkey.api.data.ContainerManager", ManagerPage.LoggingLevel.DEBUG);
         WebTestHelper.logToServer("=Test= Starting container delete: " + path);
 
         DeleteContainerCommand dcc = new DeleteContainerCommand();
@@ -159,19 +155,12 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         catch (SocketTimeoutException e)
         {
-            // NOTE: do not restore log level on timeout -- server is still deleting the container
-            resetLogger = false;
             WebTestHelper.logToServer("=Test= Timed out deleting container: " + path);
             throw new TestTimeoutException("Timed out deleting container: " + path, e);
         }
         catch (IOException e)
         {
             throw new RuntimeException("Failed to delete container: " + path, e);
-        }
-        finally
-        {
-            if((resetLogger) && (WebTestHelper.getWebPort() != 80) && (!WebTestHelper.getContextPath().isEmpty()))
-                Log4jUtils.setLogLevel("org.labkey.api.data.ContainerManager", ManagerPage.LoggingLevel.INFO);
         }
     }
 
