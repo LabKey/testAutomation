@@ -1129,6 +1129,12 @@ public abstract class Locator extends By
         {
             return _cssLoc.getBy();
         }
+
+        @Override
+        protected By getRelativeBy()
+        {
+            return getBy();
+        }
     }
 
     public static class XPathLocator extends Locator
@@ -1434,9 +1440,14 @@ public abstract class Locator extends By
         public List<WebElement> findElements(SearchContext context)
         {
             if (!(context instanceof WebDriver || context instanceof WrapsDriver) || context instanceof WebElement)
-                return decorateWebElements(context.findElements(By.xpath(getRelativeXPath())));
+                return decorateWebElements(context.findElements(getRelativeBy()));
             else
                 return decorateWebElements(context.findElements(this.getBy()));
+        }
+
+        protected By getRelativeBy()
+        {
+            return By.xpath(getRelativeXPath());
         }
 
         private String getRelativeXPath()
