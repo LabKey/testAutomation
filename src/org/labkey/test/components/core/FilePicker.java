@@ -16,6 +16,7 @@
 package org.labkey.test.components.core;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.FileInput;
@@ -24,7 +25,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.components.ext4.Window.Window;
 
@@ -57,11 +60,19 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
     {
         getWrapper().waitFor(()-> elementCache().pickerLink.getAttribute("href") != null, 2000);
 
+        int initialInputCount = elementCache().findAttachmentInputs().size();
         // work-around issue where clicking the pickerLink doesn't take
         String script = elementCache().pickerLink.getAttribute("href");
         getWrapper().executeScript(script);     // should be "javascript:addFilePicker('filePickerTable', 'filePickerLink')
 
-        elementCache().findLastAttachmentInput().set(file);
+        List<FileInput> attachmentInputs = new ArrayList<>();
+        WebDriverWrapper.waitFor(() -> {
+            attachmentInputs.clear();
+            attachmentInputs.addAll(elementCache().findAttachmentInputs());
+            return attachmentInputs.size() == initialInputCount + 1;
+        }, "Additional file input did not appear", 1000);
+
+        attachmentInputs.get(initialInputCount).set(file);
         return this;
     }
 
@@ -115,9 +126,10 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
 
     protected class ElementCache extends Component.ElementCache
     {
-        protected FileInput findLastAttachmentInput()
+        protected List<FileInput> findAttachmentInputs()
         {
-            return new FileInput(Locators.attachmentInput.waitForElement(this, 2000), getDriver());
+            List<WebElement> inputElements = Locators.attachmentInput.findElements(this);
+            return inputElements.stream().map(el -> new FileInput(el, getDriver())).collect(Collectors.toList());
         }
 
         protected List<WebElement> findRemoveLinks()
@@ -131,6 +143,6 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
 
     public static class Locators
     {
-        static public Locator attachmentInput = Locator.tag("tbody").childTag("tr").last().append(Locator.tag("input"));
+        static public Locator attachmentInput = Locator.tag("tbody").childTag("tr").append(Locator.tag("input").withAttribute("type", "file"));
     }
 }
