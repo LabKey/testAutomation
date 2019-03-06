@@ -3211,6 +3211,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         el.sendKeys(fileNames);
     }
 
+    public void setDropZone(WebElement dropZone, List<File> files)
+    {
+        // Remove class so that WebDriver can interact with concealed form element
+        executeScript("arguments[0].setAttribute('class', '');arguments[0].setAttribute('style', '');", dropZone);
+        shortWait().until(ExpectedConditions.elementToBeClickable(dropZone)); // Takes a moment for DOM to update
+        setInput(dropZone, files);
+    }
+
     public void setFormElement(Locator loc, File file)
     {
         WebElement el = loc.waitForElement(new WebDriverWait(getDriver(), 5));
