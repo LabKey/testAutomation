@@ -15,12 +15,10 @@
  */
 package org.labkey.test.components.search;
 
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
-import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -29,7 +27,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class SearchForm extends Component
+public class SearchForm extends Component<SearchForm.Elements>
 {
     private final WebDriverWrapper _driver;
     private final WebElement _componentElement;
@@ -51,38 +49,33 @@ public class SearchForm extends Component
     {
         SearchHelper.waitForIndexer();
 
-        _driver.setFormElement(elements().searchBox(), searchTerm);
-        _driver.clickAndWait(elements().searchButton());
+        _driver.setFormElement(elementCache().searchBox(), searchTerm);
+        _driver.clickAndWait(elementCache().searchButton());
 
         return new SearchResultsPage(_driver.getDriver());
     }
 
-    private Elements elements()
+    @Override
+    protected Elements newElementCache()
     {
         return new Elements();
     }
 
-    private class Elements extends ComponentElements
+    protected class Elements extends Component.ElementCache
     {
-        @Override
-        protected SearchContext getContext()
-        {
-            return getComponentElement();
-        }
-
         private WebElement searchBox()
         {
-            return Locator.input("q").findElement(getContext());
+            return Locator.input("q").findElement(this);
         }
 
         private WebElement searchButton()
         {
-            return Locator.tagWithClass("a", "search-overlay fa fa-search").findElement(getContext());
+            return Locator.css("a.search-overlay.fa-search").findElement(this);
         }
 
         private WebElement helpLink()
         {
-            return Locator.css("a[target=labkeyHelp]").findElement(getContext());
+            return Locator.css("a[target=labkeyHelp]").findElement(this);
         }
     }
 }
