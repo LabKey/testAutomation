@@ -999,6 +999,14 @@ public abstract class Locator extends By
         }
 
         @Override
+        public XPathLocator withClasses(String... cssClasses)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.withClasses(cssClasses),
+                    _cssLoc.withClasses(cssClasses));
+        }
+
+        @Override
         public XPathLocator withoutClass(String cssClass)
         {
             return new XPathCSSLocator(
