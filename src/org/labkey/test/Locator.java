@@ -1607,7 +1607,12 @@ public abstract class Locator extends By
         public CssLocator withClass(String cssClass)
         {
             cssClass = Locator.normalizeCssClass(cssClass);
-            return append("." + cssClass);
+            return withClasses(cssClass.split(" +"));
+        }
+
+        public CssLocator withClasses(String... cssClasses)
+        {
+            return append("." + String.join(".", cssClasses));
         }
 
         public CssLocator withoutClass(String cssClass)
