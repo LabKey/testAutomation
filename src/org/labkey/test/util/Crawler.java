@@ -147,6 +147,7 @@ public class Crawler
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("admin", "setAdminMode"),
             new ControllerActionId("admin", "dumpHeap"),
+            new ControllerActionId("admin", "getSchemaXmlDoc"), // download action
             new ControllerActionId("admin", "addTab"),
             new ControllerActionId("admin", "actions"), // Gets hit often in normal testing
             new ControllerActionId("admin", "credits"), // Gets checked by BasicTest
