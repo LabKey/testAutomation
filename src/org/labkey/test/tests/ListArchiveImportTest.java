@@ -1,6 +1,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import static org.junit.Assert.assertEquals;
@@ -32,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
-public class ListArchiveImport extends BaseWebDriverTest
+public class ListArchiveImportTest extends BaseWebDriverTest
 {
     private static final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/ListOfPeople.lists.zip");
 
@@ -48,12 +49,16 @@ public class ListArchiveImport extends BaseWebDriverTest
         return Arrays.asList("list");
     }
 
+    @BeforeClass
+    public static void doSetup() throws Exception
+    {
+        ListArchiveImportTest initTest = (ListArchiveImportTest) getCurrentTest();
+        initTest._containerHelper.createProject(initTest.getProjectName(), null);
+    }
+
     @Test
     public void ImportListArchiveWithValidationTest() throws IOException, CommandException
     {
-        ListArchiveImport initTest = (ListArchiveImport) getCurrentTest();
-        initTest._containerHelper.createProject(initTest.getProjectName(), null);
-
         log("Import list and test for expected validation error");
         importListArchiveWithError();
         clickFolder(getProjectName());
@@ -74,7 +79,7 @@ public class ListArchiveImport extends BaseWebDriverTest
         insertRowsCommand.execute(cn, getProjectName());
 
         log("Import list again, this time it should import without errors.");
-        _listHelper.importListArchive(initTest.getProjectName(), LIST_ARCHIVE);
+        _listHelper.importListArchive(getProjectName(), LIST_ARCHIVE);
 
         log("Verify five rows were inserted successfully.");
         cn = createDefaultConnection(false);

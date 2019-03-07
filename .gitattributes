@@ -774,7 +774,7 @@ src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
 src/org/labkey/test/tests/KnitrReportTest.java -text
 src/org/labkey/test/tests/LinkedSchemaTest.java -text
-src/org/labkey/test/tests/ListArchiveImport.java -text
+src/org/labkey/test/tests/ListArchiveImportTest.java -text
 src/org/labkey/test/tests/ListExportTest.java -text
 src/org/labkey/test/tests/ListImportFieldsTest.java -text
 src/org/labkey/test/tests/LookupToSampleIDTest.java -text
