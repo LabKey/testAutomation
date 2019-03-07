@@ -114,6 +114,11 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("enable.heap.dump"));
     }
 
+    public static boolean isRunWebDriverHeadless()
+    {
+        return "true".equals(System.getProperty("webtest.webdriver.headless"));
+    }
+
     public static double getTimeoutMultiplier()
     {
         try

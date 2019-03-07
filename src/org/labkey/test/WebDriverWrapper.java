@@ -251,6 +251,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     options.addArguments("disable-xss-auditor");
                     options.addArguments("ignore-certificate-errors");
                     options.addArguments("disable-infobars");
+                    if (TestProperties.isRunWebDriverHeadless())
+                    {
+                        TestLogger.warn("Launching Chrome in headless mode. This is still experimental");
+                        options.addArguments("headless");
+                    }
 
                     newDriverService = ChromeDriverService.createDefaultService();
                     newWebDriver = new ChromeDriver((ChromeDriverService) newDriverService, options);
@@ -317,11 +322,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     capabilities.addPreference("--log", "WARN");
 
                     String browserPath = System.getProperty("selenium.firefox.binary", "");
+                    FirefoxBinary binary;
                     if (browserPath.length() > 0)
                     {
-                        FirefoxBinary binary = new FirefoxBinary(new File(browserPath));
-                        capabilities.setCapability(FirefoxDriver.BINARY, binary);
+                        binary = new FirefoxBinary(new File(browserPath));
                     }
+                    else
+                    {
+                        binary = new FirefoxBinary();
+                    }
+
+                    if (TestProperties.isRunWebDriverHeadless())
+                    {
+                        TestLogger.warn("Launching Firefox in headless mode. This is still experimental");
+                        binary.addCommandLineOptions("--headless");
+                    }
+                    capabilities.setCapability(FirefoxDriver.BINARY, binary);
                     try
                     {
                         newWebDriver = new FirefoxDriver(new FirefoxOptions(capabilities));
