@@ -32,7 +32,7 @@ import java.util.Map;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Hosting.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 5)
+@BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class ListArchiveImportTest extends BaseWebDriverTest
 {
     private static final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/ListOfPeople.lists.zip");
