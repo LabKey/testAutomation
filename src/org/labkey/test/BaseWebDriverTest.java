@@ -110,6 +110,7 @@ import static org.labkey.test.TestProperties.isInjectionCheckEnabled;
 import static org.labkey.test.TestProperties.isLeakCheckSkipped;
 import static org.labkey.test.TestProperties.isLinkCheckEnabled;
 import static org.labkey.test.TestProperties.isQueryCheckSkipped;
+import static org.labkey.test.TestProperties.isRunWebDriverHeadless;
 import static org.labkey.test.TestProperties.isSystemMaintenanceDisabled;
 import static org.labkey.test.TestProperties.isTestCleanupSkipped;
 import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
@@ -304,7 +305,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private static void doTearDown()
     {
-        boolean closeWindow = !_testFailed || Boolean.parseBoolean(System.getProperty("close.on.fail", "true"));
+        boolean closeWindow = !_testFailed || isRunWebDriverHeadless() || Boolean.parseBoolean(System.getProperty("close.on.fail", "true"));
         SingletonWebDriver.getInstance().tearDown(closeWindow || isTestRunningOnTeamCity());
     }
 
