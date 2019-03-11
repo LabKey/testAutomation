@@ -183,7 +183,6 @@ public class Crawler
             new ControllerActionId("ms2", "showParamsFile"),
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "showPeptide"),
-            new ControllerActionId("ms2", "showProtein"), // TODO: 16617: MS1Test imports don't match provided FASTA file
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-status", "showList"), // Is likely to contain 404 links
             new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
@@ -1020,10 +1019,13 @@ public class Crawler
 
     public static <F, T> T tryInject(BaseWebDriverTest test, Function<F, T> f, F arg)
     {
-        String msg = null;
         try
         {
-            return f.apply(arg);
+            T result = f.apply(arg);
+
+            checkForSqlInjection(test);
+
+            return result;
         }
         catch (UnhandledAlertException ex)
         {
@@ -1031,61 +1033,42 @@ public class Crawler
             if (alertText == null)
                 alertText = test.cancelAlert();
 
-            if (alertText.startsWith(injectedAlert))
-                msg = " malicious script executed";
+            checkForJavaScriptInjection(alertText);
 
-            String html = test.getHtmlSource();
-
-            if (html.contains(injectString) || html.contains(injectString2))
-                msg = "page contains injected script";
-
-            // see ConnectionWrapper.java
-            if (html.contains("SQL injection test failed"))
-                msg = "SQL injection detected";
-
-            if (msg != null)
-            {
-                String url = test.getCurrentRelativeURL();
-                fail(msg + "\n" + url);
-            }
+            checkForSqlInjection(test);
 
             throw ex;
         }
         catch (WebDriverException ex)
         {
-            String html = test.getHtmlSource();
-            if (html.contains(maliciousScript))
-                msg = "page contains injected script";
-
             Alert alert;
             while (null != (alert = test.getAlertIfPresent()))
             {
-                if (alert.getText().startsWith(injectedAlert))
-                    msg = " malicious script executed";
+                checkForJavaScriptInjection(alert.getText());
                 alert.dismiss();
             }
-            test.switchToMainWindow();
 
-            // see StatementWrapper.java
-            if (html.contains("SQL injection test failed"))
-                msg = "SQL injection detected";
-
-            if (msg != null)
-            {
-                String url = test.getCurrentRelativeURL();
-                fail(msg + "\n" + url);
-            }
+            checkForSqlInjection(test);
 
             throw ex;
         }
-        catch (RuntimeException re)
-        {
-            // ignore javascript errors (HTTPUnit has a poor engine) and non-HTML download links:
-            if (!re.getMessage().contains("ScriptException") && !re.getClass().getSimpleName().equals("NotHTMLException"))
-                throw re;
-        }
+    }
 
-        return null;
+    private static void checkForJavaScriptInjection(String alertText)
+    {
+        if (alertText.startsWith(injectedAlert))
+            fail("Crawler: Malicious script executed");
+    }
+
+    private static void checkForSqlInjection(BaseWebDriverTest test)
+    {
+        String html = test.getHtmlSource();
+        // see StatementWrapper.java
+        if (html.contains("SQL injection test failed"))
+        {
+            String url = test.getCurrentRelativeURL();
+            fail("Crawler: SQL injection detected" + "\n" + url);
+        }
     }
 
     private void testInjection(URL start)
