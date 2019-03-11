@@ -566,6 +566,13 @@ public class Crawler
                 _folder = rootRelativeURL.substring("_webdav/".length());
                 return;
             }
+            if (rootRelativeURL.startsWith("_webfiles/"))
+            {
+                _controller = "_webfiles";
+                _folder = rootRelativeURL.substring("_webfiles/".length());
+                return;
+            }
+
 
             int actionIdx = rootRelativeURL.lastIndexOf('/');
             String action = rootRelativeURL.substring(actionIdx + 1);
