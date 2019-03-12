@@ -1158,7 +1158,14 @@ public class Crawler
                     int i = pair.indexOf('=');
                     String k = i==-1 ? pair : pair.substring(0,i);
                     String v = i==-1 ? "" : pair.substring(i+1);
-                    return new AbstractMap.SimpleImmutableEntry<>(URLDecoder.decode(k), URLDecoder.decode(v));
+                    try
+                    {
+                        return new AbstractMap.SimpleImmutableEntry<>(URLDecoder.decode(k), URLDecoder.decode(v));
+                    }
+                    catch (IllegalArgumentException ex)
+                    {
+                        throw new IllegalArgumentException("Unable to decode URL parameter: " + pair, ex);
+                    }
                 })
                 .collect(Collectors.toList());
     };
