@@ -113,7 +113,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         apiPermissionsHelper.createPermissionsGroup(TEST_GROUP, USER_INFO_VIEWER, IMPERSONATED_USER, CHECKED_USER);
         apiPermissionsHelper.setPermissions(TEST_GROUP, "Reader");
-        apiPermissionsHelper.setSiteAdminRoleUserPermissions(USER_INFO_VIEWER, "See User Details");
+        apiPermissionsHelper.setSiteAdminRoleUserPermissions(USER_INFO_VIEWER, "See User and Group Details");
 
         impersonate(ADMIN_USER);
         {
