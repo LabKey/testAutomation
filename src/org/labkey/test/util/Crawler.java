@@ -188,6 +188,7 @@ public class Crawler
             new ControllerActionId("ms2", "showPeptide"),
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
+            new ControllerActionId("pipeline-status", "showFile"), // Download action
             new ControllerActionId("project", "togglePageAdminMode"),
             new ControllerActionId("query", "printRows"),
             new ControllerActionId("query", "exportRowsExcel"),
