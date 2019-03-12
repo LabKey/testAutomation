@@ -59,6 +59,7 @@ import static org.junit.Assert.fail;
 public class Crawler
 {
     private final List<ControllerActionId> _excludedActions;
+    private final List<ControllerActionId> _terminalActions;
     private final List<ControllerActionId> _actionsExcludedFromInjection;
     private final Collection<String> _adminControllers;
     private final Collection<String> _forbiddenWords;
@@ -108,6 +109,7 @@ public class Crawler
         _adminControllers = Collections.unmodifiableCollection(getAdminControllers());
         _forbiddenWords = getForbiddenWords();
         _excludedActions = getDefaultExcludedActions();
+        _terminalActions = getDefaultTerminalActions();
         _actionsExcludedFromInjection = getExcludedActionsFromInjection();
         _injectionCheckEnabled = injectionTest;
         for (String project : projects)
@@ -139,7 +141,8 @@ public class Crawler
     protected List<ControllerActionId> getDefaultExcludedActions()
     {
         List<ControllerActionId> list = new ArrayList<>();
-        Collections.addAll(list, new ControllerActionId("*", "download"), // Never crawl download links
+        Collections.addAll(list,
+            new ControllerActionId("*", "download"), // Never crawl download links
             new ControllerActionId("admin", "resetErrorMark"),
             new ControllerActionId("admin", "doCheck"),
             new ControllerActionId("admin", "runSystemMaintenance"),
@@ -184,7 +187,6 @@ public class Crawler
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "showPeptide"),
             new ControllerActionId("nlp", "runPipeline"),
-            new ControllerActionId("pipeline-status", "showList"), // Is likely to contain 404 links
             new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
             new ControllerActionId("project", "togglePageAdminMode"),
             new ControllerActionId("query", "printRows"),
@@ -230,6 +232,17 @@ public class Crawler
                 new ControllerActionId("ehr_compliancedb", "requirementDetails"),
                 new ControllerActionId("onprc_billingpublic", "begin"),
                 new ControllerActionId("hdrl", "begin")
+        );
+
+        return list;
+    }
+
+    // These actions are likely to contain bad links but should, themselves, be crawled and injection checked
+    protected List<ControllerActionId> getDefaultTerminalActions()
+    {
+        List<ControllerActionId> list = new ArrayList<>();
+        Collections.addAll(list,
+                new ControllerActionId("pipeline-status", "showList") // Is likely to contain 404 links
         );
 
         return list;
@@ -907,30 +920,33 @@ public class Crawler
                     _test.projectMenu().open();
                 }
 
-                List<String> linkAddresses = _test.getLinkAddresses();
-                List<String> formAddresses = _test.getFormAddresses();
-                linkAddresses.addAll(formAddresses);
-
                 if (code == 200 && _test.getDriver().getTitle().isEmpty())
                     _warnings.add("Action does not specify title: " + actionId.toString());
 
-                for (String url : linkAddresses)
+                if (!_terminalActions.contains(actionId))
                 {
-                    try
+                    List<String> linkAddresses = _test.getLinkAddresses();
+                    List<String> formAddresses = _test.getFormAddresses();
+                    linkAddresses.addAll(formAddresses);
+
+                    for (String url : linkAddresses)
                     {
-                        UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
-                        if (candidateUrl.isVisitableURL())
+                        try
                         {
-                            candidateUrl.setFromForm(formAddresses.contains(url));
-                            newUrlsToCheck.add(candidateUrl);
+                            UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
+                            if (candidateUrl.isVisitableURL())
+                            {
+                                candidateUrl.setFromForm(formAddresses.contains(url));
+                                newUrlsToCheck.add(candidateUrl);
+                            }
                         }
-                    }
-                    catch (IllegalArgumentException badUrl)
-                    {
-                        if (!formAddresses.contains(url)) // forms might have strange target action (e.g. '../formulations')
+                        catch (IllegalArgumentException badUrl)
                         {
-                            origin = null; // Don't grab screenshot for origin page
-                            throw new AssertionError("Unable to parse link: " + url, badUrl);
+                            if (!formAddresses.contains(url)) // forms might have strange target action (e.g. '../formulations')
+                            {
+                                origin = null; // Don't grab screenshot for origin page
+                                throw new AssertionError("Unable to parse link: " + url, badUrl);
+                            }
                         }
                     }
                 }
