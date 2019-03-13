@@ -872,6 +872,8 @@ public class Crawler
     {
         String relativeURL = urlToCheck.getRelativeURL();
         ControllerActionId actionId = new ControllerActionId(relativeURL);
+        URL currentPageUrl;
+        List<UrlToCheck> newUrlsToCheck = new ArrayList<>();
 
         // Keep track of where crawler has been
         _actionsVisited.add(actionId);
@@ -895,12 +897,11 @@ public class Crawler
                     throw alert;
             }
 
-            URL currentPageUrl = _test.getURL();
+            currentPageUrl = _test.getURL();
 
             int code = _test.getResponseCode();
 
             checkForForbiddenWords(relativeURL);
-            List<UrlToCheck> newUrlsToCheck = new ArrayList<>();
 
             if (!isIgnoredError(code, urlToCheck, origin))
             {
@@ -954,11 +955,6 @@ public class Crawler
                     }
                 }
             }
-
-            if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
-                testInjection(currentPageUrl);
-
-            return newUrlsToCheck;
         }
         catch (RuntimeException | AssertionError rethrow)
         {
@@ -982,6 +978,11 @@ public class Crawler
             else
                 throw new RuntimeException(relativeURL + "\nTriggered an exception." + (origin != null ? "\nOriginating page: " + origin.toString() : ""), rethrow);
         }
+
+        if (currentPageUrl != null && urlToCheck.isInjectableURL() && _injectionCheckEnabled)
+            testInjection(currentPageUrl, urlToCheck);
+
+        return newUrlsToCheck;
     }
 
     private static final ControllerActionId spiderAction = new ControllerActionId("admin", "spider");
@@ -1090,7 +1091,7 @@ public class Crawler
         }
     }
 
-    private void testInjection(URL start)
+    private void testInjection(URL start, UrlToCheck urlToCheck)
     {
         String base = stripQueryParams(stripHash(start.toString()));
         String query = StringUtils.trimToEmpty(start.getQuery());
@@ -1125,9 +1126,19 @@ public class Crawler
             injectParams.remove(i);
             String xss = (random.nextInt()%2)==0 ? injectString : injectString2;
             xss = (random.nextInt()%3)==0 ? URLEncoder.encode(xss) : xss;
-            String queryMalicious = key + "=" + xss + "&" + queryStringFromEntries(injectParams);
+            String paramMalicious = key + "=" + xss;
+            String queryMalicious = paramMalicious + "&" + queryStringFromEntries(injectParams);
             String urlMalicious = base + "?" + queryMalicious;
-            tryInject(_test, urlTester, urlMalicious);
+            try
+            {
+                tryInject(_test, urlTester, urlMalicious);
+            }
+            catch (Exception ex)
+            {
+                throw new AssertionError("Injection error from " + urlToCheck.getActionId().toString() + "\n" +
+                        "param: " + paramMalicious + "\n" +
+                        "URL: " + urlMalicious, ex);
+            }
         }
         // TODO this blows up jquery document completed handling, which causes pageload to not fire and then timeout
         /// tryInject(_test, urlTester, base + "?" + query + "#" + injectString);
