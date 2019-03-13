@@ -111,7 +111,7 @@ public class AssayAPITest extends BaseWebDriverTest
     {
         goToProjectHome();
 
-        String assayName = "GPAT-ImportRunApi";
+        String assayName = "GPAT-ImportRunApi" + TRICKY_CHARACTERS;
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
         if (assayId == 0)
@@ -182,7 +182,7 @@ public class AssayAPITest extends BaseWebDriverTest
     public void testImportRun_dataRows() throws Exception
     {
         goToManageAssays();
-        String assayName = "GPAT-ImportRunApi-dataRows";
+        String assayName = "GPAT-ImportRunApi-dataRows" + TRICKY_CHARACTERS;
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         AssayDesignerPage assayDesigner = assayHelper.createAssayAndEdit("General", assayName);
         log("Create a 'File' column for the assay run.");
@@ -238,7 +238,7 @@ public class AssayAPITest extends BaseWebDriverTest
         goToProjectHome();
 
         log("create GPAT assay");
-        String assayName = "GPAT-SaveBatch";
+        String assayName = "GPAT-SaveBatch" + TRICKY_CHARACTERS;
         AssayDesignerPage assayDesigner = _assayHelper.createAssayAndEdit("General", assayName);
         assayDesigner.addRunField("RunFileField", "Run File Field", FieldDefinition.ColumnType.File);
         assayDesigner.addDataField("DataFileField", "Data File Field", FieldDefinition.ColumnType.File);

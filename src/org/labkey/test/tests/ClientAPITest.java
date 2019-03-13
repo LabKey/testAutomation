@@ -100,7 +100,9 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
     public final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     public final static String LIST_KEY_NAME = "Key";
-    protected static final String TEST_ASSAY = "TestAssay1";
+    // Add tricky characters to assay name to check for regressions
+    // 36077: SelectRows: SchemaKey decoding of public schema name causes request failure
+    protected static final String TEST_ASSAY = "TestAssay1" + TRICKY_CHARACTERS;
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
     public final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
     {
