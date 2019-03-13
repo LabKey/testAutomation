@@ -188,6 +188,7 @@ public class Crawler
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "showPeptide"),
             new ControllerActionId("nlp", "runPipeline"),
+            new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
             new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
             new ControllerActionId("pipeline-status", "showFile"), // Download action
             new ControllerActionId("project", "togglePageAdminMode"),
