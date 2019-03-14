@@ -274,7 +274,6 @@ public class Crawler
         map.put(new ControllerActionId("assay", "assayRuns"), Collections.singletonList("Data.Batch/RowId")); // TODO: 23321: Bad rowId input for assay details triggers server errors
         map.put(new ControllerActionId("study-designer", "designer"), Collections.singletonList("panel")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
         map.put(new ControllerActionId("study-samples", "samples"), Collections.singletonList("AtRepository")); // TODO: 21337: study-samples.SamplesAction: SQLGenerationException from un-parseable URL parameters
-        map.put(new ControllerActionId("luminex", "leveyJenningsReport"), Collections.singletonList("controlName")); // TODO: 36967: parameter is escaped and causes false positives
 
 
         return map;
