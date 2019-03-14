@@ -68,6 +68,7 @@ public class Crawler
     // Replacements to make in HTML source before looking for "forbidden" words.
     private static Map<String, String> _sourceReplacements = new CaseInsensitiveHashMap<>();
 
+    // All parameters seen by the crawler. Used to randomly attempt injection against parameters not found in UI
     private static LinkedHashMap<String,String> _dictionary = new LinkedHashMap<>();
     static
     {
@@ -76,6 +77,7 @@ public class Crawler
     }
     private static String[] _dictionaryKeys = null;
 
+    private static Map<ControllerActionId, Set<String>> _parametersInjected = new HashMap<>();
     private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
     private static Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
     private static Set<String> _urlsChecked = new HashSet<>();
@@ -234,7 +236,20 @@ public class Crawler
                 new ControllerActionId("trialshare", "begin"),
                 new ControllerActionId("ehr_compliancedb", "requirementDetails"),
                 new ControllerActionId("onprc_billingpublic", "begin"),
-                new ControllerActionId("hdrl", "begin")
+                new ControllerActionId("hdrl", "begin"),
+
+                // Don't crawl test modules
+                new ControllerActionId("chartingapi", "*"),
+                new ControllerActionId("ETLtest", "*"),
+                new ControllerActionId("footerTest", "*"),
+                new ControllerActionId("linkedschematest", "*"),
+                new ControllerActionId("miniassay", "*"),
+                new ControllerActionId("pipelinetest", "*"),
+                new ControllerActionId("pipelinetest2", "*"),
+                new ControllerActionId("restrictedModule", "*"),
+                new ControllerActionId("scriptpad", "*"),
+                new ControllerActionId("simpletest", "*"),
+                new ControllerActionId("triggerTestModule", "*")
         );
 
         return list;
@@ -274,7 +289,7 @@ public class Crawler
         map.put(new ControllerActionId("assay", "assayRuns"), Collections.singletonList("Data.Batch/RowId")); // TODO: 23321: Bad rowId input for assay details triggers server errors
         map.put(new ControllerActionId("study-designer", "designer"), Collections.singletonList("panel")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
         map.put(new ControllerActionId("study-samples", "samples"), Collections.singletonList("AtRepository")); // TODO: 21337: study-samples.SamplesAction: SQLGenerationException from un-parseable URL parameters
-
+        map.put(new ControllerActionId("assay", "uploadWizard"), Arrays.asList("participantVisitResolver", "targetStudy")); // TODO: 37037: Assay upload wizard chokes on malformed parameters
 
         return map;
     }
@@ -654,7 +669,9 @@ public class Crawler
         public boolean equals(Object obj)
         {
             return obj instanceof ControllerActionId
-                    && _action.equalsIgnoreCase(((ControllerActionId) obj).getAction())
+                    && (_action.equalsIgnoreCase(((ControllerActionId) obj).getAction())
+                            || "*".equals(_action)
+                            || "*".equals(((ControllerActionId) obj).getAction()))
                     && (_controller.equalsIgnoreCase(((ControllerActionId) obj).getController())
                             || "*".equals(_controller)
                             || "*".equals(((ControllerActionId) obj).getController()));
@@ -981,7 +998,17 @@ public class Crawler
         }
 
         if (currentPageUrl != null && urlToCheck.isInjectableURL() && _injectionCheckEnabled)
-            testInjection(currentPageUrl, urlToCheck);
+        {
+            TestLogger.increaseIndent();
+            try
+            {
+                testInjection(currentPageUrl);
+            }
+            finally
+            {
+                TestLogger.decreaseIndent();
+            }
+        }
 
         return newUrlsToCheck;
     }
@@ -1092,7 +1119,7 @@ public class Crawler
         }
     }
 
-    private void testInjection(URL start, UrlToCheck urlToCheck)
+    private void testInjection(URL start)
     {
         String base = stripQueryParams(stripHash(start.toString()));
         String query = StringUtils.trimToEmpty(start.getQuery());
@@ -1109,21 +1136,34 @@ public class Crawler
             return null;
         };
 
-        List<Map.Entry<String,String>> params = queryStringToEntries(query);
+        List<Map.Entry<String,String>> params = Collections.unmodifiableList(queryStringToEntries(query));
 
         // add parameters to global dictionary
         params.forEach(entry -> _dictionary.put(entry.getKey(), entry.getValue()));
 
         ControllerActionId actionId = new ControllerActionId(base);
-        List<String> excludedParams = getExcludedParametersFromInjection().get(actionId);
-        List<Map.Entry<String,String>> extendedParams = addDictionaryParams(params);
-        for (int i=0 ; i<extendedParams.size() ; i++)
+
+        Set<String> alreadyAttempted = _parametersInjected.putIfAbsent(actionId, new HashSet<>());
+
+        List<String> excludedParams = getExcludedParametersFromInjection().getOrDefault(actionId, Collections.emptyList());
+
+        // Attempt injection against random parameters from the list of those found so far
+        // Don't include 'start' or 'begin' actions unless they already have some parameters
+        if (!"start".equalsIgnoreCase(actionId.getAction()) || !"begin".equalsIgnoreCase(actionId.getAction()) || params.size() > 0)
         {
-            Map.Entry<String,String> e = extendedParams.get(i);
-            if (excludedParams != null && excludedParams.contains(e.getKey()))
+            params = addDictionaryParams(params);
+        }
+        if (!params.isEmpty())
+        {
+            TestLogger.log("Attempting script injection");
+        }
+        for (int i=0 ; i < params.size() ; i++)
+        {
+            String key = params.get(i).getKey();
+            if (excludedParams.contains(key) || alreadyAttempted.contains(key))
                 continue;
-            List<Map.Entry<String,String>> injectParams = new ArrayList<>(extendedParams);
-            String key = injectParams.get(i).getKey();
+            alreadyAttempted.add(key);
+            List<Map.Entry<String,String>> injectParams = new ArrayList<>(params);
             injectParams.remove(i);
             String xss = (random.nextInt()%2)==0 ? injectString : injectString2;
             xss = (random.nextInt()%3)==0 ? URLEncoder.encode(xss) : xss;
@@ -1136,7 +1176,7 @@ public class Crawler
             }
             catch (Exception ex)
             {
-                throw new AssertionError("Injection error from " + urlToCheck.getActionId().toString() + "\n" +
+                throw new AssertionError("Injection error from " + actionId.toString() + "\n" +
                         "param: " + paramMalicious + "\n" +
                         "URL: " + urlMalicious, ex);
             }
@@ -1160,7 +1200,7 @@ public class Crawler
             if (!ret.stream().anyMatch(e -> e.getKey().equals(key)))
                 ret.add(new AbstractMap.SimpleImmutableEntry<>(key,_dictionary.get(key)));
         }
-        return ret;
+        return Collections.unmodifiableList(ret);
     }
 
     List<Map.Entry<String,String>> queryStringToEntries(String q)
