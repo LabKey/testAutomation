@@ -282,6 +282,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("dom.max_script_run_time", 0);
                     profile.setPreference("dom.max_chrome_script_run_time", 0);
 
+                    // Prevent crawler from hanging on '_print=1' pages
+                    profile.setPreference("print.always_print_silent", true);
+                    profile.setPreference("print_printer", "Print to File");
+                    profile.setPreference("print.print_to_filename", new File(downloadDir, "print.pdf").getAbsolutePath());
+
                     profile.setPreference("browser.download.folderList", 2);
                     profile.setPreference("browser.download.downloadDir", downloadDir.getAbsolutePath());
                     profile.setPreference("browser.download.dir", downloadDir.getAbsolutePath());
