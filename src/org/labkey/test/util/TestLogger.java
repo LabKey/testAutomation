@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.test.TestProperties;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
@@ -59,7 +60,8 @@ public class TestLogger
     public static void debug(String msg)
     {
         // TODO: Log at debug level if/when we convert to Log4J or similar
-        log("DEBUG: " + msg, System.out);
+        if (TestProperties.isDebugLoggingEnabled())
+            log("DEBUG: " + msg, System.out);
     }
 
     public static void warn(String str, Throwable t)

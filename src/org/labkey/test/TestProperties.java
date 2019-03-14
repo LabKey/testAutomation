@@ -158,6 +158,11 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.webdriver.logging"));
     }
 
+    public static boolean isDebugLoggingEnabled()
+    {
+        return "true".equals(System.getProperty("webtest.logging.debug"));
+    }
+
     public static String ensureGeckodriverExeProperty()
     {
         final String key = GECKO_DRIVER_EXE_PROPERTY;
