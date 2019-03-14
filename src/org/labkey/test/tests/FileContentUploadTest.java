@@ -277,7 +277,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @NotNull
     protected List<String> folderSubstringsToVerify()
     {
-        return Arrays.asList("#", "%", "[", "]", "{", "}", "%ab", "%20", "\u2603", "&", "'", "\u00E4\u00F6\u00FC\u00C5");
+        return Arrays.asList("#", "%", "[", "]", "{", "}", "+", "%ab", "%20", "\u2603", "&", "'", "\u00E4\u00F6\u00FC\u00C5");
     }
 
     @LogMethod
