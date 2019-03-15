@@ -1142,8 +1142,9 @@ public class Crawler
         params.forEach(entry -> _dictionary.put(entry.getKey(), entry.getValue()));
 
         ControllerActionId actionId = new ControllerActionId(base);
-
-        Set<String> alreadyAttempted = _parametersInjected.putIfAbsent(actionId, new HashSet<>());
+        if (_parametersInjected.containsKey(actionId))
+            _parametersInjected.put(actionId, new HashSet<>());
+        Set<String> alreadyAttempted = _parametersInjected.get(actionId);
 
         List<String> excludedParams = getExcludedParametersFromInjection().getOrDefault(actionId, Collections.emptyList());
 
