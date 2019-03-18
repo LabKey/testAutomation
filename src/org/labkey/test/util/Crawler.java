@@ -548,7 +548,7 @@ public class Crawler
                 return false;
 
             //skip any _webdav or fake urls
-            if (getActionId().getController().equalsIgnoreCase("_webdav") || getActionId().getController().equalsIgnoreCase("fake"))
+            if (getActionId().getController().equalsIgnoreCase("_webdav") || getActionId().getController().equalsIgnoreCase("_webfiles") || getActionId().getController().equalsIgnoreCase("fake"))
                 return false;
 
             // skip export actions.
