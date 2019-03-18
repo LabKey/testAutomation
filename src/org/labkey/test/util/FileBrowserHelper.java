@@ -468,6 +468,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             setFormElement(Locator.name("description"), description);
 
         String signalValue = doAndWaitForPageSignal(() -> { // Don't wait for full file list refresh yet, may need to set file properties
+            shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("x4-tip"))); // tooltip sometimes blocks upload button
             clickButton("Upload", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
             if (replace)
