@@ -138,6 +138,7 @@ public class AuditLogTest extends BaseWebDriverTest
             _containerHelper.deleteProject(AUDIT_DETAILED_TEST_PROJECT, false);
             _containerHelper.deleteProject(AUDIT_PROPERTY_EVENTS_PROJECT, false);
         }
+        Log4jUtils.resetAllLogLevels();
     }
 
     @Override
@@ -158,7 +159,6 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void turnOnAuditLogFile()
     {
-        goToHome();
         Log4jUtils.setLogLevel("org.labkey.audit.event", LoggingLevel.ALL);
         Log4jUtils.setLogLevel("org.labkey.audit.event.UserAuditEvent", LoggingLevel.ALL);
         Log4jUtils.setLogLevel("org.labkey.core.Login.LoginController", LoggingLevel.ALL);

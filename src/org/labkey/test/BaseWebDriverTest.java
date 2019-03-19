@@ -549,6 +549,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
+        Log4jUtils.resetAllLogLevels();
 
         // Start logging JS errors.
         resumeJsErrorChecker();
