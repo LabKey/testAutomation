@@ -182,10 +182,16 @@ public class PipelineStatusTable extends DataRegionTable
         if (getDataRowCount() > 0)
         {
             checkAllOnPage();
-            clickHeaderButtonAndWait("Delete");
-            if (getWrapper().isElementPresent(Locator.id("deleteRuns")))
-                getWrapper().checkCheckbox(Locator.id("deleteRuns"));
-            getWrapper().clickButton("Confirm Delete");
+            deleteSelectedRows();
         }
+    }
+
+    @Override
+    public void deleteSelectedRows()
+    {
+        clickHeaderButtonAndWait("Delete");
+        if (getWrapper().isElementPresent(Locator.id("deleteRuns")))
+            getWrapper().checkCheckbox(Locator.id("deleteRuns"));
+        getWrapper().clickButton("Confirm Delete");
     }
 }

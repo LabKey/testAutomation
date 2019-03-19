@@ -38,6 +38,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
@@ -776,15 +777,18 @@ public class FlowTest extends BaseFlowTest
     @LogMethod
     private void verifyReportError(@LoggedParam String reportName, String errorText)
     {
-        waitForPipeline("/" + getProjectName() + "/" + getFolderName());
-        goToFlowDashboard();
-        waitForPipeline("/" + getProjectName() + "/" + getFolderName());
-        clickAndWait(Locator.linkContainingText("Show Jobs"));
+        String containerPath = "/" + getProjectName() + "/" + getFolderName();
+        waitForPipelineError(containerPath);
         clickAndWait(Locator.linkWithText("ERROR"));
 
         assertTitleContains(reportName);
         assertTextPresent(errorText);
         checkExpectedErrors(2);
+
+        // Subsequent tests expect there to be no ERRORs in pipeline. Delete errored pipeline job
+        PipelineStatusTable pipelineStatusTable = PipelineStatusTable.viewJobsForContainer(this, containerPath);
+        pipelineStatusTable.checkCheckbox(0);
+        pipelineStatusTable.deleteSelectedRows();
     }
 
     @LogMethod

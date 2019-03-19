@@ -26,6 +26,7 @@ import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.SampleSetHelper;
 import org.openqa.selenium.WebDriverException;
 
@@ -138,13 +139,18 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         }
     }
 
+    protected void waitForPipelineError(String containerPath)
+    {
+        PipelineStatusTable.viewJobsForContainer(this, containerPath);
+        waitForRunningPipelineJobs(true, MAX_WAIT_SECONDS * 1000);
+    }
+
     protected void waitForPipeline(String containerPath)
     {
         pushLocation();
 
-        // Only show running jobs (not complete, cancelled, or error)
-        beginAt(containerPath + "/pipeline-status-showList.view?StatusFiles.Status~notin=COMPLETE%3BCANCELLED%3BERROR");
-        waitForRunningPipelineJobs(MAX_WAIT_SECONDS * 1000);
+        PipelineStatusTable.viewJobsForContainer(this, containerPath);
+        waitForRunningPipelineJobs(false, MAX_WAIT_SECONDS * 1000);
 
         popLocation(longWaitForPage);
     }
