@@ -528,6 +528,11 @@ public class ListHelper extends LabKeySiteWrapper
         }
     }
 
+    public static class LookUpValidator extends FieldDefinition.LookUpValidator
+    {
+
+    }
+
     public static class ListColumn extends FieldDefinition
     {
         public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url, Integer scale)

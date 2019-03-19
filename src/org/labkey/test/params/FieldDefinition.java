@@ -243,6 +243,10 @@ public class FieldDefinition
         private String _description;
         private String _message;
 
+        public FieldValidator()
+        {
+
+        }
         public FieldValidator(String name, String description, String message)
         {
             _name = name;
@@ -280,6 +284,11 @@ public class FieldDefinition
         {
             return _expression;
         }
+    }
+
+    public static class LookUpValidator extends FieldValidator
+    {
+
     }
 
     public static class RangeValidator extends FieldValidator

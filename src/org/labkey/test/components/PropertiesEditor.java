@@ -137,23 +137,32 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         if (validator != null)
         {
             final FieldPropertyDock.ValidatorsTabPane validatorsTab = fieldProperties().selectValidatorsTab();
-            if (validator instanceof FieldDefinition.RegExValidator)
-                validatorsTab.regexValidatorButton.click();
+            if (validator instanceof FieldDefinition.LookUpValidator)
+            {
+                validatorsTab.lookupValidatorButton.click();
+            }
             else
-                validatorsTab.rangeValidatorButton.click();
-            getWrapper().setFormElement(Locator.name("name"), validator.getName());
-            getWrapper().setFormElement(Locator.name("description"), validator.getDescription());
-            getWrapper().setFormElement(Locator.name("errorMessage"), validator.getMessage());
-
+            {
+                if (validator instanceof FieldDefinition.RegExValidator)
+                    validatorsTab.regexValidatorButton.click();
+                else
+                    validatorsTab.rangeValidatorButton.click();
+                getWrapper().setFormElement(Locator.name("name"), validator.getName());
+                getWrapper().setFormElement(Locator.name("description"), validator.getDescription());
+                getWrapper().setFormElement(Locator.name("errorMessage"), validator.getMessage());
+            }
             if (validator instanceof FieldDefinition.RegExValidator)
             {
                 getWrapper().setFormElement(Locator.name("expression"), ((RegExValidator)validator).getExpression());
+                getWrapper().clickButton("OK", 0);
+
             }
             else if (validator instanceof RangeValidator)
             {
                 getWrapper().setFormElement(Locator.name("firstRangeValue"), ((RangeValidator)validator).getFirstRange());
+                getWrapper().clickButton("OK", 0);
             }
-            getWrapper().clickButton("OK", 0);
+
         }
 
         if (col.isMvEnabled())
