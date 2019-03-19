@@ -44,7 +44,7 @@ public class PipelineStatusTable extends DataRegionTable
 
     public static SimpleWebDriverComponentFinder<PipelineStatusTable> finder(WebDriver driver)
     {
-        return new SimpleWebDriverComponentFinder<PipelineStatusTable>(new DataRegionFinder(driver).withName("StatusFiles"))
+        return new SimpleWebDriverComponentFinder<>(new DataRegionFinder(driver).withName("StatusFiles"))
         {
             @Override
             protected PipelineStatusTable construct(WebElement el, WebDriver driver)
@@ -54,6 +54,12 @@ public class PipelineStatusTable extends DataRegionTable
                 return pipelineStatusTable;
             }
         };
+    }
+
+    public static PipelineStatusTable viewJobsForContainer(WebDriverWrapper driverWrapper, String containerPath)
+    {
+        driverWrapper.beginAt(WebTestHelper.buildURL("pipeline-status", containerPath, "showList"));
+        return new PipelineStatusTable(driverWrapper);
     }
 
     public static PipelineStatusTable goToAllJobsPage(WebDriverWrapper driverWrapper)
@@ -175,8 +181,8 @@ public class PipelineStatusTable extends DataRegionTable
     {
         if (getDataRowCount() > 0)
         {
-            checkAll();
-            clickHeaderButton("Delete");
+            checkAllOnPage();
+            clickHeaderButtonAndWait("Delete");
             if (getWrapper().isElementPresent(Locator.id("deleteRuns")))
                 getWrapper().checkCheckbox(Locator.id("deleteRuns"));
             getWrapper().clickButton("Confirm Delete");
