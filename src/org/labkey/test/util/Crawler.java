@@ -1190,6 +1190,7 @@ public class Crawler
 
     List<Map.Entry<String,String>> addDictionaryParams(List<Map.Entry<String,String>>  in)
     {
+        _dictionary.remove("_print"); // Print view causes Crawler to hang for some actions
         List<Map.Entry<String,String>> ret = new ArrayList<>(in);
         if (null == _dictionaryKeys || _dictionaryKeys.length != _dictionary.size())
             _dictionaryKeys = _dictionary.keySet().toArray(new String[0]);
