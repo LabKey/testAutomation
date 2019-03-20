@@ -117,23 +117,23 @@ public class DatasetPublishTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    public void goToDataset(@LoggedParam String datasetName)
+    public DataRegionTable goToDataset(@LoggedParam String datasetName)
     {
         click(Locator.linkWithText("Clinical and Assay Data"));
         waitAndClickAndWait(Locator.linkWithText(datasetName));
+        return new DataRegionTable.DataRegionFinder(getDriver()).withName("Dataset").waitFor();
     }
 
     @LogMethod
     public void refreshDataset(@LoggedParam String datasetName)
     {
-        goToDataset(datasetName);
-        new DataRegionTable("Dataset", getDriver())
-                .goToView("Edit Snapshot");
+        goToDataset(datasetName).goToView("Edit Snapshot");
         doAndWaitForPageToLoad(() ->
         {
             clickButton("Update Snapshot", 0);
             assertAlertContains("Updating will replace all existing data with a new set of data. Continue?");
         });
+        new DataRegionTable.DataRegionFinder(getDriver()).withName("Dataset").waitFor();
     }
 
     @LogMethod
