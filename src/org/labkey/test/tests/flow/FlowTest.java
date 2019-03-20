@@ -618,12 +618,12 @@ public class FlowTest extends BaseFlowTest
         String reportDescription = TRICKY_CHARACTERS + " positivity report description";
 
         createPositivityReport(reportName, reportDescription);
-        executeReport(reportName);
         //Issue 12400: Script exception in flow report if all data has been filtered out
         verifyReportError(reportName, "Error: labkey.data is empty");
 
         updatePositivityReportFilter(reportName);
         executeReport(reportName);
+        waitForPipeline(getContainerPath());
         verifyReport(reportName);
 
         deleteReport(reportName);
@@ -771,14 +771,13 @@ public class FlowTest extends BaseFlowTest
 
         clickAndWait(Locator.linkWithText(reportName));
         clickButton("Execute Report");
-        waitForPipeline(getContainerPath());
     }
 
     @LogMethod
     private void verifyReportError(@LoggedParam String reportName, String errorText)
     {
-        String containerPath = "/" + getProjectName() + "/" + getFolderName();
-        waitForPipelineError(containerPath);
+        executeReport(reportName);
+        waitForPipelineError(getContainerPath());
         clickAndWait(Locator.linkWithText("ERROR"));
 
         assertTitleContains(reportName);
@@ -786,7 +785,7 @@ public class FlowTest extends BaseFlowTest
         checkExpectedErrors(2);
 
         // Subsequent tests expect there to be no ERRORs in pipeline. Delete errored pipeline job
-        PipelineStatusTable pipelineStatusTable = PipelineStatusTable.viewJobsForContainer(this, containerPath);
+        PipelineStatusTable pipelineStatusTable = PipelineStatusTable.viewJobsForContainer(this, getContainerPath());
         pipelineStatusTable.checkCheckbox(0);
         pipelineStatusTable.deleteSelectedRows();
     }
