@@ -260,6 +260,7 @@ public class Crawler
     {
         List<ControllerActionId> list = new ArrayList<>();
         Collections.addAll(list,
+                new ControllerActionId("core", "styleGuide"), // Contains fake actions for style demonstration
                 new ControllerActionId("pipeline-status", "showList") // Is likely to contain 404 links
         );
 
