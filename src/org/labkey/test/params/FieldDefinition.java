@@ -288,7 +288,18 @@ public class FieldDefinition
 
     public static class LookUpValidator extends FieldValidator
     {
+        private ColumnType _colType;
 
+        public LookUpValidator()
+        {
+            super("Lookup validator", null, null);
+            _colType = ColumnType.Lookup;
+        }
+
+        public ColumnType getColType()
+        {
+            return _colType;
+        }
     }
 
     public static class RangeValidator extends FieldValidator

@@ -530,7 +530,10 @@ public class ListHelper extends LabKeySiteWrapper
 
     public static class LookUpValidator extends FieldDefinition.LookUpValidator
     {
-
+        public LookUpValidator()
+        {
+            super();
+        }
     }
 
     public static class ListColumn extends FieldDefinition
