@@ -16,9 +16,12 @@
 
 package org.labkey.test.util;
 
+import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
@@ -46,6 +49,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
@@ -77,7 +81,7 @@ public class Crawler
     }
     private static String[] _dictionaryKeys = null;
 
-    private static Map<ControllerActionId, Set<String>> _parametersInjected = new HashMap<>();
+    private static MultiValuedMap<ControllerActionId, String> _parametersInjected = new HashSetValuedHashMap<>();
     private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
     private static Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
     private static Set<String> _urlsChecked = new HashSet<>();
@@ -144,7 +148,6 @@ public class Crawler
     {
         List<ControllerActionId> list = new ArrayList<>();
         Collections.addAll(list,
-            new ControllerActionId("*", "download"), // Never crawl download links
             new ControllerActionId("admin", "resetErrorMark"),
             new ControllerActionId("admin", "doCheck"),
             new ControllerActionId("admin", "runSystemMaintenance"),
@@ -236,23 +239,59 @@ public class Crawler
                 new ControllerActionId("trialshare", "begin"),
                 new ControllerActionId("ehr_compliancedb", "requirementDetails"),
                 new ControllerActionId("onprc_billingpublic", "begin"),
-                new ControllerActionId("hdrl", "begin"),
+                new ControllerActionId("hdrl", "begin")
 
-                // Don't crawl test modules
-                new ControllerActionId("chartingapi", "*"),
-                new ControllerActionId("ETLtest", "*"),
-                new ControllerActionId("footerTest", "*"),
-                new ControllerActionId("linkedschematest", "*"),
-                new ControllerActionId("miniassay", "*"),
-                new ControllerActionId("pipelinetest", "*"),
-                new ControllerActionId("pipelinetest2", "*"),
-                new ControllerActionId("restrictedModule", "*"),
-                new ControllerActionId("scriptpad", "*"),
-                new ControllerActionId("simpletest", "*"),
-                new ControllerActionId("triggerTestModule", "*")
         );
 
+        for (String controller : getExcludedControllers())
+        {
+            list.add(new ControllerActionId(controller, "*"));
+        }
+
+        for (String actionName : getExcludedActionNames())
+        {
+            list.add(new ControllerActionId("*", actionName));
+        }
+
         return list;
+    }
+    
+    protected Set<String> getExcludedControllers()
+    {
+        Set<String> controllers = Collections.newSetFromMap(new CaseInsensitiveMap<>());
+
+        // Don't crawl webdav
+        controllers.add("_webdav");
+        controllers.add("_webfiles");
+
+        // Don't crawl test modules
+        controllers.add("chartingapi");
+        controllers.add("ETLtest");
+        controllers.add("footerTest");
+        controllers.add("linkedschematest");
+        controllers.add("miniassay");
+        controllers.add("pipelinetest");
+        controllers.add("pipelinetest2");
+        controllers.add("restrictedModule");
+        controllers.add("scriptpad");
+        controllers.add("simpletest");
+        controllers.add("triggerTestModule");
+
+        // Don't crawl fake links
+        controllers.add("fake");
+
+        return controllers;
+    }
+
+    protected Set<String> getExcludedActionNames()
+    {
+        Set<String> actionNames = Collections.newSetFromMap(new CaseInsensitiveMap<>());
+
+        actionNames.add("export");
+        actionNames.add("downlaod");
+        actionNames.add("expandCollapse");
+
+        return actionNames;
     }
 
     // These actions are likely to contain bad links but should, themselves, be crawled and injection checked
@@ -548,16 +587,12 @@ public class Crawler
             if (_excludedActions.contains(getActionId()))
                 return false;
 
-            //skip any _webdav or fake urls
-            if (getActionId().getController().equalsIgnoreCase("_webdav") || getActionId().getController().equalsIgnoreCase("_webfiles") || getActionId().getController().equalsIgnoreCase("fake"))
+            //skip excluded controllers
+            if (_excludedActions.contains(new ControllerActionId(getActionId().getController(), "*")))
                 return false;
 
-            // skip export actions.
-            if (getActionId().getAction().toLowerCase().contains("export"))
-                return false;
-
-            // skip expanding and collapsing paths -- no HTML returned
-            if (getActionId().getAction().equals("expandCollapse"))
+            // skip universally excluded actions.
+            if (_excludedActions.contains(new ControllerActionId("*", getActionId().getAction())))
                 return false;
 
             // in addition to test projects, we'll crawl all admin functionality as well
@@ -577,17 +612,17 @@ public class Crawler
 
     public static class ControllerActionId
     {
-        private String _controller;
-        private String _action = "";
+        @NotNull private String _controller;
+        @NotNull private String _action = "";
         private String _folder;
 
-        public ControllerActionId(String controller, String action)
+        public ControllerActionId(@NotNull String controller, @NotNull String action)
         {
             _controller = controller;
             _action = action;
         }
 
-        public ControllerActionId(String rootRelativeURL)
+        public ControllerActionId(@NotNull String rootRelativeURL)
         {
             rootRelativeURL = stripQueryParams(stripHash(rootRelativeURL));
             rootRelativeURL = WebTestHelper.stripContextPath(rootRelativeURL);
@@ -620,35 +655,39 @@ public class Crawler
 
             if (_action.contains("-"))
             {
-                /* folders/ */
+                /* folder/controller-action */
                 int dash = _action.lastIndexOf("-");
                 _controller = _action.substring(0,dash);
                 _action = _action.substring(dash+1);
             }
             else
             {
-                /* controller/folders/ */
+                /* controller/folders/action */
                 int postControllerSlashIdx = rootRelativeURL.indexOf('/');
                 if (-1 == postControllerSlashIdx)
                     throw new IllegalArgumentException("Unable to parse folder out of relative URL: \"" + rootRelativeURL + "\"");
                 _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
                 rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
             }
-            _folder = rootRelativeURL;
+            _folder = StringUtils.strip(rootRelativeURL, "/");
             if (_folder.endsWith("/"))
                 _folder = _folder.substring(0,_folder.length()-1);
         }
 
-        public String getAction()
+        @NotNull public String getAction()
         {
             return _action;
         }
 
-        public String getController()
+        @NotNull public String getController()
         {
             return _controller;
         }
 
+        /**
+         * Folder is parsed out for convenience only. Is ignored for equality and hash calculations.
+         * @return container path from parsed URL
+         */
         public String getFolder()
         {
             return _folder;
@@ -663,19 +702,17 @@ public class Crawler
         @Override
         public int hashCode()
         {
-            return (null==_action?0:_action.hashCode()) ^ (null==_controller?0:_controller.hashCode());
+            return Objects.hash(_controller.toLowerCase(), _action.toLowerCase());
         }
 
         @Override
-        public boolean equals(Object obj)
+        public boolean equals(Object o)
         {
-            return obj instanceof ControllerActionId
-                    && (_action.equalsIgnoreCase(((ControllerActionId) obj).getAction())
-                            || "*".equals(_action)
-                            || "*".equals(((ControllerActionId) obj).getAction()))
-                    && (_controller.equalsIgnoreCase(((ControllerActionId) obj).getController())
-                            || "*".equals(_controller)
-                            || "*".equals(((ControllerActionId) obj).getController()));
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ControllerActionId that = (ControllerActionId) o;
+            return _controller.equalsIgnoreCase(that._controller) &&
+                    _action.equalsIgnoreCase(that._action);
         }
     }
 
@@ -823,6 +860,12 @@ public class Crawler
             assertEquals("folder", subControllerNewAction.getFolder());
             assertEquals("action", subControllerNewAction.getAction());
             assertEquals(subControllerOldAction, subControllerNewAction);
+
+            ControllerActionId actionWithHash = new ControllerActionId("/project/folder/controller-app.view#/app/hash/path");
+            assertEquals("controller", actionWithHash.getController());
+            assertEquals("project/folder", actionWithHash.getFolder());
+            assertEquals("app", actionWithHash.getAction());
+
             ControllerActionId webdavAction = new ControllerActionId("/_webdav/fred");
             assertEquals("_webdav", webdavAction.getController());
         }
@@ -836,6 +879,19 @@ public class Crawler
         TestLogger.log("Crawl complete. " + crawlStats.getNewPages() + " pages visited, " + _actionsVisited.size() + " unique actions tested by all tests.");
 
         _dictionary.keySet().forEach(TestLogger::debug);
+        TestLogger.debug("Injected:");
+        TestLogger.increaseIndent();
+        for (ControllerActionId aid : _parametersInjected.keySet())
+        {
+            TestLogger.debug(aid.toString());
+            TestLogger.increaseIndent();
+            for (String param : _parametersInjected.get(aid))
+            {
+                TestLogger.debug(param);
+            }
+            TestLogger.decreaseIndent();
+        }
+        TestLogger.decreaseIndent();
     }
 
     private CrawlStats crawl()
@@ -1143,9 +1199,6 @@ public class Crawler
         params.forEach(entry -> _dictionary.put(entry.getKey(), entry.getValue()));
 
         ControllerActionId actionId = new ControllerActionId(base);
-        if (!_parametersInjected.containsKey(actionId))
-            _parametersInjected.put(actionId, new HashSet<>());
-        Set<String> alreadyAttempted = _parametersInjected.get(actionId);
 
         List<String> excludedParams = getExcludedParametersFromInjection().getOrDefault(actionId, Collections.emptyList());
 
@@ -1162,9 +1215,9 @@ public class Crawler
         for (int i=0 ; i < params.size() ; i++)
         {
             String key = params.get(i).getKey();
-            if (excludedParams.contains(key) || alreadyAttempted.contains(key))
+            if (excludedParams.contains(key) || _parametersInjected.containsMapping(actionId, key))
                 continue;
-            alreadyAttempted.add(key);
+            _parametersInjected.put(actionId, key);
             List<Map.Entry<String,String>> injectParams = new ArrayList<>(params);
             injectParams.remove(i);
             String xss = (random.nextInt()%2)==0 ? injectString : injectString2;
