@@ -16,10 +16,12 @@
 package org.labkey.test.tests.visualization;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Hosting;
@@ -33,7 +35,10 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
 import java.net.URL;
+
+import static org.junit.Assert.assertThat;
 
 @Category({DailyC.class, Reports.class, Charting.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -237,16 +242,26 @@ public class PieChartTest extends GenericChartsTest
         clickTab("Clinical and Assay Data");
         waitForElement(Locator.linkWithText(PIE_CHART_SAVE_NAME));
         clickAndWait(Locator.linkWithText(PIE_CHART_SAVE_NAME), WAIT_FOR_PAGE);
-        export(EXPORTED_SCRIPT_CHECK_TYPE, EXPORTED_SCRIPT_CHECK_XAXIS, null);
+        waitForPieChartAnimation();
+        File pdf = export(EXPORTED_SCRIPT_CHECK_TYPE, EXPORTED_SCRIPT_CHECK_XAXIS, null).get("pdf");
+        String pdfText = TestFileUtils.readPdfText(pdf);
+        assertThat("PDF didn't contain title", pdfText, CoreMatchers.containsString(EXPORTED_SCRIPT_CHECK_XAXIS));
+        assertThat("PDF didn't contain segment labels", pdfText, CoreMatchers.containsString("Fever"));
+        assertThat("PDF didn't contain segment percent", pdfText, CoreMatchers.containsString("11%"));
     }
 
-    @Override
-    public String getSVGText(int svgIndex)
+    public void waitForPieChartAnimation()
     {
         WebElement pieChartLabel = Locator.css("svg g").withAttributeContaining("id", "labelGroup").waitForElement(getDriver(), 10000);
         //Wait for pie chart to animate
         //noinspection ResultOfMethodCallIgnored
         waitFor(() -> pieChartLabel.getAttribute("style").contains("opacity: 1"), 10000);
+    }
+
+    @Override
+    public String getSVGText(int svgIndex)
+    {
+        waitForPieChartAnimation();
         return super.getSVGText(svgIndex);
     }
 }

@@ -27,8 +27,11 @@ import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -140,28 +143,32 @@ public abstract class GenericChartsTest extends ReportTest
         return chartWizard;
     }
 
-    protected void export(String type, String xAxis, String yAxis)
+    protected Map<String, File> export(String type, String xAxis, String yAxis)
     {
+        Map<String, File> exported = new HashMap<>();
+
         waitForElement(Locator.css("svg"));
 
         log("Export as PDF");
-        clickExportPDFIcon("chart-render-div", 0);
+        File pdf = clickExportPDFIcon("chart-render-div", 0);
+        exported.put("pdf", pdf);
 
         log("Export as PNG");
-        clickExportPNGIcon("chart-render-div", 0);
+        File png = clickExportPNGIcon("chart-render-div", 0);
+        exported.put("png", png);
 
         log("Export to script.");
         Assert.assertEquals("Unexpected number of export script icons", 1, getExportScriptIconCount("chart-render-div"));
         clickExportScriptIcon("chart-render-div", 0);
         String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
-        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 
         log("Validate that the script is as expected.");
         assertTrue("Script did not contain expected text: '" + type + "' ", exportScript.toLowerCase().contains(type.toLowerCase()));
         assertTrue("Script did not contain expected text: '" + xAxis + "' ", exportScript.toLowerCase().contains(xAxis.toLowerCase()));
         if (yAxis != null)
             assertTrue("Script did not contain expected text: '" + yAxis + "' ", exportScript.toLowerCase().contains(yAxis.toLowerCase()));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 
-        goToProjectHome();
+        return exported;
     }
 }

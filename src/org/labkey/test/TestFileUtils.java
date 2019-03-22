@@ -23,6 +23,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataList;
@@ -297,6 +299,28 @@ public abstract class TestFileUtils
         }
     }
 
+    public static String readPdfText(File pdf)
+    {
+        return readPdfText(pdf, null);
+    }
+
+    public static String readPdfText(File pdf, String password)
+    {
+        try (PDDocument document = PDDocument.load(pdf, password))
+        {
+            if (document.isEncrypted())
+            {
+                document.setAllSecurityToBeRemoved(true);
+            }
+
+            return new PDFTextStripper().getText(document);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static boolean isFileInZipArchive(File zipArchive, String fileName) throws IOException
     {
         List<String> files = getFilesInZipArchive(zipArchive);
@@ -317,6 +341,7 @@ public abstract class TestFileUtils
         }
     }
 
+    @SuppressWarnings("Duplicates")
     public static List<File> unzipToDirectory(File sourceZip, File unzipDir) throws IOException
     {
         List<File> files = new ArrayList<>();
