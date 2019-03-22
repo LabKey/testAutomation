@@ -1322,6 +1322,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         if (isLinkCheckEnabled())
         {
+            checkErrors(); // Check for errors that happened before crawler
             pauseJsErrorChecker();
 
             Crawler crawler = new Crawler(this, TestProperties.getCrawlerTimeout(), isInjectionCheckEnabled());
@@ -1329,6 +1330,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             crawler.addProject(getProjectName());
             crawler.crawlAllLinks();
             resumeJsErrorChecker();
+            try
+            {
+                checkErrors();
+            }
+            catch (AssertionError ae)
+            {
+                throw new AssertionError("Crawler triggered some server-side errors.");
+            }
         }
     }
 
