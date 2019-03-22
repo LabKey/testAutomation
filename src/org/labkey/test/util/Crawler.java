@@ -31,6 +31,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.api.ProjectMenu;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
@@ -86,7 +87,7 @@ public class Crawler
     private static Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
     private static Set<String> _urlsChecked = new HashSet<>();
     public static ActionProfiler _actionProfiler = new ActionProfiler();
-    private boolean _needToGetProjectMenuLinks = true;
+    private int _remainingAttemptsToGetProjectLinks = 4;
     private int _maxDepth = 4;
     private final ArrayList<UrlToCheck> _startingUrls = new ArrayList<>();
 
@@ -993,10 +994,15 @@ public class Crawler
                 }
 
                 // Find all the links at the site
-                if (_needToGetProjectMenuLinks && depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
+                if (_remainingAttemptsToGetProjectLinks > 0 && depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
                 {
-                    _needToGetProjectMenuLinks = false;
-                    _test.projectMenu().open();
+                    _remainingAttemptsToGetProjectLinks--;
+                    try
+                    {
+                        _test.projectMenu().open();
+                        _remainingAttemptsToGetProjectLinks = 0; // Got em
+                    }
+                    catch (NoSuchElementException ignore) { } // Hiccup with the project menu. Don't worry about it
                 }
 
                 if (code == 200 && _test.getDriver().getTitle().isEmpty())
