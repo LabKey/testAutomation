@@ -80,7 +80,6 @@ public class Crawler
         Arrays.asList("rowid", "name", "userId", "query.sort", "query.rowid~eq", "query.name~contains", "returnUrl")
                 .forEach(s -> _dictionary.put(s,""));
     }
-    private static String[] _dictionaryKeys = null;
 
     private static MultiValuedMap<ControllerActionId, String> _parametersInjected = new HashSetValuedHashMap<>();
     private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
@@ -156,6 +155,7 @@ public class Crawler
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("admin", "setAdminMode"),
             new ControllerActionId("admin", "dumpHeap"),
+            new ControllerActionId("admin", "exportQueries"), // download action
             new ControllerActionId("admin", "getSchemaXmlDoc"), // download action
             new ControllerActionId("admin", "addTab"),
             new ControllerActionId("admin", "actions"), // Gets hit often in normal testing
@@ -174,6 +174,8 @@ public class Crawler
             new ControllerActionId("assay", "template"),
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("dumbster", "begin"),
+            new ControllerActionId("experiment", "exportProtocols"),
+            new ControllerActionId("experiment", "exportRunFiles"),
             new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("filetransfer", "auth"), // redirects to external site
             new ControllerActionId("flow-compensation", "download"),
@@ -199,12 +201,14 @@ public class Crawler
             new ControllerActionId("pipeline-status", "showFile"), // Download action
             new ControllerActionId("project", "togglePageAdminMode"),
             new ControllerActionId("query", "printRows"),
+            new ControllerActionId("query", "exportExcelTemplate"), // Download action
             new ControllerActionId("query", "exportRowsExcel"),
             new ControllerActionId("query", "excelWebQueryDefinition"),
             new ControllerActionId("reports", "downloadInputData"),
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("reports", "download"),
             new ControllerActionId("search", "search"), // Tests need to wait for indexer manually
+            new ControllerActionId("security", "groupExport"), // Download action
             new ControllerActionId("security", "resetPassword"),
             new ControllerActionId("study", "confirmDeleteVisit"),
             new ControllerActionId("study", "template"),
@@ -217,6 +221,7 @@ public class Crawler
             new ControllerActionId("study-reports", "deleteReports"),
             new ControllerActionId("study-reports", "deleteReport"),
             new ControllerActionId("study-reports", "deleteCustomQuery"),
+            new ControllerActionId("study-security", "exportSecurityPolicy"),
             new ControllerActionId("study-samples", "downloadSpecimenList"),
             new ControllerActionId("study-samples", "emailLabSpecimenLists"),
             new ControllerActionId("study-samples", "getSpecimenExcel"),
@@ -1212,7 +1217,7 @@ public class Crawler
         // Don't include 'start' or 'begin' actions unless they already have some parameters
         if (!"start".equalsIgnoreCase(actionId.getAction()) || !"begin".equalsIgnoreCase(actionId.getAction()) || params.size() > 0)
         {
-            params = addDictionaryParams(params);
+            params = addRandomParams(params, actionId);
         }
         if (!params.isEmpty())
         {
@@ -1248,19 +1253,23 @@ public class Crawler
 
     static Random random = new Random();
 
-    List<Map.Entry<String,String>> addDictionaryParams(List<Map.Entry<String,String>>  in)
+    List<Map.Entry<String,String>> addRandomParams(List<Map.Entry<String,String>> in, ControllerActionId actionId)
     {
         _dictionary.remove("_print"); // Print view causes Crawler to hang for some actions
         List<Map.Entry<String,String>> ret = new ArrayList<>(in);
-        if (null == _dictionaryKeys || _dictionaryKeys.length != _dictionary.size())
-            _dictionaryKeys = _dictionary.keySet().toArray(new String[0]);
-        for (int i=0 ; i<5 && ret.size() < 10 ; i++)
+
+        if (in.size() < 10)
         {
-            // pick a random dictionary key
-            String key = _dictionaryKeys[random.nextInt(_dictionaryKeys.length)];
-            // if we don't have this key already, add it
-            if (!ret.stream().anyMatch(e -> e.getKey().equals(key)))
-                ret.add(new AbstractMap.SimpleImmutableEntry<>(key,_dictionary.get(key)));
+            List<String> additionalParams = new ArrayList<>(_dictionary.keySet());
+            additionalParams.removeAll(_parametersInjected.get(actionId)); // Don't repeat injection attempts
+            additionalParams.removeAll(in.stream().map(Map.Entry::getKey).collect(Collectors.toList())); // Don't add duplicate params
+            Collections.shuffle(additionalParams);
+
+            for (int i = 0; i < additionalParams.size() && ret.size() < 10; i++)
+            {
+                String key = additionalParams.get(i);
+                ret.add(new AbstractMap.SimpleImmutableEntry<>(key, _dictionary.get(key)));
+            }
         }
         return Collections.unmodifiableList(ret);
     }
