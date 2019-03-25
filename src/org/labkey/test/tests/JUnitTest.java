@@ -323,6 +323,7 @@ public class JUnitTest extends TestSuite
                 params.put("testCase", _remoteClass);
                 command.setParameters(params);
                 command.setTimeout(_timeout * 1000 * 2);
+                System.out.println("I see the time out as: " + _timeout * 1000 * 2);
 
                 CommandResponse response = command.execute(connection, "/");
                 Map<String, Object> resultJson = response.getParsedData();
