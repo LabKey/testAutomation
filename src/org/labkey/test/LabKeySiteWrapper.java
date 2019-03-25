@@ -707,7 +707,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             {
                 // Tests hit Home portal a lot. Make it load as fast as possible
                 new PortalHelper(this).removeAllWebParts();
-                _userHelper.setDisplayName(PasswordUtil.getUsername(), AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername()) + BaseWebDriverTest.INJECT_CHARS_1);
+                String displayName = AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername())
+                        + (WebTestHelper.RANDOM.nextBoolean() ? BaseWebDriverTest.INJECT_CHARS_1 : BaseWebDriverTest.INJECT_CHARS_2);
+                _userHelper.setDisplayName(PasswordUtil.getUsername(), displayName);
 
                 PipelineStatusTable.goToAllJobsPage(this);
                 log("Wait for any upgrade/bootstrap pipeline jobs");

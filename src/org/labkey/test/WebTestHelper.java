@@ -74,12 +74,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 
 /**
  * Static methods for getting properties of and communicating with a running LabKey server
  */
 public class WebTestHelper
 {
+    public static final Random RANDOM = new Random();
+
     private static final String DEFAULT_CONTEXT_PATH = "";
     private static final Integer DEFAULT_WEB_PORT = 8080;
     private static final String DEFAULT_TARGET_SERVER = "http://localhost";
