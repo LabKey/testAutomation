@@ -294,7 +294,7 @@ public class Crawler
         Set<String> actionNames = Collections.newSetFromMap(new CaseInsensitiveMap<>());
 
         actionNames.add("export");
-        actionNames.add("downlaod");
+        actionNames.add("download");
         actionNames.add("expandCollapse");
 
         return actionNames;
