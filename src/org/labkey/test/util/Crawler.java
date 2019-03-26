@@ -190,6 +190,7 @@ public class Crawler
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("login", "createToken"),
             new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
+            new ControllerActionId("luminex", "exportDefaultValues"), // download action
             new ControllerActionId("microarray", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("ms1", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("ms2", "showParamsFile"),
