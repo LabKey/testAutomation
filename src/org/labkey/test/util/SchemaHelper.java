@@ -121,7 +121,10 @@ public class SchemaHelper
             _test._ext4Helper.waitForMaskToDisappear();
 
         if (create)
+        {
+            _test.waitForText("published"); // added as a part of Issue 37078
             _test.clickButton("Create");
+        }
         else
             _test.clickButton("Update");
 
