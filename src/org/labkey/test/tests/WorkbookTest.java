@@ -89,8 +89,8 @@ public class WorkbookTest extends BaseWebDriverTest
         assertEquals("id's generated when workbooks are created should be sequential", Arrays.asList(1, 2, 3), ids);
 
         // Edit Workbook Name
-        waitAndClick(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
-        WebElement nameInput = waitForElement(Locator.xpath("//input[@value='" + DEFAULT_WORKBOOK_NAME + "']"));
+        waitAndClick(Locator.css(".wb-name + .labkey-edit-in-place"));
+        WebElement nameInput = waitForElement(Locator.css(".wb-name + .labkey-edit-in-place + input"));
         nameInput.sendKeys(Keys.DELETE, "Renamed" + DEFAULT_WORKBOOK_NAME);
 
         // Change the focus to trigger a save
@@ -100,7 +100,7 @@ public class WorkbookTest extends BaseWebDriverTest
         assertTextPresent("Renamed" + DEFAULT_WORKBOOK_NAME);
 
         // Clear description
-        setFormElement(Locator.xpath("//textarea"), ""); // textarea is a barely used tag, so this xpath is sufficient for now.
+        setFormElement(Locator.css("#wb-description + textarea"), "");
         waitForText("No description provided. Click to add one.");
 
         // Check that title and description are saved
