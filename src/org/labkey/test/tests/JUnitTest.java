@@ -315,6 +315,7 @@ public class JUnitTest extends TestSuite
         @Override
         protected void runTest()
         {
+            System.out.println("************ Start JunitTest.runTest ************");
             long startTime = System.currentTimeMillis();
             try
             {
@@ -323,7 +324,7 @@ public class JUnitTest extends TestSuite
                 params.put("testCase", _remoteClass);
                 command.setParameters(params);
                 command.setTimeout(_timeout * 1000 * 2);
-                System.out.println("I see the time out as: " + _timeout * 1000 * 2);
+                System.out.println("************ I see the time out as: " + _timeout * 1000 * 2 + " ************");
 
                 CommandResponse response = command.execute(connection, "/");
                 Map<String, Object> resultJson = response.getParsedData();
@@ -356,6 +357,9 @@ public class JUnitTest extends TestSuite
                 err(dump(ce.getResponseText(), false));
                 fail(("remote junit failed (HTTP status code " + ce.getStatusCode() + "): " + _remoteClass) + "\n" + dump(ce.getResponseText(), true));
             }
+
+            System.out.println("************ End JunitTest.runTest ************");
+
         }
 
         private String getLogTestString(String message, long startTime)
