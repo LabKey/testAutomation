@@ -166,9 +166,6 @@ public class JUnitTest extends TestSuite
 
     private static TestSuite _suite(Predicate<Map<String,Object>> accept, final int attempt, final int upgradeAttempts) throws Exception
     {
-        // TODO Remove these System.out when testing is done.
-        System.out.println("************ Start JunitTest._suite ************");
-
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
         try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
@@ -200,9 +197,6 @@ public class JUnitTest extends TestSuite
                 Object json = JSONValue.parse(responseBody);
                 if (json == null)
                 {
-
-                    // TODO Remove these System.out when testing is done.
-                    System.out.println("************ responseBody is null ************");
 
                     if (responseBody.contains("<title>Start Modules</title>"))
                     {
@@ -250,9 +244,6 @@ public class JUnitTest extends TestSuite
                             testSuite.addTest(new Runner.ErrorTest(responseBody.contains("first time logging in") ? "ServerBootstrap" : "ServerUpgrade", upgradeError));
                         }
 
-                        // TODO Remove these System.out when testing is done.
-                        System.out.println("************ testSuite has " + testSuite.countTestCases() + " test cases. ************");
-                        System.out.println("************ testSuite and has these tests '" + testSuite.tests() + "' ************");
                         return testSuite;
                     }
                 }
@@ -263,9 +254,6 @@ public class JUnitTest extends TestSuite
                 TestSuite remotesuite = new JUnitTest();
                 Map<String, List<Map<String, Object>>> obj = (Map<String, List<Map<String, Object>>>)json;
 
-                // TODO Remove these System.out when testing is done.
-                System.out.println("************ there are " + obj.size() + " elements in the map. ************");
-
                 boolean addedHeader = false;
                 for (Map.Entry<String, List<Map<String, Object>>> entry : obj.entrySet())
                 {
@@ -274,14 +262,16 @@ public class JUnitTest extends TestSuite
                     // Individual tests include both the class name and the requested timeout
                     for (Map<String, Object> testClass : entry.getValue())
                     {
-                        // TODO Remove these System.out when testing is done.
-                        System.out.println("************ testClass keyset '" + testClass.keySet() + "' ************");
+                        // For the time being do not run performance tests with every junit check-in test suite.
+                        if(!((String)testClass.get("when")).equalsIgnoreCase("performance"))
+                        {
+                            String className = (String) testClass.get("className");
+                            // Timeout is represented in seconds
+                            int timeout = ((Number) testClass.get("timeout")).intValue();
+                            if (accept.test(testClass))
+                                testsuite.addTest(new RemoteTest(className, timeout));
+                        }
 
-                        String className = (String)testClass.get("className");
-                        // Timeout is represented in seconds
-                        int timeout = ((Number)testClass.get("timeout")).intValue();
-                        if (accept.test(testClass))
-                            testsuite.addTest(new RemoteTest(className, timeout));
                     }
                     if (!addedHeader && testsuite.countTestCases() > 0)
                     {
@@ -332,8 +322,6 @@ public class JUnitTest extends TestSuite
         @Override
         protected void runTest()
         {
-            // TODO Remove these System.out when testing is done.
-            System.out.println("************ Start JunitTest.runTest ************");
             long startTime = System.currentTimeMillis();
             try
             {
@@ -342,9 +330,6 @@ public class JUnitTest extends TestSuite
                 params.put("testCase", _remoteClass);
                 command.setParameters(params);
                 command.setTimeout(_timeout * 1000 * 2);
-                System.out.println("************ I see the time out as '" + _timeout * 1000 * 2 + "' ************");
-                System.out.println("************ I see the remoteClass as '" + _remoteClass + "' ************");
-                System.out.println("************ I see the name as '" + getName() + "' ************");
 
                 CommandResponse response = command.execute(connection, "/");
                 Map<String, Object> resultJson = response.getParsedData();
@@ -377,8 +362,6 @@ public class JUnitTest extends TestSuite
                 err(dump(ce.getResponseText(), false));
                 fail(("remote junit failed (HTTP status code " + ce.getStatusCode() + "): " + _remoteClass) + "\n" + dump(ce.getResponseText(), true));
             }
-
-            System.out.println("************ End JunitTest.runTest ************");
 
         }
 
