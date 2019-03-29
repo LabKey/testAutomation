@@ -226,7 +226,12 @@ public class WikiHelper
      */
     public String setSourceFromFile(String fileName, String wikiName)
     {
-        return setSource(TestFileUtils.getFileContents("server/test/data/api/" + fileName), wikiName);
+        return setSourceFromFile(TestFileUtils.getSampleData("api/" + fileName), wikiName);
+    }
+
+    public String setSourceFromFile(File file, String wikiName)
+    {
+        return setSource(TestFileUtils.getFileContents(file), wikiName);
     }
 
     /**
