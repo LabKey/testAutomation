@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
@@ -977,7 +977,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         String iconData = WebTestHelper.getHttpResponse(protocol + iconSrc).getResponseBody();
 
         int lengthToCompare = 3000;
-        int diff = StringUtils.getLevenshteinDistance(expectedIcon.substring(0, lengthToCompare), iconData.substring(0, lengthToCompare));
+        int diff = new LevenshteinDistance().apply(expectedIcon.substring(0, lengthToCompare), iconData.substring(0, lengthToCompare));
         assertTrue("Module report icon is not as expected, diff is " + diff, expectedIcon.equals(iconData) ||
                 diff  <= lengthToCompare * 0.03); // Might be slightly different due to indentations, etc
     }
@@ -1002,7 +1002,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         String thumbnailData = WebTestHelper.getHttpResponse(thumbnail.getAttribute("src")).getResponseBody();
 
         int lengthToCompare = 5000;
-        int diff = StringUtils.getLevenshteinDistance(expectedThumbnail.substring(0, lengthToCompare), thumbnailData.substring(0, lengthToCompare));
+        int diff = new LevenshteinDistance().apply(expectedThumbnail.substring(0, lengthToCompare), thumbnailData.substring(0, lengthToCompare));
         assertTrue("Module report thumbnail is not as expected, diff is " + diff, expectedThumbnail.equals(thumbnailData) ||
                 diff  <= lengthToCompare * 0.03); // Might be slightly different due to indentations, etc
     }

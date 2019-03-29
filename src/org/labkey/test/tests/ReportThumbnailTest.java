@@ -16,7 +16,7 @@
 
 package org.labkey.test.tests;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -361,7 +361,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
             assertFalse("Thumbnail was was still default", THUMBNAIL_DATA.equals(thumbnailData));
         else
             assertTrue("Thumbnail wasn't persisted correctly", expected.equals(thumbnailData) ||
-                    StringUtils.getLevenshteinDistance(expected.substring(0, 5000), thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
+                    new LevenshteinDistance().apply(expected.substring(0, 5000), thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
 
         THUMBNAIL_DATA = thumbnailData;
     }
