@@ -20,12 +20,14 @@ import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 import org.apache.http.HttpStatus;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.pages.files.WebDavPage;
@@ -87,6 +89,14 @@ public class WebDavTest extends BaseWebDriverTest
     protected boolean isCloudTest()
     {
         return false;
+    }
+
+    @Before
+    public void cleanFiles()
+    {
+        goToProjectHome();
+        goToModule("FileContent");
+        _fileBrowserHelper.deleteAll();
     }
 
     @Test
@@ -285,10 +295,7 @@ public class WebDavTest extends BaseWebDriverTest
 
     private void waitForIdle()
     {
-        // make sure the indexer isn't really busy
-        String baseURL = getBaseURL();
-        String waitForIdle = baseURL + "/search-waitForIdle.view";
-        beginAt(waitForIdle);
+        WebTestHelper.getHttpResponse(WebTestHelper.buildURL("search", "waitForIdle"));
     }
 
     private List<String> _listNames(Sardine s, String path) throws IOException
