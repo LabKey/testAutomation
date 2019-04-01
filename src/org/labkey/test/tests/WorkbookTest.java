@@ -47,8 +47,8 @@ public class WorkbookTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "Workbook Test Project";
     private static final String PROJECT_NAME2 = "Workbook Test Project 2";
-    private static final String DEFAULT_WORKBOOK_NAME = "TestWorkbook";
-    private static final String DEFAULT_WORKBOOK_DESCRIPTION = "Test Default Workbook Type";
+    private static final String DEFAULT_WORKBOOK_NAME = "TestWorkbook" + INJECT_CHARS_2;
+    private static final String DEFAULT_WORKBOOK_DESCRIPTION = "Test Default Workbook Type" + INJECT_CHARS_1;
     private static final String FILE_WORKBOOK_NAME = "TestFileWorkbook";
     private static final String FILE_WORKBOOK_DESCRIPTION = "Test File Workbook Type";
     private static final String ASSAY_WORKBOOK_DESCRIPTION = "Test Assay Workbook Type";
