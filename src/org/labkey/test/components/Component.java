@@ -23,6 +23,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class Component<EC extends Component.ElementCache> implements SearchContext
 {
@@ -184,6 +185,10 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
             return construct(buildLocator().findWhenNeeded(context).withTimeout(timeout));
         }
 
+        /**
+         * @deprecated Use {@link #findOptional(SearchContext)}
+         */
+        @Deprecated
         public C findOrNull(S context)
         {
             _context = context;
@@ -192,6 +197,13 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
                 return null;
             else
                 return construct(elementOrNull);
+        }
+
+        public Optional<C> findOptional(S context)
+        {
+            _context = context;
+            Optional<WebElement> optionalElement = buildLocator().findOptionalElement(context);
+            return optionalElement.map(this::construct);
         }
     }
 

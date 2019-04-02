@@ -24,6 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Wrapper for components that need a WebDriver for full functionality (e.g. page navigation or JavaScript execution)
@@ -78,9 +79,18 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
             return super.waitFor(getDriver());
         }
 
+        /**
+         * @deprecated Use {@link #findOptional()}
+         */
+        @Deprecated
         public Cmp findOrNull()
         {
             return super.findOrNull(getDriver());
+        }
+
+        public Optional<Cmp> findOptional()
+        {
+            return super.findOptional(getDriver());
         }
 
         @Override
