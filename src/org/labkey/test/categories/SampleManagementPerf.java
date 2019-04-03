@@ -1,5 +1,5 @@
 package org.labkey.test.categories;
 
-public class SampleManagementPerf extends Test
+public abstract class SampleManagementPerf extends Test
 {
 }
