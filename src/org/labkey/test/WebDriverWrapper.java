@@ -1356,7 +1356,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             public boolean handle(String htmlSource, String text)
             {
                 // Not found... stop enumerating and return false
-                if (!htmlSource.contains(text))
+                if (htmlSource == null || !htmlSource.contains(text))
                     present.setFalse();
 
                 return present.getValue();
