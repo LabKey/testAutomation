@@ -119,11 +119,23 @@ public class MethodLoggingAspect
 
         if (!method.equals(caller)) // Don't double-log overloaded methods
         {
-            String elapsedStr = String.format("%dm %d.%ds",
-                    TimeUnit.MILLISECONDS.toMinutes(elapsed),
-                    TimeUnit.MILLISECONDS.toSeconds(elapsed) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
-                    elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
+            long minutesPart = TimeUnit.MILLISECONDS.toMinutes(elapsed);
+            long secondsPart = TimeUnit.MILLISECONDS.toSeconds(elapsed) -
+                    TimeUnit.MINUTES.toSeconds(minutesPart);
+            long millisecondsPart = elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed));
+            StringBuilder elapsedStr = new StringBuilder();
+            if (minutesPart > 0)
+            {
+                elapsedStr.append(minutesPart).append("m ");
+            }
+            elapsedStr.append(secondsPart);
+            if (minutesPart == 0)
+            {
+                String millisecondsStr = String.valueOf(millisecondsPart);
+                String padding = StringUtils.repeat("0", 3 - millisecondsStr.length());
+                elapsedStr.append(".").append(padding).append(millisecondsPart);
+            }
+            elapsedStr.append("s");
             TestLogger.decreaseIndent();
             TestLogger.log(logPrefix + method + argString + " <" + elapsedStr + ">"); // Only log on successful return
         }
