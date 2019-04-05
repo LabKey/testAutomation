@@ -27,6 +27,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -100,7 +101,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private static final String OTHER_FOLDER = "OtherFolder";
     private static final String STUDY_FOLDER = "StudyFolder"; // Folder used to validate fix for issues 32454 & 32456
     private static final int MOTHER_ID = 3;
-
+    private static final String READER_USER = "reader@linkedschema.test";
 
     public static final String LIST_NAME = "LinkedSchemaTestPeople";
     public static final String LIST_DATA = "Name\tAge\tCrazy\tP\tQ\tR\tS\tT\tU\tV\tW\tX\tY\tZ\n" +
@@ -388,6 +389,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
+        _userHelper.deleteUsers(false, READER_USER);
     }
 
     @BeforeClass
@@ -580,12 +582,17 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @LogMethod
     void setupProject()
     {
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        _userHelper.createUser(READER_USER);
+
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER);
+        apiPermissionsHelper.setUserPermissions(READER_USER, "Reader");//TODO remove this after fix for linked schema permissions issue
         // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
         _containerHelper.enableModule("linkedschematest");
 
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER);
+        apiPermissionsHelper.setUserPermissions(READER_USER, "Reader");
 
         // Create a study folder.
         _containerHelper.createSubfolder(getProjectName(), STUDY_FOLDER, "Study");
@@ -661,12 +668,13 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @LogMethod
     void verifyLinkedSchema()
     {
-        goToSchemaBrowser();
-        DataRegionTable table = viewQueryData(A_PEOPLE_SCHEMA_NAME, LIST_NAME);
         log("** Check template filter is applied");
+        goToSchemaBrowser();
+        viewQueryData(A_PEOPLE_SCHEMA_NAME, LIST_NAME);
+        impersonate(READER_USER);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, A_PEOPLE_METADATA_TITLE));
-
         log("** Verify table metadata overrides when simplemodule is not active in TargetFolder");
         assertHrefContains(table, "A_People db_metadata List P", "a_db_metadata.view");
         assertHrefContains(table, "A_People db_metadata List Q", "a_db_metadata.view");
@@ -680,14 +688,14 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertHrefNotPresent(table, "db_metadata List X");
         assertHrefNotPresent(table, "file_metadata List Y");
         assertHrefNotPresent(table, "Original List Z");
+        stopImpersonating(false);
 
         log("** Verify table metadata overrides when simplemodule is active in TargetFolder");
         pushLocation();
         _containerHelper.enableModules(Arrays.asList("linkedschematest"));
         popLocation();
-
+        impersonate(READER_USER);
         table = new DataRegionTable("query", this);
-
         assertHrefContains(table, "A_People db_metadata List P", "a_db_metadata.view");
         assertHrefContains(table, "A_People db_metadata List Q", "a_db_metadata.view");
         assertHrefContains(table, "A_People db_metadata List R", "a_db_metadata.view");
@@ -700,16 +708,16 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertHrefNotPresent(table, "db_metadata List X");
         assertHrefNotPresent(table, "file_metadata List Y");
         assertHrefNotPresent(table, "Original List Z");
-
         // Check the custom details url is used
         clickAndWait(table.detailsLink(0));
         assertTitleContains("Record Details:");
         waitForText("Adam");
-
-        goToSchemaBrowser();
-        table = viewQueryData(A_PEOPLE_SCHEMA_NAME, QUERY_NAME);
+        stopImpersonating(false);
 
         log("** Verify query metadata overrides are correctly applied");
+        goToSchemaBrowser();
+        table = viewQueryData(A_PEOPLE_SCHEMA_NAME, QUERY_NAME);
+        impersonate(READER_USER);
         assertHrefContains(table, "A_People db_metadata Query P", "a_db_metadata.view");
         assertHrefContains(table, "A_People file_metadata Query Q", "a_template_file_metadata.view");
         assertHrefContains(table, "A_People template Query R", "a_template_metadata.view");
@@ -722,6 +730,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertHrefNotPresent(table, "db_metadata List X");
         assertHrefNotPresent(table, "file_metadata List Y");
         assertHrefNotPresent(table, "Original List Z");
+        stopImpersonating(false);
 
         // Disable the module in the TargetFolder container so query validation will pass at the end of the test
         _containerHelper.disableModules("linkedschematest");
