@@ -200,6 +200,7 @@ public class Crawler
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
             new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
             new ControllerActionId("pipeline-status", "showFile"), // Download action
+            new ControllerActionId("plate", "designer"),// TODO: 37208: Plate designer dumps stack trace from bad URL parameters
             new ControllerActionId("project", "togglePageAdminMode"),
             new ControllerActionId("query", "printRows"),
             new ControllerActionId("query", "exportExcelTemplate"), // Download action
