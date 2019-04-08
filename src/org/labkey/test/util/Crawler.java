@@ -287,6 +287,9 @@ public class Crawler
         // Don't crawl fake links
         controllers.add("fake");
 
+        // MS1 module is slated for removal
+        controllers.add("ms1");
+
         return controllers;
     }
 
