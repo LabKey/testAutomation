@@ -201,7 +201,6 @@ public class Crawler
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
             new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
             new ControllerActionId("pipeline-status", "showFile"), // Download action
-            new ControllerActionId("plate", "designer"),// TODO: 37208: Plate designer dumps stack trace from bad URL parameters
             new ControllerActionId("project", "togglePageAdminMode"),
             new ControllerActionId("query", "printRows"),
             new ControllerActionId("query", "exportExcelTemplate"), // Download action
@@ -342,6 +341,9 @@ public class Crawler
         map.put(new ControllerActionId("study-designer", "designer"), Collections.singletonList("panel")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
         map.put(new ControllerActionId("study-samples", "samples"), Collections.singletonList("AtRepository")); // TODO: 21337: study-samples.SamplesAction: SQLGenerationException from un-parseable URL parameters
         map.put(new ControllerActionId("assay", "uploadWizard"), Arrays.asList("participantVisitResolver", "targetStudy")); // TODO: 37037: Assay upload wizard chokes on malformed parameters
+
+        // Permanent exclusions
+        map.put(new ControllerActionId("plate", "designer"), Arrays.asList("colCount", "rowCount")); // 37208: Plate designer dumps stack trace from bad URL parameters
 
         return map;
     }
