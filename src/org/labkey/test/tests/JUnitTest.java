@@ -400,14 +400,13 @@ public class JUnitTest extends TestSuite
             {
                 if (failure.get("failedTest") != null)
                     sb.append(failure.get("failedTest")).append("\n");
-                if (failure.get("exceptionMesage") != null)
+                if (failure.get("exceptionMessage") != null)
                     sb.append("  ").append(failure.get("exceptionMessage")).append("\n");
                 if (failure.get("trace") != null)
                     sb.append("  ").append(failure.get("trace")).append("\n");
                 sb.append("\n");
             }
         }
-
     }
 
     static void err(String str)
