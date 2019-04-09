@@ -86,7 +86,17 @@
         </fk>
         <datatype>int</datatype>
       </column>
-      <column columnName="InitialReleaseYear"/>
+      <column columnName="InitialReleaseYear">
+        <validators>
+          <validator>
+            <name>SchemaTableValidator</name>
+            <typeURI>urn:lsid:labkey.com:PropertyValidator:regex</typeURI>
+            <!--A very permissive RegEx-->
+            <expression>^[^5]*$</expression>
+            <errorMessage>Failed Schema Layer RegEx</errorMessage>
+          </validator>
+        </validators>
+      </column>
       <column columnName="Image">
         <datatype>varchar</datatype>
         <displayColumnFactory>

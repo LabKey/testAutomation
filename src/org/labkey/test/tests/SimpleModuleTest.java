@@ -22,6 +22,7 @@ import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -214,6 +215,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     protected void doVerifySteps() throws Exception
     {
+        doTestColumnValidators();
         doTestRestrictedModule();
         doTestCustomFolder();
         doTestSchemas();
@@ -233,6 +235,106 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestRowLevelContainerPath();
         doTestCustomLogin();
         doTestFkLookupFilter();
+    }
+
+    @LogMethod
+    private void doTestColumnValidators() throws Exception
+    {
+        //first create a maufacturer:
+        InsertRowsCommand insertCmdM = new InsertRowsCommand("vehicle", "Manufacturers");
+        Map<String, Object> rowMapM = new HashMap<>();
+        rowMapM.put("Name", "TestManufacturer");
+        insertCmdM.addRow(rowMapM);
+        SaveRowsResponse respM = insertCmdM.execute(createDefaultConnection(false), getProjectName());
+        Object manufacturerId = respM.getRows().get(0).get("RowId");
+
+        //This table has one validator defined in the schema XML and one in query XML.  First do insert that should fail schema validator:
+        InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "Models");
+        Map<String, Object> rowMap = new HashMap<>();
+        rowMap.put("Name", "ShouldFail");
+        rowMap.put("ManufacturerId", manufacturerId);
+        rowMap.put("InitialReleaseYear", 5);
+        insertCmd.addRow(rowMap);
+        submitAndTestExpectedFailure(insertCmd, "Value '5' for field 'InitialReleaseYear' is invalid. Failed Schema Layer RegEx");
+
+        //Now fail query-layer validator
+        insertCmd = new InsertRowsCommand("vehicle", "Models");
+        rowMap = new HashMap<>();
+        rowMap.put("Name", "123456789012345678901");  //21 characters
+        rowMap.put("ManufacturerId", manufacturerId);
+        rowMap.put("InitialReleaseYear", 2000);
+        insertCmd.addRow(rowMap);
+        submitAndTestExpectedFailure(insertCmd, "Value '123456789012345678901' for field 'Name' is invalid. Failed Query Layer RegEx");
+
+        //now succeed:
+        insertCmd = new InsertRowsCommand("vehicle", "Models");
+        rowMap = new HashMap<>();
+        rowMap.put("Name", "Model1");
+        rowMap.put("ManufacturerId", manufacturerId);
+        rowMap.put("InitialReleaseYear", 2000);
+        insertCmd.addRow(rowMap);
+        SaveRowsResponse resp = insertCmd.execute(createDefaultConnection(false), getProjectName());
+        Object rowId = resp.getRows().get(0).get("RowId");
+
+        //now try to update it:
+        UpdateRowsCommand updateCmd = new UpdateRowsCommand("vehicle", "Models");
+        rowMap = new HashMap<>();
+        rowMap.put("RowId", rowId);
+        rowMap.put("Name", "123456789012345678901");  //back to failure
+        updateCmd.addRow(rowMap);
+        submitAndTestExpectedFailure(updateCmd, "Value '123456789012345678901' for field 'Name' is invalid. Failed Query Layer RegEx");
+
+        //also fail
+        updateCmd = new UpdateRowsCommand("vehicle", "Models");
+        rowMap = new HashMap<>();
+        rowMap.put("RowId", rowId);
+        rowMap.put("InitialReleaseYear", 5);  //back to failure
+        updateCmd.addRow(rowMap);
+        submitAndTestExpectedFailure(updateCmd, "Value '5' for field 'InitialReleaseYear' is invalid. Failed Schema Layer RegEx");
+
+        //now succeed:
+        updateCmd = new UpdateRowsCommand("vehicle", "Models");
+        rowMap = new HashMap<>();
+        rowMap.put("RowId", rowId);
+        rowMap.put("Name", "Model2");
+        rowMap.put("InitialReleaseYear", 2000);
+        updateCmd.addRow(rowMap);
+        updateCmd.execute(createDefaultConnection(false), getProjectName());
+
+        //clean:
+        DeleteRowsCommand deleteCmd = new DeleteRowsCommand("vehicle", "Models");
+        rowMap = new HashMap<>();
+        rowMap.put("RowId", rowId);
+        deleteCmd.addRow(rowMap);
+        deleteCmd.execute(createDefaultConnection(false), getProjectName());
+
+        deleteCmd = new DeleteRowsCommand("vehicle", "Manufacturers");
+        rowMap = new HashMap<>();
+        rowMap.put("RowId", manufacturerId);
+        deleteCmd.addRow(rowMap);
+        deleteCmd.execute(createDefaultConnection(false), getProjectName());
+    }
+
+    private void submitAndTestExpectedFailure(Command cmd, String expectedError) throws Exception
+    {
+        try
+        {
+            cmd.execute(createDefaultConnection(false), getProjectName());
+
+            throw new Exception("This should have failed");
+        }
+        catch (CommandException e)
+        {
+            Map<String, Object> responseJson = e.getProperties();
+            if (!responseJson.containsKey("errors"))
+            {
+                throw new Exception("Response lacks errors");
+            }
+
+            List<Map<String, Object>> errors = (List<Map<String, Object>>) responseJson.get("errors");
+            String msg = errors.get(0).get("exception").toString();
+            assertEquals("Incorrect exception", expectedError, msg);
+        }
     }
 
     @LogMethod

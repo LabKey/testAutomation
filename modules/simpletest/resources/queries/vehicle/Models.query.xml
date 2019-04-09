@@ -1,0 +1,21 @@
+<query xmlns="http://labkey.org/data/xml/query">
+    <metadata>
+        <tables xmlns="http://labkey.org/data/xml">
+            <table tableName="Models" tableDbType="TABLE">
+                <columns>
+                    <column columnName="Name">
+                        <validators>
+                            <validator>
+                                <name>QueryTableValidator</name>
+                                <typeURI>urn:lsid:labkey.com:PropertyValidator:regex</typeURI>
+                                <!--A very permissive RegEx-->
+                                <expression>^(.){0,20}$</expression>
+                                <errorMessage>Failed Query Layer RegEx</errorMessage>
+                            </validator>
+                        </validators>
+                    </column>
+                </columns>
+            </table>
+        </tables>
+    </metadata>
+</query>
