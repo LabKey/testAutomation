@@ -72,11 +72,6 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
         return "import";
     }
 
-    public void importFolderFromZip(File zipFile)
-    {
-        // TODO
-    }
-
     public void importFromTemplateFolder(String containerPath)
     {
         if (!containerPath.startsWith("/"))
