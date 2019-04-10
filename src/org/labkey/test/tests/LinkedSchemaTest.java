@@ -587,7 +587,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER);
-        apiPermissionsHelper.setUserPermissions(READER_USER, "Reader");//TODO remove this after fix for linked schema permissions issue
         // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
         _containerHelper.enableModule("linkedschematest");
 
