@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -94,29 +95,19 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         addEngine(type, new EngineConfig(null));
     }
 
-    public void addEngine(@LoggedParam EngineType type, EngineConfig config)
-    {
-        Map<Locator, String> configMap = config.getConfigMap();
-        addEngine(type, configMap);
-    }
-
     @LogMethod
-    public void addEngine(@LoggedParam EngineType type, Map<Locator, String> configMap)
+    public void addEngine(@LoggedParam EngineType type, EngineConfig engineConfig)
     {
         String menuText = "New " + type + " Engine";
         _ext4Helper.clickExt4MenuButton(false, Locator.id("btn_addEngine"), false, menuText);
-        WebElement menuItem = Locator.menuItem(menuText).findElementOrNull(getDriver());
+        WebElement menuItem = Locator.menuItem(menuText).findOptionalElement(getDriver()).orElse(null);
         if (menuItem != null)
         {
             mouseOver(menuItem);
             menuItem.click(); // Retry for unresponsive button
         }
-        Window(getDriver()).withTitle(EDIT_WINDOW_TITLE).waitFor();
-
-        for (Map.Entry<Locator, String> entry : configMap.entrySet())
-        {
-            setFormElement(entry.getKey(), entry.getValue());
-        }
+        Window window = Window(getDriver()).withTitle(EDIT_WINDOW_TITLE).waitFor();
+        engineConfig.configureEngine(type,window, this);
 
         String language = getFormElement(Locator.id("editEngine_languageName-inputEl"));
 
@@ -280,6 +271,14 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     public enum EngineType
     {
         PERL,
+        REMOTE_R
+            {
+                @Override
+                public String toString()
+                {
+                    return "Remote R";
+                }
+            },
         R,
         EXTERNAL,
         R_DOCKER
@@ -307,7 +306,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         private String _command;
         private String _outputFileName;
 
-        private Map<Locator, String> configMap;
+        protected Map<Locator, String> configMap;
 
         public EngineConfig(File path)
         {
@@ -328,7 +327,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
             return configMap;
         }
 
-        private void addToConfigMap(Locator field, String value)
+        public void addToConfigMap(Locator field, String value)
         {
             if (value != null)
                 configMap.put(field, value);
@@ -409,6 +408,132 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         {
             _outputFileName = outputFileName;
             return this;
+        }
+
+        public void configureEngine(EngineType type, Window configWindow, WebDriverWrapper wrapper)
+        {
+            if(! type.equals(EngineType.REMOTE_R))
+                configMap = getConfigMap();
+
+            for (Map.Entry<Locator, String> entry : configMap.entrySet())
+            {
+                wrapper.setFormElement(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    public static class RServeEngineConfig extends EngineConfig
+    {
+
+        private String _userName;
+        private String _password;
+        private String _remoteReportsTemp;
+        private String _remoteDate;
+        private String _portNumber;
+        private String _machine;
+
+        public RServeEngineConfig(File path, String userName, String password, String remoteReportsTemp, String remoteDate)
+        {
+            super(path);
+            _userName = userName;
+            _password = password;
+            _remoteReportsTemp = remoteReportsTemp;
+            _remoteDate = remoteDate;
+        }
+
+        public String getUserName()
+        {
+            return _userName;
+        }
+
+        public EngineConfig setUserName(String userName)
+        {
+            _userName = userName;
+            return this;
+        }
+
+        public String getPassword()
+        {
+            return _password;
+        }
+
+        public EngineConfig setPassword(String password)
+        {
+            _password = password;
+            return this;
+        }
+
+        public String getRemoteReportsTemp()
+        {
+            return _remoteReportsTemp;
+        }
+
+        public EngineConfig setRemoteReportsTemp(String remoteReportsTemp)
+        {
+            _remoteReportsTemp = remoteReportsTemp;
+            return this;
+        }
+
+        public String getRemoteDate()
+        {
+            return _remoteDate;
+        }
+
+        public EngineConfig setRemoteDate(String remoteData)
+        {
+            _remoteDate = remoteData;
+            return this;
+        }
+
+        public String getPortNumber()
+        {
+            return _portNumber;
+        }
+
+        public EngineConfig setPortNumber(String portNumber)
+        {
+            _portNumber = portNumber;
+            return this;
+        }
+
+        public String getMachine()
+        {
+            return _machine;
+        }
+
+        public EngineConfig setMachine(String machine)
+        {
+            _machine = machine;
+            return this;
+        }
+
+        public Map<Locator, String> getConfigMapRemoteR()
+        {
+            configMap = new HashMap<>();
+            addToConfigMap(Locator.id("editEngine_name-inputEl"), getName());
+            addToConfigMap(Locator.id("editEngine_languageName-inputEl"), getLanguageName());
+            addToConfigMap(Locator.id("editEngine_extensions-inputEl"), getExtensions());
+            addToConfigMap(Locator.id("editEngine_user-inputEl"), getUserName());
+            addToConfigMap(Locator.id("editEngine_password-inputEl"), getPassword());
+            addToConfigMap(Locator.id("editEngine_port-inputEl"), getPortNumber());
+            addToConfigMap(Locator.id("editEngine_machine-inputEl"), getMachine());
+            addToConfigMap(Locator.id("editEngine_outputFileName-inputEl"), getOutputFileName());
+
+            return configMap;
+        }
+
+        public void configureEngine(EngineType type, Window configWindow, WebDriverWrapper wrapper)
+        {
+            int i = 0;
+            super.configureEngine(type, configWindow, wrapper);
+
+            wrapper.log("Configuring the path mapping");
+            wrapper.click(Locator.tagWithClassContaining("td", "remoteURI").index(i++));
+            Locator.name("remoteURI").findElement(wrapper.getDriver()).sendKeys(_remoteReportsTemp);
+
+            wrapper.click(Locator.tagWithClassContaining("td", "remoteURI").index(i++));
+            Locator.name("remoteURI").findElement(wrapper.getDriver()).sendKeys(_remoteDate);
+
         }
     }
 

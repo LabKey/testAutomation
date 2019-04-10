@@ -78,6 +78,7 @@ public class RReportHelper
 
     private static final String localEngineName = "R Scripting Engine";
     public static final String R_DOCKER_SCRIPTING_ENGINE = "R Docker Scripting Engine";
+    private static final String REMOTE_R_SERVE ="Remote R Scripting Engine";
 
     private static final String INSTALL_RLABKEY = "install.packages(\"Rlabkey\", repos=\"http://cran.r-project.org\")";
     private static final String INSTALL_LOCAL_RLABKEY = "install.packages(\"%s\", repos=NULL)";
@@ -259,6 +260,27 @@ public class RReportHelper
             scripts.setSiteDefault(localEngineName);
         }
         return rVersion;
+    }
+
+    public void configureRemoteRserve(String reports_temp,String data)
+    {
+
+        String username = "rserve";
+        String password = "rserve";
+        ConfigureReportsAndScriptsPage.RServeEngineConfig config = new ConfigureReportsAndScriptsPage.RServeEngineConfig(getRExecutable(),username,password,reports_temp,data);
+        config.setName("Remote R Scripting Engine");
+        config.setLanguage("R");
+        config.setExtensions("R,r");
+        config.setMachine("127.0.0.1");
+        config.setPortNumber("6311");
+        config.getConfigMapRemoteR();
+
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
+        if(!scripts.isEnginePresent(REMOTE_R_SERVE))
+            scripts.addEngine(EngineType.REMOTE_R, config);
+
+        scripts.setSiteDefault(REMOTE_R_SERVE);
+
     }
 
     public void ensureFolderREngine(String engineName)

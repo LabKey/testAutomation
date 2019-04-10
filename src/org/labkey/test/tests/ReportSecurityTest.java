@@ -90,7 +90,7 @@ public class ReportSecurityTest extends ReportTest
         // give the test group read access to only the DEM-1 dataset
         goToProjectHome();
         clickFolder("My Study");
-        enterStudySecurity();
+        _studyHelper.enterStudySecurity();
 
         // enable advanced study security
         doAndWaitForPageToLoad(() -> {
