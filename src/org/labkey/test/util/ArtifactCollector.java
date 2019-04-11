@@ -134,12 +134,12 @@ public class ArtifactCollector
         return baseName + "#" + suffix;
     }
 
-    public void dumpPageSnapshot(String testName, @Nullable String subdir)
+    public void dumpPageSnapshot(String fileSuffix, @Nullable String subdir)
     {
-        dumpPageSnapshot(testName, subdir, true);
+        dumpPageSnapshot(fileSuffix, subdir, true);
     }
 
-    public void dumpPageSnapshot(String testName, @Nullable String subdir, boolean includeFullScreen)
+    public void dumpPageSnapshot(String fileSuffix, @Nullable String subdir, boolean includeFullScreen)
     {
         File dumpDir = ensureDumpDir();
         if (subdir != null && subdir.length() > 0)
@@ -149,7 +149,7 @@ public class ArtifactCollector
                 dumpDir.mkdirs();
         }
 
-        String baseName = screenshotBaseName(testName);
+        String baseName = screenshotBaseName(fileSuffix);
 
         if (includeFullScreen)
             dumpFullScreen(dumpDir, baseName);
