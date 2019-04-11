@@ -264,23 +264,17 @@ public class RReportHelper
 
     public void configureRemoteRserve(String reports_temp,String data)
     {
-
         String username = "rserve";
         String password = "rserve";
-        ConfigureReportsAndScriptsPage.RServeEngineConfig config = new ConfigureReportsAndScriptsPage.RServeEngineConfig(getRExecutable(),username,password,reports_temp,data);
-        config.setName("Remote R Scripting Engine");
-        config.setLanguage("R");
-        config.setExtensions("R,r");
+        ConfigureReportsAndScriptsPage.RServeEngineConfig config = new ConfigureReportsAndScriptsPage.RServeEngineConfig(username,password,reports_temp,data);
         config.setMachine("127.0.0.1");
         config.setPortNumber("6311");
-        config.getConfigMapRemoteR();
 
         ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
         if(!scripts.isEnginePresent(REMOTE_R_SERVE))
             scripts.addEngine(EngineType.REMOTE_R, config);
 
         scripts.setSiteDefault(REMOTE_R_SERVE);
-
     }
 
     public void ensureFolderREngine(String engineName)

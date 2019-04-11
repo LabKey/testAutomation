@@ -92,7 +92,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     @LogMethod
     public void addEngineWithDefaults(@LoggedParam EngineType type)
     {
-        addEngine(type, new EngineConfig(null));
+        addEngine(type, new EngineConfig());
     }
 
     @LogMethod
@@ -306,7 +306,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         private String _command;
         private String _outputFileName;
 
-        protected Map<Locator, String> configMap;
+        public EngineConfig() { }
 
         public EngineConfig(File path)
         {
@@ -315,22 +315,17 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
         public Map<Locator, String> getConfigMap()
         {
-            configMap = new HashMap<>();
-            addToConfigMap(Locator.id("editEngine_name-inputEl"), getName());
-            addToConfigMap(Locator.id("editEngine_languageName-inputEl"), getLanguageName());
-            addToConfigMap(Locator.id("editEngine_languageVersion-inputEl"), getLanguageVersion());
-            addToConfigMap(Locator.id("editEngine_extensions-inputEl"), getExtensions());
-            addToConfigMap(Locator.id("editEngine_exePath-inputEl"), getPath() != null ? getPath().getAbsolutePath() : null);
-            addToConfigMap(Locator.id("editEngine_exeCommand-inputEl"), getCommand());
-            addToConfigMap(Locator.id("editEngine_outputFileName-inputEl"), getOutputFileName());
+            Map<Locator, String> configMap = new HashMap<>();
+            configMap.put(Locator.id("editEngine_name-inputEl"), getName());
+            configMap.put(Locator.id("editEngine_languageName-inputEl"), getLanguageName());
+            configMap.put(Locator.id("editEngine_languageVersion-inputEl"), getLanguageVersion());
+            configMap.put(Locator.id("editEngine_extensions-inputEl"), getExtensions());
+            String value = getPath() != null ? getPath().getAbsolutePath() : null;
+            configMap.put(Locator.id("editEngine_exePath-inputEl"), value);
+            configMap.put(Locator.id("editEngine_exeCommand-inputEl"), getCommand());
+            configMap.put(Locator.id("editEngine_outputFileName-inputEl"), getOutputFileName());
 
             return configMap;
-        }
-
-        public void addToConfigMap(Locator field, String value)
-        {
-            if (value != null)
-                configMap.put(field, value);
         }
 
         public String getName()
@@ -412,19 +407,18 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
         public void configureEngine(EngineType type, Window configWindow, WebDriverWrapper wrapper)
         {
-            if(! type.equals(EngineType.REMOTE_R))
-                configMap = getConfigMap();
-
-            for (Map.Entry<Locator, String> entry : configMap.entrySet())
+            for (Map.Entry<Locator, String> entry : getConfigMap().entrySet())
             {
-                wrapper.setFormElement(entry.getKey(), entry.getValue());
+                if (entry.getValue() != null)
+                {
+                    wrapper.setFormElement(entry.getKey(), entry.getValue());
+                }
             }
         }
     }
 
     public static class RServeEngineConfig extends EngineConfig
     {
-
         private String _userName;
         private String _password;
         private String _remoteReportsTemp;
@@ -432,13 +426,36 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         private String _portNumber;
         private String _machine;
 
-        public RServeEngineConfig(File path, String userName, String password, String remoteReportsTemp, String remoteDate)
+        public RServeEngineConfig(String userName, String password, String remoteReportsTemp, String remoteDate)
         {
-            super(path);
             _userName = userName;
             _password = password;
             _remoteReportsTemp = remoteReportsTemp;
             _remoteDate = remoteDate;
+        }
+
+        @Override
+        public File getPath()
+        {
+            return null;
+        }
+
+        @Override
+        public EngineConfig setPath(File path)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String getCommand()
+        {
+            return null;
+        }
+
+        @Override
+        public EngineConfig setCommand(String command)
+        {
+            throw new UnsupportedOperationException();
         }
 
         public String getUserName()
@@ -507,33 +524,28 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
             return this;
         }
 
-        public Map<Locator, String> getConfigMapRemoteR()
+        public Map<Locator, String> getConfigMap()
         {
-            configMap = new HashMap<>();
-            addToConfigMap(Locator.id("editEngine_name-inputEl"), getName());
-            addToConfigMap(Locator.id("editEngine_languageName-inputEl"), getLanguageName());
-            addToConfigMap(Locator.id("editEngine_extensions-inputEl"), getExtensions());
-            addToConfigMap(Locator.id("editEngine_user-inputEl"), getUserName());
-            addToConfigMap(Locator.id("editEngine_password-inputEl"), getPassword());
-            addToConfigMap(Locator.id("editEngine_port-inputEl"), getPortNumber());
-            addToConfigMap(Locator.id("editEngine_machine-inputEl"), getMachine());
-            addToConfigMap(Locator.id("editEngine_outputFileName-inputEl"), getOutputFileName());
+            Map<Locator, String> configMap = super.getConfigMap();
+
+            configMap.put(Locator.id("editEngine_user-inputEl"), getUserName());
+            configMap.put(Locator.id("editEngine_password-inputEl"), getPassword());
+            configMap.put(Locator.id("editEngine_port-inputEl"), getPortNumber());
+            configMap.put(Locator.id("editEngine_machine-inputEl"), getMachine());
 
             return configMap;
         }
 
         public void configureEngine(EngineType type, Window configWindow, WebDriverWrapper wrapper)
         {
-            int i = 0;
             super.configureEngine(type, configWindow, wrapper);
 
             wrapper.log("Configuring the path mapping");
-            wrapper.click(Locator.tagWithClassContaining("td", "remoteURI").index(i++));
+            wrapper.click(Locator.tagWithClassContaining("td", "remoteURI").index(0));
             Locator.name("remoteURI").findElement(wrapper.getDriver()).sendKeys(_remoteReportsTemp);
 
-            wrapper.click(Locator.tagWithClassContaining("td", "remoteURI").index(i++));
+            wrapper.click(Locator.tagWithClassContaining("td", "remoteURI").index(1));
             Locator.name("remoteURI").findElement(wrapper.getDriver()).sendKeys(_remoteDate);
-
         }
     }
 
