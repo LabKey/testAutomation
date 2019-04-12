@@ -43,6 +43,7 @@ import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
@@ -3025,8 +3026,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setFormElement(Locator l, String text)
     {
-        WebElement el = l.waitForElement(new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT / 1000));
-        setFormElement(el, text);
+        try
+        {
+            WebElement el = l.waitForElement(new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT / 1000));
+            setFormElement(el, text);
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new ListHelper(getDriver()).dumpListMetadataInfo(nse);
+        }
     }
 
     /**

@@ -40,6 +40,17 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         return new EditListDefinitionPage(driver.getDriver());
     }
 
+    public static EditListDefinitionPage beginAt(WebDriverWrapper driver, String listName)
+    {
+        return beginAt(driver, driver.getCurrentContainerPath(), listName);
+    }
+
+    public static EditListDefinitionPage beginAt(WebDriverWrapper driver, String containerPath, String listName)
+    {
+        driver.beginAt(WebTestHelper.buildURL("list", containerPath, "editListDefinition", Maps.of("name", listName)));
+        return new EditListDefinitionPage(driver.getDriver());
+    }
+
     // TODO: List Properties
 
     public PropertiesEditor listFields()

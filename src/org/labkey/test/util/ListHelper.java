@@ -26,11 +26,14 @@ import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -160,11 +163,75 @@ public class ListHelper extends LabKeySiteWrapper
         setRowData(data, validateText);
     }
 
+    @Deprecated // Temporary method for debugging list metadata problems
+    @LogMethod
+    public RuntimeException dumpListMetadataInfo(NoSuchElementException nse)
+    {
+        if (nse.getMessage().contains("quf_"))
+        {
+            Map<String, String> urlParameters = getUrlParameters();
+            String schemaName = urlParameters.get("schemaName");
+            String queryName = urlParameters.get("query.queryName");
+            if (schemaName == null || queryName == null)
+                throw nse;
+
+            String containerPath = getCurrentContainerPath();
+            String subdir = schemaName + " MetadataError";
+            ArtifactCollector artifactCollector = BaseWebDriverTest.getCurrentTest().getArtifactCollector();
+
+            artifactCollector.dumpPageSnapshot("insertPage", subdir, false);
+            if ("lists".equals(schemaName))
+            {
+                try
+                {
+                    WebElement cancelButton = Locator.lkButton("Cancel").findElement(getDriver());
+                    String cancelHref = cancelButton.getAttribute("href");
+                    int listId = Integer.parseInt(WebTestHelper.parseUrlQuery(new URL(cancelHref)).get("listId"));
+
+                    // list-editListDefinition.view?listId=11
+                    EditListDefinitionPage.beginAt(this, containerPath, listId);
+                    waitForElement(Locator.lkButton("Export Fields"));
+                    artifactCollector.dumpPageSnapshot("listDefinitionById", subdir, false);
+                }
+                catch (MalformedURLException | NumberFormatException | NoSuchElementException ignore) { }
+
+                // list-editListDefinition.view?name=People
+                EditListDefinitionPage.beginAt(this, containerPath, queryName);
+                waitForElement(Locator.lkButton("Export Fields"));
+                artifactCollector.dumpPageSnapshot("listDefinitionByName", subdir, false);
+            }
+            // query-begin.view?#sbh-qdp-%26lists%26People
+            beginAt(WebTestHelper.buildURL("query", containerPath, "begin") + "#sbh-qdp-%26" + schemaName + "%26" + queryName);
+            waitForAnyElement(Locator.linkWithText("view data"), Locator.byClass("lk-qd-error"));
+            artifactCollector.dumpPageSnapshot("schemaBrowser", subdir, false);
+
+            // query-metadataQuery.view?schemaName=lists&query.queryName=People
+            beginAt(WebTestHelper.buildURL("query", containerPath, "metadataQuery", Map.of("schemaName", schemaName, "query.queryName", queryName)));
+            waitForElement(Locators.pageSignal("propertiesEditorChange"));
+            artifactCollector.dumpPageSnapshot("metadataEditor", subdir, false);
+
+            // query-rawTableMetaData.view?schemaName=lists&query.queryName=People
+            beginAt(WebTestHelper.buildURL("query", containerPath, "rawTableMetaData", Map.of("schemaName", schemaName, "query.queryName", queryName)));
+            artifactCollector.dumpPageSnapshot("rawMetadata", subdir, false);
+
+            return new RuntimeException("Detected possible metadata problem.", nse);
+        }
+        return nse;
+    }
+
     protected void setRowData(Map<String, ?> data, boolean validateText)
     {
         for (String key : data.keySet())
         {
-            WebElement field = waitForElement(Locator.name("quf_" + key));
+            WebElement field;
+            try
+            {
+                field = waitForElement(Locator.name("quf_" + key));
+            }
+            catch (NoSuchElementException nse)
+            {
+                throw dumpListMetadataInfo(nse);
+            }
             String inputType = field.getAttribute("type");
             Object value = data.get(key);
             if (value instanceof File)
