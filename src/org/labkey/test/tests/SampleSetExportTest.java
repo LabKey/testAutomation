@@ -35,7 +35,7 @@ public class SampleSetExportTest extends AbstractExportTest
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
 
         initTest.beginAt("/" + initTest.getProjectName() + "/experiment-listMaterialSources.view");
-        SampleSetHelper sampleHelper = new SampleSetHelper(initTest, false);
+        SampleSetHelper sampleHelper = new SampleSetHelper(initTest);
         sampleHelper.createSampleSet(SAMPLE_SET_NAME, null, Map.of("Barcode", FieldDefinition.ColumnType.String), SAMPLE_DATA);
     }
 

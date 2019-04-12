@@ -32,7 +32,6 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Checkbox;
-import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -44,7 +43,6 @@ import org.labkey.test.util.ListHelper.LookupInfo;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SampleSetHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.By;
@@ -1092,47 +1090,6 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
         new PortalHelper(this).addWebPart("Search");
         searchFor(getProjectName(), "hypertrophimadeupword", 1, null);
-    }
-
-    @Test
-    public void testLookUpValidatorForSampleSets()
-    {
-        String SAMPLE_SET= "Sample with lookup validator";
-        goToProjectHome();
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Sample Sets");
-
-        if (!Locator.linkContainingText("Fruits from Excel").existsIn(getDriver()))
-        {
-            log("Infer from excel file, then import data");
-            _listHelper.createListFromFile(PROJECT_VERIFY, "Fruits from Excel", EXCEL_DATA_FILE);
-            waitForElement(Locator.linkWithText("pomegranate"));
-            assertNoLabKeyErrors();
-        }
-
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(SAMPLE_SET);
-        List<FieldDefinition> fields = new ArrayList<>();
-        fields.add(new FieldDefinition("Key")
-                .setLabel("Label for lookup column")
-                .setLookup(new FieldDefinition.LookupInfo(null, "lists", "Fruits from Excel"))
-                .setValidator(new ListHelper.LookUpValidator()));
-        sampleHelper.addFields(fields);
-
-       goToProjectHome();
-       clickAndWait(Locator.linkWithText(SAMPLE_SET));
-       DataRegionTable table = new DataRegionTable("Material",getDriver());
-       table.clickInsertNewRow();
-
-       setFormElement(Locator.name("quf_Name"),"1");
-       selectOptionByText(Locator.name("quf_Key"),"apple");
-       clickButton("Submit");
-
-       assertEquals("Single row inserted",1,table.getDataRowCount());
-
-       goToProjectHome();
-       clickAndWait(Locator.linkContainingText("Fruits from Excel"));
-       _listHelper.deleteList();
     }
 
     @Test

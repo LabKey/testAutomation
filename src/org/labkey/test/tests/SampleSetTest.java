@@ -39,6 +39,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -206,8 +207,8 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleSetHelper.verifyDataValues(data);
 
         log("Try to create a sample set with the same name.");
-        click(Locator.linkWithText("Sample Sets"));
-        sampleSetHelper = new SampleSetHelper(this, false);
+        clickAndWait(Locator.linkWithText("Sample Sets"));
+        sampleSetHelper = new SampleSetHelper(this);
         sampleSetHelper.createSampleSet(sampleSetName, null);
         assertTextPresent("A sample set with that name already exists.");
 
@@ -281,7 +282,7 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleHelper.createSampleSet(sampleSetName, null, Map.of("StringValue", FieldDefinition.ColumnType.String));
 
         log("Go to the sample set and add some data");
-        click(Locator.linkWithText(sampleSetName));
+        clickAndWait(Locator.linkWithText(sampleSetName));
         DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents")
                 .clickInsertNewRow();
         setFormElement(Locator.name("quf_Name"), "Name1");
@@ -291,7 +292,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Try to import overlapping data with TSV");
 
         DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
-        drt.clickHeaderMenu("Insert data", SampleSetHelper.BULK_IMPORT_MENU_TEXT);
+        drt.clickImportBulkData();
         String header = "Name\t" + fieldNames.get(0) + "\n";
         String overlap =  "Name1\tToBee\n";
         String newData = "Name2\tSee\n";
@@ -317,7 +318,7 @@ public class SampleSetTest extends BaseWebDriverTest
         assertEquals(fieldNames.get(0) + " for sample 'Name2' not as expected", "See", rowData.get(fieldNames.get(0)));
 
         log("Try to import overlapping data from file");
-        drt.clickHeaderMenu("Insert data", SampleSetHelper.BULK_IMPORT_MENU_TEXT);
+        drt.clickImportBulkData();
         click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleSet.xls").getAbsolutePath());
         clickButton("Submit", "duplicate key");
@@ -936,7 +937,7 @@ public class SampleSetTest extends BaseWebDriverTest
         final String UI_STATIC_FIELD_TEXT = "This sample was added from the UI.";
 
         DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
-        drt.clickHeaderMenu("Insert data", SampleSetHelper.INSERT_NEW_ROW_MENU_TEXT);
+        drt.clickInsertNewRow();
 
         Locator sampleNameElement = Locator.name("quf_Name");
         Locator sampleStaticFieldElement = Locator.name("quf_" + REQUIRED_FIELD_NAME);
@@ -1003,7 +1004,7 @@ public class SampleSetTest extends BaseWebDriverTest
         final String UI_MISSING_REQ_SAMPLE_NAME = "mv10";
         final String UI_MISSING_FIELD_TEXT = "This should generate an error.";
         drt = sampleHelper.getSamplesDataRegionTable();
-        drt.clickHeaderMenu("Insert data", SampleSetHelper.INSERT_NEW_ROW_MENU_TEXT);
+        drt.clickInsertNewRow();
         waitForElementToBeVisible(sampleNameElement);
 
         setFormElement(sampleNameElement, UI_MISSING_REQ_SAMPLE_NAME);
@@ -1241,7 +1242,6 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Create a grandparent sample set");
         clickTab("Experiment");
         clickAndWait(Locator.linkWithText("Sample Sets"));
-        sampleHelper.setInWebPart(false);
 
         sampleHelper.createSampleSet(FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME, null,
                 Map.of("OtherProp", FieldDefinition.ColumnType.Double),
@@ -1341,6 +1341,52 @@ public class SampleSetTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_SET));
         assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLE_SET));
+    }
+
+    @Test
+    public void testLookUpValidatorForSampleSets()
+    {
+        final String SAMPLE_SET= "Sample with lookup validator";
+        final String listName = "Fruits from Excel";
+
+        log("Infer from excel file, then import data");
+        _listHelper.createListFromFile(getProjectName(), listName, TestFileUtils.getSampleData("dataLoading/excel/fruits.xls"));
+        waitForElement(Locator.linkWithText("pomegranate"));
+        assertNoLabKeyErrors();
+        int listRowCount = new DataRegionTable.DataRegionFinder(getDriver()).withName("query")
+                .find()
+                .getDataRowCount();
+
+        goToProjectHome();
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(SAMPLE_SET);
+        List<FieldDefinition> fields = new ArrayList<>();
+        final String lookupColumnLabel = "Label for lookup column";
+        fields.add(new FieldDefinition("Key")
+                .setLabel(lookupColumnLabel)
+                .setLookup(new FieldDefinition.LookupInfo(null, "lists", listName))
+                .setValidator(new ListHelper.LookUpValidator()));
+        sampleHelper.addFields(fields);
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(SAMPLE_SET));
+        DataRegionTable table = sampleHelper.getSamplesDataRegionTable();
+        table.clickInsertNewRow();
+
+        setFormElement(Locator.name("quf_Name"),"1");
+        selectOptionByText(Locator.name("quf_Key"),"apple");
+        clickButton("Submit");
+
+        assertEquals("Single row inserted",1, table.getDataRowCount());
+        assertElementPresent(Locator.linkWithText("apple"));
+
+        String missingPk = String.valueOf(listRowCount + 1);
+        String tsvString =
+                "Name\tKey\n" +
+                "2\t" + missingPk;
+        table.clickImportBulkData();
+        setFormElement(Locator.id("tsv3"), tsvString);
+        _listHelper.submitImportTsv_error("Value '" + missingPk + "' was not present in lookup target 'lists." + listName + "' for field '" + lookupColumnLabel + "'");
     }
 
     @Test
