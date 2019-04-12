@@ -42,6 +42,7 @@ public class UpdatePage extends BaseUpdatePage<BaseUpdatePage.ElementCache>
     @Override
     public DetailsPage save()
     {
+        scrollIntoView(elementCache().saveButton); // Avoid intermittent failure with button at edge of screen
         clickAndWait(elementCache().saveButton);
         return new DetailsPage(getDriver());
     }
