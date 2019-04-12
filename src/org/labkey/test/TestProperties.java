@@ -269,6 +269,8 @@ public abstract class TestProperties
                 throw new RuntimeException("Couldn't determine directory for placement of output files. " +
                         "Tried system properties failure.output.dir and java.io.tmpdir");
             }
+
+            TestLogger.log("Using " + dumpDir + " to store test output");
         }
         return dumpDir;
     }
