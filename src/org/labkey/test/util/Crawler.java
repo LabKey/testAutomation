@@ -1202,7 +1202,11 @@ public class Crawler
 
     private static void checkForServerError(BaseWebDriverTest test)
     {
-        test.assertElementNotPresent(Locator.css("table.server-error"));
+        int responseCode = test.getResponseCode();
+        if (responseCode == 200 || responseCode >= 500)
+        {
+            test.assertElementNotPresent(Locator.css("table.server-error"));
+        }
     }
 
     private void testInjection(URL start)
