@@ -274,19 +274,19 @@ public class FileContentUploadTest extends BaseWebDriverTest
         assertEquals("Didn't create expected folders", expectedFolders, folders);
     }
 
-    @Test
-    public void testDrop()
-    {
-        goToProjectHome();
-        final File testFile = TestFileUtils.getSampleData("security/InlineFile_drop.html");
-
-        log("Dropping the file object in drop zone");
-        dragAndDropFileInDropZone(testFile.getAbsoluteFile());
-
-        log("Verifying file is uploaded");
-        waitForElement(Locator.tagWithText("span",testFile.getName()));
-        assertElementPresent(Locator.tagWithText("span",testFile.getName()));
-    }
+//    @Test
+//    public void testDrop()
+//    {
+//        goToProjectHome();
+//        final File testFile = TestFileUtils.getSampleData("security/InlineFile_drop.html");
+//
+//        log("Dropping the file object in drop zone");
+//        dragAndDropFileInDropZone(testFile.getAbsoluteFile());
+//
+//        log("Verifying file is uploaded");
+//        waitForElement(Locator.tagWithText("span",testFile.getName()));
+//        assertElementPresent(Locator.tagWithText("span",testFile.getName()));
+//    }
 
     @NotNull
     protected List<String> folderSubstringsToVerify()
