@@ -55,7 +55,7 @@ import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -1141,15 +1141,20 @@ public class Crawler
     public static final String injectString = "-->\">'>'\"</script><script>" + maliciousScript + ";</script>";
     public static final String injectString2 = "-->\">'>'\"</script><img src=\"xss\" onerror=\"" + maliciousScript + ">";
 
-    public static <F, T> T tryInject(BaseWebDriverTest test, Function<F, T> f, F arg)
+    public static void tryInject(BaseWebDriverTest test, Runnable r)
+    {
+        tryInject(test, arg -> r.run(), null);
+    }
+
+    public static <F> void tryInject(BaseWebDriverTest test, Consumer<F> f, F arg)
     {
         try
         {
-            T result = f.apply(arg);
+            f.accept(arg);
 
             checkForSqlInjection(test);
 
-            return result;
+            checkForServerError(test); // Don't wait for post-test error check to catch these
         }
         catch (UnhandledAlertException ex)
         {
@@ -1195,6 +1200,11 @@ public class Crawler
         }
     }
 
+    private static void checkForServerError(BaseWebDriverTest test)
+    {
+        test.assertElementNotPresent(Locator.css("table.server-error"));
+    }
+
     private void testInjection(URL start)
     {
         String base = stripQueryParams(stripHash(start.toString()));
@@ -1206,10 +1216,9 @@ public class Crawler
         if (query.startsWith("?"))
             query = query.substring(1);
 
-        Function<String, Void> urlTester = urlMalicious -> {
+        Consumer<String> urlTester = urlMalicious -> {
             _test.beginAt(urlMalicious);
             _test.executeScript("return;"); // Trigger UnhandledAlertException
-            return null;
         };
 
         List<Map.Entry<String,String>> params = Collections.unmodifiableList(queryStringToEntries(query));

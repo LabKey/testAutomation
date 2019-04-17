@@ -29,7 +29,6 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.SummaryStatisticsHelper;
 
 import java.util.List;
-import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -143,17 +142,11 @@ public class CustomizeViewTest extends BaseWebDriverTest
         // TODO: pin, unpin, move columns/filters/sort, remove single filter clause
 
         log("** Test HTML/JavaScript escaping");
-        Crawler.tryInject(this, new Function<Void, Void>()
-        {
-            @Override
-            public Void apply(Void v)
-            {
-                _customizeViewsHelper.openCustomizeViewPanel();
-                _customizeViewsHelper.saveCustomView("BAD" + Crawler.injectString);
-                assertTextBefore("Billson", "Johnson");
-                return null;
-            }
-        }, null);
+        Crawler.tryInject(this, () -> {
+            _customizeViewsHelper.openCustomizeViewPanel();
+            _customizeViewsHelper.saveCustomView("BAD" + Crawler.injectString);
+            assertTextBefore("Billson", "Johnson");
+        });
     }
 
     @Test
