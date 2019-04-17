@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -60,8 +59,7 @@ public class UserNotificationsPanel extends WebDriverComponent<UserNotifications
 
     public static UserNotificationsPanel clickInbox(BaseWebDriverTest test)
     {
-        test.click(inboxIcon);
-        test.waitForElement(Locators.pageSignal("notificationPanelShown"), 2000);
+        test.doAndWaitForPageSignal(() -> test.click(inboxIcon), "notificationPanelShown");
         UserNotificationsPanel userNotificationsPanel = new UserNotificationsPanel(test.getDriver());
         test.shortWait().until(LabKeyExpectedConditions.animationIsDone(userNotificationsPanel.getComponentElement()));
         return userNotificationsPanel;

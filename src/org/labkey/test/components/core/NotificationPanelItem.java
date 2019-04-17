@@ -17,11 +17,11 @@ package org.labkey.test.components.core;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.Arrays;
-
+import static org.junit.Assert.fail;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class NotificationPanelItem extends Component
@@ -75,18 +75,40 @@ public class NotificationPanelItem extends Component
     public void markAsRead()
     {
         final int initialCount = _panel.getNotificationCount();
+        final String notificationId = _el.getAttribute("id");
         _markAsRead.click();
-        waitFor(() -> ExpectedConditions.invisibilityOfAllElements(Arrays.asList(_el)).apply(null)
+        try
+        {
+            waitFor(() -> ExpectedConditions.invisibilityOf(_el).apply(null)
                 && _panel.getNotificationCount() == initialCount - 1,
-                "Notification did not go away when marked as read: " + _el.getAttribute("id"), 2000);
+                "Notification did not go away when marked as read: " + notificationId, 2000);
+
+            if (!_panel.isNotificationPanelVisible())
+                fail("Notification panel closed unexectedly when marking a notificaiton as read");
+        }
+        catch (StaleElementReferenceException stale)
+        {
+            fail("Unexpected navigation when marking a notificaiton as read");
+        }
     }
 
     public void toggleExpand()
     {
         boolean initiallyExpanded = isExpanded();
+        final String notificationId = _el.getAttribute("id");
         Locator.css(" div.labkey-notification-toggle").findElement(this).click();
-        waitFor(() -> isExpanded() != initiallyExpanded,
-                "Notification did not toggle expansion: " + _el.getAttribute("id"), 2000);
+        try
+        {
+            waitFor(() -> isExpanded() != initiallyExpanded,
+                    "Notification did not toggle expansion: " + notificationId, 2000);
+
+            if (!_panel.isNotificationPanelVisible())
+                fail("Notification panel closed unexectedly when toggling a notification");
+        }
+        catch (StaleElementReferenceException stale)
+        {
+            fail("Unexpected navigation when  toggling a notification");
+        }
     }
 
     private boolean isExpanded()
