@@ -1205,7 +1205,11 @@ public class Crawler
         int responseCode = test.getResponseCode();
         if (responseCode == 200 || responseCode >= 500)
         {
-            test.assertElementNotPresent(Locator.css("table.server-error"));
+            if (test.isElementPresent(Locator.css("table.server-error")))
+            {
+                String url = test.getCurrentRelativeURL();
+                fail("Crawler: Server error detected\n" + url);
+            }
         }
     }
 
