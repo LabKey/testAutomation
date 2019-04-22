@@ -67,6 +67,7 @@ public class SchemaHelper
         {
             _test.shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='schemaTemplate']")));
             _test._ext4Helper.selectComboBoxItem("Schema Template:?", schemaTemplate);
+            _test._ext4Helper.waitForMaskToDisappear(WebDriverWrapper.WAIT_FOR_PAGE);
         }
 
         if (sourceSchemaName != null)
@@ -122,7 +123,7 @@ public class SchemaHelper
 
         if (create)
         {
-            _test.waitForText("published"); // added as a part of Issue 37078
+            _test.waitForText("will be published"); // added as a part of Issue 37078
             _test.clickButton("Create");
         }
         else
