@@ -117,6 +117,11 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPa
         clickMenuItem("Permissions");
     }
 
+    public BootstrapMenu getWebParMenu()
+    {
+        return new BootstrapMenu(getDriver(), elementCache().UX_MENU);
+    }
+
     public void clickMenuItem(String... items)
     {
         clickMenuItem(true, items);
