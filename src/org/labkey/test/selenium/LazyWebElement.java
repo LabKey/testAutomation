@@ -21,7 +21,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 /**
  * WebElement wrapper that waits for an attempt to interact with the WebElement before actually finding it
@@ -50,7 +50,7 @@ public class LazyWebElement<T extends LazyWebElement> extends WebElementWrapper
         if (_waitMs != null && _waitMs > 0)
         {
             FluentWait<SearchContext> wait = new FluentWait<>(getSearchContext());
-            wait.withTimeout(_waitMs, TimeUnit.MILLISECONDS);
+            wait.withTimeout(Duration.ofMillis(_waitMs));
             return getLocator().waitForElement(wait);
         }
         else
