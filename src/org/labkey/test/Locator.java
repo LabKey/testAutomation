@@ -717,6 +717,11 @@ public abstract class Locator extends By
         return tag("input").withAttribute("type", "text").withAttributeContaining("name", partialName);
     }
 
+    public static XPathLocator inputByIdContaining(String partialName)
+    {
+        return tag("input").withAttribute("type", "text").withAttributeContaining("id", partialName);
+    }
+
     public static XPathLocator inputById(String id)
     {
         return tagWithId("input", id);
