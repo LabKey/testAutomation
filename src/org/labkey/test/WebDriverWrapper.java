@@ -3263,6 +3263,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         //Locator to the drop zone
         WebElement element = Locator.tagWithClassContaining("div","dropzone").findElement(getDriver());
         WebElement input = (WebElement)executeScript(JS_DROP_FILES,element,offsetX,offsetY);
+        log("Web element returned " + input);
 
         //setting the input
         input.sendKeys(fileName.getAbsolutePath());
