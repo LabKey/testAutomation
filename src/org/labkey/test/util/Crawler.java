@@ -206,6 +206,7 @@ public class Crawler
             new ControllerActionId("query", "exportExcelTemplate"), // Download action
             new ControllerActionId("query", "exportRowsExcel"),
             new ControllerActionId("query", "excelWebQueryDefinition"),
+            new ControllerActionId("reports", "crosstabExport"), // Download action
             new ControllerActionId("reports", "downloadInputData"),
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("reports", "download"),
