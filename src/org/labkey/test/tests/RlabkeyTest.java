@@ -18,6 +18,8 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.reports.SaveCategoriesCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -56,6 +58,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     private static final String ISSUE_TITLE_2 = "Rlabkey: Issue in another project";
     private static final String USER = "rlabkey_user@rlabkey.test";
     private static final String ISSUE_LIST_NAME = "rlabkeyissues";
+    private static final File testData = TestFileUtils.getSampleData("api/rlabkey-api.xml");
 
     @BeforeClass
     public static void setupProject()
@@ -138,7 +141,6 @@ public class RlabkeyTest extends BaseWebDriverTest
         // need to setup some view categories first
         createCategoriesViaApi();
 
-        File testData = new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/rlabkey-api.xml");
         if (testData.exists())
         {
             // cheating here, to use the api test framework to store rlabkey tests
@@ -211,10 +213,10 @@ public class RlabkeyTest extends BaseWebDriverTest
 
     private void createCategoriesViaApi() throws Exception
     {
-        File testFile = new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/rlabkey-category-api.xml");
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        SaveCategoriesCommand command = new SaveCategoriesCommand();
+        command.setCategories("Control Group A", "Control Group B");
 
-        APITestHelper apiTester = new APITestHelper(this);
-        apiTester.setTestFiles(testFile);
-        apiTester.runApiTests();
+        command.execute(connection, getProjectName());
     }
 }

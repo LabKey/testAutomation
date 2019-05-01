@@ -23,6 +23,7 @@ import org.labkey.remoteapi.PostCommand;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SaveCategoriesCommand extends PostCommand<CommandResponse>
 {
@@ -35,6 +36,11 @@ public class SaveCategoriesCommand extends PostCommand<CommandResponse>
     public void setCategories(Category... categories)
     {
         _categories = Arrays.asList(categories);
+    }
+
+    public void setCategories(String... categoryLabels)
+    {
+        _categories = Arrays.stream(categoryLabels).map(label -> new Category(label)).collect(Collectors.toList());
     }
 
     @Override
