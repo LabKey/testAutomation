@@ -73,7 +73,6 @@ public abstract class TestFileUtils
 {
     private static File _labkeyRoot = null;
     private static File _buildDir = null;
-    public static final File DEFAULT_SAMPLEDATA_DIR = new File(getLabKeyRoot(), "sampledata");
 
     public static String getFileContents(String rootRelativePath)
     {
@@ -186,7 +185,8 @@ public abstract class TestFileUtils
         }
         else
         {
-            sampledataDirs.add(DEFAULT_SAMPLEDATA_DIR.toString());
+            sampledataDirs.add(new File(getLabKeyRoot(), "sampledata").toString());
+            sampledataDirs.add(new File(getLabKeyRoot(), "server/test/data").toString());
         }
 
         File foundFile = null;
