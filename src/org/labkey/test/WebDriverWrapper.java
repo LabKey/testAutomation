@@ -589,11 +589,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 "        for (i = 0; i < forms.length ; i++) {\n" +
                 "          var action = forms[i].getAttribute('action');\n" +   // raw attribute value
                 "          if (action === 'begin' || action === '#') continue;\n" +
+                "          if ((action === '' || action == undefined) && LABKEY.ActionURL.getAction() === 'begin') continue;" +
                 "          action = forms[i].action || window.location.href;\n" +
                 "          if (typeof action !== 'string') continue;\n" +
                 "          if (action.indexOf('?')==-1) action += '?';\n" +
+                "          var and = '';\n" +
                 "          for (j=0 ; j<forms[i].elements.length ; j++) {\n" +
-                "             if (forms[i].elements[j].name && forms[i].elements[j].name!='X-LABKEY-CSRF') action += '&' + forms[i].elements[j].name + '=' + (forms[i].elements[j].value||'');\n" +
+                "            if (forms[i].elements[j].name && forms[i].elements[j].name!='X-LABKEY-CSRF') {\n" +
+                "              action += and + forms[i].elements[j].name + '=' + (forms[i].elements[j].value || '');\n" +
+                "              and = '&';\n" +
+                "            }\n" +
                 "          }\n" +
                 "          addresses.push(action);\n" +
                 "        }\n"
