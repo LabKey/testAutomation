@@ -945,6 +945,7 @@ src/org/labkey/test/util/Maps.java -text
 src/org/labkey/test/util/MetadataEditorHelper.java -text
 src/org/labkey/test/util/NonWindowsTest.java -text
 src/org/labkey/test/util/OlapHelper.java -text
+src/org/labkey/test/util/PageFactory.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PerlHelper.java -text
 src/org/labkey/test/util/PermissionsHelper.java -text

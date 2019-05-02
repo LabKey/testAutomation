@@ -16,10 +16,11 @@
 package org.labkey.test.pages.query;
 
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PageFactory;
+import org.labkey.test.util.RelativeUrl;
 import org.openqa.selenium.WebDriver;
 
 public class ExecuteQueryPage extends LabKeyPage<ExecuteQueryPage.ElementCache>
@@ -36,8 +37,14 @@ public class ExecuteQueryPage extends LabKeyPage<ExecuteQueryPage.ElementCache>
 
     public static ExecuteQueryPage beginAt(WebDriverWrapper driver, String containerPath, String schemaName, String queryName)
     {
-        driver.beginAt(WebTestHelper.buildURL("query", containerPath, "executeQuery", Maps.of("schemaName", schemaName, "query.queryName", queryName)));
-        return new ExecuteQueryPage(driver.getDriver());
+        return getPageFactory(schemaName, queryName).setContainerPath(containerPath).navigate(driver);
+    }
+
+    public static PageFactory<ExecuteQueryPage> getPageFactory(String schemaName, String queryName)
+    {
+        return new RelativeUrl("query", "executeQuery")
+                .addParameters(Maps.of("schemaName", schemaName, "query.queryName", queryName))
+                .getPageFactory(wd -> new ExecuteQueryPage(wd));
     }
 
     public DataRegionTable getDataRegion()

@@ -34,6 +34,7 @@ import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.pages.user.ShowUsersPage;
@@ -1032,20 +1033,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    public void navigateToQuery(String schemaName, String queryName)
+    public ExecuteQueryPage navigateToQuery(String schemaName, String queryName)
     {
-        navigateToQuery(schemaName, queryName, null);
+        return navigateToQuery(schemaName, queryName, null);
     }
 
-    public void navigateToQuery(String schemaName, String queryName, Integer msTimeout)
+    public ExecuteQueryPage navigateToQuery(String schemaName, String queryName, Integer msTimeout)
     {
-        RelativeUrl queryURL = new RelativeUrl("query", "executequery");
-        queryURL.setContainerPath(getCurrentContainerPath());
-        queryURL.addParameter("schemaName", schemaName);
-        queryURL.addParameter("query.queryName", queryName);
-        queryURL.setTimeout(msTimeout);
-
-        queryURL.navigate(this);
+        return ExecuteQueryPage.getPageFactory(schemaName, queryName).navigate(this, msTimeout);
     }
 
     public void navigateToMetadataQuery(String schemaName, String queryName)

@@ -17,24 +17,42 @@ package org.labkey.test.util;
 
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.LabKeyPage;
+import org.openqa.selenium.WebDriver;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class RelativeUrl
 {
-    private String _controller;
-    private String _containerPath;
-    private String _action;
-    private Map<String, String> _parameters;
+    private final String _controller;
+    private String _containerPath = null;
+    private final String _action;
+    private final Map<String, String> _parameters;
     private Integer _msTimeout;
 
     public RelativeUrl(String controller, String action)
     {
-        setController(controller);
-        setAction(action);
-        setContainerPath(null);
+        _controller = controller;
+        if (action.endsWith("Action"))
+            action = action.substring(0, action.indexOf("Action"));
+        _action = action;
         _parameters = new HashMap<>();
+    }
+
+    private RelativeUrl(RelativeUrl copy)
+    {
+        _controller = copy._controller;
+        _containerPath = copy._containerPath;
+        _action = copy._action;
+        _parameters = new HashMap<>(copy._parameters);
+        _msTimeout = copy._msTimeout;
+    }
+
+    public RelativeUrl copy()
+    {
+        return new RelativeUrl(this);
     }
 
     public String toString()
@@ -42,14 +60,22 @@ public class RelativeUrl
         return WebTestHelper.buildRelativeUrl(_controller, _containerPath, _action, _parameters);
     }
 
-    public void addParameter(String param)
+    public RelativeUrl addParameter(String param)
     {
         addParameter(param, null);
+        return this;
     }
 
-    public void addParameter(String param, String value)
+    public RelativeUrl addParameters(Map<String, String> params)
+    {
+        _parameters.putAll(params);
+        return this;
+    }
+
+    public RelativeUrl addParameter(String param, String value)
     {
         _parameters.put(param, value);
+        return this;
     }
 
     public void navigate(WebDriverWrapper test)
@@ -60,26 +86,25 @@ public class RelativeUrl
             test.beginAt(toString(), _msTimeout);
     }
 
-    public void setController(String controller)
-    {
-        _controller = controller;
-    }
-
-    public void setContainerPath(String containerPath)
+    public RelativeUrl setContainerPath(String containerPath)
     {
         _containerPath = containerPath;
+        return this;
     }
 
-    public void setAction(String action)
+    public String getContainerPath()
     {
-        if (action.endsWith("Action"))
-            action = action.substring(0, action.indexOf("Action"));
-
-        _action = action;
+        return _containerPath;
     }
 
-    public void setTimeout(Integer msTimeout)
+    public RelativeUrl setTimeout(Integer msTimeout)
     {
         _msTimeout = msTimeout;
+        return this;
+    }
+
+    public <P extends LabKeyPage> PageFactory<P> getPageFactory(Function<WebDriver, P> pageConstructor)
+    {
+        return new PageFactory<>(this, pageConstructor);
     }
 }
