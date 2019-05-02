@@ -16,12 +16,12 @@
 package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.reports.SaveCategoriesCommand;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -29,9 +29,10 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestLogger;
@@ -40,7 +41,6 @@ import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @Category({DailyB.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
@@ -58,7 +58,13 @@ public class RlabkeyTest extends BaseWebDriverTest
     private static final String ISSUE_TITLE_2 = "Rlabkey: Issue in another project";
     private static final String USER = "rlabkey_user@rlabkey.test";
     private static final String ISSUE_LIST_NAME = "rlabkeyissues";
-    private static final File testData = TestFileUtils.getSampleData("api/rlabkey-api.xml");
+    private static final File RLABKEY_API = TestFileUtils.getSampleData("api/rlabkey-api.xml");
+    private static final File RLABKEY_API_EXPERIMENT = TestFileUtils.getSampleData("api/rlabkey-api-experiment.xml");
+    private static final File RLABKEY_API_ISSUES = TestFileUtils.getSampleData("api/rlabkey-api-issues.xml");
+    private static final File RLABKEY_API_LIST = TestFileUtils.getSampleData("api/rlabkey-api-list.xml");
+    private static final File RLABKEY_API_QUERY = TestFileUtils.getSampleData("api/rlabkey-api-query.xml");
+    private static final File RLABKEY_API_STUDY = TestFileUtils.getSampleData("api/rlabkey-api-study.xml");
+    private static final File RLABKEY_API_WEBDAV = TestFileUtils.getSampleData("api/rlabkey-api-webdav.xml");
 
     @BeforeClass
     public static void setupProject()
@@ -71,36 +77,28 @@ public class RlabkeyTest extends BaseWebDriverTest
     {
         _rReportHelper.ensureRConfig();
 
-        _userHelper.createUser(USER);
-        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-        log("Create Projects");
-        _containerHelper.createProject(PROJECT_NAME_2, null);
-        apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME_2, "Users");
-        apiPermissionsHelper.setPermissions("Users", "Editor");
         _containerHelper.createProject(PROJECT_NAME, "Study");
         CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
         createStudyPage.setLabel("Rlabkey Study")
                 .setTimepointType(StudyHelper.TimepointType.VISIT)
                 .createStudy();
 
+        _containerHelper.createProject(PROJECT_NAME_2, null);
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
+        new ApiPermissionsHelper(this).checkInheritedPermissions();
+    }
+
+    // create an issues list in projects and subfolder to test ContainerFilters.
+    @LogMethod
+    private void setupIssues()
+    {
+        log("Create user to assign issues to");
+        _userHelper.createUser(USER);
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME_2, "Users");
+        apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, PROJECT_NAME_2);
         apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME, "Users");
-        apiPermissionsHelper.setPermissions("Users", "Editor");
-
-        log("Import Lists");
-        File listArchive = new File(_rReportHelper.getRLibraryPath(), "/listArchive.zip");
-
-        if (!listArchive.exists())
-            fail("Unable to locate the list archive: " + listArchive.getName());
-
-        goToProjectHome();
-        _listHelper.importListArchive(listArchive);
-        // create an issues list in a project and subfolder to test ContainerFilters.
-
-        goToModule("FileContent");
-        // Dummy files for saveBatch API test
-        _fileBrowserHelper.createFolder("data.tsv");
-        _fileBrowserHelper.createFolder("result.txt");
-
+        apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, PROJECT_NAME);
         IssuesHelper issuesHelper = new IssuesHelper(this);
 
         // create an site wide issues list
@@ -111,9 +109,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
         issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_0));
 
-        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
-        apiPermissionsHelper.checkInheritedPermissions();
-
+        clickFolder(FOLDER_NAME);
         createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
         issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_1));
 
@@ -138,47 +134,94 @@ public class RlabkeyTest extends BaseWebDriverTest
     @Test
     public void testRlabkey() throws Exception
     {
-        // need to setup some view categories first
+        doRLabkeyTest(RLABKEY_API);
+    }
+
+    @Test
+    public void testRlabkeyExperimentApi() throws Exception
+    {
+        goToProjectHome();
+        goToModule("FileContent");
+        // Dummy files for saveBatch API test
+        _fileBrowserHelper.createFolder("data.tsv");
+        _fileBrowserHelper.createFolder("result.txt");
+
+        doRLabkeyTest(RLABKEY_API_EXPERIMENT);
+    }
+
+    @Test
+    public void testRlabkeyIssuesApi() throws Exception
+    {
+        doRLabkeyTest(RLABKEY_API_ISSUES);
+    }
+
+    @Test
+    public void testRlabkeyListApi() throws Exception
+    {
+        doRLabkeyTest(RLABKEY_API_LIST);
+    }
+
+    @Test
+    public void testRlabkeyQueryApi() throws Exception
+    {
+        log("Import Lists");
+        File listArchive = new File(_rReportHelper.getRLibraryPath(), "/listArchive.zip");
+        goToProjectHome();
+        _listHelper.importListArchive(listArchive);
+
+        setupIssues();
+        doRLabkeyTest(RLABKEY_API_QUERY);
+    }
+
+    @Test
+    public void testRlabkeyStudyApi() throws Exception
+    {
         createCategoriesViaApi();
 
-        if (testData.exists())
+        doRLabkeyTest(RLABKEY_API_STUDY);
+    }
+
+    @Test @Ignore ("Coming in 2.2.6")
+    public void testRlabkeyWebDavApi() throws Exception
+    {
+        doRLabkeyTest(RLABKEY_API_WEBDAV);
+    }
+
+    private void doRLabkeyTest(File testData) throws Exception
+    {
+        // cheating here, to use the api test framework to store rlabkey tests
+        List<APITestHelper.ApiTestCase> tests = APITestHelper.parseTests(testData);
+
+        if (!tests.isEmpty())
         {
-            // cheating here, to use the api test framework to store rlabkey tests
-            List<APITestHelper.ApiTestCase> tests = APITestHelper.parseTests(testData);
+            clickProject(getProjectName());
+            goToManageViews().clickAddReport("R Report");
 
-            if (!tests.isEmpty())
+            // we want to load the Rlabkey package from the override location
+            File libPath = _rReportHelper.getRLibraryPath();
+            String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
+
+            for (APITestHelper.ApiTestCase test : tests)
             {
-                clickProject(getProjectName());
-                waitAndClickAndWait(Locator.linkWithText(LIST_NAME));
-                DataRegionTable table = new DataRegionTable("query", getDriver());
-                table.goToReport("Create R Report");
+                StringBuilder sb = new StringBuilder(pathCmd);
 
-                // we want to load the Rlabkey package from the override location
-                File libPath = _rReportHelper.getRLibraryPath();
-                String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
+                sb.append('\n');
+                String testScript = test.getUrl().trim()
+                        .replaceAll("%baseUrl%", WebTestHelper.getBaseURL())
+                        .replaceAll("%projectName%", getProjectName());
+                if (WebTestHelper.getBaseURL().startsWith("https")) // Allow self-signed certificate
+                    testScript = testScript.replace("library(Rlabkey)", "library(Rlabkey)\nlabkey.acceptSelfSignedCerts()");
+                sb.append(testScript);
+                String verify = test.getResponse().trim().replaceAll("%projectName%", getProjectName());
 
-                for (APITestHelper.ApiTestCase test : tests)
-                {
-                    StringBuilder sb = new StringBuilder(pathCmd);
-
-                    sb.append('\n');
-                    String testScript = test.getUrl().trim()
-                            .replaceAll("%baseUrl%", WebTestHelper.getBaseURL())
-                            .replaceAll("%projectName%", getProjectName());
-                    if (WebTestHelper.getBaseURL().startsWith("https")) // Allow self-signed certificate
-                        testScript = testScript.replace("library(Rlabkey)", "library(Rlabkey)\nlabkey.acceptSelfSignedCerts()");
-                    sb.append(testScript);
-                    String verify = test.getResponse().trim().replaceAll("%projectName%", getProjectName());
-
-                    log("execute test: " + test.getName());
-                    TestLogger.increaseIndent();
-                    final boolean success = _rReportHelper.executeScript(sb.toString(), verify);
-                    TestLogger.decreaseIndent();
-                    assertTrue("Failed executing R script for test case: " + test.getName(), success);
-                }
-                _rReportHelper.clickSourceTab();
-                _rReportHelper.saveReport("dummy");
+                log("execute test: " + test.getName());
+                TestLogger.increaseIndent();
+                final boolean success = _rReportHelper.executeScript(sb.toString(), verify);
+                TestLogger.decreaseIndent();
+                assertTrue("Failed executing R script for test case: " + test.getName(), success);
             }
+            _rReportHelper.clickSourceTab();
+            clickButton("Cancel");
         }
     }
 

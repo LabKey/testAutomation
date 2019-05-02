@@ -1,0 +1,130 @@
+<ApiTests xmlns="http://labkey.org/query/xml">
+    <test name="create list by inferring fields" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                df <- data.frame(intKey=c(1:3), customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
+                fields <- labkey.domain.inferFields(baseUrl="%baseUrl%", folderPath="%projectName%", df)
+                dd <- labkey.domain.createDesign(name="test list", fields=fields)
+                labkey.domain.create(baseUrl="%baseUrl%", folderPath="%projectName%", domainKind="IntList", domainDesign=dd, options=list(keyName = "intKey"))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $success
+                [1] TRUE
+                $name
+                [1] "test list"
+             ]]>
+        </response>
+    </test>
+    <test name="insert rows into the list" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                newrow <- data.frame(
+                    customInt=1
+                    , customString="custom string value")
+
+                labkey.insertRows(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $queryName
+                [1] "test list"
+                $schemaName
+                [1] "lists"
+                $rows[[1]]$customInt
+                [1] 1
+                $rows[[1]]$customString
+                [1] "custom string value"
+            ]]>
+        </response>
+    </test>
+    <test name="update the list domain" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                ## change the type of one of the columns
+                domain <- labkey.domain.get(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list")
+
+                domain$fields[3,]$rangeURI = "xsd:string"
+                domain$fields[3,]$name = "changed to string"
+                labkey.domain.save(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=domain)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $success
+                [1] TRUE
+            ]]>
+        </response>
+    </test>
+    <test name="update the list domain two" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                ## remove one of the columns
+                df <- data.frame(intKey=c(1:3), customInt=c(1:3))
+                fields <- labkey.domain.inferFields(baseUrl="%baseUrl%", folderPath="%projectName%", df)
+                oldDesign <- labkey.domain.get(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list")
+                newDesign <- labkey.domain.createDesign(name="test list", fields=fields)
+
+                newDesign$domainId = oldDesign$domainId
+                newDesign$domainURI = oldDesign$domainURI
+
+                newDesign$fields[1,]$propertyId = oldDesign$fields[1,]$propertyId
+                newDesign$fields[1,]$propertyURI = oldDesign$fields[1,]$propertyURI
+                newDesign$fields[2,]$propertyId = oldDesign$fields[2,]$propertyId
+                newDesign$fields[2,]$propertyURI = oldDesign$fields[2,]$propertyURI
+
+                labkey.domain.save(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=newDesign)
+                newrow <- data.frame(
+                    customInt=2
+                    , customString="custom string value")
+
+                labkey.insertRows(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $success
+                [1] TRUE
+            ]]>
+        </response>
+    </test>
+    <test name="drop the list domain" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.domain.drop(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                [1] "Domain deleted"
+                $success
+                [1] TRUE
+            ]]>
+        </response>
+    </test>
+    <test name="create a domain from a domain template" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.domain.create(baseUrl="%baseUrl%", folderPath="%projectName%", domainTemplate="Priority", module="simpletest", domainGroup="todolist")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $success
+                [1] TRUE
+                $templateDescription
+                [1] "simpletest: todolist#Priority"
+                $name
+                [1] "Priority"
+            ]]>
+        </response>
+    </test>
+</ApiTests>

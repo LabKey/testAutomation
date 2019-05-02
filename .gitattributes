@@ -34,6 +34,12 @@ data/api/maxRows.js -text
 data/api/napApiTest.html -text
 data/api/queryRegressionTest.js -text
 data/api/queryTest.js -text
+data/api/rlabkey-api-experiment.xml -text
+data/api/rlabkey-api-issues.xml -text
+data/api/rlabkey-api-list.xml -text
+data/api/rlabkey-api-query.xml -text
+data/api/rlabkey-api-study.xml -text
+data/api/rlabkey-api-webdav.xml -text
 data/api/rlabkey-api.xml -text
 data/api/scatterPlotPointClickTestFn.js -text
 data/api/security-api.xml -text

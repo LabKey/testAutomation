@@ -1,0 +1,35 @@
+<ApiTests xmlns="http://labkey.org/query/xml">
+    <test name="create directory" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+             ]]>
+        </response>
+    </test>
+    <test name="list files" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+             ]]>
+        </response>
+    </test>
+    <test name="create directory with tricky characters" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+             ]]>
+        </response>
+    </test>
+</ApiTests>
