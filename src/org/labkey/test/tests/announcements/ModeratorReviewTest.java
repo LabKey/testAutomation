@@ -166,6 +166,11 @@ public class ModeratorReviewTest extends BaseWebDriverTest
                 .setBody(title)
                 .submit();
         stopImpersonating();
+        if (expectAutoApproval)
+        {
+            ModeratorReviewPage.beginAt(this);
+            assertTextNotPresent(title);
+        }
 
         verifyMessage(title, expectAutoApproval);
 
