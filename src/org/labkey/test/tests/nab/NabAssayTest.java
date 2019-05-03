@@ -540,20 +540,17 @@ public class NabAssayTest extends AbstractAssayTest
     {
         final String WIKIPAGE_NAME = "Nab API Wiki";
 
-        PortalHelper portalHelper = new PortalHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
 
         navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
-        portalHelper.addWebPart("Wiki");
+        goToModule("Wiki");
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
-        wikiHelper.setWikiBody(TestFileUtils.getFileContents(new File(TestFileUtils.getLabKeyRoot(), "server/test/data/api/napApiTest.html")));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/napApiTest.html")));
         wikiHelper.saveWikiPage();
-        waitForWikiDivPopulation(TEST_DIV_ID, 30);
+        waitForElement(Locator.id(TEST_DIV_ID));
         waitForElements(Locator.id(TEST_DIV_ID).child(Locator.tagWithText("div", "Success!")), 2);
-
-        portalHelper.removeWebPart(WIKIPAGE_NAME);
     }
 
     private void assertStudyData(int ptidCount)
