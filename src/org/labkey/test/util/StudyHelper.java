@@ -31,6 +31,7 @@ import org.labkey.test.pages.ManageDatasetsPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.pages.study.StudySecurityPage;
+import org.openqa.selenium.interactions.Actions;
 
 import java.io.File;
 import java.io.IOException;
@@ -155,6 +156,7 @@ public class StudyHelper
             {
                 _test._ext4Helper.uncheckCheckbox("Share Category?");
             }
+            new Actions(_test.getDriver()).moveByOffset(-50, -50); // Dismiss tooltip
         }
 
         _test.click(Ext4Helper.Locators.ext4Button("Save"));
@@ -222,6 +224,7 @@ public class StudyHelper
             {
                 _test._ext4Helper.uncheckCheckbox("Share Category?");
             }
+            new Actions(_test.getDriver()).moveByOffset(-50, -50); // Dismiss tooltip
         }
         _test._ext4Helper.clickWindowButton("Define " + participantString + " Group", "Save", 0, 0);
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
