@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -283,7 +284,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE03);
     }
 
-    @Test
+    @Test @Ignore("Issue 37413: Server becomes unresponsive after importing folder archive to multiple folders")
     public void testImportToMultipleFolders()
     {
         File zipFile = IMPORT_STUDY_FILE;
