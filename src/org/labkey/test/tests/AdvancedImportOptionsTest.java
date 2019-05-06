@@ -47,7 +47,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 {
     private static final String LIMITED_USER = "limited@advancedimport.test";
 
-    private static final String IMPORT_STUDY_FILE = "/sampledata/AdvancedImportOptions/AdvancedImportStudyProject01.folder.zip";
+    private static final File IMPORT_STUDY_FILE = TestFileUtils.getSampleData("AdvancedImportOptions/AdvancedImportStudyProject01.folder.zip");
     private static final String IMPORT_PROJECT_FILE01 = "Advanced Import By File";
     private static final String IMPORT_PROJECT_FILE02 = "Advanced Import By File With Filters";
     private static final String IMPORT_PROJECT_FILE03 = "Advanced Import By Pipeline With Filters";
@@ -96,7 +96,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
     @Test
     public void testBasicImportFromFile()
     {
-        File zipFile  = new File(TestFileUtils.getLabKeyRoot() + IMPORT_STUDY_FILE);
+        File zipFile = IMPORT_STUDY_FILE;
 
         log("Create a new project to import the existing data.");
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE01, false);
@@ -153,7 +153,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
     @Test
     public void testFilteredImportFromFile()
     {
-        File zipFile  = new File(TestFileUtils.getLabKeyRoot() + IMPORT_STUDY_FILE);
+        File zipFile = IMPORT_STUDY_FILE;
 
         log("Create a new project to import the existing data.");
         _containerHelper.createProject(IMPORT_PROJECT_FILE02, "Study");
@@ -220,7 +220,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
     @Test
     public void testFilteredImportFromPipeline()
     {
-        File zipFile  = new File(TestFileUtils.getLabKeyRoot() + IMPORT_STUDY_FILE);
+        File zipFile = IMPORT_STUDY_FILE;
 
         log("Create a new project to import the existing data.");
         _containerHelper.createProject(IMPORT_PROJECT_FILE03, "Study");
@@ -286,7 +286,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
     @Test
     public void testImportToMultipleFolders()
     {
-        File zipFile  = new File(TestFileUtils.getLabKeyRoot() + IMPORT_STUDY_FILE);
+        File zipFile = IMPORT_STUDY_FILE;
         _userHelper.createUser(LIMITED_USER);
 
         log("Create a new project to import the existing data into multiple folders.");
