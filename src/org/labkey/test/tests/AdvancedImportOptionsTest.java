@@ -16,13 +16,14 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.studydesigner.AssayScheduleWebpart;
 import org.labkey.test.components.studydesigner.ImmunizationScheduleWebpart;
@@ -284,9 +285,12 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE03);
     }
 
-    @Test @Ignore("Issue 37413: Server becomes unresponsive after importing folder archive to multiple folders")
+    @Test
     public void testImportToMultipleFolders()
     {
+        Assume.assumeTrue("Issue 37413: Server becomes unresponsive after importing folder archive to multiple folders",
+                WebTestHelper.getDatabaseType() != WebTestHelper.DatabaseType.MicrosoftSQLServer);
+
         File zipFile = IMPORT_STUDY_FILE;
         _userHelper.createUser(LIMITED_USER);
 
