@@ -593,8 +593,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 "          if ((action === '' || action == undefined) && LABKEY.ActionURL.getAction() === 'begin') continue;" +
                 "          action = forms[i].action || window.location.href;\n" +
                 "          if (typeof action !== 'string') continue;\n" +
-                "          if (action.indexOf('?')==-1) action += '?';\n" +
-                "          var and = '';\n" +
+                "          var and = '&';\n" +
+                "          if (action.indexOf('?')==-1) and = '?';\n" + // No parameters in action, start query string
                 "          for (j=0 ; j<forms[i].elements.length ; j++) {\n" +
                 "            if (forms[i].elements[j].name && forms[i].elements[j].name!='X-LABKEY-CSRF') {\n" +
                 "              action += and + forms[i].elements[j].name + '=' + (forms[i].elements[j].value || '');\n" +
