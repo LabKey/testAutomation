@@ -36,9 +36,13 @@ import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
@@ -181,16 +185,41 @@ public class RlabkeyTest extends BaseWebDriverTest
         doRLabkeyTest(RLABKEY_API_STUDY);
     }
 
-    @Test @Ignore ("Coming in 2.2.6")
+    @Test @Ignore("Coming in RLabKey 2.2.6")
     public void testRlabkeyWebDavApi() throws Exception
     {
-        doRLabkeyTest(RLABKEY_API_WEBDAV);
+        Map<String, String> scriptReplacements = new HashMap<>();
+
+        WebDavUploadHelper webDav = new WebDavUploadHelper(getProjectName());
+
+        // Setup dir to simulate local R environment
+        File downloadDir = new File(TestFileUtils.getDefaultFileRoot(getProjectName()), "webdav_download");
+        webDav.mkDir(downloadDir.getName());
+        scriptReplacements.put("downloadDir", downloadDir.getAbsolutePath());
+
+        // Setup files in simulated target server
+        webDav.putRandomBytes("remote/readChecks/getMe.txt");
+        webDav.putRandomBytes("remote/readChecks/dir_a/a.txt");
+        webDav.mkDir("remote/readChecks/empty_dir");
+        webDav.mkDir("remote/writeChecks");
+        webDav.mkDir("remote/writeChecks/deleteMe_empty");
+        webDav.putRandomBytes("remote/writeChecks/deleteMe/file.txt");
+        webDav.putRandomBytes("remote/writeChecks/deleteMe.txt");
+        File remoteDir = new File(downloadDir.getParentFile(), "remote");
+        scriptReplacements.put("remoteDir", remoteDir.getAbsolutePath());
+
+        doRLabkeyTest(RLABKEY_API_WEBDAV, scriptReplacements);
     }
 
     private void doRLabkeyTest(File testData) throws Exception
     {
+        doRLabkeyTest(testData, Collections.emptyMap());
+    }
+
+    private void doRLabkeyTest(File testData, Map<String, String> scriptReplacements) throws Exception
+    {
         // cheating here, to use the api test framework to store rlabkey tests
-        List<APITestHelper.ApiTestCase> tests = APITestHelper.parseTests(testData);
+        List<APITestHelper.ApiTestCase> tests = APITestHelper.parseTests(testData, false);
 
         if (!tests.isEmpty())
         {
@@ -211,8 +240,15 @@ public class RlabkeyTest extends BaseWebDriverTest
                         .replaceAll("%projectName%", getProjectName());
                 if (WebTestHelper.getBaseURL().startsWith("https")) // Allow self-signed certificate
                     testScript = testScript.replace("library(Rlabkey)", "library(Rlabkey)\nlabkey.acceptSelfSignedCerts()");
-                sb.append(testScript);
                 String verify = test.getResponse().trim().replaceAll("%projectName%", getProjectName());
+                for (String key : scriptReplacements.keySet())
+                {
+                    String token = "%" + key + "%";
+                    String replacement = scriptReplacements.get(key);
+                    testScript = testScript.replaceAll(token, replacement);
+                    verify = verify.replaceAll(token, replacement);
+                }
+                sb.append(testScript);
 
                 log("execute test: " + test.getName());
                 TestLogger.increaseIndent();
