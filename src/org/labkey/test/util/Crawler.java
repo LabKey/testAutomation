@@ -342,6 +342,7 @@ public class Crawler
         // Permanent exclusions
         map.put(new ControllerActionId("plate", "designer"), Arrays.asList("colCount", "rowCount")); // 37208: Plate designer dumps stack trace from bad URL parameters
         map.put(new ControllerActionId("reports", "runReport"), Arrays.asList(".lastFilter")); // Action triggers a POST, which logs an error. See `ViewServlet.requestActionURL`
+        map.put(new ControllerActionId("study", "dataset"), Arrays.asList(".lastFilter")); // Action triggers a POST, which logs an error. See `ViewServlet.requestActionURL`
 
         return map;
     }
