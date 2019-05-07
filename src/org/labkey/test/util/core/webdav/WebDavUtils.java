@@ -59,12 +59,18 @@ public class WebDavUtils
         for (int i = 1; i <= fileCount; i++)
         {
             String fileName = "random_" + i + ".bin";
-            byte[] fileBytes = new byte[fileSize];
-            random.nextBytes(fileBytes);
             if (i % progressFrequency == 0 || i == fileCount)
                 TestLogger.log("Upload progress: " + i + "/" + fileCount);
-            sardine.put(davUrlPrefix + fileName, fileBytes);
+            putRandomBytes(sardine, davUrlPrefix + fileName, fileSize);
         }
+    }
+
+    @LogMethod
+    public static void putRandomBytes(Sardine sardine, @LoggedParam String fullDavUrl, int fileSize) throws IOException
+    {
+        byte[] fileBytes = new byte[fileSize];
+        random.nextBytes(fileBytes);
+        sardine.put(fullDavUrl, fileBytes);
     }
 
     /**

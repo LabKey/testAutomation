@@ -134,4 +134,24 @@ public class WebDavUploadHelper
             throw new RuntimeException("Failed to upload file: " + message, e);
         }
     }
+
+    public String getUrl(String relativePath)
+    {
+        return _urlFactory.getPath(relativePath);
+    }
+
+    public void mkDir(String relativePath) throws IOException
+    {
+        _sardine.createDirectory(_urlFactory.getPath(relativePath));
+    }
+
+    public void putRandomBytes(String relativePath) throws IOException
+    {
+        putRandomBytes(relativePath, 5);
+    }
+
+    public void putRandomBytes(String relativePath, int size) throws IOException
+    {
+        WebDavUtils.putRandomBytes(_sardine, _urlFactory.getPath(relativePath), size);
+    }
 }
