@@ -94,6 +94,11 @@ public class APITestHelper
 
     public static List<ApiTestCase> parseTests(File testFile)
     {
+        return parseTests(testFile, true);
+    }
+
+    public static List<ApiTestCase> parseTests(File testFile, boolean strictType)
+    {
         try
         {
             List<ApiTestCase> tests = new ArrayList<>();
@@ -103,7 +108,7 @@ public class APITestHelper
             {
                 for (TestCaseType testCase : doc.getApiTests().getTestArray())
                 {
-                    tests.add(parseTestCase(testCase));
+                    tests.add(parseTestCase(testCase, strictType));
                 }
             }
             return tests;
@@ -114,24 +119,21 @@ public class APITestHelper
         }
     }
 
-    private static ApiTestCase parseTestCase(TestCaseType element)
+    private static ApiTestCase parseTestCase(TestCaseType element, boolean strictType)
     {
         ApiTestCase testCase = new ApiTestCase();
 
         String type = element.getType();
-        if ("get".equalsIgnoreCase(type))
-            testCase.setType(ActionType.get);
-        else if ("post".equalsIgnoreCase(type))
-            testCase.setType(ActionType.post);
-        else
-            throw new RuntimeException("Invalid test type, only 'GET' or 'POST' types are allowed");
+        if (strictType && !"get".equalsIgnoreCase(type) && !"post".equalsIgnoreCase(type))
+            throw new RuntimeException("Invalid test type [" + type + "], only 'GET' or 'POST' types are allowed");
+        testCase.setType(type);
 
         testCase.setName(element.getName());
         testCase.setFailOnMatch(element.getFailOnMatch());
 
         String url = element.getUrl();
         if (url != null)
-            testCase.setUrl(StringUtils.trim(url));
+            testCase.setUrl(StringUtils.trim(url).replaceAll("^\\s+", ""));
         else
             fail("Test case did not have the required url element");
 
@@ -146,7 +148,7 @@ public class APITestHelper
         return testCase;
     }
 
-    private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch, @NotNull String username, @NotNull String password, boolean acceptErrors)
+    private void sendRequestDirect(String name, String url, String type, String formData, String expectedResponse, boolean failOnMatch, @NotNull String username, @NotNull String password, boolean acceptErrors)
     {
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpUriRequest method = null;
@@ -155,10 +157,10 @@ public class APITestHelper
 
         switch (type)
         {
-            case get:
+            case "get":
                 method = new HttpGet(requestUrl);
                 break;
-            case post:
+            case "post":
                 method = new HttpPost(requestUrl);
                 ((HttpPost)method).setEntity(new StringEntity(formData, ContentType.create("application/json", "UTF-8")));
                 break;
@@ -201,15 +203,10 @@ public class APITestHelper
             method.setHeader(csrf.getName(), csrf.getValue());
     }
 
-    enum ActionType {
-        get,
-        post
-    }
-
     public static class ApiTestCase
     {
         private String _name;
-        private ActionType _type;
+        private String _type;
         private String _url;
         private String _response;
         private String _formData;
@@ -225,12 +222,12 @@ public class APITestHelper
             _name = name;
         }
 
-        public ActionType getType()
+        public String getType()
         {
             return _type;
         }
 
-        public void setType(ActionType type)
+        public void setType(String type)
         {
             _type = type;
         }
