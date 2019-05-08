@@ -39,6 +39,7 @@ import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -226,6 +227,8 @@ public class RlabkeyTest extends BaseWebDriverTest
             clickProject(getProjectName());
             goToManageViews().clickAddReport("R Report");
 
+            List<String> errors = new ArrayList<>();
+
             // we want to load the Rlabkey package from the override location
             File libPath = _rReportHelper.getRLibraryPath();
             String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
@@ -235,29 +238,44 @@ public class RlabkeyTest extends BaseWebDriverTest
                 StringBuilder sb = new StringBuilder(pathCmd);
 
                 sb.append('\n');
-                String testScript = test.getUrl().trim()
-                        .replaceAll("%baseUrl%", WebTestHelper.getBaseURL())
+                String expectedOutput = test.getResponse().trim()
+                        .replaceAll("\n +", "\n")
                         .replaceAll("%projectName%", getProjectName());
-                if (WebTestHelper.getBaseURL().startsWith("https")) // Allow self-signed certificate
-                    testScript = testScript.replace("library(Rlabkey)", "library(Rlabkey)\nlabkey.acceptSelfSignedCerts()");
-                String verify = test.getResponse().trim().replaceAll("%projectName%", getProjectName());
-                for (String key : scriptReplacements.keySet())
                 {
-                    String token = "%" + key + "%";
-                    String replacement = scriptReplacements.get(key);
-                    testScript = testScript.replaceAll(token, replacement);
-                    verify = verify.replaceAll(token, replacement);
+                    String testScript = test.getUrl().trim()
+                            .replaceAll("\n +", "\n")
+                            .replaceAll("%baseUrl%", WebTestHelper.getBaseURL())
+                            .replaceAll("%projectName%", getProjectName());
+                    if (WebTestHelper.getBaseURL().startsWith("https")) // Allow self-signed certificate
+                        testScript = testScript.replace("library(Rlabkey)", "library(Rlabkey)\nlabkey.acceptSelfSignedCerts()");
+                    for (String key : scriptReplacements.keySet())
+                    {
+                        String token = "%" + key + "%";
+                        String replacement = scriptReplacements.get(key);
+                        testScript = testScript.replaceAll(token, replacement);
+                        expectedOutput = expectedOutput.replaceAll(token, replacement);
+                    }
+                    sb.append(testScript);
                 }
-                sb.append(testScript);
 
                 log("execute test: " + test.getName());
                 TestLogger.increaseIndent();
-                final boolean success = _rReportHelper.executeScript(sb.toString(), verify);
+                final boolean success = _rReportHelper.executeScript(sb.toString(), expectedOutput);
+                if (!success)
+                {
+                    TestLogger.error("Expected results for test case: " + test.getName() + ":\n" + expectedOutput);
+                    TestLogger.error("Script for failed test case: " + test.getName() + ":\n" + sb.toString());
+                    errors.add(test.getName());
+                }
                 TestLogger.decreaseIndent();
-                assertTrue("Failed executing R script for test case: " + test.getName(), success);
             }
             _rReportHelper.clickSourceTab();
             clickButton("Cancel");
+            assertTrue("Failed executing R script for test case(s): " + String.join(", ", errors) + ". See log for details.", errors.isEmpty());
+        }
+        else
+        {
+            throw new IllegalStateException("No test cases found in " + testData.getAbsolutePath());
         }
     }
 
