@@ -25,6 +25,8 @@ import org.labkey.test.pages.ConfigureDbLoginPage;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
+import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +45,16 @@ public class TestScrubber extends ExtraSiteWrapper
     @LogMethod
     public void cleanSiteSettings()
     {
-        simpleSignIn();
+        try
+        {
+            simpleSignIn();
+        }
+        catch (WebDriverException wde)
+        {
+            // Sometimes, we are unable to create a second FirefoxDriver instance
+            TestLogger.error("Unable to clean site settings", wde);
+            return;
+        }
 
         try
         {
@@ -55,11 +66,12 @@ public class TestScrubber extends ExtraSiteWrapper
         {
             // Assure that this failure is noticed
             // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
-            log("**************************ERROR*******************************");
-            log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
-            log("** Server may be in a bad state.                            **");
-            log("** Set tools directory manually or bootstrap to fix.        **");
-            log("**************************ERROR*******************************");
+            TestLogger.error("**************************ERROR*******************************");
+            TestLogger.error("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
+            TestLogger.error("** Server may be in a bad state.                            **");
+            TestLogger.error("** Set tools directory manually or bootstrap to fix.        **");
+            TestLogger.error("**************************ERROR*******************************");
+            TestLogger.error("", e);
         }
 
         try
@@ -68,7 +80,7 @@ public class TestScrubber extends ExtraSiteWrapper
         }
         catch (RuntimeException e)
         {
-            log("Failed to remove site-wide terms of use. This will likely cause other tests to fail.");
+            TestLogger.error("Failed to remove site-wide terms of use. This will likely cause other tests to fail.", e);
         }
 
         try
@@ -77,7 +89,7 @@ public class TestScrubber extends ExtraSiteWrapper
         }
         catch (RuntimeException e)
         {
-            log("Failed to reset DB login config after test");
+            TestLogger.error("Failed to reset DB login config after test", e);
         }
 
         try
@@ -86,7 +98,7 @@ public class TestScrubber extends ExtraSiteWrapper
         }
         catch (RuntimeException e)
         {
-            log("Failed to reset Secondary Authentication after test");
+            TestLogger.error("Failed to reset Secondary Authentication after test", e);
         }
         try
         {
@@ -94,7 +106,7 @@ public class TestScrubber extends ExtraSiteWrapper
         }
         catch (IOException | CommandException e)
         {
-            log("Failed to disable login attempt limit after test");
+            TestLogger.error("Failed to disable login attempt limit after test", e);
         }
 
         try
@@ -103,7 +115,7 @@ public class TestScrubber extends ExtraSiteWrapper
         }
         catch (RuntimeException e)
         {
-            log("Failed to re-enable file Upload after test");
+            TestLogger.error("Failed to re-enable file Upload after test", e);
         }
     }
 
