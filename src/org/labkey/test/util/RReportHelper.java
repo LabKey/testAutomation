@@ -154,7 +154,7 @@ public class RReportHelper
             {
                 if (!scriptOutput.contains(part.trim()))
                 {
-                    _test.log("Error: could not find expected text: " + part + ".\nfrom value:\n" + scriptOutput);
+                    TestLogger.error("Error: could not find expected text: " + part + ".\nfrom value:\n" + scriptOutput);
                     return false;
                 }
             }
@@ -167,7 +167,7 @@ public class RReportHelper
     {
         if (scriptOutput.contains("javax.script.ScriptException"))
         {
-            _test.log("Error: the script failed with an error:\n" + scriptOutput);
+            TestLogger.error("Error: the script failed with an error:\n" + scriptOutput);
             return true;
         }
 
@@ -402,12 +402,12 @@ public class RReportHelper
             }
         }
 
-        _test.log("Environment info: " + System.getenv());
+        TestLogger.error("Environment info: " + System.getenv());
 
         if (null == rHome)
         {
-            _test.log("");   // Blank line helps make the following message more readable
-            _test.log("R_HOME environment variable is not set.  Set R_HOME to your R bin directory to enable automatic configuration.");
+            TestLogger.error("");   // Blank line helps make the following message more readable
+            TestLogger.error("R_HOME environment variable is not set.  Set R_HOME to your R bin directory to enable automatic configuration.");
         }
         throw new IllegalStateException("R is not configured on this system. Failed R tests.");
     }
