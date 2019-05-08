@@ -186,7 +186,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         doRLabkeyTest(RLABKEY_API_STUDY);
     }
 
-    @Test @Ignore("Coming in RLabKey 2.2.6")
+    @Test @Ignore("Coming in Rlabkey 2.2.6")
     public void testRlabkeyWebDavApi() throws Exception
     {
         Map<String, String> scriptReplacements = new HashMap<>();
@@ -200,7 +200,9 @@ public class RlabkeyTest extends BaseWebDriverTest
 
         // Setup files in simulated target server
         webDav.putRandomBytes("remote/readChecks/getMe.txt");
-        webDav.putRandomBytes("remote/readChecks/dir_a/a.txt");
+        webDav.putRandomBytes("remote/readChecks/getMe/a.txt");
+        webDav.putRandomBytes("remote/readChecks/getMe/subdir/b.txt");
+        webDav.mkDir("remote/readChecks/getMe/empty_subdir");
         webDav.mkDir("remote/readChecks/empty_dir");
         webDav.mkDir("remote/writeChecks");
         webDav.mkDir("remote/writeChecks/deleteMe_empty");
