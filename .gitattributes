@@ -985,6 +985,8 @@ src/org/labkey/test/util/SqlserverOnlyTest.java -text
 src/org/labkey/test/util/StudyHelper.java -text
 src/org/labkey/test/util/StudyImporter.java -text
 src/org/labkey/test/util/SummaryStatisticsHelper.java -text
+src/org/labkey/test/util/TestDataGenerator.java -text
+src/org/labkey/test/util/TestDataValidator.java -text
 src/org/labkey/test/util/TestLogger.java -text
 src/org/labkey/test/util/TextSearcher.java -text
 src/org/labkey/test/util/Timer.java -text
