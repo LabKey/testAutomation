@@ -59,7 +59,8 @@
             <![CDATA[
                 library(Rlabkey)
                 c("dir.create", dir.create("%downloadDir%/overwriteDir"))
-                c("webdav.get", labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/overwriteDir", overwrite=TRUE))
+                c("webdav.get", tryCatch({labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/overwriteDir", overwrite=TRUE)},
+                    error = function(e) {e$message}))
                 c("file.exists", file.exists("%downloadDir%/overwriteDir"))
                 c("file.info.isdir", file.info("%downloadDir%/overwriteDir")$isdir)
             ]]>
@@ -67,7 +68,7 @@
         <response>
             <![CDATA[
                 [1] "dir.create" "TRUE"
-                [1] "webdav.get" "FALSE"
+                The local filepath exists and is a directory
                 [1] "file.exists" "TRUE"
                 [1] "file.info.isdir" "TRUE"
              ]]>
@@ -77,16 +78,15 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                c("webdav.get", labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localFilePath="%downloadDir%/getMe_download", overwrite=FALSE))
+               c("webdav.get",  tryCatch({labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localFilePath="%downloadDir%/getMe_download", overwrite=FALSE)},
+                    error = function(e) {e$message}))
                 c("file.exists", file.exists("%downloadDir%/getMe_download"))
-                c("file.info.isdir", file.info("%downloadDir%/getMe_download")$isdir)
             ]]>
         </url>
         <response>
             <![CDATA[
-                [1] "webdav.get" "TRUE"
-                [1] "file.exists" "TRUE"
-                [1] "file.info.isdir" "FALSE"
+                The requested file is a directory
+                [1] "file.exists" "FALSE"
              ]]>
         </response>
     </test>
@@ -95,14 +95,16 @@
             <![CDATA[
                 library(Rlabkey)
                 c("file.exists pre", file.exists("%downloadDir%/noexist.txt"))
-                c("webdav.get", labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/noexist.txt", localFilePath="%downloadDir%/noexist.txt", overwrite=TRUE))
+                c("webdav.get", tryCatch({labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/noexist.txt", localFilePath="%downloadDir%/noexist.txt", overwrite=TRUE)},
+                    error = function(e) {e$message}))
                 c("file.exists post", file.exists("%downloadDir%/noexist.txt"))
             ]]>
         </url>
         <response>
             <![CDATA[
                 [1] "file.exists pre" "FALSE"
-                [1] "webdav.get" "FALSE"
+                [1] "webdav.get"
+                Status code = 404
                 [1] "file.exists post" "FALSE"
              ]]>
         </response>
@@ -130,13 +132,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                c("webdav.mkDir", labkey.webdav.mkDir(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/mkDirFail/subdir"))
+                c("webdav.mkDir", tryCatch({labkey.webdav.mkDir(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/mkDirFail/subdir")},
+                    error = function(e) {e$message}))
                 c("remote file.exists", file.exists("%remoteDir%/writeChecks/mkDirFail"))
             ]]>
         </url>
         <response>
             <![CDATA[
-                [1] "webdav.mkDir" "FALSE"
+                Status code = 409
                 [1] "remote file.exists" "FALSE"
              ]]>
         </response>
@@ -237,6 +240,35 @@
              ]]>
         </response>
     </test>
+    <test name="webdav.listDir file" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                c("webdav.listDir", labkey.webdav.listDir(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt"))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                [[1]]
+                [1] "webdav.listDir"
+             ]]>
+        </response>
+    </test>
+    <test name="webdav.listDir noexist" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                c("webdav.listDir", tryCatch({labkey.webdav.listDir(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/noexist")},
+                    error = function(e) {e$message}))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                [1] "webdav.listDir"
+                Status code = 404
+             ]]>
+        </response>
+    </test>
     <test name="webdav.delete" type="post">
         <url>
             <![CDATA[
@@ -293,14 +325,16 @@
             <![CDATA[
                 library(Rlabkey)
                 c("remote file.exists pre", file.exists("%remoteDir%/writeChecks/noexist.txt"))
-                c("webdav.delete", labkey.webdav.delete(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/noexist.txt"))
+                c("webdav.delete", tryCatch({labkey.webdav.delete(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/noexist.txt")},
+                    error = function(e) {e$message}))
                 c("remote file.exists post", file.exists("%remoteDir%/writeChecks/noexist.txt"))
             ]]>
         </url>
         <response>
             <![CDATA[
                 [1] "remote file.exists pre" "FALSE"
-                [1] "webdav.delete" "FALSE"
+                [1] "webdav.delete"
+                Status code = 404
                 [1] "remote file.exists post" "FALSE"
              ]]>
         </response>
