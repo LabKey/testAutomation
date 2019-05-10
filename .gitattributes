@@ -396,6 +396,7 @@ src/org/labkey/remoteapi/domain/CreateDomainCommand.java -text
 src/org/labkey/remoteapi/domain/DeleteDomainCommand.java -text
 src/org/labkey/remoteapi/domain/DeleteDomainResponse.java -text
 src/org/labkey/remoteapi/domain/DomainResponse.java -text
+src/org/labkey/remoteapi/domain/GetDomainCommand.java -text
 src/org/labkey/remoteapi/getdata/GetDataCommand.java -text
 src/org/labkey/remoteapi/getdata/GetDataResponse.java -text
 src/org/labkey/remoteapi/olap/MdxCommand.java -text
