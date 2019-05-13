@@ -284,7 +284,8 @@ public class WebTestHelper
 
     public static String getBaseUrlWithoutContextPath()
     {
-        String portPortion = 80 == getWebPort() ? "" : ":" + getWebPort();
+        int defaultPort = getTargetServer().startsWith("https") ? 443 : 80;
+        String portPortion = defaultPort == getWebPort() ? "" : ":" + getWebPort();
 
         return getTargetServer() + portPortion;
     }
