@@ -64,7 +64,11 @@ public class TestDataValidator
                 .findFirst().get();
     }
 
-    private List<Map<String, Object>> findRowsWithMatchingColumnValues(Map<String, Object> toValidate, List<String> columnsToIgnore)
+    /**
+        @param toValidate : a map of column/value pairs to match
+        @return : a list of rows from this object's generated data with matching column/values
+    * */
+    public List<Map<String, Object>> findRowsWithMatchingColumnValues(Map<String, Object> toValidate, List<String> columnsToIgnore)
     {
         List<Map<String, Object>> filteringList = new ArrayList<>();
         filteringList.addAll(getRows());
@@ -75,7 +79,7 @@ public class TestDataValidator
             if (columnsToIgnore!=null && columnsToIgnore.contains(columnName))      // todo; do this case-insensitively
                 continue;
 
-            String key = getCaseInvariantKey(columnName, toValidate);     // gets the corresponding case-sentitive
+            String key = getCaseInvariantKey(columnName, toValidate);     // gets the corresponding case-sensitive key
             String expectedValue = toValidate.get(key).toString();
 
             filteringList =  filteringList.stream().filter(a -> a.get(columnName).toString().equals(expectedValue))    // filter smaller and smaller sets

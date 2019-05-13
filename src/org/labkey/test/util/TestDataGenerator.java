@@ -7,6 +7,8 @@ import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DeleteDomainCommand;
 import org.labkey.remoteapi.domain.DeleteDomainResponse;
 import org.labkey.remoteapi.domain.DomainResponse;
+import org.labkey.remoteapi.domain.GetDomainCommand;
+import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -20,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
@@ -32,6 +33,7 @@ public class TestDataGenerator
     // chose a Character random from this String
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
 
+    private final Map<Integer, String> _indices = new HashMap<>();  // used to keep columns and row keys aligned
     private final Map<String, Map<String, Object>> _columns = new CaseInsensitiveHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
     private List<Map<String, Object>> _rows = new ArrayList<>();
@@ -58,7 +60,7 @@ public class TestDataGenerator
         _schema=schema;
         _queryName=queryName;
         _containerPath = containerPath;
-        List<Map<String, Object>> fieldSet = extractFieldSetFrom(cn, schema, queryName, containerPath);
+        List<Map<String, Object>> fieldSet = extractDomainFieldSetFrom(cn, schema, queryName, containerPath);
         withColumnSet(fieldSet);   // extract the columns from the specified query
     }
 
@@ -72,11 +74,20 @@ public class TestDataGenerator
         return _queryName;
     }
 
+    /**
+     *
+     * @param columns   The fieldSet for the domain/sampleset/list.
+     * @return
+     */
     public TestDataGenerator withColumnSet(List<Map<String, Object>> columns)
     {
+        int index = 0;
         for (Map<String, Object> col : columns)
         {
-            _columns.put(col.get("name").toString(), col);
+            String columnName = col.get("name").toString();
+            _columns.put(columnName, col);                      // todo: encapsulate columns/indices in a class
+            _indices.put(index, columnName);                    // and use that everyhere columns are modified or read
+            index++;
         }
         return this;
     }
@@ -110,14 +121,34 @@ public class TestDataGenerator
         return this;
     }
 
+    /**
+     *  // helper to allow adding values as List.of(a, b, c)
+     * @param values
+     * @return
+     */
+    public TestDataGenerator addRow(List<Object> values)
+    {
+        Map<String, Object> row = new HashMap<>();
+        for (int i = 0; i < values.size(); i++)     // walk across keys in index order, insert values in that order
+        {
+            String keyAtIndex = _indices.get(i);
+            row.put(keyAtIndex, values.get(i) != "null" ? values.get(i).toString() : null);
+        }
+        _rows.add(row);
+        _rowCount = getRows().size();
+        return this;
+    }
+
+    /**
+     *  Adds the specified row to the internal collection of rowMaps the object contains.
+     *  To insert them to the server, use this.
+     *  it is acceptable to add columns that don't exist in the destination, but be careful
+     * @param customRow use Map.of(colName1, colValue1 ...)
+     * @return
+     */
     public TestDataGenerator addCustomRow(Map<String, Object> customRow)
     {
-        // make sure the map conforms to our column names
-        Set<String> columnNames = _columns.keySet();
-        if (!columnNames.containsAll(customRow.keySet()))
-            throw new IllegalArgumentException("");
-
-        getRows().add(customRow);
+        _rows.add(customRow);
         _rowCount = getRows().size();
         return this;
     }
@@ -182,7 +213,7 @@ public class TestDataGenerator
         }
     }
 
-    private String randomString(int size)
+    public String randomString(int size)
     {
         StringBuilder val = new StringBuilder();
         for (int i=0; i<size; i++)
@@ -193,7 +224,7 @@ public class TestDataGenerator
         return val.toString();
     }
 
-    private int randomInt(int min, int max)
+    public int randomInt(int min, int max)
     {
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
@@ -205,7 +236,7 @@ public class TestDataGenerator
     /*
     * simple way to get a dateformat:  (String)executeScript("return LABKEY.container.formats.dateTimeFormat");
     * */
-    private String randomDate(String dateFormat, Date min, Date max)
+    public String randomDateString(String dateFormat, Date min, Date max)
     {
         long random = ThreadLocalRandom.current().nextLong(min.getTime(), max.getTime());
         Date date = new Date(random);
@@ -225,12 +256,39 @@ public class TestDataGenerator
         return delCmd.execute(cn, _containerPath);
     }
 
-    public SaveRowsResponse insertGeneratedRows(Connection cn) throws IOException, CommandException
+    public SaveRowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         InsertRowsCommand insertRowsCommand = new InsertRowsCommand(getSchema(), getQueryName());
-        insertRowsCommand.setRows(getRows());
-        SaveRowsResponse response = insertRowsCommand.execute(cn, _containerPath);
-        return response;
+        insertRowsCommand.setRows(rows);
+        return insertRowsCommand.execute(cn, _containerPath);
+    }
+
+    public SelectRowsResponse getRowsFromServer(Connection cn) throws IOException, CommandException
+    {
+        return getRowsFromServer(cn, null);
+    }
+
+    public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns) throws IOException, CommandException
+    {
+        SelectRowsCommand cmd = new SelectRowsCommand(getSchema(), getQueryName());
+        if (intendedColumns!=null)
+            cmd.setColumns(intendedColumns);
+        return cmd.execute(cn, _containerPath);
+    }
+
+    /**
+     *
+     * @param cn
+     * @param rowsToDelete
+     * @return  a list of the rows that were deleted
+     * @throws IOException
+     * @throws CommandException
+     */
+    public SaveRowsResponse deleteRows(Connection cn, List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
+    {
+        DeleteRowsCommand cmd = new DeleteRowsCommand(getSchema(), getQueryName());
+        cmd.setRows(rowsToDelete);
+        return cmd.execute(cn, _containerPath);
     }
 
     public TestDataValidator getValidator()
@@ -238,10 +296,39 @@ public class TestDataGenerator
         return new TestDataValidator(_schema, _queryName, _containerPath, _columns, _rows);
     }
 
-    static public List<Map<String, Object>> extractFieldSetFrom(Connection cn, String schema, String queryName, String containerPath) throws IOException, CommandException
+    /**
+     * The domain fields exclude the standard and magic columns, such as rowId, lsid, parent.
+     * @param cn
+     * @param schema
+     * @param queryName
+     * @param containerPath
+     * @return
+     * @throws IOException
+     * @throws CommandException
+     */
+    static public List<Map<String, Object>> extractDomainFieldSetFrom(Connection cn, String schema, String queryName, String containerPath) throws IOException, CommandException
     {
-        // todo: use
+        GetDomainCommand getDomainCommand = new GetDomainCommand(schema, queryName);
+        DomainResponse domainResponse = getDomainCommand.execute(cn, containerPath);
+        return domainResponse.getColumns();
+    }
+
+    /**
+     *  extracts the requested column set from the existing/specified table
+     * @param cn
+     * @param schema
+     * @param queryName
+     * @param containerPath
+     * @param requestedColumns
+     * @return
+     * @throws IOException
+     * @throws CommandException
+     */
+    static public List<Map<String, Object>> extractRequestedColumnSet(Connection cn, String schema, String queryName, String containerPath,
+                                                                      List<String> requestedColumns)    throws IOException, CommandException
+    {
         SelectRowsCommand cmd = new SelectRowsCommand(schema, queryName);
+        cmd.setColumns(requestedColumns);
         SelectRowsResponse response = cmd.execute(cn, containerPath);
         return response.getColumnModel();
     }

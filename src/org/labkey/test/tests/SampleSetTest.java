@@ -25,7 +25,11 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.experiment.LineageCommand;
+import org.labkey.remoteapi.experiment.LineageNode;
+import org.labkey.remoteapi.experiment.LineageResponse;
 import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -44,6 +48,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -385,6 +390,152 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         log("Looks like all reserved filed names were caught.");
+    }
+
+
+    /**
+     * This test creates a domain with an explicit 'parent' column and supplies a set of lineage nodes that use the explicit
+     * column and an ad-hoc column (MaterialInput/TableName) for lineage
+     * The test then deletes some rows and confirms that values in the 'parent' columns persist when their parent row
+     * is deleted, but lineage values in MaterialInputs/TableName do not persist after their parent is deleted,
+     * @throws IOException
+     * @throws CommandException
+     */
+    @Test
+    public void deleteLineageParent() throws IOException, CommandException
+    {
+        // create a sampleset with the following explicit domain columns
+        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "Family", getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", "String"),
+                        TestDataGenerator.simpleFieldDef("parent", "String"),   // parent is a 'magic' field, looks up to name column
+                        TestDataGenerator.simpleFieldDef("age", "int"),
+                        TestDataGenerator.simpleFieldDef("height", "int")
+                ))
+                .addDataSupplier("parent", () -> null)  // don't put generated data into 'parent'- insert will fail if the value doesn't reference a name
+                .withGeneratedRows(25);
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.addRow(List.of("A","null", 56, 60));
+        dgen.addRow(List.of("B", "null", 48, 50));
+        dgen.addRow(List.of("C", "A,B", 12, 50));
+        dgen.addRow(List.of("D", "B", 15, 60));
+        dgen.addCustomRow(Map.of("name", "E", "age", 12, "height", 44, "MaterialInputs/Family", "B"));
+        dgen.addCustomRow(Map.of("name", "F", "age", 12, "height", 44, "MaterialInputs/Family", "A,B"));
+        dgen.addRow(List.of("G", "C", 15, 60));
+        dgen.addRow(List.of("H", "A,B,C", 15, 60));
+        dgen.addRow(List.of("I", "G", 15, 60));
+        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        refresh();
+        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        waitAndClick(Locator.linkWithText("Family"));
+        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        assertEquals(34, materialsList.getDataRowCount());
+
+        // peel saved rows A,B,C from the insert response
+        List<Map<String, Object>> rowsToDelete = saveRowsResponse.getRows().stream()
+                .filter((a)-> a.get("name").equals("A") ||
+                        a.get("name").equals("B") ||
+                        a.get("name").equals("C")).collect(Collectors.toList());
+
+        Map<String, Object> E = saveRowsResponse.getRows().stream()
+                .filter((a)-> a.get("name").equals("E")).findFirst().orElse(null);
+        LineageCommand lineageCommand = new LineageCommand.Builder(E.get("lsid").toString())
+                .setChildren(false)
+                .setParents(true)
+                .setDepth(1).build();
+        LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(true), getCurrentContainerPath());
+        assertEquals("don't expect MaterialInput/tablename lookup to persist records that have been deleted",
+                1, lineageResponse.getSeed().getParents().size());
+
+        // delete rows A, B, C
+        dgen.deleteRows(createDefaultConnection(true), rowsToDelete);
+        SelectRowsResponse selectResponse = dgen.getRowsFromServer(createDefaultConnection(true),
+                List.of("rowId", "lsid", "name", "parent", "age", "height", "MaterialInputs/Family", "Inputs/First"));
+        List<Map<String, Object>> remainingRows = selectResponse.getRows();
+
+        // get rows with parents A, B, C
+        Map<String, Object> rowD = remainingRows.stream()
+                .filter((a)-> a.get("name").equals("D")).findFirst().orElse(null);
+        Map<String, Object> rowG = remainingRows.stream()
+                .filter((a)-> a.get("name").equals("G")).findFirst().orElse(null);
+        Map<String, Object> rowH = remainingRows.stream()
+                .filter((a)-> a.get("name").equals("H")).findFirst().orElse(null);
+
+        // ensure that after deleting parents, these rows' derivation is still preserved in explicit column 'parent'
+        assertEquals("Expect parent value to remain even if parent row is removed","B", rowD.get("parent"));
+        assertEquals("Expect parent value to remain even if parent row is removed","C", rowG.get("parent"));
+        assertEquals("Expect parent value to remain even if parent row is removed","A,B,C", rowH.get("parent"));
+
+        // now make sure materialInputs derivations don't persist references to deleted records
+        Map<String, Object> rowE = remainingRows.stream()
+                .filter((a)-> a.get("name").equals("E")).findFirst().orElse(null);
+        LineageCommand linCmd = new LineageCommand.Builder(rowE.get("lsid").toString())
+                .setChildren(false)
+                .setParents(true)
+                .setDepth(1).build();
+        LineageResponse linResponse = linCmd.execute(createDefaultConnection(true), getCurrentContainerPath());
+        assertEquals("don't expect MaterialInput/tablename lookup to persist records that have been deleted",
+                0, linResponse.getSeed().getParents().size());
+
+        log("foo");
+    }
+
+    @Test
+    public void testInsertLargeLineageGraph() throws IOException, CommandException
+    {
+        // create a sampleset with the following explicit domain columns
+        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "bigLineage", getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", "String"),
+                        TestDataGenerator.simpleFieldDef("parent", "String"),   // parent is a 'magic' field, looks up to name column
+                        TestDataGenerator.simpleFieldDef("data", "int"),
+                        TestDataGenerator.simpleFieldDef("testIndex", "int")
+                ));
+
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        Map indexRow = Map.of("name", "seed", "data", dgen.randomInt(3, 2000), "testIndex", 0); // create the first seed in the lineage
+        SaveRowsResponse seedInsert = dgen.insertRows(createDefaultConnection(true), List.of(indexRow));
+        SelectRowsResponse seedSelect = dgen.getRowsFromServer(createDefaultConnection(true),
+                List.of("lsid", "name", "parent", "data", "testIndex"));
+
+        // create a serial table of records; each derived from the former via parent:name column reference
+        // insert them all at once
+        String previousName = "seed";
+        int testIndex = 1;
+        int intendedGenerationDepth = 4999;
+        for (int i = 0; i < intendedGenerationDepth; i++)
+        {
+            String name = dgen.randomString(30);
+            Map row = Map.of("name", name, "data", dgen.randomInt(3, 1395), "testIndex", testIndex , "parent", previousName);
+            dgen.addCustomRow(row);
+            previousName = name;
+            testIndex++;
+        }
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        SelectRowsResponse insertedSelect = dgen.getRowsFromServer(createDefaultConnection(true),
+                List.of("name", "parent", "data", "testIndex"));
+
+        refresh();      // the dataregion is helpful when debugging, not needed for testing
+        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        waitAndClick(Locator.linkWithText("bigLineage"));
+        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+
+        Map<String, Object> seed = seedSelect.getRows().stream()
+                .filter((a)-> a.get("testIndex").equals(0)).findFirst().orElse(null);
+        LineageCommand linCmd = new LineageCommand.Builder(seed.get("lsid").toString())
+                .setChildren(true)
+                .setParents(false)
+                .setDepth(intendedGenerationDepth).build();
+        LineageResponse linResponse = linCmd.execute(createDefaultConnection(true), getCurrentContainerPath());
+        LineageNode node = linResponse.getSeed();
+        int generationDepth = 0;
+        while(node.getChildren().size()>0)  // walk the node depth until the end
+        {
+            node = node.getChildren().get(0).getNode();
+            generationDepth++;
+        }
+        assertEquals("Expect lineage depth to be" +intendedGenerationDepth, intendedGenerationDepth, generationDepth);
     }
 
     @Test
