@@ -421,7 +421,27 @@ public class WebTestHelper
 
     public static Connection getRemoteApiConnection()
     {
-        return new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        return getRemoteApiConnection(false);
+    }
+
+    public static Connection getRemoteApiConnection(boolean includeCookies)
+    {
+        String username = PasswordUtil.getUsername();
+        Connection connection = new Connection(getBaseURL(), username, PasswordUtil.getPassword());
+
+        if (includeCookies)
+            addCachedCookies(connection, username);
+
+        return connection;
+    }
+
+    private static Connection addCachedCookies(Connection connection, String username)
+    {
+        for (Cookie cookie : getCookies(username).values())
+        {
+            connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
+        }
+        return connection;
     }
 
     public static void logToServer(String message)
