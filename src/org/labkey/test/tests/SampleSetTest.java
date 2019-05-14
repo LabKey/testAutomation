@@ -392,6 +392,77 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Looks like all reserved filed names were caught.");
     }
 
+    @Test
+    public void testLineageWithImplicitParentColumn() throws IOException, CommandException
+    {
+        // create a sampleset with the following explicit domain columns
+        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "implicitParentage", getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", "String"),
+                        TestDataGenerator.simpleFieldDef("data", "int"),
+                        TestDataGenerator.simpleFieldDef("stringData", "String")
+                ));
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.addRow(List.of("A", 12, dgen.randomString(15)));
+        dgen.addRow(List.of("B", 13, dgen.randomString(15)));
+        dgen.addRow(List.of("C", 15, dgen.randomString(15)));
+        dgen.addCustomRow(Map.of("name", "D", "data", 12, "stringData", dgen.randomString(15), "parent", "B"));
+        dgen.addCustomRow(Map.of("name", "E", "data", 14, "stringData", dgen.randomString(15), "parent", "B"));
+        dgen.addCustomRow(Map.of("name", "F", "data", 12, "stringData", dgen.randomString(15), "parent", "A,B"));
+        dgen.addCustomRow(Map.of("name", "G", "data", 12, "stringData", dgen.randomString(15), "parent", "C"));
+        dgen.addCustomRow(Map.of("name", "H", "data", 14, "stringData", dgen.randomString(15), "parent", "A,B,C"));
+        dgen.addCustomRow(Map.of("name", "I", "data", 12, "stringData", dgen.randomString(15), "parent", "B,G"));
+
+        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        // get row 'B' after insert
+        Map<String, Object> rowB = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("B"))
+            .findFirst().orElse(null);
+        Map<String, Object> rowH = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("H"))
+                .findFirst().orElse(null);
+        Map<String, Object> rowI = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("I"))
+                .findFirst().orElse(null);
+
+        refresh();
+        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        waitAndClick(Locator.linkWithText("implicitParentage"));
+        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+
+        // get the lineage graph
+        LineageCommand lineageCommand = new LineageCommand.Builder(rowB.get("lsid").toString())
+                .setChildren(true)
+                .setParents(false)
+                .setDepth(3).build();
+        LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(true), getCurrentContainerPath());
+        List<LineageNode> nodeChildren = new ArrayList<>();
+        for (LineageNode.Edge run : lineageResponse.getSeed().getChildren())
+        {
+            for (LineageNode.Edge child : run.getNode().getChildren()) // children in this context are runs
+            {
+                nodeChildren.add(child.getNode());      // in this case, D and E were processed as a single run
+            }
+        }
+        assertEquals(5, nodeChildren.size());
+
+        // now delete row B
+        dgen.deleteRows(createDefaultConnection(true), List.of(rowB));
+
+        // get the lineage graph
+        LineageCommand parents = new LineageCommand.Builder(rowH.get("lsid").toString())
+                .setChildren(false)
+                .setParents(true)
+                .setDepth(3).build();
+        LineageResponse parentResponse = parents.execute(createDefaultConnection(true), getCurrentContainerPath());
+        List<LineageNode> nodeParents = new ArrayList<>();
+        for (LineageNode.Edge run : parentResponse.getSeed().getParents())
+        {
+            for (LineageNode.Edge child : run.getNode().getParents()) // children in this context are runs
+            {
+                nodeParents.add(child.getNode());      // in this case, D and E were processed as a single run
+            }
+        }
+        assertEquals(2, nodeParents.size());
+    }
 
     /**
      * This test creates a domain with an explicit 'parent' column and supplies a set of lineage nodes that use the explicit
