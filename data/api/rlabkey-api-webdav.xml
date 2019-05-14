@@ -357,7 +357,7 @@
                 [1] "webdav.downloadFolder" "TRUE"
                 [1] "dir.exists post" "TRUE"
                 [1] "file.info.size a" "5"
-                [1] "file.info.size B" "5"
+                [1] "file.info.size b" "5"
                 [1] "empty dir.exists" "TRUE"
              ]]>
         </response>
@@ -380,7 +380,7 @@
                 [1] "webdav.downloadFolder" "TRUE"
                 [1] "dir.exists post" "TRUE"
                 [1] "file.info.size a" "5"
-                [1] "file.info.size B" "5"
+                [1] "file.info.size b" "5"
                 [1] "empty dir.exists" "TRUE"
              ]]>
         </response>
