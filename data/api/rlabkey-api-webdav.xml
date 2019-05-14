@@ -343,8 +343,8 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                c("file.exists pre", file.exists("%downloadDir%/getMe"))
-                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localDir="%downloadDir%", overwrite=FALSE))
+                c("dir.create", dir.create("%downloadDir%/getMe"))
+                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localDir="%downloadDir%/getMe", overwrite=FALSE))
                 c("dir.exists post", dir.exists("%downloadDir%/getMe"))
                 c("file.info.size a", file.info("%downloadDir%/getMe/a.txt")$size)
                 c("file.info.size b", file.info("%downloadDir%/getMe/subdir/b.txt")$size)
@@ -353,7 +353,7 @@
         </url>
         <response>
             <![CDATA[
-                [1] "file.exists pre" "FALSE"
+                [1] "dir.create" "TRUE"
                 [1] "webdav.downloadFolder" "TRUE"
                 [1] "dir.exists post" "TRUE"
                 [1] "file.info.size a" "5"
@@ -367,7 +367,8 @@
             <![CDATA[
                 library(Rlabkey)
                 c("dir.create", dir.create("%downloadDir%/overwrite/getMe", recursive=TRUE))
-                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localDir="%downloadDir%/overwrite", overwrite=TRUE))
+                c("file.create", file.create("%downloadDir%/overwrite/getMe/a.txt"))
+                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localDir="%downloadDir%/overwrite/getMe", overwrite=TRUE))
                 c("dir.exists post", dir.exists("%downloadDir%/overwrite/getMe"))
                 c("file.info.size a", file.info("%downloadDir%/overwrite/getMe/a.txt")$size)
                 c("file.info.size b", file.info("%downloadDir%/overwrite/getMe/subdir/b.txt")$size)
@@ -377,6 +378,7 @@
         <response>
             <![CDATA[
                 [1] "dir.create" "TRUE"
+                [1] "file.create" "TRUE"
                 [1] "webdav.downloadFolder" "TRUE"
                 [1] "dir.exists post" "TRUE"
                 [1] "file.info.size a" "5"
@@ -390,17 +392,23 @@
             <![CDATA[
                 library(Rlabkey)
                 c("dir.create", dir.create("%downloadDir%/noOverwrite/getMe", recursive=TRUE))
-                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localDir="%downloadDir%/noOverwrite", overwrite=FALSE))
-                c("dir.exists post", dir.exists("%downloadDir%/noOverwrite/getMe"))
-                c("file.exists post", file.exists("%downloadDir%/noOverwrite/getMe/a.txt"))
+                c("file.create", file.create("%downloadDir%/overwrite/getMe/a.txt"))
+                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localDir="%downloadDir%/noOverwrite/getMe", overwrite=FALSE))
+                c("dir.exists post", dir.exists("%downloadDir%/overwrite/getMe"))
+                c("file.info.size a", file.info("%downloadDir%/overwrite/getMe/a.txt")$size)
+                c("file.info.size b", file.info("%downloadDir%/overwrite/getMe/subdir/b.txt")$size)
+                c("empty dir.exists", dir.exists("%downloadDir%/overwrite/getMe/empty_subdir"))
             ]]>
         </url>
         <response>
             <![CDATA[
                 [1] "dir.create" "TRUE"
-                [1] "webdav.downloadFolder" "FALSE"
+                [1] "file.create" "TRUE"
+                [1] "webdav.downloadFolder" "TRUE"
                 [1] "dir.exists post" "TRUE"
-                [1] "file.exists post" "FALSE"
+                [1] "file.info.size a" "0"
+                [1] "file.info.size b" "5"
+                [1] "empty dir.exists" "TRUE"
              ]]>
         </response>
     </test>
