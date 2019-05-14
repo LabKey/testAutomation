@@ -561,7 +561,7 @@ public class SampleSetTest extends BaseWebDriverTest
         dgen.addRow(List.of("I", "G", 15, 60));
         SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
-        refresh();
+        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
         waitAndClick(Locator.linkWithText("Family"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
@@ -612,8 +612,6 @@ public class SampleSetTest extends BaseWebDriverTest
         LineageResponse linResponse = linCmd.execute(createDefaultConnection(true), getCurrentContainerPath());
         assertEquals("don't expect MaterialInput/tablename lookup to persist records that have been deleted",
                 0, linResponse.getSeed().getParents().size());
-
-        log("foo");
     }
 
     @Test
@@ -651,7 +649,7 @@ public class SampleSetTest extends BaseWebDriverTest
         SelectRowsResponse insertedSelect = dgen.getRowsFromServer(createDefaultConnection(true),
                 List.of("name", "parent", "data", "testIndex"));
 
-        refresh();      // the dataregion is helpful when debugging, not needed for testing
+        navigateToFolder(getProjectName(), LINEAGE_FOLDER);      // the dataregion is helpful when debugging, not needed for testing
         DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
         waitAndClick(Locator.linkWithText("bigLineage"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
