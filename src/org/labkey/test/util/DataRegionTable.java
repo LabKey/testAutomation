@@ -47,6 +47,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -256,11 +258,15 @@ public class DataRegionTable extends DataRegion
      */
     public void assertPaginationText(int firstRow, int lastRow, int totalRows)
     {
-        String expected = String.format("%,d",firstRow) + " - " + String.format("%,d", lastRow) + " of " + String.format("%,d", totalRows);
+        String expected = firstRow + " - " + lastRow + " of " + totalRows;
         String fullPaginationText = Locator.css(".labkey-pagination")
                 .findElement(elementCache().getButtonBar()).getText();
 
-        assertEquals("Wrong pagination text", expected, fullPaginationText);
+        Pattern pattern = Pattern.compile("\\d+ - \\d+ of \\d+");
+        Matcher matcher = pattern.matcher(fullPaginationText);
+        assertTrue("Unable to parse pagination text: " + fullPaginationText, matcher.find());
+        String actual = matcher.group(0);
+        assertEquals("Wrong pagination text", expected, actual);
     }
 
     /**
