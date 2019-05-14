@@ -71,6 +71,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({DailyA.class})
@@ -462,6 +463,69 @@ public class SampleSetTest extends BaseWebDriverTest
             }
         }
         assertEquals(2, nodeParents.size());
+    }
+
+    /**
+     * regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37465
+     * @throws IOException
+     * @throws CommandException
+     */
+    @Test
+    public void testLookupWithInvalidLookupValue() throws IOException, CommandException
+    {
+        // create a sampleset
+        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "badLookupTest", getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", "String"),
+                        TestDataGenerator.simpleFieldDef("data", "int")
+                ));
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
+        dgen.addCustomRow(Map.of("name", "B", "data", 12,  "MaterialInputs/badLookupTest", "A"));   // derives from A
+        dgen.addCustomRow(Map.of("name", "C", "data", 12,  "MaterialInputs/badLookupTest", "A"));
+        dgen.addCustomRow(Map.of("name", "D", "data", 12,  "MaterialInputs/badLookupTest", "BOGUS")); //<--bad lookup here
+        try
+        {
+            dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+            fail("Expect CommandException when inserting bogus lookup");
+        }catch (CommandException successMaybe)
+        {
+            assertTrue("expect bad lookup to produce error containing [Sample input 'BOGUS' in SampleSet 'badLookupTest' not found];\n" +
+                            "instead got: [" + successMaybe.getMessage() + "]",
+                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleSet 'badLookupTest' not found"));
+        }
+    }
+
+    /**
+     *  regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37465
+     * @throws IOException
+     * @throws CommandException
+     */
+    @Test
+    public void testLookupWithInvalidParentColumnValue() throws IOException, CommandException
+    {
+        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "badParentLookup", getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", "String"),
+                        TestDataGenerator.simpleFieldDef("data", "int")
+                ));
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
+        dgen.addCustomRow(Map.of("name", "B", "data", 13,  "parent", "A"));   // derives from A
+        dgen.addCustomRow(Map.of("name", "C", "data", 14,  "parent", "A"));
+        dgen.addCustomRow(Map.of("name", "D", "data", 15,  "parent", "BOGUS")); //<--bad lookup here
+        try
+        {
+            dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+            fail("Expect CommandException when inserting bogus lookup");
+        }catch (CommandException successMaybe)  // success looks like a CommandException with the expected message
+        {
+            assertTrue("expect bad lookup to produce error containing [Sample input 'BOGUS' in SampleSet 'badLookupTest' not found];\n" +
+                    "instead got: [" + successMaybe.getMessage() + "]",
+                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleSet 'badLookupTest' not found"));
+        }
+
+        log("foo");
     }
 
     /**
