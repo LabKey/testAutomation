@@ -214,6 +214,15 @@ public class ListHelper extends LabKeySiteWrapper
             beginAt(WebTestHelper.buildURL("query", containerPath, "rawTableMetaData", Map.of("schemaName", schemaName, "query.queryName", queryName)));
             artifactCollector.dumpPageSnapshot("rawMetadata", subdir, false);
 
+            // Clear caches
+            TestLogger.log("Clear cache: " +
+                    WebTestHelper.getHttpResponse(WebTestHelper.buildURL("admin", "memTracker", Map.of("clearCaches", "1"))).getResponseCode());
+
+            // Check schema browser after clearing caches
+            beginAt(WebTestHelper.buildURL("query", containerPath, "begin") + "#sbh-qdp-%26" + schemaName + "%26" + queryName);
+            waitForAnyElement(Locator.linkWithText("view data"), Locator.byClass("lk-qd-error"));
+            artifactCollector.dumpPageSnapshot("schemaBrowserClearedCache", subdir, false);
+
             return new RuntimeException("Detected possible metadata problem.", nse);
         }
         return nse;
