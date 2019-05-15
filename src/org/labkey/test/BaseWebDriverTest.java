@@ -2396,7 +2396,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         Locator iconLoc = chartLoc.append(EXPORT_ICON).append(imageLoc);
         WebElement exportIcon = iconLoc.findElement(getDriver());
         mouseOver(chartLoc); // mouse over to make sure icon is visible
-        return doAndWaitForDownload(exportIcon::click);
+        try
+        {
+            return doAndWaitForDownload(exportIcon::click);
+        }
+        catch (TimeoutException retry) // Download sometimes fails on first attempt
+        {
+            mouseOver(chartLoc);
+            return doAndWaitForDownload(exportIcon::click);
+        }
     }
 
     public List<Map<String, Object>> loadTsv(File tsv)
