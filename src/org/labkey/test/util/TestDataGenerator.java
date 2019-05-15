@@ -123,6 +123,8 @@ public class TestDataGenerator
 
     /**
      *  // helper to allow adding values as List.of(a, b, c)
+     *  Note: this helper uses the indexes of the fieldSet in testDataGenerator, so you can only use this helper
+     *  for fields that are explicitly part of the domain.  To add values into off-domain/lookup columns, use @addCustomRow
      * @param values
      * @return
      */
@@ -260,6 +262,7 @@ public class TestDataGenerator
     {
         InsertRowsCommand insertRowsCommand = new InsertRowsCommand(getSchema(), getQueryName());
         insertRowsCommand.setRows(rows);
+        insertRowsCommand.setTimeout(180000);       // default here will support large inserts
         return insertRowsCommand.execute(cn, _containerPath);
     }
 

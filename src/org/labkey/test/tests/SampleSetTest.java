@@ -393,9 +393,16 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Looks like all reserved filed names were caught.");
     }
 
+    /**
+     *  coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37466
+     * @throws IOException
+     * @throws CommandException
+     */
     @Test
     public void testLineageWithImplicitParentColumn() throws IOException, CommandException
     {
+        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
+
         // create a sampleset with the following explicit domain columns
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "implicitParentage", getCurrentContainerPath())
                 .withColumnSet(List.of(
@@ -407,12 +414,12 @@ public class SampleSetTest extends BaseWebDriverTest
         dgen.addRow(List.of("A", 12, dgen.randomString(15)));
         dgen.addRow(List.of("B", 13, dgen.randomString(15)));
         dgen.addRow(List.of("C", 15, dgen.randomString(15)));
-        dgen.addCustomRow(Map.of("name", "D", "data", 12, "stringData", dgen.randomString(15), "parent", "B"));
-        dgen.addCustomRow(Map.of("name", "E", "data", 14, "stringData", dgen.randomString(15), "parent", "B"));
-        dgen.addCustomRow(Map.of("name", "F", "data", 12, "stringData", dgen.randomString(15), "parent", "A,B"));
-        dgen.addCustomRow(Map.of("name", "G", "data", 12, "stringData", dgen.randomString(15), "parent", "C"));
-        dgen.addCustomRow(Map.of("name", "H", "data", 14, "stringData", dgen.randomString(15), "parent", "A,B,C"));
-        dgen.addCustomRow(Map.of("name", "I", "data", 12, "stringData", dgen.randomString(15), "parent", "B,G"));
+        dgen.addCustomRow(Map.of("name", "D", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "B"));
+        dgen.addCustomRow(Map.of("name", "E", "data", 14, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "B"));
+        dgen.addCustomRow(Map.of("name", "F", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "A,B"));
+        dgen.addCustomRow(Map.of("name", "G", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "C"));
+        dgen.addCustomRow(Map.of("name", "H", "data", 14, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "A,B,C"));
+        dgen.addCustomRow(Map.of("name", "I", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "B,G"));
 
         SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
@@ -462,7 +469,10 @@ public class SampleSetTest extends BaseWebDriverTest
                 nodeParents.add(child.getNode());      // in this case, D and E were processed as a single run
             }
         }
-        assertEquals(2, nodeParents.size());
+        assertEquals( "Issue 37466: Expect rowH to still derive from A and C",2, nodeParents.size());
+
+        // only delete on success
+        dgen.deleteDomain(createDefaultConnection(true));
     }
 
     /**
@@ -473,7 +483,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testLookupWithInvalidLookupValue() throws IOException, CommandException
     {
-        // create a sampleset
+        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "badLookupTest", getCurrentContainerPath())
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", "String"),
@@ -504,6 +514,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testLookupWithInvalidParentColumnValue() throws IOException, CommandException
     {
+        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "badParentLookup", getCurrentContainerPath())
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", "String"),
@@ -511,21 +522,22 @@ public class SampleSetTest extends BaseWebDriverTest
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
-        dgen.addCustomRow(Map.of("name", "B", "data", 13,  "parent", "A"));   // derives from A
-        dgen.addCustomRow(Map.of("name", "C", "data", 14,  "parent", "A"));
-        dgen.addCustomRow(Map.of("name", "D", "data", 15,  "parent", "BOGUS")); //<--bad lookup here
+        dgen.addCustomRow(Map.of("name", "B", "data", 13,  "MaterialInputs/badParentLookup", "A"));   // derives from A
+        dgen.addCustomRow(Map.of("name", "C", "data", 14,  "MaterialInputs/badParentLookup", "B"));
+        dgen.addCustomRow(Map.of("name", "D", "data", 15,  "MaterialInputs/badParentLookup", "BOGUS")); //<--bad lookup here
         try
         {
             dgen.insertRows(createDefaultConnection(true), dgen.getRows());
             fail("Expect CommandException when inserting bogus lookup");
         }catch (CommandException successMaybe)  // success looks like a CommandException with the expected message
         {
-            assertTrue("expect bad lookup to produce error containing [Sample input 'BOGUS' in SampleSet 'badLookupTest' not found];\n" +
+            assertTrue("expect bad lookup to produce error containing [Sample input 'BOGUS' in SampleSet 'badParentLookup' not found];\n" +
                     "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleSet 'badLookupTest' not found"));
+                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleSet 'badParentLookup' not found"));
         }
 
-        log("foo");
+        // clean up on success
+        dgen.deleteDomain(createDefaultConnection(true));
     }
 
     /**
@@ -539,39 +551,37 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void deleteLineageParent() throws IOException, CommandException
     {
+        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
+
         // create a sampleset with the following explicit domain columns
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "Family", getCurrentContainerPath())
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", "String"),
-                        TestDataGenerator.simpleFieldDef("parent", "String"),   // parent is a 'magic' field, looks up to name column
                         TestDataGenerator.simpleFieldDef("age", "int"),
                         TestDataGenerator.simpleFieldDef("height", "int")
-                ))
-                .addDataSupplier("parent", () -> null)  // don't put generated data into 'parent'- insert will fail if the value doesn't reference a name
-                .withGeneratedRows(25);
+                ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        dgen.addRow(List.of("A","null", 56, 60));
-        dgen.addRow(List.of("B", "null", 48, 50));
-        dgen.addRow(List.of("C", "A,B", 12, 50));
-        dgen.addRow(List.of("D", "B", 15, 60));
+        dgen.addRow(List.of("A", 56, 60));
+        dgen.addRow(List.of("B", 48, 50));
+        dgen.addCustomRow(Map.of("name", "C", "age", 12, "height", 44, "MaterialInputs/Family", "A,B"));
+        dgen.addCustomRow(Map.of("name", "D", "age", 12, "height", 44, "MaterialInputs/Family", "B"));
         dgen.addCustomRow(Map.of("name", "E", "age", 12, "height", 44, "MaterialInputs/Family", "B"));
         dgen.addCustomRow(Map.of("name", "F", "age", 12, "height", 44, "MaterialInputs/Family", "A,B"));
-        dgen.addRow(List.of("G", "C", 15, 60));
-        dgen.addRow(List.of("H", "A,B,C", 15, 60));
-        dgen.addRow(List.of("I", "G", 15, 60));
+        dgen.addCustomRow(Map.of("name", "G", "age", 12, "height", 44, "MaterialInputs/Family", "C"));
+        dgen.addCustomRow(Map.of("name", "H", "age", 12, "height", 44, "MaterialInputs/Family", "A,B,C"));
+        dgen.addCustomRow(Map.of("name", "I", "age", 12, "height", 44, "MaterialInputs/Family", "G"));
         SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
-        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
+        refresh();
         DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
         waitAndClick(Locator.linkWithText("Family"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        assertEquals(34, materialsList.getDataRowCount());
+        assertEquals(9, materialsList.getDataRowCount());
 
-        // peel saved rows A,B,C from the insert response
+        // peel saved rows A and B from the insert response
         List<Map<String, Object>> rowsToDelete = saveRowsResponse.getRows().stream()
-                .filter((a)-> a.get("name").equals("A") ||
-                        a.get("name").equals("B") ||
-                        a.get("name").equals("C")).collect(Collectors.toList());
+                .filter((a)-> a.get("name").equals("B") ||
+                        a.get("name").equals("A")).collect(Collectors.toList());
 
         Map<String, Object> E = saveRowsResponse.getRows().stream()
                 .filter((a)-> a.get("name").equals("E")).findFirst().orElse(null);
@@ -583,24 +593,11 @@ public class SampleSetTest extends BaseWebDriverTest
         assertEquals("don't expect MaterialInput/tablename lookup to persist records that have been deleted",
                 1, lineageResponse.getSeed().getParents().size());
 
-        // delete rows A, B, C
+        // delete rows A, B
         dgen.deleteRows(createDefaultConnection(true), rowsToDelete);
         SelectRowsResponse selectResponse = dgen.getRowsFromServer(createDefaultConnection(true),
                 List.of("rowId", "lsid", "name", "parent", "age", "height", "MaterialInputs/Family", "Inputs/First"));
         List<Map<String, Object>> remainingRows = selectResponse.getRows();
-
-        // get rows with parents A, B, C
-        Map<String, Object> rowD = remainingRows.stream()
-                .filter((a)-> a.get("name").equals("D")).findFirst().orElse(null);
-        Map<String, Object> rowG = remainingRows.stream()
-                .filter((a)-> a.get("name").equals("G")).findFirst().orElse(null);
-        Map<String, Object> rowH = remainingRows.stream()
-                .filter((a)-> a.get("name").equals("H")).findFirst().orElse(null);
-
-        // ensure that after deleting parents, these rows' derivation is still preserved in explicit column 'parent'
-        assertEquals("Expect parent value to remain even if parent row is removed","B", rowD.get("parent"));
-        assertEquals("Expect parent value to remain even if parent row is removed","C", rowG.get("parent"));
-        assertEquals("Expect parent value to remain even if parent row is removed","A,B,C", rowH.get("parent"));
 
         // now make sure materialInputs derivations don't persist references to deleted records
         Map<String, Object> rowE = remainingRows.stream()
@@ -612,16 +609,18 @@ public class SampleSetTest extends BaseWebDriverTest
         LineageResponse linResponse = linCmd.execute(createDefaultConnection(true), getCurrentContainerPath());
         assertEquals("don't expect MaterialInput/tablename lookup to persist records that have been deleted",
                 0, linResponse.getSeed().getParents().size());
+
+        dgen.deleteDomain(createDefaultConnection(true));
     }
 
     @Test
     public void testInsertLargeLineageGraph() throws IOException, CommandException
     {
+        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         // create a sampleset with the following explicit domain columns
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "bigLineage", getCurrentContainerPath())
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", "String"),
-                        TestDataGenerator.simpleFieldDef("parent", "String"),   // parent is a 'magic' field, looks up to name column
                         TestDataGenerator.simpleFieldDef("data", "int"),
                         TestDataGenerator.simpleFieldDef("testIndex", "int")
                 ));
@@ -636,18 +635,18 @@ public class SampleSetTest extends BaseWebDriverTest
         // insert them all at once
         String previousName = "seed";
         int testIndex = 1;
-        int intendedGenerationDepth = 4999;
+        int intendedGenerationDepth = 99;
         for (int i = 0; i < intendedGenerationDepth; i++)
         {
             String name = dgen.randomString(30);
-            Map row = Map.of("name", name, "data", dgen.randomInt(3, 1395), "testIndex", testIndex , "parent", previousName);
+            Map row = Map.of("name", name, "data", dgen.randomInt(3, 1395), "testIndex", testIndex , "MaterialInputs/bigLineage", previousName);
             dgen.addCustomRow(row);
             previousName = name;
             testIndex++;
         }
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
         SelectRowsResponse insertedSelect = dgen.getRowsFromServer(createDefaultConnection(true),
-                List.of("name", "parent", "data", "testIndex"));
+                List.of("name", "data", "testIndex"));
 
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);      // the dataregion is helpful when debugging, not needed for testing
         DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
@@ -669,6 +668,9 @@ public class SampleSetTest extends BaseWebDriverTest
             generationDepth++;
         }
         assertEquals("Expect lineage depth to be" +intendedGenerationDepth, intendedGenerationDepth, generationDepth);
+
+        // clean up the sampleset on success
+        dgen.deleteDomain(createDefaultConnection(true));
     }
 
     @Test
