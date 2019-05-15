@@ -3354,24 +3354,23 @@ public abstract class WebDriverWrapper implements WrapsDriver
             throw new IllegalArgumentException("Element not a checkbox: " + el.toString() + "\nTry Ext4Helper or ExtHelper.");
         }
 
+        Boolean indeterminate = executeScript("return arguments[0].indeterminate;", Boolean.class, el);
+        if (indeterminate != null && indeterminate)
+        {
+            el.click();
+        }
+
         boolean selected = el.isSelected();
         if (check != selected)
             el.click();
 
-        // Check to see if the checkbox has really been set to the desired state.
         try
         {
-            // '.toggle' is often an Ext4 checkbox. 'isSelected' doesn't detect its state correctly.
-            if (!el.getAttribute("name").equalsIgnoreCase(".toggle"))
-            {
-                log("In WebDriverWrapper.setCheckbox checking the value of the checkbox after clicking it.");
-                Assert.assertEquals("Failed to set checkbox to requested state.", check, el.isSelected());
-            }
+            Assert.assertEquals("Failed to set checkbox to requested state.", check, el.isSelected());
         }
-        catch(StaleElementReferenceException stale)
+        catch (StaleElementReferenceException ignore)
         {
             // In some cases the clicking the checkbox causes a refresh and the element goes stale.
-            log("In WebDriverWrapper.setCheckbox the element has gone stale after clicking it.");
         }
 
     }
