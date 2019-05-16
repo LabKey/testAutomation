@@ -108,6 +108,7 @@ public class IssuesHelper extends WebDriverWrapper
         popLocation();
 
         portalHelper.addWebPart("Issues Summary");
+        selectOptionByValue(Locator.name("issueDefName"), name);
         clickAndWait(Locator.linkWithText("Submit"));
         portalHelper.addWebPart("Search");
 
