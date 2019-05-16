@@ -406,9 +406,9 @@ public class SampleSetTest extends BaseWebDriverTest
         // create a sampleset with the following explicit domain columns
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "implicitParentage", getCurrentContainerPath())
                 .withColumnSet(List.of(
-                        TestDataGenerator.simpleFieldDef("name", "String"),
-                        TestDataGenerator.simpleFieldDef("data", "int"),
-                        TestDataGenerator.simpleFieldDef("stringData", "String")
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer),
+                        TestDataGenerator.simpleFieldDef("stringData", FieldDefinition.ColumnType.String)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addRow(List.of("A", 12, dgen.randomString(15)));
@@ -433,7 +433,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         refresh();
         DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
-        waitAndClick(Locator.linkWithText("implicitParentage"));
+        waitAndClickAndWait(Locator.linkWithText("implicitParentage"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 
         // get the lineage graph
@@ -486,8 +486,8 @@ public class SampleSetTest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "badLookupTest", getCurrentContainerPath())
                 .withColumnSet(List.of(
-                        TestDataGenerator.simpleFieldDef("name", "String"),
-                        TestDataGenerator.simpleFieldDef("data", "int")
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
@@ -517,8 +517,8 @@ public class SampleSetTest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "badParentLookup", getCurrentContainerPath())
                 .withColumnSet(List.of(
-                        TestDataGenerator.simpleFieldDef("name", "String"),
-                        TestDataGenerator.simpleFieldDef("data", "int")
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
@@ -556,9 +556,9 @@ public class SampleSetTest extends BaseWebDriverTest
         // create a sampleset with the following explicit domain columns
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "Family", getCurrentContainerPath())
                 .withColumnSet(List.of(
-                        TestDataGenerator.simpleFieldDef("name", "String"),
-                        TestDataGenerator.simpleFieldDef("age", "int"),
-                        TestDataGenerator.simpleFieldDef("height", "int")
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("age", FieldDefinition.ColumnType.Integer),
+                        TestDataGenerator.simpleFieldDef("height", FieldDefinition.ColumnType.Integer)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addRow(List.of("A", 56, 60));
@@ -620,9 +620,9 @@ public class SampleSetTest extends BaseWebDriverTest
         // create a sampleset with the following explicit domain columns
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "bigLineage", getCurrentContainerPath())
                 .withColumnSet(List.of(
-                        TestDataGenerator.simpleFieldDef("name", "String"),
-                        TestDataGenerator.simpleFieldDef("data", "int"),
-                        TestDataGenerator.simpleFieldDef("testIndex", "int")
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer),
+                        TestDataGenerator.simpleFieldDef("testIndex", FieldDefinition.ColumnType.Integer)
                 ));
 
         dgen.createDomain(createDefaultConnection(true), "SampleSet");

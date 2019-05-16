@@ -1,5 +1,6 @@
 package org.labkey.test.util;
 
+import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
@@ -7,12 +8,12 @@ import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DeleteDomainCommand;
 import org.labkey.remoteapi.domain.DeleteDomainResponse;
 import org.labkey.remoteapi.domain.DomainResponse;
-import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.params.FieldDefinition;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -33,45 +34,34 @@ public class TestDataGenerator
     // chose a Character random from this String
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
 
-    private final Map<Integer, String> _indices = new HashMap<>();  // used to keep columns and row keys aligned
-    private final Map<String, Map<String, Object>> _columns = new CaseInsensitiveHashMap<>();
+    private final Map<Integer, FieldDefinition> _indices = new HashMap<>();  // used to keep columns and row keys aligned
+    // TODO: Make `_columns` a `Map<String, FieldDefinition>`
+    private final Map<String, FieldDefinition> _columns = new CaseInsensitiveHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
     private List<Map<String, Object>> _rows = new ArrayList<>();
-    private int _rowCount = 0;
-    private String _schema;
-    private String _queryName;
-    private String _containerPath;
+
+    private FieldDefinition.LookupInfo _lookupInfo;
 
 
     /*  use TestDataGenerator to generate data to a specific fieldSet
     *  */
     public TestDataGenerator(String schema, String queryName, String containerPath)
     {
-        _schema=schema;
-        _queryName=queryName;
-        _containerPath = containerPath;
+        _lookupInfo = new FieldDefinition.LookupInfo(containerPath, schema, queryName);
     }
-
-    /*
-    this constructor extracts the fieldSet from the specified domain
-    * */
-    public TestDataGenerator(Connection cn, String schema, String queryName, String containerPath) throws IOException, CommandException
+    public TestDataGenerator(FieldDefinition.LookupInfo lookupInfo)
     {
-        _schema=schema;
-        _queryName=queryName;
-        _containerPath = containerPath;
-        List<Map<String, Object>> fieldSet = extractDomainFieldSetFrom(cn, schema, queryName, containerPath);
-        withColumnSet(fieldSet);   // extract the columns from the specified query
+        _lookupInfo = lookupInfo;
     }
 
     public String getSchema()
     {
-        return _schema;
+        return _lookupInfo.getSchema();
     }
 
     public String getQueryName()
     {
-        return _queryName;
+        return _lookupInfo.getTable();
     }
 
     /**
@@ -79,14 +69,13 @@ public class TestDataGenerator
      * @param columns   The fieldSet for the domain/sampleset/list.
      * @return
      */
-    public TestDataGenerator withColumnSet(List<Map<String, Object>> columns)
+    public TestDataGenerator withColumnSet(List<FieldDefinition> columns)
     {
         int index = 0;
-        for (Map<String, Object> col : columns)
+        for (FieldDefinition fieldDef : columns)
         {
-            String columnName = col.get("name").toString();
-            _columns.put(columnName, col);                      // todo: encapsulate columns/indices in a class
-            _indices.put(index, columnName);                    // and use that everyhere columns are modified or read
+            _columns.put(fieldDef.getName(), fieldDef);
+            _indices.put(index, fieldDef);
             index++;
         }
         return this;
@@ -94,11 +83,10 @@ public class TestDataGenerator
 
     public TestDataGenerator withGeneratedRows(int desiredRowCount)
     {
-        boolean generate = _rowCount == 0;
-        _rowCount = desiredRowCount;
+        boolean generate = getRowCount() == 0;
 
         if (generate)
-            generateRows();
+            generateRows(desiredRowCount);
 
         return this;
     }
@@ -130,14 +118,15 @@ public class TestDataGenerator
      */
     public TestDataGenerator addRow(List<Object> values)
     {
+        Assert.assertEquals("Did not provide the correct size row", _indices.size(), values.size());
+
         Map<String, Object> row = new HashMap<>();
         for (int i = 0; i < values.size(); i++)     // walk across keys in index order, insert values in that order
         {
-            String keyAtIndex = _indices.get(i);
-            row.put(keyAtIndex, values.get(i) != "null" ? values.get(i).toString() : null);
+            String keyAtIndex = _indices.get(i).getName();
+            row.put(keyAtIndex, values.get(i));
         }
-        _rows.add(row);
-        _rowCount = getRows().size();
+        addCustomRow(row);
         return this;
     }
 
@@ -151,7 +140,6 @@ public class TestDataGenerator
     public TestDataGenerator addCustomRow(Map<String, Object> customRow)
     {
         _rows.add(customRow);
-        _rowCount = getRows().size();
         return this;
     }
 
@@ -170,23 +158,23 @@ public class TestDataGenerator
         List<Map<String, Object>> cols = new ArrayList<>();
         for (String key: _columns.keySet())
         {
-            cols.add(_columns.get(key));
+            cols.add(_columns.get(key).toMap());
         }
         return cols;
     }
 
-    public void generateRows()
+    public void generateRows(int numberOfRowsToGenerate)
     {
         if (_columns.keySet().size() == 0)
             throw new IllegalStateException("can't generate row data without column definitions");
 
-        for (int i= 0; i < _rowCount; i++)
+        for (int i= 0; i < numberOfRowsToGenerate; i++)
         {
             Map<String, Object> newRow = new HashMap<>();
 
             for (String key : _columns.keySet())
             {
-                Map<String, Object> columnDefinition = _columns.get(key);
+                Map<String, Object> columnDefinition = _columns.get(key).toMap();
                 // get the column definition
                 String columnName = columnDefinition.get("name").toString().toLowerCase();
                 String columnType = columnDefinition.get("rangeURI").toString().toLowerCase();
@@ -249,13 +237,13 @@ public class TestDataGenerator
     {
         CreateDomainCommand cmd = new CreateDomainCommand(domainKind, getQueryName());
         cmd.setColumns(getColumns());
-        return cmd.execute(cn, _containerPath);
+        return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
     public DeleteDomainResponse deleteDomain(Connection cn) throws IOException, CommandException
     {
         DeleteDomainCommand delCmd = new DeleteDomainCommand(getSchema(), getQueryName());
-        return delCmd.execute(cn, _containerPath);
+        return delCmd.execute(cn, _lookupInfo.getFolder());
     }
 
     public SaveRowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
@@ -263,7 +251,7 @@ public class TestDataGenerator
         InsertRowsCommand insertRowsCommand = new InsertRowsCommand(getSchema(), getQueryName());
         insertRowsCommand.setRows(rows);
         insertRowsCommand.setTimeout(180000);       // default here will support large inserts
-        return insertRowsCommand.execute(cn, _containerPath);
+        return insertRowsCommand.execute(cn, _lookupInfo.getFolder());
     }
 
     public SelectRowsResponse getRowsFromServer(Connection cn) throws IOException, CommandException
@@ -276,7 +264,7 @@ public class TestDataGenerator
         SelectRowsCommand cmd = new SelectRowsCommand(getSchema(), getQueryName());
         if (intendedColumns!=null)
             cmd.setColumns(intendedColumns);
-        return cmd.execute(cn, _containerPath);
+        return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
     /**
@@ -291,57 +279,19 @@ public class TestDataGenerator
     {
         DeleteRowsCommand cmd = new DeleteRowsCommand(getSchema(), getQueryName());
         cmd.setRows(rowsToDelete);
-        return cmd.execute(cn, _containerPath);
+        return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
     public TestDataValidator getValidator()
     {
-        return new TestDataValidator(_schema, _queryName, _containerPath, _columns, _rows);
-    }
-
-    /**
-     * The domain fields exclude the standard and magic columns, such as rowId, lsid, parent.
-     * @param cn
-     * @param schema
-     * @param queryName
-     * @param containerPath
-     * @return
-     * @throws IOException
-     * @throws CommandException
-     */
-    static public List<Map<String, Object>> extractDomainFieldSetFrom(Connection cn, String schema, String queryName, String containerPath) throws IOException, CommandException
-    {
-        GetDomainCommand getDomainCommand = new GetDomainCommand(schema, queryName);
-        DomainResponse domainResponse = getDomainCommand.execute(cn, containerPath);
-        return domainResponse.getColumns();
-    }
-
-    /**
-     *  extracts the requested column set from the existing/specified table
-     * @param cn
-     * @param schema
-     * @param queryName
-     * @param containerPath
-     * @param requestedColumns
-     * @return
-     * @throws IOException
-     * @throws CommandException
-     */
-    static public List<Map<String, Object>> extractRequestedColumnSet(Connection cn, String schema, String queryName, String containerPath,
-                                                                      List<String> requestedColumns)    throws IOException, CommandException
-    {
-        SelectRowsCommand cmd = new SelectRowsCommand(schema, queryName);
-        cmd.setColumns(requestedColumns);
-        SelectRowsResponse response = cmd.execute(cn, containerPath);
-        return response.getColumnModel();
+        return new TestDataValidator(_lookupInfo, _columns, _rows);
     }
 
     // helper to generate a column or field definition
-    static public Map<String, Object> simpleFieldDef(String name, String rangeURI)
+    static public FieldDefinition simpleFieldDef(String name, FieldDefinition.ColumnType type)
     {
-        Map<String, Object> fieldDef = new HashMap<>();
-        fieldDef.put("name", name.toLowerCase());             // column name
-        fieldDef.put("rangeURI", rangeURI);                   // column type
+        FieldDefinition fieldDef = new FieldDefinition(name);
+        fieldDef.setType(type);
         return fieldDef;
     }
 }

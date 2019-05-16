@@ -16,24 +16,39 @@
 package org.labkey.test.params;
 
 import org.jetbrains.annotations.Nullable;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
+
+import java.util.Map;
 
 public class FieldDefinition
 {
+    private String NAME_KEY = "name";
     private String _name;
+    private String LABEL_KEY = "label";
     private String _label;
     private ColumnType _type;
+    private String TYPE_KEY = "rangeURI";
+    private String DESCRIPTION_KEY="description";
     private String _description;
+    private String FORMAT_KEY= "formatString";
     private String _format;
+    private String MV_ENABLED_KEY = "mvEnabled";
     private boolean _mvEnabled;
+    private String REQUIRED_KEY = "required";
     private boolean _required;
     private LookupInfo _lookup;
+    private String LOOKUP_KEY;
     private FieldValidator _validator;
+    private String URL_KEY;
     private String _url;
+    private String SCALE_KEY = "scale";
     private Integer _scale;
+
+    private CaseInsensitiveHashMap _map = new CaseInsensitiveHashMap();
 
     public FieldDefinition(String name)
     {
-        _name = name;
+        setName(name);
     }
 
     public String getName()
@@ -44,6 +59,7 @@ public class FieldDefinition
     public FieldDefinition setName(String name)
     {
         _name = name;
+        replaceInMap(NAME_KEY, name);
         return this;
     }
 
@@ -55,6 +71,7 @@ public class FieldDefinition
     public FieldDefinition setLabel(String label)
     {
         _label = label;
+        replaceInMap(LABEL_KEY, label);
         return this;
     }
 
@@ -66,6 +83,7 @@ public class FieldDefinition
     public FieldDefinition setType(ColumnType type)
     {
         _type = type;
+        replaceInMap(TYPE_KEY, type.getJsonType());
         return this;
     }
 
@@ -77,6 +95,7 @@ public class FieldDefinition
     public FieldDefinition setDescription(String description)
     {
         _description = description;
+        replaceInMap(DESCRIPTION_KEY, description);
         return this;
     }
 
@@ -88,6 +107,7 @@ public class FieldDefinition
     public FieldDefinition setFormat(String format)
     {
         _format = format;
+        replaceInMap(FORMAT_KEY, format);
         return this;
     }
 
@@ -99,6 +119,7 @@ public class FieldDefinition
     public FieldDefinition setMvEnabled(boolean mvEnabled)
     {
         _mvEnabled = mvEnabled;
+        replaceInMap(MV_ENABLED_KEY, mvEnabled);
         return this;
     }
 
@@ -110,6 +131,7 @@ public class FieldDefinition
     public FieldDefinition setRequired(boolean required)
     {
         _required = required;
+        _map.put(REQUIRED_KEY, required);
         return this;
     }
 
@@ -143,6 +165,7 @@ public class FieldDefinition
     public FieldDefinition setURL(String url)
     {
         _url = url;
+        replaceInMap(URL_KEY, url);
         return this;
     }
 
@@ -154,9 +177,21 @@ public class FieldDefinition
     public FieldDefinition setScale(Integer scale)
     {
         _scale = scale;
+        replaceInMap(SCALE_KEY, scale);
         return this;
     }
 
+    public Map<String, Object> toMap()
+    {
+        return _map;
+    }
+
+    private void replaceInMap(String key, Object value)
+    {
+        if (_map.get(key) != null)
+            _map.remove(key);
+        _map.put(key, value);
+    }
 
     public enum RangeType
     {
@@ -176,20 +211,28 @@ public class FieldDefinition
 
     public enum ColumnType
     {
-        MultiLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"), DateTime("DateTime"), Boolean("Boolean"),
-        Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer"), Flag("Flag (String)"), Attachment("Attachment"), User("User"), Lookup("Lookup");
+        MultiLine("Multi-Line Text", "string"), Integer("Integer", "int"),
+        String("Text (String)", "string"), Subject("Subject/Participant (String)", "string"),
+        DateTime("DateTime", "date"), Boolean("Boolean", "boolean"),
+        Double("Number (Double)", "float"), File("File", null),
+        AutoInteger("Auto-Increment Integer", "int"),
+        Flag("Flag (String)", null), Attachment("Attachment", null),
+        User("User", "int"), Lookup("Lookup", null);
 
-        private final String _description;
+        private final String _description;  // the display value in the UI for this kind of field
+        private final String _jsonType;     // the key used inside the API
 
-        ColumnType(String description)
+        ColumnType(String description, String jsonType)
         {
             _description = description;
+            _jsonType = jsonType;
         }
 
         public String toString()
         {
             return _description;
         }
+        public String getJsonType() { return _jsonType; }
     }
 
     public static class LookupInfo

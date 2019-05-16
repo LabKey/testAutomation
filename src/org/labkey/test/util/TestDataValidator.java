@@ -1,6 +1,7 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
+import org.labkey.test.params.FieldDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,19 +10,16 @@ import java.util.stream.Collectors;
 
 public class TestDataValidator
 {
-    private String _schema;
-    private String _queryName;
-    private String _containerPath;
 
-    private Map<String, Map<String, Object>> _columns = new CaseInsensitiveHashMap<>();
+    private FieldDefinition.LookupInfo _lookupInfo;
+
+    private Map<String, FieldDefinition> _columns = new CaseInsensitiveHashMap<>();
     private List<Map<String, Object>> _rows = new ArrayList<>();
 
-    public TestDataValidator(String schema, String queryName, String containerPath, Map<String,
-            Map<String, Object>> columns, List<Map<String, Object>> rows)
+    public TestDataValidator(FieldDefinition.LookupInfo lookupInfo,
+            Map<String, FieldDefinition> columns, List<Map<String, Object>> rows)
     {
-        _schema=schema;
-        _queryName=queryName;
-        _containerPath=containerPath;
+        _lookupInfo = lookupInfo;
         _columns = columns;
         _rows = rows;
     }
