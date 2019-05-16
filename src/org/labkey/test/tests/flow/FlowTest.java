@@ -434,7 +434,7 @@ public class FlowTest extends BaseFlowTest
         assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("ff_compensationMatrixOption"), "Matrix: " + FCS_FILE_1 + " comp matrix"));
 
-        checkCheckbox(Locator.checkboxByName(".toggle"));
+        click(Locator.checkboxByName(".toggle")); // "Select all" checkbox behavior is unusual because some rows are disabled
         clickButton("Analyze selected runs");
         waitForPipeline(getContainerPath());
 
