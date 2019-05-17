@@ -36,10 +36,10 @@ import org.labkey.remoteapi.security.RemoveGroupMembersCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper.PrincipalType;
 import org.labkey.test.util.PortalHelper;
 
@@ -88,7 +88,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         log("Starting security portion of test...");
         clickProject(PROJECT_NAME);
 
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         cn.setAcceptSelfSignedCerts(true);
 
         log("creating a new user...");

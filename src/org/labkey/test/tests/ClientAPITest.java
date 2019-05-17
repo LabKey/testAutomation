@@ -1299,7 +1299,10 @@ public class ClientAPITest extends BaseWebDriverTest
 
     private Connection getConnection(boolean validPassword)
     {
-        return new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), validPassword ? PasswordUtil.getPassword() : "bad connection password");
+        if (validPassword)
+            return WebTestHelper.getRemoteApiConnection();
+        else
+            return new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), "bad connection password");
     }
 
     @LogMethod

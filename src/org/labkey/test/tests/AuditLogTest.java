@@ -46,7 +46,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.BufferedReader;
@@ -407,7 +406,7 @@ public class AuditLogTest extends BaseWebDriverTest
             _containerHelper.enableModule("simpletest");
             goToProjectHome();
 
-            Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+            Connection cn = WebTestHelper.getRemoteApiConnection();
 
             // create manufacturer (which has summary audit log level)
             InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
@@ -863,7 +862,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     private List<Map<String, Object>> getDomainEventLog(String projectName)
     {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainAuditEvent");
         cmd.setRequiredVersion(9.1);
         cmd.setColumns(Arrays.asList("rowid", "created", "createdby", "impersonatedby", "projectid", "domainuri", "domainname", "comment"));
@@ -875,7 +874,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     private List<Map<String, Object>> getDomainPropertyEventLog(String domainName, @Nullable List<String> eventIds)
     {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainPropertyAuditEvent");
         cmd.setRequiredVersion(9.1);
         cmd.setColumns(Arrays.asList("Created", "CreatedBy", "ImpersonatedBy", "propertyname", "action", "domainname", "domaineventid", "Comment"));

@@ -55,7 +55,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     public ApiPermissionsHelper(WebDriverWrapper test)
     {
-        this(test, () -> new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword()));
+        this(test, () -> WebTestHelper.getRemoteApiConnection());
     }
 
     @Override

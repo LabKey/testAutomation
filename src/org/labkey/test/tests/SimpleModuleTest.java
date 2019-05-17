@@ -52,7 +52,6 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WikiHelper;
@@ -356,7 +355,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Testing schemas in modules...");
         beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
 
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
         log("** Inserting new Manufacturers via java client api...");
         InsertRowsCommand insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
@@ -1129,7 +1128,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestContainerColumns() throws Exception
     {
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
         log("** Testing container columns");
         SelectRowsCommand selectCmd = new SelectRowsCommand(CORE_SCHEMA, "Containers");
@@ -1177,7 +1176,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         log("Testings custom views for insert/update/details");
 
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
         log("** using selectRows to test details view, which has been customized in schema XML only");
         SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
@@ -1256,7 +1255,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         log("** Testing filtering and sorting via java API...");
 
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
         log("** Select using selectRows and a view with a filter in it");
         SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
@@ -1775,7 +1774,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         try
         {
             cleanupSchema(cn);

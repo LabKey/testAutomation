@@ -2035,8 +2035,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void deleteAllRows(String projectName, String schema, String table) throws IOException, CommandException
     {
-
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand(schema, table);
         SelectRowsResponse resp = cmd.execute(cn, projectName);
         if (resp.getRowCount().intValue() > 0)

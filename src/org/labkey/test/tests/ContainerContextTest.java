@@ -39,7 +39,6 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WikiHelper;
@@ -655,7 +654,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     @LogMethod
     private String insertEmissionTest(String workbookId, String suffix, int vehicleId, String parentRowId) throws IOException, CommandException
     {
-            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+            Connection cn = WebTestHelper.getRemoteApiConnection();
 
             InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "EmissionTest");
             Map<String, Object> rowMap = new HashMap<>();
@@ -678,7 +677,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     private void deleteVehicleRecords() throws IOException, CommandException
     {
             log("deleting records from vehicle schema that may have been created by this test");
-            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+            Connection cn = WebTestHelper.getRemoteApiConnection();
 
             SelectRowsCommand sr0 = new SelectRowsCommand("vehicle", "EmissionTest");
             SelectRowsResponse resp0 = sr0.execute(cn, getProjectName());
@@ -738,7 +737,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     {
             deleteVehicleRecords();  //schema should be enabled, so dont ignore exceptions
 
-            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+            Connection cn = WebTestHelper.getRemoteApiConnection();
 
             //look like we need to create this too
             InsertRowsCommand insertCmd0 = new InsertRowsCommand("vehicle", "colors");

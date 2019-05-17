@@ -45,7 +45,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -961,7 +960,7 @@ public class SampleSetTest extends BaseWebDriverTest
         List<Map<String, String>> results = new ArrayList<>(6);
         Map<String, String> tempRow;
 
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleSetName);
         cmd.setColumns(fields);
 

@@ -70,7 +70,7 @@ public class APIContainerHelper extends AbstractContainerHelper
 
     public CreateContainerResponse doCreateContainer(String parentPath, @Nullable String name, String title, String folderType, boolean isWorkbook)
     {
-        Connection connection = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection connection = WebTestHelper.getRemoteApiConnection();
         CreateContainerCommand command = new CreateContainerCommand(name);
 
         if (isWorkbook)
@@ -168,7 +168,7 @@ public class APIContainerHelper extends AbstractContainerHelper
     @Override
     public void moveFolder(@LoggedParam String projectName, @LoggedParam String folderName, @LoggedParam String newParent, final boolean createAlias) throws CommandException
     {
-        Connection connection = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection connection = WebTestHelper.getRemoteApiConnection();
 
         final String containerPath = projectName + "/" + folderName;
         PostCommand command = new PostCommand("core", "moveContainer")

@@ -40,7 +40,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -185,7 +184,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         verifyAPIKeysTablePresence(true);
 
         log("Verify " + CRYPT_COLUMN + " column is not accessible");
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         GetQueryDetailsCommand cmdqd = new GetQueryDetailsCommand("core", APIKEYS_TABLE);
         try
         {
@@ -265,7 +264,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
     private void deleteAPIKeys(List<Map<String, Object>> _generatedApiKeys) throws IOException
     {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         DeleteRowsCommand cmddel = new DeleteRowsCommand("core", APIKEYS_TABLE);
         cmddel.setRows(_generatedApiKeys);
         try
@@ -298,7 +297,7 @@ public class ApiKeyTest extends BaseWebDriverTest
     protected Map<String, Object> getLastAPIKeyRecord() throws IOException
     {
         // Call the API with admin account (current user)
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
         SelectRowsCommand cmd = new SelectRowsCommand("core", APIKEYS_TABLE);
         cmd.setRequiredVersion(9.1);

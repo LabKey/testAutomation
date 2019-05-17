@@ -39,7 +39,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.SimpleHttpResponse;
 
 import java.io.IOException;
@@ -256,7 +255,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         insertViaFormNoPerms(PROJECT_NAME, "Haha!", 3);
 
         log("** Trying to insert via api on uneditable external schema");
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         Row[] rows = new Row[] {new Row("A", 3), new Row("B", 4) };
         InsertRowsCommand cmd = new InsertRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Row row : rows)
@@ -311,7 +310,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     void doTestViaJavaApi() throws Exception
     {
         String containerPath = StringUtils.join(Arrays.asList(PROJECT_NAME, FOLDER_NAME), "/");
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
         Row[] inserted = new Row[] {new Row("A", 3), new Row("B", 4) };
         int[] pks = insertViaJavaApi(containerPath, cn, inserted);

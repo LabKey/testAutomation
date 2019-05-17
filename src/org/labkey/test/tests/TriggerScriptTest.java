@@ -38,7 +38,6 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.Alert;
 
@@ -303,7 +302,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         EmployeeRecord row1 = new EmployeeRecord("Emp 1", ssn1, "LK"),
                        row2 = new EmployeeRecord("Emp 6", ssn2, "KL");
 
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
         String testName = API_TEST;
         String step = "AfterInsert";
@@ -464,7 +463,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
      */
     private void doAPITriggerTest(String schemaName, String queryName, String keyColumnName, boolean requiresDate) throws Exception
     {
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = WebTestHelper.getRemoteApiConnection();
         String flagField = COMMENTS_FIELD; //Field to watch in trigger script
         String updateField = COUNTRY_FIELD; //field that is set by trigger scripts and Updates
 
