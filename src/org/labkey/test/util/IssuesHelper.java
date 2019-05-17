@@ -34,6 +34,7 @@ import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 
 import java.io.File;
@@ -108,7 +109,7 @@ public class IssuesHelper extends WebDriverWrapper
         popLocation();
 
         portalHelper.addWebPart("Issues Summary");
-        selectOptionByValue(Locator.name("issueDefName"), name);
+        selectOptionByValue(Locator.name("issueDefName"), name.toLowerCase().replaceAll("[ -]+", ""));
         clickAndWait(Locator.linkWithText("Submit"));
         portalHelper.addWebPart("Search");
 
@@ -178,8 +179,12 @@ public class IssuesHelper extends WebDriverWrapper
     @LogMethod
     public DetailsPage addIssue(Map<String, String> issue, File... attachments)
     {
-        goToModule("Issues");
-        clickButton("New Issue");
+        Locator.XPathLocator buttonLoc = Locator.lkButton("New Issue");
+        WebElement newIssuesButton = buttonLoc.findOptionalElement(getDriver()).orElseGet(() -> {
+            goToModule("Issues");
+            return buttonLoc.findElement(getDriver());
+        });
+        clickAndWait(newIssuesButton);
         InsertPage insertPage = new InsertPage(getDriver());
 
         for (Map.Entry<String, String> field : issue.entrySet())
