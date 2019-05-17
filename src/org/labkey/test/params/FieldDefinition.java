@@ -130,7 +130,6 @@ public class FieldDefinition
     public FieldDefinition setLookup(LookupInfo lookup)
     {
         _lookup = lookup;
-        _type = null;
         return this;
     }
 
@@ -171,13 +170,15 @@ public class FieldDefinition
     {
         CaseInsensitiveHashMap<Object> map = new CaseInsensitiveHashMap<>();
 
-        if (getLookup() != null)
-            throw new IllegalArgumentException("`FieldDefinition.toMap()` does not currently support lookup columns");
-
         map.put("name", getName());
         if (getLabel() != null)
             map.put("label", getLabel());
-        if (getType() != null)
+
+        if (getLookup() != null)
+        {
+            throw new IllegalArgumentException("`FieldDefinition.toMap()` does not currently support lookup columns");
+        }
+        else if (getType() != null)
         {
             if (getType().getJsonType() == null)
                 throw new IllegalArgumentException("`FieldDefinition.toMap()` does not currently support column type: " + getType().name());
