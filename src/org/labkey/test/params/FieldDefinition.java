@@ -22,45 +22,38 @@ import java.util.Map;
 
 public class FieldDefinition
 {
-    private String NAME_KEY = "name";
-    private String _name;
-    private String LABEL_KEY = "label";
+    private final String _name;
     private String _label;
     private ColumnType _type;
-    private String TYPE_KEY = "rangeURI";
-    private String DESCRIPTION_KEY="description";
     private String _description;
-    private String FORMAT_KEY= "formatString";
     private String _format;
-    private String MV_ENABLED_KEY = "mvEnabled";
     private boolean _mvEnabled;
-    private String REQUIRED_KEY = "required";
     private boolean _required;
     private LookupInfo _lookup;
-    private String LOOKUP_KEY;
     private FieldValidator _validator;
-    private String URL_KEY;
     private String _url;
-    private String SCALE_KEY = "scale";
     private Integer _scale;
 
-    private CaseInsensitiveHashMap _map = new CaseInsensitiveHashMap();
+    public FieldDefinition(String name, ColumnType type)
+    {
+        _name = name;
+        _type = type;
+    }
 
     public FieldDefinition(String name)
     {
-        setName(name);
+        this(name, ColumnType.String);
+    }
+
+    public FieldDefinition(String name, LookupInfo lookup)
+    {
+        _name = name;
+        _lookup = lookup;
     }
 
     public String getName()
     {
         return _name;
-    }
-
-    public FieldDefinition setName(String name)
-    {
-        _name = name;
-        replaceInMap(NAME_KEY, name);
-        return this;
     }
 
     public String getLabel()
@@ -71,7 +64,6 @@ public class FieldDefinition
     public FieldDefinition setLabel(String label)
     {
         _label = label;
-        replaceInMap(LABEL_KEY, label);
         return this;
     }
 
@@ -83,7 +75,6 @@ public class FieldDefinition
     public FieldDefinition setType(ColumnType type)
     {
         _type = type;
-        replaceInMap(TYPE_KEY, type.getJsonType());
         return this;
     }
 
@@ -95,7 +86,6 @@ public class FieldDefinition
     public FieldDefinition setDescription(String description)
     {
         _description = description;
-        replaceInMap(DESCRIPTION_KEY, description);
         return this;
     }
 
@@ -107,7 +97,6 @@ public class FieldDefinition
     public FieldDefinition setFormat(String format)
     {
         _format = format;
-        replaceInMap(FORMAT_KEY, format);
         return this;
     }
 
@@ -119,7 +108,6 @@ public class FieldDefinition
     public FieldDefinition setMvEnabled(boolean mvEnabled)
     {
         _mvEnabled = mvEnabled;
-        replaceInMap(MV_ENABLED_KEY, mvEnabled);
         return this;
     }
 
@@ -131,7 +119,6 @@ public class FieldDefinition
     public FieldDefinition setRequired(boolean required)
     {
         _required = required;
-        _map.put(REQUIRED_KEY, required);
         return this;
     }
 
@@ -143,6 +130,7 @@ public class FieldDefinition
     public FieldDefinition setLookup(LookupInfo lookup)
     {
         _lookup = lookup;
+        _type = null;
         return this;
     }
 
@@ -165,7 +153,6 @@ public class FieldDefinition
     public FieldDefinition setURL(String url)
     {
         _url = url;
-        replaceInMap(URL_KEY, url);
         return this;
     }
 
@@ -177,20 +164,35 @@ public class FieldDefinition
     public FieldDefinition setScale(Integer scale)
     {
         _scale = scale;
-        replaceInMap(SCALE_KEY, scale);
         return this;
     }
 
     public Map<String, Object> toMap()
     {
-        return _map;
-    }
+        CaseInsensitiveHashMap<Object> map = new CaseInsensitiveHashMap<>();
 
-    private void replaceInMap(String key, Object value)
-    {
-        if (_map.get(key) != null)
-            _map.remove(key);
-        _map.put(key, value);
+        if (getLookup() != null)
+            throw new IllegalArgumentException("`FieldDefinition.toMap()` does not currently support lookup columns");
+
+        map.put("name", getName());
+        if (getLabel() != null)
+            map.put("label", getLabel());
+        if (getType() != null)
+        {
+            if (getType().getJsonType() == null)
+                throw new IllegalArgumentException("`FieldDefinition.toMap()` does not currently support column type: " + getType().name());
+            map.put("rangeURI", getType().getJsonType());
+        }
+        if (getDescription() != null)
+            map.put("description", getDescription());
+        if (getFormat() != null)
+            map.put("formatString", getFormat());
+        map.put("mvEnabled", isMvEnabled());
+        map.put("required", isRequired());
+        if (getScale() != null)
+            map.put("scale", getScale());
+
+        return map;
     }
 
     public enum RangeType
