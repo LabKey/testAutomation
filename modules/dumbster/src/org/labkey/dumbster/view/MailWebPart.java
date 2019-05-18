@@ -33,6 +33,7 @@ public class MailWebPart extends JspView<MailPage>
     }
 
 
+    @Override
     protected void prepareWebPart(MailPage model) throws ServletException
     {
         super.prepareWebPart(model);
