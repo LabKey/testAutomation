@@ -25,6 +25,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.domain.DomainResponse;
+import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
@@ -504,6 +506,64 @@ public class SampleSetTest extends BaseWebDriverTest
                     successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleSet 'badLookupTest' not found"));
         }
     }
+
+    @Test
+    public void samplesWithLookupsTest() throws IOException, CommandException
+    {
+        goToProjectHome("Home");
+        DomainResponse getSamplesDomain = new GetDomainCommand("exp.materials", "testSamples")
+                .execute(createDefaultConnection(true), getCurrentContainerPath());
+        DomainResponse getLookupDomain = new GetDomainCommand("exp.materials", "lookups")
+                .execute(createDefaultConnection(true), getCurrentContainerPath());
+        DomainResponse ctLookupDomain = new GetDomainCommand("exp.materials", "otherLookups")
+                .execute(createDefaultConnection(true), getCurrentContainerPath());
+
+        // create a basic sampleset
+        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
+        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "sampleData", getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("strData", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("intData", FieldDefinition.ColumnType.Integer),
+                        TestDataGenerator.simpleFieldDef("floatData", FieldDefinition.ColumnType.Double)
+                ));
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.addCustomRow(Map.of("name", "A", "strData", "argy", "intData", 6, "floatData", 2.5));
+        dgen.addCustomRow(Map.of("name", "B", "strData", "bargy","intData", 7, "floatData", 3.5));
+        dgen.addCustomRow(Map.of("name", "C", "strData", "foofoo","intData", 8, "floatData", 4.5));
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        String lookupContainer = getProjectName() + "/" + LINEAGE_FOLDER;
+        navigateToFolder(getProjectName(), FOLDER_NAME);
+        // create another with a lookup to it
+        TestDataGenerator lookupDgen = new TestDataGenerator("exp.materials", "sampleLookups", getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("strLookup", FieldDefinition.ColumnType.Lookup)
+                                .setLookup(new FieldDefinition.LookupInfo(lookupContainer, "exp.materials", "sampleData")
+                                        .setTableType("string")),
+                        TestDataGenerator.simpleFieldDef("intLookup", FieldDefinition.ColumnType.Lookup)
+                                .setLookup(new FieldDefinition.LookupInfo(lookupContainer, "exp.materials", "sampleData")
+                                        .setTableType("int")),
+                        TestDataGenerator.simpleFieldDef("floatLooky", FieldDefinition.ColumnType.Lookup)
+                                .setLookup(new FieldDefinition.LookupInfo(lookupContainer, "exp.materials", "sampleData")
+                                        .setTableType("float"))
+                ));
+        lookupDgen.createDomain(createDefaultConnection(true), "SampleSet");
+        lookupDgen.addCustomRow(Map.of("name", "B"));
+        lookupDgen.addCustomRow(Map.of("strLookup", "B"));
+        lookupDgen.addCustomRow(Map.of("intLookup", "B"));
+        lookupDgen.addCustomRow(Map.of("floatLooky", "B"));
+        lookupDgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        refresh();
+        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        waitAndClick(Locator.linkWithText("sampleLookups"));
+        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        assertEquals(3, materialsList.getDataRowCount());
+        log("foo");
+    }
+
 
     /**
      *  regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37465

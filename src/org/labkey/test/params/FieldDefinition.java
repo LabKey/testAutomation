@@ -176,7 +176,10 @@ public class FieldDefinition
 
         if (getLookup() != null)
         {
-            throw new IllegalArgumentException("`FieldDefinition.toMap()` does not currently support lookup columns");
+            map.put("lookupSchema", getLookup().getSchema());
+            map.put("lookupQuery", getLookup().getTable());
+            map.put("lookupContainer", getLookup().getFolder());
+            map.put("rangeUri", getLookup().getTableType());
         }
         else if (getType() != null)
         {
@@ -276,9 +279,10 @@ public class FieldDefinition
             return _tableType;
         }
 
-        public void setTableType(String tableType)
+        public LookupInfo setTableType(String tableType)
         {
             _tableType = tableType;
+            return this;
         }
 
     }
