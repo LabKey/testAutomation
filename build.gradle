@@ -39,8 +39,15 @@ if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
     BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":remoteapi:labkey-api-jdbc")
 }
 
-
 if (project.hasProperty("teamcity"))
 {
     apply plugin: 'org.labkey.teamCity'
+}
+
+project.sourceSets {
+    uiTest {
+        java {
+            srcDirs = ["src"]
+        }
+    }
 }
