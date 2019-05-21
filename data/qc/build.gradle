@@ -1,3 +1,4 @@
+import org.labkey.gradle.task.RunTestSuite
 import org.labkey.gradle.util.BuildUtils;
 
 apply plugin: 'java'
@@ -71,3 +72,9 @@ project.task('transformWarningJar',
 project.tasks.jar.dependsOn(project.tasks.validatorJar)
 project.tasks.jar.dependsOn(project.tasks.transformJar)
 project.tasks.jar.dependsOn(project.tasks.transformWarningJar)
+
+project.tasks.jar.configure { jarTask ->
+    project.project(BuildUtils.getTestProjectPath(project.gradle)).tasks.withType(RunTestSuite).configureEach({ t ->
+        t.dependsOn(jarTask)
+    })
+}
