@@ -35,7 +35,6 @@ public abstract class TimeChartTest extends ReportTest
     private static final String FOLDER_NAME =  "Demo Study";
     protected static final String VISIT_FOLDER_NAME =  "Demo Visit Study";
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
-    public static final String TEST_DATA_API_PATH = "server/test/data/api";
 
     protected static final String GROUP1_NAME = "Some Participants";
     protected static final String GROUP2_NAME = "Other Participants";

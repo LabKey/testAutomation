@@ -28,7 +28,6 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -153,14 +152,14 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "buttonTest");
         setFormElement(Locator.name("title"), "buttonTest");
-        wikiHelper.setWikiBody(TestFileUtils.getFileContents(new File(TestFileUtils.getApiScriptFolder(), CUSTOMIZER_FILE)));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/" + CUSTOMIZER_FILE)));
         clickButton("Save & Close");
 
         portalHelper.addWebPart("Wiki");
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "paramEcho");
         setFormElement(Locator.name("title"), "Parameter Echo");
-        wikiHelper.setWikiBody(TestFileUtils.getFileContents(new File(TestFileUtils.getApiScriptFolder(), PARAM_ECHO_CONTENT_FILE)));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/" + PARAM_ECHO_CONTENT_FILE)));
         clickButton("Save & Close");
 
         DataRegionTable buttonRegion = DataRegionTable.findDataRegionWithinWebpart(this, "buttonTest");

@@ -32,7 +32,7 @@ public abstract class TestProperties
 {
     static
     {
-        try (Reader propReader = Readers.getReader(new File(TestFileUtils.getLabKeyRoot(), "server/test/test.properties")))
+        try (Reader propReader = Readers.getReader(new File(TestFileUtils.getTestRoot(), "test.properties")))
         {
             TestLogger.log("Loading properties from test.properties");
             Properties properties = new Properties();
@@ -191,7 +191,7 @@ public abstract class TestProperties
                 }
             }
 
-            File testBin = new File(TestFileUtils.getLabKeyRoot(), "server/test/bin");
+            File testBin = new File(TestFileUtils.getTestRoot(), "bin");
             File driverPath = new File(testBin, executable);
             System.setProperty(key, driverPath.getAbsolutePath());
         }
@@ -227,7 +227,7 @@ public abstract class TestProperties
                 }
             }
 
-            File testBin = new File(TestFileUtils.getLabKeyRoot(), "server/test/bin");
+            File testBin = new File(TestFileUtils.getTestRoot(), "bin");
             File chromePath = new File(testBin, chromeExe);
             System.setProperty(key, chromePath.getAbsolutePath());
         }

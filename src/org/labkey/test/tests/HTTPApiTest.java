@@ -58,7 +58,7 @@ public class HTTPApiTest extends BaseWebDriverTest
 
     protected File[] getTestFiles()
     {
-        return new File[]{new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/http-api.xml")};
+        return new File[]{TestFileUtils.getSampleData("api/http-api.xml")};
     }
 
     @Override

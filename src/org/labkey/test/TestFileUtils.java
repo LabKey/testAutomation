@@ -73,6 +73,7 @@ public abstract class TestFileUtils
 {
     private static File _labkeyRoot = null;
     private static File _buildDir = null;
+    private static File _testRoot = null;
 
     public static String getFileContents(String rootRelativePath)
     {
@@ -117,7 +118,7 @@ public abstract class TestFileUtils
                 {
                     throw new IllegalStateException("Specified LabKey root does not exist [" + _labkeyRoot + "]. Configure this by passing VM arg labkey.root={yourroot}");
                 }
-                if (!new File(_labkeyRoot, "server/test").exists())
+                if (!new File(_labkeyRoot, "server").exists())
                 {
                     throw new IllegalStateException("Specified LabKey root exists [" + _labkeyRoot + "] but isn't the root of a LabKey enlistment. Configure this by passing VM arg labkey.root={yourroot}");
                 }
@@ -129,7 +130,7 @@ public abstract class TestFileUtils
             else
             {
                 _labkeyRoot = new File("").getAbsoluteFile();
-                if (_labkeyRoot.getName().equals("test") && _labkeyRoot.getParentFile().getName().equals("server"))
+                if (_labkeyRoot.getParentFile().getName().equals("server"))
                     _labkeyRoot = _labkeyRoot.getParentFile().getParentFile(); // Working directory is in '{labkey.root}/server'; otherwise is in enlistment root
                 else if (_labkeyRoot.getName().equals("server"))
                     _labkeyRoot = _labkeyRoot.getParentFile(); // Working directory is in '{labkey.root}/server'; otherwise is in enlistment root
@@ -142,11 +143,27 @@ public abstract class TestFileUtils
         return _labkeyRoot.toString();
     }
 
+    public static File getTestRoot()
+    {
+        if (_testRoot == null)
+        {
+            _testRoot = new File(getLabKeyRoot(), "server/test");
+            if (!_testRoot.exists())
+                _testRoot = new File(getLabKeyRoot(), "server/testAutomation");
+        }
+        return _testRoot;
+    }
+
+    private static String getTestProjectName()
+    {
+        return getTestRoot().getName();
+    }
+
     public static File getTestBuildDir()
     {
         if (_buildDir == null)
         {
-            _buildDir = new File(getLabKeyRoot(), "build/modules/test"); // Gradle
+            _buildDir = new File(getLabKeyRoot(), "build/modules/" + getTestProjectName()); // Gradle
         }
         return _buildDir;
     }
@@ -186,7 +203,7 @@ public abstract class TestFileUtils
         else
         {
             sampledataDirs.add(new File(getLabKeyRoot(), "sampledata").toString());
-            sampledataDirs.add(new File(getLabKeyRoot(), "server/test/data").toString());
+            sampledataDirs.add(new File(getTestRoot(), "data").toString());
         }
 
         File foundFile = null;
@@ -209,11 +226,6 @@ public abstract class TestFileUtils
                 "Run `./gradlew :server:test:build :server:test:writeSampleDataFile` once to locate all sampledata" + "\n" +
                 "Currently known sample data locations: " + String.join("\n", sampledataDirs), foundFile);
         return foundFile;
-    }
-
-    public static File getApiScriptFolder()
-    {
-        return new File(getLabKeyRoot(), "server/test/data/api");
     }
 
     public static String getProcessOutput(File executable, String... args) throws IOException

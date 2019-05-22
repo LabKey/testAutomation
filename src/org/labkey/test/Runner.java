@@ -187,8 +187,7 @@ public class Runner extends TestSuite
 
     private static File getRemainingTestsFile()
     {
-        String labkeyRoot = TestFileUtils.getLabKeyRoot();
-        return new File(labkeyRoot, "server/test/remainingTests.txt");
+        return new File(TestFileUtils.getTestRoot(), "remainingTests.txt");
     }
 
     private String getProgress()

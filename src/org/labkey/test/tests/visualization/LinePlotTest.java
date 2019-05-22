@@ -335,8 +335,6 @@ public class LinePlotTest extends GenericChartsTest
 
     }
 
-    private static final String TEST_DATA_API_PATH = "server/test/data/api";
-
     @LogMethod
     private void doPointClickLinePlotTest()
     {
@@ -381,7 +379,7 @@ public class LinePlotTest extends GenericChartsTest
         lookAndFeelDialog.disableDeveloperMode();
         assertElementNotPresent(Locators.labkeyError);
         // test use-case to navigate to query page on click
-        String function = TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
+        String function = TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/scatterPlotPointClickTestFn.js"));
         lookAndFeelDialog.clickDeveloperEnable()
                 .setDeveloperSourceContent(function)
                 .clickApply();

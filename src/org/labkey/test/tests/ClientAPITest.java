@@ -980,7 +980,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
     protected String setSourceFromFile(String fileName, boolean excludeTags)
     {
-        return setSource(TestFileUtils.getFileContents("server/test/data/api/" + fileName), excludeTags);
+        return setSource(TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/" + fileName)), excludeTags);
     }
 
     protected String setSource(String srcFragment)

@@ -418,7 +418,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         // reset to the default point click function
         lookAndFeelDialog.clickDeveloperEnable();
         // test use-case to navigate to participant page on click
-        String function = TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js");
+        String function = TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/timeChartPointClickTestFn.js"));
         lookAndFeelDialog.setDeveloperSourceContent(function).clickApply();
 
         timeChartWizard.reSaveReport();

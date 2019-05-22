@@ -80,7 +80,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         click(Locator.linkContainingText("Source"));
         setFormElement(Locator.name("name"), TRICKY_CHARACTERS + "wiki page");
 
-        wikiHelper.setWikiBody(TestFileUtils.getFileContents("server/test/data/api/EmbeddedQueryWebPart.html"));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/EmbeddedQueryWebPart.html")));
 
         clickButton("Save & Close");
         waitForText("Display Name");

@@ -128,7 +128,7 @@ public class TimeChartAPITest extends TimeChartTest
             add(Pair.of("Days", Arrays.asList(44.0, 79.0, 108.0, 190.0, 246.0)));
         }};
 
-        testVisApi(TEST_DATA_API_PATH + "/getDataDateTest.html", GETDATA_API_TEST_TITLES, GETDATA_API_TEST_NUMROWS, GETDATA_API_DATETEST_COLNAMES, null, GETDATA_API_TEST_DAYS,
+        testVisApi(TestFileUtils.getSampleData("api/getDataDateTest.html"), GETDATA_API_TEST_TITLES, GETDATA_API_TEST_NUMROWS, GETDATA_API_DATETEST_COLNAMES, null, GETDATA_API_TEST_DAYS,
                 GETDATA_API_TEST_MEASURES);
     }
 
@@ -160,7 +160,7 @@ public class TimeChartAPITest extends TimeChartTest
             add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
         }};
 
-        testVisApi(TEST_DATA_API_PATH + "/getDataVisitTest.html", GETDATA_API_TEST_TITLES, GETDATA_API_TEST_NUMROWS, GETDATA_API_VISITTEST_COLNAMES, null, GETDATA_API_TEST_VISITLABEL,
+        testVisApi(TestFileUtils.getSampleData("api/getDataVisitTest.html"), GETDATA_API_TEST_TITLES, GETDATA_API_TEST_NUMROWS, GETDATA_API_VISITTEST_COLNAMES, null, GETDATA_API_TEST_VISITLABEL,
                 GETDATA_API_TEST_MEASURES);
     }
 
@@ -220,7 +220,7 @@ public class TimeChartAPITest extends TimeChartTest
                 {"study_Lab Results_ParticipantVisit_Visit",  "study_Lab Results_ParticipantVisit_Visit_DisplayOrder", "study_Lab Results_ParticipantVisit_Visit_Label", "AggregateCount", "study_Lab Results_CD4_STDDEV", "IL-10 (23)::study_LuminexAssay_ObsConc_MAX", "IL-2 (3)::study_LuminexAssay_ObsConc_MAX","TNF-alpha (40)::study_LuminexAssay_ObsConc_MAX"}
         };
 
-        testVisApi(TEST_DATA_API_PATH + "/getDataAggregateTest.html", GETDATA_API_TEST_TITLES_AGGREGATE,
+        testVisApi(TestFileUtils.getSampleData("api/getDataAggregateTest.html"), GETDATA_API_TEST_TITLES_AGGREGATE,
                 GETDATA_API_TEST_NUMROWS_AGGREGATE, GETDATA_API_COLNAMES_AGGREGATE, null);
     }
 
@@ -260,11 +260,11 @@ public class TimeChartAPITest extends TimeChartTest
                 "Unable to find field AnalyteNameNA in study.LuminexAssay.",
         };
 
-        testVisApi(TEST_DATA_API_PATH + "/getDataErrorsTest.html", GETDATA_API_TEST_TITLES_ERRORS, null, null, GETDATA_API_TEST_OUPUT_ERRORS);
+        testVisApi(TestFileUtils.getSampleData("api/getDataErrorsTest.html"), GETDATA_API_TEST_TITLES_ERRORS, null, null, GETDATA_API_TEST_OUPUT_ERRORS);
     }
 
     @SafeVarargs
-    private final void testVisApi(String htmlPage, String[] testTitles, @Nullable int[] testRowCounts, @Nullable String[][] testColumnNames,
+    private final void testVisApi(File htmlPage, String[] testTitles, @Nullable int[] testRowCounts, @Nullable String[][] testColumnNames,
                                   @Nullable String[] testOutputTexts, List<Pair<String, List<Object>>>... colsForAllTests)
     {
         PortalHelper portalHelper = new PortalHelper(this);
@@ -369,7 +369,7 @@ public class TimeChartAPITest extends TimeChartTest
     @Override
     protected File[] getTestFiles()
     {
-        return new File[]{new File(TestFileUtils.getLabKeyRoot() + "/" + TEST_DATA_API_PATH + "/timechart-api.xml")};
+        return new File[]{TestFileUtils.getSampleData("api/timechart-api.xml")};
     }
 
     @Override

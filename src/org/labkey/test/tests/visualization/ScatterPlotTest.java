@@ -635,8 +635,6 @@ public class ScatterPlotTest extends GenericChartsTest
         assertTrue("Only the help button should be enabled. More than one button enabled.", 1 == (buttonsCount - disabledButtonsCount));
     }
 
-    private static final String TEST_DATA_API_PATH = "server/test/data/api";
-
     @LogMethod
     private void doPointClickScatterPlotTest()
     {
@@ -680,7 +678,7 @@ public class ScatterPlotTest extends GenericChartsTest
         lookAndFeelDialog.disableDeveloperMode();
         assertElementNotPresent(Locators.labkeyError);
         // test use-case to navigate to query page on click
-        String function = TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
+        String function = TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/scatterPlotPointClickTestFn.js"));
         lookAndFeelDialog.clickDeveloperEnable()
                 .setDeveloperSourceContent(function)
                 .clickApply();

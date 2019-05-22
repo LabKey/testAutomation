@@ -45,7 +45,7 @@ public class SecurityApiTest extends BaseWebDriverTest
 
     protected File[] getTestFiles()
     {
-        return new File[]{new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/security-api.xml")};
+        return new File[]{TestFileUtils.getSampleData("api/security-api.xml")};
     }
 
     @Override
