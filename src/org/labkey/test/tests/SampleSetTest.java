@@ -525,6 +525,7 @@ public class SampleSetTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "C", "strData", "foofoo","intData", 8, "floatData", 4.5));
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
+        // create the lookup sampleset in a different folder- configured to look to the first one
         String lookupContainer = getProjectName() + "/" + LINEAGE_FOLDER;
         navigateToFolder(getProjectName(), FOLDER_NAME);
         // create another with a lookup to it
@@ -553,9 +554,10 @@ public class SampleSetTest extends BaseWebDriverTest
         waitAndClick(Locator.linkWithText("sampleLookups"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         assertEquals(3, materialsList.getDataRowCount());
-        log("foo");
-    }
 
+        lookupDgen.deleteDomain(createDefaultConnection(true));
+        dgen.deleteDomain(createDefaultConnection(true));
+    }
 
     /**
      *  regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37465
