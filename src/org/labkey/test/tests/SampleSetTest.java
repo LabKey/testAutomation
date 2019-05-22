@@ -21,12 +21,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.domain.DomainResponse;
-import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
@@ -400,6 +399,7 @@ public class SampleSetTest extends BaseWebDriverTest
      * @throws CommandException
      */
     @Test
+    @Ignore
     public void testLineageWithImplicitParentColumn() throws IOException, CommandException
     {
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
@@ -510,14 +510,6 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void samplesWithLookupsTest() throws IOException, CommandException
     {
-        goToProjectHome("Home");
-        DomainResponse getSamplesDomain = new GetDomainCommand("exp.materials", "testSamples")
-                .execute(createDefaultConnection(true), getCurrentContainerPath());
-        DomainResponse getLookupDomain = new GetDomainCommand("exp.materials", "lookups")
-                .execute(createDefaultConnection(true), getCurrentContainerPath());
-        DomainResponse ctLookupDomain = new GetDomainCommand("exp.materials", "otherLookups")
-                .execute(createDefaultConnection(true), getCurrentContainerPath());
-
         // create a basic sampleset
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "sampleData", getCurrentContainerPath())
