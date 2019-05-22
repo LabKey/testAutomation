@@ -159,6 +159,12 @@ public abstract class TestFileUtils
         return getTestRoot().getName();
     }
 
+    @Deprecated (forRemoval = true)
+    public static File getApiScriptFolder()
+    {
+        return new File(getTestRoot(), "data/api");
+    }
+
     public static File getTestBuildDir()
     {
         if (_buildDir == null)
