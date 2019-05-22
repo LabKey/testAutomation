@@ -43,11 +43,3 @@ if (project.hasProperty("teamcity"))
 {
     apply plugin: 'org.labkey.teamCity'
 }
-
-project.sourceSets {
-    uiTest {
-        java {
-            srcDirs = ["src"]
-        }
-    }
-}
