@@ -44,8 +44,7 @@ public class FilesQueryTest extends BaseWebDriverTest
     private static final String CUSTOM_PROPERTY = "CustomProp";
     protected static final String TEST_USER = "user_files@filesquery.test";
     private static final String TEST_GROUP = "FilesQueryTestGroup";
-    private static final String PIPELINE_OVERRIDE_RELATIVE = "studies/ExtraKeyStudy/study/";
-    private static final String PIPELINE_OVERRIDE = "sampledata/" + PIPELINE_OVERRIDE_RELATIVE;
+    private static final File PIPELINE_FOLDER = TestFileUtils.getSampleData("studies/ExtraKeyStudy/study");
 
     private PortalHelper _portalHelper = new PortalHelper(this);
     private ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
@@ -136,13 +135,12 @@ public class FilesQueryTest extends BaseWebDriverTest
     {
         ensureFilesUpToDate();
         log("Set pipeline root override to a file system location");
-        setPipelineRoot(getPipelinePath());
+        setPipelineRoot(PIPELINE_FOLDER.getAbsolutePath());
         goToProjectHome();
 
         log("Insert a valid file record which might not have been picked up due to delayed sync");
         impersonate(TEST_USER);
-        String fileToInsertPath = PIPELINE_OVERRIDE_RELATIVE + "datasets/dataset5001.tsv";
-        final File fileToInsert = TestFileUtils.getSampleData(fileToInsertPath);
+        final File fileToInsert = new File(PIPELINE_FOLDER, "datasets/dataset5001.tsv");
         final String fileInsertedName = fileToInsert.getName();
         insertFileRecord(fileToInsert.getAbsolutePath(), "InsertedCustomProp");
         stopImpersonating();
@@ -157,8 +155,7 @@ public class FilesQueryTest extends BaseWebDriverTest
 
         log("Verify all files under pipeline are picked up automatically by exp.files");
         ensureFilesUpToDate();
-        final File pipelineFolder = TestFileUtils.getSampleData(PIPELINE_OVERRIDE_RELATIVE);
-        String[] allFiles = pipelineFolder.list();
+        String[] allFiles = PIPELINE_FOLDER.list();
         List<String> filesPickedUp = table.getColumnDataAsText("Name");
         for (String expectedFile : allFiles)
         {
@@ -219,11 +216,6 @@ public class FilesQueryTest extends BaseWebDriverTest
         List<FileBrowserExtendedProperty> fileProperties = new ArrayList<>();
         fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, customPropValue, false));
         _fileBrowserHelper.uploadFile(testFile, fileDescription, fileProperties, false);
-    }
-
-    public static String getPipelinePath()
-    {
-        return TestFileUtils.getLabKeyRoot() + "/" + PIPELINE_OVERRIDE;
     }
 
     @Override

@@ -30,6 +30,7 @@ import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -83,11 +84,12 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickProject(getProjectName());
         _containerHelper.enableModules(Arrays.asList("Query", "Flow"));
 
-        createQuery(getProjectName(), "PassFailDetails", TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
-        createQuery(getProjectName(), "PassFail", TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
-        //createQuery(getProjectName(), "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
-        createQuery(getProjectName(), "COMP", TestFileUtils.getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), true);
-        createQuery(getProjectName(), "Comparison", TestFileUtils.getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), true);
+        File sampledataDir = TestFileUtils.getSampleData("flow/flowjoquery/query");
+        createQuery(getProjectName(), "PassFailDetails", TestFileUtils.getFileContents(new File(sampledataDir, "PassFailDetails.sql")), TestFileUtils.getFileContents(new File(sampledataDir, "PassFailDetails.xml")), true);
+        createQuery(getProjectName(), "PassFail", TestFileUtils.getFileContents(new File(sampledataDir, "PassFail.sql")), TestFileUtils.getFileContents(new File(sampledataDir, "PassFail.xml")), true);
+        //createQuery(getProjectName(), "DeviationFromMean", getFileContents(new File(sampledataDir, "DeviationFromMean.sql")), getFileContents(new File(sampledataDir, "DeviationFromMean.xml")), true);
+        createQuery(getProjectName(), "COMP", TestFileUtils.getFileContents(new File(sampledataDir, "COMP.sql")), TestFileUtils.getFileContents(new File(sampledataDir, "COMP.xml")), true);
+        createQuery(getProjectName(), "Comparison", TestFileUtils.getFileContents(new File(sampledataDir, "Comparison.sql")), TestFileUtils.getFileContents(new File(sampledataDir, "Comparison.xml")), true);
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 run"));
