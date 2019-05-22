@@ -1,1 +1,0 @@
-The gradle plugin requires this directory. Fixed in 1.2.6

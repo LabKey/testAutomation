@@ -9,7 +9,6 @@ bin/windows/VERSION -text
 bin/windows/chromedriver.exe -text
 bin/windows/geckodriver.exe -text
 /build.gradle -text
-chromeextensions/README.txt -text
 data/api/EmbeddedQueryWebPart.html -text
 data/api/LuminexGuideSet.html -text
 data/api/assayTest.js -text
