@@ -5,8 +5,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.domain.DomainResponse;
-import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -106,10 +104,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
     @Test
     public void sampleSetWithMissingValueField() throws IOException, CommandException
     {
-        goToProjectHome("Home");
         String missingValueTable = "mvSamples";
-        DomainResponse getMVSamplesDomain = new GetDomainCommand("exp.materials", missingValueTable)
-                .execute(createDefaultConnection(true), getCurrentContainerPath());
 
         navigateToFolder(getProjectName(), FOLDER_NAME);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", missingValueTable, getCurrentContainerPath())
