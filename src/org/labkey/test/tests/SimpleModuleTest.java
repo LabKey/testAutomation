@@ -149,6 +149,24 @@ public class SimpleModuleTest extends BaseWebDriverTest
             "  </table>\n" +
             "</tables>\n";
 
+    private static final String XML_METADATA_NO_POPUP = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
+            "  <table tableName=\"Models\" tableDbType=\"TABLE\">\n" +
+            "    <columns>\n" +
+            "      <column columnName=\"Image\">\n" +
+            "        <datatype>varchar</datatype>\n" +
+            "        <displayColumnFactory>\n" +
+            "          <className>org.labkey.api.data.URLDisplayColumn$Factory</className>\n" +
+            "          <properties>\n" +
+            "            <property name=\"thumbnailImageUrl\">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>\n" +
+            "            <property name=\"popupImageUrl\"></property>\n" +
+            "          </properties>\n" +
+            "        </displayColumnFactory>\n" +
+            "        <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>\n" +
+            "      </column>\n" +
+            "    </columns>\n" +
+            "  </table>\n" +
+            "</tables>\n";
+
     private final PortalHelper portalHelper = new PortalHelper(this);
 
     protected String getProjectName()
@@ -419,27 +437,28 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText("view data"));
 
         // default thumbnail
-        validateThumbnails(DEFAULT_IMAGE.getName(), "50px", FOCUS_POPUP.getName(), null);
+        validateThumbnails(DEFAULT_IMAGE.getName(), "50px", true, FOCUS_POPUP.getName(), null);
         // both thumbnail and popup
-        validateThumbnails(PRIUS_THUMBNAIL.getName(), "50px", PRIUS_POPUP.getName(), null);
+        validateThumbnails(PRIUS_THUMBNAIL.getName(), "50px", true, PRIUS_POPUP.getName(), null);
         // should have default popup
-        validateThumbnails(CAMRY_THUMBNAIL.getName(), "50px", DEFAULT_IMAGE.getName(), null);
+        validateThumbnails(CAMRY_THUMBNAIL.getName(), "50px", true, DEFAULT_IMAGE.getName(), null);
 
         // override the metadata to set the thumbnail and popup widths
-        goToSchemaBrowser();
-        selectQuery("vehicle", "Models");
-        waitForText("edit metadata");
-        clickAndWait(Locator.linkWithText("edit metadata"));
-        // wait for the domain editor to appear:
-        clickButton("Edit Source", defaultWaitForPage);
-        _ext4Helper.clickExt4Tab("XML Metadata");
-        setCodeEditorValue("metadataText", XML_METADATA);
-        clickButton("Save & Finish");
+        setMetadataXML("vehicle", "Models", XML_METADATA);
 
         // revalidate with the updated sizes
-        validateThumbnails(DEFAULT_IMAGE.getName(), null, FOCUS_POPUP.getName(), "150px");
-        validateThumbnails(PRIUS_THUMBNAIL.getName(), null, PRIUS_POPUP.getName(), "150px");
-        validateThumbnails(CAMRY_THUMBNAIL.getName(), null, DEFAULT_IMAGE.getName(), "150px");
+        validateThumbnails(DEFAULT_IMAGE.getName(), null, true, FOCUS_POPUP.getName(), "150px");
+        validateThumbnails(PRIUS_THUMBNAIL.getName(), null, true, PRIUS_POPUP.getName(), "150px");
+        validateThumbnails(CAMRY_THUMBNAIL.getName(), null, true, DEFAULT_IMAGE.getName(), "150px");
+
+        // override the metadata to show thumbnails but no popups
+        setMetadataXML("vehicle", "Models", XML_METADATA_NO_POPUP);
+
+        // revalidate with the updated sizes
+        validateThumbnails(DEFAULT_IMAGE.getName(), null, false, FOCUS_POPUP.getName(), "150px");
+        validateThumbnails(PRIUS_THUMBNAIL.getName(), null, false, PRIUS_POPUP.getName(), "150px");
+        validateThumbnails(CAMRY_THUMBNAIL.getName(), null, false, DEFAULT_IMAGE.getName(), "150px");
+
         log("finished testing custom thumbnail and popup images");
 
         Long priusId = null;
@@ -694,7 +713,20 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
     }
 
-    private void validateThumbnails(String thumbnailImage, @Nullable String thumbnailWidth, String popupImage, @Nullable String popupWidth)
+    private void setMetadataXML(String schemaName, String queryName, String metadata)
+    {
+        goToSchemaBrowser();
+        selectQuery(schemaName, queryName);
+        waitForText("edit metadata");
+        clickAndWait(Locator.linkWithText("edit metadata"));
+        // wait for the domain editor to appear:
+        clickButton("Edit Source", defaultWaitForPage);
+        _ext4Helper.clickExt4Tab("XML Metadata");
+        setCodeEditorValue("metadataText", metadata);
+        clickButton("Save & Finish");
+    }
+
+    private void validateThumbnails(String thumbnailImage, @Nullable String thumbnailWidth, boolean hasPopup, String popupImage, @Nullable String popupWidth)
     {
         Locator thumbnail = Locator.tag("img").withAttributeContaining("src", thumbnailImage).
                 withAttributeContaining("style", thumbnailWidth != null ? "width:" + thumbnailWidth : "max-width:32px");
@@ -702,17 +734,26 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Hover over the thumbnail and make sure the pop-up is as expected.");
         fireEvent(thumbnail, SeleniumEvent.mouseover);
-        //mouseOver(Locator.xpath("//img[contains(@src, '" + thumbnailImage + "')]"));
-        shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
-        Locator popup = Locator.tag("div").withAttribute("id", "helpDiv").descendant("img").withAttributeContaining("src", popupImage).
-                withAttributeContaining("style", popupWidth != null ? "width:" + popupWidth : "max-width:300px");
-        String src = popup.findElement(getDriver()).getAttribute("src");
-        fireEvent(thumbnail, SeleniumEvent.mouseout);
-        Locator.tagWithClass("th", "labkey-selectors").findElement(getDriver()).click(); // safe out-click in the first header cell
-        shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("#helpDiv")));
 
-        assertTrue("Wrong image in popup: " + src, src.contains(popupImage));
-        assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
+        if (hasPopup)
+        {
+            Locator popup = Locator.tag("div").withAttribute("id", "helpDiv").descendant("img").withAttributeContaining("src", popupImage).
+                    withAttributeContaining("style", popupWidth != null ? "width:" + popupWidth : "max-width:300px");
+            shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
+            String src = popup.findElement(getDriver()).getAttribute("src");
+
+            fireEvent(thumbnail, SeleniumEvent.mouseout);
+            Locator.tagWithClass("th", "labkey-selectors").findElement(getDriver()).click(); // safe out-click in the first header cell
+            shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("#helpDiv")));
+
+            assertTrue("Wrong image in popup: " + src, src.contains(popupImage));
+            assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
+        }
+        else
+        {
+            Locator popup = Locator.tag("div").withAttribute("id", "helpDiv").descendant("img").withAttributeContaining("src", popupImage);
+            assertTrue("Popup should not be present", !popup.existsIn(getDriver()));
+        }
     }
 
     @LogMethod
