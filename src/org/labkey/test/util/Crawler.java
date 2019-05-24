@@ -311,6 +311,7 @@ public class Crawler
     {
         List<ControllerActionId> list = new ArrayList<>();
         Collections.addAll(list,
+                new ControllerActionId("admin", "caches"), // Just links to self and 404 pages
                 new ControllerActionId("core", "styleGuide"), // Contains fake actions for style demonstration
                 new ControllerActionId("pipeline-status", "showList") // Is likely to contain 404 links
         );
