@@ -1,0 +1,14 @@
+* text=auto !eol
+/module.properties -text
+src/com/dumbster/smtp/SimpleSmtpServer.java -text
+src/com/dumbster/smtp/SmtpActionType.java -text
+src/com/dumbster/smtp/SmtpMessage.java -text
+src/com/dumbster/smtp/SmtpRequest.java -text
+src/com/dumbster/smtp/SmtpResponse.java -text
+src/com/dumbster/smtp/SmtpState.java -text
+src/org/labkey/dumbster/DumbsterController.java -text
+src/org/labkey/dumbster/DumbsterModule.java -text
+src/org/labkey/dumbster/model/DumbsterManager.java -text
+src/org/labkey/dumbster/view/MailPage.java -text
+src/org/labkey/dumbster/view/MailWebPart.java -text
+src/org/labkey/dumbster/view/mailWebPart.jsp -text
