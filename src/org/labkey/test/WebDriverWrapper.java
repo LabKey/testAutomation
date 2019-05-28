@@ -1690,7 +1690,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             if(index == -1)
                 return s + " not found";
             if(index <= previousIndex)
-                return s + " occured out of order; came before " + previousString;
+                return s + " occurred out of order; came before " + previousString;
             previousIndex = index;
             previousString = s;
         }
