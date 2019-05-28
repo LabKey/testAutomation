@@ -1,0 +1,80 @@
+import org.labkey.gradle.task.RunTestSuite
+import org.labkey.gradle.util.BuildUtils;
+
+apply plugin: 'java'
+
+dependencies {
+  BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle))
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs = ['src']
+    }
+  }
+}
+
+project.task('validatorJar',
+        group: "QC",
+        type: Jar,
+        description: "Builds jar for assay validation",
+        {
+          from sourceSets.main.output
+          from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+          archiveName "validator.jar"
+          destinationDir = project.projectDir
+          manifest {
+            attributes 'Implementation-Title': 'Assay Validator Jar',
+                    'Implementation-Version': project.version,
+                    'Built-By' : System.getProperty("user.name"),
+                    'Main-Class': 'org.labkey.AssayValidator'
+          }
+        }
+)
+
+project.task('transformJar',
+        group: "QC",
+        type: Jar,
+        description: "Builds jar for doing assay transforms",
+        {
+          from sourceSets.main.output
+          from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+          archiveName "transform.jar"
+          destinationDir = project.projectDir
+          manifest {
+            attributes 'Implementation-Title': 'Assay Validator Jar',
+                    'Implementation-Version': project.version,
+                    'Built-By' : System.getProperty("user.name"),
+                    'Main-Class': 'org.labkey.AssayTransform'
+          }
+        }
+)
+
+project.task('transformWarningJar',
+        group: "QC",
+        type: Jar,
+        description: "Builds jar for doing assay transform warnings",
+        {
+          from sourceSets.main.output
+          from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+          archiveName "transformWarning.jar"
+          destinationDir = project.projectDir
+          manifest {
+            attributes 'Implementation-Title': 'Assay Validator Jar',
+                    'Implementation-Version': project.version,
+                    'Built-By' : System.getProperty("user.name"),
+                    'Main-Class': 'org.labkey.AssayTransformWarning'
+          }
+        }
+)
+
+project.tasks.jar.dependsOn(project.tasks.validatorJar)
+project.tasks.jar.dependsOn(project.tasks.transformJar)
+project.tasks.jar.dependsOn(project.tasks.transformWarningJar)
+
+project.tasks.jar.configure { jarTask ->
+    project.project(BuildUtils.getTestProjectPath(project.gradle)).tasks.withType(RunTestSuite).configureEach({ t ->
+        t.dependsOn(jarTask)
+    })
+}
