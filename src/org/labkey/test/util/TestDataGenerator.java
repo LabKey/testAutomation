@@ -233,6 +233,26 @@ public class TestDataGenerator
         return new SimpleDateFormat(dateFormat).format(date);
     }
 
+    public String writeTsvContents()
+    {
+        StringBuilder builder = new StringBuilder();
+        for (Integer index: _indices.keySet())
+        {
+            builder.append(_indices.get(index).getName() + "\t");
+        }
+        builder.append("\n");
+
+        for (Map row : _rows)
+        {
+            for (Integer index: _indices.keySet())
+            {
+                builder.append(row.get(_indices.get(index).getName()) + "\t");
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
+    }
+
     public DomainResponse createDomain(Connection cn, String domainKind) throws IOException, CommandException
     {
         CreateDomainCommand cmd = new CreateDomainCommand(domainKind, getQueryName());

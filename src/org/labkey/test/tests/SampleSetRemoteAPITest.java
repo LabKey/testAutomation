@@ -9,6 +9,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -129,14 +130,23 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
 
         materialsList.clickEditRow(0);
         setFormElement(Locator.input("quf_mvStringData"), "testValue");
-        selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringData_MVIndicator"),
-                "Q");
+
+        /* SQL and PG handle casing differently- and labkey passes the differently-cased field names straight through.
+        * Until we figure out a way to do case-insensitive matching over xpath, fork in the test code based on which DB we're running */
+        if(WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer))
+            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringData_MVIndicator"), "Q");
+        else
+            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvstringdata_mvindicator"), "Q");
         clickButton("Submit");
+
         materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+
         materialsList.clickEditRow(1);
         setFormElement(Locator.input("quf_mvStringData"), "otherValue");
-        selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringData_MVIndicator"),
-                "N");
+        if(WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer))
+            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringData_MVIndicator"), "N");
+        else
+            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvstringdata_mvindicator"), "N");
         clickButton("Submit");
         materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 
