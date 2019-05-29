@@ -29,7 +29,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.TextSearcher;
 
-import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -247,7 +246,7 @@ public class ViabilityTest extends AbstractViabilityTest
         _assayHelper.clickEditAssayDesign(true);
 
         AssayDesignerPage assayDesigner = new AssayDesignerPage(getDriver());
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
         assayDesigner.saveAndClose();
 
         final String runName = "transformed assayId";

@@ -534,7 +534,7 @@ public class ElispotAssayTest extends AbstractAssayTest
 
 
         AssayDesignerPage assayDesigner = _assayHelper.clickEditAssayDesign();
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
         assayDesigner.saveAndClose();
         DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
 

@@ -31,7 +31,6 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.openqa.selenium.WebDriverException;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -122,7 +121,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         clickAndWait(Locator.linkContainingText("QC Assay"));
         _assayHelper.clickEditAssayDesign();
         AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
-        assayDesigner.addTransformScript((TestFileUtils.getSampleData("qc/validator.jar")));
+        assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/validator.jar"));
         assayDesigner.saveAndClose();
         goToProjectHome();
         _listHelper.importListArchive(getProjectName(), TestFileUtils.getSampleData("ProgrammaticQC/Programmatic QC.lists.zip"));
@@ -145,10 +144,10 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), assayName);
 
         AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
         if (addQCScript)
         {
-            assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/validator.jar"));
+            assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/validator.jar"));
         }
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)

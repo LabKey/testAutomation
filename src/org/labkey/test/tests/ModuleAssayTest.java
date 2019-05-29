@@ -170,7 +170,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         {
             log("setting transform script in assay design");
             AssayDesignerPage designer = new AssayDesignerPage(getDriver());
-            designer.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+            designer.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
         }
         else
         {
