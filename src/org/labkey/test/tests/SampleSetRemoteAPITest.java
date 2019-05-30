@@ -20,6 +20,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestDataValidator;
 import org.labkey.test.util.TextSearcher;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -136,6 +137,10 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "Second", "mvStringData", "Q", "volume", 15.5));
         dgen.addCustomRow(Map.of("name", "Third","mvStringData", "N", "volume", 16.5));
         dgen.addCustomRow(Map.of("name", "Fourth","mvStringData", "N", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Fifth","mvStringData", "ABCDEF", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Sixth","mvStringData", "GHIJKL", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Seventh","mvStringData", "ValidValue", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Eighth","mvStringData", "ActualData", "volume", 17.5));
 
         // write the domain data into TSV format, for import via the UI
         String importTsv = dgen.writeTsvContents();
@@ -153,14 +158,24 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         // re-find materialsList after importing MV data
         materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         List<Map<String, String>> insertedRows = new ArrayList<>();
-        for (int i=0; i<4; i++)
+        for (int i=0; i<dgen.getRows().size(); i++)
         {
             insertedRows.add(materialsList.getRowDataAsMap(i));
         }
 
+        // confirm that firstRow has an MV indicator supplied
+        int firstIndex = materialsList.getRowIndex("Name", "First");
+        WebElement firstRow = materialsList.findRow(firstIndex);
+        Locator.tagWithClass("td", "labkey-mv-indicator")
+                .withDescendant(Locator.tagWithText("a", "Q")).findElement(firstRow);
+        int fourthIndex = materialsList.getRowIndex("Name", "Fourth");
+        WebElement fourthRow = materialsList.findRow(fourthIndex);
+        Locator.tagWithClass("td", "labkey-mv-indicator")
+                .withDescendant(Locator.tagWithText("a", "N")).findElement(fourthRow);
+
         // confirm that every one of the initially-created rows were present with all values in the materialsList dataregion
         TestDataValidator validator = dgen.getValidator();      // validator has a copy of
-        String error = validator.enumerateMissingRows(insertedRows, Arrays.asList("Flag"));  // ensure all 4 rows made it with expected values
+        String error = validator.enumerateMissingRows(insertedRows, Arrays.asList("Flag"));  // ensure all rows made it with expected values
         assertEquals("", error);    // if any expected rows are absent, error will describe what it expected but did not find
     }
 
