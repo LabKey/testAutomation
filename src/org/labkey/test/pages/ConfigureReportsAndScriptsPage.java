@@ -538,6 +538,8 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
         public void configureEngine(EngineType type, Window configWindow, WebDriverWrapper wrapper)
         {
+            // need to set the change password checkbox
+            wrapper._ext4Helper.checkCheckbox(Locator.id("editEngine_changePassword-inputEl"));
             super.configureEngine(type, configWindow, wrapper);
 
             wrapper.log("Configuring the path mapping");
