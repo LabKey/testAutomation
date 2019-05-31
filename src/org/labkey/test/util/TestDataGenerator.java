@@ -13,6 +13,7 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.params.FieldDefinition;
 
 import java.io.IOException;
@@ -198,6 +199,11 @@ public class TestDataGenerator
             case "int":
                 return () -> randomInt(0, 20);
             case "http://www.w3.org/2001/xmlschema#int":
+                return () -> randomInt(0, 20);
+            case "float":
+                return () -> randomFloat(0, 20);
+            case "double":
+                return () -> randomDouble(0, 20);
             default:
                 throw new IllegalArgumentException("ColumnType " + columnType + " isn't implemented yet");
         }
@@ -221,6 +227,22 @@ public class TestDataGenerator
 
         Random r = new Random();
         return r.nextInt((max - min) + 1) + min;
+    }
+
+    public float randomFloat(float min, float max)
+    {
+        if (min >= max)
+            throw new IllegalArgumentException("min must be less than max");
+        Random r = new Random();
+        return  min + r.nextFloat() * (max - min);
+    }
+
+    public Double randomDouble(double min, double max)
+    {
+        if (min >= max)
+            throw new IllegalArgumentException("min must be less than max");
+        Random r = new Random();
+        return  min + r.nextDouble() * (max - min);
     }
 
     /*
@@ -272,6 +294,14 @@ public class TestDataGenerator
         insertRowsCommand.setRows(rows);
         insertRowsCommand.setTimeout(180000);       // default here will support large inserts
         return insertRowsCommand.execute(cn, _lookupInfo.getFolder());
+    }
+
+    public SaveRowsResponse updateRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
+    {
+        UpdateRowsCommand updateRowsCommand = new UpdateRowsCommand(getSchema(), getQueryName());
+        updateRowsCommand.setRows(rows);
+        updateRowsCommand.setTimeout(180000);
+        return  updateRowsCommand.execute(cn, _lookupInfo.getFolder());
     }
 
     public SelectRowsResponse getRowsFromServer(Connection cn) throws IOException, CommandException
