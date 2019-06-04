@@ -20,9 +20,11 @@ import org.apache.commons.io.FileUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -242,15 +244,21 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         log("Setting QC states in study " + folder + ".");
         navigateToFolder(project, folder);
         clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
-        setFormElement(Locator.name("newLabel"), "Approved");
-        setFormElement(Locator.name("newDescription"), "We all like approval.");
-        clickButton("Save");
-        setFormElement(Locator.name("newLabel"), "Pending Review");
-        setFormElement(Locator.name("newDescription"), "No one likes to be reviewed.");
-        click(Locator.checkboxByName("newPublicData"));
-        clickButton("Save");
-        selectOptionByText(Locator.name("defaultAssayQCState"), "Pending Review");
+
+        addState("Approved", "We all like approval", false);
+        addState("Pending Review", "No one likes to be reviewed.", true);
+    }
+
+    private void addState(String state, String description, boolean publicData)
+    {
+        waitAndClickAndWait(Locator.linkWithText("Manage Dataset QC States"));
+        WebElement searchContext = Locator.tagWithAttribute("form", "name", "manageQCStates")
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        Locator.tagWithClass("span", "fa-plus-circle").waitForElement(searchContext, 1000)
+                .click();
+        setFormElement(Locator.name("newLabels"), state);
+        setFormElement(Locator.name("newDescriptions"), description);
+        new Checkbox(Locator.checkboxByName("newPublicData").findElement(searchContext)).set(publicData);
         clickButton("Save");
     }
 
