@@ -20,11 +20,10 @@ import org.apache.commons.io.FileUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -245,21 +244,13 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         navigateToFolder(project, folder);
         clickTab("Manage");
 
-        addState("Approved", "We all like approval", false);
-        addState("Pending Review", "No one likes to be reviewed.", true);
-    }
-
-    private void addState(String state, String description, boolean publicData)
-    {
-        waitAndClickAndWait(Locator.linkWithText("Manage Dataset QC States"));
-        WebElement searchContext = Locator.tagWithAttribute("form", "name", "manageQCStates")
-                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        Locator.tagWithClass("span", "fa-plus-circle").waitForElement(searchContext, 1000)
-                .click();
-        setFormElement(Locator.name("newLabels"), state);
-        setFormElement(Locator.name("newDescriptions"), description);
-        new Checkbox(Locator.checkboxByName("newPublicData").findElement(searchContext)).set(publicData);
-        clickButton("Save");
+        new ManageStudyPage(getDriver())
+                .manageDatasetQCStates()
+                .setStateRow("Approved", "We all like approval", false)
+                .clickSave()
+                .manageDatasetQCStates()
+                .setStateRow("Pending Review", "No one likes to be reviewed.", true)
+                .clickSave();
     }
 
     protected void enterStudySecurity()
