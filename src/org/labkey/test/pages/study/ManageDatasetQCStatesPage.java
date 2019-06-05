@@ -22,7 +22,7 @@ public class ManageDatasetQCStatesPage extends LabKeyPage<ManageDatasetQCStatesP
 
     public static ManageDatasetQCStatesPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("controller", containerPath, "action"));
+        driver.beginAt(WebTestHelper.buildURL("study", containerPath, "manageQCStates"));
         return new ManageDatasetQCStatesPage(driver.getDriver());
     }
 
