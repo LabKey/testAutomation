@@ -246,10 +246,8 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
 
         new ManageStudyPage(getDriver())
                 .manageDatasetQCStates()
-                .setStateRow("Approved", "We all like approval", false)
-                .clickSave()
-                .manageDatasetQCStates()
-                .setStateRow("Pending Review", "No one likes to be reviewed.", true)
+                .addStateRow("Approved", "We all like approval", false)
+                .addStateRow("Pending Review", "No one likes to be reviewed.", true)
                 .clickSave();
     }
 

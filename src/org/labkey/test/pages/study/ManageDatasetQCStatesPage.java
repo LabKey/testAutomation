@@ -32,14 +32,17 @@ public class ManageDatasetQCStatesPage extends LabKeyPage<ManageDatasetQCStatesP
         waitForText("Manage Dataset QC States");
     }
 
-    public ManageDatasetQCStatesPage setStateRow(String state, String description, boolean publicData)
+    public ManageDatasetQCStatesPage addStateRow(String state, String description, boolean publicData)
     {
-
         Locator.tagWithClass("span", "fa-plus-circle").waitForElement(elementCache().stateForm, 1000)
-                .click();
-        setFormElement(Locator.name("newLabels"), state);
-        setFormElement(Locator.name("newDescriptions"), description);
-        new Checkbox(Locator.checkboxByName("newPublicData").findElement(elementCache().stateForm)).set(publicData);
+                .click();               // there is only ever on
+        Locator lastLabelLoc = Locator.xpath("(//input[@name='newLabels'])[last()]");
+        Locator lastDescLoc = Locator.xpath("(//input[@name='newDescriptions'])[last()]");
+        Locator lastCheckbox = Locator.xpath("(//input[@type='checkbox' and @name='newPublicData'])[last()]");
+
+        setFormElement(lastLabelLoc, state);
+        setFormElement(lastDescLoc, description);
+        new Checkbox(lastCheckbox.findElement(elementCache().stateForm)).set(publicData);
 
         return this;
     }
