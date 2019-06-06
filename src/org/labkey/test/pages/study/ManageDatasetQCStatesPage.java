@@ -8,6 +8,9 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ManageDatasetQCStatesPage extends LabKeyPage<ManageDatasetQCStatesPage.ElementCache>
 {
     public ManageDatasetQCStatesPage(WebDriver driver)
@@ -35,16 +38,29 @@ public class ManageDatasetQCStatesPage extends LabKeyPage<ManageDatasetQCStatesP
     public ManageDatasetQCStatesPage addStateRow(String state, String description, boolean publicData)
     {
         Locator.tagWithClass("span", "fa-plus-circle").waitForElement(elementCache().stateForm, 1000)
-                .click();               // there is only ever on
-        Locator lastLabelLoc = Locator.xpath("(//input[@name='newLabels'])[last()]");
-        Locator lastDescLoc = Locator.xpath("(//input[@name='newDescriptions'])[last()]");
-        Locator lastCheckbox = Locator.xpath("(//input[@type='checkbox' and @name='newPublicData'])[last()]");
+                .click();               // there is only ever one "add state" button; click it
 
-        setFormElement(lastLabelLoc, state);
-        setFormElement(lastDescLoc, description);
-        new Checkbox(lastCheckbox.findElement(elementCache().stateForm)).set(publicData);
+        QCStateTableRow newRow = new QCStateTableRow(
+                QCStateTableRow.Locators.lastRow.waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), getDriver());
+
+        newRow.setState(state)
+                .setDescription(description)
+                .setPublicData(publicData);
 
         return this;
+    }
+
+    public List<QCStateTableRow> getStateRows()
+    {
+        return QCStateTableRow.Locators.rowLoc.findElements(getDriver())
+                .stream()
+                .map(elem -> new QCStateTableRow(elem, getDriver()))
+                .collect(Collectors.toList());
+    }
+
+    public QCStateTableRow getStateRow(String stateName)
+    {
+        return getStateRows().stream().filter(a-> a.getState().equals(stateName)).findFirst().orElse(null);
     }
 
     public ManageDatasetQCStatesPage setStatePublic(String id, boolean publicData)
@@ -55,26 +71,45 @@ public class ManageDatasetQCStatesPage extends LabKeyPage<ManageDatasetQCStatesP
 
     public ManageDatasetQCStatesPage setDefaultAssayQCState(String state)
     {
-        selectOptionByText(Locator.name("defaultAssayQCState"), state);
+        selectOptionByText(elementCache().defaultAssayQCState, state);
         return this;
+    }
+    public String getDefaultAssayQCState()
+    {
+        return getSelectedOptionText(elementCache().defaultAssayQCState);
     }
 
     public ManageDatasetQCStatesPage setDefaultDirectEntryQCState(String state)
     {
-        selectOptionByText(Locator.name("defaultDirectEntryQCState"), state);
+        selectOptionByText(elementCache().defaultDirectEntryQCStateLoc, state);
         return this;
+    }
+
+    public String getDefaultDirectEntryQCState()
+    {
+        return getSelectedOptionText(elementCache().defaultDirectEntryQCStateLoc);
     }
 
     public ManageDatasetQCStatesPage setDefaultPipelineQCState(String state)
     {
-        selectOptionByText(Locator.name("defaultPipelineQCState"), state);
+        selectOptionByText(elementCache().defaultPipelineQCStateLoc, state);
         return this;
     }
 
-    public ManageDatasetQCStatesPage showPrivateDataByDefault(String state)
+    public String getDefaultPipelineQCState()
     {
-        selectOptionByText(Locator.name("showPrivateDataByDefault"), state);
+        return getSelectedOptionText(elementCache().defaultPipelineQCStateLoc);
+    }
+
+    public ManageDatasetQCStatesPage setDefaultVisibility(String state)  // will be either Public data or All data
+    {
+        selectOptionByText(elementCache().defaultVisibilityLoc, state);
         return this;
+    }
+
+    public String getDefaultVisibility()
+    {
+        return getSelectedOptionText(elementCache().defaultVisibilityLoc);
     }
 
     public ManageStudyPage clickSave()
@@ -92,5 +127,11 @@ public class ManageDatasetQCStatesPage extends LabKeyPage<ManageDatasetQCStatesP
     {
         WebElement stateForm = Locator.tagWithAttribute("form", "name", "manageQCStates")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+
+        Locator.XPathLocator defaultDirectEntryQCStateLoc = Locator.name("defaultDirectEntryQCState");
+        Locator.XPathLocator defaultPipelineQCStateLoc = Locator.name("defaultPipelineQCState");
+
+        Locator.XPathLocator defaultVisibilityLoc = Locator.name("showPrivateDataByDefault");
+        Locator.XPathLocator defaultAssayQCState = Locator.name("defaultAssayQCState");
     }
 }
