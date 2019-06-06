@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Remote Test with Parameterized Query no Default val</name>
+    <description>append rows from "remote" source to target without default val</description>
+    <transforms>
+        <transform type="RemoteQueryTransformStep" id="step1">
+            <description>Copy to target</description>
+            <source remoteSource="EtlTest_RemoteConnection" schemaName="study" queryName="parameterizedWithoutDefault" >
+                <sourceColumns>
+                    <column>ParticipantId</column>
+                    <column>date</column>
+                    <column>name</column>
+                </sourceColumns>
+            </source>
+            <destination schemaName="study" queryName="etl target" targetOption="truncate"/>
+        </transform>
+    </transforms>
+    <schedule>
+        <poll interval="15s" />
+    </schedule>
+    <parameters>
+        <parameter name="myParam" value="etlOverride2" type="VARCHAR"/>
+    </parameters>
+</etl>
