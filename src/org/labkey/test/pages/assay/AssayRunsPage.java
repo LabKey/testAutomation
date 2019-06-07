@@ -55,6 +55,21 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
         return new AssayDataPage(getDriver());
     }
 
+    public UpdateQCStatePage updateSelectedQcStatus()
+    {
+        getTable().clickHeaderMenu("QC State", "Update state of selected rows");
+        return new UpdateQCStatePage(getDriver());
+    }
+
+    public AssayRunsPage setRowQcStatus(int rowIndex, String state, String comment)
+    {
+        getTable().checkCheckbox(rowIndex);
+        return updateSelectedQcStatus()
+                .selectState(state)
+                .setComment(comment)
+                .clickUpdate();
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();
