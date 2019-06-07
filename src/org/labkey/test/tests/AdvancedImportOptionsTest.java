@@ -29,6 +29,7 @@ import org.labkey.test.components.studydesigner.AssayScheduleWebpart;
 import org.labkey.test.components.studydesigner.ImmunizationScheduleWebpart;
 import org.labkey.test.components.studydesigner.VaccineDesignWebpart;
 import org.labkey.test.pages.StartImportPage;
+import org.labkey.test.pages.study.ManageDatasetQCStatesPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
 import org.openqa.selenium.WebElement;
@@ -39,7 +40,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -125,31 +128,31 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Validate assay schedule.");
         clickTab("Assays");
         AssayScheduleWebpart assayScheduleWebpart = new AssayScheduleWebpart(getDriver());
-        Assert.assertEquals(1, assayScheduleWebpart.getAssayRowCount());
-        Assert.assertEquals("Name is Assay01", assayScheduleWebpart.getAssayCellDisplayValue("AssayName", 0));
-        Assert.assertEquals("Assay01 Configuration", assayScheduleWebpart.getAssayCellDisplayValue("Description", 0));
-        Assert.assertEquals("This is text in the assay plan (schedule).", assayScheduleWebpart.getAssayPlan());
+        assertEquals(1, assayScheduleWebpart.getAssayRowCount());
+        assertEquals("Name is Assay01", assayScheduleWebpart.getAssayCellDisplayValue("AssayName", 0));
+        assertEquals("Assay01 Configuration", assayScheduleWebpart.getAssayCellDisplayValue("Description", 0));
+        assertEquals("This is text in the assay plan (schedule).", assayScheduleWebpart.getAssayPlan());
 
         log("Validate Immunizations.");
         clickTab("Immunizations");
         ImmunizationScheduleWebpart immunizationScheduleWebpart = new ImmunizationScheduleWebpart(getDriver());
-        Assert.assertEquals(1, immunizationScheduleWebpart.getCohortRowCount());
-        Assert.assertEquals("Cohort01", immunizationScheduleWebpart.getCohortCellDisplayValue("Label", 0));
-        Assert.assertEquals("5", immunizationScheduleWebpart.getCohortCellDisplayValue("SubjectCount", 0));
-        Assert.assertEquals("Treatment01 ?", immunizationScheduleWebpart.getCohortCellDisplayValue("TimePoint01", 0));
+        assertEquals(1, immunizationScheduleWebpart.getCohortRowCount());
+        assertEquals("Cohort01", immunizationScheduleWebpart.getCohortCellDisplayValue("Label", 0));
+        assertEquals("5", immunizationScheduleWebpart.getCohortCellDisplayValue("SubjectCount", 0));
+        assertEquals("Treatment01 ?", immunizationScheduleWebpart.getCohortCellDisplayValue("TimePoint01", 0));
 
         log("Validate Vaccine Design.");
         clickTab("Vaccine Design");
         VaccineDesignWebpart vaccineDesignWebpart = new VaccineDesignWebpart(getDriver());
-        Assert.assertEquals(3, vaccineDesignWebpart.getImmunogenRowCount());
-        Assert.assertEquals("Imm001", vaccineDesignWebpart.getImmunogenCellDisplayValue("Label", 0));
-        Assert.assertEquals("immType02", vaccineDesignWebpart.getImmunogenCellDisplayValue("Type", 0));
-        Assert.assertEquals("Imm003", vaccineDesignWebpart.getImmunogenCellDisplayValue("Label", 1));
-        Assert.assertEquals("immType01", vaccineDesignWebpart.getImmunogenCellDisplayValue("Type", 1));
-        Assert.assertEquals("Imm002", vaccineDesignWebpart.getImmunogenCellDisplayValue("Label", 2));
-        Assert.assertEquals("immType02", vaccineDesignWebpart.getImmunogenCellDisplayValue("Type", 2));
-        Assert.assertEquals(1, vaccineDesignWebpart.getAdjuvantRowCount());
-        Assert.assertEquals("AdjLabel01", vaccineDesignWebpart.getAdjuvantCellDisplayValue("Label", 0));
+        assertEquals(3, vaccineDesignWebpart.getImmunogenRowCount());
+        assertEquals("Imm001", vaccineDesignWebpart.getImmunogenCellDisplayValue("Label", 0));
+        assertEquals("immType02", vaccineDesignWebpart.getImmunogenCellDisplayValue("Type", 0));
+        assertEquals("Imm003", vaccineDesignWebpart.getImmunogenCellDisplayValue("Label", 1));
+        assertEquals("immType01", vaccineDesignWebpart.getImmunogenCellDisplayValue("Type", 1));
+        assertEquals("Imm002", vaccineDesignWebpart.getImmunogenCellDisplayValue("Label", 2));
+        assertEquals("immType02", vaccineDesignWebpart.getImmunogenCellDisplayValue("Type", 2));
+        assertEquals(1, vaccineDesignWebpart.getAdjuvantRowCount());
+        assertEquals("AdjLabel01", vaccineDesignWebpart.getAdjuvantCellDisplayValue("Label", 0));
     }
 
     @Test
@@ -206,9 +209,10 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         assertTextPresent("Jimmy Neutron Lab", "Dexter's Lab");
 
         log("Validate QC State.");
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
-        assertFormElementEquals(Locator.css("td:nth-child(2) > input[type=\"text\"]:nth-child(2)"), "QC State Name 01");
+        ManageDatasetQCStatesPage manageDatasetQCStatesPage = goToManageStudy().manageDatasetQCStates();
+        List<String> expectedStates = Arrays.asList("[none]", "QC State Name 01");
+        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(row -> row.getState()).collect(Collectors.toList());
+        assertEquals("Wrong QC states imported", expectedStates, states);
 
         log("Validate wiki content are not imported");
         goToProjectHome(IMPORT_PROJECT_FILE02);
@@ -272,9 +276,10 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         assertTextPresent("Jimmy Neutron Lab", "Dexter's Lab");
 
         log("Validate QC State.");
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Dataset QC States"), WAIT_FOR_PAGE);
-        assertFormElementEquals(Locator.css("td:nth-child(2) > input[type=\"text\"]:nth-child(2)"), "QC State Name 01");
+        ManageDatasetQCStatesPage manageDatasetQCStatesPage = goToManageStudy().manageDatasetQCStates();
+        List<String> expectedStates = Arrays.asList("[none]", "QC State Name 01");
+        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(row -> row.getState()).collect(Collectors.toList());
+        assertEquals("Wrong QC states imported", expectedStates, states);
 
         log("Validate wiki content are not imported");
         goToProjectHome(IMPORT_PROJECT_FILE03);
