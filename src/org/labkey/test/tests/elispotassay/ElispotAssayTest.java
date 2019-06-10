@@ -548,7 +548,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         uploadFile(TEST_ASSAY_ELISPOT_FILE4, "D", "Save and Finish", false);
 
         // verify there is a spot count value of 747.747 and a custom column added by the transform
-        clickAndWait(Locator.linkContainingText("AID_0161456 W5"));
+        clickAndWait(Locator.linkContainingText("transformed assayId"));
     }
 
     protected void doBackgroundSubtractionTest()

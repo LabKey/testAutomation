@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -242,16 +243,12 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         log("Setting QC states in study " + folder + ".");
         navigateToFolder(project, folder);
         clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
-        setFormElement(Locator.name("newLabel"), "Approved");
-        setFormElement(Locator.name("newDescription"), "We all like approval.");
-        clickButton("Save");
-        setFormElement(Locator.name("newLabel"), "Pending Review");
-        setFormElement(Locator.name("newDescription"), "No one likes to be reviewed.");
-        click(Locator.checkboxByName("newPublicData"));
-        clickButton("Save");
-        selectOptionByText(Locator.name("defaultAssayQCState"), "Pending Review");
-        clickButton("Save");
+
+        new ManageStudyPage(getDriver())
+                .manageDatasetQCStates()
+                .addStateRow("Approved", "We all like approval", false)
+                .addStateRow("Pending Review", "No one likes to be reviewed.", true)
+                .clickSave();
     }
 
     protected void enterStudySecurity()

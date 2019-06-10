@@ -397,7 +397,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         click(Locator.linkWithText(MSG1_TITLE));
         assertTextPresent(
                 "1 <b>x</b>",
-                "<a href=\"/labkey" + WebTestHelper.buildRelativeUrl("list", getProjectName(), "begin") + "?\" class=\"labkey-text-link\">manage lists</a>");
+                "<a class=\"labkey-text-link\" href=\"/labkey" + WebTestHelper.buildRelativeUrl("list", getProjectName(), "begin") + "?\">manage lists</a>");
         click(Locator.linkWithText(MSG1_TITLE).index(1));
         assertTextPresent("first message testing");
         assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
