@@ -19,6 +19,7 @@
 <%@ page import="org.apache.commons.lang3.ArrayUtils" %>
 <%@ page import="org.labkey.api.data.Container" %>
 <%@ page import="org.labkey.api.data.DataRegion" %>
+<%@ page import="org.labkey.api.util.HtmlString" %>
 <%@ page import="org.labkey.api.util.MailHelper" %>
 <%@ page import="org.labkey.api.util.PageFlowUtil" %>
 <%@ page import="org.labkey.api.util.UniqueID" %>
@@ -190,7 +191,7 @@ function toggleRecorder(checkbox)
             <td><%=h(m.getHeaderValue("From"))%></td>
             <td><%=formatDateTime(m.getCreatedTimestamp())%></td>
             <td><a onclick="toggleBody('email_body_<%=rowIndex%>'); return false;"><%=h(m.getHeaderValue("Subject"))%></a>
-                <div id="email_body_<%=rowIndex%>" style="display: none;"><br><%=body%></div></td>
+                <div id="email_body_<%=rowIndex%>" style="display: none;"><br><%=HtmlString.unsafe(body.toString())%></div></td>
             <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
                 <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=headers%></div></td>
             <td>
