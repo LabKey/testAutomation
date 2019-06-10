@@ -18,7 +18,4 @@
     <schedule>
         <poll interval="15s" />
     </schedule>
-    <parameters>
-        <parameter name="myParam" value="etlOverride" type="VARCHAR"/>
-    </parameters>
 </etl>
