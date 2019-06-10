@@ -80,6 +80,11 @@ public class ManageAssayQCStatesPage extends LabKeyPage<ManageAssayQCStatesPage.
         clickButton("Save");
     }
 
+    public void clickCancel()
+    {
+        clickButton("Cancel");
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -48,7 +48,27 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
     public static ImportFolderPage beginAt(WebDriverWrapper driver, String containerPath)
     {
         driver.beginAt(WebTestHelper.buildURL("admin", containerPath, "importFolder", Maps.of("tabId", "import")));
-        return new ImportFolderPage(driver.getDriver());
+        ImportFolderPage page = new ImportFolderPage(driver.getDriver());
+        page.setDriver(driver.getDriver());
+        return page;
+    }
+
+    public ImportFolderPage selectLocalZipArchive()
+    {
+        elementCache().localZipRadio.check();
+        return this;
+    }
+
+    public ImportFolderPage chooseFile(File file)
+    {
+        setFormElement(Locator.input("folderZip"), file);
+        return this;
+    }
+
+    public void clickImportFolder()
+    {
+        clickButton("Import Folder");
+
     }
 
     @NotNull
