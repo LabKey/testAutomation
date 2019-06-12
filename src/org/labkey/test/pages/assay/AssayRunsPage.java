@@ -43,7 +43,7 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
 
     public DataRegionTable getTable()
     {
-        return DataRegionTable.DataRegion(getDriver()).withName("Runs").findWhenNeeded(getDriver());
+        return DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor(getDriver());
     }
 
     public AssayDataPage clickAssayIdLink(String assayId)
