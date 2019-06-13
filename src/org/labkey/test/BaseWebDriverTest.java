@@ -152,8 +152,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private String _lastPageText = null;
     protected static boolean _testFailed = false;
     protected static boolean _anyTestFailed = false;
-    public final static int WAIT_FOR_PAGE = 30000;
-    public final static int WAIT_FOR_JAVASCRIPT = 10000;
     private final ArtifactCollector _artifactCollector;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
@@ -244,11 +242,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public WebDriver getWrappedDriver()
     {
         return SingletonWebDriver.getInstance().getWebDriver();
-    }
-
-    protected void setIsPerfTest(boolean isPerfTest)
-    {
-        this.isPerfTest = isPerfTest;
     }
 
     protected abstract @Nullable String getProjectName();
@@ -938,7 +931,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         checkViews();
 
-        if (!isPerfTest && isTestRunningOnTeamCity())
+        if (isTestRunningOnTeamCity())
             checkActionCoverage();
 
         checkLinks();

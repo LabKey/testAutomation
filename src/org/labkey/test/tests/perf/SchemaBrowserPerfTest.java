@@ -74,7 +74,6 @@ public class SchemaBrowserPerfTest extends PerformanceTest
     @Test
     public void testSteps()
     {
-        setIsPerfTest(true);
         _containerHelper.createProject(getProjectName(), "Study");
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudyWith200Tables.zip"));
         // add additional tables as needed
