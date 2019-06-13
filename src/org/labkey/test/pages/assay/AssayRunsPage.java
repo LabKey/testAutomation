@@ -37,7 +37,7 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
 
     public static AssayRunsPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("controller", containerPath, "action"));
+        driver.beginAt(WebTestHelper.buildURL("assay", containerPath, "assayRuns"));
         return new AssayRunsPage(driver.getDriver());
     }
 
