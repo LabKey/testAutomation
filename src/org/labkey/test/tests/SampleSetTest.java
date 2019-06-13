@@ -1532,7 +1532,7 @@ public class SampleSetTest extends BaseWebDriverTest
         goToModule("Query");
         viewQueryData("auditLog", "SampleSetAuditEvent");
         assertTextPresent(
-                "Samples inserted or updated in: " + sampleSetName);
+                "Samples inserted in: " + sampleSetName);
 
     }
 
