@@ -182,8 +182,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation";
 
-    protected boolean isPerfTest = false;
-
     static final Set<String> urlsSeen = new HashSet<>();
 
     static
