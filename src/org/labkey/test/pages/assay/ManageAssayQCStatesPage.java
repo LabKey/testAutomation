@@ -25,7 +25,7 @@ public class ManageAssayQCStatesPage extends LabKeyPage<ManageAssayQCStatesPage.
 
     public static ManageAssayQCStatesPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("controller", containerPath, "action"));
+        driver.beginAt(WebTestHelper.buildURL("core", containerPath, "manageQCStates"));
         return new ManageAssayQCStatesPage(driver.getDriver());
     }
 

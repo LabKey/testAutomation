@@ -8,6 +8,7 @@ import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
@@ -29,13 +30,13 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return new ExportFolderPage(driver.getDriver());
     }
 
-    public ExportFolderPage selectExperimentsAndRuns(boolean checked)
+    public ExportFolderPage includeExperimentsAndRuns(boolean checked)
     {
         elementCache().experimentsAndRunsCheckbox.set(checked);
         return this;
     }
 
-    public ExportFolderPage exportRoleAssignments(boolean checked)
+    public ExportFolderPage includeRoleAssignments(boolean checked)
     {
         elementCache().roleAssighmentsCheckbox.set(checked);
         return this;
@@ -43,17 +44,17 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
 
     public ExportFolderPage includeFiles(boolean checked)
     {
-        elementCache().selectFilesCheckbox.set(checked);
+        elementCache().includeFilesCheckbox.set(checked);
         return this;
     }
 
-    public ExportFolderPage selectETLDefintions(boolean checked)
+    public ExportFolderPage includeETLDefintions(boolean checked)
     {
         elementCache().etlDefinitionsCheckbox.set(checked);
         return this;
     }
 
-    public ExportFolderPage exportSecurityGroups(boolean checked)
+    public ExportFolderPage includeSecurityGroups(boolean checked)
     {
         elementCache().exportSecurityGroupsCheckbox.set(checked);
         return this;
@@ -68,7 +69,7 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
     public File exportToBrowserAsZipFile()
     {
         elementCache().browserAsZipFileToggle.check();
-        return clickAndWaitForDownload(Locator.linkWithSpan("Export"));
+        return clickAndWaitForDownload(elementCache().exportBtn);
     }
 
     protected ElementCache newElementCache()
@@ -84,7 +85,7 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         public Checkbox roleAssighmentsCheckbox = new Checkbox(Locator.tagWithText("label", "Role assignments for users and groups")
                 .precedingSibling("input").findWhenNeeded(getDriver()));
 
-        public Checkbox selectFilesCheckbox = new Checkbox(Locator.tagWithText("label", "Files")
+        public Checkbox includeFilesCheckbox = new Checkbox(Locator.tagWithText("label", "Files")
                 .precedingSibling("input").findWhenNeeded(getDriver()));
 
         public Checkbox etlDefinitionsCheckbox = new Checkbox(Locator.tagWithText("label", "ETL Definitions")
@@ -97,5 +98,6 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         RadioButton browserAsZipFileToggle = new RadioButton(Locator.tagContainingText("label", "Browser as zip file")
             .precedingSibling("input").findWhenNeeded(getDriver()));
 
+        WebElement exportBtn = Locator.linkWithSpan("Export").findWhenNeeded(getDriver());
     }
 }

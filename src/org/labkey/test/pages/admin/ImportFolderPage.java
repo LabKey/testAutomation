@@ -68,7 +68,6 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
     public void clickImportFolder()
     {
         clickButton("Import Folder");
-
     }
 
     @NotNull

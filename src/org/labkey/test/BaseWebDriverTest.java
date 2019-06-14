@@ -1382,25 +1382,25 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         goToFolderManagement().goToExportTab();
         waitForElement(Locator.tagWithClass("table", "export-location"));
 
-        ExportFolderPage thisPage = new ExportFolderPage(getDriver());
+        ExportFolderPage exportFolderPage = new ExportFolderPage(getDriver());
 
         if (exportETLDefination)
-            thisPage.selectETLDefintions(exportETLDefination);
+            exportFolderPage.includeETLDefintions(exportETLDefination);
 
         if (exportSecurityGroups)
-            thisPage.exportSecurityGroups(exportSecurityGroups);
+            exportFolderPage.includeSecurityGroups(exportSecurityGroups);
 
         if (exportRoleAssignments)
-            thisPage.exportRoleAssignments(exportRoleAssignments);
+            exportFolderPage.includeRoleAssignments(exportRoleAssignments);
 
         if (includeSubfolders)
-            thisPage.includeSubfolders(includeSubfolders);
+            exportFolderPage.includeSubfolders(includeSubfolders);
 
         if (includeFiles)
-            thisPage.includeFiles(includeFiles);
+            exportFolderPage.includeFiles(includeFiles);
 
         checkRadioButton(Locator.tagWithClass("table", "export-location").index(locationIndex)); // first locator with this name is "Pipeline root export directory, as individual files
-        return thisPage;
+        return exportFolderPage;
     }
 
     @LogMethod
