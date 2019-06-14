@@ -1,10 +1,13 @@
 package org.labkey.remoteapi.domain;
 
 import org.json.simple.JSONObject;
+import org.labkey.remoteapi.PostCommand;
 
-public class GetDomainCommand  extends DomainCommand
+public class GetDomainCommand extends PostCommand<DomainResponse>
 {
     private Integer _domainId;
+    private String _schemaName;
+    private String _domainName;
 
     public GetDomainCommand(String schemaName, String domainName)
     {
@@ -17,6 +20,48 @@ public class GetDomainCommand  extends DomainCommand
     {
         super("property", "getDomain");
         _domainId = domainId;
+    }
+
+    /**
+     * Returns the schema name.
+     * @return The schema name.
+     */
+    public String getSchemaName()
+    {
+        return _schemaName;
+    }
+
+    /**
+     * Sets the schema name
+     * @param schemaName The new schema name.
+     */
+    public void setSchemaName(String schemaName)
+    {
+        _schemaName = schemaName;
+    }
+
+    /**
+     * Returns the domain name.
+     * @return The domain name.
+     */
+    public String getDomainName()
+    {
+        return _domainName;
+    }
+
+    /**
+     * Sets the schema name
+     * @param domainName The new domain name.
+     */
+    public void setDomainName(String domainName)
+    {
+        _domainName = domainName;
+    }
+
+    @Override
+    protected DomainResponse createResponse(String text, int status, String contentType, JSONObject json)
+    {
+        return new DomainResponse(text, status, contentType, json, this);
     }
 
     @Override
