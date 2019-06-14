@@ -34,9 +34,10 @@ public abstract class PerformanceTest extends BaseWebDriverTest
         return null;
     }
 
-    protected PerformanceTest()
+    @Override
+    protected void checkActionCoverage()
     {
-        setIsPerfTest(true);
+        // action coverage check overwrites 'teamcity-info.xml'
     }
 
     public void writePerfDataToFile()

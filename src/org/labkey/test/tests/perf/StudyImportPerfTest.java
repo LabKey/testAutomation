@@ -34,7 +34,6 @@ public class StudyImportPerfTest extends PerformanceTest
     @Test
     public void testSteps()
     {
-        setIsPerfTest(true);
         _containerHelper.createProject(getProjectName(), "Study");
 
         long startTime = System.currentTimeMillis();
