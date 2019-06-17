@@ -164,7 +164,7 @@ public class SecurityTest extends BaseWebDriverTest
                 "/analytics/begin.view?", "/login/configure.view?", "/admin/customizeEmail.view?", "/admin/filesSiteSettings.view?",
                 "/admin/projectSettings.view?", "/flow/flowAdmin.view?", "/admin/reorderFolders.view?", "/admin/customizeSite.view?",
                 "/core/configureReportsAndScripts.view?", "/audit/showAuditLog.view?", "/search/admin.view?",
-                "/ms1/showAdmin.view?", "/ms2/showMS2Admin.view?", "/experiment-types/begin.view?", "/pipeline-status/showList.view?",
+                "/ms2/showMS2Admin.view?", "/experiment-types/begin.view?", "/pipeline-status/showList.view?",
                 "/pipeline/setup.view?", "/ms2/showProteinAdmin.view?", "/admin/actions.view?", "/admin/caches.view?",
                 "/admin/dbChecker.view?", "/query/dataSourceAdmin.view?", "/admin/dumpHeap.view?", "/admin/environmentVariables.view?",
                 "/admin/memTracker.view?", "/admin/queries.view?", "/admin/resetErrorMark.view?", "/admin/showThreads.view?",
