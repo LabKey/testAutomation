@@ -120,7 +120,6 @@ public class AdminConsoleTest extends BaseWebDriverTest
                 "short urls",
                 "audit log",
                 "full-text search",
-                "ms1",
                 "pipeline",
                 "site-wide terms of use",
                 "actions",
