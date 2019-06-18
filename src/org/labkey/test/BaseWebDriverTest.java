@@ -56,6 +56,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
+import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
@@ -1374,28 +1375,32 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @LogMethod
-    protected void prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles,boolean exportETLDefination, int locationIndex)
+    protected ExportFolderPage prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles,boolean exportETLDefination, int locationIndex)
     {
         if (folderName != null)
             clickFolder(folderName);
         goToFolderManagement().goToExportTab();
         waitForElement(Locator.tagWithClass("table", "export-location"));
 
-        if(exportETLDefination)
-            new Checkbox(Locator.tagWithText("label", "ETL Definitions").precedingSibling("input").findElement(getDriver())).check();
+        ExportFolderPage exportFolderPage = new ExportFolderPage(getDriver());
+
+        if (exportETLDefination)
+            exportFolderPage.includeETLDefintions(exportETLDefination);
 
         if (exportSecurityGroups)
-            new Checkbox(Locator.tagWithText("label", "Project-level groups and members").precedingSibling("input").findElement(getDriver())).check();
+            exportFolderPage.includeSecurityGroups(exportSecurityGroups);
 
         if (exportRoleAssignments)
-            new Checkbox(Locator.tagWithText("label", "Role assignments for users and groups").precedingSibling("input").findElement(getDriver())).check();
+            exportFolderPage.includeRoleAssignments(exportRoleAssignments);
 
         if (includeSubfolders)
-            new Checkbox(Locator.tagContainingText("label", "Include Subfolders").precedingSibling("input").findElement(getDriver())).check();
+            exportFolderPage.includeSubfolders(includeSubfolders);
 
         if (includeFiles)
-            new Checkbox(Locator.tagContainingText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
+            exportFolderPage.includeFiles(includeFiles);
+
         checkRadioButton(Locator.tagWithClass("table", "export-location").index(locationIndex)); // first locator with this name is "Pipeline root export directory, as individual files
+        return exportFolderPage;
     }
 
     @LogMethod

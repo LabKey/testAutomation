@@ -22,7 +22,7 @@ import org.openqa.selenium.WebElement;
 
 public class RadioButton extends Checkbox
 {
-    private RadioButton(WebElement radio)
+    public RadioButton(WebElement radio)
     {
         super(radio);
     }

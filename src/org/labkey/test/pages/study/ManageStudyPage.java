@@ -46,6 +46,12 @@ public class ManageStudyPage extends LabKeyPage<ManageStudyPage.ElementCache>
         return new StudySecurityPage(getDriver());
     }
 
+    public ManageDatasetsPage manageDatasets()
+    {
+        clickAndWait(elementCache().manageDatasets);
+        return new ManageDatasetsPage(getDriver());
+    }
+
     public ManageDatasetQCStatesPage manageDatasetQCStates()
     {
         clickAndWait(elementCache().manageQCStates);
@@ -59,6 +65,7 @@ public class ManageStudyPage extends LabKeyPage<ManageStudyPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
+        WebElement manageDatasets = Locator.linkWithText("Manage Datasets").findWhenNeeded(this);
         WebElement manageSecurity = Locator.linkWithText("Manage Security").findWhenNeeded(this);
         WebElement manageQCStates = Locator.linkWithText("Manage Dataset QC States").findWhenNeeded(this);
     }
