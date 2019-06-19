@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015 LabKey Corporation
+ * Copyright (c) 2012-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,10 @@ public abstract class PerformanceTest extends BaseWebDriverTest
         return null;
     }
 
-    protected PerformanceTest()
+    @Override
+    protected void checkActionCoverage()
     {
-        setIsPerfTest(true);
+        // action coverage check overwrites 'teamcity-info.xml'
     }
 
     public void writePerfDataToFile()

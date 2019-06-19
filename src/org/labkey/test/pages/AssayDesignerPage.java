@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 LabKey Corporation
+ * Copyright (c) 2016-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,6 +143,12 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         return this;
     }
 
+    public AssayDesignerPage enableQCStates(boolean checked)
+    {
+        elementCache().qcEnabledCheckbox.set(checked);
+        return this;
+    }
+
     public PropertiesEditor batchFields()
     {
         return elementCache().batchFieldsPanel;
@@ -244,7 +250,7 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         final Checkbox editableRunsCheckbox = Checkbox(Locator.checkboxByName("editableRunProperties")).findWhenNeeded(this);
         final Checkbox editableResultCheckbox = Checkbox(Locator.checkboxByName("editableResultProperties")).findWhenNeeded(this);
         final Checkbox backgroundUploadCheckbox = Checkbox(Locator.checkboxByName("backgroundUpload")).findWhenNeeded(this);
-
+        final Checkbox qcEnabledCheckbox = Checkbox(Locator.checkboxByName("qcEnabled")).findWhenNeeded(this);
 
         final PropertiesEditor batchFieldsPanel = PropertiesEditor(getDriver()).withTitleContaining("Batch Fields").findWhenNeeded();
         final PropertiesEditor runFieldsPanel = PropertiesEditor(getDriver()).withTitleContaining("Run Fields").findWhenNeeded();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 LabKey Corporation
+ * Copyright (c) 2018-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,12 @@ public class ManageStudyPage extends LabKeyPage<ManageStudyPage.ElementCache>
         return new StudySecurityPage(getDriver());
     }
 
+    public ManageDatasetsPage manageDatasets()
+    {
+        clickAndWait(elementCache().manageDatasets);
+        return new ManageDatasetsPage(getDriver());
+    }
+
     public ManageDatasetQCStatesPage manageDatasetQCStates()
     {
         clickAndWait(elementCache().manageQCStates);
@@ -59,6 +65,7 @@ public class ManageStudyPage extends LabKeyPage<ManageStudyPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
+        WebElement manageDatasets = Locator.linkWithText("Manage Datasets").findWhenNeeded(this);
         WebElement manageSecurity = Locator.linkWithText("Manage Security").findWhenNeeded(this);
         WebElement manageQCStates = Locator.linkWithText("Manage Dataset QC States").findWhenNeeded(this);
     }

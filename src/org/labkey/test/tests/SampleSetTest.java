@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2018 LabKey Corporation
+ * Copyright (c) 2011-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1532,7 +1532,7 @@ public class SampleSetTest extends BaseWebDriverTest
         goToModule("Query");
         viewQueryData("auditLog", "SampleSetAuditEvent");
         assertTextPresent(
-                "Samples inserted or updated in: " + sampleSetName);
+                "Samples inserted in: " + sampleSetName);
 
     }
 
