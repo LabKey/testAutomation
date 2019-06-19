@@ -18,7 +18,7 @@ package org.labkey.remoteapi.domain;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
-public class GetDomainCommand  extends PostCommand<DomainResponse>
+public class GetDomainCommand extends PostCommand<DomainResponse>
 {
     private Integer _domainId;
     private String _schemaName;
