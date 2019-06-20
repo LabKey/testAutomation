@@ -3208,8 +3208,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
             Actions actions = new Actions(getDriver());
             actions.doubleClick(el).perform();
 
-            log("WARNING: Clear did not remove the text, going to clear the field manually.");
-
             // Not really sure where the cursor is in relation to the text so LEFT_ARROW until we are at the start.
             for(int i = 0; i < length; i++)
             {
