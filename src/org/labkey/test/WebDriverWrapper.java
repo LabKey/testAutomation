@@ -442,7 +442,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public Object executeAsyncScript(String script, Object... arguments)
     {
-        script = "var callback = arguments[arguments.length - 1];\n" + script; // See WebDriver documentation
+        script = "var callback = arguments[arguments.length - 1];\n" +
+                "try {" +
+                script + // See WebDriver documentation
+                "} catch (error) { callback(error); }"; // ensure that the callback is invoked when an exception would otherwise prevent it
         return ((JavascriptExecutor) getDriver()).executeAsyncScript(script, arguments);
     }
 
