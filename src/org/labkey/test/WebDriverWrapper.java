@@ -3195,7 +3195,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     private void setHtml5NumberInput(WebElement el, String text)
     {
 
-        log("Using the setHtml5NumberInput function to set the value.");
         el.clear();
 
         // Calling clear on the element doesn't reliably clear the field, if it fails try the hack.
