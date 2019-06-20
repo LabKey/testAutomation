@@ -203,7 +203,6 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         String missingValueSamplesFolder = "mvAssaySamplesFolder";
         _containerHelper.createSubfolder(getProjectName(), missingValueSamplesFolder);
 
-
         // create assay
         String assaySubfolder = "TestAssayFolder";
         String assayName = "AssayForSampleDerivation";
@@ -211,8 +210,9 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                 .addDataField("SampleName", "SampleName", FieldDefinition.ColumnType.String)
                 .addDataField("SampleVolume", "SampleVolume", FieldDefinition.ColumnType.Double)
                 .saveAndClose();
-        insertAssayData(assayName, assaySubfolder, new FieldDefinition.LookupInfo(getProjectName() + "/" + assaySubfolder,
+        List<TestDataGenerator> dataGenerators = generateAssayData(new FieldDefinition.LookupInfo(getProjectName() + "/" + assaySubfolder,
                 "assay.General.AssayForSampleDerivation_assay", "Runs"));
+        insertAssayData(assayName, dataGenerators);
 
         // get the sampleID, it will be needed later
         waitAndClickAndWait(Locator.linkWithText("Assay List"));
@@ -241,6 +241,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
 
         // todo: do this using the SaveAssayBatchCommand; it currently blows up if you attempt to get a Material without supplying the SampleSetID
         String createScript = "LABKEY.Experiment.saveBatch({\n" +
+                "  success: callback, failure:callback, \n" +
                 "  assayId: "+assayIdStringValue+",\n" +
                 "  batch: {\n" +
                 "    name: 'foo',\n" +
@@ -264,11 +265,10 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                 "    }]\n" +
                 "  }\n" +
                 "})";
-        executeScript(createScript);
+        executeAsyncScript(createScript);
 
         // add a bodyWebPart here to make viewing the sampleset easier while debugging
         new PortalHelper(getDriver()).addBodyWebPart("Sample Sets");
-        refresh();
         DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
         waitAndClick(Locator.linkWithText(missingValueTable));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
@@ -291,6 +291,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
 
         // now update one of the new rows and add another
         String updateScript = "LABKEY.Experiment.saveBatch({\n" +
+                "  success: callback, failure:callback, \n" +
                 "  assayId: "+assayIdStringValue+",\n" +
                 "  batch: {\n" +
                 "    name: 'foo',\n" +
@@ -314,8 +315,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                 "    }]\n" +
                 "  }\n" +
                 "})";
-        executeScript(updateScript);
-        sleep(2500); // ugh, again.
+        executeAsyncScript(updateScript);
 
         SelectRowsResponse updateResponse = dgen.getRowsFromServer(createDefaultConnection(true));
         Map<String, Object> thirdAddedSample = updateResponse.getRows()
@@ -326,8 +326,6 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         assertNotNull("expect a new sample to be added to the set", thirdAddedSample);
         assertEquals(17.0, thirdAddedSample.get("volume"));
         assertEquals("also new from api", thirdAddedSample.get("mvStringData"));
-
-
     }
 
 
@@ -346,8 +344,9 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                 .addDataField("SampleName", "SampleName", FieldDefinition.ColumnType.String)
                 .addDataField("SampleVolume", "SampleVolume", FieldDefinition.ColumnType.Double)
                 .saveAndClose();
-        insertAssayData(assayName, assaySubfolder, new FieldDefinition.LookupInfo(getProjectName() + "/" + assaySubfolder,
+        List<TestDataGenerator> dataGenerators = generateAssayData(new FieldDefinition.LookupInfo(getProjectName() + "/" + assaySubfolder,
                 "assay.General.AssayForSaveBatchDerivation_assay", "Runs"));
+        insertAssayData(assayName, dataGenerators);
 
         // get the sampleID, it will be needed later
         waitAndClickAndWait(Locator.linkWithText("Assay List"));
@@ -449,7 +448,12 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         // get the samples from the sampleset
         SelectRowsResponse sampleSetResponse = dgen.getRowsFromServer(createDefaultConnection(true));
 
-        // at this point, the API either doesn't work or requires some hack to make it work.
+        // at this point, the API either doesn't work or requires some hack to make it work if you aren't
+        // importing from a file.
+        // the Javascript API works if you feed it dummy datarows and a per-run properties, the Java api
+        // treats that sort of input as invalid and throws errors.
+        // If you provide a valid pipeline root that doesn't find files or datas, the API does not
+        // convert materialoutputs into created sample materials
         // the materialoutputs are present, but the API does not create samples derived from the runs.
 
     }
@@ -466,10 +470,10 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
 
     /**
      * generates data (runs) for the gpat assay used by tests in this class.
-     * @param assayName
+     * @param assayLookup : specifies the container, schema, name of the assay's run table
      * @return
      */
-    private List<TestDataGenerator> insertAssayData(String assayName, String assaySubfolder, FieldDefinition.LookupInfo assayLookup)
+    private List<TestDataGenerator> generateAssayData(FieldDefinition.LookupInfo assayLookup)
     {
         List<FieldDefinition> resultsFieldset = List.of(
                 TestDataGenerator.simpleFieldDef("ParticipantID",FieldDefinition.ColumnType.String),
@@ -483,7 +487,6 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                 .addCustomRow(Map.of("ParticipantID", "Jim", "Date", "11/12/2018", "SampleName", "Red", "SampleVolume", 14.5))
                 .addCustomRow(Map.of("ParticipantID", "Billy", "Date", "11/13/2018", "SampleName", "Yellow", "SampleVolume", 17.5))
                 .addCustomRow(Map.of("ParticipantID", "Michael", "Date", "11/14/2018", "SampleName", "Orange", "SampleVolume", 11.5));
-        String pasteData1 = dgen1.writeTsvContents();
 
         TestDataGenerator dgen2 = new TestDataGenerator(assayLookup)
                 .withColumnSet(resultsFieldset)
@@ -491,7 +494,6 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                 .addCustomRow(Map.of("ParticipantID", "William", "Date", "10/12/2018", "SampleName", "Red", "SampleVolume", 14.5))
                 .addCustomRow(Map.of("ParticipantID", "Jenny", "Date", "10/13/2018", "SampleName", "Yellow", "SampleVolume", 17.5))
                 .addCustomRow(Map.of("ParticipantID", "Hermione", "Date", "10/14/2018", "SampleName", "Orange", "SampleVolume", 11.5));
-        String pasteData2 = dgen2.writeTsvContents();
 
         TestDataGenerator dgen3 = new TestDataGenerator(assayLookup)
                 .withColumnSet(resultsFieldset)
@@ -499,23 +501,32 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                 .addCustomRow(Map.of("ParticipantID", "Arthur", "Date", "10/12/2018", "SampleName", "Red", "SampleVolume", 14.5))
                 .addCustomRow(Map.of("ParticipantID", "Colin", "Date", "10/13/2018", "SampleName", "Yellow", "SampleVolume", 17.5))
                 .addCustomRow(Map.of("ParticipantID", "Ronald", "Date", "10/14/2018", "SampleName", "Orange", "SampleVolume", 11.5));
-        String pasteData3 = dgen3.writeTsvContents();
 
+        return Arrays.asList(dgen1, dgen2, dgen3);
+    }
+
+    private void insertAssayData(String assayName, List<TestDataGenerator> dataGenerators)
+    {
+        // assumes we are at the assay list
         waitAndClickAndWait(Locator.linkWithText(assayName));
         AssayRunsPage assayRunsPage = new AssayRunsPage(getDriver());
         DataRegionTable runsTable = assayRunsPage.getTable();
         runsTable.clickHeaderButton("Import Data");
         clickButton("Next");
 
-        // insert 3 runs
-        new AssayImportPage(getDriver()).setNamedTextAreaValue("TextAreaDataCollector.textArea", pasteData1);
-        clickButton("Save and Import Another Run");
-        new AssayImportPage(getDriver()).setNamedTextAreaValue("TextAreaDataCollector.textArea", pasteData2);
-        clickButton("Save and Import Another Run");
-        new AssayImportPage(getDriver()).setNamedTextAreaValue("TextAreaDataCollector.textArea", pasteData3);
-        clickButton("Save and Finish");
+        int limit = dataGenerators.size();
+        int imported = 0;
+        for(TestDataGenerator dataGen : dataGenerators)
+        {
+            new AssayImportPage(getDriver()).setNamedTextAreaValue("TextAreaDataCollector.textArea",
+                    dataGen.writeTsvContents());
+            imported++;
 
-        return Arrays.asList(dgen1, dgen2, dgen3);
+            if(imported < limit)
+                clickButton("Save and Import Another Run");
+            else
+                clickButton("Save and Finish");
+        }
     }
 
     @Override
