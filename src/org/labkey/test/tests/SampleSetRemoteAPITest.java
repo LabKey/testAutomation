@@ -301,7 +301,8 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                 "      materialOutputs: [\n" +
                 "        // create/update samples in the target sample set\n" +
                 "        { rowId: "+secondAddedRowId+", sampleSet: { name: 'mvAssaySamples' }, properties: { 'mvStringData': 'newer from api', volume: 7 } },\n" +
-                "        { name: 'another really new one', sampleSet: { name: 'mvAssaySamples' }, properties: { 'mvStringData': 'also new from api', volume:17 } }\n" +
+                "        { name: 'another really new one', sampleSet: { name: 'mvAssaySamples' }, " +
+                "           properties: { 'mvStringData': 'also new from api', volume:17, mvstringdata_mvindicator : 'N' } }\n" +
                 "      ],\n" +
                 "\n" +
                 "      properties: {\n" +
@@ -326,6 +327,10 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         assertNotNull("expect a new sample to be added to the set", thirdAddedSample);
         assertEquals(17.0, thirdAddedSample.get("volume"));
         assertEquals("also new from api", thirdAddedSample.get("mvStringData"));
+        assertEquals("N", thirdAddedSample.get("mvstringdata_mvindicator"));
+
+        //TODO: validate the update sample scenario if it ever works
+        // thirdAddedSample receiving no mvIndicator value is a repro of https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37786
     }
 
 
