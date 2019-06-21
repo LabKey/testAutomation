@@ -3156,6 +3156,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
             case "search":
                 setInput(input, value); // These don't require special handling, don't output warning
                 break;
+            case "number":
+                setHtml5NumberInput(input, value);
+                break;
             default:
                 log(String.format("WARNING: No special handling defined for HTML5 input type = '%s'.", inputType));
                 setInput(input, value);
@@ -3187,6 +3190,39 @@ public abstract class WebDriverWrapper implements WrapsDriver
         fireEvent(el, SeleniumEvent.focus);
         executeScript("arguments[0].value = ''", el);
         el.sendKeys(formDate);
+    }
+
+    private void setHtml5NumberInput(WebElement el, String text)
+    {
+
+        el.clear();
+
+        // Calling clear on the element doesn't reliably clear the field, if it fails try the hack.
+        String valueAsNumber = el.getAttribute("valueAsNumber").trim().toLowerCase();
+        if(!valueAsNumber.equals("nan"))
+        {
+
+            int length = valueAsNumber.length();
+
+            // Double click to edit the cell.
+            Actions actions = new Actions(getDriver());
+            actions.doubleClick(el).perform();
+
+            // Not really sure where the cursor is in relation to the text so LEFT_ARROW until we are at the start.
+            for(int i = 0; i < length; i++)
+            {
+                el.sendKeys(Keys.ARROW_LEFT);
+            }
+
+            // Now delete all of the characters.
+            for(int i = 0; i < length; i++)
+            {
+                el.sendKeys(Keys.DELETE);
+            }
+
+        }
+
+        el.sendKeys(text);
     }
 
     /**
