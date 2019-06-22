@@ -388,7 +388,7 @@ public abstract class AbstractContainerHelper
         _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName));
         _test.clickButton("Delete", waitTime);
         // confirm delete subfolders if present
-        if (_test.isTextPresent("This folder has subfolders."))
+        if (_test.isElementPresent(Locator.lkButton("Delete All Folders.")))
             _test.clickButton("Delete All Folders", waitTime);
         // confirm delete:
         _test.clickButton("Delete", waitTime);

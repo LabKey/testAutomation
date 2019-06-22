@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.WebTestHelper;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -34,16 +35,17 @@ public class WorkbookHelper
     }
 
     /**
-     * Create a new workbook in a project containing a workbook webpart on the portal page
-     * @param project Name of parent project
+     * Create a new workbook in a project/folder containing a workbook webpart on the portal page
+     * @param containerPath Path of the parent folder
      * @param title Title of created workbook
      * @param description Description of created workbook
      * @param folderType Type of created workbook
      * @return workbook id
      */
-    public int createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
+    public int createWorkbook(String containerPath, String title, String description, WorkbookFolderType folderType)
     {
-        _test.clickProject(project);
+        _test.beginAt(WebTestHelper.buildURL("project", containerPath, "begin"));
+
         DataRegionTable dt = DataRegionTable.findDataRegionWithinWebpart(_test, "Workbooks");
         dt.clickInsertNewRow();
 

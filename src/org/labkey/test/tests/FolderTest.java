@@ -19,10 +19,18 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.ext4.Window;
@@ -32,15 +40,24 @@ import org.labkey.test.pages.admin.ReorderFoldersPage;
 import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WorkbookHelper;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 25 )
@@ -111,7 +128,7 @@ public class FolderTest extends BaseWebDriverTest
     @Before
     public void preTest()
     {
-        clickProject(getProjectName());
+        goToProjectHome();
         goToFolderManagement();
     }
 
@@ -253,6 +270,119 @@ public class FolderTest extends BaseWebDriverTest
         log("creating template folder from above folder");
         _containerHelper.createSubFolderFromTemplateWithTitle(getProjectName(),"Child Folder","/"+getProjectName()+"/Parent Folder","Child Title");
         assertElementPresent(Locator.tagContainingText("h3","Child Title"));
+    }
+
+    private void createListWithData(String subfolder) throws Exception
+    {
+        _listHelper.createList(getProjectName() + "/" + subfolder, "List1", ListHelper.ListColumnType.AutoInteger, "RowId", new ListHelper.ListColumn("Col1", "ColLabel", ListHelper.ListColumnType.String));
+
+        InsertRowsCommand ir = new InsertRowsCommand("lists", "List1");
+        Map<String, Object> row1 = new HashMap<>();
+        row1.put("Col1", 1);
+
+        ir.addRow(row1);
+
+        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        ir.execute(cn, getProjectName() + "/" + subfolder);
+    }
+
+    @Test
+    public void deleteFoldersTest() throws Exception
+    {
+        log("testing delete actions");
+        _containerHelper.createSubfolder(getProjectName(), "NoChildren");
+        createListWithData("NoChildren");
+
+
+        _containerHelper.createSubfolder(getProjectName(), "HasChildren");
+        createListWithData("HasChildren");
+        _containerHelper.createSubfolder(getProjectName() + "/HasChildren", "Subfolder");
+
+        clickProject(getProjectName());
+        ensureAdminMode();
+
+        //Delete a folder without children, expect only one-step confirmation needed
+        FolderManagementPage folderManagementPage = goToFolderManagement();
+        waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(getProjectName()));
+        waitForElement(Locator.tagWithText("span", "Shared").withClass("x4-tree-node-text"));
+        sleep(1000); //allow the tree to expand
+        waitAndClick(Locator.tagWithText("span", "NoChildren").withClass("x4-tree-node-text"));
+        waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode("NoChildren"));
+        clickButton("Delete", WAIT_FOR_PAGE);
+        waitForElement(Locator.tagWithText("td", "You are about to delete the following folder:"));
+        waitForElement(Locator.tagContainingText("li", getProjectName() + "/NoChildren, containing the following objects:"));
+        waitForElement(Locator.tagWithText("li", "1 lists"));
+
+        clickButton("Delete", WAIT_FOR_PAGE);
+
+        //Delete a folder with children, expect two-step confirmation needed
+        goToFolderManagement();
+        waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(getProjectName()));
+        waitForElement(Locator.tagWithText("span", "Shared").withClass("x4-tree-node-text"));
+        sleep(1000); //allow the tree to expand
+        waitAndClick(Locator.tagWithText("span", "HasChildren").withClass("x4-tree-node-text"));
+        waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode("HasChildren"));
+        clickButton("Delete", WAIT_FOR_PAGE);
+        waitForElement(Locator.tagWithText("td", "This folder has subfolders. If you continue you will permanently delete the folder, its subfolders, and all the objects they contain. The next page will summarize some of the objects in these folders and give you another chance to cancel."));
+        clickButton("Delete All Folders", WAIT_FOR_PAGE);
+        waitForElement(Locator.tagContainingText("li", getProjectName() + "/HasChildren, containing the following objects:"));
+        waitForElement(Locator.tagContainingText("li", getProjectName() + "/HasChildren/Subfolder"));
+        waitForElement(Locator.tagWithText("li", "1 lists"));
+        clickButton("Delete", WAIT_FOR_PAGE);
+
+        //now delete multiple workbooks:
+        _containerHelper.createSubfolder(getProjectName(), "WorkbookParent");
+        goToProjectHome(getProjectName() + "/WorkbookParent");
+        PortalHelper ph = new PortalHelper(this);
+        ph.addBodyWebPart("Workbooks");
+        DataRegionTable dr = DataRegionTable.findDataRegionWithinWebpart(this, "Workbooks");
+
+        WorkbookHelper workbookHelper = new WorkbookHelper(this);
+        workbookHelper.createWorkbook(getProjectName() + "/WorkbookParent", "WB1", "Description", WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK);
+        int wb = workbookHelper.createWorkbook(getProjectName() + "/WorkbookParent", "WB2", "Description", WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK);
+        createListWithData("WorkbookParent/" + wb);
+
+        workbookHelper.createWorkbook(getProjectName() + "/WorkbookParent", "WB3", "Description", WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK);
+        goToProjectHome(getProjectName() + "/WorkbookParent");
+        dr = DataRegionTable.findDataRegionWithinWebpart(this, "Workbooks");
+
+        assertEquals("Incorrect row count", 3, dr.getDataRowCount());
+
+        dr.checkCheckbox(1);
+        dr.checkCheckbox(2);
+        dr.clickHeaderButton("Delete");
+        assertTrue(acceptAlert().contains("Are you sure you want to delete the selected rows?"));
+        waitForElement(Locator.tagWithText("td", "You are about to delete the following folders:"));
+        waitForElement(Locator.tagContainingText("li", getProjectName() + "/WorkbookParent/2, containing the following objects"));
+        waitForElement(Locator.tagWithText("li", "1 lists"));
+        waitForElement(Locator.tagContainingText("li", getProjectName() + "/WorkbookParent/3 and all the objects it contains"));
+        clickButton("Delete", WAIT_FOR_PAGE);
+
+        //make sure we cannot delete using the client API
+        goToProjectHome(getProjectName() + "/WorkbookParent");
+        try
+        {
+            Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+            SelectRowsCommand sr = new SelectRowsCommand("core", "workbooks");
+            sr.setColumns(Arrays.asList("EntityId"));
+            SelectRowsResponse srr = sr.execute(cn, getProjectName() + "/WorkbookParent");
+            Object entityId = srr.getRows().get(0).get("EntityId");
+
+            DeleteRowsCommand drc = new DeleteRowsCommand("core", "workbooks");
+            Map<String, Object> row1 = new HashMap<>();
+            row1.put("EntityId", entityId);
+            drc.addRow(row1);
+
+            SaveRowsResponse resp = drc.execute(new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword()), getContainerId());
+
+            throw new Exception("That command should have failed");
+        }
+        catch (IOException | CommandException e)
+        {
+            assertEquals("Incorrect error message", "Deleting workbooks through the query service is not supported", e.getMessage());
+        }
+
+        _containerHelper.deleteFolder(getProjectName(), "WorkbookParent");
     }
 
     @Override public BrowserType bestBrowser()
