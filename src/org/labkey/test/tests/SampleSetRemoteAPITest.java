@@ -523,14 +523,15 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         int imported = 0;
         for(TestDataGenerator dataGen : dataGenerators)
         {
-            new AssayImportPage(getDriver()).setNamedTextAreaValue("TextAreaDataCollector.textArea",
+            AssayImportPage page = new AssayImportPage(getDriver())
+                    .setNamedTextAreaValue("TextAreaDataCollector.textArea",
                     dataGen.writeTsvContents());
             imported++;
 
             if(imported < limit)
-                clickButton("Save and Import Another Run");
+                page.clickSaveAndImportAnother();
             else
-                clickButton("Save and Finish");
+                page.clickSaveAndFinish();
         }
     }
 
