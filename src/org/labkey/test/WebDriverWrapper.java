@@ -3204,9 +3204,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
             int length = valueAsNumber.length();
 
-            // Double click to edit the cell.
-            Actions actions = new Actions(getDriver());
-            actions.doubleClick(el).perform();
+            el.click();
 
             // Not really sure where the cursor is in relation to the text so LEFT_ARROW until we are at the start.
             for(int i = 0; i < length; i++)
@@ -3221,6 +3219,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
 
         }
+
+        // Sometimes focus is lost before the value is set, so make sure the element has focus.
+        el.click();
 
         el.sendKeys(text);
     }
