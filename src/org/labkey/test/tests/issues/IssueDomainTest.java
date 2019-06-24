@@ -18,13 +18,14 @@ import org.labkey.test.util.IssuesHelper;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @Category({Issues.class, DailyA.class, Data.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 20)
+@BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class IssueDomainTest extends BaseWebDriverTest
 {
     private IssuesHelper _issuesHelper = new IssuesHelper(this);
@@ -85,23 +86,23 @@ public class IssueDomainTest extends BaseWebDriverTest
     @Test
     public void mandatoryFieldTest() throws Exception
     {
-        log("Remove mandatory field 'NotifyList'");
+        log("Remove mandatory field 'notifylist'");
         GetDomainCommand getCmd = new GetDomainCommand(DOMAIN_NAME, ISSUES_NAME);
         DomainResponse getDomainResponse = getCmd.execute(this.createDefaultConnection(false), getContainerPath());
         List<Map<String, Object>> getDomainCols = getDomainResponse.getColumns();
+        ListIterator<Map<String, Object>> getDomainColsIterator = getDomainCols.listIterator();
 
-        int index = 0;
-        for (Map<String, Object> col : getDomainCols)
+        while(getDomainColsIterator.hasNext())
         {
-            String colName = (String) col.get("name");
+            String colName = (String) getDomainColsIterator.next().get("name");
             if ("notifylist".equalsIgnoreCase(colName))
             {
-                getDomainCols.remove(index);
+                getDomainColsIterator.remove();
                 break;
             }
-            index++;
         }
 
+        log("Attempt saving updated domain without mandatory field 'notifylist'");
         SaveDomainCommand saveCmd = new SaveDomainCommand(DOMAIN_KIND, ISSUES_NAME);
         long getDomainId = getDomainResponse.getDomainId();
         saveCmd.setDomainId((int) getDomainId);
