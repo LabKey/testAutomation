@@ -210,7 +210,9 @@ public class DataRegionTable extends DataRegion
         @Override
         protected DataRegionTable construct(WebElement el, WebDriver driver)
         {
-            DataRegionTable constructed = new DataRegionTable(new RefindingWebElement(el, buildLocator(), getContext()).withTimeout(getTimeout()), driver);
+            if (buildLocator() != null && getContext() != null) // Prevent NPE after using `DataRegionFinder.locatedBy(..)`
+                el = new RefindingWebElement(el, buildLocator(), getContext()).withTimeout(getTimeout());
+            DataRegionTable constructed = new DataRegionTable(el, driver);
             constructed.setUpdateTimeout(getTimeout());
             if (!_lazy)
                 constructed.elementCache();
