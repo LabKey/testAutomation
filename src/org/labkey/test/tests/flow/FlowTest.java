@@ -33,6 +33,7 @@ import org.labkey.test.pages.flow.reports.QCReportEditorPage;
 import org.labkey.test.pages.flow.reports.ReportEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AuditLogTest;
+import org.labkey.test.util.DataRegion;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserHelper;
@@ -434,15 +435,13 @@ public class FlowTest extends BaseFlowTest
         assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("ff_compensationMatrixOption"), "Matrix: " + FCS_FILE_1 + " comp matrix"));
 
-        click(Locator.checkboxByName(".toggle")); // "Select all" checkbox behavior is unusual because some rows are disabled
+        // Non-standard data-region, can't use `DataRegionTable` component. No enclosing 'lk-region-form'
+        doAndWaitForPageSignal(() -> click(Locator.checkboxByName(".toggle")), DataRegion.UPDATE_SIGNAL);
         clickButton("Analyze selected runs");
-        waitForPipeline(getContainerPath());
 
-        goToFlowDashboard();
-        clickAndWait(Locator.linkWithText("FlowExperiment2"));
-        table = new DataRegionTable("query", getDriver());
+        // Analyze should auto-navigate to 'flow-run-showRuns.view' after job finishes
+        table = new DataRegionTable.DataRegionFinder(getDriver()).withName("query").waitFor();
         table.clickHeaderMenu("Query", query1);
-        //_extHelper.clickMenuButton("Query", query1);
         assertTextPresent("File Path Root");
 
         setSelectedFields(getContainerPath(), "flow", query1, "MostColumns", new String[] {"RowId", "Count","WellCount"});
