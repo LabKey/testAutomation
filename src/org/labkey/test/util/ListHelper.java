@@ -351,6 +351,7 @@ public class ListHelper extends LabKeySiteWrapper
             expectedTexts.add(col.getLabel());
         }
         expectedTexts.remove("");
+        expectedTexts.remove(null);
         assertTextPresent(new ArrayList<>(expectedTexts));
     }
 
