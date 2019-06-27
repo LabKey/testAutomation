@@ -87,7 +87,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
 
         //import more to sample set while in subfolder
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
-        sampleHelper.bulkImport(SAMPLE_SET_SUB_FOLDER, SampleSetHelper.MERGE_DATA_OPTION);
+        sampleHelper.bulkImport(SAMPLE_SET_SUB_FOLDER, SampleSetHelper.MERGE_DATA_LABEL);
     }
 
     @Before
