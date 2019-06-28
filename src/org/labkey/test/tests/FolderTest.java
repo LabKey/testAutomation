@@ -48,7 +48,6 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WorkbookHelper;
 import org.openqa.selenium.WebElement;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -287,22 +286,16 @@ public class FolderTest extends BaseWebDriverTest
     }
 
     @Test
-    public void deleteFoldersTest() throws Exception
+    public void deleteFoldersWithoutChildrenTest() throws Exception
     {
-        log("testing delete actions");
         _containerHelper.createSubfolder(getProjectName(), "NoChildren");
         createListWithData("NoChildren");
-
-
-        _containerHelper.createSubfolder(getProjectName(), "HasChildren");
-        createListWithData("HasChildren");
-        _containerHelper.createSubfolder(getProjectName() + "/HasChildren", "Subfolder");
 
         clickProject(getProjectName());
         ensureAdminMode();
 
         //Delete a folder without children, expect only one-step confirmation needed
-        FolderManagementPage folderManagementPage = goToFolderManagement();
+        goToFolderManagement();
         waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(getProjectName()));
         waitForElement(Locator.tagWithText("span", "Shared").withClass("x4-tree-node-text"));
         sleep(1000); //allow the tree to expand
@@ -312,8 +305,18 @@ public class FolderTest extends BaseWebDriverTest
         waitForElement(Locator.tagWithText("td", "You are about to delete the following folder:"));
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/NoChildren, containing the following objects:"));
         waitForElement(Locator.tagWithText("li", "1 lists"));
-
         clickButton("Delete", WAIT_FOR_PAGE);
+    }
+
+    @Test
+    public void deleteFoldersWithChildrenTest() throws Exception
+    {
+        _containerHelper.createSubfolder(getProjectName(), "HasChildren");
+        createListWithData("HasChildren");
+        _containerHelper.createSubfolder(getProjectName() + "/HasChildren", "Subfolder");
+
+        clickProject(getProjectName());
+        ensureAdminMode();
 
         //Delete a folder with children, expect two-step confirmation needed
         goToFolderManagement();
@@ -329,13 +332,16 @@ public class FolderTest extends BaseWebDriverTest
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/HasChildren/Subfolder"));
         waitForElement(Locator.tagWithText("li", "1 lists"));
         clickButton("Delete", WAIT_FOR_PAGE);
+    }
 
+    @Test
+    public void deleteWorkbooksTest() throws Exception
+    {
         //now delete multiple workbooks:
         _containerHelper.createSubfolder(getProjectName(), "WorkbookParent");
         goToProjectHome(getProjectName() + "/WorkbookParent");
         PortalHelper ph = new PortalHelper(this);
         ph.addBodyWebPart("Workbooks");
-        DataRegionTable dr = DataRegionTable.findDataRegionWithinWebpart(this, "Workbooks");
 
         WorkbookHelper workbookHelper = new WorkbookHelper(this);
         workbookHelper.createWorkbook(getProjectName() + "/WorkbookParent", "WB1", "Description", WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK);
@@ -344,7 +350,7 @@ public class FolderTest extends BaseWebDriverTest
 
         workbookHelper.createWorkbook(getProjectName() + "/WorkbookParent", "WB3", "Description", WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK);
         goToProjectHome(getProjectName() + "/WorkbookParent");
-        dr = DataRegionTable.findDataRegionWithinWebpart(this, "Workbooks");
+        DataRegionTable dr = DataRegionTable.findDataRegionWithinWebpart(this, "Workbooks");
 
         assertEquals("Incorrect row count", 3, dr.getDataRowCount());
 
@@ -377,7 +383,7 @@ public class FolderTest extends BaseWebDriverTest
 
             throw new Exception("That command should have failed");
         }
-        catch (IOException | CommandException e)
+        catch (CommandException e)
         {
             assertEquals("Incorrect error message", "Deleting workbooks through the query service is not supported", e.getMessage());
         }
