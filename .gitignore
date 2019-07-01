@@ -1,0 +1,5 @@
+# IntelliJ build directory
+out/
+
+# Transform jars built by Gradle
+data/qc/*.jar
