@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class WorkbookHelper
 {
@@ -75,6 +76,15 @@ public class WorkbookHelper
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public void deleteWorkbooksFromDataRegion(DataRegionTable dr)
+    {
+        dr.clickHeaderButton("Delete");
+        assertTrue(_test.acceptAlert().contains("Are you sure you want to delete the selected rows?"));
+
+        _test.waitForElement(Locator.tagWithText("td", "You are about to delete the following folders:"));
+        _test.clickButton("Delete", _test.WAIT_FOR_PAGE);
     }
 
     public enum WorkbookFolderType
