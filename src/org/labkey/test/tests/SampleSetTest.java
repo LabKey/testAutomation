@@ -270,12 +270,6 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTrue("Should have row with second imported value", drt.getRowIndex(fieldNames.get(0), "Ex") >= 0);
     }
 
-    private void selectInsertOption(String value, int index)
-    {
-        List<WebElement> buttons = Locator.radioButtonByNameAndValue("insertOption", value).findElements(this.getDriver());
-        buttons.get(index).click();
-    }
-
     @Test
     public void testImportTypeOptions()
     {
@@ -305,8 +299,8 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("text"), header + overlap + newData);
         clickButton("Submit", "duplicate key");
 
-        log("Switch to 'Insert and Update'");
-        sampleHelper.selectImportOption(SampleSetHelper.MERGE_DATA_OPTION, 1);
+        log("Switch to 'Insert and Replace'");
+        sampleHelper.selectImportOption(SampleSetHelper.MERGE_DATA_LABEL, 1);
         clickButton("Submit");
 
         log("Validate data was updated and new data added");
@@ -326,11 +320,11 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Try to import overlapping data from file");
         drt.clickImportBulkData();
         click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
-        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleSet.xls").getAbsolutePath());
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleSet.xls"));
         clickButton("Submit", "duplicate key");
 
-        log ("Switch to 'Insert and Update'");
-        selectInsertOption("MERGE", 0);
+        log ("Switch to 'Insert and Replace'");
+        sampleHelper.selectImportOption(SampleSetHelper.MERGE_DATA_LABEL, 0);
         clickButton("Submit");
         log ("Validate data was updated and new data added");
         assertEquals("Number of samples not as expected", 3, drt.getDataRowCount());
@@ -926,7 +920,7 @@ public class SampleSetTest extends BaseWebDriverTest
         updateSampleData.add(updatedFields);
 
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
 
     }
 
@@ -1222,7 +1216,7 @@ public class SampleSetTest extends BaseWebDriverTest
         // TODO: Need to pass in all of the columns so as not to lose any data. See TODO comment below.
         List<Map<String, String>> updateSampleData = new ArrayList<>();
         updateSampleData.add(sampleData.get(testDataIndex));
-        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
         expectedMissingCount--;
 
         // TODO: Need to revisit. When doing a bulk update if a field is missing the update views it as a request to
@@ -1236,7 +1230,7 @@ public class SampleSetTest extends BaseWebDriverTest
 //        List<Map<String, String>> updateSampleData = new ArrayList<>();
 //        updateSampleData.add(tempSample);
 //
-//        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+//        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
 
         if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
         {
@@ -1316,7 +1310,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Validate that the required field check works as expected.");
         updateSampleData = new ArrayList<>();
         updateSampleData.add(Map.of("Name", "mv10", REQUIRED_FIELD_NAME, "", MISSING_FIELD_NAME, "There should be no value in the required field.", INDICATOR_FIELD_NAME, ""));
-        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.IMPORT_DATA_OPTION, 0);
+        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.IMPORT_DATA_LABEL, 0);
 
         boolean errorMsgShown;
         try
@@ -1628,7 +1622,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 "SampleSetBVTChildA\tSampleSetBVT13\t1.111\n" +
                 "SampleSetBVTChildB\tSampleSetBVT14\t2.222\n";
 
-        sampleHelper.bulkImport(REPARENTED_CHILD_SAMPLE_SET_TSV, SampleSetHelper.MERGE_DATA_OPTION);
+        sampleHelper.bulkImport(REPARENTED_CHILD_SAMPLE_SET_TSV, SampleSetHelper.MERGE_DATA_LABEL);
 
         clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
         assertTextPresent("2.222");

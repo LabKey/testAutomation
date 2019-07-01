@@ -22,7 +22,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,13 +30,14 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 
 public class SampleSetHelper extends WebDriverWrapper
 {
     private final WebDriver _driver;
     private Map<String, FieldDefinition.ColumnType> _fields;
-    public static final String IMPORT_DATA_OPTION = "IMPORT";
-    public static final String MERGE_DATA_OPTION = "MERGE";
+    public static final String IMPORT_DATA_LABEL = "Insert";
+    public static final String MERGE_DATA_LABEL = "Insert and Replace";
 
     public SampleSetHelper(WebDriverWrapper driverWrapper)
     {
@@ -132,10 +132,9 @@ public class SampleSetHelper extends WebDriverWrapper
         return this;
     }
 
-    public SampleSetHelper selectImportOption(String value, int index)
+    public SampleSetHelper selectImportOption(String label, int index)
     {
-        List<WebElement> buttons = Locator.radioButtonByNameAndValue("insertOption", value).findElements(getDriver());
-        buttons.get(index).click();
+        RadioButton().withLabel(label).index(index).find(getDriver()).check();
         return this;
     }
 
@@ -227,7 +226,7 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void bulkImport(File dataFile)
     {
-        bulkImport(dataFile, IMPORT_DATA_OPTION);
+        bulkImport(dataFile, IMPORT_DATA_LABEL);
     }
 
     public void bulkImport(File dataFile, String importOption)
@@ -251,7 +250,7 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void bulkImport(String tsvData)
     {
-        bulkImport(tsvData, IMPORT_DATA_OPTION);
+        bulkImport(tsvData, IMPORT_DATA_LABEL);
     }
 
     public void bulkImport(String tsvData, String importOption)
@@ -269,12 +268,12 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void bulkImport(List<Map<String, String>> data)
     {
-        bulkImport(data, IMPORT_DATA_OPTION, null);
+        bulkImport(data, IMPORT_DATA_LABEL, null);
     }
 
     public void bulkImport(List<Map<String, String>> data, int waitTime)
     {
-        bulkImport(data, IMPORT_DATA_OPTION, waitTime);
+        bulkImport(data, IMPORT_DATA_LABEL, waitTime);
     }
 
     public void bulkImport(List<Map<String, String>> data, String importOption)
