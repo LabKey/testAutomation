@@ -695,8 +695,8 @@ public class Ext4Helper
         {
             try
             {
-                _test.executeAsyncScript("Ext4.onReady(callback);");
-                return true;
+                Object result = _test.executeAsyncScript("Ext4.onReady(callback);");
+                return result == null; // If executeAsyncScript returned something, there was probably an error.
             }
             catch (WebDriverException scriptError)
             {
