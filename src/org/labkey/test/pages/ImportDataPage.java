@@ -17,6 +17,7 @@ package org.labkey.test.pages;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -137,8 +138,8 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     {
         WebElement pasteDataTextArea = Locator.xpath("//div[@id='copypasteDiv1']/descendant::textarea").findWhenNeeded(this);
         Locator importAltKeyChk = Locator.input("importLookupByAlternateKey");//.findWhenNeeded(this);
-        WebElement submitBtn = Locator.button("Submit").findWhenNeeded(this);
-        WebElement cancelBtn = Locator.button("Cancel").findWhenNeeded(this);
+        WebElement submitBtn = Ext4Helper.Locators.ext4Button("Submit").findWhenNeeded(this);
+        WebElement cancelBtn = Ext4Helper.Locators.ext4Button("Cancel").findWhenNeeded(this);
         WebElement uploadExpando = Locator.id("uploadFileDiv2Expando").findWhenNeeded(this);
         WebElement copyPasteExpando = Locator.id("copyPasteDiv1Expando").findWhenNeeded(this);
         WebElement copyPasteDiv = Locator.id("copypasteDiv1").findElement(this);
