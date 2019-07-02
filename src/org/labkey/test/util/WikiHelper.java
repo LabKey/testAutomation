@@ -71,7 +71,7 @@ public class WikiHelper
         if (null != attachment)
         {
             _test.click(Locator.linkWithText("Attach a file"));
-            _test.setFormElement(Locator.name("formFiles[0]"), attachment);
+            _test.setFormElement(Locator.name("formFiles[00]"), attachment);
             Locator.lkButton("remove").waitForElement(_test.shortWait());
         }
         saveWikiPage();
