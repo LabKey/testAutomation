@@ -99,7 +99,7 @@ public class WikiTest extends BaseWebDriverTest
         log("test attachments in wiki");
         click(Locator.linkWithText("Attach a file"));
         File file = wikiHelper.getSampleFile();
-        setFormElement(Locator.name("formFiles[0]"), file);
+        setFormElement(Locator.name("formFiles[00]"), file);
         wikiHelper.saveWikiPage();
 
         DataRegionTable.DataRegion(getDriver()).withName(WIKI_PAGE_WEBPART_ID).waitFor();
