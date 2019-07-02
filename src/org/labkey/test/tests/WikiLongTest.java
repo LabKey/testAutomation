@@ -237,7 +237,7 @@ public class WikiLongTest extends BaseWebDriverTest
         click(Locator.linkWithText("Attach a file"));
 
         File file = _wikiHelper.getSampleFile();
-        setFormElement(Locator.name("formFiles[0]"), file);
+        setFormElement(Locator.name("formFiles[00]"), file);
         _wikiHelper.saveWikiPage();
         waitForElement(Locator.linkContainingText(file.getName()));
         assertTextPresent(WIKI_PAGE3_WEBPART_TEST,
