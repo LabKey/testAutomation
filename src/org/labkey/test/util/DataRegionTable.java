@@ -852,11 +852,11 @@ public class DataRegionTable extends DataRegion
         statsWindow.apply();
     }
 
-    public void verifySummaryStatisticValue(String columnName, String stat, String expectedValue)
+    public void verifySummaryStatisticValue(String columnName, String stat, String expectedValue, String filterDescription)
     {
         clickColumnMenu(columnName, false, "Summary Statistics...");
         SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(getDriver());
-        assertEquals("Stat value not as expected for: " + stat, expectedValue, statsWindow.getValue(stat));
+        assertEquals("Stat value not as expected for " + stat + " with filter " + filterDescription, expectedValue, statsWindow.getValue(stat));
         statsWindow.cancel();
     }
 
