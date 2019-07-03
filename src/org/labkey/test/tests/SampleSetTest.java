@@ -40,6 +40,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -791,8 +792,9 @@ public class SampleSetTest extends BaseWebDriverTest
         int rowIndex = drtSamples.getIndexWhereDataAppears(SAMPLE_NAME_TO_DELETE, "Name");
         drtSamples.checkCheckbox(rowIndex);
         drtSamples.clickHeaderButton("Delete");
-        waitForElementToBeVisible(Locator.lkButton("Confirm Delete"));
-        clickAndWait(Locator.lkButton("Confirm Delete"));
+        Window.Window(getDriver()).withTitle("Permanently delete 1 sample").waitFor()
+                .clickButton("Yes, Delete", true);
+        _ext4Helper.waitForMaskToDisappear();
 
         // Remove the same row from the Sample Set input data.
         int testDataIndex = getSampleIndexFromTestInput(SAMPLE_NAME_TO_DELETE, sampleData);
