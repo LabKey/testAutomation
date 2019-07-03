@@ -39,7 +39,7 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 
     public void setFormat(Format format)
     {
-        _extHelper.selectComboBoxItem("Format:", format.format);
+        _ext4Helper.selectComboBoxItem("Format:", format.format);
     }
 
     public void setImportLookupByAlternateKey(boolean useAltKey)
@@ -103,7 +103,7 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     }
 
     public enum Format{
-        TSV("Text (String)"), CSV("Multi-Line Text");
+        TSV("Tab-separated text (tsv)"), CSV("Comma-separated text (csv)");
 
         private String format;
 
