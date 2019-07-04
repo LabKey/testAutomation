@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
 
@@ -310,6 +311,16 @@ public class SampleSetHelper extends WebDriverWrapper
                 clickButton("Submit");
 
         }
+    }
+
+    public SampleSetHelper deleteSamples(String expectedTitle)
+    {
+        getSamplesDataRegionTable().clickHeaderButton("Delete");
+        Window.Window(getDriver()).withTitle(expectedTitle).waitFor()
+                .clickButton("Yes, Delete", true);
+        Window.Window(getDriver()).withTitleContaining("Delete sample").waitFor();
+        _ext4Helper.waitForMaskToDisappear();
+        return this;
     }
 
     public SampleSetHelper verifyDataRow(Map<String, String> data, int index)

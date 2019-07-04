@@ -722,6 +722,123 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testDeleteMultipleSamplesNoDependencies()
+    {
+        final String SAMPLE_SET_NAME = "DeleteIndependentSamples";
+        List<String> sampleNames = Arrays.asList("I-1", "I-2", "I-3");
+        List<Map<String, String>> sampleData = new ArrayList<>();
+        sampleNames.forEach(name -> {
+            sampleData.add(Map.of("Name", name));
+        });
+
+        clickProject(PROJECT_NAME);
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null,
+                Map.of("Field01",  FieldDefinition.ColumnType.String),
+                sampleData);
+
+        DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
+        log("Delete all the samples that have been created");
+        sampleNames.forEach(name -> {
+            drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(name, "Name"));
+        });
+        drtSamples.clickHeaderButton("Delete");
+        Window.Window(getDriver()).withTitle("Permanently delete " + sampleNames.size() + " samples").waitFor()
+                .clickButton("Yes, Delete", true);
+        _ext4Helper.waitForMaskToDisappear();
+        assertEquals("Should have removed all the selected samples", 0, drtSamples.getDataRowCount());
+    }
+
+    @Test
+    public void testDeleteSamplesSomeWithDerivedSamples()
+    {
+        final String SAMPLE_SET_NAME = "DeleteSamplesWithParents";
+        List<String> parentSampleNames = Arrays.asList("P-1", "P-2", "P-3");
+        List<Map<String, String>> sampleData = new ArrayList<>();
+        parentSampleNames.forEach(name -> {
+            sampleData.add(Map.of("Name", name));
+        });
+
+        clickProject(PROJECT_NAME);
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        log("Create a sample set with some potential parents");
+        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null,
+                null,
+                sampleData);
+        DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
+        log("Derive one sample from another");
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
+        clickButton("Derive Samples");
+        clickButton("Next");
+        String childName = parentSampleNames.get(0) + ".1";
+        setFormElement(Locator.name("outputSample1_Name"), childName);
+        clickButton("Submit");
+
+        log("Derive a sample from the one just created");
+        clickAndWait(Locator.linkContainingText("derive samples from this sample"));
+        clickButton("Next");
+        String grandchildName = childName + ".1";
+        setFormElement(Locator.name("outputSample1_Name"), grandchildName);
+        clickButton("Submit");
+
+        log("Derive a sample with two parents");
+        clickAndWait(Locator.linkContainingText(SAMPLE_SET_NAME));
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
+        clickButton("Derive Samples");
+        clickButton("Next");
+        String twoParentChildName = parentSampleNames.get(1) + "+" + childName + ".1";
+        setFormElement(Locator.name("outputSample1_Name"), twoParentChildName);
+        clickButton("Submit");
+
+        clickAndWait(Locator.linkContainingText(SAMPLE_SET_NAME));
+
+        log("Try to delete parent sample");
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
+        drtSamples.clickHeaderButton("Delete");
+        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
+                .clickButton("Dismiss", true);
+
+        log("Try to delete multiple parent samples");
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
+        drtSamples.clickHeaderButton("Delete");
+        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
+                .clickButton("Dismiss", true);
+
+        log("Try to delete parent and child");
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
+        sampleHelper.deleteSamples("Permanently delete 1 sample");
+
+        assertEquals("Deleted sample " + twoParentChildName + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
+        assertTrue("Parent sample " + parentSampleNames.get(1) + " does not appears in grid", drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name") > -1);
+
+        log("Now that the child is gone, try to delete the parent");
+        sampleHelper.deleteSamples("Permanently delete 1 sample");
+
+        assertEquals("Deleted sample " + parentSampleNames.get(1) + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
+
+        log("Now try to delete what's left, in several hitches");
+        drtSamples.checkAllOnPage();
+        sampleHelper.deleteSamples("Permanently delete 2 samples");
+        assertEquals("Number of samples after deletion not as expected", 2, drtSamples.getDataRowCount());
+
+        sampleHelper.deleteSamples("Permanently delete 1 sample");
+        assertEquals("Number of samples after deletion not as expected", 1, drtSamples.getDataRowCount());
+
+        sampleHelper.deleteSamples("Permanently delete 1 sample");
+        assertEquals("Number of samples after deletion not as expected", 0, drtSamples.getDataRowCount());
+
+    }
+
+//    @Test // TODO
+//    public void testDeleteSamplesSomeWithAssayData()
+//    {
+//
+//    }
+
+    @Test
     public void testUpdateAndDeleteWithCommentsAndFlags()
     {
         final String SAMPLE_SET_NAME = "UpdateAndDeleteFields";
@@ -788,7 +905,7 @@ public class SampleSetTest extends BaseWebDriverTest
         cv.addColumn("Description");
         cv.saveCustomView();
 
-        log("Delete a record that has a description and an flag/comment");
+        log("Delete a record that has a description and a flag/comment");
         int rowIndex = drtSamples.getIndexWhereDataAppears(SAMPLE_NAME_TO_DELETE, "Name");
         drtSamples.checkCheckbox(rowIndex);
         drtSamples.clickHeaderButton("Delete");
