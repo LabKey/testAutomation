@@ -197,6 +197,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
     }
 
     @Test
+    @Ignore ("Issue 37786: Sample written to SampleSet via LABKEY.Experiment.saveBatch does not receive missingvalue_mvindicator value")
     public void insertSamplesOverSaveBatchAPI() throws Exception
     {
         String missingValueTable = "mvAssaySamples";
