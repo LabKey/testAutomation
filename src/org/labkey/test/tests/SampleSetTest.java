@@ -870,24 +870,25 @@ public class SampleSetTest extends BaseWebDriverTest
                 null,
                 sampleData);
 
-        log("Create an assay with sampleId in the batch fields");
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText("Assay List"));
-        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("General", BATCH_ID_ASSAY);
-        designerPage.addLookupBatchField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
-        designerPage.save();
-
-        log("Upload assay data for batch-level sampleId");
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText("Assay List"));
-        clickAndWait(Locator.linkWithText(BATCH_ID_ASSAY));
-        clickButton("Import Data");
-        setFormElement(Locator.name(SAMPLE_ID_FIELD_NAME), BATCH_SAMPLE_NAME);
-        clickButton("Next");
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN_DATA);
-        clickButton("Save and Finish");
-
-        // TODO enable when this actually works
+//  Note that we currently will not find runs where the batch id references a sampleId.  See Issue 37918.
+//        log("Create an assay with sampleId in the batch fields");
+//        goToProjectHome();
+//        clickAndWait(Locator.linkWithText("Assay List"));
+//        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("General", BATCH_ID_ASSAY);
+//        designerPage.addLookupBatchField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
+//        designerPage.save();
+//
+//        log("Upload assay data for batch-level sampleId");
+//        goToProjectHome();
+//        clickAndWait(Locator.linkWithText("Assay List"));
+//        clickAndWait(Locator.linkWithText(BATCH_ID_ASSAY));
+//        clickButton("Import Data");
+//        setFormElement(Locator.name(SAMPLE_ID_FIELD_NAME), BATCH_SAMPLE_NAME);
+//        clickButton("Next");
+//        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN_DATA);
+//        clickButton("Save and Finish");
+//
+//
 //        log("Try to delete the sample referenced in the batch");
 //        goToProjectHome();
 //        click(Locator.linkWithText(SAMPLE_SET_NAME));
@@ -899,7 +900,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Create an assay with sampleId in the data field");
         goToProjectHome();
-        designerPage = _assayHelper.createAssayAndEdit("General", DATA_ID_ASSAY);
+        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("General", DATA_ID_ASSAY);
         designerPage.addLookupDataField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
         designerPage.save();
 
