@@ -36,6 +36,12 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return this;
     }
 
+    public ExportFolderPage includeQCStateSettings(boolean checked)     // note: this checkbox will only be present for assay and study folder types
+    {
+        elementCache().qcStateSettingsCheckbox.set(checked);
+        return this;
+    }
+
     public ExportFolderPage includeRoleAssignments(boolean checked)
     {
         elementCache().roleAssighmentsCheckbox.set(checked);
@@ -80,6 +86,8 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         public Checkbox experimentsAndRunsCheckbox = new Checkbox(Locator.tagWithText("label", "Experiments and runs")
+                .precedingSibling("input").findWhenNeeded(getDriver()));
+        public Checkbox qcStateSettingsCheckbox = new Checkbox(Locator.tagWithText("label", "QC State Settings")
                 .precedingSibling("input").findWhenNeeded(getDriver()));
 
         public Checkbox roleAssighmentsCheckbox = new Checkbox(Locator.tagWithText("label", "Role assignments for users and groups")
