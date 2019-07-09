@@ -743,11 +743,8 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleNames.forEach(name -> {
             drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(name, "Name"));
         });
-        drtSamples.clickHeaderButton("Delete");
-        Window.Window(getDriver()).withTitle("Permanently delete " + sampleNames.size() + " samples").waitFor()
-                .clickButton("Yes, Delete", true);
-        _ext4Helper.waitForMaskToDisappear();
-        assertEquals("Should have removed all the selected samples", 0, drtSamples.getDataRowCount());
+        sampleHelper.deleteSamples("Permanently delete " + sampleNames.size() + " samples");
+        assertEquals("Should have removed all the selected samples", 0, sampleHelper.getSamplesDataRegionTable().getDataRowCount());
     }
 
     @Test
