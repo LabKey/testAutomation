@@ -975,15 +975,16 @@ public class SampleSetTest extends BaseWebDriverTest
         expectedSampleCount--;
         assertEquals("Number of samples not as expected after deletion", expectedSampleCount, sampleTable.getDataRowCount());
 
-        log("Delete the assay run referencing the sample in the batch properties");
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(BATCH_ID_ASSAY));
-        runsTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Runs").find();
-        runsTable.checkAllOnPage();
-        runsTable.clickHeaderButton("Delete");
-        clickButton("Confirm Delete");
+//        log("Delete the assay run referencing the sample in the batch properties");
+//        goToProjectHome();
+//        clickAndWait(Locator.linkWithText(BATCH_ID_ASSAY));
+//        runsTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Runs").find();
+//        runsTable.checkAllOnPage();
+//        runsTable.clickHeaderButton("Delete");
+//        clickButton("Confirm Delete");
 
-        log("Now try to delete the sample that was referenced in the batch properties, but still referenced in the data of another assay");
+//        log("Now try to delete the sample that was referenced in the batch properties, but still referenced in the data of another assay");
+        log("Now try to delete the sample is referenced in the data of an assay");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
         sampleTable.uncheckAllOnPage();
