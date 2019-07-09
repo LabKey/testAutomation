@@ -29,17 +29,17 @@
                             }],
                         },
                         {
-                        "role": "NO_PERMISSIONS",
-                        "permissions": 0,
-                        "isSystemGroup": true,
-                        "roles": [],
-                        "name": "Developers",
-                        "effectivePermissions": [],
-                        "groups": [],
-                        "id": -4,
-                        "type": "g",
-                        "isProjectGroup": false,
-                        "roleLabel": "No Permissions"
+                            "role": "NO_PERMISSIONS",
+                            "permissions": 0,
+                            "isSystemGroup": true,
+                            "roles": [],
+                            "name": "Developers",
+                            "effectivePermissions": [],
+                            "groups": [],
+                            "id": -4,
+                            "type": "g",
+                            "isProjectGroup": false,
+                            "roleLabel": "No Permissions"
                         },
                         {
                             "id": -3,
@@ -88,7 +88,8 @@
                                 "org.labkey.announcements.model.SecureMessageBoardRespondPermission",
                                 "org.labkey.api.security.permissions.ReadSomePermission",
                                 "org.labkey.api.security.permissions.UpdatePermission",
-                                "org.labkey.announcements.model.SecureMessageBoardReadPermission"
+                                "org.labkey.announcements.model.SecureMessageBoardReadPermission",
+                                "org.labkey.api.security.permissions.DesignSampleSetPermission"
                             ],
                             "groups": []
                         },
