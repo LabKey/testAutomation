@@ -180,6 +180,16 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         return this;
     }
 
+    public AssayDesignerPage addLookupBatchField(String name, @Nullable String label, String schema, String table)
+    {
+        batchFields().addField(new FieldDefinition(name).
+                        setLabel(label).
+                        setType(FieldDefinition.ColumnType.Lookup).
+                        setLookup(new FieldDefinition.LookupInfo(null, schema, table)));
+        return this;
+    }
+
+
     public void removeBatchField(String name)
     {
         batchFields().selectField(name).markForDeletion();
@@ -196,6 +206,16 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         return this;
     }
 
+
+    public AssayDesignerPage addLookupRunField(String name, @Nullable String label, String schema, String table)
+    {
+        runFields().addField(new FieldDefinition(name)
+                .setLabel(label)
+                .setType(FieldDefinition.ColumnType.Lookup)
+                .setLookup(new FieldDefinition.LookupInfo(null, schema, table)));
+        return this;
+    }
+
     public void removeRunField(String name)
     {
         runFields().selectField(name).markForDeletion();
@@ -209,6 +229,15 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
     public AssayDesignerPage addDataField(String name, @Nullable String label, @Nullable FieldDefinition.ColumnType type)
     {
         dataFields().addField(new FieldDefinition(name).setLabel(label).setType(type));
+        return this;
+    }
+
+    public AssayDesignerPage addLookupDataField(String name, @Nullable String label, String schema, String table)
+    {
+        dataFields().addField(new FieldDefinition(name).
+                        setLabel(label).
+                        setType(FieldDefinition.ColumnType.Lookup).
+                        setLookup(new FieldDefinition.LookupInfo(null, schema, table)));
         return this;
     }
 
