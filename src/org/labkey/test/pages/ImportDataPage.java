@@ -15,22 +15,21 @@
  */
 package org.labkey.test.pages;
 
-import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.List;
+import java.util.Optional;
 
-/**
- * Created by RyanS on 5/18/2017.
- */
+import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
+
 public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 {
     public ImportDataPage(WebDriver driver)
     {
         super(driver);
-        //waitFor(()-> {return elementCache().pasteDataTextArea.isDisplayed();});
     }
 
     public void setText(String text)
@@ -40,29 +39,18 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 
     public void setFormat(Format format)
     {
-        _extHelper.selectComboBoxItem("Format:", format.format);
+        _ext4Helper.selectComboBoxItem("Format:", format.format);
     }
 
     public void setImportLookupByAlternateKey(boolean useAltKey)
     {
         // Find the checkbox for the currently expanded section
-        List<WebElement> els = elementCache().importAltKeyChk.findElements(this.elementCache());
-        WebElement input = null;
-        for (WebElement el : els)
-        {
-            if (!el.isDisplayed())
-                continue;
-            input = el;
-            break;
-        }
+        String checkboxLabel = "Import Lookups by Alternate Key";
+        Optional<Checkbox> altKeyCheckbox = Ext4Checkbox().withLabel(checkboxLabel)
+                .findAll(getDriver()).stream().filter(Checkbox::isDisplayed).findAny();
 
-        if (input == null)
-            Assert.fail("Failed to find checkbox: " + elementCache().importAltKeyChk.toString());
-
-        if (useAltKey)
-            checkCheckbox(input);
-        else
-            uncheckCheckbox(input);
+        altKeyCheckbox.orElseThrow(() -> new AssertionError("Failed to find checkbox for: " + checkboxLabel))
+                .set(useAltKey);
     }
 
     public void selectUpload()
@@ -77,12 +65,12 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 
     public void expandUpload()
     {
-        click(elementCache().uploadExpando);
+        elementCache().uploadExpando.click();
     }
 
     public void expandCopyPaste()
     {
-        click(elementCache().copyPasteExpando);
+        elementCache().copyPasteExpando.click();
     }
 
     public void setUploadFileLocation(String path)
@@ -94,14 +82,14 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     {
         selectUpload();
         setUploadFileLocation(filePath);
-        elementCache().submitBtn.click();
+        submit();
     }
 
     public void pasteData(String tsv,boolean expectSuccess, String error)
     {
         selectCopyPaste();
         setText(tsv);
-        elementCache().submitBtn.click();
+        submit();
     }
 
     public void submit()
@@ -111,11 +99,11 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 
     public void cancel()
     {
-        click(elementCache().cancelBtn);
+        clickAndWait(elementCache().cancelBtn);
     }
 
-    enum Format{
-        TSV("Text (String)"), CSV("Multi-Line Text");
+    public enum Format{
+        TSV("Tab-separated text (tsv)"), CSV("Comma-separated text (csv)");
 
         private String format;
 
@@ -136,9 +124,8 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         WebElement pasteDataTextArea = Locator.xpath("//div[@id='copypasteDiv1']/descendant::textarea").findWhenNeeded(this);
-        Locator importAltKeyChk = Locator.input("importLookupByAlternateKey");//.findWhenNeeded(this);
-        WebElement submitBtn = Locator.button("Submit").findWhenNeeded(this);
-        WebElement cancelBtn = Locator.button("Cancel").findWhenNeeded(this);
+        WebElement submitBtn = Ext4Helper.Locators.ext4Button("Submit").findWhenNeeded(this);
+        WebElement cancelBtn = Ext4Helper.Locators.ext4Button("Cancel").findWhenNeeded(this);
         WebElement uploadExpando = Locator.id("uploadFileDiv2Expando").findWhenNeeded(this);
         WebElement copyPasteExpando = Locator.id("copyPasteDiv1Expando").findWhenNeeded(this);
         WebElement copyPasteDiv = Locator.id("copypasteDiv1").findElement(this);
