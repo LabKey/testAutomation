@@ -314,7 +314,6 @@ public class MessagesLongTest extends BaseWebDriverTest
                 .setConversationName("Message")
                 .save();
 
-//        siteNavBar.exitPageAdminMode();
         log("Check if sorting works");
         _portalHelper.clickWebpartMenuItem("Messages", true, "New");
         new InsertPage(getDriver())
