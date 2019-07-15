@@ -37,7 +37,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Window;
@@ -76,7 +76,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
-@Category({DailyA.class})
+@Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class SampleSetTest extends BaseWebDriverTest
 {
@@ -164,7 +164,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 "D\tB\n";
         sampleHelper.bulkImport(deriveSamples);
 
-        log("foo");
+        log("Use SelectRowCommand to get the samples and validate.");
         SelectRowsResponse samples = executeSelectRowCommand("samples", LINEAGE_SAMPLE_SET_NAME, ContainerFilter.Current, getProjectName()+"/"+LINEAGE_FOLDER, null);
         Map<String, Object> rowA =  samples.getRows().stream().filter((a)-> a.get("Name").equals("A")).collect(Collectors.toList()).get(0);
         Map<String, Object> rowB =  samples.getRows().stream().filter((a)-> a.get("Name").equals("B")).collect(Collectors.toList()).get(0);
