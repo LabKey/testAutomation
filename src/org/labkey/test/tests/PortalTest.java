@@ -96,9 +96,12 @@ public class PortalTest extends BaseWebDriverTest
         portalHelper.addWebPart("MS2 Runs");
         assertElementPresent(Locator.linkWithText("MS2 Runs"));
 
+        SiteNavBar siteNavBar = new SiteNavBar(getDriver());
+        siteNavBar.enterPageAdminMode();
         portalHelper.clickWebpartMenuItem("Messages", "Admin");
         assertTextPresent("Customize");
         clickButton("Cancel");
+        siteNavBar.exitPageAdminMode();
     }
 
     @Test
