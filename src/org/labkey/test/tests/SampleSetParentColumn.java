@@ -532,7 +532,7 @@ public class SampleSetParentColumn extends BaseWebDriverTest
     }
 
     @Test
-    public void testUseThenRemoveAndAliasParentColumn()
+    public void testUseThenRemoveAnAliasParentColumn()
     {
 
         final String PARENT_COLUMN = "P7";
