@@ -15,6 +15,8 @@
  */
 package org.labkey.test.pages;
 
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.components.ext4.Checkbox;
@@ -25,6 +27,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
+import static org.junit.Assert.assertEquals;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 
 public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
@@ -34,80 +37,79 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         super(driver);
     }
 
-    public void setText(String text)
+    public ImportDataPage setText(String text)
     {
+        selectCopyPaste();
         setFormElement(elementCache().pasteDataTextArea, text);
+        return this;
     }
 
-    public void setFormat(Format format)
+    public ImportDataPage setFormat(Format format)
     {
-        _ext4Helper.selectComboBoxItem("Format:", format.format);
+        elementCache().formatCombo.selectComboBoxItem(format.format);
+        return this;
     }
 
-    public void setImportLookupByAlternateKey(boolean useAltKey)
+    public ImportDataPage setImportLookupByAlternateKey(boolean useAltKey)
     {
         elementCache().getAltKeyCheckbox().set(useAltKey);
+        return this;
     }
 
-    public void selectUpload()
+    public ImportDataPage selectUpload()
     {
         if (!elementCache().uploadFileDiv.isDisplayed())
         {
-            expandUpload();
+            elementCache().uploadExpando.click();
         }
+        return this;
     }
 
-    public void selectCopyPaste()
+    public ImportDataPage selectCopyPaste()
     {
         if (!elementCache().copyPasteDiv.isDisplayed())
         {
-            expandCopyPaste();
+            elementCache().copyPasteExpando.click();
         }
+        return this;
     }
 
-    public void expandUpload()
-    {
-        elementCache().uploadExpando.click();
-    }
-
-    public void expandCopyPaste()
-    {
-        elementCache().copyPasteExpando.click();
-    }
-
-    public void setUploadFileLocation(File file)
-    {
-        setFormElement(elementCache().uploadFileFilePath, file);
-    }
-
-    public void uploadData(File file, String error)
+    public ImportDataPage setFile(File file)
     {
         selectUpload();
-        setUploadFileLocation(file);
-        submit();
-        assertError(error);
+        setFormElement(elementCache().uploadFileFilePath, file);
+        return this;
     }
 
-    public void pasteData(String tsv, String error)
-    {
-        selectCopyPaste();
-        setText(tsv);
-        submit();
-        assertError(error);
-    }
-
-    private void assertError(String error)
-    {
-        if (error != null)
-        {
-            assertElementPresent(Locators.labkeyError.withText(error));
-        }
-    }
-
-    public void submit()
+    public ImportDataPage submit()
     {
         clickAndWait(elementCache().getSubmitButton());
         clearCache();
+        return this;
+    }
+
+    public ImportDataPage submitExpectingError(String error)
+    {
+        String actualError = submitExpectingError();
+        assertEquals(error, actualError);
+        return this;
+    }
+
+    public String submitExpectingError()
+    {
+        elementCache().getSubmitButton().click();
+        return waitForErrors();
+    }
+
+    private String waitForErrors()
+    {
+        Mutable<String> error = new MutableObject<>();
+        shortWait().until(wd ->
+        {
+            error.setValue(String.join("\n", getTexts(Locators.labkeyError.withText().findElements(getDriver()))));
+            return !error.getValue().isBlank();
+        });
+        return error.getValue();
     }
 
     public void cancel()
@@ -144,12 +146,12 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         // Upload file
         WebElement uploadFileDiv = Locator.id("uploadFileDiv2").findWhenNeeded(this);
         WebElement uploadExpando = Locator.id("uploadFileDiv2Expando").findWhenNeeded(this);
-        WebElement uploadFileFilePath = Locator.xpath("//div[@id='uploadFileDiv2']/descendant::input[@name='file']").findElement(this);
+        WebElement uploadFileFilePath = Locator.input("file").findWhenNeeded(uploadFileDiv);
 
         // Paste data
         WebElement copyPasteDiv = Locator.id("copypasteDiv1").findWhenNeeded(this);
         WebElement copyPasteExpando = Locator.id("copyPasteDiv1Expando").findWhenNeeded(this);
-        WebElement pasteDataTextArea = Locator.xpath("//div[@id='copypasteDiv1']/descendant::textarea").findWhenNeeded(this);
+        WebElement pasteDataTextArea = Locator.tag("textarea").findWhenNeeded(copyPasteDiv);
         ComboBox formatCombo = new ComboBox.ComboBoxFinder(getDriver()).withLabel("Format:").findWhenNeeded(this);
 
         WebElement getExpandedPanel()
