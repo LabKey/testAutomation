@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Category({DailyC.class})
 public class SampleSetParentColumn extends BaseWebDriverTest
@@ -181,7 +183,7 @@ public class SampleSetParentColumn extends BaseWebDriverTest
 
     }
 
-    private void checkDataRegionOnSampleDetailPage(String dataRegionName, String columnName, List<String> expectedValues)
+    private void checkAllRowsInDataRegion(String dataRegionName, String columnName, List<String> expectedValues)
     {
         DataRegionTable dataRegionTable = new DataRegionTable(dataRegionName, this);
 
@@ -191,8 +193,26 @@ public class SampleSetParentColumn extends BaseWebDriverTest
 
         for(String expectedValue : expectedValues)
         {
-            Assert.assertTrue("Value '" + expectedValue + "' was not shown in column '" + columnName + "'.", dataInTable.contains(expectedValue));
+            Assert.assertTrue("Value '" + expectedValue + "' was not shown in column '" + columnName + "' in data region '" + dataRegionName +"'.", dataInTable.contains(expectedValue));
         }
+
+    }
+
+    private void regexCheckRowInDataRegion(String dataRegionName, int rowIndex, String columnName, String regexExpected)
+    {
+        DataRegionTable dataRegionTable = new DataRegionTable(dataRegionName, this);
+
+        List<String> dataInTable = dataRegionTable.getColumnDataAsText(columnName);
+
+        Assert.assertTrue("There were no rows in the data region '" + dataRegionName + "'.", dataInTable.size() > 0);
+        Assert.assertTrue("The index given for the row (" + rowIndex + ") is beyond the number of rows in the data region '" + dataRegionName + "' (" + dataInTable.size() + ").", rowIndex < dataInTable.size());
+
+        String cellValue = dataInTable.get(rowIndex);
+
+        Pattern p = Pattern.compile(regexExpected);
+        Matcher m = p.matcher(cellValue);
+
+        Assert.assertTrue("For data-region '" + dataRegionName + "', column '" + columnName + "' the regular express '" + regexExpected + "' did not match the value '" + cellValue + "'.", m.find());
 
     }
 
@@ -225,22 +245,22 @@ public class SampleSetParentColumn extends BaseWebDriverTest
         log("Check sample 'SA_05' and make sure the parent materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SA_05"));
 
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SA_03", "SA_02"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SA_03", "SA_02"));
 
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" ", "Derive sample from SA_03"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", "Derive sample from SA_03"));
 
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SA_02"));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SA_02"));
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
 
         log("Check sample 'SA_03' and make sure the child materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SA_03"));
 
-        checkDataRegionOnSampleDetailPage("childMaterials", "Name", List.of("SA_05", "SA_02"));
+        checkAllRowsInDataRegion("childMaterials", "Name", List.of("SA_05", "SA_02"));
 
-        checkDataRegionOnSampleDetailPage("childMaterials", "Run", List.of("Derive sample from SA_02", "Derive sample from SA_03"));
+        checkAllRowsInDataRegion("childMaterials", "Run", List.of("Derive sample from SA_02", "Derive sample from SA_03"));
 
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SA_02", "Derive sample from SA_03"));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SA_02", "Derive sample from SA_03"));
 
     }
 
@@ -272,18 +292,18 @@ public class SampleSetParentColumn extends BaseWebDriverTest
         log("Check sample 'SB_05' and make sure the parent materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SB_05"));
 
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SB_03", "SB_02"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" ", "Derive sample from SB_03"));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SB_02"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SB_03", "SB_02"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", "Derive sample from SB_03"));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SB_02"));
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
 
         log("Check sample 'SB_03' and make sure the child materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SB_03"));
 
-        checkDataRegionOnSampleDetailPage("childMaterials", "Name", List.of("SB_05", "SB_02"));
-        checkDataRegionOnSampleDetailPage("childMaterials", "Run", List.of("Derive sample from SB_02", "Derive sample from SB_03"));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SB_02", "Derive sample from SB_03"));
+        checkAllRowsInDataRegion("childMaterials", "Name", List.of("SB_05", "SB_02"));
+        checkAllRowsInDataRegion("childMaterials", "Run", List.of("Derive sample from SB_02", "Derive sample from SB_03"));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SB_02", "Derive sample from SB_03"));
 
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
         sampleHelper = new SampleSetHelper(this);
@@ -304,18 +324,18 @@ public class SampleSetParentColumn extends BaseWebDriverTest
         log("Check sample 'SB_10' and make sure the parent materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SB_10"));
 
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SB_08", "SB_07"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" ", "Derive sample from SB_08"));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SB_07"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SB_08", "SB_07"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", "Derive sample from SB_08"));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SB_07"));
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
 
         log("Check sample 'SB_08' and make sure the child materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SB_08"));
 
-        checkDataRegionOnSampleDetailPage("childMaterials", "Name", List.of("SB_10", "SB_07"));
-        checkDataRegionOnSampleDetailPage("childMaterials", "Run", List.of("Derive sample from SB_07", "Derive sample from SB_08"));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SB_07", "Derive sample from SB_08"));
+        checkAllRowsInDataRegion("childMaterials", "Name", List.of("SB_10", "SB_07"));
+        checkAllRowsInDataRegion("childMaterials", "Run", List.of("Derive sample from SB_07", "Derive sample from SB_08"));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SB_07", "Derive sample from SB_08"));
 
     }
 
@@ -345,9 +365,9 @@ public class SampleSetParentColumn extends BaseWebDriverTest
 
         log("Check sample 'SC_05' and make sure the parent materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SC_05"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("S_0"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" "));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive 2 samples from S_0"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("S_0"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive 2 samples from S_0"));
 
     }
 
@@ -377,9 +397,9 @@ public class SampleSetParentColumn extends BaseWebDriverTest
 
         log("Check sample 'SD_05' and make sure the parent materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SD_05"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SIB_0"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" "));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive 2 samples from SIB_0"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SIB_0"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive 2 samples from SIB_0"));
 
     }
 
@@ -413,28 +433,28 @@ public class SampleSetParentColumn extends BaseWebDriverTest
 
         log("Check sample 'SE_02' and make sure the parent materials are correct. It's parent should be in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SE_02"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("S_10"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" "));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from S_10"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("S_10"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from S_10"));
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
 
         log("Check sample 'SE_03' and make sure the parent materials are correct. It's parent should be in the same sample set.");
         waitAndClickAndWait(Locator.linkWithText("SE_03"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SE_01"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" "));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SE_01"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SE_01"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SE_01"));
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
 
         log("Check sample 'SE_05' which should have two parents, one in this sample set and another in the parent container sample set .");
         waitAndClickAndWait(Locator.linkWithText("SE_05"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SE_04", "S_11"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" ", " "));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SE_04", "S_11"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
+        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
 
         // Not sure how reliable this test will be, will the order always be "S_11, SE_04"?
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from S_11, SE_04"));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from S_11, SE_04"));
 
     }
 
@@ -469,30 +489,29 @@ public class SampleSetParentColumn extends BaseWebDriverTest
 
         log("Check sample 'SF_02' and make sure the parent materials are correct. It's parent should be in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SF_02"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("S_20"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" "));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from S_20"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("S_20"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from S_20"));
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
 
         log("Check sample 'SF_03' and make sure the parent materials are correct. It's parent should be in the same sample set.");
         waitAndClickAndWait(Locator.linkWithText("SF_03"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SF_01"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" "));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SF_01"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_01"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SF_01"));
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
 
         log("Check sample 'SF_05' which should have two parents, one in this sample set and another in the parent container sample set .");
         waitAndClickAndWait(Locator.linkWithText("SF_05"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SF_04", "S_21"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" ", " "));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_04", "S_21"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
 
         // TODO uncomment this check when issue 37982 is resolved.
-//        checkDataRegionOnSampleDetailPage("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
+//        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
 
-        // Not sure how reliable this test will be, will the order always be "SE_11, SE_04"?
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from S_21, SF_04"));
+        regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_21, SF_04|SF_04, S_21)");
 
         // Not really sure how valuable the following checks are.
         log("Now import some more samples using the alias.");
@@ -509,25 +528,25 @@ public class SampleSetParentColumn extends BaseWebDriverTest
 
         log("Check sample 'SF_07' and make sure the parent materials are correct. It's parent should be in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SF_07"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("S_22"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" "));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from S_22"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("S_22"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from S_22"));
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
 
         log("Check sample 'SF_08' and make sure the parent materials are correct. It's parent should be in the same sample set.");
         waitAndClickAndWait(Locator.linkWithText("SF_08"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SF_01"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" "));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SF_01"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_01"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SF_01"));
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
 
         log("Check sample 'SF_10' which should have two parents, one in this sample set and another in the parent container sample set .");
         waitAndClickAndWait(Locator.linkWithText("SF_10"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SF_04", "S_23"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" ", " "));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_04", "S_23"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
+        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
 
     }
 
@@ -580,20 +599,20 @@ public class SampleSetParentColumn extends BaseWebDriverTest
 
         log("Check sample 'SG_02' and make sure that the parent values are unchanged.");
         waitAndClickAndWait(Locator.linkWithText("SG_02"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Name", List.of("SG_01"));
-        checkDataRegionOnSampleDetailPage("parentMaterials", "Run", List.of(" "));
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SG_01"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SG_01"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SG_01"));
 
         log("Go to SG_01 and make sure it still only has one child.");
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
 
         waitAndClickAndWait(Locator.linkWithText("SG_01"));
 
-        checkDataRegionOnSampleDetailPage("childMaterials", "Name", List.of("SG_02"));
+        checkAllRowsInDataRegion("childMaterials", "Name", List.of("SG_02"));
 
-        checkDataRegionOnSampleDetailPage("childMaterials", "Run", List.of("Derive sample from SG_01"));
+        checkAllRowsInDataRegion("childMaterials", "Run", List.of("Derive sample from SG_01"));
 
-        checkDataRegionOnSampleDetailPage("Runs", "Name", List.of("Derive sample from SG_01"));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SG_01"));
 
     }
 
