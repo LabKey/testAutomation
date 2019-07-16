@@ -21,7 +21,9 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.params.FieldDefinition;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -139,10 +141,87 @@ public class SampleSetHelper extends WebDriverWrapper
     }
 
 
+    public SampleSetHelper addParentColumnAlias(Map<String, String> aliases)
+    {
+        for(String importHeader : aliases.keySet())
+        {
+            addParentColumnAlias(importHeader, aliases.get(importHeader));
+        }
+
+        return this;
+    }
+
+    public SampleSetHelper addParentColumnAlias(String parentAlias, String parentSampleSet)
+    {
+        List<WebElement> importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
+        List<WebElement> importAliasSelects = Locator.tagWithName("select", "importAliasValues").findElements(getDriver());
+
+        int countOfInputs = importAliasInputs.size();
+
+        click(Locator.linkWithText("add parent column import alias"));
+        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() > countOfInputs, 1000);
+        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() == Locator.tagWithName("select", "importAliasValues").findElements(getDriver()).size(), 1000);
+
+        importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
+        importAliasSelects = Locator.tagWithName("select", "importAliasValues").findElements(getDriver());
+
+        int index = importAliasInputs.size() - 1;
+
+        WebElement aliasInput = importAliasInputs.get(index);
+
+        setFormElement(aliasInput, parentAlias);
+        String listValue = "materialInputs/" + parentSampleSet;
+
+        WebElement aliasSelect = importAliasSelects.get(index);
+        selectOptionByValue(aliasSelect, listValue);
+
+        return this;
+    }
+
+    public SampleSetHelper removeParentColumnAlias(String parentAlias)
+    {
+
+        List<WebElement> importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
+
+        int countOfInputs = importAliasInputs.size();
+
+        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() > countOfInputs, 1000);
+
+        importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
+
+        int index = 0;
+        for(WebElement input : importAliasInputs)
+        {
+            if(getFormElement(input).trim().equalsIgnoreCase(parentAlias.trim()))
+            {
+                break;
+            }
+            index++;
+        }
+
+        if(index == importAliasInputs.size())
+            throw new NoSuchElementException("No 'Parent Alias' with the value of '" + parentAlias + "' was found.");
+
+        importAliasInputs = Locator.tagWithClass("a", "removeAliasTrigger").findElements(getDriver());
+
+        importAliasInputs.get(index).click();
+
+        clickButton("Update");
+
+        return this;
+    }
+
     public SampleSetHelper goToSampleSet(String name)
     {
         TestLogger.log("Go to the sample set '" + name + "'");
         click(Locator.linkWithText(name));
+        return this;
+    }
+
+    public SampleSetHelper goToEditSampleSet(String name)
+    {
+        goToSampleSet(name);
+        waitAndClickAndWait(Locator.lkButton("Edit Set"));
         return this;
     }
 

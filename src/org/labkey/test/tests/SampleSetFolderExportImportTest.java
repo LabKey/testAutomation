@@ -26,7 +26,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.admin.FolderManagementPage;
@@ -47,7 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Category({DailyA.class})
+@Category({DailyC.class})
 public class SampleSetFolderExportImportTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleSetExportFolderTest";
