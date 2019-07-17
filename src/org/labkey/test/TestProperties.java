@@ -86,12 +86,12 @@ public abstract class TestProperties
 
     public static boolean isServerRemote()
     {
-        return "true".equals(System.getProperty("labkey.isRemote", "true"));
+        return "true".equals(System.getProperty("labkey.isRemote", "false"));
     }
 
     public static boolean isIgnoreMissingModules()
     {
-        return "true".equals(System.getProperty("webtest.ignoreMissingModules", "true"));
+        return "true".equals(System.getProperty("webtest.ignoreMissingModules", "false"));
     }
 
     public static boolean isLeakCheckSkipped()
