@@ -140,7 +140,6 @@ public class SampleSetHelper extends WebDriverWrapper
         return this;
     }
 
-
     public SampleSetHelper addParentColumnAlias(Map<String, String> aliases)
     {
         for(String importHeader : aliases.keySet())
@@ -151,7 +150,7 @@ public class SampleSetHelper extends WebDriverWrapper
         return this;
     }
 
-    public SampleSetHelper addParentColumnAlias(String parentAlias, String parentSampleSet)
+    public SampleSetHelper addParentColumnAlias(String parentAlias, String inputName)
     {
         List<WebElement> importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
         List<WebElement> importAliasSelects = Locator.tagWithName("select", "importAliasValues").findElements(getDriver());
@@ -170,10 +169,9 @@ public class SampleSetHelper extends WebDriverWrapper
         WebElement aliasInput = importAliasInputs.get(index);
 
         setFormElement(aliasInput, parentAlias);
-        String listValue = "materialInputs/" + parentSampleSet;
 
         WebElement aliasSelect = importAliasSelects.get(index);
-        selectOptionByValue(aliasSelect, listValue);
+        selectOptionByTextContaining(aliasSelect, inputName);
 
         return this;
     }

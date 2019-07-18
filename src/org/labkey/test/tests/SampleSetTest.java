@@ -350,7 +350,7 @@ public class SampleSetTest extends BaseWebDriverTest
     public void testReservedFieldNames()
     {
 
-        log("Validate that reservered values cannot be used as field names.");
+        log("Validate that reserved values cannot be used as field names.");
 
         List<String> reserveredNames = Arrays.asList("Name", "Description", "Flag", "RowId", "SampleSet", "Folder", "Run", "Inputs", "Outputs");
 
