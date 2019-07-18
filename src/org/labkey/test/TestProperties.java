@@ -84,6 +84,16 @@ public abstract class TestProperties
         return !undefinedBuildTypeProperty.equals(System.getProperty(buildTypeProperty, undefinedBuildTypeProperty));
     }
 
+    public static boolean isServerRemote()
+    {
+        return "true".equals(System.getProperty("labkey.isRemote", "false"));
+    }
+
+    public static boolean isIgnoreMissingModules()
+    {
+        return "true".equals(System.getProperty("webtest.ignoreMissingModules", "false"));
+    }
+
     public static boolean isLeakCheckSkipped()
     {
         return "false".equals(System.getProperty("memCheck", "true"));

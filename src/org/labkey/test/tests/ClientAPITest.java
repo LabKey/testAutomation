@@ -183,8 +183,6 @@ public class ClientAPITest extends BaseWebDriverTest
         init._containerHelper.createProject(OTHER_PROJECT, null);
         init._containerHelper.createProject(PROJECT_NAME, null);
 
-        init.enableEmailRecorder();
-
         init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
         init._containerHelper.createSubfolder(PROJECT_NAME, TIME_STUDY_FOLDER);
         init._containerHelper.createSubfolder(PROJECT_NAME, VISIT_STUDY_FOLDER);
