@@ -34,7 +34,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.assay.AssayImportPage;
@@ -53,7 +53,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@Category({DailyA.class})
+@Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class SampleSetRemoteAPITest extends BaseWebDriverTest
 {

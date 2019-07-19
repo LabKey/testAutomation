@@ -37,7 +37,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.params.FieldDefinition;
@@ -74,7 +74,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
-@Category({DailyA.class})
+@Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class SampleSetTest extends BaseWebDriverTest
 {
@@ -350,7 +350,7 @@ public class SampleSetTest extends BaseWebDriverTest
     public void testReservedFieldNames()
     {
 
-        log("Validate that reservered values cannot be used as field names.");
+        log("Validate that reserved values cannot be used as field names.");
 
         List<String> reserveredNames = Arrays.asList("Name", "Description", "Flag", "RowId", "SampleSet", "Folder", "Run", "Inputs", "Outputs");
 
