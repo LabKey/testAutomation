@@ -19,6 +19,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -45,6 +46,10 @@ public abstract class ImpersonateWindow extends Window<ImpersonateWindow.Element
                     {
                         TestLogger.log("Ignoring alert on impersonation: " + alertText);
                         alert.accept();
+                    }
+                    else
+                    {
+                        throw new UnhandledAlertException("Unexpected alert when attempting to impersonate", alertText);
                     }
                 }
             }
