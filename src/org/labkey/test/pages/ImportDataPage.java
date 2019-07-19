@@ -15,14 +15,19 @@
  */
 package org.labkey.test.pages;
 
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.Optional;
+import java.io.File;
 
+import static org.junit.Assert.assertEquals;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 
 public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
@@ -32,85 +37,100 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         super(driver);
     }
 
-    public void setText(String text)
-    {
-        setFormElement(elementCache().pasteDataTextArea,text);
-    }
-
-    public void setFormat(Format format)
-    {
-        _ext4Helper.selectComboBoxItem("Format:", format.format);
-    }
-
-    public void setImportLookupByAlternateKey(boolean useAltKey)
-    {
-        // Find the checkbox for the currently expanded section
-        String checkboxLabel = "Import Lookups by Alternate Key";
-        Optional<Checkbox> altKeyCheckbox = Ext4Checkbox().withLabel(checkboxLabel)
-                .findAll(getDriver()).stream().filter(Checkbox::isDisplayed).findAny();
-
-        altKeyCheckbox.orElseThrow(() -> new AssertionError("Failed to find checkbox for: " + checkboxLabel))
-                .set(useAltKey);
-    }
-
-    public void selectUpload()
-    {
-        if(!elementCache().uploadFileDiv.isDisplayed()){expandUpload();}
-    }
-
-    public void selectCopyPaste()
-    {
-        if(!elementCache().copyPasteDiv.isDisplayed()){expandCopyPaste();}
-    }
-
-    public void expandUpload()
-    {
-        elementCache().uploadExpando.click();
-    }
-
-    public void expandCopyPaste()
-    {
-        elementCache().copyPasteExpando.click();
-    }
-
-    public void setUploadFileLocation(String path)
-    {
-        setFormElement(elementCache().uploadFileFilePath,path);
-    }
-
-    public void uploadData(String filePath, boolean expectSuccess, String error)
-    {
-        selectUpload();
-        setUploadFileLocation(filePath);
-        submit();
-    }
-
-    public void pasteData(String tsv,boolean expectSuccess, String error)
+    public ImportDataPage setText(String text)
     {
         selectCopyPaste();
-        setText(tsv);
-        submit();
+        setFormElement(elementCache().pasteDataTextArea, text);
+        return this;
     }
 
-    public void submit()
+    public ImportDataPage setFormat(Format format)
     {
-        clickAndWait(elementCache().submitBtn);
+        elementCache().formatCombo.selectComboBoxItem(format.format);
+        return this;
+    }
+
+    public ImportDataPage setImportLookupByAlternateKey(boolean useAltKey)
+    {
+        elementCache().getAltKeyCheckbox().set(useAltKey);
+        return this;
+    }
+
+    public ImportDataPage selectUpload()
+    {
+        if (!elementCache().uploadFileDiv.isDisplayed())
+        {
+            elementCache().uploadExpando.click();
+        }
+        return this;
+    }
+
+    public ImportDataPage selectCopyPaste()
+    {
+        if (!elementCache().copyPasteDiv.isDisplayed())
+        {
+            elementCache().copyPasteExpando.click();
+        }
+        return this;
+    }
+
+    public ImportDataPage setFile(File file)
+    {
+        selectUpload();
+        setFormElement(elementCache().uploadFileFilePath, file);
+        return this;
+    }
+
+    public ImportDataPage submit()
+    {
+        clickAndWait(elementCache().getSubmitButton());
+        clearCache();
+        return this;
+    }
+
+    public ImportDataPage submitExpectingError(String error)
+    {
+        String actualError = submitExpectingError();
+        assertEquals(error, actualError);
+        return this;
+    }
+
+    public String submitExpectingError()
+    {
+        elementCache().getSubmitButton().click();
+        return waitForErrors();
+    }
+
+    private String waitForErrors()
+    {
+        Mutable<String> error = new MutableObject<>();
+        shortWait().until(wd ->
+        {
+            error.setValue(String.join("\n", getTexts(Locators.labkeyError.withText().findElements(getDriver()))));
+            return !error.getValue().isBlank();
+        });
+        return error.getValue();
     }
 
     public void cancel()
     {
-        clickAndWait(elementCache().cancelBtn);
+        clickAndWait(elementCache().getCancelButton());
+        clearCache();
     }
 
-    public enum Format{
+    public enum Format
+    {
         TSV("Tab-separated text (tsv)"), CSV("Comma-separated text (csv)");
 
         private String format;
 
-        public String getFormat(){
+        public String getFormat()
+        {
             return this.format;
         }
-        Format(String format){
+
+        Format(String format)
+        {
             this.format = format;
         }
     }
@@ -123,13 +143,40 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement pasteDataTextArea = Locator.xpath("//div[@id='copypasteDiv1']/descendant::textarea").findWhenNeeded(this);
-        WebElement submitBtn = Ext4Helper.Locators.ext4Button("Submit").findWhenNeeded(this);
-        WebElement cancelBtn = Ext4Helper.Locators.ext4Button("Cancel").findWhenNeeded(this);
+        // Upload file
+        WebElement uploadFileDiv = Locator.id("uploadFileDiv2").findWhenNeeded(this);
         WebElement uploadExpando = Locator.id("uploadFileDiv2Expando").findWhenNeeded(this);
+        WebElement uploadFileFilePath = Locator.input("file").findWhenNeeded(uploadFileDiv);
+
+        // Paste data
+        WebElement copyPasteDiv = Locator.id("copypasteDiv1").findWhenNeeded(this);
         WebElement copyPasteExpando = Locator.id("copyPasteDiv1Expando").findWhenNeeded(this);
-        WebElement copyPasteDiv = Locator.id("copypasteDiv1").findElement(this);
-        WebElement uploadFileDiv = Locator.id("uploadFileDiv2").findElement(this);
-        WebElement uploadFileFilePath = Locator.xpath("//div[@id='uploadFileDiv2']/descendant::input[@name='file']").findElement(this);
+        WebElement pasteDataTextArea = Locator.tag("textarea").findWhenNeeded(copyPasteDiv);
+        ComboBox formatCombo = new ComboBox.ComboBoxFinder(getDriver()).withLabel("Format:").findWhenNeeded(this);
+
+        WebElement getExpandedPanel()
+        {
+            if (copyPasteDiv.isDisplayed())
+                return copyPasteDiv;
+            else if (uploadFileDiv.isDisplayed())
+                return uploadFileDiv;
+            else
+                throw new IllegalStateException("Unable to determine expanded panel");
+        }
+
+        WebElement getSubmitButton()
+        {
+            return Ext4Helper.Locators.ext4Button("Submit").findElement(getExpandedPanel());
+        }
+
+        WebElement getCancelButton()
+        {
+            return Ext4Helper.Locators.ext4Button("Cancel").findElement(getExpandedPanel());
+        }
+
+        Checkbox getAltKeyCheckbox()
+        {
+            return Ext4Checkbox().withLabel("Import Lookups by Alternate Key").find(getExpandedPanel());
+        }
     }
 }
