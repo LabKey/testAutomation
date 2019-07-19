@@ -4,6 +4,7 @@ import org.json.simple.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ public class DomainCommand extends PostCommand<DomainResponse>
     protected String _schemaName;
     protected String _domainName;
     private String _domainKind;
+    private Map<String, String> _options = new HashMap<>();
     private List<Map<String, Object>> _columns = new ArrayList<>();
 
     public DomainCommand(String controllerName, String actionName)
@@ -87,6 +89,20 @@ public class DomainCommand extends PostCommand<DomainResponse>
     public void setSchemaName(String schemaName)
     {
         _schemaName = schemaName;
+    }
+
+    /**
+     * sets the domain options, such as keyName
+     * @param options
+     */
+    public void setOptions(Map options)
+    {
+        _options = options;
+    }
+
+    public Map<String, String> getOptions()
+    {
+        return  _options;
     }
 
 }

@@ -15,9 +15,9 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.DomainFieldRow;
 import org.labkey.test.components.DomainFormPanel;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 
@@ -54,9 +54,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
     public void preTest() throws Exception
     {
         goToProjectHome();
-        navBar().enterPageAdminMode();
         new PortalHelper(getDriver()).addBodyWebPart("Sample Sets");
-        navBar().exitPageAdminMode();
+        new PortalHelper(getDriver()).addBodyWebPart("Lists");
     }
 
     @Test
@@ -65,8 +64,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String listName = "NumericFieldsList";
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
 
-        ListHelper helper = new ListHelper(getDriver());
-        helper.createList(getProjectName(), listName, ListHelper.ListColumnType.Integer,"Key");
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)     // just make the list
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("Number", FieldDefinition.ColumnType.Integer)
+                ));
+        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
@@ -77,7 +79,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setType("Integer")
                 .expand()
                 .setNumberFormat("###,###,###")
-                .setScaleType("LINEAR")
+                .setScaleType(PropertiesEditor.ScaleType.LINEAR)
                 .setDescription("field for an Integer")
                 .setLabel("IntegerFieldLabel");
 
@@ -87,30 +89,29 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setType("Decimal")
                 .expand()
                 .setNumberFormat("###,###,###.000")
-                .setScaleType("LOG")
+                .setScaleType(PropertiesEditor.ScaleType.LOG)
                 .setDescription("field for a decimal")
                 .setLabel("DecimalField");
         domainDesignerPage.clickSaveChanges();
 
-
-        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+        dgen = new TestDataGenerator(lookupInfo)        // now put some test data in the new fields
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("Key", FieldDefinition.ColumnType.Integer),
                         TestDataGenerator.simpleFieldDef("integerField", FieldDefinition.ColumnType.Integer)
                 ));
-        dgen.addCustomRow(Map.of("Key", 1, "integerField", 10000000, "decimalField", 6.022));
-        dgen.addCustomRow(Map.of("Key", 2, "integerField", 8675309, "decimalField", 3.1415926));
-        dgen.addCustomRow(Map.of("Key", 3, "integerField", 123456789, "decimalField", 12345.678));
-        dgen.addCustomRow(Map.of("Key", 4, "integerField", 98765432, "decimalField", 1234.56789));
-        dgen.addCustomRow(Map.of("Key", 5, "integerField", 4, "decimalField", 5.654));
+        dgen.addCustomRow(Map.of("Number", 1, "integerField", 10000000, "decimalField", 6.022));
+        dgen.addCustomRow(Map.of("Number", 2, "integerField", 8675309, "decimalField", 3.1415926));
+        dgen.addCustomRow(Map.of("Number", 3, "integerField", 123456789, "decimalField", 12345.678));
+        dgen.addCustomRow(Map.of("Number", 4, "integerField", 98765432, "decimalField", 1234.56789));
+        dgen.addCustomRow(Map.of("Number", 5, "integerField", 4, "decimalField", 5.654));
         SaveRowsResponse response = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));
         DataRegionTable listQuery = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
-        listQuery.setSort("Key", SortDirection.ASC);
+        listQuery.setSort("Number", SortDirection.ASC);
 
-        Map row1 = listQuery.getRowDataAsMap("Key", "1");
+        Map row1 = listQuery.getRowDataAsMap("Number", "1");
         assertEquals("10,000,000", row1.get("integerField"));
         assertEquals("6.022", row1.get("decimalField"));
 

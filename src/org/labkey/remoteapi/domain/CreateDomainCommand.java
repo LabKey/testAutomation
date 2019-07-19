@@ -32,8 +32,7 @@ public class CreateDomainCommand extends DomainCommand
     public JSONObject getJsonObject()
     {
         JSONObject obj = new JSONObject();
-        obj.put("schemaName", getSchemaName());
-        obj.put("domainKind", getDomainKind());
+        obj.put("kind", getDomainKind());
 
         JSONArray fields = new JSONArray();
         fields.addAll(getColumns());
@@ -43,6 +42,14 @@ public class CreateDomainCommand extends DomainCommand
         domainDesign.put("fields", fields);
 
         obj.put("domainDesign", domainDesign);
+
+        if (!getOptions().isEmpty())
+        {
+            JSONObject domainOptions = new JSONObject();
+            domainOptions.putAll(getOptions());
+            obj.put("options", domainOptions);
+        }
+
         return obj;
     }
 }

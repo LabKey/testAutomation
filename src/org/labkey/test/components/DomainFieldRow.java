@@ -58,9 +58,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    public String getType()
+    public FieldDefinition.ColumnType getType()
     {
-        return getWrapper().getFormElement(elementCache().fieldTypeSelectInput);
+        String typeString = getWrapper().getFormElement(elementCache().fieldTypeSelectInput);
+        return Enum.valueOf(FieldDefinition.ColumnType.class, typeString);
     }
 
     public int getIndex()
@@ -187,14 +188,15 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().numericFormatInput.getValue();
     }
 
-    public DomainFieldRow setScaleType(String scaleType)
+    public DomainFieldRow setScaleType(PropertiesEditor.ScaleType scaleType)
     {
-        getWrapper().setFormElement(elementCache().defaultScaleTypeSelect, scaleType);
+        getWrapper().setFormElement(elementCache().defaultScaleTypeSelect, scaleType.toString());
         return this;
     }
-    public String getScaleType(String scaleType)
+    public PropertiesEditor.ScaleType getScaleType(String scaleType)
     {
-        return getWrapper().getFormElement(elementCache().defaultScaleTypeSelect);
+        String scaleTypeString = getWrapper().getFormElement(elementCache().defaultScaleTypeSelect);
+        return Enum.valueOf(PropertiesEditor.ScaleType.class, scaleTypeString);
     }
 
     //

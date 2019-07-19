@@ -25,11 +25,17 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     {
         elementCache().saveChangesBtn.click();
 
-        waitFor(()-> Locator.tagWithClass("div", "alert-success").existsIn(getDriver()),
+        String currentURL = getDriver().getCurrentUrl();
+        waitFor(()-> Locator.tagWithClass("div", "alert-success").existsIn(getDriver()) ||
+                getDriver().getCurrentUrl() != currentURL,
                 "domain save did not notify success", WAIT_FOR_JAVASCRIPT);
         return this;
     }
 
+    public DomainFormPanel fieldProperties()
+    {
+        return elementCache().firstDomainFormPanel;
+    }
     public DomainFormPanel fieldProperties(String queryName)
     {
         return elementCache().domainFormPanel(queryName);
@@ -48,7 +54,10 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        DomainFormPanel domainFormPanel(String domainName)
+        DomainFormPanel firstDomainFormPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())   // for situations where there's only one on the page
+                .findWhenNeeded(this);                                                          // and the caller is too lazy to specify which one they want
+
+        DomainFormPanel domainFormPanel(String domainName)                                              // for situations with multiple domainformpanels on the same page
         {
             return new DomainFormPanel.DomainFormPanelFinder(getDriver())
                     .withTitle("Field Properties - " + domainName).findWhenNeeded(this);
