@@ -139,7 +139,7 @@ public class ExpTest extends BaseWebDriverTest
         PropertiesEditor.FieldRow row = editor.selectField("Created");
         row.setLabel("editedCreated");
         PropertiesEditor.FieldPropertyDock.FormatTabPane tabPane = row.properties().selectFormatTab();
-        tabPane.propertyFormat.set("ddd MMM dd yyyy");
+        tabPane.setPropertyFormat("ddd MMM dd yyyy");
         clickButton("Save", 0);
         waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
 

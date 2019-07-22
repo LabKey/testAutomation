@@ -28,7 +28,9 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.SetDefaultValuesListPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.Format;
 import org.labkey.test.selenium.WebElementWrapper;
+import org.labkey.test.util.ExtHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -122,16 +124,16 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             newFieldRow.setType(col.getType());
 
         if (col.getDescription() != null)
-            fieldProperties().selectDisplayTab().description.set(col.getDescription());
+            fieldProperties().selectDisplayTab().setDescription(col.getDescription());
 
         if (col.getURL() != null)
-            fieldProperties().selectDisplayTab().url.set(col.getURL());
+            fieldProperties().selectDisplayTab().setUrl(col.getURL());
 
         if (col.getFormat() != null)
-            fieldProperties().selectFormatTab().propertyFormat.set(col.getFormat());
+            fieldProperties().selectFormatTab().setPropertyFormat(col.getFormat());
 
         if (col.isRequired())
-            fieldProperties().selectValidatorsTab().required.check();
+            fieldProperties().selectValidatorsTab().setRequired(true);
 
         FieldDefinition.FieldValidator validator = col.getValidator();
         if (validator != null)
@@ -167,12 +169,12 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         if (col.isMvEnabled())
         {
-            fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();
+            fieldProperties().selectAdvancedTab().setMvEnabled(true);
         }
 
         if (col.getScale() != null)
         {
-            fieldProperties().selectAdvancedTab().maxTextInput.set(col.getScale().toString());
+            fieldProperties().selectAdvancedTab().setMaxTextLength(col.getScale().toString());
         }
 
         return newFieldRow;
@@ -191,6 +193,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         return getSelectedField();
     }
 
+    @Deprecated
     public FieldPropertyDock fieldProperties()
     {
         return elementCache().fieldPropertyDock;
@@ -553,12 +556,22 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
                 super("Display");
             }
 
-            public final Input description = Input(Locator.id("propertyDescription"), getDriver()).findWhenNeeded(this);
-            public final Input url = Input(Locator.id("url"), getDriver()).findWhenNeeded(this);
-            public final Checkbox showInGrid = Checkbox(Locator.css("#propertyShownInGrid > input")).findWhenNeeded(this);
-            public final Checkbox showInInsert = Checkbox(Locator.css("#propertyShownInInsert > input")).findWhenNeeded(this);
-            public final Checkbox showInUpdate = Checkbox(Locator.css("#propertyShownInUpdate > input")).findWhenNeeded(this);
-            public final Checkbox showInDetails = Checkbox(Locator.css("#propertyShownInDetails > input")).findWhenNeeded(this);
+            private final Input description = Input(Locator.id("propertyDescription"), getDriver()).findWhenNeeded(this);
+            private final Input url = Input(Locator.id("url"), getDriver()).findWhenNeeded(this);
+            private final Checkbox showInGrid = Checkbox(Locator.css("#propertyShownInGrid > input")).findWhenNeeded(this);
+            private final Checkbox showInInsert = Checkbox(Locator.css("#propertyShownInInsert > input")).findWhenNeeded(this);
+            private final Checkbox showInUpdate = Checkbox(Locator.css("#propertyShownInUpdate > input")).findWhenNeeded(this);
+            private final Checkbox showInDetails = Checkbox(Locator.css("#propertyShownInDetails > input")).findWhenNeeded(this);
+
+            public void setDescription(String description)
+            {
+                this.description.set(description);
+            }
+
+            public void setUrl(String url)
+            {
+                this.url.set(url);
+            }
         }
 
         public class FormatTabPane extends FieldTabPane
@@ -568,9 +581,47 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
                 super("Format");
             }
 
-            public final Input propertyFormat = Input(Locator.id("propertyFormat"), getDriver()).findWhenNeeded(this);
+            private final Input propertyFormat = Input(Locator.id("propertyFormat"), getDriver()).findWhenNeeded(this);
+
+            public void setPropertyFormat(String propertyFormat)
+            {
+                this.propertyFormat.set(propertyFormat);
+            }
             public final WebElement addConditionalFormat = Locator.lkButton("Add Conditional Format").findWhenNeeded(this);
-            // TODO: Add conditional format stuff
+
+            public void addConditionalFormat(String value, Format format)
+            {
+                addConditionalFormat(null, value, format);
+            }
+
+            public void addConditionalFormat(String filterType, String value, Format format)
+            {
+                addConditionalFormat.click();
+                WebElement filterDialog = Locator.tagWithClassContaining("div", "labkey-filter-dialog").waitForElement(getDriver(), 10000);
+                if (filterType != null)
+                {
+                    new ExtHelper(getWrapper()).selectComboBoxItem("Filter Type:", filterType);
+                }
+                getWrapper().setFormElement(Locator.tagWithName("input", "value_1").findElement(filterDialog), value);
+                getWrapper().clickButton("OK", 0);
+                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(filterDialog));
+                if (format.isBold())
+                {
+                    getWrapper().checkCheckbox(Locator.checkboxByName("Bold").last());
+                }
+                if (format.isItalics())
+                {
+                    getWrapper().checkCheckbox(Locator.checkboxByName("Italic").last());
+                }
+                if (format.isUnderline())
+                {
+                    getWrapper().checkCheckbox(Locator.checkboxByName("Underline").last());
+                }
+                if (format.isStrikethrough())
+                {
+                    getWrapper().checkCheckbox(Locator.checkboxByName("Strikethrough").last());
+                }
+            }
         }
 
         public class ValidatorsTabPane extends FieldTabPane
@@ -580,7 +631,17 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
                 super("Validators");
             }
 
-            public final Checkbox required = Checkbox(Locator.tagWithName("input", "required")).findWhenNeeded(this);
+            private final Checkbox required = Checkbox(Locator.tagWithName("input", "required")).findWhenNeeded(this);
+
+            public boolean isRequired()
+            {
+                return required.get();
+            }
+
+            public void setRequired(boolean required)
+            {
+                this.required.set(required);
+            }
             private final WebElement regexValidatorButton = Locator.lkButton("Add RegEx Validator").findWhenNeeded(this);
             private final WebElement rangeValidatorButton = Locator.lkButton("Add Range Validator").findWhenNeeded(this);
             private final WebElement lookupValidatorButton = Locator.lkButton("Add Lookup Validator").findWhenNeeded(this);
@@ -595,10 +656,25 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
                 super("Reporting");
             }
 
-            public final Checkbox measure = Checkbox(Locator.tagWithName("input", "measure")).findWhenNeeded(this);
-            public final Checkbox dimension = Checkbox(Locator.tagWithName("input", "dimension")).findWhenNeeded(this);
-            public final Checkbox recommendedVariable = Checkbox(Locator.tagWithName("input", "recommendedVariable")).findWhenNeeded(this);
-            public final EnumSelect<ScaleType> defaultScale = EnumSelect(Locator.tagWithClass("select", "gwt-ListBox"), ScaleType.class).findWhenNeeded(this);
+            private final Checkbox measure = Checkbox(Locator.tagWithName("input", "measure")).findWhenNeeded(this);
+            private final Checkbox dimension = Checkbox(Locator.tagWithName("input", "dimension")).findWhenNeeded(this);
+            private final Checkbox recommendedVariable = Checkbox(Locator.tagWithName("input", "recommendedVariable")).findWhenNeeded(this);
+            private final EnumSelect<ScaleType> defaultScale = EnumSelect(Locator.tagWithClass("select", "gwt-ListBox"), ScaleType.class).findWhenNeeded(this);
+
+            public void setMeasure(boolean isMeasure)
+            {
+                measure.set(isMeasure);
+            }
+
+            public void setDimension(boolean isDimension)
+            {
+                dimension.set(isDimension);
+            }
+
+            public void setDefaultScale(ScaleType scale)
+            {
+                defaultScale.set(scale);
+            }
         }
 
         public class AdvancedTabPane extends FieldTabPane
@@ -608,18 +684,54 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
                 super("Advanced");
             }
 
-            public final Checkbox mvEnabledCheckbox = Checkbox(Locator.tagWithName("input", "mvEnabled")).findWhenNeeded(this);
-            public final EnumSelect<DefaultType> defaultTypeSelect = EnumSelect(Locator.tagWithName("select", "defaultValue"), DefaultType.class).findWhenNeeded(this);
+            private final Checkbox mvEnabledCheckbox = Checkbox(Locator.tagWithName("input", "mvEnabled")).findWhenNeeded(this);
+            private final EnumSelect<DefaultType> defaultTypeSelect = EnumSelect(Locator.tagWithName("select", "defaultValue"), DefaultType.class).findWhenNeeded(this);
+            private final Input importAliasesInput = Input(Locator.id("importAliases"), getDriver()).findWhenNeeded(this);
+            private final EnumSelect<PhiSelectType> phi = EnumSelect(Locator.tagWithName("select", "phiLevel"), PhiSelectType.class).findWhenNeeded(this);
             public SetDefaultValuesListPage clickSelectDefaultValue()
             {
                 new WebDriverWrapperImpl(getDriver()).clickAndWait(Locator.linkWithText("set value"));
                 return new SetDefaultValuesListPage(getDriver());
             }
-            public final Input importAliasesInput = Input(Locator.id("importAliases"), getDriver()).findWhenNeeded(this);
-            public final EnumSelect<PhiSelectType> phi = EnumSelect(Locator.tagWithName("select", "phiLevel"), PhiSelectType.class).findWhenNeeded(this);
-            public final Checkbox excludeFromShiftingCheckbox = Checkbox(Locator.tagWithName("input", "excludeFromShifting")).findWhenNeeded(this);
+
+            private final Checkbox excludeFromShiftingCheckbox = Checkbox(Locator.tagWithName("input", "excludeFromShifting")).findWhenNeeded(this);
+
+            public void setMvEnabled(boolean enabled)
+            {
+                mvEnabledCheckbox.set(enabled);
+            }
+
+            public void setDefaultType(DefaultType defaultType)
+            {
+                defaultTypeSelect.set(defaultType);
+            }
+
+            public void setImportAliases(String importAliases)
+            {
+                importAliasesInput.set(importAliases);
+            }
+
+            public void setPhiLevel(PhiSelectType phiLevel)
+            {
+                phi.set(phiLevel);
+            }
             public final Checkbox maxTextCheckbox = Checkbox(Locator.tagWithName("input", "isMaxText")).findWhenNeeded(this);
+
+            public void enableMaxText(boolean enabled)
+            {
+                maxTextCheckbox.set(enabled);
+            }
             public final Input maxTextInput = Input(Locator.name("scale"), getDriver()).findWhenNeeded(this);
+
+            public String getMaxTextLength()
+            {
+                return maxTextInput.get();
+            }
+
+            public void setMaxTextLength(String maxTextLength)
+            {
+                maxTextInput.set(maxTextLength);
+            }
         }
     }
 
@@ -829,4 +941,5 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             return _roleName;
         }
     }
+
 }

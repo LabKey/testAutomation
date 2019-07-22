@@ -224,10 +224,10 @@ public class ColumnResizeTest extends BaseWebDriverTest
                 .selectAdvancedTab();
 
         //Uncheck Max if necessary
-        advancedProperties.maxTextCheckbox.uncheck();
-        advancedProperties.maxTextInput.set(String.valueOf(newScale));
+        advancedProperties.enableMaxText(false);
+        advancedProperties.setMaxTextLength(String.valueOf(newScale));
         if (checkMax)
-            advancedProperties.maxTextCheckbox.check();
+            advancedProperties.enableMaxText(true);
     }
 
     private void assertScaleEquals(PropertiesEditor propertiesEditor, int rowIndex, Integer expected)
@@ -235,7 +235,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         String scaleStr = propertiesEditor
                 .selectField(rowIndex).properties()
                 .selectAdvancedTab()
-                .maxTextInput.get();
+                .getMaxTextLength();
         Integer scale = Integer.valueOf(scaleStr.replace(",",""));
 
         Assert.assertEquals(String.format("Scale for row [%d] is actually [%d] vs expected [%d]", rowIndex, scale, expected), expected, scale);

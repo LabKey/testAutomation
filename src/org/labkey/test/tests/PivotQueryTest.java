@@ -26,7 +26,6 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.PropertiesEditor;
-import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -157,7 +156,7 @@ public class PivotQueryTest extends ReportTest
 
         log("Change the column's reporting status to 'measure'");
         PropertiesEditor.FieldPropertyDock.ReportingTabPane tabPane = row.properties().selectReportingTab();
-        tabPane.measure.check();
+        tabPane.setMeasure(true);
 
         doAndWaitForPageToLoad(() -> {
             click(Locator.linkWithSpan("Save"));

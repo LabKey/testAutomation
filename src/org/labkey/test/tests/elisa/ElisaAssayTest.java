@@ -108,7 +108,7 @@ public class ElisaAssayTest extends AbstractAssayTest
         // set the specimenId field default value to be : last entered
         PropertiesEditor sample_fields = PropertiesEditor(getDriver()).withTitleContaining("Sample Fields").find();
         sample_fields.selectField("SpecimenId");
-        sample_fields.fieldProperties().selectAdvancedTab().defaultTypeSelect.set(PropertiesEditor.DefaultType.LAST_ENTERED);
+        sample_fields.fieldProperties().selectAdvancedTab().setDefaultType(PropertiesEditor.DefaultType.LAST_ENTERED);
 
         clickButton("Save", 0);
         waitForText(20000, "Save successful.");

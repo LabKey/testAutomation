@@ -334,7 +334,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         for (int pos : positions)
         {
-            adminPage.configureFields().selectField(pos).properties().selectValidatorsTab().required.set(selected);
+            adminPage.configureFields().selectField(pos).properties().selectValidatorsTab().setRequired(selected);
         }
     }
 
