@@ -47,6 +47,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    /**
+     * selects the field data type.  Note: after the field is initially created, the select will be disabled
+     * @param columnType
+     * @return
+     */
     public DomainFieldRow setType(FieldDefinition.ColumnType columnType)
     {
         getWrapper().setFormElement(elementCache().fieldTypeSelectInput, columnType.toString());
@@ -137,21 +142,25 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setDescription(String description)
     {
+        expand();
         getWrapper().setFormElement(elementCache().descriptionTextArea, description);
         return this;
     }
     public String getDescription()
     {
+        expand();
         return getWrapper().getFormElement(elementCache().descriptionTextArea);
     }
 
     public DomainFieldRow setLabel(String label)
     {
+        expand();
         elementCache().labelInput.setValue(label);
         return this;
     }
     public String getLabel()
     {
+        expand();
         return elementCache().labelInput.getValue();
     }
 
@@ -180,21 +189,25 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setNumberFormat(String format)
     {
+        expand();
         elementCache().numericFormatInput.set(format);
         return this;
     }
     public String getNumberFormat()
     {
+        expand();
         return elementCache().numericFormatInput.getValue();
     }
 
     public DomainFieldRow setScaleType(PropertiesEditor.ScaleType scaleType)
     {
+        expand();
         getWrapper().setFormElement(elementCache().defaultScaleTypeSelect, scaleType.toString());
         return this;
     }
     public PropertiesEditor.ScaleType getScaleType(String scaleType)
     {
+        expand();
         String scaleTypeString = getWrapper().getFormElement(elementCache().defaultScaleTypeSelect);
         return Enum.valueOf(PropertiesEditor.ScaleType.class, scaleTypeString);
     }
@@ -204,15 +217,18 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow allowMaxChar()
     {
+        expand();
         elementCache().allowMaxCharCountRadio.set(true);
         return this;
     }
     public boolean isMaxCharDefault()
     {
+        expand();
         return  elementCache().allowMaxCharCountRadio.isChecked();
     }
     public DomainFieldRow setCharCount(int maxCharCount)
     {
+        expand();
         String strCharCount = Integer.toString(maxCharCount);
         elementCache().setCharCountRadio.set(true);
         getWrapper().waitFor(()-> elementCache().charScaleInput.getComponentElement().getAttribute("disabled")==null,
@@ -222,10 +238,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     }
     public boolean isCustomCharSelected()
     {
+        expand();
         return elementCache().setCharCountRadio.isChecked();
     }
     public Integer customCharCount()
     {
+        expand();
         return Integer.parseInt(elementCache().charScaleInput.getValue());
     }
 
@@ -234,20 +252,24 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setDateFormat(String formatString)
     {
+        expand();
         elementCache().dateFormatInput.setValue(formatString);
         return this;
     }
     public String getDateFormat()
     {
+        expand();
         return elementCache().dateFormatInput.getValue();
     }
     public DomainFieldRow setDateShift(boolean shift)
     {
+        expand();
         elementCache().dateShiftBox.set(shift);
         return this;
     }
     public boolean getDateShift()
     {
+        expand();
         return elementCache().dateShiftBox.get();
     }
 
