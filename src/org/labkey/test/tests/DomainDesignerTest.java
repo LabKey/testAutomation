@@ -11,7 +11,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.DomainFieldRow;
 import org.labkey.test.components.DomainFormPanel;
@@ -28,7 +28,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class})
+@Category({DailyB.class})
 public class DomainDesignerTest extends BaseWebDriverTest
 {
     @Override
@@ -73,8 +73,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
 
-        DomainFieldRow integerRow = domainDesignerPage
-                .fieldProperties(listName)
+        DomainFormPanel panel = domainDesignerPage.fieldProperties();
+        DomainFieldRow integerRow = panel
                 .addField("integerField")
                 .setType("Integer")
                 .expand()
@@ -83,8 +83,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setDescription("field for an Integer")
                 .setLabel("IntegerFieldLabel");
 
-        DomainFieldRow decimalRow = domainDesignerPage
-                .fieldProperties(listName)
+        DomainFieldRow decimalRow = panel
                 .addField("decimalField")
                 .setType("Decimal")
                 .expand()
