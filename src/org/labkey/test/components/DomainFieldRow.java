@@ -69,6 +69,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return Enum.valueOf(FieldDefinition.ColumnType.class, typeString);
     }
 
+    public boolean getRequiredField()
+    {
+        return elementCache().fieldRequiredCheckbox.get();
+    }
+    public DomainFieldRow setRequiredField(boolean checked)
+    {
+        elementCache().fieldRequiredCheckbox.set(checked);
+        return this;
+    }
+
     public int getIndex()
     {
         String itemIndexAttribute = getComponentElement().getAttribute("tabindex");
@@ -166,21 +176,25 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setImportAliases(String aliases)
     {
+        expand();
         elementCache().importAliasesInput.setValue(aliases);
         return this;
     }
     public String getImportAliases()
     {
+        expand();
         return elementCache().importAliasesInput.getValue();
     }
 
     public DomainFieldRow setUrl(String url)
     {
+        expand();
         elementCache().urlInput.setValue(url);
         return this;
     }
     public String getUrl()
     {
+        expand();
         return elementCache().urlInput.getValue();
     }
 
@@ -285,8 +299,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             .findWhenNeeded(this), getDriver());
         public WebElement fieldTypeSelectInput = Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-type-")
                 .findWhenNeeded(this);
-        public WebElement fieldRequiredCheckbox = Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-required-")
-                .findWhenNeeded(this);
+        public Checkbox fieldRequiredCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-required-")
+                .findWhenNeeded(this));
 
         public WebElement expandToggle = Locator.tagWithClass("div", "domain-field-icon")
                 .child(Locator.tagWithAttribute("svg", "data-icon", "pencil-alt"))

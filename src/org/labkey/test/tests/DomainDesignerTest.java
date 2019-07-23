@@ -77,7 +77,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow integerRow = panel
                 .addField("integerField")
                 .setType("Integer")
-                .expand()
                 .setNumberFormat("###,###,###")
                 .setScaleType(PropertiesEditor.ScaleType.LINEAR)
                 .setDescription("field for an Integer")
@@ -86,7 +85,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow decimalRow = panel
                 .addField("decimalField")
                 .setType("Decimal")
-                .expand()
                 .setNumberFormat("###,###,###.000")
                 .setScaleType(PropertiesEditor.ScaleType.LOG)
                 .setDescription("field for a decimal")
