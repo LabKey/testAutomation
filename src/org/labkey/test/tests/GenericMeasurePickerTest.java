@@ -82,7 +82,7 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         EditDatasetDefinitionPage editDatasetDefinitionPage = new DatasetPropertiesPage(getDriver()).clickEditDefinition();
         editDatasetDefinitionPage.getFieldsEditor()
                 .selectField("HIVRapidTest").properties().selectReportingTab()
-                .dimension.check();
+                .setDimension(true);
         editDatasetDefinitionPage.save();
     }
 

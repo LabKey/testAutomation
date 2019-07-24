@@ -143,13 +143,13 @@ public class ScatterPlotTest extends GenericChartsTest
         datasetFieldsPanel.selectField(APXHEENT);
 
         log("Change the column's reporting status to 'measure'");
-        datasetFieldsPanel.fieldProperties().selectReportingTab().measure.check();
+        datasetFieldsPanel.fieldProperties().selectReportingTab().setMeasure(true);
 
         log("click on the 'Pulse' field");
         datasetFieldsPanel.selectField(APXPULSE);
 
         log("Change the column's reporting status to 'dimension'");
-        datasetFieldsPanel.fieldProperties().selectReportingTab().dimension.check();
+        datasetFieldsPanel.fieldProperties().selectReportingTab().setDimension(true);
 
         clickAndWait(Locator.linkWithSpan("Save"));
         waitForText("APX-1: Abbreviated Physical Exam Dataset Properties");
