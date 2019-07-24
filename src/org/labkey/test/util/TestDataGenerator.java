@@ -270,8 +270,17 @@ public class TestDataGenerator
 
     public DomainResponse createDomain(Connection cn, String domainKind) throws IOException, CommandException
     {
+        return createDomain(cn, domainKind, null);
+    }
+
+    public DomainResponse createDomain(Connection cn, String domainKind, Map domainOptions) throws IOException, CommandException
+    {
         CreateDomainCommand cmd = new CreateDomainCommand(domainKind, getQueryName());
         cmd.setColumns(getColumns());
+
+        if (domainOptions!= null)
+            cmd.setOptions(domainOptions);
+
         return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
