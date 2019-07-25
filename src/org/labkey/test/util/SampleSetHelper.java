@@ -313,13 +313,15 @@ public class SampleSetHelper extends WebDriverWrapper
         }
     }
 
-    public SampleSetHelper deleteSamples(String expectedTitle)
+    public SampleSetHelper deleteSamples(DataRegionTable samplesTable, String expectedTitle)
     {
-        getSamplesDataRegionTable().clickHeaderButton("Delete");
-        Window.Window(getDriver()).withTitle(expectedTitle).waitFor()
-                .clickButton("Yes, Delete", false);
-        Window.Window(getDriver()).withTitleContaining("Delete sample").waitFor();
-        _ext4Helper.waitForMaskToDisappear();
+        samplesTable.doAndWaitForUpdate(() -> {
+            samplesTable.clickHeaderButton("Delete");
+            Window.Window(getDriver()).withTitle(expectedTitle).waitFor()
+                    .clickButton("Yes, Delete", false);
+            Window.Window(getDriver()).withTitleContaining("Delete sample").waitFor();
+            _ext4Helper.waitForMaskToDisappear();
+        });
         return this;
     }
 
