@@ -607,20 +607,25 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
                 getWrapper().shortWait().until(ExpectedConditions.stalenessOf(filterDialog));
                 if (format.isBold())
                 {
-                    getWrapper().checkCheckbox(Locator.checkboxByName("Bold").last());
+                    getWrapper().checkCheckbox(findLastCheckbox("Bold"));
                 }
                 if (format.isItalics())
                 {
-                    getWrapper().checkCheckbox(Locator.checkboxByName("Italic").last());
-                }
-                if (format.isUnderline())
-                {
-                    getWrapper().checkCheckbox(Locator.checkboxByName("Underline").last());
+                    getWrapper().checkCheckbox(findLastCheckbox("Italic"));
                 }
                 if (format.isStrikethrough())
                 {
-                    getWrapper().checkCheckbox(Locator.checkboxByName("Strikethrough").last());
+                    getWrapper().checkCheckbox(findLastCheckbox("Strikethrough"));
                 }
+            }
+
+            private WebElement findLastCheckbox(String name)
+            {
+                List<WebElement> elements = Locator.checkboxByName(name).findElements(this);
+                if (elements.isEmpty())
+                    Locator.checkboxByName(name).findElement(this); // Should throw NoSuchElementException
+
+                return elements.get(elements.size() - 1);
             }
         }
 
