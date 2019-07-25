@@ -498,7 +498,7 @@ public class SampleSetParentColumn extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
         checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
 
-        regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_11, SE_04|S_04, SE_11)");
+        regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_11, SE_04|SE_04, S_11)");
 
     }
 
@@ -555,9 +555,7 @@ public class SampleSetParentColumn extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_04", "S_21"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
 
-        // TODO uncomment this check when issue 37982 is resolved. I commented this out because the checks that
-        //  follow are useful to do and shouldn't be skipped if possible
-//        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
+        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_21, SF_04|SF_04, S_21)");
 
