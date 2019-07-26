@@ -743,7 +743,7 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleNames.forEach(name -> {
             drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(name, "Name"));
         });
-        sampleHelper.deleteSamples("Permanently delete " + sampleNames.size() + " samples");
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete " + sampleNames.size() + " samples");
         assertEquals("Should have removed all the selected samples", 0, sampleHelper.getSamplesDataRegionTable().getDataRowCount());
     }
 
@@ -807,25 +807,25 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Try to delete parent and child");
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
-        sampleHelper.deleteSamples("Permanently delete 1 sample");
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
 
         assertEquals("Deleted sample " + twoParentChildName + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
         assertTrue("Parent sample " + parentSampleNames.get(1) + " does not appears in grid", drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name") > -1);
 
         log("Now that the child is gone, try to delete the parent");
-        sampleHelper.deleteSamples("Permanently delete 1 sample");
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
 
         assertEquals("Deleted sample " + parentSampleNames.get(1) + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
 
         log("Now try to delete what's left, in several hitches");
         drtSamples.checkAllOnPage();
-        sampleHelper.deleteSamples("Permanently delete 2 samples");
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 2 samples");
         assertEquals("Number of samples after deletion not as expected", 2, drtSamples.getDataRowCount());
 
-        sampleHelper.deleteSamples("Permanently delete 1 sample");
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
         assertEquals("Number of samples after deletion not as expected", 1, drtSamples.getDataRowCount());
 
-        sampleHelper.deleteSamples("Permanently delete 1 sample");
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
         assertEquals("Number of samples after deletion not as expected", 0, drtSamples.getDataRowCount());
 
     }
@@ -954,7 +954,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Delete the un-referenced samples");
         sampleTable.checkAllOnPage();
-        sampleHelper.deleteSamples("Permanently delete 1 sample");
+        sampleHelper.deleteSamples(sampleTable, "Permanently delete 1 sample");
         expectedSampleCount--;
         assertEquals("Number of samples not as expected after deletion", expectedSampleCount, sampleTable.getDataRowCount());
 
@@ -971,7 +971,7 @@ public class SampleSetTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
         sampleTable.uncheckAllOnPage();
         sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(RUN_SAMPLE_NAME, "Name"));
-        sampleHelper.deleteSamples("Permanently delete 1 sample");
+        sampleHelper.deleteSamples(sampleTable, "Permanently delete 1 sample");
         expectedSampleCount--;
         assertEquals("Number of samples not as expected after deletion", expectedSampleCount, sampleTable.getDataRowCount());
 
@@ -1005,7 +1005,7 @@ public class SampleSetTest extends BaseWebDriverTest
         goToProjectHome();
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
         sampleTable.checkAllOnPage();
-        sampleHelper.deleteSamples("Permanently delete 3 samples");
+        sampleHelper.deleteSamples(sampleTable, "Permanently delete 3 samples");
         assertEquals("Number of samples not as expected after deletion", 0, sampleTable.getDataRowCount());
 
     }
