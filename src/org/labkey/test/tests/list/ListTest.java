@@ -32,6 +32,7 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.params.Format;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -302,7 +303,7 @@ public class ListTest extends BaseWebDriverTest
         PropertiesEditor.FieldRow row = editor.selectField(_listCol6.getName());
         PropertiesEditor.FieldPropertyDock.AdvancedTabPane tabPane = row.properties().selectAdvancedTab();
 
-        tabPane.importAliasesInput.set(ALIASED_KEY_NAME);
+        tabPane.setImportAliases(ALIASED_KEY_NAME);
         click(Locator.id("partdown_2"));
 
         _listHelper.clickSave();
@@ -880,13 +881,7 @@ public class ListTest extends BaseWebDriverTest
 
         PropertiesEditor.FieldRow row = editor.selectField("BoolCol");
         PropertiesEditor.FieldPropertyDock.FormatTabPane tabPane = row.properties().selectFormatTab();
-        tabPane.addConditionalFormat.click();
-        _extHelper.waitForExtDialog("Apply Conditional Format Where BoolCol", WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("value_1"), "true");
-        _extHelper.clickExtButton("Apply Conditional Format Where BoolCol", "OK", 0);
-        checkCheckbox(Locator.checkboxByName("Bold"));
-        checkCheckbox(Locator.checkboxByName("Italic"));
-        checkCheckbox(Locator.checkboxByName("Strikethrough"));
+        tabPane.addConditionalFormat("true", new Format.Builder().setBold(true).setItalics(true).setStrikethrough(true).build());
         click(Locator.xpath("//div[@title='Color']"));
         waitForElement(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//fieldset[./legend/span[text()='Background']]//input"), "FF0000"); // Red background
@@ -906,20 +901,10 @@ public class ListTest extends BaseWebDriverTest
         // Set multiple conditional formats on int column.
         row = editor.selectField("IntCol");
         tabPane = row.properties().selectFormatTab();
-        tabPane.addConditionalFormat.click();
         // If greater than 5, Bold
-        _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
-        _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
-        setFormElement(Locator.id("value_1"), "5");
-        _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
-        checkCheckbox(Locator.checkboxByName("Bold"));
+        tabPane.addConditionalFormat("Is Greater Than", "5", Format.BOLD);
         // If greater than 7, strikethrough
-        tabPane.addConditionalFormat.click();
-        _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
-        _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
-        setFormElement(Locator.id("value_1"), "7");
-        _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
-        checkCheckbox(Locator.checkboxByName("Strikethrough").index(1));
+        tabPane.addConditionalFormat("Is Greater Than", "7", Format.STRIKETHROUGH);
 
         // Switch the order of filters so that >7 takes precedence over >5
         dragAndDrop(Locator.xpath("//div[text()='Is Greater Than 5']"), Locator.xpath("//div[text()='Is Greater Than 7']"));
@@ -1005,13 +990,13 @@ public class ListTest extends BaseWebDriverTest
         // set phi levels
         PropertiesEditor listFieldEditor = _listHelper.getListFieldEditor();
         listFieldEditor.selectField("NotPhiColumn");
-        listFieldEditor.fieldProperties().selectAdvancedTab().phi.set(PropertiesEditor.PhiSelectType.NotPHI);
+        listFieldEditor.fieldProperties().selectAdvancedTab().setPhiLevel(PropertiesEditor.PhiSelectType.NotPHI);
         listFieldEditor.selectField("LimitedPhiColumn");
-        listFieldEditor.fieldProperties().selectAdvancedTab().phi.set(PropertiesEditor.PhiSelectType.Limited);
+        listFieldEditor.fieldProperties().selectAdvancedTab().setPhiLevel(PropertiesEditor.PhiSelectType.Limited);
         listFieldEditor.selectField("PhiColumn");
-        listFieldEditor.fieldProperties().selectAdvancedTab().phi.set(PropertiesEditor.PhiSelectType.PHI);
+        listFieldEditor.fieldProperties().selectAdvancedTab().setPhiLevel(PropertiesEditor.PhiSelectType.PHI);
         listFieldEditor.selectField("RestrictedPhiColumn");
-        listFieldEditor.fieldProperties().selectAdvancedTab().phi.set(PropertiesEditor.PhiSelectType.Restricted);
+        listFieldEditor.fieldProperties().selectAdvancedTab().setPhiLevel(PropertiesEditor.PhiSelectType.Restricted);
 
         _listHelper.clickSave();
         goToProjectHome();

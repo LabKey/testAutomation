@@ -1092,7 +1092,7 @@ public abstract class Locator extends By
         {
             return new XPathCSSLocator(
                     _xLoc.last(),
-                    _cssLoc.lastChild());
+                    _cssLoc.lastOfType());
         }
 
         @Override
@@ -1647,6 +1647,11 @@ public abstract class Locator extends By
         public CssLocator lastChild()
         {
             return append(":last-child");
+        }
+
+        public CssLocator lastOfType()
+        {
+            return append(":last-of-type");
         }
 
         @Override

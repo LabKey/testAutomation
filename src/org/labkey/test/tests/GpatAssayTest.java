@@ -206,7 +206,7 @@ public class GpatAssayTest extends BaseWebDriverTest
                 .setLabel("Result")
                 .properties()
                 .selectAdvancedTab()
-                .importAliasesInput.set("Score");
+                .setImportAliases("Score");
 
         assayDesignerPage.saveAndClose();
         clickButton("Next", defaultWaitForPage);

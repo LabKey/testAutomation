@@ -33,16 +33,15 @@ public class WikiHelper
         _test = test;
     }
 
-    private void create(String name, @Nullable String format, @Nullable String title)
+    private EditPage create(String name, @Nullable String format, @Nullable String title)
     {
-        if (null != format)
-            createNewWikiPage(format);
-        else
-            createNewWikiPage();
+        EditPage wikiEditPage = createNewWikiPage(format);
 
-        _test.setFormElement(Locator.name("name"), name);
+        wikiEditPage.setName(name);
         if (null != title)
-            _test.setFormElement(Locator.name("title"), title);
+            wikiEditPage.setTitle(title);
+
+        return wikiEditPage;
     }
 
     public void createWikiPage(String name, @Nullable String title, File srcFile)
@@ -56,28 +55,24 @@ public class WikiHelper
 
     public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, boolean index, @Nullable File attachment, boolean wikiVisualBody)
     {
-        create(name, format, title);
+        EditPage editPage = create(name, format, title);
 
         if (wikiVisualBody)
             setWikiVisualBody(body);
         else
             setSource(body);
 
-        if(index)
-            _test.checkCheckbox(Locator.checkboxByName("shouldIndex"));
-        else
-            _test.uncheckCheckbox(Locator.checkboxByName("shouldIndex"));
+        editPage.setShouldIndex(index);
 
         if (null != attachment)
         {
-            _test.click(Locator.linkWithText("Attach a file"));
-            _test.setFormElement(Locator.name("formFiles[00]"), attachment);
-            Locator.lkButton("remove").waitForElement(_test.shortWait());
+            editPage.addAttachment(attachment);
         }
-        saveWikiPage();
+        editPage.saveAndClose();
+        _test.waitForElement(Locator.linkWithText(title != null ? title : name));
         if (attachment != null)
         {
-            _test.assertElementPresent(Locator.linkWithText(" " + attachment.getName()));
+            _test.assertElementPresent(Locator.linkWithText(attachment.getName()));
         }
     }
 
@@ -126,24 +121,13 @@ public class WikiHelper
     /**
      * Creates a new wiki page
      * @param format The format for the new page. Allowed values are "RADEOX" (for wiki),
-     * "HTML", and "TEXT_WITH_LINKS". Note that these are the string names for the
+     * "HTML", "MARKDOWN", and "TEXT_WITH_LINKS". Note that these are the string names for the
      * WikiRendererType enum values.
      * 
      */
-    public void createNewWikiPage(String format)
+    public EditPage createNewWikiPage(String format)
     {
-        if(!clickCreateNewWiki())
-        {
-            _test.goToModule("Wiki");
-            if(!clickCreateNewWiki())
-            {
-                throw new IllegalStateException("Could not find a link on the current page to create a new wiki page." +
-                        " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
-                        " before calling this method.");
-            }
-        }
-
-        convertWikiFormat(format);
+        return createNewWikiPage(format != null ? WikiRendererType.valueOf(format) : WikiRendererType.HTML);
     }
 
     private boolean clickCreateNewWiki()
@@ -161,9 +145,20 @@ public class WikiHelper
         return true;
     }
 
-    public void createNewWikiPage(WikiRendererType format)
+    public EditPage createNewWikiPage(WikiRendererType format)
     {
-        EditPage.beginAt(_test).convertWikiFormat(format);
+        if(!clickCreateNewWiki())
+        {
+            _test.goToModule("Wiki");
+            if(!clickCreateNewWiki())
+            {
+                throw new IllegalStateException("Could not find a link on the current page to create a new wiki page." +
+                        " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
+                        " before calling this method.");
+            }
+        }
+
+        return new EditPage(_test.getDriver()).convertWikiFormat(format);
     }
 
     //must already be on wiki page
@@ -191,9 +186,9 @@ public class WikiHelper
      * Creates a new wiki page using HTML as the format. See {@link WikiHelper#createNewWikiPage(String)}
      * for more details.
      */
-    @LogMethod(quiet = true)public void createNewWikiPage()
+    @LogMethod(quiet = true)public EditPage createNewWikiPage()
     {
-        createNewWikiPage("HTML");
+        return createNewWikiPage((String)null);
     }
 
     /**

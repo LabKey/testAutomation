@@ -424,7 +424,7 @@ public class UserTest extends BaseWebDriverTest
                 propertiesEditor
                  .selectField(field).properties()
                     .selectValidatorsTab()
-                    .required.set(false);
+                        .setRequired(false);
             }
             clickButton("Save");
         }
@@ -452,7 +452,7 @@ public class UserTest extends BaseWebDriverTest
         fieldProperties
                 .selectField(name).properties()
                 .selectValidatorsTab()
-                .required.set(select);
+                .setRequired(select);
     }
 
     private void verifyFieldChecked(String name)
@@ -461,7 +461,7 @@ public class UserTest extends BaseWebDriverTest
         Boolean isChecked = fieldProperties
                 .selectField(name).properties()
                 .selectValidatorsTab()
-                .required.get();
+                .isRequired();
 
         assertTrue("Field should be set to required: " + name, isChecked);
     }

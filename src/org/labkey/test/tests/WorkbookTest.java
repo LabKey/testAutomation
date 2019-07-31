@@ -148,7 +148,8 @@ public class WorkbookTest extends BaseWebDriverTest
         // Delete a workbook
         DataRegionTable workbooks = new DataRegionTable("query", this);
         workbooks.checkCheckbox(2);
-        workbooks.deleteSelectedRows();
+        WorkbookHelper workbookHelper = new WorkbookHelper(this);
+        workbookHelper.deleteWorkbooksFromDataRegion(workbooks);
         waitForTextToDisappear("Renamed" + DEFAULT_WORKBOOK_NAME);
 
         // Test Workbook APIs
@@ -173,7 +174,6 @@ public class WorkbookTest extends BaseWebDriverTest
         //Create new project, add a workbook to it and ensure that the id is 1
         _containerHelper.createProject(PROJECT_NAME2, null);
         portalHelper.addWebPart("Workbooks");
-        WorkbookHelper workbookHelper = new WorkbookHelper(this);
         int id = workbookHelper.createWorkbook(PROJECT_NAME2, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, WorkbookFolderType.FILE_WORKBOOK);
         assertEquals("workbook added to new project did not have id=1", id, 1);
     }

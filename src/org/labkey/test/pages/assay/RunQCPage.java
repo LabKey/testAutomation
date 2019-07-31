@@ -16,8 +16,8 @@
 package org.labkey.test.pages.assay;
 
 import org.labkey.test.Locator;
-import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.components.PlateGrid;
+import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -58,15 +58,13 @@ public class RunQCPage<EC extends RunQCPage.ElementCache> extends LabKeyPage<EC>
 
     public void clickCancel()
     {
-        elementCache().cancel.click();
-        waitForPage();
+        clickAndWait(elementCache().cancel);
         waitForElement(Locator.xpath("//table[contains(@class, 'plate-summary')]"));
     }
 
     public void clickFinish()
     {
-        elementCache().finish.click();
-        waitForPage();
+        clickAndWait(elementCache().finish);
         waitForElement(Locator.xpath("//table[contains(@class, 'plate-summary')]"));
         sleep(1000);
     }
