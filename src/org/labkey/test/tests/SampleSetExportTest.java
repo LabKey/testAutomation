@@ -19,7 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
 import org.labkey.test.util.SampleSetHelper;
@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Category({DailyB.class})
+@Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class SampleSetExportTest extends AbstractExportTest
 {
