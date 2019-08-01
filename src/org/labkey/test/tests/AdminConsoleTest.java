@@ -190,21 +190,21 @@ public class AdminConsoleTest extends BaseWebDriverTest
     public void testConfigureReturnURL()
     {
         String host = "google.com";
-        goToAdminConsole().clickExternalRedirectURLS();
+        goToAdminConsole().clickExternalRedirectHosts();
 
         log("Verifying host cannot be blank ");
         clickButton("Save");
-        assertElementPresent(Locator.css(".labkey-error").withText("External Redirect URL must not be blank."));
+        assertElementPresent(Locator.css(".labkey-error").withText("External redirect host name must not be blank."));
 
         log("Setting the host URL");
-        setFormElement(Locator.name("newExternalRedirectURL"), host);
+        setFormElement(Locator.name("newExternalRedirectHost"), host);
         clickButton("Save");
 
         log("Verifying url got added correctly");
-        assertEquals(host, getFormElement(Locator.name("existingExternalURL1")));
+        assertEquals(host, getFormElement(Locator.name("existingExternalHost1")));
 
         log("Verifying cannot be duplicate");
-        setFormElement(Locator.name("newExternalRedirectURL"), host);
+        setFormElement(Locator.name("newExternalRedirectHost"), host);
         clickButton("Save");
         assertElementPresent(Locator.css(".labkey-error").withText("\'" + host + "\' already exists. Duplicate hosts not allowed."));
 
