@@ -95,6 +95,11 @@ public class Ext4FieldRef extends Ext4CmpRef
         return getEval("getValue()");
     }
 
+    public Object getRawValue()
+    {
+        return getEval("getRawValue()");
+    }
+
     public Double getDoubleValue()
     {
         Object val = getEval("getValue()");
