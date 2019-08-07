@@ -1165,9 +1165,25 @@ public abstract class Locator extends By
                 return this;
         }
 
+        public XPathLocator containingIgnoreCase(String contains)
+        {
+            if (contains != null && !contains.isEmpty())
+                return this.withPredicate("contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(contains.toLowerCase())+")");
+            else
+                return this;
+        }
+
         public XPathLocator notContaining(String contains)
         {
             return this.withPredicate("not(contains(normalize-space(), "+xq(contains)+"))");
+        }
+
+        public XPathLocator notContainingIgnoreCase(String contains)
+        {
+            if (contains != null && !contains.isEmpty())
+                return this.withPredicate("not(contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(contains.toLowerCase())+"))");
+            else
+                return this;
         }
 
         public XPathLocator withText(String text)

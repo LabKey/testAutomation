@@ -699,7 +699,7 @@ public class SampleSetParentColumn extends BaseWebDriverTest
 
         Assert.assertTrue("Error message is not present.", isElementPresent(errorMsgLocator));
         Assert.assertTrue("Error message is not visible.", isElementVisible(errorMsgLocator));
-        Assert.assertEquals("Error message not as expected.", "Property exists with alias name: " + ALIAS_NAME_CONFLICT, errorMsgLocator.findElement(getDriver()).getText());
+        Assert.assertEquals("Error message not as expected.", "A sample set property already exists with parent alias header: " + ALIAS_NAME_CONFLICT, errorMsgLocator.findElement(getDriver()).getText());
 
         log("Now add a valid parent column and check that you cannot now add a field in the sample set with the same name.");
 
