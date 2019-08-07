@@ -883,18 +883,20 @@ public class DataRegionTable extends DataRegion
         doAndWaitForUpdate(() -> clickColumnMenu(columnName, !isAsync(), "Clear Sort"));
     }
 
-    public void openFilterDialog(String columnName)
+    public WebElement openFilterDialog(String columnName)
     {
         String columnLabel = elementCache().getColumnHeader(columnName).getText();
         clickColumnMenu(columnName, false, "Filter...");
 
         final Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
-        getWrapper().waitForElement(filterDialog);
+        WebElement filterDialogElement = getWrapper().waitForElement(filterDialog);
 
         WebDriverWrapper.waitFor(() -> getWrapper().isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden()) ||
                         getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())),
                 "Filter Dialog", WAIT_FOR_JAVASCRIPT);
         getWrapper()._extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+
+        return filterDialogElement;
     }
 
     @LogMethod (quiet = true)
