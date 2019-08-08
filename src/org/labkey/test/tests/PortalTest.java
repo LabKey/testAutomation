@@ -104,50 +104,6 @@ public class PortalTest extends BaseWebDriverTest
         siteNavBar.exitPageAdminMode();
     }
 
-    @Test
-    public void doFolderTypeTest()
-    {
-        final String folderName = "folderTypeTest";
-        final List<String> microarrayRequiredWebparts = Arrays.asList(
-                "Data Pipeline",
-                "Microarray Summary");
-        final List<String> microarrayPreferredWebparts = Arrays.asList(
-                "Microarray Runs",
-                "Assay Runs",
-                "Pending MageML Files",
-                "Assay List");
-        final List<String> collaborationPreferredWebparts = Arrays.asList(
-                "Subfolders",
-                "Wiki",
-                "Messages",
-                "Pages");
-
-        _containerHelper.createSubfolder(getProjectName(), getProjectName(), folderName, "Microarray", null);
-
-        List<String> currentPreferredWebparts;
-
-        log("Verify microarray folder webparts");
-        assertWebparts(microarrayRequiredWebparts, microarrayPreferredWebparts);
-
-        log("Verify webparts after changing folder type");
-        _containerHelper.setFolderType("Collaboration");
-        currentPreferredWebparts = new ArrayList<>(microarrayRequiredWebparts);
-        currentPreferredWebparts.addAll(microarrayPreferredWebparts);
-        currentPreferredWebparts.addAll(collaborationPreferredWebparts);
-        assertWebparts(Collections.emptyList(), currentPreferredWebparts);
-
-        for (String webpartTitle : microarrayRequiredWebparts)
-        {
-            portalHelper.removeWebPart(webpartTitle);
-        }
-        currentPreferredWebparts.removeAll(microarrayRequiredWebparts);
-        assertWebparts(Collections.emptyList(), currentPreferredWebparts);
-
-        log("Verify that required webparts get re-added");
-        _containerHelper.setFolderType("Microarray");
-        assertWebparts(microarrayRequiredWebparts, currentPreferredWebparts);
-    }
-
     @LogMethod
     public void assertWebparts(List<String> requiredWebparts, List<String> preferredWebparts)
     {
