@@ -77,7 +77,7 @@ public class ElispotAssayTest extends AbstractAssayTest
     protected final String TEST_ASSAY_FLUOROSPOT_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME2;
     private static final String FLUOROSPOT_DETECTION_METHOD = "fluorescent";
 
-    public static final String STUDY_FOLDER = "Fluorospot";
+    public static final String FLUOROSPOT_FOLDER = "Fluorospot";
 
     public List<String> getAssociatedModules()
     {
@@ -154,7 +154,7 @@ public class ElispotAssayTest extends AbstractAssayTest
     @Test
     public void fluorospotTests()
     {
-        _containerHelper.createSubfolder(getProjectName(), STUDY_FOLDER, "Assay");
+        _containerHelper.createSubfolder(getProjectName(), FLUOROSPOT_FOLDER, "Assay");
 
         //create a new fluorospot assay
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
@@ -214,7 +214,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         waitAndClick(Locator.linkWithText("view results"));
         DataRegionTable results = new DataRegionTable("Data", this);
         results.ensureColumnsPresent("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Spot Size", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader");
-        assertEquals(Arrays.asList("Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", "Fluorospot Study"), results.getRowDataAsText(0));
+        assertEquals(Arrays.asList("Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " "), results.getRowDataAsText(0));
     }
 
     private void verifyDataRegion(DataRegionTable table, SortDirection sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
