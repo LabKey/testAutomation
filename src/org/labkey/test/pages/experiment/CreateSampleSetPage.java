@@ -35,16 +35,31 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return this;
     }
 
+    public String getName()
+    {
+        return elementCache().nameInput.get();
+    }
+
     public CreateSampleSetPage setDescription(String desc)
     {
         elementCache().descriptionInput.set(desc);
         return this;
     }
 
+    public String getDescrption()
+    {
+        return elementCache().descriptionInput.get();
+    }
+
     public CreateSampleSetPage setNameExpression(String nameExp)
     {
         elementCache().nameExpressionInput.set(nameExp);
         return this;
+    }
+
+    public String getNameExpression()
+    {
+        return elementCache().nameExpressionInput.get();
     }
 
     public CreateSampleSetPage addParentColumnAlias(String importHeader, String materialInputName)

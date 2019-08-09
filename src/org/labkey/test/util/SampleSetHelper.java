@@ -22,6 +22,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.experiment.CreateSampleSetPage;
+import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.pages.property.EditDomainPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.SampleSetDomainProps;
@@ -218,11 +219,11 @@ public class SampleSetHelper extends WebDriverWrapper
         return this;
     }
 
-    public SampleSetHelper goToEditSampleSet(String name)
+    public UpdateSampleSetPage goToEditSampleSet(String name)
     {
         goToSampleSet(name);
         waitAndClickAndWait(Locator.lkButton("Edit Set"));
-        return this;
+        return new UpdateSampleSetPage(getDriver());
     }
 
     public void setFields(Map<String, FieldDefinition.ColumnType> fields)
