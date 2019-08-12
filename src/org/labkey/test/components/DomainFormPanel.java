@@ -130,7 +130,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         // Should only modify row collections with findFieldRows() and addFieldButton.click()
         private List<DomainFieldRow> fieldRows;
         private Map<String, Integer> fieldNames = new TreeMap<>();
-        private Locator rowLoc = Locator.tagWithClass("tr", "editor-field-row");
+        private final Locator rowLoc = Locator.tagWithClass("div", "domain-field-row");
 
         private List<DomainFieldRow> findFieldRows()
         {

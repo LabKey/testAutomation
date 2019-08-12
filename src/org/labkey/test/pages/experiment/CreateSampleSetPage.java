@@ -100,11 +100,11 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        Input nameInput = Input.Input(Locator.tagWithName("input","name"), getDriver())
+        Input nameInput = Input.Input(Locator.name("name"), getDriver())
                 .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
-        Input nameExpressionInput = Input.Input(Locator.tagWithName("input","nameExpression"), getDriver())
+        Input nameExpressionInput = Input.Input(Locator.name("nameExpression"), getDriver())
                 .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
-        Input descriptionInput = Input.Input(Locator.tagWithName("input","description"), getDriver())
+        Input descriptionInput = Input.Input(Locator.name("description"), getDriver())
                 .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
 
         WebElement createButton = Locator.lkButton("Create").findWhenNeeded(this);
