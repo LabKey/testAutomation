@@ -17,7 +17,6 @@ package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LogMethod;
@@ -29,7 +28,7 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 
 
-public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
+public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.ElementCache>
 {
     protected final WebDriver _driver;
     protected final WebElement _componentElement;
@@ -38,13 +37,8 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
     public BootstrapMenu(WebDriver driver, WebElement componentElement)
     {
-        this(new WebDriverWrapperImpl(driver), componentElement);
-    }
-
-    public BootstrapMenu(WebDriverWrapper wrapper, WebElement componentElement)
-    {
         _componentElement = componentElement;
-        _driver = wrapper.getDriver();
+        _driver = driver;
     }
 
     static public BootstrapMenuFinder finder(WebDriver driver)
@@ -165,15 +159,20 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         clickSubMenu(wait ? getWrapper().getDefaultWaitForPage() : 0, subMenuLabels);
     }
 
-    @Override
-    protected Elements newElementCache()
+    protected Locator getToggleLocator()
     {
-        return new Elements();
+        return Locators.toggleAnchor();
     }
 
-    protected class Elements extends Component.ElementCache
+    @Override
+    protected ElementCache newElementCache()
     {
-        public WebElement toggleAnchor = Locators.toggleAnchor().findWhenNeeded(getComponentElement());
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends Component.ElementCache
+    {
+        public final WebElement toggleAnchor = getToggleLocator().findWhenNeeded(getComponentElement());
 
         public WebElement findOpenMenu()
         {
