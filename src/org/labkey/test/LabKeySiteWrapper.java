@@ -1265,6 +1265,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      */
     public void stopImpersonating(Boolean goHome)
     {
+        if (!onLabKeyClassicPage()) // Single-page apps don't have impersonation capabilities
+        {
+            goToHome();
+            goHome = false;
+        }
         navBar().stopImpersonating();
         if (goHome)
             goToHome();

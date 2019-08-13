@@ -1114,6 +1114,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (Boolean)executeScript("return window.LABKEY != undefined;");
     }
 
+    public boolean onLabKeyClassicPage()
+    {
+        return onLabKeyPage() && Locator.byClass("lk-header-ct").existsIn(getDriver()); // Single-page apps don't have 'lk-header-ct'
+    }
+
     public boolean isSignedIn()
     {
         return (Boolean)executeScript("return LABKEY.user.isSignedIn;");

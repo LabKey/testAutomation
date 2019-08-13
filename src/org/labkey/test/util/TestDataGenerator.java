@@ -50,7 +50,6 @@ public class TestDataGenerator
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
 
     private final Map<Integer, FieldDefinition> _indices = new HashMap<>();  // used to keep columns and row keys aligned
-    // TODO: Make `_columns` a `Map<String, FieldDefinition>`
     private final Map<String, FieldDefinition> _columns = new CaseInsensitiveHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
     private List<Map<String, Object>> _rows = new ArrayList<>();
