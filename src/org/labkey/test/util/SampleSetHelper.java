@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2019 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
@@ -5,7 +20,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -16,13 +33,14 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 
 public class SampleSetHelper extends WebDriverWrapper
 {
     private final WebDriver _driver;
     private Map<String, FieldDefinition.ColumnType> _fields;
-    public static final String IMPORT_DATA_OPTION = "IMPORT";
-    public static final String MERGE_DATA_OPTION = "MERGE";
+    public static final String IMPORT_DATA_LABEL = "Insert";
+    public static final String MERGE_DATA_LABEL = "Insert and Replace";
 
     public SampleSetHelper(WebDriverWrapper driverWrapper)
     {
@@ -117,18 +135,92 @@ public class SampleSetHelper extends WebDriverWrapper
         return this;
     }
 
-    public SampleSetHelper selectImportOption(String value, int index)
+    public SampleSetHelper selectImportOption(String label, int index)
     {
-        List<WebElement> buttons = Locator.radioButtonByNameAndValue("insertOption", value).findElements(getDriver());
-        buttons.get(index).click();
+        RadioButton().withLabel(label).index(index).find(getDriver()).check();
         return this;
     }
 
+    public SampleSetHelper addParentColumnAlias(Map<String, String> aliases)
+    {
+        for(String importHeader : aliases.keySet())
+        {
+            addParentColumnAlias(importHeader, aliases.get(importHeader));
+        }
+
+        return this;
+    }
+
+    public SampleSetHelper addParentColumnAlias(String parentAlias, String inputName)
+    {
+        List<WebElement> importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
+        List<WebElement> importAliasSelects = Locator.tagWithName("select", "importAliasValues").findElements(getDriver());
+
+        int countOfInputs = importAliasInputs.size();
+
+        click(Locator.linkWithText("add parent column import alias"));
+        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() > countOfInputs, 1000);
+        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() == Locator.tagWithName("select", "importAliasValues").findElements(getDriver()).size(), 1000);
+
+        importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
+        importAliasSelects = Locator.tagWithName("select", "importAliasValues").findElements(getDriver());
+
+        int index = importAliasInputs.size() - 1;
+
+        WebElement aliasInput = importAliasInputs.get(index);
+
+        setFormElement(aliasInput, parentAlias);
+
+        WebElement aliasSelect = importAliasSelects.get(index);
+        selectOptionByTextContaining(aliasSelect, inputName);
+
+        return this;
+    }
+
+    public SampleSetHelper removeParentColumnAlias(String parentAlias)
+    {
+
+        List<WebElement> importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
+
+        int countOfInputs = importAliasInputs.size();
+
+        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() > countOfInputs, 1000);
+
+        importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
+
+        int index = 0;
+        for(WebElement input : importAliasInputs)
+        {
+            if(getFormElement(input).trim().equalsIgnoreCase(parentAlias.trim()))
+            {
+                break;
+            }
+            index++;
+        }
+
+        if(index == importAliasInputs.size())
+            throw new NoSuchElementException("No 'Parent Alias' with the value of '" + parentAlias + "' was found.");
+
+        importAliasInputs = Locator.tagWithClass("a", "removeAliasTrigger").findElements(getDriver());
+
+        importAliasInputs.get(index).click();
+
+        clickButton("Update");
+
+        return this;
+    }
 
     public SampleSetHelper goToSampleSet(String name)
     {
         TestLogger.log("Go to the sample set '" + name + "'");
         click(Locator.linkWithText(name));
+        return this;
+    }
+
+    public SampleSetHelper goToEditSampleSet(String name)
+    {
+        goToSampleSet(name);
+        waitAndClickAndWait(Locator.lkButton("Edit Set"));
         return this;
     }
 
@@ -212,7 +304,7 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void bulkImport(File dataFile)
     {
-        bulkImport(dataFile, IMPORT_DATA_OPTION);
+        bulkImport(dataFile, IMPORT_DATA_LABEL);
     }
 
     public void bulkImport(File dataFile, String importOption)
@@ -236,7 +328,7 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void bulkImport(String tsvData)
     {
-        bulkImport(tsvData, IMPORT_DATA_OPTION);
+        bulkImport(tsvData, IMPORT_DATA_LABEL);
     }
 
     public void bulkImport(String tsvData, String importOption)
@@ -254,12 +346,12 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void bulkImport(List<Map<String, String>> data)
     {
-        bulkImport(data, IMPORT_DATA_OPTION, null);
+        bulkImport(data, IMPORT_DATA_LABEL, null);
     }
 
     public void bulkImport(List<Map<String, String>> data, int waitTime)
     {
-        bulkImport(data, IMPORT_DATA_OPTION, waitTime);
+        bulkImport(data, IMPORT_DATA_LABEL, waitTime);
     }
 
     public void bulkImport(List<Map<String, String>> data, String importOption)
@@ -296,6 +388,18 @@ public class SampleSetHelper extends WebDriverWrapper
                 clickButton("Submit");
 
         }
+    }
+
+    public SampleSetHelper deleteSamples(DataRegionTable samplesTable, String expectedTitle)
+    {
+        samplesTable.doAndWaitForUpdate(() -> {
+            samplesTable.clickHeaderButton("Delete");
+            Window.Window(getDriver()).withTitle(expectedTitle).waitFor()
+                    .clickButton("Yes, Delete", false);
+            Window.Window(getDriver()).withTitleContaining("Delete sample").waitFor();
+            _ext4Helper.waitForMaskToDisappear();
+        });
+        return this;
     }
 
     public SampleSetHelper verifyDataRow(Map<String, String> data, int index)

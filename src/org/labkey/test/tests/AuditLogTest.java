@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2018 LabKey Corporation
+ * Copyright (c) 2011-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.Format;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Log4jUtils;
@@ -620,19 +621,16 @@ public class AuditLogTest extends BaseWebDriverTest
 
         log("Change properties on field '" + FIELD01_NAME + "'.");
         PropertiesEditor.FieldRow fr = _listHelper.getListFieldEditor().selectField(FIELD01_NAME);
-        fr.properties().selectAdvancedTab().phi.set(PropertiesEditor.PhiSelectType.Restricted);
-        fr.properties().selectValidatorsTab().required.set(true);
-        fr.properties().selectDisplayTab().description.set(FIELD01_UPDATED_DESCRIPTION);
+        fr.properties().selectAdvancedTab().setPhiLevel(PropertiesEditor.PhiSelectType.Restricted);
+        fr.properties().selectValidatorsTab().setRequired(true);
+        fr.properties().selectDisplayTab().setDescription(FIELD01_UPDATED_DESCRIPTION);
         fr.setLabel(FIELD01_UPDATED_LABEL);
 
         log("Change properties on field '" + FIELD02_NAME + "'.");
         fr = _listHelper.getListFieldEditor().selectField(FIELD02_NAME);
-        fr.properties().selectReportingTab().defaultScale.set(PropertiesEditor.ScaleType.LOG);
-        fr.properties().selectFormatTab().addConditionalFormat.click();
-        waitForElement(Locator.tagWithClassContaining("div", "labkey-filter-dialog"));
-        setFormElement(Locator.tagWithName("input", "value_1"), "5");
-        clickButton("OK", 0);
-        fr.properties().selectFormatTab().propertyFormat.set("#!");
+        fr.properties().selectReportingTab().setDefaultScale(PropertiesEditor.ScaleType.LOG);
+        fr.properties().selectFormatTab().addConditionalFormat("5", Format.NONE);
+        fr.properties().selectFormatTab().setPropertyFormat("#!");
         _listHelper.clickSave();
 
         log("Get a list of ids from the Domain Events Audit Log again but this time remove from the list the ids from the created events.");

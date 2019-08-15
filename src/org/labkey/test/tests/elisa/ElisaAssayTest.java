@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018 LabKey Corporation
+ * Copyright (c) 2018-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ public class ElisaAssayTest extends AbstractAssayTest
         // set the specimenId field default value to be : last entered
         PropertiesEditor sample_fields = PropertiesEditor(getDriver()).withTitleContaining("Sample Fields").find();
         sample_fields.selectField("SpecimenId");
-        sample_fields.fieldProperties().selectAdvancedTab().defaultTypeSelect.set(PropertiesEditor.DefaultType.LAST_ENTERED);
+        sample_fields.fieldProperties().selectAdvancedTab().setDefaultType(PropertiesEditor.DefaultType.LAST_ENTERED);
 
         clickButton("Save", 0);
         waitForText(20000, "Save successful.");

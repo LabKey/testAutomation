@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 LabKey Corporation
+ * Copyright (c) 2013-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -311,6 +311,11 @@ public class AliquotTest extends SpecimenBaseTest
         startSpecimenImport(2, SPECIMEN_ARCHIVE_148);
         setExpectSpecimenImportError(true);
         waitForSpecimenImport();
+
+        // Check there was an error in the specimen merge.
+        clickAndWait(Locator.linkWithText("ERROR"));
+        assertTextPresent("With an editable specimen repository, importing may not reference any existing specimen. " +
+                "8 imported specimen events refer to existing specimens.");
 
         // Make sure the expected errors have been logged and will not hang up the test later on.
         checkExpectedErrors(1);

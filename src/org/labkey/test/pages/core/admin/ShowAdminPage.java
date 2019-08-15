@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018 LabKey Corporation
+ * Copyright (c) 2016-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,10 +75,10 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().analyticsSettingsLink);
     }
 
-    public void clickExternalRedirectURLS()
+    public void clickExternalRedirectHosts()
     {
         goToAdminConsoleLinksSection();
-        clickAndWait(elementCache().externalRedirectURL);
+        clickAndWait(elementCache().externalRedirectHostLink);
     }
 
     public ShowAuditLogPage clickAuditLog()
@@ -199,7 +199,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement sectionActiveUsers = Locator.linkWithText("Active Users").findWhenNeeded(this);
 
         protected WebElement analyticsSettingsLink = Locator.linkWithText("analytics settings").findWhenNeeded(this);
-        protected WebElement externalRedirectURL = Locator.linkWithText("External Redirect URLs").findElement(this);
+        protected WebElement externalRedirectHostLink = Locator.linkWithText("External Redirect Hosts").findElement(this);
         protected WebElement auditLogLink = Locator.linkWithText("audit log").findWhenNeeded(this);
         protected WebElement authenticationLink = Locator.linkWithText("authentication").findWhenNeeded(this);
         protected WebElement configureFooterLink = Locator.linkWithText("configure footer").findWhenNeeded(this);

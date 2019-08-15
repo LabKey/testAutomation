@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2018 LabKey Corporation
+ * Copyright (c) 2008-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1092,7 +1092,7 @@ public abstract class Locator extends By
         {
             return new XPathCSSLocator(
                     _xLoc.last(),
-                    _cssLoc.lastChild());
+                    _cssLoc.lastOfType());
         }
 
         @Override
@@ -1165,9 +1165,25 @@ public abstract class Locator extends By
                 return this;
         }
 
+        public XPathLocator containingIgnoreCase(String contains)
+        {
+            if (contains != null && !contains.isEmpty())
+                return this.withPredicate("contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(contains.toLowerCase())+")");
+            else
+                return this;
+        }
+
         public XPathLocator notContaining(String contains)
         {
             return this.withPredicate("not(contains(normalize-space(), "+xq(contains)+"))");
+        }
+
+        public XPathLocator notContainingIgnoreCase(String contains)
+        {
+            if (contains != null && !contains.isEmpty())
+                return this.withPredicate("not(contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(contains.toLowerCase())+"))");
+            else
+                return this;
         }
 
         public XPathLocator withText(String text)
@@ -1647,6 +1663,11 @@ public abstract class Locator extends By
         public CssLocator lastChild()
         {
             return append(":last-child");
+        }
+
+        public CssLocator lastOfType()
+        {
+            return append(":last-of-type");
         }
 
         @Override

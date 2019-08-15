@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 LabKey Corporation
+ * Copyright (c) 2013-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -33,6 +34,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Charting;
@@ -47,11 +49,11 @@ import org.openqa.selenium.interactions.Actions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @Category({DailyC.class, Charting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
@@ -91,6 +93,13 @@ public class ChartingAPITest extends BaseWebDriverTest
     public void initProject()
     {
         _containerHelper.createProject(getProjectName(), null);
+
+        Set<String> installedModules = _containerHelper.getActiveModules(getProjectName());
+        if (TestProperties.isIgnoreMissingModules() && !installedModules.contains("chartingapi") )
+        {
+            throw new AssumptionViolatedException("Module not installed [chartingapi].  Skipping test.");
+        }
+
         createPeopleList();
     }
 

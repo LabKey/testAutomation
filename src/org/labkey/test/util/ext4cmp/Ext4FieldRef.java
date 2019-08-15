@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 LabKey Corporation
+ * Copyright (c) 2012-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,6 +93,11 @@ public class Ext4FieldRef extends Ext4CmpRef
     public Object getValue()
     {
         return getEval("getValue()");
+    }
+
+    public Object getRawValue()
+    {
+        return getEval("getRawValue()");
     }
 
     public Double getDoubleValue()

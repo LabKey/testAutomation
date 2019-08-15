@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2018 LabKey Corporation
+ * Copyright (c) 2011-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,7 +145,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         //Make sure the Editor can edit
         impersonate(GAMMA_EDITOR_USER);
         navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
-        portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
+        portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
         checkCheckbox(Locator.radioButtonByNameAndValue("emailPreference", "0"));
         clickButton("Update");
         clickFolder(GAMMA_SUB_FOLDER_NAME);
@@ -160,7 +160,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         //Make sure that the Author can read as well, edit his own but not edit the Edtiors
         impersonate(GAMMA_AUTHOR_USER);
         navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
-        portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
+        portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
         checkCheckbox(Locator.radioButtonByNameAndValue("emailPreference", "0"));
         clickButton("Update");
         clickFolder(GAMMA_SUB_FOLDER_NAME);

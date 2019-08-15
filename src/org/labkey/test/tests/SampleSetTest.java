@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2018 LabKey Corporation
+ * Copyright (c) 2011-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,11 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -74,7 +76,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
-@Category({DailyA.class})
+@Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class SampleSetTest extends BaseWebDriverTest
 {
@@ -270,12 +272,6 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTrue("Should have row with second imported value", drt.getRowIndex(fieldNames.get(0), "Ex") >= 0);
     }
 
-    private void selectInsertOption(String value, int index)
-    {
-        List<WebElement> buttons = Locator.radioButtonByNameAndValue("insertOption", value).findElements(this.getDriver());
-        buttons.get(index).click();
-    }
-
     @Test
     public void testImportTypeOptions()
     {
@@ -305,8 +301,8 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("text"), header + overlap + newData);
         clickButton("Submit", "duplicate key");
 
-        log("Switch to 'Insert and Update'");
-        sampleHelper.selectImportOption(SampleSetHelper.MERGE_DATA_OPTION, 1);
+        log("Switch to 'Insert and Replace'");
+        sampleHelper.selectImportOption(SampleSetHelper.MERGE_DATA_LABEL, 1);
         clickButton("Submit");
 
         log("Validate data was updated and new data added");
@@ -326,11 +322,11 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Try to import overlapping data from file");
         drt.clickImportBulkData();
         click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
-        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleSet.xls").getAbsolutePath());
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleSet.xls"));
         clickButton("Submit", "duplicate key");
 
-        log ("Switch to 'Insert and Update'");
-        selectInsertOption("MERGE", 0);
+        log ("Switch to 'Insert and Replace'");
+        sampleHelper.selectImportOption(SampleSetHelper.MERGE_DATA_LABEL, 0);
         clickButton("Submit");
         log ("Validate data was updated and new data added");
         assertEquals("Number of samples not as expected", 3, drt.getDataRowCount());
@@ -356,7 +352,7 @@ public class SampleSetTest extends BaseWebDriverTest
     public void testReservedFieldNames()
     {
 
-        log("Validate that reservered values cannot be used as field names.");
+        log("Validate that reserved values cannot be used as field names.");
 
         List<String> reserveredNames = Arrays.asList("Name", "Description", "Flag", "RowId", "SampleSet", "Folder", "Run", "Inputs", "Outputs");
 
@@ -727,6 +723,294 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testDeleteMultipleSamplesNoDependencies()
+    {
+        final String SAMPLE_SET_NAME = "DeleteIndependentSamples";
+        List<String> sampleNames = Arrays.asList("I-1", "I-2", "I-3");
+        List<Map<String, String>> sampleData = new ArrayList<>();
+        sampleNames.forEach(name -> {
+            sampleData.add(Map.of("Name", name));
+        });
+
+        clickProject(PROJECT_NAME);
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null,
+                Map.of("Field01",  FieldDefinition.ColumnType.String),
+                sampleData);
+
+        DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
+        log("Delete all the samples that have been created");
+        sampleNames.forEach(name -> {
+            drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(name, "Name"));
+        });
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete " + sampleNames.size() + " samples");
+        assertEquals("Should have removed all the selected samples", 0, sampleHelper.getSamplesDataRegionTable().getDataRowCount());
+    }
+
+    @Test
+    public void testDeleteSamplesSomeWithDerivedSamples()
+    {
+        final String SAMPLE_SET_NAME = "DeleteSamplesWithParents";
+        List<String> parentSampleNames = Arrays.asList("P-1", "P-2", "P-3");
+        List<Map<String, String>> sampleData = new ArrayList<>();
+        parentSampleNames.forEach(name -> {
+            sampleData.add(Map.of("Name", name));
+        });
+
+        clickProject(PROJECT_NAME);
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        log("Create a sample set with some potential parents");
+        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null,
+                null,
+                sampleData);
+        DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
+        log("Derive one sample from another");
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
+        clickButton("Derive Samples");
+        clickButton("Next");
+        String childName = parentSampleNames.get(0) + ".1";
+        setFormElement(Locator.name("outputSample1_Name"), childName);
+        clickButton("Submit");
+
+        log("Derive a sample from the one just created");
+        clickAndWait(Locator.linkContainingText("derive samples from this sample"));
+        clickButton("Next");
+        String grandchildName = childName + ".1";
+        setFormElement(Locator.name("outputSample1_Name"), grandchildName);
+        clickButton("Submit");
+
+        log("Derive a sample with two parents");
+        clickAndWait(Locator.linkContainingText(SAMPLE_SET_NAME));
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
+        clickButton("Derive Samples");
+        clickButton("Next");
+        String twoParentChildName = parentSampleNames.get(1) + "+" + childName + ".1";
+        setFormElement(Locator.name("outputSample1_Name"), twoParentChildName);
+        clickButton("Submit");
+
+        clickAndWait(Locator.linkContainingText(SAMPLE_SET_NAME));
+
+        log("Try to delete parent sample");
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
+        drtSamples.clickHeaderButton("Delete");
+        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
+                .clickButton("Dismiss", true);
+
+        log("Try to delete multiple parent samples");
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
+        drtSamples.clickHeaderButton("Delete");
+        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
+                .clickButton("Dismiss", true);
+
+        log("Try to delete parent and child");
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
+        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
+
+        assertEquals("Deleted sample " + twoParentChildName + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
+        assertTrue("Parent sample " + parentSampleNames.get(1) + " does not appears in grid", drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name") > -1);
+
+        log("Now that the child is gone, try to delete the parent");
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
+
+        assertEquals("Deleted sample " + parentSampleNames.get(1) + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
+
+        log("Now try to delete what's left, in several hitches");
+        drtSamples.checkAllOnPage();
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 2 samples");
+        assertEquals("Number of samples after deletion not as expected", 2, drtSamples.getDataRowCount());
+
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
+        assertEquals("Number of samples after deletion not as expected", 1, drtSamples.getDataRowCount());
+
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
+        assertEquals("Number of samples after deletion not as expected", 0, drtSamples.getDataRowCount());
+
+    }
+
+    @Test
+    public void testDeleteSamplesSomeWithAssayData()
+    {
+        final PortalHelper portalHelper = new PortalHelper(this);
+        final String SAMPLE_SET_NAME = "DeleteSamplesWithAssayData";
+        final String SAMPLE_ID_FIELD_NAME = "sampleId";
+        final String DATA_ID_ASSAY = "GPAT - SampleId Data";
+        final String BATCH_ID_ASSAY = "GPAT - SampleId Batch";
+        final String RUN_ID_ASSAY = "GPAT - SampleId Run";
+        List<String> sampleNames = Arrays.asList("P-1", "P-2", "P-3", "P-4", "P-5");
+        final String BATCH_SAMPLE_NAME = sampleNames.get(1);
+        final String RUN_SAMPLE_NAME = sampleNames.get(2);
+
+        int expectedSampleCount = sampleNames.size();
+
+        final String SAMPLE_ID_TEST_RUN_DATA = SAMPLE_ID_FIELD_NAME + "\n" +
+                sampleNames.get(0) + "\n" +
+                sampleNames.get(3) + "\n" +
+                sampleNames.get(1) + "\n";
+
+        final String TEST_RUN_DATA = "specimenID\n" +
+                "Specimen-01\n" +
+                "Specimen-02\n" +
+                "Specimen-03\n";
+
+        List<Map<String, String>> sampleData = new ArrayList<>();
+        sampleNames.forEach(name -> {
+            sampleData.add(Map.of("Name", name));
+        });
+        goToProjectHome();
+        portalHelper.addWebPart("Assay List");
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        log("Create a sample set");
+        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null,
+                null,
+                sampleData);
+
+//  Note that we currently will not find runs where the batch id references a sampleId.  See Issue 37918.
+//        log("Create an assay with sampleId in the batch fields");
+//        goToProjectHome();
+//        clickAndWait(Locator.linkWithText("Assay List"));
+//        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("General", BATCH_ID_ASSAY);
+//        designerPage.addLookupBatchField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
+//        designerPage.save();
+//
+//        log("Upload assay data for batch-level sampleId");
+//        goToProjectHome();
+//        clickAndWait(Locator.linkWithText("Assay List"));
+//        clickAndWait(Locator.linkWithText(BATCH_ID_ASSAY));
+//        clickButton("Import Data");
+//        setFormElement(Locator.name(SAMPLE_ID_FIELD_NAME), BATCH_SAMPLE_NAME);
+//        clickButton("Next");
+//        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN_DATA);
+//        clickButton("Save and Finish");
+//
+//
+//        log("Try to delete the sample referenced in the batch");
+//        goToProjectHome();
+//        click(Locator.linkWithText(SAMPLE_SET_NAME));
+//        DataRegionTable sampleTable = sampleHelper.getSamplesDataRegionTable();
+//        sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(BATCH_SAMPLE_NAME, "Name"));
+//        sampleTable.clickHeaderButton("Delete");
+//        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
+//                .clickButton("Dismiss", true);
+
+        log("Create an assay with sampleId in the data field");
+        goToProjectHome();
+        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("General", DATA_ID_ASSAY);
+        designerPage.addLookupDataField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
+        designerPage.save();
+
+        log("Upload assay data referencing sampleId");
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(DATA_ID_ASSAY));
+        clickButton("Import Data");
+        clickButton("Next");
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), SAMPLE_ID_TEST_RUN_DATA);
+        clickButton("Save and Finish");
+
+        log("Try to delete all samples");
+        goToProjectHome();
+        click(Locator.linkWithText(SAMPLE_SET_NAME));
+        DataRegionTable sampleTable = sampleHelper.getSamplesDataRegionTable();
+        sampleTable.checkAllOnPage();
+        sampleTable.clickHeaderButton("Delete");
+        Window.Window(getDriver()).withTitle("Permanently delete 2 samples").waitFor()
+                .clickButton("Cancel", true);
+        log("Uncheck the ones that can be deleted and try to delete again");
+        sampleTable.uncheckCheckbox(sampleTable.getIndexWhereDataAppears(sampleNames.get(2), "Name"));
+        sampleTable.uncheckCheckbox(sampleTable.getIndexWhereDataAppears(sampleNames.get(4), "Name"));
+        sampleTable.clickHeaderButton("Delete");
+        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
+                .clickButton("Dismiss", true);
+
+
+        log("Create an assay with sampleId in the run fields");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText("Assay List"));
+        designerPage = _assayHelper.createAssayAndEdit("General", RUN_ID_ASSAY);
+        designerPage.addLookupRunField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
+        designerPage.save();
+
+        log("Upload assay data for run-level sampleId");
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(RUN_ID_ASSAY));
+        clickButton("Import Data");
+        clickButton("Next");
+        setFormElement(Locator.name(SAMPLE_ID_FIELD_NAME), RUN_SAMPLE_NAME);
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN_DATA);
+        clickButton("Save and Finish");
+
+        log("Try to delete the sampleId referenced in the run field");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        sampleTable = sampleHelper.getSamplesDataRegionTable();
+        sampleTable.uncheckAllOnPage();
+        sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(RUN_SAMPLE_NAME, "Name"));
+
+        sampleTable.clickHeaderButton("Delete");
+        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
+                .clickButton("Dismiss", true);
+
+        log("Delete the un-referenced samples");
+        sampleTable.checkAllOnPage();
+        sampleHelper.deleteSamples(sampleTable, "Permanently delete 1 sample");
+        expectedSampleCount--;
+        assertEquals("Number of samples not as expected after deletion", expectedSampleCount, sampleTable.getDataRowCount());
+
+        log("Delete the assay run referencing the sample in run properties");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(RUN_ID_ASSAY));
+        DataRegionTable runsTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Runs").find();
+        runsTable.checkAllOnPage();
+        runsTable.clickHeaderButton("Delete");
+        clickButton("Confirm Delete");
+
+        log("Now try to delete the sample that was referenced in the run properties");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        sampleTable.uncheckAllOnPage();
+        sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(RUN_SAMPLE_NAME, "Name"));
+        sampleHelper.deleteSamples(sampleTable, "Permanently delete 1 sample");
+        expectedSampleCount--;
+        assertEquals("Number of samples not as expected after deletion", expectedSampleCount, sampleTable.getDataRowCount());
+
+//        log("Delete the assay run referencing the sample in the batch properties");
+//        goToProjectHome();
+//        clickAndWait(Locator.linkWithText(BATCH_ID_ASSAY));
+//        runsTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Runs").find();
+//        runsTable.checkAllOnPage();
+//        runsTable.clickHeaderButton("Delete");
+//        clickButton("Confirm Delete");
+
+//        log("Now try to delete the sample that was referenced in the batch properties, but still referenced in the data of another assay");
+        log("Now try to delete the sample is referenced in the data of an assay");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        sampleTable.uncheckAllOnPage();
+        sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(BATCH_SAMPLE_NAME, "Name"));
+        sampleTable.clickHeaderButton("Delete");
+        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
+                .clickButton("Dismiss", true);
+
+        log("Delete the assay run referencing the samples in the data");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(DATA_ID_ASSAY));
+        runsTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Runs").find();
+        runsTable.checkAllOnPage();
+        runsTable.clickHeaderButton("Delete");
+        clickButton("Confirm Delete");
+
+        log("Try to delete the rest of the samples");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        sampleTable.checkAllOnPage();
+        sampleHelper.deleteSamples(sampleTable, "Permanently delete 3 samples");
+        assertEquals("Number of samples not as expected after deletion", 0, sampleTable.getDataRowCount());
+
+    }
+
+    @Test
     public void testUpdateAndDeleteWithCommentsAndFlags()
     {
         final String SAMPLE_SET_NAME = "UpdateAndDeleteFields";
@@ -793,12 +1077,13 @@ public class SampleSetTest extends BaseWebDriverTest
         cv.addColumn("Description");
         cv.saveCustomView();
 
-        log("Delete a record that has a description and an flag/comment");
+        log("Delete a record that has a description and a flag/comment");
         int rowIndex = drtSamples.getIndexWhereDataAppears(SAMPLE_NAME_TO_DELETE, "Name");
         drtSamples.checkCheckbox(rowIndex);
         drtSamples.clickHeaderButton("Delete");
-        waitForElementToBeVisible(Locator.lkButton("Confirm Delete"));
-        clickAndWait(Locator.lkButton("Confirm Delete"));
+        Window.Window(getDriver()).withTitle("Permanently delete 1 sample").waitFor()
+                .clickButton("Yes, Delete", true);
+        _ext4Helper.waitForMaskToDisappear();
 
         // Remove the same row from the Sample Set input data.
         int testDataIndex = getSampleIndexFromTestInput(SAMPLE_NAME_TO_DELETE, sampleData);
@@ -926,7 +1211,7 @@ public class SampleSetTest extends BaseWebDriverTest
         updateSampleData.add(updatedFields);
 
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
 
     }
 
@@ -1222,7 +1507,7 @@ public class SampleSetTest extends BaseWebDriverTest
         // TODO: Need to pass in all of the columns so as not to lose any data. See TODO comment below.
         List<Map<String, String>> updateSampleData = new ArrayList<>();
         updateSampleData.add(sampleData.get(testDataIndex));
-        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
         expectedMissingCount--;
 
         // TODO: Need to revisit. When doing a bulk update if a field is missing the update views it as a request to
@@ -1236,7 +1521,7 @@ public class SampleSetTest extends BaseWebDriverTest
 //        List<Map<String, String>> updateSampleData = new ArrayList<>();
 //        updateSampleData.add(tempSample);
 //
-//        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_OPTION);
+//        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
 
         if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
         {
@@ -1316,7 +1601,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Validate that the required field check works as expected.");
         updateSampleData = new ArrayList<>();
         updateSampleData.add(Map.of("Name", "mv10", REQUIRED_FIELD_NAME, "", MISSING_FIELD_NAME, "There should be no value in the required field.", INDICATOR_FIELD_NAME, ""));
-        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.IMPORT_DATA_OPTION, 0);
+        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.IMPORT_DATA_LABEL, 0);
 
         boolean errorMsgShown;
         try
@@ -1532,7 +1817,7 @@ public class SampleSetTest extends BaseWebDriverTest
         goToModule("Query");
         viewQueryData("auditLog", "SampleSetAuditEvent");
         assertTextPresent(
-                "Samples inserted or updated in: " + sampleSetName);
+                "Samples inserted in: " + sampleSetName);
 
     }
 
@@ -1628,7 +1913,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 "SampleSetBVTChildA\tSampleSetBVT13\t1.111\n" +
                 "SampleSetBVTChildB\tSampleSetBVT14\t2.222\n";
 
-        sampleHelper.bulkImport(REPARENTED_CHILD_SAMPLE_SET_TSV, SampleSetHelper.MERGE_DATA_OPTION);
+        sampleHelper.bulkImport(REPARENTED_CHILD_SAMPLE_SET_TSV, SampleSetHelper.MERGE_DATA_LABEL);
 
         clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
         assertTextPresent("2.222");

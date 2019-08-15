@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2018 LabKey Corporation
+ * Copyright (c) 2011-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -424,7 +424,7 @@ public class UserTest extends BaseWebDriverTest
                 propertiesEditor
                  .selectField(field).properties()
                     .selectValidatorsTab()
-                    .required.set(false);
+                        .setRequired(false);
             }
             clickButton("Save");
         }
@@ -452,7 +452,7 @@ public class UserTest extends BaseWebDriverTest
         fieldProperties
                 .selectField(name).properties()
                 .selectValidatorsTab()
-                .required.set(select);
+                .setRequired(select);
     }
 
     private void verifyFieldChecked(String name)
@@ -461,7 +461,7 @@ public class UserTest extends BaseWebDriverTest
         Boolean isChecked = fieldProperties
                 .selectField(name).properties()
                 .selectValidatorsTab()
-                .required.get();
+                .isRequired();
 
         assertTrue("Field should be set to required: " + name, isChecked);
     }

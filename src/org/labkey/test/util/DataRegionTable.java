@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2018 LabKey Corporation
+ * Copyright (c) 2008-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -210,7 +210,9 @@ public class DataRegionTable extends DataRegion
         @Override
         protected DataRegionTable construct(WebElement el, WebDriver driver)
         {
-            DataRegionTable constructed = new DataRegionTable(new RefindingWebElement(el, buildLocator(), getContext()).withTimeout(getTimeout()), driver);
+            if (buildLocator() != null && getContext() != null) // Prevent NPE after using `DataRegionFinder.locatedBy(..)`
+                el = new RefindingWebElement(el, buildLocator(), getContext()).withTimeout(getTimeout());
+            DataRegionTable constructed = new DataRegionTable(el, driver);
             constructed.setUpdateTimeout(getTimeout());
             if (!_lazy)
                 constructed.elementCache();
@@ -850,11 +852,11 @@ public class DataRegionTable extends DataRegion
         statsWindow.apply();
     }
 
-    public void verifySummaryStatisticValue(String columnName, String stat, String expectedValue)
+    public void verifySummaryStatisticValue(String columnName, String stat, String expectedValue, String filterDescription)
     {
         clickColumnMenu(columnName, false, "Summary Statistics...");
         SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(getDriver());
-        assertEquals("Stat value not as expected for: " + stat, expectedValue, statsWindow.getValue(stat));
+        assertEquals("Stat value not as expected for " + stat + " with filter " + filterDescription, expectedValue, statsWindow.getValue(stat));
         statsWindow.cancel();
     }
 

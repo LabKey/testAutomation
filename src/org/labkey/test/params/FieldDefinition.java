@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 LabKey Corporation
+ * Copyright (c) 2016-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,13 +217,19 @@ public class FieldDefinition
 
     public enum ColumnType
     {
-        MultiLine("Multi-Line Text", "string"), Integer("Integer", "int"),
-        String("Text (String)", "string"), Subject("Subject/Participant (String)", "string"),
-        DateTime("DateTime", "date"), Boolean("Boolean", "boolean"),
-        Double("Number (Double)", "float"), File("File", null),
+        MultiLine("Multi-Line Text", "string"),
+        Integer("Integer", "int"),
+        String("Text (String)", "string"),
+        Subject("Subject/Participant (String)", "string"),
+        DateTime("DateTime", "date"),
+        Boolean("Boolean", "boolean"),
+        Double("Number (Double)", "float"),
+        File("File", null),
         AutoInteger("Auto-Increment Integer", "int"),
-        Flag("Flag (String)", null), Attachment("Attachment", null),
-        User("User", "int"), Lookup("Lookup", null);
+        Flag("Flag (String)", null),
+        Attachment("Attachment", null),
+        User("User", "int"),
+        Lookup("Lookup", null);
 
         private final String _description;  // the display value in the UI for this kind of field
         private final String _jsonType;     // the key used inside the API

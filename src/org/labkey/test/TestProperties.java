@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 LabKey Corporation
+ * Copyright (c) 2013-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,16 @@ public abstract class TestProperties
         String buildTypeProperty = "teamcity.buildType.id";
         String undefinedBuildTypeProperty = "${" + buildTypeProperty + "}";
         return !undefinedBuildTypeProperty.equals(System.getProperty(buildTypeProperty, undefinedBuildTypeProperty));
+    }
+
+    public static boolean isServerRemote()
+    {
+        return "true".equals(System.getProperty("labkey.isRemote", "false"));
+    }
+
+    public static boolean isIgnoreMissingModules()
+    {
+        return "true".equals(System.getProperty("webtest.ignoreMissingModules", "false"));
     }
 
     public static boolean isLeakCheckSkipped()

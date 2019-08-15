@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2018 LabKey Corporation
+ * Copyright (c) 2014-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -334,7 +334,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         PropertiesEditor.FieldRow row = editor.selectField(0);
         row.setName(CUSTOM_PROPERTY);
-        row.properties().selectDisplayTab().url.set("http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
+        row.properties().selectDisplayTab().setUrl("http://labkey.test/?a=${" + CUSTOM_PROPERTY + "}&b=${" + COLUMN_NAME + "}");
 
         editor.addField(new FieldDefinition(COLUMN_NAME).setLabel(COLUMN_NAME).setLookup(new FieldDefinition.LookupInfo(getProjectName(), "lists", LIST_NAME)));
         clickButton("Save & Close");

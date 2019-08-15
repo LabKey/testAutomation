@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2018 LabKey Corporation
+ * Copyright (c) 2011-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -539,9 +539,9 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         log("setting fields to enable missing values and look up");
         assay.dataFields().selectField(4).setType(new ListHelper.LookupInfo(null, "lists", "Ages"));
-        assay.dataFields().fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();
+        assay.dataFields().fieldProperties().selectAdvancedTab().setMvEnabled(true);
         assay.dataFields().selectField(5);
-        assay.dataFields().fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();
+        assay.dataFields().fieldProperties().selectAdvancedTab().setMvEnabled(true);
 
         assay.saveAndClose();
     }

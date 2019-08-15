@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018 LabKey Corporation
+ * Copyright (c) 2012-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
+import org.junit.AssumptionViolatedException;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.admin.GetModulesCommand;
@@ -25,6 +26,7 @@ import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.admin.CreateSubFolderPage;
@@ -197,6 +199,11 @@ public abstract class AbstractContainerHelper
             }
             catch (NoSuchElementException missingModule)
             {
+                if (TestProperties.isIgnoreMissingModules())
+                {
+                    throw new AssumptionViolatedException("Module not installed [" + moduleName + "]. Skipping test.");
+                }
+
                 String supportedDbMessage = "";
                 if (_test instanceof PostgresOnlyTest)
                 {
@@ -388,7 +395,7 @@ public abstract class AbstractContainerHelper
         _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName));
         _test.clickButton("Delete", waitTime);
         // confirm delete subfolders if present
-        if (_test.isTextPresent("This folder has subfolders."))
+        if (_test.isElementPresent(Locator.lkButton("Delete All Folders.")))
             _test.clickButton("Delete All Folders", waitTime);
         // confirm delete:
         _test.clickButton("Delete", waitTime);

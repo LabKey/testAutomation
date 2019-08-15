@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018 LabKey Corporation
+ * Copyright (c) 2015-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -442,7 +442,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public Object executeAsyncScript(String script, Object... arguments)
     {
-        script = "var callback = arguments[arguments.length - 1];\n" + script; // See WebDriver documentation
+        script = "var callback = arguments[arguments.length - 1];\n" + // See WebDriver documentation for details on injected callback
+                "try {" +
+                script +
+                "} catch (error) { callback(error); }"; // ensure that the callback is invoked when an exception would otherwise prevent it
         return ((JavascriptExecutor) getDriver()).executeAsyncScript(script, arguments);
     }
 
@@ -3156,6 +3159,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
             case "search":
                 setInput(input, value); // These don't require special handling, don't output warning
                 break;
+            case "number":
+                setHtml5NumberInput(input, value);
+                break;
             default:
                 log(String.format("WARNING: No special handling defined for HTML5 input type = '%s'.", inputType));
                 setInput(input, value);
@@ -3187,6 +3193,40 @@ public abstract class WebDriverWrapper implements WrapsDriver
         fireEvent(el, SeleniumEvent.focus);
         executeScript("arguments[0].value = ''", el);
         el.sendKeys(formDate);
+    }
+
+    private void setHtml5NumberInput(WebElement el, String text)
+    {
+
+        el.clear();
+
+        // Calling clear on the element doesn't reliably clear the field, if it fails try the hack.
+        String valueAsNumber = el.getAttribute("valueAsNumber").trim().toLowerCase();
+        if(!valueAsNumber.equals("nan"))
+        {
+
+            int length = valueAsNumber.length();
+
+            el.click();
+
+            // Not really sure where the cursor is in relation to the text so LEFT_ARROW until we are at the start.
+            for(int i = 0; i < length; i++)
+            {
+                el.sendKeys(Keys.ARROW_LEFT);
+            }
+
+            // Now delete all of the characters.
+            for(int i = 0; i < length; i++)
+            {
+                el.sendKeys(Keys.DELETE);
+            }
+
+        }
+
+        // Sometimes focus is lost before the value is set, so make sure the element has focus.
+        el.click();
+
+        el.sendKeys(text);
     }
 
     /**

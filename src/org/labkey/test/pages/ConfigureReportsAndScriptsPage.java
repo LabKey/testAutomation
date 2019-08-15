@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 LabKey Corporation
+ * Copyright (c) 2016-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -538,6 +538,8 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
         public void configureEngine(EngineType type, Window configWindow, WebDriverWrapper wrapper)
         {
+            // need to set the change password checkbox
+            wrapper._ext4Helper.checkCheckbox(Locator.id("editEngine_changePassword-inputEl"));
             super.configureEngine(type, configWindow, wrapper);
 
             wrapper.log("Configuring the path mapping");

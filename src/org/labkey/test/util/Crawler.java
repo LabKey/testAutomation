@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2018 LabKey Corporation
+ * Copyright (c) 2008-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,7 +193,7 @@ public class Crawler
             new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
             new ControllerActionId("luminex", "exportDefaultValues"), // download action
             new ControllerActionId("microarray", "designer"), // assay designer prompts to save design when navigating away
-            new ControllerActionId("ms1", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
+            new ControllerActionId("ms2", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("ms2", "showParamsFile"),
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "showPeptide"),

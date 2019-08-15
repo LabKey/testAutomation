@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2018 LabKey Corporation
+ * Copyright (c) 2011-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ public class ExpTest extends BaseWebDriverTest
         PropertiesEditor.FieldRow row = editor.selectField("Created");
         row.setLabel("editedCreated");
         PropertiesEditor.FieldPropertyDock.FormatTabPane tabPane = row.properties().selectFormatTab();
-        tabPane.propertyFormat.set("ddd MMM dd yyyy");
+        tabPane.setPropertyFormat("ddd MMM dd yyyy");
         clickButton("Save", 0);
         waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
 

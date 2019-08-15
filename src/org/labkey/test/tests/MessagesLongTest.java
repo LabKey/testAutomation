@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2018 LabKey Corporation
+ * Copyright (c) 2011-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.dumbster.EmailRecordTable;
-import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.announcements.AdminPage;
 import org.labkey.test.pages.announcements.InsertPage;
@@ -169,11 +169,13 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         log("Check email preferences");
-        _portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
         checkCheckbox(Locator.radioButtonByName("emailPreference").index(2));
         clickButton("Update");
         clickButton("Done");
 
+        SiteNavBar siteNavBar = new SiteNavBar(getDriver());
+        siteNavBar.enterPageAdminMode();
         log("Customize message board");
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         new AdminPage(getDriver())
@@ -181,6 +183,7 @@ public class MessagesLongTest extends BaseWebDriverTest
                 .save();
 
         verifyAdmin();
+        siteNavBar.exitPageAdminMode();
         clickProject(PROJECT_NAME);
 
         log("Check message works in Wiki");
@@ -219,9 +222,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementPresent(Locator.tagWithText("li", "hair clogs"));
         assertElementPresent(Locator.tagWithText("li", "stinky feet"));
         assertElementPresent(Locator.tagWithText("li", "internet trolls"));
-        clickButton("Submit", 0);
-        Window confirmWindow = Window.Window(getDriver()).withTitle("Confirm message formatting").find();
-        confirmWindow.clickButton("Yes");
+        clickButton("Submit");
         assertElementPresent(Locator.tagWithText("h1", "Holy Header, Batman!"));
         assertElementPresent(Locator.tagWithText("strong", "bold as bold can possibly be"));
 
@@ -289,6 +290,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Check with security");
         // TODO: Convert to test.pages.announcements.AdminPage
         clickProject(PROJECT_NAME);
+        siteNavBar = new SiteNavBar(getDriver());
+        siteNavBar.enterPageAdminMode();
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.radioButtonByName("secure").index(1));
         clickButton("Save");
@@ -343,7 +346,7 @@ public class MessagesLongTest extends BaseWebDriverTest
                 .includeFormatPicker(false)
                 .selectDefaultAssignedTo(_userHelper.getDisplayNameForEmail(USER1))
                 .save();
-
+        siteNavBar.exitPageAdminMode();
         log("Check if status and expires work");
         clickButton("New");
         assertTextPresent(_userHelper.getDisplayNameForEmail(USER1));
@@ -364,6 +367,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         testMemberLists();
 
         clickProject(PROJECT_NAME);
+        siteNavBar = new SiteNavBar(getDriver());
+        siteNavBar.enterPageAdminMode();
         // TODO: Convert to test.pages.announcements.AdminPage
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.radioButtonByName("secure"));
@@ -371,6 +376,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
         clickButton("Delete Message");
         clickButton("Delete");
+        siteNavBar.exitPageAdminMode();
 
         log("Check delete response works and is recognized");
         clickAndWait(Locator.linkWithText("view message or respond").index(1));
@@ -397,7 +403,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         click(Locator.linkWithText(MSG1_TITLE));
         assertTextPresent(
                 "1 <b>x</b>",
-                "<a href=\"/labkey" + WebTestHelper.buildRelativeUrl("list", getProjectName(), "begin") + "?\" class=\"labkey-text-link\">manage lists</a>");
+                "<a class=\"labkey-text-link\" href=\"/labkey" + WebTestHelper.buildRelativeUrl("list", getProjectName(), "begin") + "?\">manage lists</a>");
         click(Locator.linkWithText(MSG1_TITLE).index(1));
         assertTextPresent("first message testing");
         assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
@@ -565,7 +571,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
         clickButton("Save and Finish");
 
-        _portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
         checkCheckbox(Locator.radioButtonByName("emailPreference").index(1));
         clickButton("Update");
         clickButton("Done");

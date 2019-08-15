@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 LabKey Corporation
+ * Copyright (c) 2018-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,13 +37,13 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
 
     public static AssayRunsPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("controller", containerPath, "action"));
+        driver.beginAt(WebTestHelper.buildURL("assay", containerPath, "assayRuns"));
         return new AssayRunsPage(driver.getDriver());
     }
 
     public DataRegionTable getTable()
     {
-        return DataRegionTable.DataRegion(getDriver()).withName("Runs").findWhenNeeded(getDriver());
+        return DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor(getDriver());
     }
 
     public AssayDataPage clickAssayIdLink(String assayId)
@@ -53,6 +53,30 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
         WebElement link = Locator.linkWithText(assayId).waitForElement(cell, WAIT_FOR_JAVASCRIPT);
         clickAndWait(link);
         return new AssayDataPage(getDriver());
+    }
+
+    public UpdateQCStatePage updateSelectedQcStatus()
+    {
+        getTable().clickHeaderMenu("QC State", "Update state of selected rows");
+        return new UpdateQCStatePage(getDriver());
+    }
+
+    public ManageAssayQCStatesPage manageQCStates()
+    {
+        getTable().clickHeaderMenu("QC State", "Manage states");
+        return new ManageAssayQCStatesPage(getDriver());
+    }
+
+    public AssayRunsPage setRowQcStatus(String state, String comment, int... rowIndices)
+    {
+        for (int rowIndex : rowIndices)
+        {
+            getTable().checkCheckbox(rowIndex);
+        }
+        return updateSelectedQcStatus()
+                .selectState(state)
+                .setComment(comment)
+                .clickUpdate();
     }
 
     protected ElementCache newElementCache()

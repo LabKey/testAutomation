@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018 LabKey Corporation
+ * Copyright (c) 2018-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -548,7 +548,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         uploadFile(TEST_ASSAY_ELISPOT_FILE4, "D", "Save and Finish", false);
 
         // verify there is a spot count value of 747.747 and a custom column added by the transform
-        clickAndWait(Locator.linkContainingText("AID_0161456 W5"));
+        clickAndWait(Locator.linkContainingText("transformed assayId"));
     }
 
     protected void doBackgroundSubtractionTest()

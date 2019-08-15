@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 LabKey Corporation
+ * Copyright (c) 2013-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,53 +96,12 @@ public class PortalTest extends BaseWebDriverTest
         portalHelper.addWebPart("MS2 Runs");
         assertElementPresent(Locator.linkWithText("MS2 Runs"));
 
+        SiteNavBar siteNavBar = new SiteNavBar(getDriver());
+        siteNavBar.enterPageAdminMode();
         portalHelper.clickWebpartMenuItem("Messages", "Admin");
         assertTextPresent("Customize");
         clickButton("Cancel");
-    }
-
-    @Test
-    public void doFolderTypeTest()
-    {
-        final String folderName = "folderTypeTest";
-        final List<String> microarrayRequiredWebparts = Arrays.asList(
-                "Data Pipeline",
-                "Microarray Summary");
-        final List<String> microarrayPreferredWebparts = Arrays.asList(
-                "Microarray Runs",
-                "Assay Runs",
-                "Pending MageML Files",
-                "Assay List");
-        final List<String> collaborationPreferredWebparts = Arrays.asList(
-                "Subfolders",
-                "Wiki",
-                "Messages",
-                "Pages");
-
-        _containerHelper.createSubfolder(getProjectName(), getProjectName(), folderName, "Microarray", null);
-
-        List<String> currentPreferredWebparts;
-
-        log("Verify microarray folder webparts");
-        assertWebparts(microarrayRequiredWebparts, microarrayPreferredWebparts);
-
-        log("Verify webparts after changing folder type");
-        _containerHelper.setFolderType("Collaboration");
-        currentPreferredWebparts = new ArrayList<>(microarrayRequiredWebparts);
-        currentPreferredWebparts.addAll(microarrayPreferredWebparts);
-        currentPreferredWebparts.addAll(collaborationPreferredWebparts);
-        assertWebparts(Collections.emptyList(), currentPreferredWebparts);
-
-        for (String webpartTitle : microarrayRequiredWebparts)
-        {
-            portalHelper.removeWebPart(webpartTitle);
-        }
-        currentPreferredWebparts.removeAll(microarrayRequiredWebparts);
-        assertWebparts(Collections.emptyList(), currentPreferredWebparts);
-
-        log("Verify that required webparts get re-added");
-        _containerHelper.setFolderType("Microarray");
-        assertWebparts(microarrayRequiredWebparts, currentPreferredWebparts);
+        siteNavBar.exitPageAdminMode();
     }
 
     @LogMethod

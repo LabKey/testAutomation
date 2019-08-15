@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 LabKey Corporation
+ * Copyright (c) 2013-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -358,9 +358,9 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
 
         if (null == expected)
-            assertFalse("Thumbnail was was still default", THUMBNAIL_DATA.equals(thumbnailData));
+            assertFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
         else
-            assertTrue("Thumbnail wasn't persisted correctly", expected.equals(thumbnailData) ||
+            assertTrue("Thumbnail wasn't persisted correctly.", expected.equals(thumbnailData) ||
                     new LevenshteinDistance().apply(expected.substring(0, 5000), thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
 
         THUMBNAIL_DATA = thumbnailData;

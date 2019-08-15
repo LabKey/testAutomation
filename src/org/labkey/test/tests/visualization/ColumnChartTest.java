@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018 LabKey Corporation
+ * Copyright (c) 2018-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,38 +90,38 @@ public class ColumnChartTest extends BaseWebDriverTest
         PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Dataset Fields").find();
         editor.selectField(PREGNANCY_COLUMN_NAME);
         PropertiesEditor.FieldPropertyDock.ReportingTabPane pane = editor.fieldProperties().selectReportingTab();
-        pane.dimension.check();
-        pane.measure.uncheck();
-        editor.fieldProperties().selectReportingTab().dimension.check();
+        pane.setDimension(true);
+        pane.setMeasure(false);
+        editor.fieldProperties().selectReportingTab().setDimension(true);
         DATA_SOURCE_1_DIMENSIONS.add(PREGNANCY_COLUMN_NAME);
 
         editor.selectField(LANGUAGE_COLUMN_NAME);
-        pane.dimension.check();
-        pane.measure.uncheck();
+        pane.setDimension(true);
+        pane.setMeasure(false);
         DATA_SOURCE_1_DIMENSIONS.add(LANGUAGE_COLUMN_NAME);
 
         editor.selectField(SIGNATURE_COLUMN_NAME);
-        pane.dimension.check();
-        pane.measure.uncheck();
+        pane.setDimension(true);
+        pane.setMeasure(false);
         DATA_SOURCE_1_DIMENSIONS.add(SIGNATURE_COLUMN_NAME);
 
         log("Set the '" + RESPIRATIONS_COLUMN_NAME + "' and '" + WEIGHT_COLUMN_NAME + "' fields to be both dimensions and measures.");
         editor.selectField(RESPIRATIONS_COLUMN_NAME);
-        pane.dimension.check();
-        pane.measure.check();
+        pane.setDimension(true);
+        pane.setMeasure(true);
         DATA_SOURCE_1_DIMENSIONS.add(RESPIRATIONS_COLUMN_NAME);
         DATA_SOURCE_1_MEASURES.add(RESPIRATIONS_COLUMN_NAME);
 
         editor.selectField(WEIGHT_COLUMN_NAME);
-        pane.dimension.check();
-        pane.measure.check();
+        pane.setDimension(true);
+        pane.setMeasure(true);
         DATA_SOURCE_1_DIMENSIONS.add(WEIGHT_COLUMN_NAME);
         DATA_SOURCE_1_MEASURES.add(WEIGHT_COLUMN_NAME);
 
         log("Set '" + PULSE_COLUMN_NAME + "' to not be a measure or dimensions");
         editor.selectField(PULSE_COLUMN_NAME);
-        pane.dimension.uncheck();
-        pane.measure.uncheck();
+        pane.setDimension(false);
+        pane.setMeasure(false);
 
         log("Add the default measures to the ArrayList");
         DATA_SOURCE_1_MEASURES.add("Temp_C");

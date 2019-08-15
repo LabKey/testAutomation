@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015 LabKey Corporation
+ * Copyright (c) 2012-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ public class StudyImportPerfTest extends PerformanceTest
     @Test
     public void testSteps()
     {
-        setIsPerfTest(true);
         _containerHelper.createProject(getProjectName(), "Study");
 
         long startTime = System.currentTimeMillis();

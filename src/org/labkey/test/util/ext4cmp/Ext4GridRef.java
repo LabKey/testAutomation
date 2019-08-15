@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 LabKey Corporation
+ * Copyright (c) 2014-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package org.labkey.test.util.ext4cmp;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -28,6 +30,7 @@ import org.openqa.selenium.interactions.Actions;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -154,6 +157,10 @@ public class Ext4GridRef extends Ext4CmpRef
 
         _test.setFormElementJS(el, "");
         el.sendKeys(value);
+        _test.sleep(1000);
+        Ext4Helper.Locators.comboListItem().withText(value + " " + Locator.NBSP)
+                .findOptionalElement(_test.getDriver())
+                .ifPresent(WebElement::click);
 
         //if the editor is still displayed, try to close it
         if (el.isDisplayed())

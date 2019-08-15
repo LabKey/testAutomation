@@ -19,12 +19,16 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.EnumSelect;
+import org.labkey.test.components.html.Input;
+import org.labkey.test.components.wiki.WikiFilePicker;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.File;
 import java.util.Collections;
 
 import static org.labkey.test.components.html.EnumSelect.EnumSelect;
@@ -55,10 +59,10 @@ public class EditPage extends LabKeyPage<EditPage.ElementCache>
      * Converts the current wiki page being edited to the specified format.
      * If the page is already in that format, it will no-op.
      */
-    public void convertWikiFormat(WikiRendererType format)
+    public EditPage convertWikiFormat(WikiRendererType format)
     {
         if (getWikiFormat() == format)
-            return;
+            return this;
 
         elementCache().convertButton.click();
 
@@ -67,11 +71,54 @@ public class EditPage extends LabKeyPage<EditPage.ElementCache>
         changeFormatWindow.clickConvert();
         WebElement status = waitForElement(Locator.id("status").containing("Converted."));
         shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(status)));
+
+        clearCache(); // Just to be on the safe side
+        return this;
     }
 
     public WikiRendererType getWikiFormat()
     {
         return WikiRendererType.valueOf((String) executeScript("return LABKEY._wiki.getProps().rendererType;"));
+    }
+
+    public void saveAndClose()
+    {
+        clickAndWait(elementCache().saveAndCloseButton);
+    }
+
+    public EditPage setName(String name)
+    {
+        elementCache().nameInput.set(name);
+        return this;
+    }
+
+    public EditPage setTitle(String title)
+    {
+        elementCache().titleInput.set(title);
+        return this;
+    }
+
+    public EditPage setBody(String body)
+    {
+        elementCache().bodyTextArea.set(body);
+        return this;
+    }
+
+    public EditPage setShouldIndex(boolean shouldIndex)
+    {
+        elementCache().shouldIndexCheckbox.set(shouldIndex);
+        return this;
+    }
+
+    public EditPage addAttachment(File file)
+    {
+        getFilePicker().addAttachment(file);
+        return this;
+    }
+
+    public WikiFilePicker getFilePicker()
+    {
+        return elementCache().filePicker;
     }
 
     protected ElementCache newElementCache()
@@ -81,7 +128,14 @@ public class EditPage extends LabKeyPage<EditPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
+        WebElement saveAndCloseButton = Locator.lkButton("Save & Close").findWhenNeeded(this);
+        WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
         WebElement convertButton = Locator.lkButton("Convert To...").findWhenNeeded(this);
+        Input nameInput = Input.Input(Locator.name("name"), getDriver()).findWhenNeeded(this);
+        Input titleInput = Input.Input(Locator.name("title"), getDriver()).findWhenNeeded(this);
+        Input bodyTextArea = Input.Input(Locator.name("body"), getDriver()).findWhenNeeded(this);
+        Checkbox shouldIndexCheckbox = Checkbox.Checkbox(Locator.checkboxByName("shouldIndex")).findWhenNeeded(this);
+        WikiFilePicker filePicker = new WikiFilePicker(getDriver());
     }
 
     public class ChangeFormatWindow extends Window

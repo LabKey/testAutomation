@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2018 LabKey Corporation
+ * Copyright (c) 2011-2019 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ public class WikiTest extends BaseWebDriverTest
         log("test attachments in wiki");
         click(Locator.linkWithText("Attach a file"));
         File file = wikiHelper.getSampleFile();
-        setFormElement(Locator.name("formFiles[0]"), file);
+        setFormElement(Locator.name("formFiles[00]"), file);
         wikiHelper.saveWikiPage();
 
         DataRegionTable.DataRegion(getDriver()).withName(WIKI_PAGE_WEBPART_ID).waitFor();
