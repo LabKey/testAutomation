@@ -66,6 +66,7 @@ public class Crawler
     private final List<ControllerActionId> _excludedActions;
     private final List<ControllerActionId> _terminalActions;
     private final List<ControllerActionId> _actionsExcludedFromInjection;
+    private final List<ControllerActionId> _actionsMayLinkTo404;
     private final Collection<String> _adminControllers;
     private final Collection<String> _forbiddenWords;
     private final boolean _prioritizeAdminPages;
@@ -117,6 +118,7 @@ public class Crawler
         _excludedActions = getDefaultExcludedActions();
         _terminalActions = getDefaultTerminalActions();
         _actionsExcludedFromInjection = getExcludedActionsFromInjection();
+        _actionsMayLinkTo404 = getAllowed404Sources();
         _injectionCheckEnabled = injectionTest;
         for (String project : projects)
         {
@@ -289,10 +291,16 @@ public class Crawler
         // Don't crawl fake links
         controllers.add("fake");
 
-        // MS1 module is slated for removal
-        controllers.add("ms1");
-
         return controllers;
+    }
+
+    protected List<ControllerActionId> getAllowed404Sources()
+    {
+        List<ControllerActionId> list = new ArrayList<>();
+        Collections.addAll(list, spiderAction,
+                new ControllerActionId("harvest", "begin"));
+
+        return list;
     }
 
     protected Set<String> getExcludedActionNames()
@@ -1101,7 +1109,7 @@ public class Crawler
     {
         if (code == HttpStatus.SC_NOT_FOUND) // 404
         {
-            if (origin == null || isAdminSpiderAction(origin))
+            if (origin == null || _actionsMayLinkTo404.contains(new ControllerActionId(origin.toString())))
                 return true; // Ignore 404s from the initial set of links
             if (_test.isElementPresent(Locators.labkeyError.containing("module is not enabled")))
                 return true; // Some modules return 404 when not enabled
