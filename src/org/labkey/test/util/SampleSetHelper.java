@@ -25,7 +25,7 @@ import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.pages.property.EditDomainPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.SampleSetDomainProps;
+import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -68,7 +68,7 @@ public class SampleSetHelper extends WebDriverWrapper
         return _driver;
     }
 
-    public SampleSetHelper createSampleSet(SampleSetDomainProps props)
+    public SampleSetHelper createSampleSet(SampleSetDefinition props)
     {
         CreateSampleSetPage createPage = goToCreateNewSampleSet();
 
@@ -119,7 +119,7 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields)
     {
-        SampleSetDomainProps props = new SampleSetDomainProps();
+        SampleSetDefinition props = new SampleSetDefinition();
         props.setName(name);
         props.setNameExpression(nameExpression);
         _fields = fields;

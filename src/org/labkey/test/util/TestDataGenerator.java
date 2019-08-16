@@ -289,6 +289,11 @@ public class TestDataGenerator
         return delCmd.execute(cn, _lookupInfo.getFolder());
     }
 
+    public SaveRowsResponse insertRows(Connection cn) throws IOException, CommandException
+    {
+        return insertRows(cn, getRows());
+    }
+
     public SaveRowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         InsertRowsCommand insertRowsCommand = new InsertRowsCommand(getSchema(), getQueryName());
@@ -333,8 +338,6 @@ public class TestDataGenerator
     // helper to generate a column or field definition
     static public FieldDefinition simpleFieldDef(String name, FieldDefinition.ColumnType type)
     {
-        FieldDefinition fieldDef = new FieldDefinition(name);
-        fieldDef.setType(type);
-        return fieldDef;
+        return new FieldDefinition(name).setType(type);
     }
 }
