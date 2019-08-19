@@ -461,6 +461,13 @@ public class ListHelper extends LabKeySiteWrapper
         waitForElement(Locator.id("tsv3"));
     }
 
+    public void bulkImportData(String listData)
+    {
+        clickImportData();
+        setFormElement(Locator.name("text"), listData);
+        submitImportTsv_success();
+    }
+
     public EditListDefinitionPage clickEditDesign()
     {
         waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
