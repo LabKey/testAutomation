@@ -28,6 +28,7 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 
 import java.io.IOException;
@@ -287,6 +288,11 @@ public class TestDataGenerator
     {
         DeleteDomainCommand delCmd = new DeleteDomainCommand(getSchema(), getQueryName());
         return delCmd.execute(cn, _lookupInfo.getFolder());
+    }
+
+    public SaveRowsResponse insertRows() throws IOException, CommandException
+    {
+        return insertRows(WebTestHelper.getRemoteApiConnection(), getRows());
     }
 
     public SaveRowsResponse insertRows(Connection cn) throws IOException, CommandException
