@@ -287,6 +287,8 @@ public class Crawler
         controllers.add("scriptpad");
         controllers.add("simpletest");
         controllers.add("triggerTestModule");
+        controllers.add("test");
+        controllers.add("devtools");
 
         // Don't crawl fake links
         controllers.add("fake");
