@@ -111,6 +111,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.WeakHashMap;
@@ -2291,19 +2292,23 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return loc.findElement(getDriver()).isDisplayed();
     }
 
-    public void assertElementPresent(Locator loc)
+    public WebElement assertElementPresent(Locator loc)
     {
-        assertTrue("Element is not present: " + loc.getLoggableDescription(), isElementPresent(loc));
+        Optional<WebElement> optionalElement = loc.findOptionalElement(getDriver());
+        assertTrue("Element is not present: " + loc.getLoggableDescription(), optionalElement.isPresent());
+        return optionalElement.orElse(null);
     }
 
-    public void assertElementPresent(Locator loc, int amount)
+    public List<WebElement> assertElementPresent(Locator loc, int amount)
     {
-        assertElementPresent("Element '" + loc + "' is not present " + amount + " times", loc, amount);
+        return assertElementPresent("Element '" + loc + "' is not present " + amount + " times", loc, amount);
     }
 
-    public void assertElementPresent(String message, Locator loc, int amount)
+    public List<WebElement> assertElementPresent(String message, Locator loc, int amount)
     {
-        assertEquals(message, amount, getElementCount(loc));
+        List<WebElement> elements = loc.findElements(getDriver());
+        assertEquals(message, amount, elements.size());
+        return elements;
     }
 
     public void assertElementContains(Locator loc, String text)
