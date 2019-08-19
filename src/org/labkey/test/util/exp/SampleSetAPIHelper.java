@@ -4,6 +4,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
@@ -21,6 +22,12 @@ public class SampleSetAPIHelper
      */
     public static TestDataGenerator createEmptySampleSet(String containerPath, SampleSetDefinition props)
     {
+        if (props.getFields().stream().noneMatch(field -> field.getName().equalsIgnoreCase("name")))
+        {
+            // UI adds "name" field for you. API does not.
+            props.addField(new FieldDefinition("name").setType(FieldDefinition.ColumnType.String));
+        }
+
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", props.getName(), containerPath)
                 .withColumnSet(props.getFields());
 
