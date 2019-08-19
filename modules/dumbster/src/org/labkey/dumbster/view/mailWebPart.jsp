@@ -193,7 +193,7 @@ function toggleRecorder(checkbox)
             <td><a onclick="toggleBody('email_body_<%=rowIndex%>'); return false;"><%=h(m.getHeaderValue("Subject"))%></a>
                 <div id="email_body_<%=rowIndex%>" style="display: none;"><br><%=HtmlString.unsafe(body.toString())%></div></td>
             <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
-                <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=HtmlString.unsafe(headers.toString())%></div></td>
+                <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=unsafe(headers.toString())%></div></td>
             <td>
                 <%=text(contentTypes.contains("text/html") ? "<a href=\"" + h(DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")) + "\" target=\"_messageHtml\">HTML</a>" : "&nbsp;")%>
             </td>
