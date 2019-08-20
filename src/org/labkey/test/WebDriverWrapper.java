@@ -2296,7 +2296,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         Optional<WebElement> optionalElement = loc.findOptionalElement(getDriver());
         assertTrue("Element is not present: " + loc.getLoggableDescription(), optionalElement.isPresent());
-        return optionalElement.orElse(null);
+        return optionalElement.get();
     }
 
     public List<WebElement> assertElementPresent(Locator loc, int amount)

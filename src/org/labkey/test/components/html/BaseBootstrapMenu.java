@@ -41,7 +41,7 @@ public abstract class BaseBootstrapMenu extends WebDriverComponent<BaseBootstrap
         return this;
     }
 
-    public boolean isExpanded()
+    protected boolean isExpanded()
     {
         return "true".equals(elementCache().toggleAnchor.getAttribute("aria-expanded"));
     }
