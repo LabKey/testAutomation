@@ -75,6 +75,23 @@ public class APIAssayHelper extends AbstractAssayHelper
         return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
     }
 
+    @LogMethod(quiet = true)
+    public ImportRunResponse importAssay(int assayID, String runName, File file, String projectPath,
+                                         @Nullable Map<String, Object> runProperties, @Nullable Map<String, Object> batchProperties)  throws CommandException, IOException
+    {
+        ImportRunCommand  irc = new ImportRunCommand(assayID, file);
+        irc.setName(runName);
+
+        if(null != runProperties)
+            irc.setProperties(runProperties);
+
+        if(null != batchProperties)
+            irc.setBatchProperties(batchProperties);
+
+        irc.setTimeout(180000); // Wait 3 minutes for assay import
+        return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
+    }
+
     public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {
         importAssay(assayName, file, projectPath, Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
@@ -83,6 +100,13 @@ public class APIAssayHelper extends AbstractAssayHelper
     public void importAssay(String assayName, File file, String projectPath, @Nullable Map<String, Object> batchProperties) throws CommandException, IOException
     {
         importAssay(getIdFromAssayName(assayName, projectPath), file, projectPath, batchProperties);
+    }
+
+    @LogMethod(quiet = true)
+    public void importAssay(String assayName, String runName, File file, String projectPath,
+                                         @Nullable Map<String, Object> runProperties, @Nullable Map<String, Object> batchProperties)  throws CommandException, IOException
+    {
+        importAssay(getIdFromAssayName(assayName, projectPath), runName, file, projectPath, runProperties, batchProperties);
     }
 
     @Override

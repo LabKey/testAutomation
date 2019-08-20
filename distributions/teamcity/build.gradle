@@ -30,7 +30,8 @@ if (project.hasProperty('inheritedDistPath'))
     String testModulesPath = "${BuildUtils.getTestProjectPath(project.gradle)}:modules"
     String dumbsterModule = "${testModulesPath}:dumbster"
     String simpletestModule = "${testModulesPath}:simpletest"
-    List<String> testModules = [dumbsterModule, simpletestModule]
+    String devtoolsModule = BuildUtils.getPlatformModuleProjectPath(project.gradle, "devtools")
+    List<String> testModules = [dumbsterModule, simpletestModule, devtoolsModule]
     if (project.hasProperty("inheritedDistIncludeAllTestModules"))
     {
         project.findProject(testModulesPath).subprojects {
