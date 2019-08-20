@@ -47,6 +47,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public Input nameInput()
+    {
+        return elementCache().fieldNameInput;
+    }
+
     /**
      * selects the field data type.  Note: after the field is initially created, the select will be disabled
      * @param columnType
@@ -61,6 +66,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         getWrapper().setFormElement(elementCache().fieldTypeSelectInput, columnType);
         return this;
+    }
+    public WebElement typeInput()
+    {
+        return elementCache().fieldTypeSelectInput;
     }
 
     public FieldDefinition.ColumnType getType()
@@ -77,6 +86,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         elementCache().fieldRequiredCheckbox.set(checked);
         return this;
+    }
+
+    public String detailsMessage()
+    {
+        return elementCache().domainFieldDetailsSpan.getText();
     }
 
     public int getIndex()
@@ -287,6 +301,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().dateShiftBox.get();
     }
 
+    public boolean hasFieldError()
+    {
+        return getComponentElement().getAttribute("class").contains("domain-field-row-error");
+    }
+
+    public boolean hasFieldWarning()
+    {
+        return getComponentElement().getAttribute("class").contains("domain-field-row-warning");
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -301,6 +325,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .findWhenNeeded(this);
         public Checkbox fieldRequiredCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-required-")
                 .findWhenNeeded(this));
+
+        public WebElement domainFieldDetailsSpan = Locator.tagWithClass("span", "domain-field-details")
+                .findWhenNeeded(this);
 
         public WebElement expandToggle = Locator.tagWithClass("div", "domain-field-icon")
                 .child(Locator.tagWithAttribute("svg", "data-icon", "pencil-alt"))
@@ -346,7 +373,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public static class DomainFieldRowFinder extends WebDriverComponentFinder<DomainFieldRow, DomainFieldRowFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-field-row");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row");
         private String _title = null;
 
         public DomainFieldRowFinder(WebDriver driver)

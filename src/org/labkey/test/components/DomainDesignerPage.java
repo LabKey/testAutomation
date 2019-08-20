@@ -21,15 +21,30 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return new DomainDesignerPage(driver.getDriver());
     }
 
-    public DomainDesignerPage clickSaveChanges()
+    public DomainDesignerPage clickSave()
     {
-        elementCache().saveChangesBtn.click();
+        elementCache().saveButton.click();
+        return this;
+    }
+    public WebElement saveButton()
+    {
+        return elementCache().saveButton;
+    }
+
+    public DomainDesignerPage clickSaveAndFinish()
+    {
+        elementCache().saveAndFinishButton.click();
 
         String currentURL = getDriver().getCurrentUrl();
         waitFor(()-> Locator.tagWithClass("div", "alert-success").existsIn(getDriver()) ||
                 getDriver().getCurrentUrl() != currentURL,
                 "domain save did not notify success", WAIT_FOR_JAVASCRIPT);
         return this;
+    }
+
+    public WebElement saveAndFinishButton()
+    {
+        return elementCache().saveAndFinishButton;
     }
 
     public DomainFormPanel fieldProperties()
@@ -41,10 +56,37 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return elementCache().domainFormPanel(queryName);
     }
 
+    public String waitForError()
+    {
+        waitFor(()-> Locators.dangerAlertLoc.existsIn(getDriver()),
+                "the error alert did not appear as expected", 1000);
+        return  errorAlert().getText();
+    }
     public WebElement errorAlert()
     {
-        Locator alertLoc = Locator.tagWithClass("div", "alert-danger");
-        return alertLoc.existsIn(getDriver()) ? null : alertLoc.findElement(getDriver());
+        return Locators.dangerAlertLoc.existsIn(getDriver()) ? Locators.dangerAlertLoc.findElement(getDriver()) : null;
+    }
+
+    public String waitForWarning()
+    {
+        waitFor(()-> Locators.warningAlertLoc.existsIn(getDriver()),
+                "the warning alert did not appear as expected", 1000);
+        return  warningAlert().getText();
+    }
+    public WebElement warningAlert()
+    {
+        return Locators.warningAlertLoc.existsIn(getDriver()) ? Locators.warningAlertLoc.findElement(getDriver()) : null;
+    }
+
+    public String waitForInfo()
+    {
+        waitFor(()-> Locators.infoAlertLoc.existsIn(getDriver()),
+                "the info alert did not appear as expected", 1000);
+        return  infoAlert().getText();
+    }
+    public WebElement infoAlert()
+    {
+        return Locators.infoAlertLoc.existsIn(getDriver()) ? Locators.infoAlertLoc.findElement(getDriver()) : null;
     }
 
     protected ElementCache newElementCache()
@@ -62,7 +104,9 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
             return new DomainFormPanel.DomainFormPanelFinder(getDriver())
                     .withTitle("Field Properties - " + domainName).findWhenNeeded(this);
         }
-        WebElement saveChangesBtn = Locators.domainDesignerButton("Save Changes")
+        WebElement saveAndFinishButton = Locators.domainDesignerButton("Save And Finish")
+                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement saveButton = Locator.button("Save")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement cancelBtn = Locators.domainDesignerButton("Cancel")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
@@ -72,7 +116,12 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     {
         static public Locator.XPathLocator domainDesignerButton(String text)
         {
-            return Locator.tagWithClass("button", "domain-designer-button").withText(text);
+            return Locator.tagWithClass("button", "btn-success-default").withText(text);
         }
+
+        static public Locator infoAlertLoc = Locator.tagWithClass("div", "alert-info");
+        static public Locator successAlertLoc = Locator.tagWithClass("div", "alert-success");
+        static public Locator dangerAlertLoc = Locator.tagWithClass("div", "alert-danger");
+        static public Locator warningAlertLoc = Locator.tagWithClass("div", "alert-warning");
     }
 }

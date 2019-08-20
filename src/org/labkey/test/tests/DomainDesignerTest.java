@@ -7,6 +7,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -20,12 +21,18 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
@@ -48,14 +55,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
+        new PortalHelper(getDriver()).addBodyWebPart("Sample Sets");
+        new PortalHelper(getDriver()).addBodyWebPart("Lists");
     }
 
     @Before
     public void preTest() throws Exception
     {
         goToProjectHome();
-        new PortalHelper(getDriver()).addBodyWebPart("Sample Sets");
-        new PortalHelper(getDriver()).addBodyWebPart("Lists");
     }
 
     @Test
@@ -89,7 +96,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setScaleType(PropertiesEditor.ScaleType.LOG)
                 .setDescription("field for a decimal")
                 .setLabel("DecimalField");
-        domainDesignerPage.clickSaveChanges();
+        domainDesignerPage.clickSaveAndFinish();
 
         dgen = new TestDataGenerator(lookupInfo)        // now put some test data in the new fields
                 .withColumnSet(List.of(
@@ -149,7 +156,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setDescription("basic multiline field")
                 .setLabel("MultiLineField")
                 .allowMaxChar();
-        domainDesignerPage.clickSaveChanges();
+        domainDesignerPage.clickSaveAndFinish();
 
         dgen.addCustomRow(Map.of("name", "first", "stringField", "baaaaaasic string heeeeeeeeeeere", "multiLineField", "multi\nline\nfield"));
         dgen.addCustomRow(Map.of("name", "second", "stringField", "basic string heeeeere", "multiLineField", "multi\nline\nfield with extra"));
@@ -188,12 +195,21 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainFormPanel.getField("deleteMe")
                 .clickRemoveField()
                 .dismiss("Yes");
-        domainDesignerPage.clickSaveChanges();
+        domainDesignerPage.clickSaveAndFinish();
 
         GetDomainCommand domainCommand = new GetDomainCommand("exp.materials", sampleSet);
         DomainResponse afterResponse = domainCommand.execute(createDefaultConnection(true), getProjectName());
         List<Map<String, Object>> remainingFields = afterResponse.getColumns();
         assertEquals("expect only field in the domain to have been deleted", 0, remainingFields.size());
+
+        // double-check to ensure the column has been deleted
+        SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection(true));
+        // this column should no longer exist
+        List<Map<String, Object>> deleteMe = rowsResponse.getColumnModel().stream().filter(a -> a.get("dataIndex").equals("deleteMe")).collect(Collectors.toList());
+        assertEquals(0, deleteMe.size());
+        // make sure the name field is still there
+        List<Map<String, Object>> name = rowsResponse.getColumnModel().stream().filter(a -> a.get("dataIndex").equals("Name")).collect(Collectors.toList());
+        assertEquals(1, name.size());
     }
 
     @Test
@@ -219,7 +235,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setDateShift(false)
                 .setDescription("simplest date format of all")
                 .setLabel("DateTime");
-        domainDesignerPage.clickSaveChanges();
+        domainDesignerPage.clickSaveAndFinish();
 
         // insert sample dates, confirm expected formats
 
@@ -241,6 +257,254 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertEquals("2017-05-15 23:25", billyMap.get("addedField"));
         Map<String, String> jeffMap = samplesTable.getRowDataAsMap("Name", "jeff");
         assertEquals("2007-05-15 11:25", jeffMap.get("addedField"));
+    }
+
+    @Test
+    public void testBlankNameFieldOnAddedField() throws Exception
+    {
+        String sampleSet = "errorColumnSampleSet";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        // go to the new domain designer and do some work here
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+
+        // add a new field, but leave the name field blank
+        DomainFieldRow noNameRow = domainFormPanel.addField("");
+        domainDesignerPage.clickSave();
+
+        domainDesignerPage.waitForError();
+        assertTrue ("field should report error if saved without a name", noNameRow.hasFieldError());
+        assertEquals("New field. Error: Please provide a name for each field.", noNameRow.detailsMessage());
+        WebElement errorDiv = domainDesignerPage.errorAlert();
+        assertNotNull(errorDiv);
+        String hasNoNameError = domainDesignerPage.waitForError();
+        assertTrue("expect error to contain [Please provide a name for each field.] but was[" +hasNoNameError+ "]",
+                hasNoNameError.contains("Please provide a name for each field."));
+
+        // now give the field a name with characters that will get a warning
+        noNameRow.setName("&foolishness!");
+        String warning = domainDesignerPage.waitForWarning();
+        String warningfieldMessage = noNameRow.detailsMessage();
+        String expectedWarning = "SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore";
+        assertTrue("expect error to contain ["+expectedWarning+"] but was[" +warning+ "]",
+                warning.contains(expectedWarning));
+        assertTrue("expect field-level warning to contain ["+expectedWarning+"] but was[" +warningfieldMessage+ "]",
+                warning.contains(expectedWarning));
+    }
+
+    @Test
+    public void testDuplicateFieldName() throws Exception
+    {
+        String sampleSet = "errorDuplicateFieldSampleset";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        // go to the new domain designer and do some work here
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+
+        // add a new field, but leave the name field blank
+        DomainFieldRow firstcol = domainFormPanel.getField("firstCol");
+        DomainFieldRow dupeNameRow = domainFormPanel.addField("firstCol");
+        domainDesignerPage.clickSave();
+
+        // confirm the page shows the summary error
+        String dupeError = domainDesignerPage.waitForError();
+        String expectedError = "The field name 'firstCol' is already taken. Please provide a unique name for each field.";
+        assertTrue("expect field-level warning to contain ["+expectedError+"] but was[" +dupeError+ "]",
+                dupeError.contains(expectedError));
+
+        // ensure the duplicate fields show as error fields, with explanations
+        assertTrue("expect duplicate field name rows to show errors", firstcol.hasFieldError());
+        String firstColErrorStatus = firstcol.detailsMessage();
+        assertTrue("expect field-level warning to contain ["+expectedError+"] but was[" +firstColErrorStatus+ "]",
+                firstColErrorStatus.contains(expectedError));
+        assertTrue("expect duplicate field name to show as error", dupeNameRow.hasFieldError());
+        String dupeColErrorStatus = dupeNameRow.detailsMessage();
+        assertTrue("expect field-level warning to contain ["+expectedError+"] but was[" +dupeColErrorStatus+ "]",
+                dupeColErrorStatus.contains(expectedError));
+    }
+
+    @Test
+    public void testUserCannotEditListKeyFields() throws Exception
+    {
+        String list = "testUserCannotEditKeyFieldsList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        // go to the new domain designer and do some work here
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(list);
+
+        // confirm the field name/data type edits are disabled
+        DomainFieldRow keyRow = domainFormPanel.getField("id");
+        assertFalse("expect field name edit to be disabled", keyRow.nameInput().getComponentElement().isEnabled());
+        assertNotNull(keyRow.nameInput().getComponentElement().getAttribute("disabled"));
+        assertFalse("expect field type select to be disabled", keyRow.typeInput().isEnabled());
+        assertNotNull(keyRow.typeInput().getAttribute("disabled"));
+    }
+
+    @Test
+    public void testDeleteFieldInListWithData() throws Exception
+    {
+        String list = "testDeleteFieldList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        dgen.addCustomRow(Map.of("name", "first", "color", "orange"));
+        dgen.addCustomRow(Map.of("name", "second", "color", "green"));
+        dgen.addCustomRow(Map.of("name", "third", "color", "blue"));
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        // go to the new domain designer and do some work here
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(list);
+
+        DomainFieldRow nameRow = domainFormPanel.getField("name");
+        // first, delete 'name' column
+        nameRow.clickRemoveField()
+                .dismiss("Yes");
+        domainDesignerPage.clickSave();
+        String saveMsg = domainDesignerPage.waitForInfo();
+        String expectedMsg = "Save Successful";
+        assertTrue("expect field-level warning to contain ["+expectedMsg+"] but was[" +saveMsg+ "]",
+                saveMsg.contains(expectedMsg));
+
+        DomainFieldRow colorRow = domainFormPanel.getField("color");
+        colorRow.clickRemoveField()
+                .dismiss("Yes");
+        domainDesignerPage.clickSave();
+        domainDesignerPage.waitForInfo();
+
+        // there should just be the key field (id) now:
+        domainFormPanel = domainDesignerPage.fieldProperties(list); // re-find the panel to work around field caching silliness
+        assertNotNull(domainFormPanel.getField("id"));
+        assertNull(domainFormPanel.getField("color"));
+        assertNull(domainFormPanel.getField("name"));
+    }
+
+    @Test
+    public void testDeleteRequiredField() throws Exception
+    {
+        String list = "testDeleteRequiredFieldList";
+
+        // create the list
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)
+                            .setRequired(true),                                                                 // <-- marked 'required'
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        dgen.addCustomRow(Map.of("name", "first", "color", "orange"));
+        dgen.addCustomRow(Map.of("name", "second", "color", "green"));
+        dgen.addCustomRow(Map.of("name", "third", "color", "blue"));
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        // go to the new domain designer and do some work here
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(list);
+
+        DomainFieldRow nameRow = domainFormPanel.getField("name");
+        // confirm the UI shows its expected 'required' status
+        assertEquals (true, nameRow.getRequiredField());
+
+        nameRow.clickRemoveField()
+                .dismiss("Yes");
+        domainDesignerPage.clickSave();
+        domainDesignerPage.waitForInfo();       // expect the 'save successful' sprite to appear
+    }
+
+    /**
+     * confirms that the key field (called 'name') in a sampleset is not shown in the domain editor
+     * @throws Exception
+     */
+    @Test
+    public void testConfirmNameFieldFromSamplesetNotShown() throws Exception
+    {
+        String sampleSet = "hiddenNameFieldSampleset";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        // go to the new domain designer and do some work here
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+
+        DomainFieldRow nameField = domainFormPanel.getField("name");
+        assertNull("expect the 'name' field not to be shown in the domain editor", nameField);
+        assertNotNull("confirm that the 'firstCol' field is found", domainFormPanel.getField("firstCol"));
+    }
+
+    @Test
+    public void testAddFieldsWithReservedNames() throws Exception
+    {
+        String sampleSet = "fieldsWithReservedNamesSampleSet";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        // go to the new domain designer and do some work here
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+
+        DomainFieldRow modifiedRow = domainFormPanel.addField("modified");
+        DomainFieldRow blarg1 = domainFormPanel.addField("blarg");
+        DomainFieldRow blarg2 = domainFormPanel.addField("blarg");
+        DomainFieldRow clientFieldWarning = domainFormPanel.addField("select * from table");
+
+        domainDesignerPage.clickSave();
+        String clientWarning = domainDesignerPage.waitForWarning();
+        String multipleIssuesError = domainDesignerPage.waitForError();
+        String expectedErrMsg = "Multiple fields contain issues that need to be fixed. Review the red highlighted fields below for more information.";
+        String expectedWarningMsg = " SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore.";
+        assertTrue( "expect error message to contain ["+expectedErrMsg+"] but was ["+multipleIssuesError+"]",
+                multipleIssuesError.contains(expectedErrMsg));
+        assertTrue( "expect warning message to contain ["+expectedWarningMsg+"] but was ["+clientWarning+"]",
+                clientWarning.contains(expectedWarningMsg));
+
+        assertTrue("expect field error when using reserved field names", modifiedRow.hasFieldError());
+        assertTrue("expect error for duplicate field names", blarg1.hasFieldError());
+        assertTrue("expect error for duplicate field names", blarg2.hasFieldError());
+        assertTrue("expect warning for field name with spaces or special characters", clientFieldWarning.hasFieldWarning());
     }
 
     @Override
