@@ -1,5 +1,6 @@
 package org.labkey.test.components;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -24,6 +25,8 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     public DomainDesignerPage clickSave()
     {
         elementCache().saveButton.click();
+        String msg = waitForAnyAlert();
+        log("Clicking save.  Waited until alert with message ["+msg+"] appeared");
         return this;
     }
     public WebElement saveButton()
@@ -31,15 +34,10 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return elementCache().saveButton;
     }
 
-    public DomainDesignerPage clickSaveAndFinish()
+    public void clickSaveAndFinish()
     {
-        elementCache().saveAndFinishButton.click();
-
-        String currentURL = getDriver().getCurrentUrl();
-        waitFor(()-> Locator.tagWithClass("div", "alert-success").existsIn(getDriver()) ||
-                getDriver().getCurrentUrl() != currentURL,
-                "domain save did not notify success", WAIT_FOR_JAVASCRIPT);
-        return this;
+        log("clicking [Save and Finish]");
+        clickAndWait(elementCache().saveAndFinishButton);
     }
 
     public WebElement saveAndFinishButton()
@@ -58,35 +56,42 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public String waitForError()
     {
-        waitFor(()-> Locators.dangerAlertLoc.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.dangerAlertLoc.existsIn(getDriver()),
                 "the error alert did not appear as expected", 1000);
         return  errorAlert().getText();
     }
     public WebElement errorAlert()
     {
-        return Locators.dangerAlertLoc.existsIn(getDriver()) ? Locators.dangerAlertLoc.findElement(getDriver()) : null;
+        return BootstrapLocators.dangerAlertLoc.existsIn(getDriver()) ? BootstrapLocators.dangerAlertLoc.findElement(getDriver()) : null;
     }
 
     public String waitForWarning()
     {
-        waitFor(()-> Locators.warningAlertLoc.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.warningAlertLoc.existsIn(getDriver()),
                 "the warning alert did not appear as expected", 1000);
         return  warningAlert().getText();
     }
     public WebElement warningAlert()
     {
-        return Locators.warningAlertLoc.existsIn(getDriver()) ? Locators.warningAlertLoc.findElement(getDriver()) : null;
+        return BootstrapLocators.warningAlertLoc.existsIn(getDriver()) ? BootstrapLocators.warningAlertLoc.findElement(getDriver()) : null;
     }
 
     public String waitForInfo()
     {
-        waitFor(()-> Locators.infoAlertLoc.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.infoAlertLoc.existsIn(getDriver()),
                 "the info alert did not appear as expected", 1000);
         return  infoAlert().getText();
     }
     public WebElement infoAlert()
     {
-        return Locators.infoAlertLoc.existsIn(getDriver()) ? Locators.infoAlertLoc.findElement(getDriver()) : null;
+        return BootstrapLocators.infoAlertLoc.existsIn(getDriver()) ? BootstrapLocators.infoAlertLoc.findElement(getDriver()) : null;
+    }
+
+    public String waitForAnyAlert()
+    {
+        WebElement alert = Locator.waitForAnyElement(shortWait(),
+                BootstrapLocators.dangerAlertLoc, BootstrapLocators.infoAlertLoc, BootstrapLocators.warningAlertLoc, BootstrapLocators.successAlertLoc);
+        return alert.getText();
     }
 
     protected ElementCache newElementCache()
@@ -119,9 +124,5 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
             return Locator.tagWithClass("button", "btn-success-default").withText(text);
         }
 
-        static public Locator infoAlertLoc = Locator.tagWithClass("div", "alert-info");
-        static public Locator successAlertLoc = Locator.tagWithClass("div", "alert-success");
-        static public Locator dangerAlertLoc = Locator.tagWithClass("div", "alert-danger");
-        static public Locator warningAlertLoc = Locator.tagWithClass("div", "alert-warning");
     }
 }

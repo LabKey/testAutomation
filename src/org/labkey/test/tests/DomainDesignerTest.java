@@ -1,5 +1,7 @@
 package org.labkey.test.tests;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,7 +28,6 @@ import org.openqa.selenium.WebElement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -204,6 +205,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // double-check to ensure the column has been deleted
         SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection(true));
+        List<String> columnsAfterDelete = rowsResponse.getColumnModel().stream().map(col -> (String) col.get("dataIndex")).collect(Collectors.toList());
+        Assert.assertThat("Columns after delete", columnsAfterDelete, CoreMatchers.allOf(CoreMatchers.hasItem("Name"), CoreMatchers.not(CoreMatchers.hasItem("deleteMe"))));
+
         // this column should no longer exist
         List<Map<String, Object>> deleteMe = rowsResponse.getColumnModel().stream().filter(a -> a.get("dataIndex").equals("deleteMe")).collect(Collectors.toList());
         assertEquals(0, deleteMe.size());
@@ -505,6 +509,48 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect error for duplicate field names", blarg1.hasFieldError());
         assertTrue("expect error for duplicate field names", blarg2.hasFieldError());
         assertTrue("expect warning for field name with spaces or special characters", clientFieldWarning.hasFieldWarning());
+    }
+
+    /**
+     * provides regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38314
+     * @throws Exception
+     */
+    @Test
+    public void verifySavedFieldCannotBeRenamedReservedName() throws Exception
+    {
+        String sampleSet = "renameColToReservedNameTest";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        // go to the new domain designer and do some work here
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+
+        DomainFieldRow testCol = domainFormPanel.getField("testCol");
+        testCol.setName("modified");
+        domainDesignerPage.clickSave();
+
+        // confirm expected error warning
+        String expectedError = "'modified' is a reserved field name";
+        String error = domainDesignerPage.waitForError();
+        assertTrue("expect error containing ["+expectedError+"] but it was ["+error+"]",
+                error.contains(expectedError));
+
+        // double-check to ensure the column has not been altered on the server side
+        SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection(true));
+        List<String> columnsAfterSaveAttempt = rowsResponse.getColumnModel().stream().map(col -> (String) col.get("dataIndex")).collect(Collectors.toList());
+        Assert.assertThat("Columns after delete", columnsAfterSaveAttempt,
+                CoreMatchers.allOf(CoreMatchers.hasItem("Name"),
+                        CoreMatchers.hasItem("testCol"),
+                        CoreMatchers.hasItem("extraField"),
+                        CoreMatchers.not(CoreMatchers.hasItem("modified"))));
     }
 
     @Override
