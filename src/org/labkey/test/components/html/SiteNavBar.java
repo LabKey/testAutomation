@@ -361,7 +361,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
     public static class Locators
     {
-        private static final Locator.XPathLocator exitAdminBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Exit Admin Mode']");
+        private static final Locator.XPathLocator exitAdminBtn = Locator.tagWithClass("a", "btn").withText("Exit Admin Mode");
         public static final Locator.XPathLocator userMenu = Locator.id("headerUserDropdown");
     }
 }
