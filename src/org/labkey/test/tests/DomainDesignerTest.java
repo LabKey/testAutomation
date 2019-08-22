@@ -547,9 +547,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection(true));
         List<String> columnsAfterSaveAttempt = rowsResponse.getColumnModel().stream().map(col -> (String) col.get("dataIndex")).collect(Collectors.toList());
         Assert.assertThat("Columns after delete", columnsAfterSaveAttempt,
-                CoreMatchers.allOf(CoreMatchers.hasItem("Name"),
-                        CoreMatchers.hasItem("testCol"),
-                        CoreMatchers.hasItem("extraField"),
+                CoreMatchers.allOf(CoreMatchers.hasItems("Name", "testCol", "extraField"),
                         CoreMatchers.not(CoreMatchers.hasItem("modified"))));
     }
 

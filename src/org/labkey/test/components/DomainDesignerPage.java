@@ -56,41 +56,41 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public String waitForError()
     {
-        waitFor(()-> BootstrapLocators.dangerAlertLoc.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.dangerAlert.existsIn(getDriver()),
                 "the error alert did not appear as expected", 1000);
         return  errorAlert().getText();
     }
     public WebElement errorAlert()
     {
-        return BootstrapLocators.dangerAlertLoc.existsIn(getDriver()) ? BootstrapLocators.dangerAlertLoc.findElement(getDriver()) : null;
+        return BootstrapLocators.dangerAlert.existsIn(getDriver()) ? BootstrapLocators.dangerAlert.findElement(getDriver()) : null;
     }
 
     public String waitForWarning()
     {
-        waitFor(()-> BootstrapLocators.warningAlertLoc.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.warningAlert.existsIn(getDriver()),
                 "the warning alert did not appear as expected", 1000);
         return  warningAlert().getText();
     }
     public WebElement warningAlert()
     {
-        return BootstrapLocators.warningAlertLoc.existsIn(getDriver()) ? BootstrapLocators.warningAlertLoc.findElement(getDriver()) : null;
+        return BootstrapLocators.warningAlert.existsIn(getDriver()) ? BootstrapLocators.warningAlert.findElement(getDriver()) : null;
     }
 
     public String waitForInfo()
     {
-        waitFor(()-> BootstrapLocators.infoAlertLoc.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.infoAlert.existsIn(getDriver()),
                 "the info alert did not appear as expected", 1000);
         return  infoAlert().getText();
     }
     public WebElement infoAlert()
     {
-        return BootstrapLocators.infoAlertLoc.existsIn(getDriver()) ? BootstrapLocators.infoAlertLoc.findElement(getDriver()) : null;
+        return BootstrapLocators.infoAlert.existsIn(getDriver()) ? BootstrapLocators.infoAlert.findElement(getDriver()) : null;
     }
 
     public String waitForAnyAlert()
     {
         WebElement alert = Locator.waitForAnyElement(shortWait(),
-                BootstrapLocators.dangerAlertLoc, BootstrapLocators.infoAlertLoc, BootstrapLocators.warningAlertLoc, BootstrapLocators.successAlertLoc);
+                BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
         return alert.getText();
     }
 
