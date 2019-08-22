@@ -28,6 +28,7 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 
 import java.io.IOException;
@@ -50,7 +51,6 @@ public class TestDataGenerator
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
 
     private final Map<Integer, FieldDefinition> _indices = new HashMap<>();  // used to keep columns and row keys aligned
-    // TODO: Make `_columns` a `Map<String, FieldDefinition>`
     private final Map<String, FieldDefinition> _columns = new CaseInsensitiveHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
     private List<Map<String, Object>> _rows = new ArrayList<>();
@@ -290,6 +290,16 @@ public class TestDataGenerator
         return delCmd.execute(cn, _lookupInfo.getFolder());
     }
 
+    public SaveRowsResponse insertRows() throws IOException, CommandException
+    {
+        return insertRows(WebTestHelper.getRemoteApiConnection(), getRows());
+    }
+
+    public SaveRowsResponse insertRows(Connection cn) throws IOException, CommandException
+    {
+        return insertRows(cn, getRows());
+    }
+
     public SaveRowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         InsertRowsCommand insertRowsCommand = new InsertRowsCommand(getSchema(), getQueryName());
@@ -334,8 +344,6 @@ public class TestDataGenerator
     // helper to generate a column or field definition
     static public FieldDefinition simpleFieldDef(String name, FieldDefinition.ColumnType type)
     {
-        FieldDefinition fieldDef = new FieldDefinition(name);
-        fieldDef.setType(type);
-        return fieldDef;
+        return new FieldDefinition(name).setType(type);
     }
 }
