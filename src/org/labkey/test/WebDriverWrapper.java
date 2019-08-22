@@ -480,6 +480,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    @LogMethod(quiet = true)
+    public void enableUxDomainDesigner()
+    {
+        Connection cn = createDefaultConnection(false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", true);
+    }
+
+    @LogMethod(quiet = true)
+    public void disableUxDomainDesigner()
+    {
+        Connection cn = createDefaultConnection(false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", false);
+    }
+
     public enum BrowserType
     {
         REMOTE,
