@@ -6,7 +6,7 @@ import org.labkey.test.pages.LabKeyPage;
 
 import java.util.function.Supplier;
 
-public abstract class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, ConfirmPage extends LabKeyPage> extends ModalDialog
+public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, ConfirmPage extends LabKeyPage> extends ModalDialog
 {
     private final SourcePage _sourcePage;
     private final Supplier<ConfirmPage> _confirmPageSupplier;
@@ -16,7 +16,7 @@ public abstract class DeleteConfirmationDialog<SourcePage extends WebDriverWrapp
         this(sourcePage, () -> null);
     }
 
-    protected DeleteConfirmationDialog(SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    public DeleteConfirmationDialog(SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
         this("delete", sourcePage, confirmPageSupplier);
     }
