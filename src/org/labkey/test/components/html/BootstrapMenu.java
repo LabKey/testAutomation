@@ -17,34 +17,21 @@ package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebDriverWrapperImpl;
-import org.labkey.test.components.Component;
-import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-
-public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
+public class BootstrapMenu extends BaseBootstrapMenu
 {
-    protected final WebDriver _driver;
-    protected final WebElement _componentElement;
     private int _expandRetryCount = 1;
 
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
     public BootstrapMenu(WebDriver driver, WebElement componentElement)
     {
-        this(new WebDriverWrapperImpl(driver), componentElement);
-    }
-
-    public BootstrapMenu(WebDriverWrapper wrapper, WebElement componentElement)
-    {
-        _componentElement = componentElement;
-        _driver = wrapper.getDriver();
+        super(driver, componentElement);
     }
 
     static public BootstrapMenuFinder finder(WebDriver driver)
@@ -61,53 +48,10 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         return new BootstrapMenuFinder(driver).withButtonTextContaining(menuToggleText).find();
     }
 
-    /* Sometimes the menu doesn't expand on the first try.
-     * Sets the number of attempts it will make to expand the menu before failing/giving up. */
+    @Override
     public BootstrapMenu withExpandRetries(int retries)
     {
-        _expandRetryCount = retries;
-        return this;
-    }
-
-    @Override
-    protected WebDriver getDriver()
-    {
-        return _driver;
-    }
-
-    @Override
-    public WebElement getComponentElement()
-    {
-        return _componentElement;
-    }
-
-    public boolean isExpanded()
-    {
-        return "true".equals(elementCache().toggleAnchor.getAttribute("aria-expanded"));
-    }
-
-    public void expand()
-    {
-        if (!isExpanded())
-        {
-            getWrapper().scrollIntoView(elementCache().toggleAnchor);
-            for (int retry = 0; retry < _expandRetryCount; retry++)
-            {
-                elementCache().toggleAnchor.click();
-                if (WebDriverWrapper.waitFor(this::isExpanded, 1000))
-                    break;
-                else
-                    TestLogger.log("retrying menu expand, attempt #" + retry);
-            }
-        }
-        WebDriverWrapper.waitFor(this::isExpanded, "Menu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void collapse()
-    {
-        if (isExpanded())
-            elementCache().toggleAnchor.click();
-        WebDriverWrapper.waitFor(()-> !isExpanded(), "Menu did not collapse as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        return (BootstrapMenu) super.withExpandRetries(retries);
     }
 
     public List<WebElement> findVisibleMenuItems()
@@ -165,31 +109,25 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         clickSubMenu(wait ? getWrapper().getDefaultWaitForPage() : 0, subMenuLabels);
     }
 
-    @Override
-    protected Elements newElementCache()
+    protected Locator getToggleLocator()
     {
-        return new Elements();
+        return Locators.toggleAnchor();
     }
 
-    protected class Elements extends Component.ElementCache
+    @Override
+    protected ElementCache elementCache()
     {
-        public WebElement toggleAnchor = Locators.toggleAnchor().findWhenNeeded(getComponentElement());
+        return (ElementCache) super.elementCache();
+    }
 
-        public WebElement findOpenMenu()
-        {
-            WebElement insideContainerList = Locator.tagWithClassContaining("ul", "dropdown-menu")
-                    .findElementOrNull(getComponentElement());
-            if (insideContainerList != null)
-                return insideContainerList;
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
 
-            // outside the container, require it to be block-display,
-            // as is the case with dataRegion header menus.
-            return Locator.tagWithClassContaining("ul", "dropdown-menu")
-                    .notHidden()
-                    .withAttributeContaining("style", "display: block")
-                    .findElement(getDriver());
-        }
-
+    protected class ElementCache extends BaseBootstrapMenu.ElementCache
+    {
         public WebElement findVisibleMenuPanel()
         {
             WebElement menuList = findOpenMenu();

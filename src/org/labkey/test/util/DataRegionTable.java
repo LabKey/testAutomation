@@ -1518,7 +1518,7 @@ public class DataRegionTable extends DataRegion
     {
         private SelectorMenu(BootstrapMenu menu)
         {
-            super(DataRegionTable.this.getWrapper(), menu.getComponentElement());
+            super(DataRegionTable.this.getDriver(), menu.getComponentElement());
         }
 
         private void clickSubMenu(String... subMenuLabels)
