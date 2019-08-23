@@ -54,8 +54,7 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
 
     public PagingWidget collapseMenu()
     {
-        if (elementCache().paginationMenu.isExpanded())
-           elementCache().paginationMenu.collapse();
+        elementCache().paginationMenu.collapse();
         return this;
     }
 

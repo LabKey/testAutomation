@@ -19,9 +19,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 public class InsertDataClassPage extends LabKeyPage<InsertDataClassPage.ElementCache>
 {
@@ -37,32 +39,38 @@ public class InsertDataClassPage extends LabKeyPage<InsertDataClassPage.ElementC
 
     public static InsertDataClassPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("controller", containerPath, "action"));
+        driver.beginAt(WebTestHelper.buildURL("experiment", containerPath, "insertDataClass"));
         return new InsertDataClassPage(driver.getDriver());
     }
 
     public InsertDataClassPage setName(String name)
     {
-        new Input(elementCache().nameEditElement, getDriver()).set(name);
-        return new InsertDataClassPage(getDriver());
+        elementCache().nameInput.set(name);
+        return this;
     }
 
     public InsertDataClassPage setDescription(String desc)
     {
-        new Input(elementCache().descriptionEditElement, getDriver()).set(desc);
-        return new InsertDataClassPage(getDriver());
+        elementCache().descriptionInput.set(desc);
+        return this;
     }
 
     public InsertDataClassPage setNameExpression(String nameExp)
     {
-        new Input(elementCache().nameExpressionElement, getDriver()).set(nameExp);
-        return new InsertDataClassPage(getDriver());
+        elementCache().nameExpressionInput.set(nameExp);
+        return this;
     }
 
-    public InsertDataClassPage selectMaterialSourceId(String matSrcId)
+    public InsertDataClassPage selectMaterialSourceId(Integer matSrcId)
     {
-        setFormElement(elementCache().materialSourceIdElement, matSrcId);
-        return new InsertDataClassPage(getDriver());
+        elementCache().materialSourceSelect.selectByValue(matSrcId.toString());
+        return this;
+    }
+
+    public InsertDataClassPage selectMaterialSourceName(String matSrcName)
+    {
+        elementCache().materialSourceSelect.selectByVisibleText(matSrcName);
+        return this;
     }
 
     public void clickCreate()
@@ -81,16 +89,16 @@ public class InsertDataClassPage extends LabKeyPage<InsertDataClassPage.ElementC
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement nameEditElement = Locator.tagWithName("input","name")
-                .findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);;
-        WebElement descriptionEditElement = Locator.tagWithName("input","description")
-                .findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);;
-        WebElement nameExpressionElement = Locator.tagWithName("input","nameExpression")
-                .findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);;
-        WebElement materialSourceIdElement = Locator.tagWithName("select","materialSourceId")
-                .findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);;
+        Input nameInput = Input.Input(Locator.tagWithName("input","name"), getDriver())
+                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
+        Input descriptionInput = Input.Input(Locator.tagWithName("input","description"), getDriver())
+                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
+        Input nameExpressionInput = Input.Input(Locator.tagWithName("input","nameExpression"), getDriver())
+                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
+        Select materialSourceSelect = SelectWrapper.Select(Locator.tagWithName("select","materialSourceId"))
+                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
 
-        WebElement createBtn = Locator.lkButton("Create").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);;
+        WebElement createBtn = Locator.lkButton("Create").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement cancelBtn = Locator.lkButton("Cancel").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 }
