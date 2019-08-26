@@ -457,9 +457,9 @@ public class NabAssayTest extends AbstractAssayTest
 
             clickAndWait(Locator.lkButton("Home"));
             stopImpersonating();
-        }
 
-        doNabApiTest();
+            doNabApiTest(); // Use NAb study APIs
+        }
 
         runTransformTest();
 
