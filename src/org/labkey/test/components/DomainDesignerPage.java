@@ -1,5 +1,6 @@
 package org.labkey.test.components;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -21,15 +22,27 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return new DomainDesignerPage(driver.getDriver());
     }
 
-    public DomainDesignerPage clickSaveChanges()
+    public DomainDesignerPage clickSave()
     {
-        elementCache().saveChangesBtn.click();
-
-        String currentURL = getDriver().getCurrentUrl();
-        waitFor(()-> Locator.tagWithClass("div", "alert-success").existsIn(getDriver()) ||
-                getDriver().getCurrentUrl() != currentURL,
-                "domain save did not notify success", WAIT_FOR_JAVASCRIPT);
+        elementCache().saveButton.click();
+        String msg = waitForAnyAlert();
+        log("Clicking save.  Waited until alert with message ["+msg+"] appeared");
         return this;
+    }
+    public WebElement saveButton()
+    {
+        return elementCache().saveButton;
+    }
+
+    public void clickSaveAndFinish()
+    {
+        log("clicking [Save and Finish]");
+        clickAndWait(elementCache().saveAndFinishButton);
+    }
+
+    public WebElement saveAndFinishButton()
+    {
+        return elementCache().saveAndFinishButton;
     }
 
     public DomainFormPanel fieldProperties()
@@ -41,10 +54,44 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return elementCache().domainFormPanel(queryName);
     }
 
+    public String waitForError()
+    {
+        waitFor(()-> BootstrapLocators.dangerAlert.existsIn(getDriver()),
+                "the error alert did not appear as expected", 1000);
+        return  errorAlert().getText();
+    }
     public WebElement errorAlert()
     {
-        Locator alertLoc = Locator.tagWithClass("div", "alert-danger");
-        return alertLoc.existsIn(getDriver()) ? null : alertLoc.findElement(getDriver());
+        return BootstrapLocators.dangerAlert.existsIn(getDriver()) ? BootstrapLocators.dangerAlert.findElement(getDriver()) : null;
+    }
+
+    public String waitForWarning()
+    {
+        waitFor(()-> BootstrapLocators.warningAlert.existsIn(getDriver()),
+                "the warning alert did not appear as expected", 1000);
+        return  warningAlert().getText();
+    }
+    public WebElement warningAlert()
+    {
+        return BootstrapLocators.warningAlert.existsIn(getDriver()) ? BootstrapLocators.warningAlert.findElement(getDriver()) : null;
+    }
+
+    public String waitForInfo()
+    {
+        waitFor(()-> BootstrapLocators.infoAlert.existsIn(getDriver()),
+                "the info alert did not appear as expected", 1000);
+        return  infoAlert().getText();
+    }
+    public WebElement infoAlert()
+    {
+        return BootstrapLocators.infoAlert.existsIn(getDriver()) ? BootstrapLocators.infoAlert.findElement(getDriver()) : null;
+    }
+
+    public String waitForAnyAlert()
+    {
+        WebElement alert = Locator.waitForAnyElement(shortWait(),
+                BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
+        return alert.getText();
     }
 
     protected ElementCache newElementCache()
@@ -62,7 +109,9 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
             return new DomainFormPanel.DomainFormPanelFinder(getDriver())
                     .withTitle("Field Properties - " + domainName).findWhenNeeded(this);
         }
-        WebElement saveChangesBtn = Locators.domainDesignerButton("Save Changes")
+        WebElement saveAndFinishButton = Locators.domainDesignerButton("Save And Finish")
+                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement saveButton = Locator.button("Save")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement cancelBtn = Locators.domainDesignerButton("Cancel")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
@@ -72,7 +121,8 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     {
         static public Locator.XPathLocator domainDesignerButton(String text)
         {
-            return Locator.tagWithClass("button", "domain-designer-button").withText(text);
+            return Locator.tagWithClass("button", "btn-success-default").withText(text);
         }
+
     }
 }

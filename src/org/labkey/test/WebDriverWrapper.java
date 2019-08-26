@@ -111,6 +111,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.WeakHashMap;
@@ -478,6 +479,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
             Connection cn = createDefaultConnection(false);
             ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", false);
         }
+    }
+
+    @LogMethod(quiet = true)
+    public void enableUxDomainDesigner()
+    {
+        Connection cn = createDefaultConnection(false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", true);
+    }
+
+    @LogMethod(quiet = true)
+    public void disableUxDomainDesigner()
+    {
+        Connection cn = createDefaultConnection(false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", false);
     }
 
     public enum BrowserType
@@ -1112,6 +1127,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public boolean onLabKeyPage()
     {
         return (Boolean)executeScript("return window.LABKEY != undefined;");
+    }
+
+    public boolean onLabKeyClassicPage()
+    {
+        return onLabKeyPage() && Locator.byClass("lk-header-ct").existsIn(getDriver()); // Single-page apps don't have 'lk-header-ct'
     }
 
     public boolean isSignedIn()
@@ -2286,19 +2306,23 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return loc.findElement(getDriver()).isDisplayed();
     }
 
-    public void assertElementPresent(Locator loc)
+    public WebElement assertElementPresent(Locator loc)
     {
-        assertTrue("Element is not present: " + loc.getLoggableDescription(), isElementPresent(loc));
+        Optional<WebElement> optionalElement = loc.findOptionalElement(getDriver());
+        assertTrue("Element is not present: " + loc.getLoggableDescription(), optionalElement.isPresent());
+        return optionalElement.get();
     }
 
-    public void assertElementPresent(Locator loc, int amount)
+    public List<WebElement> assertElementPresent(Locator loc, int amount)
     {
-        assertElementPresent("Element '" + loc + "' is not present " + amount + " times", loc, amount);
+        return assertElementPresent("Element '" + loc + "' is not present " + amount + " times", loc, amount);
     }
 
-    public void assertElementPresent(String message, Locator loc, int amount)
+    public List<WebElement> assertElementPresent(String message, Locator loc, int amount)
     {
-        assertEquals(message, amount, getElementCount(loc));
+        List<WebElement> elements = loc.findElements(getDriver());
+        assertEquals(message, amount, elements.size());
+        return elements;
     }
 
     public void assertElementContains(Locator loc, String text)

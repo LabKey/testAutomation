@@ -21,7 +21,11 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.experiment.CreateSampleSetPage;
+import org.labkey.test.pages.experiment.UpdateSampleSetPage;
+import org.labkey.test.pages.property.EditDomainPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -64,6 +68,36 @@ public class SampleSetHelper extends WebDriverWrapper
         return _driver;
     }
 
+    public SampleSetHelper createSampleSet(SampleSetDefinition props)
+    {
+        CreateSampleSetPage createPage = goToCreateNewSampleSet();
+
+        createPage.setName(props.getName());
+        if (props.getNameExpression() != null)
+        {
+            createPage.setNameExpression(props.getNameExpression());
+        }
+        if (props.getDescription() != null)
+        {
+            createPage.setDescription(props.getDescription());
+        }
+        for (String importHeader : props.getImportAliases().keySet())
+        {
+            createPage.addParentColumnAlias(importHeader, props.getImportAliases().get(importHeader));
+        }
+
+        EditDomainPage editDomainPage = createPage.clickCreate();
+
+        PropertiesEditor fieldEditor = editDomainPage.getFieldEditor();
+        for (FieldDefinition fieldDefinition : props.getFields())
+        {
+            fieldEditor.addField(fieldDefinition);
+        }
+        editDomainPage.clickSave();
+
+        return this;
+    }
+
     public SampleSetHelper createSampleSet(String name)
     {
         return createSampleSet(name, null);
@@ -71,67 +105,63 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression)
     {
-        goToCreateNewSampleSet();
-        setNameAndExpression(name, nameExpression);
+        CreateSampleSetPage createSampleSetPage = goToCreateNewSampleSet();
+
+        createSampleSetPage.setName(name);
+        if (nameExpression != null)
+        {
+            createSampleSetPage.setNameExpression(nameExpression);
+        }
+
+        createSampleSetPage.clickCreate();
         return this;
     }
 
     public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields)
     {
-        this.goToCreateNewSampleSet()
-                .setNameAndExpression(name, nameExpression)
-                .addFields(fields);
+        SampleSetDefinition props = new SampleSetDefinition();
+        props.setName(name);
+        props.setNameExpression(nameExpression);
+        _fields = fields;
+        if (fields != null)
+        {
+            for (String fieldName : fields.keySet())
+            {
+                props.addField(new FieldDefinition(fieldName).setType(fields.get(fieldName)));
+            }
+        }
+
+        createSampleSet(props);
     }
 
     public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields, File dataFile)
     {
-        this.goToCreateNewSampleSet()
-                .setNameAndExpression(name, nameExpression)
-                .addFields(fields)
-                .goToSampleSet(name)
-                .bulkImport(dataFile);
+        createSampleSet(name, nameExpression, fields);
+        goToSampleSet(name).bulkImport(dataFile);
     }
 
     public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields, String data)
     {
-        this.goToCreateNewSampleSet()
-                .setNameAndExpression(name, nameExpression)
-                .addFields(fields)
-                .goToSampleSet(name)
-                .bulkImport(data);
+        createSampleSet(name, nameExpression, fields);
+        goToSampleSet(name).bulkImport(data);
     }
 
     public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields, List<Map<String, String>> data)
     {
-        this.goToCreateNewSampleSet()
-                .setNameAndExpression(name, nameExpression)
-                .addFields(fields)
-                .goToSampleSet(name)
-                .bulkImport(data);
+        createSampleSet(name, nameExpression, fields);
+        goToSampleSet(name).bulkImport(data);
     }
 
-    public SampleSetHelper goToCreateNewSampleSet()
+    public CreateSampleSetPage goToCreateNewSampleSet()
     {
         getSampleSetsList().clickHeaderButtonAndWait("Create New Sample Set");
-        return this;
+        return new CreateSampleSetPage(getDriver());
     }
 
 
     public SampleSetHelper setNameExpression(String nameExpression)
     {
-        setFormElement(Locator.id("nameExpression"), nameExpression);
-        return this;
-    }
-
-    public SampleSetHelper setNameAndExpression(String name, @Nullable String nameExpression)
-    {
-        setFormElement(Locator.id("name"), name);
-        if (nameExpression != null)
-        {
-            setFormElement(Locator.id("nameExpression"), nameExpression);
-        }
-
-        clickButton("Create");
+        new CreateSampleSetPage(getDriver()).setNameExpression(nameExpression);
         return this;
     }
 
@@ -143,36 +173,11 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public SampleSetHelper addParentColumnAlias(Map<String, String> aliases)
     {
+        CreateSampleSetPage createSampleSetPage = new CreateSampleSetPage(getDriver());
         for(String importHeader : aliases.keySet())
         {
-            addParentColumnAlias(importHeader, aliases.get(importHeader));
+            createSampleSetPage.addParentColumnAlias(importHeader, aliases.get(importHeader));
         }
-
-        return this;
-    }
-
-    public SampleSetHelper addParentColumnAlias(String parentAlias, String inputName)
-    {
-        List<WebElement> importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
-        List<WebElement> importAliasSelects = Locator.tagWithName("select", "importAliasValues").findElements(getDriver());
-
-        int countOfInputs = importAliasInputs.size();
-
-        click(Locator.linkWithText("add parent column import alias"));
-        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() > countOfInputs, 1000);
-        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() == Locator.tagWithName("select", "importAliasValues").findElements(getDriver()).size(), 1000);
-
-        importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
-        importAliasSelects = Locator.tagWithName("select", "importAliasValues").findElements(getDriver());
-
-        int index = importAliasInputs.size() - 1;
-
-        WebElement aliasInput = importAliasInputs.get(index);
-
-        setFormElement(aliasInput, parentAlias);
-
-        WebElement aliasSelect = importAliasSelects.get(index);
-        selectOptionByTextContaining(aliasSelect, inputName);
 
         return this;
     }
@@ -217,11 +222,11 @@ public class SampleSetHelper extends WebDriverWrapper
         return this;
     }
 
-    public SampleSetHelper goToEditSampleSet(String name)
+    public UpdateSampleSetPage goToEditSampleSet(String name)
     {
         goToSampleSet(name);
         waitAndClickAndWait(Locator.lkButton("Edit Set"));
-        return this;
+        return new UpdateSampleSetPage(getDriver());
     }
 
     public void setFields(Map<String, FieldDefinition.ColumnType> fields)

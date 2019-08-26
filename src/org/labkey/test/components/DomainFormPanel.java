@@ -1,19 +1,22 @@
 package org.labkey.test.components;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementCache>
 {
-    final WebElement _el;
-    final WebDriver _driver;
-    private Map<String, DomainFieldRow> _fieldRows = null;
+    private final WebElement _el;
+    private final WebDriver _driver;
 
     public DomainFormPanel(WebElement element, WebDriver driver)
     {
@@ -33,56 +36,60 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return _driver;
     }
 
+    public DomainFormPanel addField(FieldDefinition fieldDefinition)
+    {
+        DomainFieldRow fieldRow = addField(fieldDefinition.getName());
+
+        if (fieldDefinition.getLookup() != null)
+            throw new IllegalArgumentException("Lookups are not yet supported");
+        else if (fieldDefinition.getType() != null)
+            fieldRow.setType(fieldDefinition.getType());
+
+        if (fieldDefinition.getDescription() != null)
+            fieldRow.setDescription(fieldDefinition.getDescription());
+        if (fieldDefinition.getLabel() != null)
+            fieldRow.setLabel(fieldDefinition.getLabel());
+        if (fieldDefinition.getFormat() != null)
+            fieldRow.setNumberFormat(fieldDefinition.getFormat());
+        if (fieldDefinition.getScale() != null)
+            fieldRow.setCharCount(fieldDefinition.getScale());
+        if (fieldDefinition.getURL() != null)
+            fieldRow.setUrl(fieldDefinition.getURL());
+        if (fieldDefinition.getValidator() != null)
+            throw new IllegalArgumentException("Validators are not yet supported");
+        if (fieldDefinition.isMvEnabled())
+            throw new IllegalArgumentException("Missing Value indicators are not yet supported");
+        if (fieldDefinition.isRequired())
+            fieldRow.setRequiredField(fieldDefinition.isRequired());
+
+        return this;
+    }
+
     public DomainFieldRow addField(String name)
     {
-        int nextIndex = -1;
-        if (fieldRows().keySet().size() > 0)
-        {
-            DomainFieldRow lastRow = fieldRows().values().stream().max(Comparator.comparingInt(DomainFieldRow::getIndex)).get();
-            nextIndex = lastRow.getIndex()+1;
-        }
-
-        elementCache().addFieldSpan.click();
-        _fieldRows = null;  // force cache refresh here
-
-        // if there were 0 rows, use the row with empty name- else find it by nextIndex
-        DomainFieldRow newFieldRow = (nextIndex == -1) ? getField("") : getField(nextIndex);
+        elementCache().addFieldButton.click();
+        List<DomainFieldRow> fieldRows = elementCache().findFieldRows();
+        DomainFieldRow newFieldRow = fieldRows.get(fieldRows.size() - 1);
 
         newFieldRow.setName(name);
         return newFieldRow;
     }
 
-    public void removeField(String name)
+    public DomainFormPanel removeField(String name)
     {
-        getField(name)
-                .clickRemoveField();
-        _fieldRows = null;          // invalidate the cache
+        getField(name).clickRemoveField().dismiss("Yes");
+
+        return this;
     }
 
     public DomainFieldRow getField(String name)
     {
-        if (fieldRows().containsKey(name))
-            return _fieldRows.get(name);
-        else return null;
+        return elementCache().findFieldRow(name);
     }
 
     public DomainFieldRow getField(int tabIndex)
     {
-        return fieldRows().values().stream().filter(a-> a.getIndex()==tabIndex).findFirst().orElse(null);
-    }
-
-    public Map<String, DomainFieldRow> fieldRows()
-    {
-        if (_fieldRows == null)
-        {
-            _fieldRows = new HashMap<>();
-            List<DomainFieldRow> rows = new DomainFieldRow.DomainFieldRowFinder(getDriver()).findAll(this);
-            for (DomainFieldRow row : rows)
-            {
-                _fieldRows.put(row.getName(), row);
-            }
-        }
-        return _fieldRows;
+        return elementCache().findFieldRows().get(tabIndex);
     }
 
     protected ElementCache newElementCache()
@@ -92,8 +99,73 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     protected class ElementCache extends WebDriverComponent.ElementCache
     {
-        public WebElement addFieldSpan = Locator.tagWithClass("span", "domain-form-add")
-                .findWhenNeeded(this);
+        protected WebElement addFieldButton = new WebElementWrapper()
+        {
+            WebElement el = Locator.byClass("domain-form-add").findWhenNeeded(DomainFormPanel.this);
+
+            @Override
+            public WebElement getWrappedElement()
+            {
+                return el;
+            }
+
+            @Override
+            public void click()
+            {
+                int initialCount = findFieldRows().size();
+                super.click();
+                WebDriverWrapper.waitFor(() -> {
+                    clearFieldCache();
+                    return findFieldRows().size() == initialCount + 1;
+                }, "New field didn't appear", 10000);
+            }
+        };
+
+        protected void clearFieldCache()
+        {
+            fieldRows = null;
+            fieldNames.clear();
+        }
+
+        // Should only modify row collections with findFieldRows() and addFieldButton.click()
+        private List<DomainFieldRow> fieldRows;
+        private Map<String, Integer> fieldNames = new TreeMap<>();
+        private final Locator rowLoc = Locator.tagWithClass("div", "domain-field-row");
+
+        private List<DomainFieldRow> findFieldRows()
+        {
+            if (fieldRows == null)
+            {
+                fieldRows = new ArrayList<>();
+                rowLoc.findElements(DomainFormPanel.this.getComponentElement())
+                        .forEach(e -> fieldRows.add(new DomainFieldRow(e, getDriver())));
+            }
+            return fieldRows;
+        }
+
+        private DomainFieldRow findFieldRow(String name)
+        {
+            if (!fieldNames.containsKey(name))
+            {
+                List<DomainFieldRow> fieldRows = findFieldRows();
+                for (int i = 0; i < fieldRows.size(); i++)
+                {
+                    DomainFieldRow fieldRow = fieldRows.get(i);
+                    String fieldRowName = fieldRow.getName();
+                    if (!fieldNames.containsValue(i) && !StringUtils.trimToEmpty(fieldRowName).isEmpty())
+                    {
+                        fieldNames.put(fieldRowName, i);
+                    }
+                    if (name.equalsIgnoreCase(fieldRowName))
+                    {
+                        return fieldRow;
+                    }
+                }
+            }
+            if (!fieldNames.containsKey(name))
+                return null;
+            return fieldRows.get(fieldNames.get(name));
+        }
     }
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>

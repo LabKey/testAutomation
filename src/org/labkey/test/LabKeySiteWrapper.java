@@ -238,7 +238,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (!onLabKeyPage() || isOnServerErrorPage())
             goToHome();
         if (isImpersonating())
+        {
+            if (!onLabKeyClassicPage()) // Single-page apps don't have impersonation capabilities
+            {
+                goToHome();
+            }
             stopImpersonating(false);
+        }
         if (!isSignedInAsPrimaryTestUser())
         {
             if (isSignedIn())
