@@ -17,28 +17,51 @@
                     sampleIds.push(samples[k].objectId);
                 }
 
-                LABKEY.Assay.getStudyNabRuns({
-                    objectIds: sampleIds,
-                    containerPath: testProjectName + '/' + testStudyName,
-                    success: function(runs) {
-                        if (runs.length === 0) return;
-                        if (runs[0].cutoffs[0] !== 50) return;
+                LABKEY.Security.getModules({
+                    success: function (response) {
+                        var hasStudy = false;
+                        for (var m = 0; m < response.modules; m++) {
+                            if (response.modules[m].name === "Study") {
+                                hasStudy = true;
+                                break;
+                            }
+                        }
 
-                        LABKEY.Assay.getStudyNabGraphURL({
-                            objectIds: sampleIds,
-                            containerPath: testProjectName + '/' + testStudyName,
-                            success : function(graph) {
-                                if (graph.length === 0) return;
-                                if (graph.url.indexOf(encodeURIComponent(testProjectName) + '/' + encodeURIComponent(testStudyName)) < 0) return;
+                        if (hasStudy) {
+                            LABKEY.Assay.getStudyNabRuns({
+                                objectIds: sampleIds,
+                                containerPath: testProjectName + '/' + testStudyName,
+                                success: function (runs) {
+                                    if (runs.length === 0) return;
+                                    if (runs[0].cutoffs[0] !== 50) return;
 
-                                var node = document.createElement('div');
-                                node.appendChild(document.createTextNode('Success!'));
-                                document.getElementById('testDiv').appendChild(node);
-                            },
-                            failure : function() {}
-                        });
+                                    LABKEY.Assay.getStudyNabGraphURL({
+                                        objectIds: sampleIds,
+                                        containerPath: testProjectName + '/' + testStudyName,
+                                        success: function (graph) {
+                                            if (graph.length === 0) return;
+                                            if (graph.url.indexOf(encodeURIComponent(testProjectName) + '/' + encodeURIComponent(testStudyName)) < 0) return;
+
+                                            var node = document.createElement('div');
+                                            node.appendChild(document.createTextNode('Success!'));
+                                            document.getElementById('testDiv').appendChild(node);
+                                        },
+                                        failure: function () {
+                                        }
+                                    });
+                                },
+                                failure: function () {
+                                }
+                            });
+                        }
+                        else { // Skip check if Study module isn't installed
+                            var node = document.createElement('div');
+                            node.appendChild(document.createTextNode('Success!'));
+                            document.getElementById('testDiv').appendChild(node);
+                        }
                     },
-                    failure : function() {}
+                    failure: function () {
+                    }
                 });
             }
         },
