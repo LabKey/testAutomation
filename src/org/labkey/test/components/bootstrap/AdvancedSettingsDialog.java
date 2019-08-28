@@ -67,6 +67,46 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
+    public boolean enableMeasure()
+    {
+        return elementCache().enableMeasure.get();
+    }
+    public AdvancedSettingsDialog enableMeasure(boolean checked)
+    {
+        elementCache().enableMeasure.set(checked);
+        return this;
+    }
+
+    public boolean enableDimension()
+    {
+        return elementCache().enableDimension.get();
+    }
+    public AdvancedSettingsDialog enableDimension(boolean checked)
+    {
+        elementCache().enableDimension.set(checked);
+        return this;
+    }
+
+    public boolean enableRecommendedVariable()
+    {
+        return elementCache().recommendedVariable.get();
+    }
+    public AdvancedSettingsDialog enableRecommendedVariable(boolean checked)
+    {
+        elementCache().recommendedVariable.set(checked);
+        return this;
+    }
+
+    public boolean missingValueEnabled()
+    {
+        return elementCache().enableMissingValues.get();
+    }
+    public AdvancedSettingsDialog enableMissingValue(boolean checked)
+    {
+        elementCache().enableMissingValues.set(checked);
+        return this;
+    }
+
 
     @Override
     protected ElementCache newElementCache()
@@ -95,6 +135,15 @@ public class AdvancedSettingsDialog extends ModalDialog
         // misc options
         public WebElement phiSelect = Locator.tagWithAttribute("select", "name", "domainpropertiesrow-PHI")
                 .findWhenNeeded(this);
+
+        public Checkbox enableMeasure = new Checkbox(
+                Locator.input("domainpropertiesrow-measure").findWhenNeeded(this));
+        public Checkbox enableDimension = new Checkbox(
+                Locator.input("domainpropertiesrow-dimension").findWhenNeeded(this));
+        public Checkbox recommendedVariable = new Checkbox(
+                Locator.input("domainpropertiesrow-recommendedVariable").findWhenNeeded(this));
+        public Checkbox enableMissingValues = new Checkbox(
+                Locator.input("domainpropertiesrow-mvEnabled").findWhenNeeded(this));
     }
 
 

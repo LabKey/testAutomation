@@ -699,6 +699,139 @@ public void showHideFieldOnDefaultGridView() throws Exception
         assertEquals("Restricted", restrictedPHIField.get("PHI"));
     }
 
+    @Test
+    public void setMissingValue() throws Exception
+    {
+        String sampleSet = "setMissingValueTest";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow missingValueRow = domainFormPanel.addField("missingValue");
+        missingValueRow.setMissingValue(true);
+        // explicitly set missingValue false on extraField
+        DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
+        extraFieldRow.setMissingValue(false);
+
+        domainDesignerPage.clickSaveAndFinish();
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> mvCol = domainResponse.getColumns().stream()
+                .filter(a->a.get("name").equals("missingValue")).findFirst().orElse(null);
+        Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
+                .filter(a->a.get("name").equals("extraField")).findFirst().orElse(null);
+        assertEquals("expect column to have MissingValue enabled", true, mvCol.get("mvEnabled"));
+        assertEquals("expect column not to have MissingValue enabled", false, extraFieldCol.get("mvEnabled"));
+    }
+
+    @Test
+    public void setFieldAsDimension() throws Exception
+    {
+        String sampleSet = "setFieldAsDimension";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow dimensionField = domainFormPanel.addField("dimensionField");
+        dimensionField.setDimension(true);
+        // explicitly set dimension false on extraField
+        DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
+        extraFieldRow.setDimension(false);
+
+        domainDesignerPage.clickSaveAndFinish();
+
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> dimensionCol = domainResponse.getColumns().stream()
+                .filter(a->a.get("name").equals("dimensionField")).findFirst().orElse(null);
+        Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
+                .filter(a->a.get("name").equals("extraField")).findFirst().orElse(null);
+        assertEquals("expect column to have dimension enabled", true, dimensionCol.get("dimension"));
+        assertEquals("expect column not to have dimension enabled", false, extraFieldCol.get("dimension"));
+    }
+
+    @Test
+    public void setFieldAsMeasure() throws Exception
+    {
+        String sampleSet = "setFieldAsMeasure";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow measureField = domainFormPanel.addField("measureField");
+        measureField.setMeasure(true);
+        // explicitly set measure false on extraField
+        DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
+        extraFieldRow.setMeasure(false);
+
+        domainDesignerPage.clickSaveAndFinish();
+
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> measureCol = domainResponse.getColumns().stream()
+                .filter(a->a.get("name").equals("measureField")).findFirst().orElse(null);
+        Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
+                .filter(a->a.get("name").equals("extraField")).findFirst().orElse(null);
+        assertEquals("expect column to have measure enabled", true, measureCol.get("measure"));
+        assertEquals("expect column not to have measure enabled", false, extraFieldCol.get("measure"));
+    }
+
+    @Test
+    public void setFieldAsVariable() throws Exception
+    {
+        String sampleSet = "setFieldAsVariable";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow variableField = domainFormPanel.addField("variableField");
+        variableField.setRecommendedVariable(true);
+        // explicitly set recommended variable false on extraField
+        DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
+        extraFieldRow.setRecommendedVariable(false);
+
+        domainDesignerPage.clickSaveAndFinish();
+
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> variableCol = domainResponse.getColumns().stream()
+                .filter(a->a.get("name").equals("variableField")).findFirst().orElse(null);
+        Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
+                .filter(a->a.get("name").equals("extraField")).findFirst().orElse(null);
+        assertEquals("expect column to have measure enabled", true, variableCol.get("recommendedVariable"));
+        assertEquals("expect column not to have measure enabled", false, extraFieldCol.get("recommendedVariable"));
+    }
+
     @Override
     protected BrowserType bestBrowser()
     {

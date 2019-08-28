@@ -345,6 +345,38 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public DomainFieldRow setMeasure(boolean checked)
+    {
+        clickAdvancedSettings()
+                .enableMeasure(checked)
+                .dismiss("Apply");
+        return this;
+    }
+
+    public DomainFieldRow setDimension(boolean checked)
+    {
+        clickAdvancedSettings()
+                .enableDimension(checked)
+                .dismiss("Apply");
+        return this;
+    }
+
+    public DomainFieldRow setRecommendedVariable(boolean checked)
+    {
+        clickAdvancedSettings()
+                .enableRecommendedVariable(checked)
+                .dismiss("Apply");
+        return this;
+    }
+
+    public DomainFieldRow setMissingValue(boolean checked)
+    {
+        clickAdvancedSettings()
+                .enableMissingValue(checked)
+                .dismiss("Apply");
+        return this;
+    }
+
     // error and warning
 
     public boolean hasFieldError()
