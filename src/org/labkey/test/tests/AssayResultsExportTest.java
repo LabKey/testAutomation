@@ -131,7 +131,7 @@ public class AssayResultsExportTest extends AbstractExportTest
 
     protected void goToDataRegionPage()
     {
-        clickProject(getProjectName());
+        goToProjectHome();
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         waitAndClickAndWait(Locator.linkWithText(ASSAY_RUN_FILE.getName()));
     }
