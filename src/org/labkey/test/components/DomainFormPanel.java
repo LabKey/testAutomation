@@ -67,6 +67,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFieldRow addField(String name)
     {
+        getWrapper().scrollIntoView(elementCache().addFieldButton, true);
         elementCache().addFieldButton.click();
         List<DomainFieldRow> fieldRows = elementCache().findFieldRows();
         DomainFieldRow newFieldRow = fieldRows.get(fieldRows.size() - 1);

@@ -1,6 +1,7 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.bootstrap.AdvancedSettingsDialog;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -116,6 +117,15 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Confirm Field Deletion")
                 .waitFor();
         return  confirmDeletionDlg;
+    }
+
+    public AdvancedSettingsDialog clickAdvancedSettings()
+    {
+        expand();
+        getWrapper().waitFor(()-> elementCache().advancedSettingsBtn.isEnabled(),
+                "the Advanced Settings button did not become enabled", 1500);
+        elementCache().advancedSettingsBtn.click();
+        return new AdvancedSettingsDialog(getDriver());
     }
 
     public DomainFieldRow expand()
@@ -300,6 +310,42 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         return elementCache().dateShiftBox.get();
     }
+
+    // advanced settings
+
+    public DomainFieldRow showFieldOnDefaultView(boolean checked)
+    {
+        clickAdvancedSettings()
+                .showInDefaultView(checked)
+                .dismiss("Apply");
+        return this;
+    }
+
+    public DomainFieldRow showFieldOnInsertView(boolean checked)
+    {
+        clickAdvancedSettings()
+                .showOnInsertView(checked)
+                .dismiss("Apply");
+        return this;
+    }
+
+    public DomainFieldRow showFieldOnUpdateView(boolean checked)
+    {
+        clickAdvancedSettings()
+                .showOnUpdateView(checked)
+                .dismiss("Apply");
+        return this;
+    }
+
+    public DomainFieldRow setPHILevel(String phiLevel)
+    {
+        clickAdvancedSettings()
+                .setPHILevel(phiLevel)
+                .dismiss("Apply");
+        return this;
+    }
+
+    // error and warning
 
     public boolean hasFieldError()
     {

@@ -551,6 +551,154 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         CoreMatchers.not(CoreMatchers.hasItem("modified"))));
     }
 
+    @Test
+public void showHideFieldOnDefaultGridView() throws Exception
+{
+    String sampleSet = "showFieldOnDefaultGridViewSampleSet";
+
+    FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+    TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+            .withColumnSet(List.of(
+                    TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                    TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                    TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+    DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+    List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+    DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+    DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+    DomainFieldRow defaultViewRow = domainFormPanel.addField("defaultViewField");
+    defaultViewRow.showFieldOnDefaultView(false);
+
+    domainDesignerPage.clickSaveAndFinish();
+
+    // expect to arrive at project home, with a list of 'sampleSets'
+    clickAndWait(Locator.linkWithText(sampleSet));
+
+    DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+    List<String> columnsInDefaultView = sampleSetTable.getColumnNames();
+    Assert.assertThat("Columns after delete", columnsInDefaultView,
+            CoreMatchers.allOf(CoreMatchers.hasItems("Name", "Flag", "extraField", "testCol"),
+                    CoreMatchers.not(CoreMatchers.hasItem("defaultViewField"))));
+}
+
+    @Test
+    public void showHideFieldOnInsertGridView() throws Exception
+    {
+        String sampleSet = "showFieldOnInsertGridViewSampleSet";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow hiddenRow = domainFormPanel.addField("hiddenField");
+        hiddenRow.showFieldOnInsertView(false);
+        DomainFieldRow shownRow = domainFormPanel.addField("shownField");
+        shownRow.showFieldOnInsertView(true);
+
+        domainDesignerPage.clickSaveAndFinish();
+
+        // expect to arrive at project home, with a list of 'sampleSets'
+        clickAndWait(Locator.linkWithText(sampleSet));
+
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        sampleSetTable.clickInsertNewRow();
+
+        waitForElement(Locator.input("quf_shownField"));
+        assertElementNotPresent(Locator.input("quf_hiddenField"));
+    }
+
+    @Test
+    public void showHideFieldOnUpdateForm() throws Exception
+    {
+        String sampleSet = "showFieldOnUpdateForm";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow hiddenRow = domainFormPanel.addField("hiddenField");
+        hiddenRow.showFieldOnUpdateView(false);
+        DomainFieldRow shownRow = domainFormPanel.addField("shownField");
+        shownRow.showFieldOnUpdateView(true);
+
+        domainDesignerPage.clickSaveAndFinish();
+        // expect to arrive at project home, with a list of 'sampleSets'
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        clickAndWait(Locator.linkWithText(sampleSet));
+
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        sampleSetTable.clickEditRow(0);
+
+        waitForElement(Locator.input("quf_shownField"));
+        assertElementNotPresent(Locator.input("quf_hiddenField"));
+    }
+
+    @Test
+    public void setPhiLevel() throws Exception
+    {
+        String sampleSet = "phiLevelSampleSet";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+
+        // create a little test data
+        dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test",
+                "notPHI", "notPHI", "limitedPHI", "limitedPHI", "fullPHI", "fullPHI", "restrictedPHI", "restrictedPHI"));
+        dgen.addCustomRow(Map.of("name", "second", "extraField", "twelve", "testCol", "blah",
+                "notPHI", "notPHI", "limitedPHI", "limitedPHI", "fullPHI", "fullPHI", "restrictedPHI", "restrictedPHI"));
+
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow notPhi = domainFormPanel.addField("notPHI");
+        notPhi.setPHILevel("Not PHI");
+        DomainFieldRow limitedPHI = domainFormPanel.addField("limitedPHI");
+        limitedPHI.setPHILevel("Limited PHI");
+        DomainFieldRow fullPHI = domainFormPanel.addField("fullPHI");
+        fullPHI.setPHILevel("Full PHI");
+        DomainFieldRow restrictedPHI = domainFormPanel.addField("restrictedPHI");
+        restrictedPHI.setPHILevel("Restricted PHI");
+
+        domainDesignerPage.clickSaveAndFinish();
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        clickAndWait(Locator.linkWithText(sampleSet));
+
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+
+        Map<String, Object> notPHiField = domainResponse.getColumns().stream().filter(a-> a.get("name").equals("notPHI")).findFirst().orElse(null);
+        assertEquals("NotPHI", notPHiField.get("PHI"));
+        Map<String, Object> limitedPHIField = domainResponse.getColumns().stream().filter(a-> a.get("name").equals("limitedPHI")).findFirst().orElse(null);
+        assertEquals("Limited", limitedPHIField.get("PHI"));
+        Map<String, Object> fullPhiField = domainResponse.getColumns().stream().filter(a-> a.get("name").equals("fullPHI")).findFirst().orElse(null);
+        assertEquals("PHI", fullPhiField.get("PHI"));
+        Map<String, Object> restrictedPHIField = domainResponse.getColumns().stream().filter(a-> a.get("name").equals("restrictedPHI")).findFirst().orElse(null);
+        assertEquals("Restricted", restrictedPHIField.get("PHI"));
+    }
+
     @Override
     protected BrowserType bestBrowser()
     {
