@@ -39,6 +39,7 @@ import org.labkey.test.util.DilutionAssayHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
+import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebDriverException;
 
@@ -91,23 +92,6 @@ public class NabAssayTest extends AbstractAssayTest
     private static final String CURVE_IC80_4PL_COL_TITLE = "Curve IC80 4pl";
     private static final String CURVE_IC80_5PL_COL_TITLE = "Curve IC80 5pl";
     private static final String CURVE_IC80_POLY_COL_TITLE = "Curve IC80 Poly";
-    // AUC Column Names(after Copy to Study).
-    private static final String AUC_STUDY_COL_TITLE = "AUC";
-    private static final String AUC_4PL_STUDY_COL_TITLE = "AUC 4pl";
-    private static final String AUC_5PL_STUDY_COL_TITLE = "AUC 5pl";
-    private static final String AUC_POLY_STUDY_COL_TITLE = "AUC Poly";
-    private static final String CURVE_IC50_STUDY_COL_TITLE = "Curve IC50";
-    private static final String CURVE_IC50_4PL_STUDY_COL_TITLE = "Curve IC50 4pl";
-    private static final String CURVE_IC50_5PL_STUDY_COL_TITLE = "Curve IC50 5pl";
-    private static final String CURVE_IC50_POLY_STUDY_COL_TITLE = "Curve IC50 Poly";
-    private static final String CURVE_IC70_STUDY_COL_TITLE = "Curve IC70";
-    private static final String CURVE_IC70_4PL_STUDY_COL_TITLE = "Curve IC70 4pl";
-    private static final String CURVE_IC70_5PL_STUDY_COL_TITLE = "Curve IC70 5pl";
-    private static final String CURVE_IC70_POLY_STUDY_COL_TITLE = "Curve IC70 Poly";
-    private static final String CURVE_IC80_STUDY_COL_TITLE = "Curve IC80";
-    private static final String CURVE_IC80_4PL_STUDY_COL_TITLE = "Curve IC80 4pl";
-    private static final String CURVE_IC80_5PL_STUDY_COL_TITLE = "Curve IC80 5pl";
-    private static final String CURVE_IC80_POLY_STUDY_COL_TITLE = "Curve IC80 Poly";
 
     private static final String PLATE_TEMPLATE_NAME = "NabAssayTest Template";
     private static final String TEST_DIV_ID = "testDiv";
@@ -137,10 +121,16 @@ public class NabAssayTest extends AbstractAssayTest
         init.doSetup();
     }
 
+    private boolean isStudyModuleInstalled()
+    {
+        boolean hasStudyModule = _containerHelper.getAllModules().contains("study");
+        if (!hasStudyModule)
+            TestLogger.warn("Study module is not installed. Skipping study-related section.");
+        return hasStudyModule;
+    }
+
     private void doSetup() throws Exception
     {
-        ensureSignedInAsPrimaryTestUser();
-
         // set up a scripting engine to run a java transform script
         new QCAssayScriptHelper(this).ensureEngineConfig();
 
@@ -148,7 +138,17 @@ public class NabAssayTest extends AbstractAssayTest
 
         //setup a pipeline for the project
         setupPipeline(getProjectName());
+        if (isStudyModuleInstalled())
+        {
+            createStudySubfolder();
+        }
 
+        //add the Assay List web part so we can create a new nab assay
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+    }
+
+    private void createStudySubfolder()
+    {
         // create a study so we can test copy-to-study later:
         _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_STUDY1);
 
@@ -157,9 +157,6 @@ public class NabAssayTest extends AbstractAssayTest
 
         clickButton("Create Study");
         clickButton("Create Study");
-
-        //add the Assay List web part so we can create a new nab assay
-        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
     }
 
     @Override
@@ -399,20 +396,24 @@ public class NabAssayTest extends AbstractAssayTest
         region.setFilter("SpecimenLsid/Property/ParticipantID", "Equals One Of (example usage: a;b;c)", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
         assertTextPresent("ptid 1 A", "ptid 1 B");
         assertTextNotPresent("ptid 1 C", "ptid 5");
-        region.checkAllOnPage();
-        region.clickHeaderButton("Copy to Study");
 
-        selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-        clickButton("Next");
+        if (isStudyModuleInstalled())
+        {
+            region.checkAllOnPage();
+            region.clickHeaderButton("Copy to Study");
 
-        region = new DataRegionTable("Data", this);
-        region.clickHeaderButton("Copy to Study");
-        assertStudyData(4);
+            selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
+            clickButton("Next");
 
-        assertAliasedAUCStudyData();
+            region = new DataRegionTable("Data", this);
+            region.clickHeaderButton("Copy to Study");
+            assertStudyData(4);
 
-        clickAndWait(Locator.linkWithText("assay"));
-        assertNabData();
+            assertAliasedAUCStudyData();
+
+            clickAndWait(Locator.linkWithText("assay"));
+            assertNabData();
+        }
 
         // Delete a single run (regression test for issue 24487)
         navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
@@ -428,34 +429,37 @@ public class NabAssayTest extends AbstractAssayTest
 
         doResolverTypeTest();
 
-        // create user with read permissions to study and dataset, but no permissions to source assay
-        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1);
-        pushLocation();  // Save our location because impersonated user won't have permission to project
-        PermissionsPage permissionsPage = navBar().goToPermissionsPage();
-        permissionsPage.createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
-        setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
-        setStudyPerms(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_STUDY_READALL);
+        if (isStudyModuleInstalled())
+        {
+            // create user with read permissions to study and dataset, but no permissions to source assay
+            navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1);
+            pushLocation();  // Save our location because impersonated user won't have permission to project
+            PermissionsPage permissionsPage = navBar().goToPermissionsPage();
+            permissionsPage.createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
+            setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
+            setStudyPerms(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_STUDY_READALL);
 
-        // view dataset, click [assay] link, see assay details in subfolder
-        impersonate(TEST_ASSAY_USR_NAB_READER);
-        popLocation();
-        assertTextPresent(TEST_ASSAY_PRJ_NAB);
-        assertTextNotPresent(TEST_ASSAY_FLDR_NAB); // assert no read permissions to subfolder
-        clickFolder(TEST_ASSAY_FLDR_STUDY1);
-        clickAndWait(Locator.linkWithText("Study Navigator"));
-        clickAndWait(Locator.linkWithText("2"));
-        assertStudyData(1);
-        clickAndWait(Locator.linkWithText("assay"));
-        assertNabData();
+            // view dataset, click [assay] link, see assay details in subfolder
+            impersonate(TEST_ASSAY_USR_NAB_READER);
+            popLocation();
+            assertTextPresent(TEST_ASSAY_PRJ_NAB);
+            assertTextNotPresent(TEST_ASSAY_FLDR_NAB); // assert no read permissions to subfolder
+            clickFolder(TEST_ASSAY_FLDR_STUDY1);
+            clickAndWait(Locator.linkWithText("Study Navigator"));
+            clickAndWait(Locator.linkWithText("2"));
+            assertStudyData(1);
+            clickAndWait(Locator.linkWithText("assay"));
+            assertNabData();
 
-        // no permission to details page for "ptid 1 C"; it wasn't copied to the study
-        beginAt(ptid1c_detailsURL);
-        assertEquals(403, getResponseCode());
+            // no permission to details page for "ptid 1 C"; it wasn't copied to the study
+            beginAt(ptid1c_detailsURL);
+            assertEquals(403, getResponseCode());
 
-        clickAndWait(Locator.lkButton("Home"));
-        stopImpersonating();
+            clickAndWait(Locator.lkButton("Home"));
+            stopImpersonating();
 
-        doNabApiTest();
+            doNabApiTest(); // Use NAb study APIs
+        }
 
         runTransformTest();
 
@@ -656,22 +660,22 @@ public class NabAssayTest extends AbstractAssayTest
         _customizeViewsHelper.addColumn("AUC_Poly",        AUC_POLY_COL_TITLE);
         _customizeViewsHelper.addColumn("AUC_4pl",         AUC_4PL_COL_TITLE);
         _customizeViewsHelper.addColumn("AUC_5pl",         AUC_5PL_COL_TITLE);
-        _customizeViewsHelper.addColumn("Cutoff50/IC_Poly", CURVE_IC50_POLY_STUDY_COL_TITLE);
-        _customizeViewsHelper.addColumn("Cutoff50/IC_4pl",  CURVE_IC50_4PL_STUDY_COL_TITLE);
-        _customizeViewsHelper.addColumn("Cutoff70/IC_Poly", CURVE_IC70_POLY_STUDY_COL_TITLE);
-        _customizeViewsHelper.addColumn("Cutoff80/IC_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
+        _customizeViewsHelper.addColumn("Cutoff50/IC_Poly", CURVE_IC50_POLY_COL_TITLE);
+        _customizeViewsHelper.addColumn("Cutoff50/IC_4pl",  CURVE_IC50_4PL_COL_TITLE);
+        _customizeViewsHelper.addColumn("Cutoff70/IC_Poly", CURVE_IC70_POLY_COL_TITLE);
+        _customizeViewsHelper.addColumn("Cutoff80/IC_4pl",  CURVE_IC80_4PL_COL_TITLE);
         _customizeViewsHelper.saveCustomView();
 
         table = new DataRegionTable("Dataset", this);
-        assertEquals(table.getDataAsText(0, AUC_STUDY_COL_TITLE),        table.getDataAsText(0, AUC_POLY_STUDY_COL_TITLE));        //AUC = AUC_poly
-        assertEquals(table.getDataAsText(1, AUC_STUDY_COL_TITLE),        table.getDataAsText(1, AUC_4PL_STUDY_COL_TITLE));         //AUC = AUC_4pl
-        assertEquals(table.getDataAsText(0, CURVE_IC50_STUDY_COL_TITLE), table.getDataAsText(0, CURVE_IC50_POLY_STUDY_COL_TITLE)); //CurveIC50 = CurveIC50_poly
-        assertEquals(table.getDataAsText(1, CURVE_IC50_STUDY_COL_TITLE), table.getDataAsText(1, CURVE_IC50_4PL_STUDY_COL_TITLE));  //CurveIC50 = CurveIC50_4pl
-        assertEquals(table.getDataAsText(0, CURVE_IC70_STUDY_COL_TITLE), table.getDataAsText(0, CURVE_IC70_POLY_STUDY_COL_TITLE)); //CurveIC70 = CurveIC70_poly
-        assertEquals(table.getDataAsText(1, CURVE_IC80_STUDY_COL_TITLE), table.getDataAsText(1, CURVE_IC80_4PL_STUDY_COL_TITLE));  //CurveIC80 = CurveIC80_4pl
+        assertEquals(table.getDataAsText(0, AUC_COL_TITLE),        table.getDataAsText(0, AUC_POLY_COL_TITLE));        //AUC = AUC_poly
+        assertEquals(table.getDataAsText(1, AUC_COL_TITLE),        table.getDataAsText(1, AUC_4PL_COL_TITLE));         //AUC = AUC_4pl
+        assertEquals(table.getDataAsText(0, CURVE_IC50_COL_TITLE), table.getDataAsText(0, CURVE_IC50_POLY_COL_TITLE)); //CurveIC50 = CurveIC50_poly
+        assertEquals(table.getDataAsText(1, CURVE_IC50_COL_TITLE), table.getDataAsText(1, CURVE_IC50_4PL_COL_TITLE));  //CurveIC50 = CurveIC50_4pl
+        assertEquals(table.getDataAsText(0, CURVE_IC70_COL_TITLE), table.getDataAsText(0, CURVE_IC70_POLY_COL_TITLE)); //CurveIC70 = CurveIC70_poly
+        assertEquals(table.getDataAsText(1, CURVE_IC80_COL_TITLE), table.getDataAsText(1, CURVE_IC80_4PL_COL_TITLE));  //CurveIC80 = CurveIC80_4pl
 
-        assertEquals(" ", table.getDataAsText(0, CURVE_IC80_STUDY_COL_TITLE)); //IC80 = blank
-        assertEquals(" ", table.getDataAsText(1, CURVE_IC70_STUDY_COL_TITLE)); //IC70 = blank
+        assertEquals(" ", table.getDataAsText(0, CURVE_IC80_COL_TITLE)); //IC80 = blank
+        assertEquals(" ", table.getDataAsText(1, CURVE_IC70_COL_TITLE)); //IC70 = blank
     }
 
     @LogMethod
