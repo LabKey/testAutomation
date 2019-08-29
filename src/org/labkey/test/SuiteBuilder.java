@@ -21,6 +21,7 @@ import org.labkey.test.categories.Continue;
 import org.labkey.test.categories.Disabled;
 import org.labkey.test.categories.Empty;
 import org.labkey.test.categories.Test;
+import org.labkey.test.util.TestLogger;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +82,17 @@ public class SuiteBuilder
                 .setUrls(packageUrls)
                 .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
         Set<Class<?>> tests = new HashSet<>(reflections.getTypesAnnotatedWith(Category.class));
+        Map<String, Class<?>> categoriesByName = new HashMap<>();
+        reflections.getSubTypesOf(Test.class).forEach(cat ->
+        {
+            String key = cat.getSimpleName().toLowerCase();
+            if (categoriesByName.containsKey(key))
+            {
+                Class<?> existingCat = categoriesByName.get(key);
+                TestLogger.warn(String.format("Ambiguous test category [%s]. Defined in '%s' and '%s'", key, cat.getName(), existingCat.getName()));
+            }
+            categoriesByName.put(key, cat);
+        });
 
         tests.removeIf(clz -> Modifier.isAbstract(clz.getModifiers()));
         _suites.put(Continue.class.getSimpleName(), Collections.emptySet()); // Not actually a suite, used to continue interrupted suite
@@ -100,22 +113,11 @@ public class SuiteBuilder
                 testClasses.put(simpleName, test);
             }
 
-            List<Class<?>> categoriesFromAnnotation = Arrays.asList(((Category) test.getAnnotation(Category.class)).value());
+            List<Class<?>> categoriesFromAnnotation = new ArrayList<>(Arrays.asList(((Category) test.getAnnotation(Category.class)).value()));
             if (categoriesFromAnnotation.contains(Disabled.class))
             {
                 // Remove disabled tests from all other suites
                 categoriesFromAnnotation = Collections.singletonList(Disabled.class);
-            }
-            for (Class category : categoriesFromAnnotation)
-            {
-                addTestToSuite(test, category.getSimpleName());
-                Class supercategory = category.getSuperclass();
-
-                while (supercategory != null && Test.class.isAssignableFrom(supercategory))
-                {
-                    addTestToSuite(test, supercategory.getSimpleName());
-                    supercategory = supercategory.getSuperclass();
-                }
             }
 
             // parse test package, add module-derived suites. We expect these to follow the pattern
@@ -129,8 +131,26 @@ public class SuiteBuilder
                 {
                     suiteName = suiteName + "_disabled";
                 }
+                else if (categoriesByName.containsKey(suiteName))
+                {
+                    // Respect suite inheritance for package-inferred suites
+                    categoriesFromAnnotation.add(categoriesByName.get(suiteName));
+                }
                 addTestToSuite(test, suiteName);
             }
+
+            for (Class category : categoriesFromAnnotation)
+            {
+                addTestToSuite(test, category.getSimpleName());
+                Class supercategory = category.getSuperclass();
+
+                while (supercategory != null && Test.class.isAssignableFrom(supercategory))
+                {
+                    addTestToSuite(test, supercategory.getSimpleName());
+                    supercategory = supercategory.getSuperclass();
+                }
+            }
+
             addTestToSuite(test, Test.class.getSimpleName()); // Make sure test is in the master "Test" suite
         }
     }
