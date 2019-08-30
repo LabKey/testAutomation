@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,7 +84,23 @@ public class APIAssayHelper extends AbstractAssayHelper
         irc.setName(runName);
 
         if(null != runProperties)
-            irc.setProperties(runProperties);
+        {
+            // The 'Comment' property needs to be set by calling setComment, it isn't set by having it in the
+            // runProperties map and calling setProperties.
+            // At the time of this change having a property 'Comment' in the map has no effect when
+            // irc.setProperties is called. To be safe going to remove it from the collection, and so as not to impact
+            // the calling function going to use a clone of the parameter passed in.
+
+            Map<String, Object> _runProperties = new HashMap<>();
+            _runProperties.putAll(runProperties);
+            if(_runProperties.containsKey("Comment"))
+            {
+                irc.setComment(_runProperties.get("Comment").toString());
+                _runProperties.remove("Comment");
+            }
+
+            irc.setProperties(_runProperties);
+        }
 
         if(null != batchProperties)
             irc.setBatchProperties(batchProperties);
