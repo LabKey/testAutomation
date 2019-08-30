@@ -1292,11 +1292,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (BROWSER_TYPE == BrowserType.CHROME)
             refresh(); // Chrome blocks sequential downloads from javascript
-
-        // Download list of mutation warnings and add to TeamCity artifacts.
-        File downloadWarnings = downloadFromUrl("admin-exportMutationWarnings.view");
-        File exportMutationsFile = new File(TestProperties.getDumpDir(), "MutationWarnings.txt");
-        replaceArtifact(downloadWarnings, exportMutationsFile, "exported mutation warnings");
     }
 
     private void replaceArtifact(File downloadedFile, File artifactFile, String description)
