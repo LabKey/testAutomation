@@ -15,18 +15,18 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.openqa.selenium.NoSuchElementException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Category({DailyC.class})
-public class SampleSetParentColumn extends BaseWebDriverTest
+public class SampleSetParentColumnTest extends BaseWebDriverTest
 {
 
     private static final String PROJECT_NAME = "SampleSetParentAliasProject";
@@ -73,7 +73,7 @@ public class SampleSetParentColumn extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleSetParentColumn init = (SampleSetParentColumn) getCurrentTest();
+        SampleSetParentColumnTest init = (SampleSetParentColumnTest) getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
