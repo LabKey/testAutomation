@@ -167,6 +167,21 @@ public class SimpleModuleTest extends BaseWebDriverTest
             "  </table>\n" +
             "</tables>\n";
 
+    private static final String XML_METADATA_CUSTOM_QUERY = "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
+            "  <table tableName=\"SelectOnColors\" tableDbType=\"NOT_IN_DB\">\n" +
+            "    <pkColumnName>Name</pkColumnName>\n" +
+            "     <insertUrl>/query/insertQueryRow.view?schemaName=vehicle&amp;queryName=Colors</insertUrl> \n" +
+            "     <updateUrl>/query/updateQueryRow.view?schemaName=vehicle&amp;queryName=Colors&amp;Name=${Name}</updateUrl> \n" +
+            "     <importUrl>/query/import.view?schemaName=vehicle&amp;queryName=Colors</importUrl> \n" +
+            "     <deleteUrl>/query/deleteQueryRows.view?schemaName=vehicle&amp;queryName=Colors</deleteUrl> \n" +
+            "    <columns>\n" +
+            "      \t<column columnName=\"Name\">\n" +
+            "        \t<isKeyField>true</isKeyField>\n" +
+            "        </column>\n" +
+            "    </columns>\n" +
+            "  </table>\n" +
+            "</tables>";
+
     private final PortalHelper portalHelper = new PortalHelper(this);
 
     protected String getProjectName()
@@ -252,6 +267,86 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestRowLevelContainerPath();
         doTestCustomLogin();
         doTestFkLookupFilter();
+        doTestMetadataOverrideForCustomQuery();
+    }
+
+    @LogMethod
+    private void doTestMetadataOverrideForCustomQuery()
+    {
+        goToProjectHome();
+        String subFolder = "Metadata override for custom query";
+        String customQueryName = "SelectOnColors";
+        _containerHelper.createSubfolder(getProjectName(), subFolder);
+
+        goToSchemaBrowser();
+        createNewQuery(VEHICLE_SCHEMA);
+        setFormElement(Locator.name("ff_newQueryName"), customQueryName);
+        selectOptionByText(Locator.name("ff_baseTableName"), "Colors");
+        clickButton("Create and Edit Source", 0);
+
+        clickButton("Save & Finish");
+        assertElementNotPresent(Locator.tagWithAttribute("a", "data-original-title", "Insert data"));
+        assertElementNotPresent(Locator.tagWithAttribute("a", "data-original-title", "Delete"));
+
+        goToSchemaBrowser();
+        selectQuery(VEHICLE_SCHEMA, customQueryName);
+        waitForText("edit metadata");
+        clickAndWait(Locator.linkWithText("edit metadata"));
+        // wait for the domain editor to appear:
+        clickButton("Edit Source", defaultWaitForPage);
+        _ext4Helper.clickExt4Tab("XML Metadata");
+        setCodeEditorValue("metadataText", XML_METADATA_CUSTOM_QUERY);
+        clickButton("Save & Finish");
+
+        assertElementPresent(Locator.tagWithAttribute("a", "data-original-title", "Insert data"));
+        assertElementPresent(Locator.tagWithAttribute("a", "data-original-title", "Delete"));
+        DataRegionTable customQuery = new DataRegionTable("query", getDriver());
+        customQuery.clickInsertNewRow();
+
+        setFormElement(Locator.name("quf_Name"), "Teal");
+        setFormElement(Locator.name("quf_Hex"), "#008080");
+        setFormElement(Locator.name("quf_TriggerScriptProperty"), "#008080");
+        clickButton("Submit");
+
+        assertEquals("After insert : Mismatch in row between custom query and hard table", getRowCount(VEHICLE_SCHEMA, customQueryName), getRowCount(VEHICLE_SCHEMA, "Colors"));
+        assertEquals("Comparing colors in both table", getValuesOfColumn(customQueryName, "Name"), getValuesOfColumn("Colors", "Name"));
+
+        customQuery = new DataRegionTable("query", getDriver());
+        customQuery.clickEditRow(customQuery.getRowIndex("Name", "Teal!"));
+        setFormElement(Locator.name("quf_Name"), "Teal!!!!");
+        clickButton("Submit");
+
+        assertEquals("Comparing colors in both table", getValuesOfColumn(customQueryName, "Name"), getValuesOfColumn("Colors", "Name"));
+
+        customQuery = new DataRegionTable("query", getDriver());
+        customQuery.checkCheckbox(customQuery.getRowIndex("Name", "Silver!"));
+        customQuery.deleteSelectedRows();
+
+        assertEquals("After Delete : Mismatch in row between custom query and hard table", getRowCount(VEHICLE_SCHEMA, customQueryName), getRowCount(VEHICLE_SCHEMA, "Colors"));
+
+    }
+
+    private int getRowCount(String schemaName, String tableName)
+    {
+        pushLocation();
+        goToSchemaBrowser();
+        viewQueryData(schemaName, tableName);
+        DataRegionTable customQuery = new DataRegionTable("query", getDriver());
+        int returnValue = customQuery.getDataRowCount();
+        popLocation();
+        return returnValue;
+    }
+
+    private List<String> getValuesOfColumn(String tableName, String colunmName)
+    {
+        pushLocation();
+        goToSchemaBrowser();
+        viewQueryData(VEHICLE_SCHEMA, tableName);
+        DataRegionTable customQuery = new DataRegionTable("query", getDriver());
+        List<String> retVal = customQuery.getColumnDataAsText(colunmName);
+        popLocation();
+        return retVal;
+
     }
 
     @LogMethod
