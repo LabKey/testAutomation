@@ -80,7 +80,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFormPanel removeField(String name)
     {
         getField(name).clickRemoveField().dismiss("Yes");
-
+        clearElementCache();
         return this;
     }
 
@@ -140,7 +140,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             {
                 fieldRows = new ArrayList<>();
                 rowLoc.findElements(DomainFormPanel.this.getComponentElement())
-                        .forEach(e -> fieldRows.add(new DomainFieldRow(e, getDriver())));
+                        .forEach(e -> fieldRows.add(new DomainFieldRow(DomainFormPanel.this, e, getDriver())));
             }
             return fieldRows;
         }

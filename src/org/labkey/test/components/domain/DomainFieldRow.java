@@ -17,11 +17,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 {
     final WebElement _el;
     final WebDriver _driver;
+    final DomainFormPanel _formPanel;
 
-    public DomainFieldRow(WebElement element, WebDriver driver)
+    public DomainFieldRow(DomainFormPanel panel, WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
+        _formPanel = panel;
     }
 
     @Override
@@ -454,10 +456,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row");
         private String _title = null;
+        private DomainFormPanel _domainFormPanel;
 
-        public DomainFieldRowFinder(WebDriver driver)
+        public DomainFieldRowFinder(DomainFormPanel panel, WebDriver driver)
         {
             super(driver);
+            _domainFormPanel = panel;
         }
 
         public DomainFieldRowFinder withTitle(String title)
@@ -469,7 +473,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         @Override
         protected DomainFieldRow construct(WebElement el, WebDriver driver)
         {
-            return new DomainFieldRow(el, driver);
+            return new DomainFieldRow(_domainFormPanel, el, driver);
         }
 
         @Override
