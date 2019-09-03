@@ -1,20 +1,25 @@
-package org.labkey.test.components.bootstrap;
+package org.labkey.test.components.domain;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class AdvancedSettingsDialog extends ModalDialog
 {
-    private AdvancedSettingsDialog(ModalDialogFinder finder, WebDriver driver)
+    private DomainFieldRow _row;
+
+    private AdvancedSettingsDialog(DomainFieldRow row, ModalDialogFinder finder, WebDriver driver)
     {
         super(finder.waitFor().getComponentElement(), driver);
+        _row = row;
     }
 
-    public AdvancedSettingsDialog(WebDriver driver)
+    public AdvancedSettingsDialog(DomainFieldRow row, WebDriver driver)
     {
-        this(new ModalDialogFinder(driver).withTitle("Advanced Settings and Properties"), driver);
+        this(row, new ModalDialogFinder(driver).withTitle("Advanced Settings and Properties"), driver);
     }
 
     public boolean showInDefaultView()
@@ -61,9 +66,9 @@ public class AdvancedSettingsDialog extends ModalDialog
     {
         return getWrapper().getFormElement(elementCache().phiSelect);
     }
-    public AdvancedSettingsDialog setPHILevel(String phiLevel)
+    public AdvancedSettingsDialog setPHILevel(PropertiesEditor.PhiSelectType phiLevel)
     {
-        getWrapper().setFormElement(elementCache().phiSelect, phiLevel);
+        getWrapper().setFormElement(elementCache().phiSelect, phiLevel.getText());
         return this;
     }
 
@@ -107,6 +112,17 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
+    public DomainFieldRow apply()
+    {
+        dismiss("Apply");
+        return _row;
+    }
+
+    public DomainFieldRow cancel()
+    {
+        dismiss("Cancel");
+        return _row;
+    }
 
     @Override
     protected ElementCache newElementCache()
@@ -117,7 +133,7 @@ public class AdvancedSettingsDialog extends ModalDialog
     @Override
     protected ElementCache elementCache()
     {
-        return new ElementCache();
+        return  (ElementCache) super.elementCache();
     }
 
     protected class ElementCache extends ModalDialog.ElementCache

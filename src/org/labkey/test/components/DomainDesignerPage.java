@@ -4,6 +4,7 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;

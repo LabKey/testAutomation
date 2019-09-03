@@ -1,7 +1,8 @@
-package org.labkey.test.components;
+package org.labkey.test.components.domain;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.bootstrap.AdvancedSettingsDialog;
+import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -125,7 +126,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         getWrapper().waitFor(()-> elementCache().advancedSettingsBtn.isEnabled(),
                 "the Advanced Settings button did not become enabled", 1500);
         elementCache().advancedSettingsBtn.click();
-        return new AdvancedSettingsDialog(getDriver());
+        return new AdvancedSettingsDialog(this, getDriver());
     }
 
     public DomainFieldRow expand()
@@ -317,7 +318,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .showInDefaultView(checked)
-                .dismiss("Apply");
+                .apply();
         return this;
     }
 
@@ -325,7 +326,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .showOnInsertView(checked)
-                .dismiss("Apply");
+                .apply();
         return this;
     }
 
@@ -333,15 +334,15 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .showOnUpdateView(checked)
-                .dismiss("Apply");
+                .apply();
         return this;
     }
 
-    public DomainFieldRow setPHILevel(String phiLevel)
+    public DomainFieldRow setPHILevel(PropertiesEditor.PhiSelectType phiLevel)
     {
         clickAdvancedSettings()
                 .setPHILevel(phiLevel)
-                .dismiss("Apply");
+                .apply();
         return this;
     }
 
@@ -349,7 +350,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .enableMeasure(checked)
-                .dismiss("Apply");
+                .apply();
         return this;
     }
 
@@ -357,7 +358,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .enableDimension(checked)
-                .dismiss("Apply");
+                .apply();
         return this;
     }
 
@@ -365,7 +366,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .enableRecommendedVariable(checked)
-                .dismiss("Apply");
+                .apply();
         return this;
     }
 
@@ -373,7 +374,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .enableMissingValue(checked)
-                .dismiss("Apply");
+                .apply();
         return this;
     }
 

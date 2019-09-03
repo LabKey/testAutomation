@@ -16,9 +16,9 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.DomainFieldRow;
-import org.labkey.test.components.DomainFormPanel;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -26,10 +26,14 @@ import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -547,7 +551,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection(true));
         List<String> columnsAfterSaveAttempt = rowsResponse.getColumnModel().stream().map(col -> (String) col.get("dataIndex")).collect(Collectors.toList());
         Assert.assertThat("Columns after delete", columnsAfterSaveAttempt,
-                CoreMatchers.allOf(CoreMatchers.hasItems("Name", "testCol", "extraField"),
+                CoreMatchers.allOf(hasItems("Name", "testCol", "extraField"),
                         CoreMatchers.not(CoreMatchers.hasItem("modified"))));
     }
 
@@ -569,6 +573,8 @@ public void showHideFieldOnDefaultGridView() throws Exception
     DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
     DomainFieldRow defaultViewRow = domainFormPanel.addField("defaultViewField");
     defaultViewRow.showFieldOnDefaultView(false);
+    DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
+    extraFieldRow.showFieldOnDefaultView(true); // true is default behavior
 
     domainDesignerPage.clickSaveAndFinish();
 
@@ -578,7 +584,7 @@ public void showHideFieldOnDefaultGridView() throws Exception
     DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
     List<String> columnsInDefaultView = sampleSetTable.getColumnNames();
     Assert.assertThat("Columns after delete", columnsInDefaultView,
-            CoreMatchers.allOf(CoreMatchers.hasItems("Name", "Flag", "extraField", "testCol"),
+            CoreMatchers.allOf(hasItems("Name", "Flag", "extraField", "testCol"),
                     CoreMatchers.not(CoreMatchers.hasItem("defaultViewField"))));
 }
 
@@ -674,13 +680,13 @@ public void showHideFieldOnDefaultGridView() throws Exception
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
         DomainFieldRow notPhi = domainFormPanel.addField("notPHI");
-        notPhi.setPHILevel("Not PHI");
+        notPhi.setPHILevel(PropertiesEditor.PhiSelectType.NotPHI);
         DomainFieldRow limitedPHI = domainFormPanel.addField("limitedPHI");
-        limitedPHI.setPHILevel("Limited PHI");
+        limitedPHI.setPHILevel(PropertiesEditor.PhiSelectType.Limited);
         DomainFieldRow fullPHI = domainFormPanel.addField("fullPHI");
-        fullPHI.setPHILevel("Full PHI");
+        fullPHI.setPHILevel(PropertiesEditor.PhiSelectType.PHI);
         DomainFieldRow restrictedPHI = domainFormPanel.addField("restrictedPHI");
-        restrictedPHI.setPHILevel("Restricted PHI");
+        restrictedPHI.setPHILevel(PropertiesEditor.PhiSelectType.Restricted);
 
         domainDesignerPage.clickSaveAndFinish();
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
@@ -688,6 +694,12 @@ public void showHideFieldOnDefaultGridView() throws Exception
 
         DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "PHI",
+                "notPHI", "limitedPHI", "fullPHI", "restrictedPHI");
+        assertEquals("NotPHI", testColumnProperties.get("notPHI"));
+        assertEquals("Limited", testColumnProperties.get("limitedPHI"));
+        assertEquals("PHI", testColumnProperties.get("fullPHI"));
+        assertEquals("Restricted", testColumnProperties.get("restrictedPHI"));
 
         Map<String, Object> notPHiField = domainResponse.getColumns().stream().filter(a-> a.get("name").equals("notPHI")).findFirst().orElse(null);
         assertEquals("NotPHI", notPHiField.get("PHI"));
@@ -725,12 +737,10 @@ public void showHideFieldOnDefaultGridView() throws Exception
 
         domainDesignerPage.clickSaveAndFinish();
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
-        Map<String, Object> mvCol = domainResponse.getColumns().stream()
-                .filter(a->a.get("name").equals("missingValue")).findFirst().orElse(null);
-        Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
-                .filter(a->a.get("name").equals("extraField")).findFirst().orElse(null);
-        assertEquals("expect column to have MissingValue enabled", true, mvCol.get("mvEnabled"));
-        assertEquals("expect column not to have MissingValue enabled", false, extraFieldCol.get("mvEnabled"));
+        Map<String, Object> testColumnMVProperties = getPropertyPerColumn(domainResponse.getColumns(), "mvEnabled", "missingValue", "extraField");
+
+        assertEquals("expect column to have MissingValue enabled", true, testColumnMVProperties.get("missingValue"));
+        assertEquals("expect column not to have MissingValue enabled", false, testColumnMVProperties.get("extraField"));
     }
 
     @Test
@@ -758,6 +768,11 @@ public void showHideFieldOnDefaultGridView() throws Exception
         domainDesignerPage.clickSaveAndFinish();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "dimension",
+                "dimensionField", "extraField");
+        assertEquals("dimensionField should have dimension marked true", true, testColumnProperties.get("dimensionField"));
+        assertEquals("extraField shoudl not have dimension marked true", false, testColumnProperties.get("extraField"));
+
         Map<String, Object> dimensionCol = domainResponse.getColumns().stream()
                 .filter(a->a.get("name").equals("dimensionField")).findFirst().orElse(null);
         Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
@@ -791,6 +806,12 @@ public void showHideFieldOnDefaultGridView() throws Exception
         domainDesignerPage.clickSaveAndFinish();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+
+        Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "measure",
+                "measureField", "extraField");
+        assertEquals("measureField should have dimension marked true", true, testColumnProperties.get("measureField"));
+        assertEquals("extraField shoudl not have dimension marked true", false, testColumnProperties.get("extraField"));
+
         Map<String, Object> measureCol = domainResponse.getColumns().stream()
                 .filter(a->a.get("name").equals("measureField")).findFirst().orElse(null);
         Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
@@ -824,12 +845,28 @@ public void showHideFieldOnDefaultGridView() throws Exception
         domainDesignerPage.clickSaveAndFinish();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "recommendedVariable",
+                "variableField", "extraField");
+        assertEquals("variableField should have recommendedVariable marked true", true, testColumnProperties.get("variableField"));
+        assertEquals("extraField should not have recommendedVariable marked true", false, testColumnProperties.get("extraField"));
+
         Map<String, Object> variableCol = domainResponse.getColumns().stream()
                 .filter(a->a.get("name").equals("variableField")).findFirst().orElse(null);
         Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
                 .filter(a->a.get("name").equals("extraField")).findFirst().orElse(null);
-        assertEquals("expect column to have measure enabled", true, variableCol.get("recommendedVariable"));
-        assertEquals("expect column not to have measure enabled", false, extraFieldCol.get("recommendedVariable"));
+        assertEquals("expect column to have recommendedVariable enabled", true, variableCol.get("recommendedVariable"));
+        assertEquals("expect column not to have recommendedVariable enabled", false, extraFieldCol.get("recommendedVariable"));
+    }
+
+
+    public Map<String, Object> getPropertyPerColumn(List<Map<String, Object>> columns, String property, String... expectedColumnNames)
+    {
+        Map<String, Object> propertyPerColumn = new HashMap<>();
+        columns.forEach(col -> propertyPerColumn.put((String) col.get("name"), col.get(property)));
+        assertThat("Didn't find expected columns", propertyPerColumn.keySet(), hasItems(expectedColumnNames));
+        return propertyPerColumn.keySet().stream()
+                .filter(key -> Arrays.asList(expectedColumnNames).contains(key))
+                .collect(Collectors.toMap(Function.identity(), propertyPerColumn::get));
     }
 
     @Override

@@ -1,8 +1,9 @@
-package org.labkey.test.components;
+package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.WebDriver;
