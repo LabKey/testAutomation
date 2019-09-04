@@ -23,6 +23,7 @@ import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DeleteDomainCommand;
 import org.labkey.remoteapi.domain.DeleteDomainResponse;
 import org.labkey.remoteapi.domain.DomainResponse;
+import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
@@ -304,6 +305,13 @@ public class TestDataGenerator
             cmd.setOptions(domainOptions);
 
         return cmd.execute(cn, _lookupInfo.getFolder());
+    }
+
+    public DomainResponse getDomain(Connection cn) throws IOException, CommandException
+    {
+        GetDomainCommand cmd = new GetDomainCommand(getSchema(), getQueryName());
+        DomainResponse response = cmd.execute(cn, _lookupInfo.getFolder());
+        return response;
     }
 
     public DeleteDomainResponse deleteDomain(Connection cn) throws IOException, CommandException

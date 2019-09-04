@@ -1,6 +1,8 @@
-package org.labkey.test.components;
+package org.labkey.test.components.domain;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -15,11 +17,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 {
     final WebElement _el;
     final WebDriver _driver;
+    final DomainFormPanel _formPanel;
 
-    public DomainFieldRow(WebElement element, WebDriver driver)
+    public DomainFieldRow(DomainFormPanel panel, WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
+        _formPanel = panel;
     }
 
     @Override
@@ -116,6 +120,15 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Confirm Field Deletion")
                 .waitFor();
         return  confirmDeletionDlg;
+    }
+
+    public AdvancedSettingsDialog clickAdvancedSettings()
+    {
+        expand();
+        getWrapper().waitFor(()-> elementCache().advancedSettingsBtn.isEnabled(),
+                "the Advanced Settings button did not become enabled", 1500);
+        elementCache().advancedSettingsBtn.click();
+        return new AdvancedSettingsDialog(this, getDriver());
     }
 
     public DomainFieldRow expand()
@@ -301,6 +314,74 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().dateShiftBox.get();
     }
 
+    // advanced settings
+
+    public DomainFieldRow showFieldOnDefaultView(boolean checked)
+    {
+        clickAdvancedSettings()
+                .showInDefaultView(checked)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow showFieldOnInsertView(boolean checked)
+    {
+        clickAdvancedSettings()
+                .showOnInsertView(checked)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow showFieldOnUpdateView(boolean checked)
+    {
+        clickAdvancedSettings()
+                .showOnUpdateView(checked)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow setPHILevel(PropertiesEditor.PhiSelectType phiLevel)
+    {
+        clickAdvancedSettings()
+                .setPHILevel(phiLevel)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow setMeasure(boolean checked)
+    {
+        clickAdvancedSettings()
+                .enableMeasure(checked)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow setDimension(boolean checked)
+    {
+        clickAdvancedSettings()
+                .enableDimension(checked)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow setRecommendedVariable(boolean checked)
+    {
+        clickAdvancedSettings()
+                .enableRecommendedVariable(checked)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow setMissingValue(boolean checked)
+    {
+        clickAdvancedSettings()
+                .enableMissingValue(checked)
+                .apply();
+        return this;
+    }
+
+    // error and warning
+
     public boolean hasFieldError()
     {
         return getComponentElement().getAttribute("class").contains("domain-field-row-error");
@@ -375,10 +456,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row");
         private String _title = null;
+        private DomainFormPanel _domainFormPanel;
 
-        public DomainFieldRowFinder(WebDriver driver)
+        public DomainFieldRowFinder(DomainFormPanel panel, WebDriver driver)
         {
             super(driver);
+            _domainFormPanel = panel;
         }
 
         public DomainFieldRowFinder withTitle(String title)
@@ -390,7 +473,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         @Override
         protected DomainFieldRow construct(WebElement el, WebDriver driver)
         {
-            return new DomainFieldRow(el, driver);
+            return new DomainFieldRow(_domainFormPanel, el, driver);
         }
 
         @Override

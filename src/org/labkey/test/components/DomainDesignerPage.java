@@ -4,6 +4,7 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
@@ -107,7 +108,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         DomainFormPanel domainFormPanel(String domainName)                                              // for situations with multiple domainformpanels on the same page
         {
             return new DomainFormPanel.DomainFormPanelFinder(getDriver())
-                    .withTitle("Field Properties - " + domainName).findWhenNeeded(this);
+                    .withTitle(domainName).findWhenNeeded(this);
         }
         WebElement saveAndFinishButton = Locators.domainDesignerButton("Save And Finish")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
