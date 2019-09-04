@@ -25,6 +25,8 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
+import org.labkey.remoteapi.query.TruncateTableCommand;
+import org.labkey.remoteapi.query.TruncateTableResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.remoteapi.security.AddGroupMembersCommand;
 import org.labkey.remoteapi.security.CreateGroupCommand;
@@ -167,6 +169,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
         doCommandFromResponseTest();
         doExtendedFormatTest();
 
+        // NOTE: This test deletes all rows in the table so it should be done last.
+        doTruncateTableTest();
+
         log("Finished query portion of test.");
     }
 
@@ -249,6 +254,22 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertTextNotPresent("UPDATED first name");
 
         log("Completed CRUD test...");
+    }
+
+    protected void doTruncateTableTest() throws Exception
+    {
+        log("Starting TruncateTable test...");
+        Connection cn = createDefaultConnection(false);
+
+        //delete the record
+        log("Truncating the table");
+        TruncateTableCommand truncCmd = new TruncateTableCommand("lists", LIST_NAME);
+        TruncateTableResponse resp = truncCmd.execute(cn, PROJECT_NAME);
+
+        assertEquals(0, resp.getRows().size());
+        assertEquals(2L, resp.getDeletedRows());
+
+        log("Completed TruncateTable test...");
     }
 
     protected void doCommandFromResponseTest() throws Exception
