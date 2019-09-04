@@ -337,7 +337,13 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         dgen.deleteDomain(createDefaultConnection(true));
     }
 
+    /**
+     * regression for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38436
+     * @throws CommandException
+     * @throws IOException
+     */
     @Test
+    @Ignore("ignoring result until issue 38436 can be resolved.")
     public void exportMissingValueSampleSetToTSV() throws CommandException, IOException
     {
         String missingValueTable = "mvSamplesForExport";
