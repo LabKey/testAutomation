@@ -28,8 +28,8 @@ import org.labkey.remoteapi.assay.Material;
 import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.remoteapi.assay.SaveAssayBatchResponse;
-import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -338,7 +338,6 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
     }
 
     @Test
-    @Ignore
     public void exportMissingValueSampleSetToTSV() throws CommandException, IOException
     {
         String missingValueTable = "mvSamplesForExport";
@@ -385,8 +384,6 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         {
             assertTextPresent(exportFileSearcher, expectedRow);
         }
-
-        log("foo");
     }
 
 
