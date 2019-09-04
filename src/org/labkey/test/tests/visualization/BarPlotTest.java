@@ -33,6 +33,8 @@ import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 @Category({DailyC.class, Reports.class, Charting.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
@@ -210,6 +212,10 @@ public class BarPlotTest extends GenericChartsTest
 
         log("Save the plot.");
         savePlot(BAR_PLOT_SAVE_NAME_3, "This is a bar plot from the grouped bar plot test.");
+
+        log("Verify it can be resolved by report name as well as ID");
+        beginAt(getCurrentRelativeURL().replaceAll("reportId=.*", "reportId=" + URLEncoder.encode("db:" + BAR_PLOT_SAVE_NAME_3, Charset.defaultCharset())));
+        waitForText("APX-1: Abbreviated Physical Exam");
     }
 
     @LogMethod
