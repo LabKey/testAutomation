@@ -700,15 +700,6 @@ public void showHideFieldOnDefaultGridView() throws Exception
         assertEquals("Limited", testColumnProperties.get("limitedPHI"));
         assertEquals("PHI", testColumnProperties.get("fullPHI"));
         assertEquals("Restricted", testColumnProperties.get("restrictedPHI"));
-
-        Map<String, Object> notPHiField = domainResponse.getColumns().stream().filter(a-> a.get("name").equals("notPHI")).findFirst().orElse(null);
-        assertEquals("NotPHI", notPHiField.get("PHI"));
-        Map<String, Object> limitedPHIField = domainResponse.getColumns().stream().filter(a-> a.get("name").equals("limitedPHI")).findFirst().orElse(null);
-        assertEquals("Limited", limitedPHIField.get("PHI"));
-        Map<String, Object> fullPhiField = domainResponse.getColumns().stream().filter(a-> a.get("name").equals("fullPHI")).findFirst().orElse(null);
-        assertEquals("PHI", fullPhiField.get("PHI"));
-        Map<String, Object> restrictedPHIField = domainResponse.getColumns().stream().filter(a-> a.get("name").equals("restrictedPHI")).findFirst().orElse(null);
-        assertEquals("Restricted", restrictedPHIField.get("PHI"));
     }
 
     @Test
@@ -738,7 +729,6 @@ public void showHideFieldOnDefaultGridView() throws Exception
         domainDesignerPage.clickSaveAndFinish();
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
         Map<String, Object> testColumnMVProperties = getPropertyPerColumn(domainResponse.getColumns(), "mvEnabled", "missingValue", "extraField");
-
         assertEquals("expect column to have MissingValue enabled", true, testColumnMVProperties.get("missingValue"));
         assertEquals("expect column not to have MissingValue enabled", false, testColumnMVProperties.get("extraField"));
     }
@@ -771,14 +761,7 @@ public void showHideFieldOnDefaultGridView() throws Exception
         Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "dimension",
                 "dimensionField", "extraField");
         assertEquals("dimensionField should have dimension marked true", true, testColumnProperties.get("dimensionField"));
-        assertEquals("extraField shoudl not have dimension marked true", false, testColumnProperties.get("extraField"));
-
-        Map<String, Object> dimensionCol = domainResponse.getColumns().stream()
-                .filter(a->a.get("name").equals("dimensionField")).findFirst().orElse(null);
-        Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
-                .filter(a->a.get("name").equals("extraField")).findFirst().orElse(null);
-        assertEquals("expect column to have dimension enabled", true, dimensionCol.get("dimension"));
-        assertEquals("expect column not to have dimension enabled", false, extraFieldCol.get("dimension"));
+        assertEquals("extraField should not have dimension marked true", false, testColumnProperties.get("extraField"));
     }
 
     @Test
@@ -810,14 +793,7 @@ public void showHideFieldOnDefaultGridView() throws Exception
         Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "measure",
                 "measureField", "extraField");
         assertEquals("measureField should have dimension marked true", true, testColumnProperties.get("measureField"));
-        assertEquals("extraField shoudl not have dimension marked true", false, testColumnProperties.get("extraField"));
-
-        Map<String, Object> measureCol = domainResponse.getColumns().stream()
-                .filter(a->a.get("name").equals("measureField")).findFirst().orElse(null);
-        Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
-                .filter(a->a.get("name").equals("extraField")).findFirst().orElse(null);
-        assertEquals("expect column to have measure enabled", true, measureCol.get("measure"));
-        assertEquals("expect column not to have measure enabled", false, extraFieldCol.get("measure"));
+        assertEquals("extraField should not have dimension marked true", false, testColumnProperties.get("extraField"));
     }
 
     @Test
@@ -849,13 +825,6 @@ public void showHideFieldOnDefaultGridView() throws Exception
                 "variableField", "extraField");
         assertEquals("variableField should have recommendedVariable marked true", true, testColumnProperties.get("variableField"));
         assertEquals("extraField should not have recommendedVariable marked true", false, testColumnProperties.get("extraField"));
-
-        Map<String, Object> variableCol = domainResponse.getColumns().stream()
-                .filter(a->a.get("name").equals("variableField")).findFirst().orElse(null);
-        Map<String, Object> extraFieldCol = domainResponse.getColumns().stream()
-                .filter(a->a.get("name").equals("extraField")).findFirst().orElse(null);
-        assertEquals("expect column to have recommendedVariable enabled", true, variableCol.get("recommendedVariable"));
-        assertEquals("expect column not to have recommendedVariable enabled", false, extraFieldCol.get("recommendedVariable"));
     }
 
 
