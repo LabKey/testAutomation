@@ -108,7 +108,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         DomainFormPanel domainFormPanel(String domainName)                                              // for situations with multiple domainformpanels on the same page
         {
             return new DomainFormPanel.DomainFormPanelFinder(getDriver())
-                    .withTitle("Field Properties - " + domainName).findWhenNeeded(this);
+                    .withTitle(domainName).findWhenNeeded(this);
         }
         WebElement saveAndFinishButton = Locators.domainDesignerButton("Save And Finish")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);

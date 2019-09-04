@@ -8,6 +8,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +70,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFieldRow addField(String name)
     {
         getWrapper().scrollIntoView(elementCache().addFieldButton, true);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addFieldButton)); // give modal dialogs time to disappear
         elementCache().addFieldButton.click();
         List<DomainFieldRow> fieldRows = elementCache().findFieldRows();
         DomainFieldRow newFieldRow = fieldRows.get(fieldRows.size() - 1);
@@ -196,7 +198,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         protected Locator locator()
         {
             if (_title != null)
-                return _baseLocator.withDescendant(Locator.tagWithClass("div", "panel-title").withText( _title));
+                return _baseLocator.withDescendant(Locator.tagWithClass("div", "panel-heading").withText( _title));
             else
                 return _baseLocator;
         }
