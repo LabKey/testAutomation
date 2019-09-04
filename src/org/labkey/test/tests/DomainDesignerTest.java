@@ -4,6 +4,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.domain.DomainResponse;
@@ -16,20 +17,25 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.DomainFieldRow;
-import org.labkey.test.components.DomainFormPanel;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -547,8 +553,297 @@ public class DomainDesignerTest extends BaseWebDriverTest
         SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection(true));
         List<String> columnsAfterSaveAttempt = rowsResponse.getColumnModel().stream().map(col -> (String) col.get("dataIndex")).collect(Collectors.toList());
         Assert.assertThat("Columns after delete", columnsAfterSaveAttempt,
-                CoreMatchers.allOf(CoreMatchers.hasItems("Name", "testCol", "extraField"),
+                CoreMatchers.allOf(hasItems("Name", "testCol", "extraField"),
                         CoreMatchers.not(CoreMatchers.hasItem("modified"))));
+    }
+
+    /**
+     * regresses issue https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38341
+     * @throws Exception
+     */
+    @Test
+    @Ignore("ignore this test until issue 38341 is resolved")
+    public void showHideFieldOnDefaultGridView() throws Exception
+    {
+        String sampleSet = "showFieldOnDefaultGridViewSampleSet";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow defaultViewRow = domainFormPanel.addField("defaultViewField");
+        defaultViewRow.showFieldOnDefaultView(false);
+        DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
+        extraFieldRow.showFieldOnDefaultView(true); // true is default behavior
+
+        domainDesignerPage.clickSaveAndFinish();
+
+        // expect to arrive at project home, with a list of 'sampleSets'
+        clickAndWait(Locator.linkWithText(sampleSet));
+
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        List<String> columnsInDefaultView = sampleSetTable.getColumnNames();
+        Assert.assertThat("Columns after delete", columnsInDefaultView,
+                CoreMatchers.allOf(hasItems("Name", "Flag", "extraField", "testCol"),
+                        CoreMatchers.not(CoreMatchers.hasItem("defaultViewField"))));
+    }
+
+    @Test
+    public void showHideFieldOnInsertGridView() throws Exception
+    {
+        String sampleSet = "showFieldOnInsertGridViewSampleSet";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow hiddenRow = domainFormPanel.addField("hiddenField");
+        hiddenRow.showFieldOnInsertView(false);
+        DomainFieldRow shownRow = domainFormPanel.addField("shownField");
+        shownRow.showFieldOnInsertView(true);
+
+        domainDesignerPage.clickSaveAndFinish();
+
+        // expect to arrive at project home, with a list of 'sampleSets'
+        clickAndWait(Locator.linkWithText(sampleSet));
+
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        sampleSetTable.clickInsertNewRow();
+
+        waitForElement(Locator.input("quf_shownField"));
+        assertElementNotPresent(Locator.input("quf_hiddenField"));
+    }
+
+    @Test
+    public void showHideFieldOnUpdateForm() throws Exception
+    {
+        String sampleSet = "showFieldOnUpdateForm";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow hiddenRow = domainFormPanel.addField("hiddenField");
+        hiddenRow.showFieldOnUpdateView(false);
+        DomainFieldRow shownRow = domainFormPanel.addField("shownField");
+        shownRow.showFieldOnUpdateView(true);
+
+        domainDesignerPage.clickSaveAndFinish();
+        // expect to arrive at project home, with a list of 'sampleSets'
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        clickAndWait(Locator.linkWithText(sampleSet));
+
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        sampleSetTable.clickEditRow(0);
+
+        waitForElement(Locator.input("quf_shownField"));
+        assertElementNotPresent(Locator.input("quf_hiddenField"));
+    }
+
+    @Test
+    public void setPhiLevel() throws Exception
+    {
+        String sampleSet = "phiLevelSampleSet";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+
+        // create a little test data
+        dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test",
+                "notPHI", "notPHI", "limitedPHI", "limitedPHI", "fullPHI", "fullPHI", "restrictedPHI", "restrictedPHI"));
+        dgen.addCustomRow(Map.of("name", "second", "extraField", "twelve", "testCol", "blah",
+                "notPHI", "notPHI", "limitedPHI", "limitedPHI", "fullPHI", "fullPHI", "restrictedPHI", "restrictedPHI"));
+
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow notPhi = domainFormPanel.addField("notPHI");
+        notPhi.setPHILevel(PropertiesEditor.PhiSelectType.NotPHI);
+        DomainFieldRow limitedPHI = domainFormPanel.addField("limitedPHI");
+        limitedPHI.setPHILevel(PropertiesEditor.PhiSelectType.Limited);
+        DomainFieldRow fullPHI = domainFormPanel.addField("fullPHI");
+        fullPHI.setPHILevel(PropertiesEditor.PhiSelectType.PHI);
+        DomainFieldRow restrictedPHI = domainFormPanel.addField("restrictedPHI");
+        restrictedPHI.setPHILevel(PropertiesEditor.PhiSelectType.Restricted);
+
+        domainDesignerPage.clickSaveAndFinish();
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        clickAndWait(Locator.linkWithText(sampleSet));
+
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "PHI",
+                Arrays.asList("notPHI", "limitedPHI", "fullPHI", "restrictedPHI"));
+        assertEquals("NotPHI", testColumnProperties.get("notPHI"));
+        assertEquals("Limited", testColumnProperties.get("limitedPHI"));
+        assertEquals("PHI", testColumnProperties.get("fullPHI"));
+        assertEquals("Restricted", testColumnProperties.get("restrictedPHI"));
+    }
+
+    @Test
+    public void setMissingValue() throws Exception
+    {
+        String sampleSet = "setMissingValueTest";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow missingValueRow = domainFormPanel.addField("missingValue");
+        missingValueRow.setMissingValue(true);
+        // explicitly set missingValue false on extraField
+        DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
+        extraFieldRow.setMissingValue(false);
+
+        domainDesignerPage.clickSaveAndFinish();
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> testColumnMVProperties = getPropertyPerColumn(domainResponse.getColumns(), "mvEnabled",
+                Arrays.asList("missingValue", "extraField"));
+        assertEquals("expect column to have MissingValue enabled", true, testColumnMVProperties.get("missingValue"));
+        assertEquals("expect column not to have MissingValue enabled", false, testColumnMVProperties.get("extraField"));
+    }
+
+    @Test
+    public void setFieldAsDimension() throws Exception
+    {
+        String sampleSet = "setFieldAsDimension";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow dimensionField = domainFormPanel.addField("dimensionField");
+        dimensionField.setDimension(true);
+        // explicitly set dimension false on extraField
+        DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
+        extraFieldRow.setDimension(false);
+
+        domainDesignerPage.clickSaveAndFinish();
+
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "dimension",
+                Arrays.asList("dimensionField", "extraField"));
+        assertEquals("dimensionField should have dimension marked true", true, testColumnProperties.get("dimensionField"));
+        assertEquals("extraField should not have dimension marked true", false, testColumnProperties.get("extraField"));
+    }
+
+    @Test
+    public void setFieldAsMeasure() throws Exception
+    {
+        String sampleSet = "setFieldAsMeasure";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow measureField = domainFormPanel.addField("measureField");
+        measureField.setMeasure(true);
+        // explicitly set measure false on extraField
+        DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
+        extraFieldRow.setMeasure(false);
+
+        domainDesignerPage.clickSaveAndFinish();
+
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+
+        Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "measure",
+                Arrays.asList("measureField", "extraField"));
+        assertEquals("measureField should have dimension marked true", true, testColumnProperties.get("measureField"));
+        assertEquals("extraField should not have dimension marked true", false, testColumnProperties.get("extraField"));
+    }
+
+    @Test
+    public void setFieldAsVariable() throws Exception
+    {
+        String sampleSet = "setFieldAsVariable";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        List<Map<String, Object>> createdFields = createResponse.getColumns();
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFieldRow variableField = domainFormPanel.addField("variableField");
+        variableField.setRecommendedVariable(true);
+        // explicitly set recommended variable false on extraField
+        DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
+        extraFieldRow.setRecommendedVariable(false);
+
+        domainDesignerPage.clickSaveAndFinish();
+
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "recommendedVariable",
+                Arrays.asList("variableField", "extraField"));
+        assertEquals("variableField should have recommendedVariable marked true", true, testColumnProperties.get("variableField"));
+        assertEquals("extraField should not have recommendedVariable marked true", false, testColumnProperties.get("extraField"));
+    }
+
+
+    public Map<String, Object> getPropertyPerColumn(List<Map<String, Object>> columns, String property, List<String> expectedColumnNames)
+    {
+        Map<String, Object> propertyPerColumn = new HashMap<>();
+        columns.forEach(col -> propertyPerColumn.put((String) col.get("name"), col.get(property)));
+        assertThat("Didn't find expected columns", new ArrayList<>(propertyPerColumn.keySet()), hasItems(expectedColumnNames.toArray()));
+        return propertyPerColumn.keySet().stream()
+                .filter(key -> expectedColumnNames.contains(key))
+                .collect(Collectors.toMap(Function.identity(), propertyPerColumn::get));
     }
 
     @Override
