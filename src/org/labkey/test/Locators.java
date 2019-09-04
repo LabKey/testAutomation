@@ -55,6 +55,17 @@ public abstract class Locators
         return Locator.byClass("footer-block");
     }
 
+
+    public static Locator brandLink()
+    {
+        return Locator.byClass("brand-link");
+    }
+
+    public static Locator bannerPanel()
+    {
+        return Locator.byClass("row content-banner");
+    }
+
     public static Locator.XPathLocator pageSignal(String signalName)
     {
         return Locator.id("testSignals").childTag("div").withAttribute("name", signalName);

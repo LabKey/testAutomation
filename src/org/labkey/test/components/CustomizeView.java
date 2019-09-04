@@ -98,9 +98,9 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         return elementCache();
     }
 
-    public void openCustomizeViewPanel()
+    public CustomizeView openCustomizeViewPanel()
     {
-        getDataRegion().openCustomizeGrid();
+        return getDataRegion().openCustomizeGrid();
     }
 
     public boolean isPanelExpanded()
@@ -291,7 +291,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
     public void revertUnsavedView()
     {
-        _driver.clickAndWait(elements().revertButton);
+        getDataRegion().doAndWaitForUpdate(() -> _driver.clickAndWait(elements().revertButton));
     }
 
     /**

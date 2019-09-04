@@ -268,7 +268,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
     {
         final String ASSAY_NAME = "Issue26774Assay";
         final String LIST_NAME = "DataList";
-        final File STUDY_ZIP = TestFileUtils.getSampleData("AssayBackgroundImport/assayTestList.xls");
+        final File LIST_DATA = TestFileUtils.getSampleData("AssayBackgroundImport/assayTestList.xls");
 
         // This test is to cover a testing gap identified in bug 26774 (Issues linking assay runs with sample sets).
 
@@ -290,7 +290,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
 
         log("Create a list with data coming from the test file.");
 
-        _listHelper.createListFromFile(ASSAY_BACKGROUND_IMPORT_PROJECT, LIST_NAME, STUDY_ZIP);
+        _listHelper.createListFromFile(ASSAY_BACKGROUND_IMPORT_PROJECT, LIST_NAME, LIST_DATA);
 
         log("go back to home.");
         goToProjectHome(ASSAY_BACKGROUND_IMPORT_PROJECT);
@@ -312,7 +312,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
 
         checkRadioButton(Locator.radioButtonById("Fileupload"));
         waitForElement(Locator.xpath("//input[@name='__primaryFile__']"));
-        setFormElement(Locator.xpath("//input[@name='__primaryFile__']"), STUDY_ZIP);
+        setFormElement(Locator.xpath("//input[@name='__primaryFile__']"), LIST_DATA);
 
         clickButton("Save and Finish", "Data Pipeline");
 

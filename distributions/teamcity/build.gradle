@@ -26,14 +26,20 @@ if (project.hasProperty('inheritedDistPath'))
     project.logger.info("inheriting from distribution ${inheritedDistPath}")
     project.evaluationDependsOn(inheritedDistPath)
     Distribution.inheritDependencies(project, inheritedDistPath)
-    String dumbsterModulePath;
-    if (project.findProject(":server:modules:dumbster") != null)
-        dumbsterModulePath = ":server:modules:dumbster"
-    else
-        dumbsterModulePath = "${BuildUtils.getTestProjectPath(project.gradle)}:modules:dumbster"
-    BuildUtils.addModuleDistributionDependencies(project, [dumbsterModulePath,
-                                                           BuildUtils.getPlatformModuleProjectPath(project.gradle, "devtools"),
-                                                           "${BuildUtils.getTestProjectPath(project.gradle)}:modules:simpletest"])
+
+    String testModulesPath = "${BuildUtils.getTestProjectPath(project.gradle)}:modules"
+    String dumbsterModule = "${testModulesPath}:dumbster"
+    String simpletestModule = "${testModulesPath}:simpletest"
+    String devtoolsModule = BuildUtils.getPlatformModuleProjectPath(project.gradle, "devtools")
+    List<String> testModules = [dumbsterModule, simpletestModule, devtoolsModule]
+    if (project.hasProperty("inheritedDistIncludeAllTestModules"))
+    {
+        project.findProject(testModulesPath).subprojects {
+            Project testModule -> testModules.add(testModule.path)
+        }
+    }
+    BuildUtils.addModuleDistributionDependencies(project, testModules)
+
     def split = inheritedDistPath.split(":")
     String inheritedDistName = split[split.length - 1]
     tasks.distribution.subDirName = "test/" + inheritedDistName

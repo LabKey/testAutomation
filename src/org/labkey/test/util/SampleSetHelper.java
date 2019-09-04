@@ -123,9 +123,12 @@ public class SampleSetHelper extends WebDriverWrapper
         props.setName(name);
         props.setNameExpression(nameExpression);
         _fields = fields;
-        for (String fieldName : fields.keySet())
+        if (fields != null)
         {
-            props.addField(new FieldDefinition(fieldName).setType(fields.get(fieldName)));
+            for (String fieldName : fields.keySet())
+            {
+                props.addField(new FieldDefinition(fieldName).setType(fields.get(fieldName)));
+            }
         }
 
         createSampleSet(props);
