@@ -114,7 +114,7 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
         pass = validateCount("span.fa-file-image-o", 6) & pass;
 
         log("Validate number of archive icons is correct.");
-        pass = validateCount("span.fa-file-archive-o", 3) & pass;
+        pass = validateCount("span.fa-file-archive-o", 4) & pass;
 
         log("Validate number of video icons is correct.");
         pass = validateCount("span.fa-file-video-o", 1) & pass;
@@ -126,10 +126,13 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
         pass = validateCount("span.fa-file-excel-o", 4) & pass;
 
         log("Validate number of list icons is correct.");
-        pass = validateCount("span.fa-list-alt", 1) & pass;
+        pass = validateCount("span.fa-list-alt", 2) & pass;
 
         log("Validate number of powerpoint icons is correct.");
         pass = validateCount("span.fa-file-powerpoint-o", 2) & pass;
+
+        log("Validate number of file icons is correct.");
+        pass = validateCount("span.fa-file-o", 1) & pass;
 
         assertTrue("Count(s) for icons were not as expected. Review log to find the counts that were wrong.", pass);
     }
