@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -30,31 +31,52 @@ public class UIAssayHelper extends AbstractAssayHelper
         super(test);
     }
 
-    public void importAssay(int assayID, File file, String projectPath) throws CommandException, IOException
-    {
-        throw new RuntimeException("Not implemented");
-    }
-
     @Override
     public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {
-        String[] folders = projectPath.split("/");
-        _test.clickProject(folders[0]);
-        if (folders.length > 1)
-            _test.clickFolder(folders[folders.length - 1]);
-        _test.clickAndWait(Locator.linkWithText(assayName));
-        _test.clickButton("Import Data");
-        _test.clickButton("Next");
-
-        _test.checkRadioButton(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
-        _test.setFormElement(Locator.name("__primaryFile__"), file);
-        _test.clickButton("Save and Finish");
+        importAssay(assayName, file, projectPath, null, null);
     }
 
     @Override
     public void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException
     {
-        importAssay(assayName, file, projectPath); //UI doesn't need to worry about the batch properties, it's done automatically
+        importAssay(assayName, file, projectPath, batchProperties, null);
+    }
+
+    public void importAssay(String assayName, File file, String projectPath, @Nullable Map<String, Object> batchProperties, @Nullable Map<String, Object> runProperties)
+    {
+        String[] folders = projectPath.split("/");
+        _test.clickProject(folders[0]);
+        if (folders.length > 1)
+            _test.clickFolder(folders[folders.length - 1]);
+
+        _test.clickAndWait(Locator.linkWithText(assayName));
+        _test.clickButton("Import Data");
+
+        if(null != batchProperties)
+        {
+            for(String tagName : batchProperties.keySet())
+            {
+                _test.setFormElement(Locator.name(tagName), batchProperties.get(tagName).toString());
+            }
+        }
+
+        _test.clickButton("Next");
+
+        if(null != runProperties)
+        {
+            for(String tagName : runProperties.keySet())
+            {
+                _test.setFormElement(Locator.name(tagName), runProperties.get(tagName).toString());
+            }
+        }
+
+        _test.checkRadioButton(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
+
+        _test.setFormElement(Locator.name("__primaryFile__"), file);
+
+        _test.clickButton("Save and Finish");
+
     }
 
     @Override
