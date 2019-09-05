@@ -6,8 +6,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.GetDomainCommand;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -186,8 +188,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("deleteMe", FieldDefinition.ColumnType.String)
                 ));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        List<Map<String, Object>> createdFields = createResponse.getColumns();
-        assertTrue(createdFields.get(0).get("name").equals("deleteMe"));
+        List<PropertyDescriptor> createdFields = createResponse.getDomain().getFields();
+        assertTrue(createdFields.get(0).getName().equals("deleteMe"));
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
@@ -200,8 +202,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         GetDomainCommand domainCommand = new GetDomainCommand("exp.materials", sampleSet);
         DomainResponse afterResponse = domainCommand.execute(createDefaultConnection(true), getProjectName());
-        List<Map<String, Object>> remainingFields = afterResponse.getColumns();
-        assertEquals("expect only field in the domain to have been deleted", 0, remainingFields.size());
+        Domain domain = afterResponse.getDomain();
+        assertEquals("expect only field in the domain to have been deleted", 0, domain.getFields().size());
 
         // double-check to ensure the column has been deleted
         SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection(true));
@@ -225,8 +227,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        List<Map<String, Object>> createdFields = createResponse.getColumns();
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
@@ -273,8 +274,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        List<Map<String, Object>> createdFields = createResponse.getColumns();
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
@@ -314,8 +314,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        List<Map<String, Object>> createdFields = createResponse.getColumns();
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
@@ -353,8 +352,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
-        List<Map<String, Object>> createdFields = createResponse.getColumns();
+        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
@@ -378,8 +376,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
-        List<Map<String, Object>> createdFields = createResponse.getColumns();
+        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
 
         dgen.addCustomRow(Map.of("name", "first", "color", "orange"));
         dgen.addCustomRow(Map.of("name", "second", "color", "green"));
@@ -425,8 +422,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)
                             .setRequired(true),                                                                 // <-- marked 'required'
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
-        List<Map<String, Object>> createdFields = createResponse.getColumns();
+        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
 
         dgen.addCustomRow(Map.of("name", "first", "color", "orange"));
         dgen.addCustomRow(Map.of("name", "second", "color", "green"));
@@ -461,8 +457,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        List<Map<String, Object>> createdFields = createResponse.getColumns();
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
@@ -483,8 +478,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        List<Map<String, Object>> createdFields = createResponse.getColumns();
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
@@ -526,8 +520,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        List<Map<String, Object>> createdFields = createResponse.getColumns();
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);

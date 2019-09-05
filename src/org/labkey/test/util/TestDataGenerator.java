@@ -15,14 +15,16 @@
  */
 package org.labkey.test.util;
 
+import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
-import org.labkey.remoteapi.domain.DeleteDomainCommand;
-import org.labkey.remoteapi.domain.DeleteDomainResponse;
 import org.labkey.remoteapi.domain.DomainResponse;
+import org.labkey.remoteapi.domain.DropDomainCommand;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
@@ -168,12 +170,14 @@ public class TestDataGenerator
         return _rows.size();
     }
 
-    public List<Map<String, Object>> getColumns()
+    private List<PropertyDescriptor> getColumns()
     {
-        List<Map<String, Object>> cols = new ArrayList<>();
-        for (String key: _columns.keySet())
+        List<PropertyDescriptor> cols = new ArrayList<>();
+        for (FieldDefinition field : _columns.values())
         {
-            cols.add(_columns.get(key).toMap());
+            JSONObject json = new JSONObject();
+            json.putAll(field.toMap());
+            cols.add(new PropertyDescriptor(json));
         }
         return cols;
     }
@@ -276,7 +280,7 @@ public class TestDataGenerator
     public DomainResponse createDomain(Connection cn, String domainKind, Map domainOptions) throws IOException, CommandException
     {
         CreateDomainCommand cmd = new CreateDomainCommand(domainKind, getQueryName());
-        cmd.setColumns(getColumns());
+        cmd.getDomainDesign().setFields(getColumns());
 
         if (domainOptions!= null)
             cmd.setOptions(domainOptions);
@@ -284,9 +288,9 @@ public class TestDataGenerator
         return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
-    public DeleteDomainResponse deleteDomain(Connection cn) throws IOException, CommandException
+    public CommandResponse deleteDomain(Connection cn) throws IOException, CommandException
     {
-        DeleteDomainCommand delCmd = new DeleteDomainCommand(getSchema(), getQueryName());
+        DropDomainCommand delCmd = new DropDomainCommand(getSchema(), getQueryName());
         return delCmd.execute(cn, _lookupInfo.getFolder());
     }
 
