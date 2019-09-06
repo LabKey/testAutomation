@@ -15,9 +15,18 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.domain.CreateDomainCommand;
+import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.DomainResponse;
+import org.labkey.remoteapi.domain.DropDomainCommand;
+import org.labkey.remoteapi.domain.GetDomainCommand;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
+import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -42,14 +51,19 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PermissionsHelper.PrincipalType;
 import org.labkey.test.util.PortalHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -74,18 +88,22 @@ public class JavaClientApiTest extends BaseWebDriverTest
     public static final String USER_NAME = "user1@javaclientapi.test";
     public static final String GROUP_NAME = "TEST GROUP";
 
-    @Test
-    public void testSteps() throws Exception
+    @BeforeClass
+    @LogMethod
+    public static void doSetup() throws Exception
     {
-        log("Starting Java client api library test...");
-        _containerHelper.createProject(PROJECT_NAME, null);
-        doSecurityTest();
-        doQueryTest();
-
-        log("Finished Java client api library test.");
+        JavaClientApiTest initTest = (JavaClientApiTest)getCurrentTest();
+        initTest.setupProject();
     }
 
-    protected void doSecurityTest() throws Exception
+    @LogMethod
+    private void setupProject()
+    {
+        _containerHelper.createProject(getProjectName(), null);
+    }
+
+    @Test
+    public void doSecurityTest() throws Exception
     {
         log("Starting security portion of test...");
         clickProject(PROJECT_NAME);
@@ -139,7 +157,8 @@ public class JavaClientApiTest extends BaseWebDriverTest
         _userHelper.deleteUsers(true, USER_NAME);
     }
 
-    protected void doQueryTest() throws Exception
+    @Test
+    public void doQueryTest() throws Exception
     {
         log("Starting query portion of test...");
         clickProject(PROJECT_NAME);
@@ -340,6 +359,75 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertEquals("Too many rows when maxrows=0", 0, resp.getRows().size());
 
         log("Completed test of maxrows=0");
+    }
+
+    @Test
+    public void doDomainTest() throws Exception
+    {
+        String LIST_NAME = "ApiTestList";
+
+        log("Testing domain APIs");
+        Connection cn = new Connection(getBaseURL());
+
+        CreateDomainCommand createCmd = new CreateDomainCommand("IntList", LIST_NAME);
+        createCmd.setOptions(Collections.singletonMap("keyName", "key"));
+
+        Domain design = createCmd.getDomainDesign();
+        List<PropertyDescriptor> fields = new ArrayList<>();
+        fields.add(new PropertyDescriptor("foo", "string"));
+        fields.add(new PropertyDescriptor("bar", "int"));
+        fields.add(new PropertyDescriptor("baz", "date"));
+
+        design.setFields(fields);
+        DomainResponse response = createCmd.execute(cn, PROJECT_NAME);
+
+        assertTrue("Create domain request failed", 200 == response.getStatusCode());
+
+        Set<String> expected = new HashSet<>(Arrays.asList("key", "foo", "bar", "baz"));
+        verifyDomain(response.getDomain(), expected);
+
+        GetDomainCommand getCmd = new GetDomainCommand("lists", LIST_NAME);
+        response = getCmd.execute(cn, PROJECT_NAME);
+        verifyDomain(response.getDomain(), expected);
+
+        log("modify the existing domain");
+        SaveDomainCommand saveCmd = new SaveDomainCommand("lists", LIST_NAME);
+        Domain domain = response.getDomain();
+        saveCmd.setDomainDesign(domain);
+        domain.getFields().add(new PropertyDescriptor("new field", "string"));
+        PropertyDescriptor lookup = new PropertyDescriptor("new field with lookup", "string");
+        lookup.setLookup("lists", "fakeLookup", null);
+        domain.getFields().add(lookup);
+
+        response = saveCmd.execute(cn, PROJECT_NAME);
+
+        expected.add("new field");
+        expected.add("new field with lookup");
+        verifyDomain(response.getDomain(), expected);
+
+        log("remove some fields from the existing domain");
+        domain.getFields().remove(domain.getFields().size()-1);
+        domain.getFields().remove(domain.getFields().size()-1);
+
+        expected.remove("new field");
+        expected.remove("new field with lookup");
+
+        response = saveCmd.execute(cn, PROJECT_NAME);
+        verifyDomain(response.getDomain(), expected);
+
+        DropDomainCommand dropCmd = new DropDomainCommand("lists", LIST_NAME);
+        CommandResponse cmdResponse = dropCmd.execute(cn, PROJECT_NAME);
+        assertTrue("Drop domain request failed", 200 == cmdResponse.getStatusCode());
+    }
+
+    private void verifyDomain(Domain domain, Set<String> expectedFields)
+    {
+        assertTrue("Wrong number of fields created", domain.getFields().size() == expectedFields.size());
+
+        for (PropertyDescriptor descriptor : domain.getFields())
+        {
+            assertTrue("unexpected field", expectedFields.contains(descriptor.getName()));
+        }
     }
 
     public void assertUserExists(String email)
