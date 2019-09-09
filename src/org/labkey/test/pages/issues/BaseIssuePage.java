@@ -182,7 +182,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
             if (issueComments == null)
             {
                 List<WebElement> commentEls = Locator.css("div.currentIssue").findElements(this);
-                issueComments = Collections.unmodifiableList(commentEls.stream().map(IssueComment::new).collect(Collectors.toList()));
+                issueComments = commentEls.stream().map(IssueComment::new).collect(Collectors.toUnmodifiableList());
             }
 
             return issueComments;
@@ -196,6 +196,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
         private String timestamp;
         private String comment;
         private Map<String, String> fieldChanges;
+        private Map<String, WebElement> attachments;
 
         IssueComment(WebElement component)
         {
@@ -232,7 +233,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
 
                 for (String change : changes)
                 {
-                    Pattern pattern = Pattern.compile("(.+)\uc2bb(.*)");
+                    Pattern pattern = Pattern.compile("(.+)\\uc2bb(.*)");
                     Matcher matcher = pattern.matcher(change);
 
                     if (matcher.find())
@@ -244,6 +245,29 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
                 }
             }
             return fieldChanges;
+        }
+
+        public Map<String, WebElement> getAttachments()
+        {
+            if (attachments == null)
+            {
+                attachments = new HashMap<>();
+                List<WebElement> links = Collections.unmodifiableList(Locator.css(".issues-attachments a").findElements(component));
+                if (!links.isEmpty())
+                {
+                    links.forEach(link -> {
+                        String nonBlank = shortWait().withMessage("Attachment link was blank").until(wd -> {
+                            String text = link.getText().trim();
+                            if (text.isEmpty())
+                                return null;
+                            else
+                                return text;
+                        });
+                        attachments.put(nonBlank, link);
+                    });
+                }
+            }
+            return attachments;
         }
     }
 }
