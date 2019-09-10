@@ -668,6 +668,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         final String ALIAS_NAME_CONFLICT = "ConflictName";
         final String GOOD_PARENT_NAME = "P8";
         final String SAMPLE_SET_NAME = "SimpleSampleSet08";
+        final String CURRENT_SAMPLE_SET_OPTION = "(Current Sample Set)";
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
@@ -691,7 +692,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         log("Add a parent alias column to the sample set that conflicts with a given column name.");
         sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
 
-        sampleHelper.addParentColumnAlias(Map.of(ALIAS_NAME_CONFLICT, SAMPLE_SET_NAME));
+        sampleHelper.addParentColumnAlias(Map.of(ALIAS_NAME_CONFLICT, CURRENT_SAMPLE_SET_OPTION));
 
         clickButton("Update");
 
@@ -703,7 +704,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         log("Now add a valid parent column and check that you cannot now add a field in the sample set with the same name.");
 
-        sampleHelper.addParentColumnAlias(Map.of(GOOD_PARENT_NAME, SAMPLE_SET_NAME));
+        sampleHelper.addParentColumnAlias(Map.of(GOOD_PARENT_NAME, CURRENT_SAMPLE_SET_OPTION));
 
         clickButton("Update");
 
