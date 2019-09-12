@@ -213,6 +213,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         log("Check Absolute File Path in File Browser");
 
         final String ABSOLUTE_FILE_PATH_BUTTON_ID = "10";
+        final String s = File.separator;
 
         new ApiPermissionsHelper(this)
                 .setSiteAdminRoleUserPermissions(PasswordUtil.getUsername(), "See Absolute File Paths");
@@ -230,7 +231,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         String absolutePath = FileBrowserHelper.Locators.gridRowWithNodeId(filename)
                 .append(Locator.byClass("x4-grid-cell").last()).findElement(getDriver()).getText();
-        assertThat("Absolute file path for file", absolutePath, CoreMatchers.containsString("/@files/" + filename));
+        assertThat("Absolute file path for file", absolutePath, CoreMatchers.containsString(s + "@files" + s + filename));
 
         log("Check Absolute File Path in WebDav");
         URL webdavURL = new URL(WebTestHelper.getBaseURL() + "/_webdav" + getCurrentContainerPath() + "/@files");
@@ -240,7 +241,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
                 .append(Locator.tagWithText("th", "Absolute Path:").followingSibling("td"))
                 .findElement(getDriver()).getText();
 
-        assertThat("Absolute file path", absolutePath, CoreMatchers.containsString("/@files"));
+        assertThat("Absolute file path", absolutePath, CoreMatchers.containsString(s + "@files"));
     }
 
     @LogMethod(quiet = true)
