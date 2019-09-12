@@ -33,6 +33,11 @@ public class FieldDefinition
     private FieldValidator _validator;
     private String _url;
     private Integer _scale;
+    private boolean _hidden = false;
+    private boolean _shownInDetailsView = true;
+    private boolean _shownInInsertView = true;
+    private boolean _shownInUpdateView = true;
+    private boolean _isPrimaryKey = false;
 
     public FieldDefinition(String name, ColumnType type)
     {
@@ -160,6 +165,57 @@ public class FieldDefinition
         return _scale;
     }
 
+    public boolean isHidden()
+    {
+        return _hidden;
+    }
+
+    public FieldDefinition isHidden(boolean hidden)
+    {
+        _hidden = hidden;
+        return this;
+    }
+
+    public boolean isPrimaryKey()
+    {
+        return  _isPrimaryKey;
+    }
+    public FieldDefinition isPrimaryKey(boolean isPrimaryKey)
+    {
+        _isPrimaryKey = isPrimaryKey;
+        return this;
+    }
+
+    public boolean shownInDetailsView()
+    {
+        return _shownInDetailsView;
+    }
+    public FieldDefinition shownInDetailsView(boolean showInDetailsView)
+    {
+        _shownInDetailsView = showInDetailsView;
+        return this;
+    }
+
+    public boolean shownInInsertView()
+    {
+        return _shownInInsertView;
+    }
+    public FieldDefinition shownInInsertView(boolean showInDetailsView)
+    {
+        _shownInInsertView = showInDetailsView;
+        return this;
+    }
+
+    public boolean shownInUpdateView()
+    {
+        return _shownInUpdateView;
+    }
+    public FieldDefinition shownInUpdateView(boolean showInDetailsView)
+    {
+        _shownInUpdateView = showInDetailsView;
+        return this;
+    }
+
     public FieldDefinition setScale(Integer scale)
     {
         _scale = scale;
@@ -190,11 +246,16 @@ public class FieldDefinition
         if (getDescription() != null)
             map.put("description", getDescription());
         if (getFormat() != null)
-            map.put("formatString", getFormat());
+            map.put("format", getFormat());
         map.put("mvEnabled", isMvEnabled());
         map.put("required", isRequired());
         if (getScale() != null)
             map.put("scale", getScale());
+        map.put("hidden", isHidden());
+        map.put("isPrimaryKey", isPrimaryKey());
+        map.put("shownInDetailsView", shownInDetailsView());
+        map.put("shownInInsertView", shownInInsertView());
+        map.put("shownInUpdateView", shownInUpdateView());
 
         return map;
     }
