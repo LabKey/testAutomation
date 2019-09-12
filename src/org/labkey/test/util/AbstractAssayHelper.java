@@ -58,7 +58,11 @@ public abstract class AbstractAssayHelper
         goToUploadXarPage();
         _test.setFormElement(Locator.name("uploadFile"), file);
         _test.clickAndWait(Locator.lkButton("Upload"));
-        _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
+
+        // Allow for other pipeline jobs that may have already run.
+        int alreadyCompletedJobs = Locator.linkContainingText("COMPLETE").findElements(_test.getDriver()).size();
+
+        _test.waitForPipelineJobsToComplete(pipelineCount + alreadyCompletedJobs, "Uploaded file - " + file.getName(), false);
     }
 
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
