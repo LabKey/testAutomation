@@ -348,47 +348,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     }
 
-    @Test
-    public void testReservedFieldNames()
-    {
-
-        log("Validate that reserved values cannot be used as field names.");
-
-        List<String> reserveredNames = Arrays.asList("Name", "Description", "Flag", "RowId", "SampleSet", "Folder", "Run", "Inputs", "Outputs");
-
-        clickProject(PROJECT_NAME);
-
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet("InvalidFieldNames");
-
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getWrappedDriver()).withTitle("Field Properties").waitFor();
-
-        fieldProperties.addField();
-
-        StringBuilder errorMsg = new StringBuilder();
-
-        reserveredNames.forEach(value -> {
-            setFormElement(Locator.tagWithName("input", "ff_name0"), value);
-            try
-            {
-                waitForElementToBeVisible(Locator.xpath("//input[@title=\"'" + value + "' is reserved\"]"));
-            }
-            catch (NoSuchElementException nse)
-            {
-                errorMsg.append(value);
-                errorMsg.append(" is not marked as a reserved field name.");
-                errorMsg.append("\n");
-            }
-        });
-
-        if(errorMsg.length() > 0)
-            Assert.fail(errorMsg.toString());
-
-        clickButton("Cancel");
-
-        log("Looks like all reserved filed names were caught.");
-    }
-
     /**
      *  coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37466
      * @throws IOException
