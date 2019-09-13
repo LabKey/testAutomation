@@ -131,6 +131,15 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return new AdvancedSettingsDialog(this, getDriver());
     }
 
+    public DomainFieldRow clickCancelCross()
+    {
+        expand();
+        getWrapper().waitFor(()-> elementCache().cancelCross.isEnabled(),
+                "Cancel cross icon did not become enabled", 1500);
+        elementCache().cancelCross.click();
+        return this;
+
+    }
     public DomainFieldRow expand()
     {
         if (!isExpanded())
@@ -314,6 +323,45 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().dateShiftBox.get();
     }
 
+    public DomainFieldRow setFromFolder(String formatString)
+    {
+        expand();
+        getWrapper().setFormElement(elementCache().fromFolderInput, formatString);
+        return this;
+    }
+
+    public String getFromFolder()
+    {
+        expand();
+        return getWrapper().getFormElement(elementCache().fromFolderInput);
+    }
+
+    public DomainFieldRow setFromSchema(String formatString)
+    {
+        expand();
+        getWrapper().setFormElement(elementCache().fromSchemaInput, formatString);
+        return this;
+    }
+
+    public String getFromSchema()
+    {
+        expand();
+        return getWrapper().getFormElement(elementCache().fromSchemaInput);
+    }
+
+    public DomainFieldRow setFromTargetTable(String formatString)
+    {
+        expand();
+        getWrapper().setFormElement(elementCache().fromTargetTableInput, formatString);
+        return this;
+    }
+
+    public String getFromTargetTable()
+    {
+        expand();
+        return getWrapper().getFormElement(elementCache().fromTargetTableInput);
+    }
+
     // advanced settings
 
     public DomainFieldRow showFieldOnDefaultView(boolean checked)
@@ -407,11 +455,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Checkbox fieldRequiredCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-required-")
                 .findWhenNeeded(this));
 
-        public WebElement domainFieldDetailsSpan = Locator.tagWithClass("span", "domain-field-details")
+        public WebElement domainFieldDetailsSpan = Locator.tagWithClass("div", "domain-field-details")
                 .findWhenNeeded(this);
 
         public WebElement expandToggle = Locator.tagWithClass("div", "domain-field-icon")
-                .child(Locator.tagWithAttribute("svg", "data-icon", "pencil-alt"))
+                .child(Locator.tagWithAttribute("svg", "data-icon", "plus-square"))
                 .findWhenNeeded(this);
 
         // controls revealed when expanded
@@ -419,6 +467,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement advancedSettingsBtn = Locator.tagWithText("button", "Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        public WebElement cancelCross = Locator.tagWithAttribute("svg", "data-icon","times")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+
 
         // common field options
         public WebElement descriptionTextArea = Locator.tagWithAttributeContaining("textarea", "id", "domainpropertiesrow-description-")
@@ -449,6 +500,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this), getDriver());
         public Checkbox dateShiftBox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-excludeFromShifting")
                 .refindWhenNeeded(this));
+
+        //lookup field options
+        public WebElement fromFolderInput = Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-lookupContainer-")
+                .findWhenNeeded(this);
+        public WebElement fromSchemaInput = Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-lookupSchema-")
+                .findWhenNeeded(this);
+        public WebElement fromTargetTableInput = Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-lookupQueryValue-")
+                .findWhenNeeded(this);
+
+
     }
 
 

@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
@@ -26,6 +27,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -833,6 +835,58 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 Arrays.asList("variableField", "extraField"));
         assertEquals("variableField should have recommendedVariable marked true", true, testColumnProperties.get("variableField"));
         assertEquals("extraField should not have recommendedVariable marked true", false, testColumnProperties.get("extraField"));
+    }
+
+    @Test
+    public void testLookUpFieldSameContainer() throws IOException, CommandException
+    {
+        String sampleSet = "setFieldAsLookup";
+        String listName = "lookUpList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+
+        lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+
+        DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
+                .setType("Lookup")
+                .expand()
+                .setFromFolder("Current Folder")
+                .setFromSchema("lists")
+                .setFromTargetTable("lookUpList (Integer)")
+                .setDescription("LookUp in same container")
+                .clickCancelCross();
+
+        assertEquals("Incorrect detail message","/DomainDesignerTest Project > lists > lookUpList",lookUpRow.detailsMessage());
+
+        domainDesignerPage.saveButton().click();
+
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        Map<String, Object> testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "lookupContainer",
+                Arrays.asList("lookUpField"));
+        assertEquals("lookUpField from folder is incorrect", "current", testColumnProperties.get("lookUpField"));
+
+        testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "lookupSchema",
+                Arrays.asList("lookUpField"));
+        assertEquals("lookUpField schema name is incorrect", "lists", testColumnProperties.get("lookUpField"));
+
+        testColumnProperties = getPropertyPerColumn(domainResponse.getColumns(), "lookupQuery",
+                Arrays.asList("lookUpField"));
+        assertEquals("lookUpField target table is incorrect", listName, testColumnProperties.get("lookUpField"));
+
     }
 
 

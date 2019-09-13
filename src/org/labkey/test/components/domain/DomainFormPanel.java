@@ -105,7 +105,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     {
         protected WebElement addFieldButton = new WebElementWrapper()
         {
-            WebElement el = Locator.byClass("domain-form-add").findWhenNeeded(DomainFormPanel.this);
+            WebElement el = Locator.css(".domain-form-add-btn .btn").findWhenNeeded(DomainFormPanel.this);
 
             @Override
             public WebElement getWrappedElement()
