@@ -1,12 +1,14 @@
-package org.labkey.test.components;
+package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +69,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFieldRow addField(String name)
     {
+        getWrapper().scrollIntoView(elementCache().addFieldButton, true);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addFieldButton)); // give modal dialogs time to disappear
         elementCache().addFieldButton.click();
         List<DomainFieldRow> fieldRows = elementCache().findFieldRows();
         DomainFieldRow newFieldRow = fieldRows.get(fieldRows.size() - 1);
@@ -78,7 +82,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFormPanel removeField(String name)
     {
         getField(name).clickRemoveField().dismiss("Yes");
-
+        clearElementCache();
         return this;
     }
 
@@ -92,6 +96,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return elementCache().findFieldRows().get(tabIndex);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -101,7 +106,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     {
         protected WebElement addFieldButton = new WebElementWrapper()
         {
-            WebElement el = Locator.byClass("domain-form-add").findWhenNeeded(DomainFormPanel.this);
+            WebElement el = Locator.byClass("domain-form-add-btn").child(Locator.tag("span")).findWhenNeeded(DomainFormPanel.this);
 
             @Override
             public WebElement getWrappedElement()
@@ -138,7 +143,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             {
                 fieldRows = new ArrayList<>();
                 rowLoc.findElements(DomainFormPanel.this.getComponentElement())
-                        .forEach(e -> fieldRows.add(new DomainFieldRow(e, getDriver())));
+                        .forEach(e -> fieldRows.add(new DomainFieldRow(DomainFormPanel.this, e, getDriver())));
             }
             return fieldRows;
         }
@@ -194,7 +199,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         protected Locator locator()
         {
             if (_title != null)
-                return _baseLocator.withDescendant(Locator.tagWithClass("div", "panel-title").withText( _title));
+                return _baseLocator.withDescendant(Locator.tagWithClass("div", "panel-heading").withText( _title));
             else
                 return _baseLocator;
         }

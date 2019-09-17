@@ -31,6 +31,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
     private static final String PROJECT_NAME = "SampleSetParentAliasProject";
     private static final String SUB_FOLDER_NAME = "ParentAliasSubFolder";
+    private static final String CURRENT_SAMPLE_SET_OPTION = "(Current Sample Set)";
 
     protected static final String PARENT_CONTAINER_SAMPLE_SET_NAME = "PrePopulatedSampleSet";
     protected static final String PARENT_CONTAINER_SAMPLE_SET_CAPTION = "Pre Populated Sample Set";
@@ -53,6 +54,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
             COL_DESCRIPTION_CAPTION, COL_DESCRIPTION_NAME,
             COL_NAME_CAPTION, COL_NAME_NAME);
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");
@@ -279,7 +281,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, SAMPLE_SET_NAME));
+        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, CURRENT_SAMPLE_SET_OPTION));
 
         log("Import samples that have an alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -326,7 +328,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN_1, SAMPLE_SET_NAME));
+        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN_1, CURRENT_SAMPLE_SET_OPTION));
 
         log("Import samples that have an alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -470,7 +472,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME,
                 PROJECT_NAME + "/" + SUB_FOLDER_NAME,
                 Map.of(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_SET_NAME,
-                        PARENT_COLUMN_SUB, SAMPLE_SET_NAME));
+                        PARENT_COLUMN_SUB, CURRENT_SAMPLE_SET_OPTION));
 
         log("Import samples that have an alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -528,7 +530,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME,
                 PROJECT_NAME + "/" + SUB_FOLDER_NAME,
                 Map.of(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_SET_NAME,
-                        PARENT_COLUMN_SUB, SAMPLE_SET_NAME));
+                        PARENT_COLUMN_SUB, CURRENT_SAMPLE_SET_OPTION));
 
         log("Import samples that use the 'materialInputs column header.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -611,7 +613,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, SAMPLE_SET_NAME));
+        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, CURRENT_SAMPLE_SET_OPTION));
 
         log("Import samples that have an alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -691,7 +693,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         log("Add a parent alias column to the sample set that conflicts with a given column name.");
         sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
 
-        sampleHelper.addParentColumnAlias(Map.of(ALIAS_NAME_CONFLICT, SAMPLE_SET_NAME));
+        sampleHelper.addParentColumnAlias(Map.of(ALIAS_NAME_CONFLICT, CURRENT_SAMPLE_SET_OPTION));
 
         clickButton("Update");
 
@@ -703,7 +705,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         log("Now add a valid parent column and check that you cannot now add a field in the sample set with the same name.");
 
-        sampleHelper.addParentColumnAlias(Map.of(GOOD_PARENT_NAME, SAMPLE_SET_NAME));
+        sampleHelper.addParentColumnAlias(Map.of(GOOD_PARENT_NAME, CURRENT_SAMPLE_SET_OPTION));
 
         clickButton("Update");
 

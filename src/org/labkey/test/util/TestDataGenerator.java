@@ -24,12 +24,14 @@ import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.DropDomainCommand;
+import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 
@@ -217,6 +219,11 @@ public class TestDataGenerator
             case "int":
                 return () -> randomInt(0, 20);
             case "http://www.w3.org/2001/xmlschema#int":
+                return () -> randomInt(0, 20);
+            case "float":
+                return () -> randomFloat(0, 20);
+            case "double":
+                return () -> randomDouble(0, 20);
             default:
                 throw new IllegalArgumentException("ColumnType " + columnType + " isn't implemented yet");
         }
@@ -240,6 +247,22 @@ public class TestDataGenerator
 
         Random r = new Random();
         return r.nextInt((max - min) + 1) + min;
+    }
+
+    public float randomFloat(float min, float max)
+    {
+        if (min >= max)
+            throw new IllegalArgumentException("min must be less than max");
+        Random r = new Random();
+        return  min + r.nextFloat() * (max - min);
+    }
+
+    public Double randomDouble(double min, double max)
+    {
+        if (min >= max)
+            throw new IllegalArgumentException("min must be less than max");
+        Random r = new Random();
+        return  min + r.nextDouble() * (max - min);
     }
 
     /*
@@ -288,6 +311,13 @@ public class TestDataGenerator
         return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
+    public DomainResponse getDomain(Connection cn) throws IOException, CommandException
+    {
+        GetDomainCommand cmd = new GetDomainCommand(getSchema(), getQueryName());
+        DomainResponse response = cmd.execute(cn, _lookupInfo.getFolder());
+        return response;
+    }
+
     public CommandResponse deleteDomain(Connection cn) throws IOException, CommandException
     {
         DropDomainCommand delCmd = new DropDomainCommand(getSchema(), getQueryName());
@@ -310,6 +340,14 @@ public class TestDataGenerator
         insertRowsCommand.setRows(rows);
         insertRowsCommand.setTimeout(180000);       // default here will support large inserts
         return insertRowsCommand.execute(cn, _lookupInfo.getFolder());
+    }
+
+    public SaveRowsResponse updateRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
+    {
+        UpdateRowsCommand updateRowsCommand = new UpdateRowsCommand(getSchema(), getQueryName());
+        updateRowsCommand.setRows(rows);
+        updateRowsCommand.setTimeout(180000);
+        return  updateRowsCommand.execute(cn, _lookupInfo.getFolder());
     }
 
     public SelectRowsResponse getRowsFromServer(Connection cn) throws IOException, CommandException

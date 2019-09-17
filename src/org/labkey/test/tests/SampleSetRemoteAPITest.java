@@ -28,6 +28,7 @@ import org.labkey.remoteapi.assay.Material;
 import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.remoteapi.assay.SaveAssayBatchResponse;
+import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -40,17 +41,27 @@ import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AbstractDataRegionExportOrSignHelper;
+import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.TestDataValidator;
+import org.labkey.test.util.TextSearcher;
+import org.openqa.selenium.WebElement;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 @Category({DailyC.class})
@@ -129,6 +140,256 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
 
         // clean up on success
         lookupDgen.deleteDomain(createDefaultConnection(true));
+    }
+
+
+    /**
+     * generates a small sampleset, pastes data into it via the UI, including "Q" and "N" missing value indicators
+     * @throws IOException
+     * @throws CommandException
+     */
+    @Test
+    public void importMissingValueSampleSet() throws IOException, CommandException
+    {
+        String missingValueTable = "mvSamplesForImport";
+
+        navigateToFolder(getProjectName(), FOLDER_NAME);
+        TestDataGenerator dgen = new TestDataGenerator("exp.materials", missingValueTable, getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
+                                .setMvEnabled(true).setLabel("MV Field"),
+                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)
+                ));
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.addCustomRow(Map.of("name", "First", "mvStringData", "Q", "volume", 13.5));
+        dgen.addCustomRow(Map.of("name", "Second", "mvStringData", "Q", "volume", 15.5));
+        dgen.addCustomRow(Map.of("name", "Third","mvStringData", "N", "volume", 16.5));
+        dgen.addCustomRow(Map.of("name", "Fourth","mvStringData", "N", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Fifth","mvStringData", "ABCDEF", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Sixth","mvStringData", "GHIJKL", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Seventh","mvStringData", "ValidValue", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Eighth","mvStringData", "ActualData", "volume", 17.5));
+
+        // write the domain data into TSV format, for import via the UI
+        String importTsv = dgen.writeTsvContents();
+
+        refresh();
+        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        waitAndClick(Locator.linkWithText(missingValueTable));
+        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+
+        // paste the TSV data into the form
+        materialsList.clickImportBulkData();
+        setFormElement(Locator.textarea("text"), importTsv);
+        clickButton("Submit");
+
+        // re-find materialsList after importing MV data
+        materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        List<Map<String, String>> insertedRows = new ArrayList<>();
+        for (int i=0; i<dgen.getRows().size(); i++)
+        {
+            insertedRows.add(materialsList.getRowDataAsMap(i));
+        }
+
+        // confirm that firstRow has an MV indicator supplied
+        int firstIndex = materialsList.getRowIndex("Name", "First");
+        WebElement firstRow = materialsList.findRow(firstIndex);
+        Locator.tagWithClass("td", "labkey-mv-indicator")
+                .withDescendant(Locator.tagWithText("a", "Q")).findElement(firstRow);
+        int fourthIndex = materialsList.getRowIndex("Name", "Fourth");
+        WebElement fourthRow = materialsList.findRow(fourthIndex);
+        Locator.tagWithClass("td", "labkey-mv-indicator")
+                .withDescendant(Locator.tagWithText("a", "N")).findElement(fourthRow);
+
+        // confirm that every one of the initially-created rows were present with all values in the materialsList dataregion
+        TestDataValidator validator = dgen.getValidator();      // validator has a copy of
+        String error = validator.enumerateMissingRows(insertedRows, Arrays.asList("Flag"));  // ensure all rows made it with expected values
+        assertEquals("", error);    // if any expected rows are absent, error will describe what it expected but did not find
+
+        dgen.deleteDomain(createDefaultConnection(true));
+    }
+
+    @Test
+    public void updateMissingValueSampleData() throws IOException, CommandException
+    {
+        String missingValueTable = "mvSamplesForUpdate";
+
+        navigateToFolder(getProjectName(), FOLDER_NAME);
+        TestDataGenerator dgen = new TestDataGenerator("exp.materials", missingValueTable, getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
+                                .setMvEnabled(true).setLabel("MV Field"),
+                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)
+                ));
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.addCustomRow(Map.of("name", "A", "mvStringData", "Q", "volume", 13.5));
+        dgen.addCustomRow(Map.of("name", "B", "mvStringData", "Q", "volume", 15.5));
+        dgen.addCustomRow(Map.of("name", "C","mvStringData", "N", "volume", 16.5));
+        dgen.addCustomRow(Map.of("name", "D","mvStringData", "N", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "E","mvStringData", "ABCDEF", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "F","mvStringData", "GHIJKL", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "G","mvStringData", "ValidValue", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "H","mvStringData", "ActualData", "volume", 17.5));
+
+        SaveRowsResponse insertResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        refresh();
+        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        waitAndClick(Locator.linkWithText(missingValueTable));
+        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        List<Map<String, String>> mapsFromDataRegion = new ArrayList<>();
+        for(int i=0; i< dgen.getRows().size(); i++)
+        {
+            mapsFromDataRegion.add(materialsList.getRowDataAsMap(i));
+        }
+        String missingRowsError = dgen.getValidator().enumerateMissingRows(mapsFromDataRegion, Arrays.asList("Flag"));
+        assertEquals("", missingRowsError);
+
+        // now update
+        Map<String, Object> rowE = insertResponse.getRows().stream().filter(a -> a.get("name").equals("E")).findFirst().orElse(null);
+        Map<String, Object> rowD = insertResponse.getRows().stream().filter(a -> a.get("name").equals("D")).findFirst().orElse(null);
+        rowE.put("mvstringdata_mvindicator", "Q");
+        rowD.put("mvstringdata_mvindicator", null);
+        rowD.put("mvStringData", "updatedValue");
+
+        SaveRowsResponse updateResponse = dgen.updateRows(createDefaultConnection(true), Arrays.asList(rowD, rowE));
+
+        // get a look at the result
+        refresh();
+        materialsList = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        // confirm that firstRow has an MV indicator supplied
+        int eIndex = materialsList.getRowIndex("Name", "E");
+        WebElement eRow = materialsList.findRow(eIndex);
+        Locator.tagWithClass("td", "labkey-mv-indicator")
+                .withDescendant(Locator.tagWithText("a", "Q")).findElement(eRow);
+        int dIndex = materialsList.getRowIndex("Name", "D");
+        WebElement fourthRow = materialsList.findRow(dIndex);
+        assertFalse("expect literal value, not MV", Locator.tagWithClass("td", "labkey-mv-indicator")
+                .withDescendant(Locator.tagWithText("a", "N")).existsIn(fourthRow));
+        WebElement dCell = materialsList.findCell(dIndex, "MV Field");
+        assertEquals("cell should reflect literal value", "updatedValue", dCell.getText());
+
+        // now update rows via the UI
+        String mvIndicatorColName = WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer) ?
+                "mvStringData_MVIndicator" : "mvstringdata_mvindicator";
+        materialsList.updateRow(dIndex, Map.of("mvStringData", "reallyUpdatedValue", mvIndicatorColName, "Q"));  // update the underlying value but set it mv-Q
+        materialsList.clickEditRow(eIndex);
+        selectOptionByText(Locator.name("quf_"+mvIndicatorColName), "");    // clear the mv value, reveal underlying value
+        clickButton("Submit");
+
+        eIndex = materialsList.getRowIndex("Name", "E");
+        WebElement eCell = materialsList.findCell(eIndex, "MV Field");
+        assertEquals("expect underlying value to be present when mv-flag has been cleared","ABCDEF", eCell.getText());
+        dIndex = materialsList.getRowIndex("Name", "D");
+        dCell = materialsList.findCell(dIndex, "MV Field");
+        assertEquals("expect cell to be mv-flagged", " labkey-mv-indicator", dCell.getAttribute("class"));
+        assertEquals("expect mv-indicator value instead of underlying value", "Q", dCell.getText());
+
+        dgen.deleteDomain(createDefaultConnection(true));
+    }
+
+    @Test
+    public void importMVDataWithEmptyValues() throws IOException, CommandException
+    {
+        String missingValueTable = "mvSamplesWithEmptyValues";
+
+        navigateToFolder(getProjectName(), FOLDER_NAME);
+        TestDataGenerator dgen = new TestDataGenerator("exp.materials", missingValueTable, getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
+                                .setMvEnabled(true).setLabel("MV Field"),
+                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)
+                ))
+                .withGeneratedRows(30);
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.addCustomRow(Map.of("name", "First", "mvStringData", "Q", "volume", 13.5));
+        dgen.addCustomRow(Map.of("name", "Second", "mvStringData", "Q", "volume", 15.5));
+        dgen.addCustomRow(Map.of("name", "Third","mvStringData", "N", "volume", 16.5));
+        dgen.addCustomRow(Map.of("name", "Fourth","mvStringData", "N", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Fifth","mvStringData", "", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Sixth","mvStringData", "", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Seventh","mvStringData", "ValidValue", "volume", 17.5));
+        dgen.addCustomRow(Map.of("name", "Eighth","mvStringData", "ActualData", "volume", 17.5));
+
+        // insert them via API
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        // now find the samlpleset's dataregion
+        refresh();
+        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        waitAndClick(Locator.linkWithText(missingValueTable));
+        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+
+        // confirm that fifthRow has no MV indicator supplied
+        int mvColumnIndex = materialsList.getColumnIndex("MV Field");
+        int fifthRowIndex = materialsList.getRowIndex("Name", "Fifth");
+        WebElement fifthRowMvCell = materialsList.findCell(mvColumnIndex, fifthRowIndex);
+        assertEquals("", fifthRowMvCell.getAttribute("class"));
+        // ensure that fourthRow has an MV indicator with value N
+        int fourthIndex = materialsList.getRowIndex("Name", "Fourth");
+        WebElement fourthRow = materialsList.findRow(fourthIndex);
+        Locator.tagWithClass("td", "labkey-mv-indicator")
+                .withDescendant(Locator.tagWithText("a", "N")).findElement(fourthRow);
+
+        dgen.deleteDomain(createDefaultConnection(true));
+    }
+
+    /**
+     * regression for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38436
+     * @throws CommandException
+     * @throws IOException
+     */
+    @Test
+    @Ignore("ignoring result until issue 38436 can be resolved.")
+    public void exportMissingValueSampleSetToTSV() throws CommandException, IOException
+    {
+        String missingValueTable = "mvSamplesForExport";
+        navigateToFolder(getProjectName(), FOLDER_NAME);
+
+        navigateToFolder(getProjectName(), FOLDER_NAME);
+        TestDataGenerator dgen = new TestDataGenerator("exp.materials", missingValueTable, getCurrentContainerPath())
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
+                                .setMvEnabled(true).setLabel("MV Field"),
+                        TestDataGenerator.simpleFieldDef("vol", FieldDefinition.ColumnType.Double)
+                ));
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.addCustomRow(Map.of("name", "1st", "mvStringData", "Q", "vol", 17.5));
+        dgen.addCustomRow(Map.of("name", "2nd", "mvStringData", "Q", "vol", 19.5));
+        dgen.addCustomRow(Map.of("name", "3rd","mvStringData", "N", "vol", 22.25));
+        dgen.addCustomRow(Map.of("name", "4th","mvStringData", "N", "vol", 38.75));
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());     // insert data via API rather than UI
+
+        // prepare expected values-
+        String expectedTSVData = dgen.writeTsvContents();
+        String[] tsvRows = expectedTSVData.split("\n");
+        List<String> dataRows = new ArrayList();
+        for (int i=1; i < tsvRows.length; i++) // don't validate columns; we expect labels instead of column names
+        {
+            dataRows.add(tsvRows[i]);
+        }
+
+        refresh();
+        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        waitAndClick(Locator.linkWithText(missingValueTable));
+        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+
+        materialsList.checkAllOnPage();
+        DataRegionExportHelper exportHelper = new DataRegionExportHelper(materialsList);
+        File file = exportHelper.exportText(AbstractDataRegionExportOrSignHelper.TextSeparator.TAB);
+
+        TextSearcher exportFileSearcher = new TextSearcher(file);
+        String fileContents = Files.readString(Paths.get(file.getCanonicalPath()));
+        log("parsing file contents, expecting [" + expectedTSVData + "]");
+        log("actual: [" + fileContents + "]");
+        for (String expectedRow : dataRows)
+        {
+            assertTextPresent(exportFileSearcher, expectedRow);
+        }
     }
 
 
@@ -279,11 +540,11 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         Map<String, Object> firstAddedSample = sampleSetResponse.getRows()
                 .stream()
                 .filter(a-> a.get("Name").equals("another new one"))
-                .findFirst().orElse(null);;
+                .findFirst().orElse(null);
         Map<String, Object> secondAddedSample = sampleSetResponse.getRows()
                 .stream()
                 .filter(a-> a.get("Name").equals("a new one"))
-                .findFirst().orElse(null);;
+                .findFirst().orElse(null);
 
         assertNotNull("expect new samples as outputs from batch save", firstAddedSample);
         assertNotNull("expect new samples as outputs from batch save", secondAddedSample);
