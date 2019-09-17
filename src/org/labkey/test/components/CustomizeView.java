@@ -620,8 +620,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     {
         changeTab(ViewItemType.Filter);
 
-        WebElement folderFilterCombo = Locator.css("div.labkey-folder-filter-combo").findElement(getComponentElement());
-        _driver._ext4Helper.selectComboBoxItem(Locator.id(folderFilterCombo.getAttribute("id")), folderFilter);
+        _driver._ext4Helper.selectComboBoxItem("Folder Filter:", folderFilter);
     }
 
     public void moveColumn(String fieldKey, boolean moveUp)
