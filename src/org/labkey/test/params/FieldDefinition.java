@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class FieldDefinition
 {
@@ -33,11 +34,11 @@ public class FieldDefinition
     private FieldValidator _validator;
     private String _url;
     private Integer _scale;
-    private boolean _hidden = false;
-    private boolean _shownInDetailsView = true;
-    private boolean _shownInInsertView = true;
-    private boolean _shownInUpdateView = true;
-    private boolean _isPrimaryKey = false;
+    private Optional<Boolean> _hidden = Optional.empty();
+    private Optional<Boolean> _shownInDetailsView = Optional.empty();;
+    private Optional<Boolean> _shownInInsertView = Optional.empty();;
+    private Optional<Boolean> _shownInUpdateView = Optional.empty();;
+    private Optional<Boolean> _isPrimaryKey = Optional.empty();;
 
     public FieldDefinition(String name, ColumnType type)
     {
@@ -165,54 +166,53 @@ public class FieldDefinition
         return _scale;
     }
 
-    public boolean isHidden()
+    public Optional<Boolean> isHidden()
     {
         return _hidden;
     }
-
-    public FieldDefinition isHidden(boolean hidden)
+    public FieldDefinition isHidden(Boolean hidden)
     {
-        _hidden = hidden;
+        _hidden = Optional.of(hidden);
         return this;
     }
 
-    public boolean isPrimaryKey()
+    public Optional<Boolean> isPrimaryKey()
     {
         return  _isPrimaryKey;
     }
-    public FieldDefinition isPrimaryKey(boolean isPrimaryKey)
+    public FieldDefinition isPrimaryKey(Boolean isPrimaryKey)
     {
-        _isPrimaryKey = isPrimaryKey;
+        _isPrimaryKey = Optional.of(isPrimaryKey);
         return this;
     }
 
-    public boolean shownInDetailsView()
+    public Optional<Boolean> shownInDetailsView()
     {
         return _shownInDetailsView;
     }
     public FieldDefinition shownInDetailsView(boolean showInDetailsView)
     {
-        _shownInDetailsView = showInDetailsView;
+        _shownInDetailsView = Optional.of(showInDetailsView);
         return this;
     }
 
-    public boolean shownInInsertView()
+    public Optional<Boolean> shownInInsertView()
     {
         return _shownInInsertView;
     }
     public FieldDefinition shownInInsertView(boolean showInDetailsView)
     {
-        _shownInInsertView = showInDetailsView;
+        _shownInInsertView = Optional.of(showInDetailsView);
         return this;
     }
 
-    public boolean shownInUpdateView()
+    public Optional<Boolean> shownInUpdateView()
     {
         return _shownInUpdateView;
     }
-    public FieldDefinition shownInUpdateView(boolean showInDetailsView)
+    public FieldDefinition shownInUpdateView(boolean showInUpdateView)
     {
-        _shownInUpdateView = showInDetailsView;
+        _shownInUpdateView = Optional.of(showInUpdateView);
         return this;
     }
 
@@ -251,11 +251,16 @@ public class FieldDefinition
         map.put("required", isRequired());
         if (getScale() != null)
             map.put("scale", getScale());
-        map.put("hidden", isHidden());
-        map.put("isPrimaryKey", isPrimaryKey());
-        map.put("shownInDetailsView", shownInDetailsView());
-        map.put("shownInInsertView", shownInInsertView());
-        map.put("shownInUpdateView", shownInUpdateView());
+        if (isHidden().isPresent())
+            map.put("hidden", isHidden().get());
+        if (isPrimaryKey().isPresent())
+            map.put("isPrimaryKey", isPrimaryKey().get());
+        if (shownInDetailsView().isPresent())
+            map.put("shownInDetailsView", shownInDetailsView().get());
+        if (shownInInsertView().isPresent())
+            map.put("shownInInsertView", shownInInsertView().get());
+        if (shownInUpdateView().isPresent())
+            map.put("shownInUpdateView", shownInUpdateView().get());
 
         return map;
     }
@@ -288,7 +293,7 @@ public class FieldDefinition
         File("File", null),
         AutoInteger("Auto-Increment Integer", "int"),
         Flag("Flag (String)", null),
-        Attachment("Attachment", null),
+        Attachment("Attachment", "attachment"),
         User("User", "int"),
         Lookup("Lookup", null);
 
@@ -346,9 +351,15 @@ public class FieldDefinition
             return _tableType;
         }
 
+        @Deprecated
         public LookupInfo setTableType(String tableType)
         {
             _tableType = tableType;
+            return this;
+        }
+        public LookupInfo setTableType(ColumnType tableType)
+        {
+            _tableType = tableType._jsonType;
             return this;
         }
 
