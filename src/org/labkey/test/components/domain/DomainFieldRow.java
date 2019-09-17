@@ -411,7 +411,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .findWhenNeeded(this);
 
         public WebElement expandToggle = Locator.tagWithClass("div", "domain-field-icon")
-                .child(Locator.tagWithAttribute("svg", "data-icon", "pencil-alt"))
+                .child(Locator.tagWithAttribute("svg", "data-icon", "plus-square"))
                 .findWhenNeeded(this);
 
         // controls revealed when expanded
