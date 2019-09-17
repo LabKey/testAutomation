@@ -307,6 +307,11 @@ public class TestDataGenerator
         return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
+    public DomainResponse createList(Connection cn, String keyName) throws IOException, CommandException
+    {
+        return createDomain(cn, "IntList", Map.of("keyName", keyName));
+    }
+
     public DomainResponse getDomain(Connection cn) throws IOException, CommandException
     {
         GetDomainCommand cmd = new GetDomainCommand(getSchema(), getQueryName());
