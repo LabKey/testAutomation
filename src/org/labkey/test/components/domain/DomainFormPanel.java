@@ -96,6 +96,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return elementCache().findFieldRows().get(tabIndex);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
