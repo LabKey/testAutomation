@@ -59,9 +59,8 @@ public class UIAssayHelper extends AbstractAssayHelper
             {
                 _test.setFormElement(Locator.name(tagName), batchProperties.get(tagName).toString());
             }
+            _test.clickButton("Next");
         }
-
-        _test.clickButton("Next");
 
         if(null != runProperties)
         {
