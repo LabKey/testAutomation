@@ -26,24 +26,31 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     public DomainDesignerPage clickSave()
     {
         elementCache().saveButton.click();
-        String msg = waitForAnyAlert();
-        log("Clicking save.  Waited until alert with message ["+msg+"] appeared");
+
+        if (isAlertVisible())
+        {
+            String msg = waitForAnyAlert();
+            log("Clicking save.  Waited until alert with message [" + msg + "] appeared");
+        }
+        else
+           sleep(500); //TODO: wait for page load default
+
         return this;
     }
+
+    public boolean isAlertVisible()
+    {
+        return Locators.alert.findOptionalElement(getDriver()).map(WebElement::isDisplayed).orElse(false);
+    }
+
     public WebElement saveButton()
     {
         return elementCache().saveButton;
     }
 
-    public void clickSaveAndFinish()
-    {
-        log("clicking [Save and Finish]");
-        clickAndWait(elementCache().saveAndFinishButton);
-    }
-
     public WebElement saveAndFinishButton()
     {
-        return elementCache().saveAndFinishButton;
+        return elementCache().saveButton;
     }
 
     public DomainFormPanel fieldProperties()
@@ -110,8 +117,6 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
             return new DomainFormPanel.DomainFormPanelFinder(getDriver())
                     .withTitle(domainName).findWhenNeeded(this);
         }
-        WebElement saveAndFinishButton = Locators.domainDesignerButton("Save And Finish")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement saveButton = Locator.button("Save")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement cancelBtn = Locators.domainDesignerButton("Cancel")
@@ -125,5 +130,6 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
             return Locator.tagWithClass("button", "btn-success-default").withText(text);
         }
 
+        static public Locator alert = Locator.tagWithClass("div" , "alert");
     }
 }

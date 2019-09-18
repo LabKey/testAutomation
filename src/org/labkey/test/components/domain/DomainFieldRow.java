@@ -10,6 +10,8 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -189,6 +191,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setDescription(String description)
     {
         expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().descriptionTextArea));
         getWrapper().setFormElement(elementCache().descriptionTextArea, description);
         return this;
     }
@@ -432,12 +435,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public boolean hasFieldError()
     {
-        return getComponentElement().getAttribute("class").contains("domain-field-row-error");
+        return getComponentElement().getAttribute("class").contains("domain-row-border-error");
     }
 
     public boolean hasFieldWarning()
     {
-        return getComponentElement().getAttribute("class").contains("domain-field-row-warning");
+        return getComponentElement().getAttribute("class").contains("domain-row-border-warning");
     }
 
     protected ElementCache newElementCache()
