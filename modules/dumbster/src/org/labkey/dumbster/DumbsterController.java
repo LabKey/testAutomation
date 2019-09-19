@@ -33,6 +33,7 @@ import org.labkey.api.util.MailHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.NavTree;
+import org.labkey.api.view.NotFoundException;
 import org.labkey.api.view.UnauthorizedException;
 import org.labkey.api.view.template.PageConfig;
 import org.labkey.dumbster.model.DumbsterManager;
@@ -163,7 +164,10 @@ public class DumbsterController extends SpringActionController
             if (!getUser().hasRootAdminPermission())
                 throw new UnauthorizedException();
 
-            SmtpMessage message = DumbsterManager.get().getMessages()[form.getMessage()];
+            SmtpMessage[] messages = DumbsterManager.get().getMessages();
+            if (form.getMessage() >= messages.length)
+                throw new NotFoundException();
+            SmtpMessage message = messages[form.getMessage()];
             Map<String, String> map = MailHelper.getBodyParts(DumbsterManager.convertToMimeMessage(message));
 
             String output;

@@ -96,6 +96,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return elementCache().findFieldRows().get(tabIndex);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -105,7 +106,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     {
         protected WebElement addFieldButton = new WebElementWrapper()
         {
-            WebElement el = Locator.byClass("domain-form-add").findWhenNeeded(DomainFormPanel.this);
+            WebElement el = Locator.byClass("domain-form-add-btn").child(Locator.tag("span")).findWhenNeeded(DomainFormPanel.this);
 
             @Override
             public WebElement getWrappedElement()

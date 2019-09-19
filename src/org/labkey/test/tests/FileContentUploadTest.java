@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,15 +36,17 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserExtendedProperty;
+import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.Timer;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -54,7 +57,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThat;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
 
@@ -205,11 +208,15 @@ public class FileContentUploadTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAbsoluteFilePath()
+    public void testAbsoluteFilePath() throws Exception
     {
         log("Check Absolute File Path in File Browser");
 
         final String ABSOLUTE_FILE_PATH_BUTTON_ID = "10";
+        final String s = File.separator;
+
+        new ApiPermissionsHelper(this)
+                .setSiteAdminRoleUserPermissions(PasswordUtil.getUsername(), "See Absolute File Paths");
 
         navigateToFolder(getProjectName(), subfolderName);
         final File testFile = TestFileUtils.getSampleData("security/InlineFile2.html");
@@ -220,30 +227,21 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _fileBrowserHelper.goToConfigureButtonsTab();
         _fileBrowserHelper.unhideGridColumn(ABSOLUTE_FILE_PATH_BUTTON_ID);
         click(Ext4Helper.Locators.ext4Button("submit"));
+        WebElement columnHeader = waitForElement(Locator.byClass("x4-column-header").withText("Absolute File Path").notHidden());
 
-        String atFilesPath = getCurrentContainerPath() + "/@files";
-        assertTextPresent(atFilesPath + "/" + filename);
+        String absolutePath = FileBrowserHelper.Locators.gridRowWithNodeId(filename)
+                .append(Locator.byClass("x4-grid-cell").last()).findElement(getDriver()).getText();
+        assertThat("Absolute file path for file", absolutePath, CoreMatchers.containsString(s + "@files" + s + filename));
 
-        try
-        {
-            log("Check Absolute File Path in WebDav");
-            String nodeId = "/_webdav" + getCurrentContainerPath() + "/@files/";
-            URL webdavURL = new URL(WebTestHelper.getBaseURL() + "/_webdav" + getCurrentContainerPath());
-            goToURL(webdavURL, 5000);
-            waitForText("WebDav URL");
+        log("Check Absolute File Path in WebDav");
+        URL webdavURL = new URL(WebTestHelper.getBaseURL() + "/_webdav" + getCurrentContainerPath() + "/@files");
+        goToURL(webdavURL, 5000);
+        waitForText("WebDav URL");
+        absolutePath = Locator.byClass("fb-details")
+                .append(Locator.tagWithText("th", "Absolute Path:").followingSibling("td"))
+                .findElement(getDriver()).getText();
 
-            /* --- This sometimes works in Firefox, but not Chrome in which the click does not happen (expect with breakpoints in IntelliJ)
-            Locator.XPathLocator folderTreeNode = Locator.tag("tr").attributeEndsWith("data-recordid", nodeId);
-            waitForElement(folderTreeNode);
-            click(folderTreeNode);
-            waitForText("Absolute Path", atFilesPath);
-            */
-        }
-        catch (MalformedURLException e)
-        {
-            fail(e.getMessage());
-        }
-
+        assertThat("Absolute file path", absolutePath, CoreMatchers.containsString(s + "@files"));
     }
 
     @LogMethod(quiet = true)

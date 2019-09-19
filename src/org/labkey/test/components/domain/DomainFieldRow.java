@@ -392,6 +392,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getComponentElement().getAttribute("class").contains("domain-field-row-warning");
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -411,7 +412,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .findWhenNeeded(this);
 
         public WebElement expandToggle = Locator.tagWithClass("div", "domain-field-icon")
-                .child(Locator.tagWithAttribute("svg", "data-icon", "pencil-alt"))
+                .child(Locator.tagWithAttribute("svg", "data-icon", "plus-square"))
                 .findWhenNeeded(this);
 
         // controls revealed when expanded
