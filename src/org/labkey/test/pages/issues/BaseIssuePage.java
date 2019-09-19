@@ -116,6 +116,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
         return WebTestHelper.parseUrlQuery(getURL()).get("issueId");
     }
 
+    @Override
     protected abstract EC newElementCache();
 
     protected class ElementCache extends LabKeyPage.ElementCache

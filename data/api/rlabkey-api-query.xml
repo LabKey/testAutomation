@@ -603,4 +603,26 @@
              ]]>
         </response>
     </test>
+    <test name="truncate table" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                labkey.truncateTable("%baseUrl%", folderPath="/%projectName%",schemaName="lists", queryName="AllTypes")
+
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $success
+                [1] TRUE
+                $schemaName
+                [1] "lists"
+                $queryName
+                [1] "AllTypes"
+                $deletedRows
+                [1] 10011
+            ]]>
+        </response>
+    </test>
 </ApiTests>

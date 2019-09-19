@@ -95,6 +95,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return alert.getText();
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

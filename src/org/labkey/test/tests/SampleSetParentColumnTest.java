@@ -54,6 +54,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
             COL_DESCRIPTION_CAPTION, COL_DESCRIPTION_NAME,
             COL_NAME_CAPTION, COL_NAME_NAME);
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");

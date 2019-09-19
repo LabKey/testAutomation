@@ -184,6 +184,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private final PortalHelper portalHelper = new PortalHelper(this);
 
+    @Override
     protected String getProjectName()
     {
         return getClass().getSimpleName() + " Project";
@@ -1908,6 +1909,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                 .assertModuleEnabled(moduleName);
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         Connection cn = WebTestHelper.getRemoteApiConnection();

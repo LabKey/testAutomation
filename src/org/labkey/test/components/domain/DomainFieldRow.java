@@ -392,6 +392,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getComponentElement().getAttribute("class").contains("domain-field-row-warning");
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
