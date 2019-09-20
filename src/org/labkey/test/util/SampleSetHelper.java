@@ -81,9 +81,12 @@ public class SampleSetHelper extends WebDriverWrapper
         {
             createPage.setDescription(props.getDescription());
         }
+
+        int i = 0;
         for (String importHeader : props.getImportAliases().keySet())
         {
-            createPage.addParentColumnAlias(importHeader, props.getImportAliases().get(importHeader));
+            createPage.addParentColumnAlias(i, importHeader, props.getImportAliases().get(importHeader));
+            i++;
         }
 
         EditDomainPage editDomainPage = createPage.clickCreate();
@@ -174,9 +177,12 @@ public class SampleSetHelper extends WebDriverWrapper
     public SampleSetHelper addParentColumnAlias(Map<String, String> aliases)
     {
         CreateSampleSetPage createSampleSetPage = new CreateSampleSetPage(getDriver());
+
+        int i = 0;
         for(String importHeader : aliases.keySet())
         {
-            createSampleSetPage.addParentColumnAlias(importHeader, aliases.get(importHeader));
+            createSampleSetPage.addParentColumnAlias(i, importHeader, aliases.get(importHeader));
+            i++;
         }
 
         return this;
