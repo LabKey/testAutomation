@@ -59,41 +59,6 @@ public class UIAssayHelper extends AbstractAssayHelper
             {
                 _test.setFormElement(Locator.name(tagName), batchProperties.get(tagName).toString());
             }
-            _test.clickButton("Next");
-        }
-
-        if(null != runProperties)
-        {
-            for(String tagName : runProperties.keySet())
-            {
-                _test.setFormElement(Locator.name(tagName), runProperties.get(tagName).toString());
-            }
-        }
-
-        _test.checkRadioButton(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
-
-        _test.setFormElement(Locator.name("__primaryFile__"), file);
-
-        _test.clickButton("Save and Finish");
-
-    }
-
-    public void importAssay(String assayName, File file, String projectPath, @Nullable Map<String, Object> batchProperties, @Nullable Map<String, Object> runProperties)
-    {
-        String[] folders = projectPath.split("/");
-        _test.clickProject(folders[0]);
-        if (folders.length > 1)
-            _test.clickFolder(folders[folders.length - 1]);
-
-        _test.clickAndWait(Locator.linkWithText(assayName));
-        _test.clickButton("Import Data");
-
-        if(null != batchProperties)
-        {
-            for(String tagName : batchProperties.keySet())
-            {
-                _test.setFormElement(Locator.name(tagName), batchProperties.get(tagName).toString());
-            }
         }
 
         _test.clickButton("Next");
