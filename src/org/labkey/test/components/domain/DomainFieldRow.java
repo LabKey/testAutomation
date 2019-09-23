@@ -443,6 +443,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getComponentElement().getAttribute("class").contains("domain-row-border-warning");
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -68,6 +68,7 @@ public class BarPlotTest extends GenericChartsTest
         return clickChartLayoutButton(LookAndFeelBarPlot.class);
     }
 
+    @Override
     @LogMethod
     protected void testPlots()
     {

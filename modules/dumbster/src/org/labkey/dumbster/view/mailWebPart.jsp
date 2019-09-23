@@ -31,6 +31,8 @@
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="static org.labkey.api.util.DOM.Attribute.*" %>
+<%@ page import="static org.labkey.api.util.DOM.*" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%!
@@ -195,17 +197,17 @@ function toggleRecorder(checkbox)
             <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
                 <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=unsafe(headers.toString())%></div></td>
             <td>
-                <%=text(contentTypes.contains("text/html") ? "<a href=\"" + h(DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")) + "\" target=\"_messageHtml\">HTML</a>" : "&nbsp;")%>
+                <%=contentTypes.contains("text/html") ? createHtml(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")).at(target, "_messageHtml"), "HTML")) : unsafe("&nbsp;")%>
             </td>
             <td>
-                <%=text(contentTypes.contains("text/plain") ? "<a href=\"" + h(DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")) + "\" target=\"_messageText\">Text</a>" : "&nbsp;")%>
+                <%=contentTypes.contains("text/plain") ? createHtml(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")).at(target, "_messageText"), "Text")) : unsafe("&nbsp;")%>
             </td>
         </tr>
 <%
         }
     }
 %>
-    <tr id=<%=q(renderId)%> style="display: <%=text(messages.length > 0 ? "none" : "")%>;"><td colspan="6">No email recorded.</td></tr>
+    <tr id=<%=q(renderId)%> style="display: <%=unsafe(messages.length > 0 ? "none" : "")%>;"><td colspan="6">No email recorded.</td></tr>
 </table>
 <%
     if (getUser().hasRootAdminPermission())

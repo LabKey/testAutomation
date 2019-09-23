@@ -540,11 +540,11 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         Map<String, Object> firstAddedSample = sampleSetResponse.getRows()
                 .stream()
                 .filter(a-> a.get("Name").equals("another new one"))
-                .findFirst().orElse(null);;
+                .findFirst().orElse(null);
         Map<String, Object> secondAddedSample = sampleSetResponse.getRows()
                 .stream()
                 .filter(a-> a.get("Name").equals("a new one"))
-                .findFirst().orElse(null);;
+                .findFirst().orElse(null);
 
         assertNotNull("expect new samples as outputs from batch save", firstAddedSample);
         assertNotNull("expect new samples as outputs from batch save", secondAddedSample);
