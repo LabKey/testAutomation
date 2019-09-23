@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -44,6 +45,7 @@ public class SurveyTest extends BaseWebDriverTest
     protected final String pipelineLoc =  "/sampledata/survey";
     private final String projectSurveyDesign = "My Project Survey Design";
     private final String subfolderSurveyDesign = "My Subfolder Survey Design";
+    private final String AUTO_SAVE_SURVEY_DESIGN = "Auto Save Survey Design";
     private final String firstSurvey = "First Survey";
     private final String secondSurvey = "Second Survey";
     private final String headerWikiBody = "Header wiki content to appear above the survey form panel.";
@@ -64,15 +66,32 @@ public class SurveyTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
-    @Test
-    public void testSteps()
+    @BeforeClass
+    @LogMethod
+    public static void doSetup() throws Exception
+    {
+        SurveyTest initTest = (SurveyTest)getCurrentTest();
+        initTest.setupProject();
+    }
+
+    @LogMethod
+    private void setupProject()
     {
         setupProjectFolder();
         setupSubfolder();
+    }
 
+    @Test
+    public void testProjectSurvey()
+    {
         verifySurveyFromProject();
         verifyEditSurvey();
         verifySubmitSurvey();
+    }
+
+    @Test
+    public void testSubfolderSurvey()
+    {
         verifySurveyFromSubfolder();
         verifySurveyContainerPermissions();
     }
@@ -86,7 +105,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(getProjectName(), new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         _containerHelper.enableModule(getProjectName(), "Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(getProjectName(), null, null, projectSurveyDesign, null, "lists", "listA");
+        createSurveyDesign(getProjectName(), null, null, projectSurveyDesign, null, "lists", "listA", null);
     }
 
     @LogMethod
@@ -98,7 +117,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(folderName, new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         clickFolder(folderName);
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(folderName, null, null, subfolderSurveyDesign, null, "lists", "listA");
+        createSurveyDesign(folderName, null, null, subfolderSurveyDesign, null, "lists", "listA", null);
 
         log("Add users that will be used for permissions testing");
         _userHelper.createUser(EDITOR);
@@ -113,7 +132,7 @@ public class SurveyTest extends BaseWebDriverTest
     }
 
     protected void createSurveyDesign(String project, @Nullable String folder, @Nullable String tabName, String designName, @Nullable String description,
-                                      String schemaName, String queryName)
+                                      String schemaName, String queryName, @Nullable File metadataFile)
     {
         log("Create new survey design");
         if (folder != null && !isElementPresent(Locator.id("folderBar").withText(folder)))
@@ -121,18 +140,19 @@ public class SurveyTest extends BaseWebDriverTest
         if (tabName != null && !isElementPresent(Locator.xpath("//li[contains(@class, 'tab-nav-active')]/a").withText(tabName)))
             clickAndWait(Locator.linkWithText(tabName));
         DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
-        createSurveyDesign(designName, description, schemaName, queryName, null);
+        createSurveyDesign(designName, description, schemaName, queryName, metadataFile);
     }
 
     @LogMethod
-    private void verifySurveyFromProject()
+    public void verifySurveyFromProject()
     {
         // add a survey webpart to the subfolder using the project survey design
+        clickProject(getProjectName());
         clickFolder(folderName);
         addSurveyWebpart(projectSurveyDesign);
 
         log("Create a new survey instance (i.e. take the survey)");
-        clickButtonByIndex("Create Survey", 0, WAIT_FOR_JAVASCRIPT);
+        clickButton("Create Survey", WAIT_FOR_JAVASCRIPT);
         waitForText("Survey Label*");
         // verify that the save and submit buttons are disabled (and that they are visible, since this is the "auto" survey layout)
         assertTrue("Save button should be initially disabled", isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Save']")));
@@ -154,7 +174,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickFolder(folderName);
         waitForText(firstSurvey);
         clickAndWait(Locator.linkWithText("listA"));
-        assertTextPresentInThisOrder("txtField", "txtAreaField", "true", "999", "999.1", "2013-01-04", "Test1");
+        assertTextPresent("txtField", "txtAreaField", "true", "999", "999.1", "2013-01-04", "Test1");
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("listA"));
         waitForText("No data to show.");
@@ -183,7 +203,7 @@ public class SurveyTest extends BaseWebDriverTest
         //verify that the responses were saved with their changes
         clickFolder(folderName);
         clickAndWait(Locator.linkWithText("listA"));
-        assertTextPresentInThisOrder("txtField", "txtAreaField", "new line", "false", "999", "999.1", "2013-01-04", "Test1");
+        assertTextPresent("txtField", "txtAreaField", "new line", "false", "999", "999.1", "2013-01-04", "Test1");
     }
 
     @LogMethod
@@ -236,6 +256,7 @@ public class SurveyTest extends BaseWebDriverTest
         WikiHelper wikiHelper = new WikiHelper(this);
 
         log("Create wikis for survey header/footer");
+        clickProject(getProjectName());
         clickFolder(folderName);
         goToModule("Wiki");
         wikiHelper.createNewWikiPage();
@@ -259,7 +280,7 @@ public class SurveyTest extends BaseWebDriverTest
         addSurveyWebpart(subfolderSurveyDesign);
 
         log("Verify the card layout (i.e. has section headers on left, not all questions visible, etc.)");
-        clickButtonByIndex("Create Survey", 1, WAIT_FOR_JAVASCRIPT);
+        clickButton("Create Survey", WAIT_FOR_JAVASCRIPT);
         waitForText("Start");
         assertElementPresent(Locator.xpath("//li[text()='Start']"));
         assertElementPresent(Locator.xpath("//li[text()='Section 1']"));
@@ -318,6 +339,9 @@ public class SurveyTest extends BaseWebDriverTest
         // verify survey responses in the current folder
         clickAndWait(Locator.linkWithText("listA"));
         assertTextPresent("[{\"field1\":\"field1\",\"field2\":\"field2\"}]", "2018-10-01 00:00");
+
+        clickFolder(folderName);
+        removeSurveyWebpart(subfolderSurveyDesign);
     }
 
     private void addSurveyWebpart(String surveyDesignName)
@@ -328,6 +352,12 @@ public class SurveyTest extends BaseWebDriverTest
         _ext4Helper.selectComboBoxItem("Survey Design:", surveyDesignName);
         clickButton("Submit");
         waitForText("Surveys: " + surveyDesignName);
+    }
+
+    private void removeSurveyWebpart(String surveyDesignName)
+    {
+        log("Remove Surveys webpart");
+        portalHelper.removeWebPart("Surveys: " + surveyDesignName);
     }
 
     @LogMethod
@@ -345,6 +375,8 @@ public class SurveyTest extends BaseWebDriverTest
         addSurveyWebpart(projectSurveyDesign);
         assertTextPresent("No data to show.");
         assertTextNotPresent(firstSurvey, secondSurvey);
+
+        removeSurveyWebpart(projectSurveyDesign);
     }
 
     private void addSurveyGridQuestionRecord(String val1, String val2)
@@ -391,5 +423,44 @@ public class SurveyTest extends BaseWebDriverTest
     public List<String> getAssociatedModules()
     {
         return Collections.singletonList("survey");
+    }
+
+    @Test
+    public void testSurveyAutoSave()
+    {
+        clickProject(getProjectName());
+        clickFolder(folderName);
+
+        // add survey metadata which overrides the autosave interval to 500 ms.
+        File metadata = TestFileUtils.getSampleData("survey/AutoSaveMetadata.json");
+        createSurveyDesign(getCurrentProject(), null, null, AUTO_SAVE_SURVEY_DESIGN, null, "lists", "listA", metadata);
+
+        addSurveyWebpart(AUTO_SAVE_SURVEY_DESIGN);
+
+        clickButton("Create Survey", WAIT_FOR_JAVASCRIPT);
+        waitForText("Survey Label*");
+        setFormElement(Locator.name("_surveyLabel_"), "autosave override");
+        waitForText(1000, "Responses automatically saved at");
+        clickProject(getProjectName());
+        clickFolder(folderName);
+
+        // add survey metadata which disables autosave.
+        clickEditForLabel("Survey Designs", AUTO_SAVE_SURVEY_DESIGN);
+        String json = TestFileUtils.getFileContents(pipelineLoc + "/AutoSaveDisabledMetadata.json");
+        _extHelper.setCodeMirrorValue("metadata", json);
+        clickButton("Save Survey");
+
+        clickButton("Create Survey", WAIT_FOR_JAVASCRIPT);
+        waitForText("Survey Label*");
+        setFormElement(Locator.name("_surveyLabel_"), "autosave disabled");
+        waitFor(() -> isTextPresent("Responses automatically saved at"), 65000);
+        assertTextNotPresent("Responses automatically saved at");
+        clickButton("Save", 0);
+        _extHelper.waitForExtDialog("Success");
+        _extHelper.waitForExtDialogToDisappear("Success");
+
+        clickProject(getProjectName());
+        clickFolder(folderName);
+        removeSurveyWebpart(AUTO_SAVE_SURVEY_DESIGN);
     }
 }

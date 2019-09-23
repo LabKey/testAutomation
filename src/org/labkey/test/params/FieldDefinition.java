@@ -235,7 +235,7 @@ public class FieldDefinition
             map.put("lookupSchema", getLookup().getSchema());
             map.put("lookupQuery", getLookup().getTable());
             map.put("lookupContainer", getLookup().getFolder());
-            map.put("rangeUri", getLookup().getTableType());
+            map.put("rangeURI", getLookup().getTableType());
         }
         else if (getType() != null)
         {
