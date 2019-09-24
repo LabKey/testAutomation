@@ -61,7 +61,9 @@ public class UIAssayHelper extends AbstractAssayHelper
             }
         }
 
-        _test.clickButton("Next");
+        // An assay may not have batch properties so there will not be any "Next" button.
+        if(_test.isElementPresent(Locator.button("Next")))
+            _test.clickButton("Next");
 
         if(null != runProperties)
         {
