@@ -156,7 +156,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
         public ModalDialogFinder withTitle(String title)
         {
-            _locator = Locators.dialog.withDescendant(Locators.title).containing(title);
+            _locator = Locators.dialog.withDescendant(Locator.tagWithClass("h4","modal-title")).containing(title);
             return this;
         }
 

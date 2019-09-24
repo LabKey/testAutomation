@@ -128,7 +128,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
         getWrapper().waitFor(()-> elementCache().advancedSettingsBtn.isEnabled(),
-                "the Advanced Settings button did not become enabled", 1500);
+                "the Advanced Settings button did not become enabled", 5000);
         elementCache().advancedSettingsBtn.click();
         return new AdvancedSettingsDialog(this, getDriver());
     }
@@ -469,7 +469,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // controls revealed when expanded
         public WebElement removeFieldBtn = Locator.tagWithAttributeContaining("button", "id", "domainpropertiesrow-delete-")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        public WebElement advancedSettingsBtn = Locator.tagWithText("button", "Advanced Settings")      // not enabled for now, placeholder
+        public WebElement advancedSettingsBtn = Locator.button("Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement cancelCross = Locator.tagWithAttribute("svg", "data-icon","times")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
