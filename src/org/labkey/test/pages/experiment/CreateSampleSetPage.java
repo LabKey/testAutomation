@@ -8,11 +8,13 @@ import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.property.EditDomainPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
 
 public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementCache>
 {
+    public final static String CURRENT_SAMPLE_SET_OPTION_TEXT = "(Current Sample Set)";
     public CreateSampleSetPage(WebDriver driver)
     {
         super(driver);
@@ -62,24 +64,30 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return elementCache().nameExpressionInput.get();
     }
 
-    public CreateSampleSetPage addParentColumnAlias(String importHeader, String materialInputName)
+    public CreateSampleSetPage addParentColumnAlias(int index, String importHeader, String materialInputName)
     {
         int countOfInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size();
 
         click(Locator.linkWithText("add parent column import alias"));
         waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() > countOfInputs, 1000);
 
-        List<WebElement> importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
-        List<WebElement> importAliasSelects = Locator.tagWithName("select", "importAliasValues").findElements(getDriver());
+        Input aliasInput = elementCache().parentAlias(index);
+        WebElement aliasSelect = elementCache().parentAliasSelect(index);
 
-        int index = importAliasInputs.size() - 1;
-        WebElement aliasInput = importAliasInputs.get(index);
-        WebElement aliasSelect = importAliasSelects.get(index);
-
-        setFormElement(aliasInput, importHeader);
+        aliasInput.setValue(importHeader);
         selectOptionByTextContaining(aliasSelect, materialInputName);
 
         return this;
+    }
+
+    public String getParentAlias(int index)
+    {
+        return elementCache().parentAlias(index).getValue();
+    }
+
+    public String getParentAliasSelectText(int index)
+    {
+        return new Select(elementCache().parentAliasSelect(index)).getFirstSelectedOption().getText();
     }
 
     public EditDomainPage clickCreate()
@@ -109,5 +117,15 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
 
         WebElement createButton = Locator.lkButton("Create").findWhenNeeded(this);
         WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
+
+        protected Input parentAlias(int index)
+        {
+            return Input.Input(Locator.name("importAliasKeys"), getDriver()).findAll(this).get(index);
+        }
+
+        protected WebElement parentAliasSelect(int index)
+        {
+            return Locator.tagWithName("select", "importAliasValues").findElements(getDriver()).get(index);
+        }
     }
 }
