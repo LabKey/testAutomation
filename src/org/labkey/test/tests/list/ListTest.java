@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.domain.DomainResponse;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -227,16 +228,16 @@ public class ListTest extends BaseWebDriverTest
     {
         String tableName = "listWithHiddenColumn";
         String keyFieldName = "StringKeyField";
-        FieldDefinition descriptionCol = new FieldDefinition("Description", FieldDefinition.ColumnType.String)
+        PropertyDescriptor descriptionCol = new PropertyDescriptor("Description", FieldDefinition.ColumnType.String.getJsonType())
                 .setLabel("Description").setDescription("Describes the field, yo");
-        FieldDefinition intCol = new FieldDefinition("intCol", FieldDefinition.ColumnType.Integer)
+        PropertyDescriptor intCol = new PropertyDescriptor("intCol", FieldDefinition.ColumnType.Integer.getJsonType())
                 .setLabel("TestInteger").setDescription("test int field to be used for filter");
-        FieldDefinition hiddenCol = new FieldDefinition("hidden", FieldDefinition.ColumnType.String)    // create the column as 'hidden' initially
-                .setLabel("Hidden").setDescription("should not see me").isHidden(true);
+        PropertyDescriptor hiddenCol = new PropertyDescriptor("hidden", FieldDefinition.ColumnType.String.getJsonType())    // create the column as 'hidden' initially
+                .setLabel("Hidden").setDescription("should not see me").setHidden(true);
 
         FieldDefinition.LookupInfo colorsLookup = new LookupInfo(getProjectName(), "lists", tableName);
         TestDataGenerator dgen = new TestDataGenerator(colorsLookup)
-                .withColumnSet(List.of(TestDataGenerator.simpleFieldDef(keyFieldName, FieldDefinition.ColumnType.String).isPrimaryKey(true),  // note: for list, key is hidden by default
+                .withColumns(List.of(TestDataGenerator.simpleFieldDef(keyFieldName, FieldDefinition.ColumnType.String),  // note: for list, key is hidden by default
                         descriptionCol, intCol, hiddenCol));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", keyFieldName));
 
@@ -270,16 +271,16 @@ public class ListTest extends BaseWebDriverTest
     {
         String tableName = "listForTestSort";
         String keyFieldName = "StringKeyField";
-        FieldDefinition descriptionCol = new FieldDefinition("Description", FieldDefinition.ColumnType.String)
+        PropertyDescriptor descriptionCol = new PropertyDescriptor("Description", FieldDefinition.ColumnType.String.getJsonType())
                 .setLabel("Description").setDescription("Describes the field, yo");
-        FieldDefinition intCol = new FieldDefinition("intCol", FieldDefinition.ColumnType.Integer)
+        PropertyDescriptor intCol = new PropertyDescriptor("intCol", FieldDefinition.ColumnType.Integer.getJsonType())
                 .setLabel("TestInteger").setDescription("test int field to be used for Sort");
-        FieldDefinition hiddenCol = new FieldDefinition("hidden", FieldDefinition.ColumnType.String)    // create the column as 'hidden' initially
-                .setLabel("Hidden").setDescription("should not see me").isHidden(true);
+        PropertyDescriptor hiddenCol = new PropertyDescriptor("hidden", FieldDefinition.ColumnType.String.getJsonType())    // create the column as 'hidden' initially
+                .setLabel("Hidden").setDescription("should not see me").setHidden(true);
 
         FieldDefinition.LookupInfo colorsLookup = new LookupInfo(getProjectName(), "lists", tableName);
         TestDataGenerator dgen = new TestDataGenerator(colorsLookup)
-                .withColumnSet(List.of(TestDataGenerator.simpleFieldDef(keyFieldName, FieldDefinition.ColumnType.String).isPrimaryKey(true),  // note: for list, key is hidden by default
+                .withColumns(List.of(TestDataGenerator.simpleFieldDef(keyFieldName, FieldDefinition.ColumnType.String),  // note: for list, key is hidden by default
                         descriptionCol, intCol, hiddenCol));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", keyFieldName));
 
@@ -312,16 +313,16 @@ public class ListTest extends BaseWebDriverTest
     {
         String tableName = "listForTestFilter";
         String keyFieldName = "StringKeyField";
-        FieldDefinition descriptionCol = new FieldDefinition("Description", FieldDefinition.ColumnType.String)
+        PropertyDescriptor descriptionCol = new PropertyDescriptor("Description", FieldDefinition.ColumnType.String.getJsonType())
                 .setLabel("Description").setDescription("Describes the field, yo");
-        FieldDefinition intCol = new FieldDefinition("intCol", FieldDefinition.ColumnType.Integer)
+        PropertyDescriptor intCol = new PropertyDescriptor("intCol", FieldDefinition.ColumnType.Integer.getJsonType())
                 .setLabel("TestInteger").setDescription("test int field to be used for Filtering");
-        FieldDefinition hiddenCol = new FieldDefinition("hidden", FieldDefinition.ColumnType.String)    // create the column as 'hidden' initially
-                .setLabel("Hidden").setDescription("should not see me").isHidden(true);
+        PropertyDescriptor hiddenCol = new PropertyDescriptor("hidden", FieldDefinition.ColumnType.String.getJsonType())    // create the column as 'hidden' initially
+                .setLabel("Hidden").setDescription("should not see me").setHidden(true);
 
         FieldDefinition.LookupInfo colorsLookup = new LookupInfo(getProjectName(), "lists", tableName);
         TestDataGenerator dgen = new TestDataGenerator(colorsLookup)
-                .withColumnSet(List.of(TestDataGenerator.simpleFieldDef(keyFieldName, FieldDefinition.ColumnType.String).isPrimaryKey(true),  // note: for list, key is hidden by default
+                .withColumns(List.of(TestDataGenerator.simpleFieldDef(keyFieldName, FieldDefinition.ColumnType.String),  // note: for list, key is hidden by default
                         descriptionCol, intCol, hiddenCol));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", keyFieldName));
 
@@ -364,7 +365,7 @@ public class ListTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo colorsLookup = new LookupInfo(getProjectName(), "lists", tableName);
         TestDataGenerator dgen = new TestDataGenerator(colorsLookup)
-                .withColumnSet(List.of(TestDataGenerator.simpleFieldDef(keyFieldName, FieldDefinition.ColumnType.String).isPrimaryKey(true),  // note: for list, key is hidden by default
+                .withColumns(List.of(TestDataGenerator.simpleFieldDef(keyFieldName, FieldDefinition.ColumnType.String),  // note: for list, key is hidden by default
                         TestDataGenerator.simpleFieldDef("field1", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("field2", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("field3", FieldDefinition.ColumnType.String)));
