@@ -923,10 +923,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return false;
     }
 
+    protected void disablePageUnloadEvents()
+    {
+        executeScript(
+                "window.addEventListener(\"beforeunload\", function (event) {\n" +
+                        "    event.stopPropagation();\n" +
+                        "}, true);");
+        executeScript("beforeunload = null;");
+        executeScript("window.onbeforeunload = null;");
+    }
+
     @LogMethod
     private void doPostamble()
     {
-        executeScript("window.onbeforeunload = null;");
+        disablePageUnloadEvents();
 
         ensureSignedInAsPrimaryTestUser();
 

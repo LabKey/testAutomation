@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.GetDomainCommand;
@@ -28,16 +29,13 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -47,18 +45,18 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class})
 public class DomainDesignerTest extends BaseWebDriverTest
 {
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
-
     @BeforeClass
     public static void setupProject()
     {
         DomainDesignerTest init = (DomainDesignerTest) getCurrentTest();
 
         init.doSetup();
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
     }
 
     private void doSetup()
@@ -71,6 +69,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Before
     public void preTest() throws Exception
     {
+        disablePageUnloadEvents();
         goToProjectHome();
     }
 
@@ -105,7 +104,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setScaleType(PropertiesEditor.ScaleType.LOG)
                 .setDescription("field for a decimal")
                 .setLabel("DecimalField");
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
 
         dgen = new TestDataGenerator(lookupInfo)        // now put some test data in the new fields
                 .withColumnSet(List.of(
@@ -144,7 +143,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-            .withColumnSet(List.of(
+                .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("stringField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("multilineField", FieldDefinition.ColumnType.MultiLine)
@@ -160,12 +159,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setDescription("basic string field")
                 .setLabel("StringField")
                 .setCharCount(200);
+
         domainFormPanel.getField("multilineField")
                 .expand()
                 .setDescription("basic multiline field")
                 .setLabel("MultiLineField")
                 .allowMaxChar();
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
 
         dgen.addCustomRow(Map.of("name", "first", "stringField", "baaaaaasic string heeeeeeeeeeere", "multiLineField", "multi\nline\nfield"));
         dgen.addCustomRow(Map.of("name", "second", "stringField", "basic string heeeeere", "multiLineField", "multi\nline\nfield with extra"));
@@ -204,7 +204,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainFormPanel.getField("deleteMe")
                 .clickRemoveField()
                 .dismiss("Yes");
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
 
         GetDomainCommand domainCommand = new GetDomainCommand("exp.materials", sampleSet);
         DomainResponse afterResponse = domainCommand.execute(createDefaultConnection(true), getProjectName());
@@ -246,7 +246,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setDateShift(false)
                 .setDescription("simplest date format of all")
                 .setLabel("DateTime");
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
 
         // insert sample dates, confirm expected formats
 
@@ -291,23 +291,25 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickSave();
 
         domainDesignerPage.waitForError();
-        assertTrue ("field should report error if saved without a name", noNameRow.hasFieldError());
+        assertTrue("field should report error if saved without a name", noNameRow.hasFieldError());
         assertEquals("New field. Error: Please provide a name for each field.", noNameRow.detailsMessage());
         WebElement errorDiv = domainDesignerPage.errorAlert();
         assertNotNull(errorDiv);
         String hasNoNameError = domainDesignerPage.waitForError();
-        assertTrue("expect error to contain [Please provide a name for each field.] but was[" +hasNoNameError+ "]",
+        assertTrue("expect error to contain [Please provide a name for each field.] but was[" + hasNoNameError + "]",
                 hasNoNameError.contains("Please provide a name for each field."));
 
         // now give the field a name with characters that will get a warning
         noNameRow.setName("&foolishness!");
         String warning = domainDesignerPage.waitForWarning();
         String warningfieldMessage = noNameRow.detailsMessage();
-        String expectedWarning = "SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore";
-        assertTrue("expect error to contain ["+expectedWarning+"] but was[" +warning+ "]",
+        String expectedWarning = "&foolishness! : SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore";
+        assertTrue("expect error to contain [" + expectedWarning + "] but was[" + warning + "]",
                 warning.contains(expectedWarning));
-        assertTrue("expect field-level warning to contain ["+expectedWarning+"] but was[" +warningfieldMessage+ "]",
+        assertTrue("expect field-level warning to contain [" + expectedWarning + "] but was[" + warningfieldMessage + "]",
                 warning.contains(expectedWarning));
+
+        domainDesignerPage.clickCancel();
     }
 
     @Test
@@ -334,18 +336,20 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // confirm the page shows the summary error
         String dupeError = domainDesignerPage.waitForError();
         String expectedError = "The field name 'firstCol' is already taken. Please provide a unique name for each field.";
-        assertTrue("expect field-level warning to contain ["+expectedError+"] but was[" +dupeError+ "]",
+        assertTrue("expect field-level warning to contain [" + expectedError + "] but was[" + dupeError + "]",
                 dupeError.contains(expectedError));
 
         // ensure the duplicate fields show as error fields, with explanations
         assertTrue("expect duplicate field name rows to show errors", firstcol.hasFieldError());
         String firstColErrorStatus = firstcol.detailsMessage();
-        assertTrue("expect field-level warning to contain ["+expectedError+"] but was[" +firstColErrorStatus+ "]",
+        assertTrue("expect field-level warning to contain [" + expectedError + "] but was[" + firstColErrorStatus + "]",
                 firstColErrorStatus.contains(expectedError));
         assertTrue("expect duplicate field name to show as error", dupeNameRow.hasFieldError());
         String dupeColErrorStatus = dupeNameRow.detailsMessage();
-        assertTrue("expect field-level warning to contain ["+expectedError+"] but was[" +dupeColErrorStatus+ "]",
+        assertTrue("expect field-level warning to contain [" + expectedError + "] but was[" + dupeColErrorStatus + "]",
                 dupeColErrorStatus.contains(expectedError));
+
+        domainDesignerPage.clickCancel();
     }
 
     @Test
@@ -397,19 +401,15 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // first, delete 'name' column
         nameRow.clickRemoveField()
                 .dismiss("Yes");
-        domainDesignerPage.clickSave();
-        String saveMsg = domainDesignerPage.waitForInfo();
-        String expectedMsg = "Save Successful";
-        assertTrue("expect field-level warning to contain ["+expectedMsg+"] but was[" +saveMsg+ "]",
-                saveMsg.contains(expectedMsg));
 
         DomainFieldRow colorRow = domainFormPanel.getField("color");
         colorRow.clickRemoveField()
                 .dismiss("Yes");
         domainDesignerPage.clickSave();
-        domainDesignerPage.waitForInfo();
 
         // there should just be the key field (id) now:
+        disablePageUnloadEvents();
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
         domainFormPanel = domainDesignerPage.fieldProperties(list); // re-find the panel to work around field caching silliness
         assertNotNull(domainFormPanel.getField("id"));
         assertNull(domainFormPanel.getField("color"));
@@ -426,7 +426,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumnSet(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)
-                            .setRequired(true),                                                                 // <-- marked 'required'
+                                .setRequired(true),                                                                 // <-- marked 'required'
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
 
@@ -441,16 +441,16 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         DomainFieldRow nameRow = domainFormPanel.getField("name");
         // confirm the UI shows its expected 'required' status
-        assertEquals (true, nameRow.getRequiredField());
+        assertEquals(true, nameRow.getRequiredField());
 
         nameRow.clickRemoveField()
                 .dismiss("Yes");
         domainDesignerPage.clickSave();
-        domainDesignerPage.waitForInfo();       // expect the 'save successful' sprite to appear
     }
 
     /**
      * confirms that the key field (called 'name') in a sampleset is not shown in the domain editor
+     *
      * @throws Exception
      */
     @Test
@@ -500,19 +500,22 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String multipleIssuesError = domainDesignerPage.waitForError();
         String expectedErrMsg = "Multiple fields contain issues that need to be fixed. Review the red highlighted fields below for more information.";
         String expectedWarningMsg = " SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore.";
-        assertTrue( "expect error message to contain ["+expectedErrMsg+"] but was ["+multipleIssuesError+"]",
+        assertTrue("expect error message to contain [" + expectedErrMsg + "] but was [" + multipleIssuesError + "]",
                 multipleIssuesError.contains(expectedErrMsg));
-        assertTrue( "expect warning message to contain ["+expectedWarningMsg+"] but was ["+clientWarning+"]",
+        assertTrue("expect warning message to contain [" + expectedWarningMsg + "] but was [" + clientWarning + "]",
                 clientWarning.contains(expectedWarningMsg));
 
         assertTrue("expect field error when using reserved field names", modifiedRow.hasFieldError());
         assertTrue("expect error for duplicate field names", blarg1.hasFieldError());
         assertTrue("expect error for duplicate field names", blarg2.hasFieldError());
         assertTrue("expect warning for field name with spaces or special characters", clientFieldWarning.hasFieldWarning());
+
+        domainDesignerPage.clickCancel();
     }
 
     /**
      * provides regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38314
+     *
      * @throws Exception
      */
     @Test
@@ -539,7 +542,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // confirm expected error warning
         String expectedError = "'modified' is a reserved field name";
         String error = domainDesignerPage.waitForError();
-        assertTrue("expect error containing ["+expectedError+"] but it was ["+error+"]",
+        assertTrue("expect error containing [" + expectedError + "] but it was [" + error + "]",
                 error.contains(expectedError));
 
         // double-check to ensure the column has not been altered on the server side
@@ -548,10 +551,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         Assert.assertThat("Columns after delete", columnsAfterSaveAttempt,
                 CoreMatchers.allOf(hasItems("Name", "testCol", "extraField"),
                         CoreMatchers.not(CoreMatchers.hasItem("modified"))));
+
+        domainDesignerPage.clickCancel();
     }
 
     /**
      * regresses issue https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38341
+     *
      * @throws Exception
      */
     @Test
@@ -575,12 +581,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
         extraFieldRow.showFieldOnDefaultView(true); // true is default behavior
 
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
 
         // expect to arrive at project home, with a list of 'sampleSets'
         clickAndWait(Locator.linkWithText(sampleSet));
 
-        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
         List<String> columnsInDefaultView = sampleSetTable.getColumnNames();
         Assert.assertThat("Columns after delete", columnsInDefaultView,
                 CoreMatchers.allOf(hasItems("Name", "Flag", "extraField", "testCol"),
@@ -607,12 +613,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow shownRow = domainFormPanel.addField("shownField");
         shownRow.showFieldOnInsertView(true);
 
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
 
         // expect to arrive at project home, with a list of 'sampleSets'
+        waitForElement(Locator.linkWithText(sampleSet));
         clickAndWait(Locator.linkWithText(sampleSet));
 
-        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
         sampleSetTable.clickInsertNewRow();
 
         waitForElement(Locator.input("quf_shownField"));
@@ -641,12 +648,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow shownRow = domainFormPanel.addField("shownField");
         shownRow.showFieldOnUpdateView(true);
 
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
         // expect to arrive at project home, with a list of 'sampleSets'
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
         clickAndWait(Locator.linkWithText(sampleSet));
 
-        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
         sampleSetTable.clickEditRow(0);
 
         waitForElement(Locator.input("quf_shownField"));
@@ -683,11 +690,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow restrictedPHI = domainFormPanel.addField("restrictedPHI");
         restrictedPHI.setPHILevel(PropertiesEditor.PhiSelectType.Restricted);
 
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
         clickAndWait(Locator.linkWithText(sampleSet));
 
-        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this,"Sample Set Contents");
+        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
 
         assertEquals("NotPHI", getColumn(domainResponse.getDomain(), "notPHI").getPHI());
@@ -719,7 +726,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
         extraFieldRow.setMissingValue(false);
 
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
         assertEquals("expect column to have MissingValue enabled", true, getColumn(domainResponse.getDomain(), "missingValue").getAllProperties().get("mvEnabled"));
         assertEquals("expect column not to have MissingValue enabled", false, getColumn(domainResponse.getDomain(), "extraField").getAllProperties().get("mvEnabled"));
@@ -746,7 +753,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
         extraFieldRow.setDimension(false);
 
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
         assertEquals("dimensionField should have dimension marked true", true, getColumn(domainResponse.getDomain(), "dimensionField").getDimension());
@@ -774,7 +781,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
         extraFieldRow.setMeasure(false);
 
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
 
@@ -803,12 +810,100 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
         extraFieldRow.setRecommendedVariable(false);
 
-        domainDesignerPage.clickSaveAndFinish();
+        domainDesignerPage.clickSave();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
         assertEquals("variableField should have recommendedVariable marked true", true, getColumn(domainResponse.getDomain(), "variableField").getAllProperties().get("recommendedVariable"));
         assertEquals("extraField should not have recommendedVariable marked true", false, getColumn(domainResponse.getDomain(), "extraField").getAllProperties().get("recommendedVariable"));
     }
+
+    @Test
+    public void testLookUpFieldSampleSet() throws IOException, CommandException
+    {
+        String sampleSet = "setFieldAsLookup";
+        String listName = "lookUpList1";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+
+        FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo1)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+
+        DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
+                .setType("Lookup")
+                .expand()
+                .setFromFolder("Current Folder")
+                .setFromSchema("lists")
+                .setFromTargetTable("lookUpList1 (Integer)")
+                .setDescription("LookUp in same container")
+                .clickCancelCross();
+
+        assertEquals("Incorrect detail message", "Current Folder > lists > lookUpList1", lookUpRow.detailsMessage());
+
+        domainDesignerPage.saveButton().click();
+
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        assertEquals("lookUpField from folder is incorrect", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupContainer"));
+        assertEquals("lookUpField schema name is incorrect", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupSchema"));
+        assertEquals("lookUpField target table is incorrect", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupQuery"));
+
+    }
+
+    @Test
+    public void testLookUpFieldList() throws IOException, CommandException
+    {
+        String mainListName = "setFieldAsLookupinList";
+        String lookUplistName = "lookUpList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", lookUplistName);
+        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+
+        FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "lists", mainListName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo1)
+                .withColumnSet(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse1 = dgen.createDomain(createDefaultConnection(true), "VarList", Map.of("keyName", "id"));
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", mainListName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(mainListName);
+
+        DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
+                .setType("Lookup")
+                .expand()
+                .setFromFolder("Current Folder")
+                .setFromSchema("lists")
+                .setFromTargetTable("lookUpList (Integer)")
+                .setDescription("LookUp in same container")
+                .clickCancelCross();
+
+        assertEquals("Incorrect detail message", "Current Folder > lists > lookUpList", lookUpRow.detailsMessage());
+        domainDesignerPage.clickSave();
+
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        assertEquals("lookUpField from folder should be present", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupContainer"));
+        assertEquals("lookUpField schema name should be present", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupSchema"));
+        assertEquals("lookUpField target table should be present", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupQuery"));
+        domainDesignerPage.clickCancel();
+
+    }
+
 
     public PropertyDescriptor getColumn(Domain domain, String columnName)
     {
