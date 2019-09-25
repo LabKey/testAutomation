@@ -185,33 +185,36 @@ public class FieldDefinition
         return this;
     }
 
-    public Boolean shownInDetailsView()
+    public Boolean getShownInDetailsView()
     {
         return _shownInDetailsView;
     }
-    public FieldDefinition shownInDetailsView(Boolean showInDetailsView)
+
+    public FieldDefinition setShownInDetailsView(Boolean shownInDetailsView)
     {
-        _shownInDetailsView = showInDetailsView;
+        _shownInDetailsView = shownInDetailsView;
         return this;
     }
 
-    public Boolean shownInInsertView()
+    public Boolean getShownInInsertView()
     {
         return _shownInInsertView;
     }
-    public FieldDefinition shownInInsertView(Boolean showInDetailsView)
+
+    public FieldDefinition setShownInInsertView(Boolean shownInInsertView)
     {
-        _shownInInsertView = showInDetailsView;
+        _shownInInsertView = shownInInsertView;
         return this;
     }
 
-    public Boolean shownInUpdateView()
+    public Boolean getShownInUpdateView()
     {
         return _shownInUpdateView;
     }
-    public FieldDefinition shownInUpdateView(Boolean showInUpdateView)
+
+    public FieldDefinition setShownInUpdateView(Boolean shownInUpdateView)
     {
-        _shownInUpdateView = showInUpdateView;
+        _shownInUpdateView = shownInUpdateView;
         return this;
     }
 
@@ -255,12 +258,12 @@ public class FieldDefinition
             map.put("hidden", isHidden());
         if (isPrimaryKey() != null)
             map.put("isPrimaryKey", isPrimaryKey());
-        if (shownInDetailsView() != null)
-            map.put("shownInDetailsView", shownInDetailsView());
-        if (shownInInsertView() != null)
-            map.put("shownInInsertView", shownInInsertView());
-        if (shownInUpdateView() != null)
-            map.put("shownInUpdateView", shownInUpdateView());
+        if (getShownInDetailsView() != null)
+            map.put("shownInDetailsView", getShownInDetailsView());
+        if (getShownInInsertView() != null)
+            map.put("shownInInsertView", getShownInInsertView());
+        if (getShownInUpdateView() != null)
+            map.put("shownInUpdateView", getShownInUpdateView());
 
         return map;
     }
