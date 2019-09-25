@@ -27,8 +27,8 @@ public class FieldDefinition
     private ColumnType _type;
     private String _description;
     private String _format;
-    private Boolean _mvEnabled;
-    private Boolean _required;
+    private Boolean _mvEnabled = false;
+    private boolean _required;
     private LookupInfo _lookup;
     private FieldValidator _validator;
     private String _url;
@@ -105,12 +105,12 @@ public class FieldDefinition
         return this;
     }
 
-    public boolean isMvEnabled()
+    public Boolean isMvEnabled()
     {
         return _mvEnabled;
     }
 
-    public FieldDefinition setMvEnabled(Boolean mvEnabled)
+    public FieldDefinition setMvEnabled(boolean mvEnabled)
     {
         _mvEnabled = mvEnabled;
         return this;
@@ -121,7 +121,7 @@ public class FieldDefinition
         return _required;
     }
 
-    public FieldDefinition setRequired(Boolean required)
+    public FieldDefinition setRequired(boolean required)
     {
         _required = required;
         return this;
@@ -246,7 +246,8 @@ public class FieldDefinition
             map.put("description", getDescription());
         if (getFormat() != null)
             map.put("format", getFormat());
-        map.put("mvEnabled", isMvEnabled());
+        if (isMvEnabled() != null)
+            map.put("mvEnabled", isMvEnabled());
         map.put("required", isRequired());
         if (getScale() != null)
             map.put("scale", getScale());
