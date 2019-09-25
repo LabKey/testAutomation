@@ -4,6 +4,7 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
@@ -35,6 +36,15 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         else
            sleep(500); //TODO: wait for page load default
 
+        return this;
+    }
+
+    public DomainDesignerPage clickCancel()
+    {
+        elementCache().cancelBtn.click();
+        ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?")
+                .waitFor();
+        confirmDeletionDlg.dismiss("No, Discard Changes");
         return this;
     }
 
@@ -120,7 +130,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         }
         WebElement saveButton = Locator.button("Save")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement cancelBtn = Locators.domainDesignerButton("Cancel")
+        WebElement cancelBtn = Locator.button("Cancel")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 

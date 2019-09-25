@@ -930,6 +930,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                         "    event.stopPropagation();\n" +
                         "}, true);");
         executeScript("beforeunload = null;");
+        executeScript("window.onbeforeunload = null;");
     }
 
     @LogMethod

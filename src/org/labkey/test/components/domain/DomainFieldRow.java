@@ -1,5 +1,6 @@
 package org.labkey.test.components.domain;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.WebDriverComponent;
@@ -7,10 +8,12 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -267,14 +270,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setScaleType(PropertiesEditor.ScaleType scaleType)
     {
         expand();
-        getWrapper().setFormElement(elementCache().defaultScaleTypeSelect, scaleType.toString());
+        elementCache().defaultScaleTypeSelect.selectByVisibleText(scaleType.toString());
         return this;
     }
 
     public PropertiesEditor.ScaleType getScaleType(String scaleType)
     {
         expand();
-        String scaleTypeString = getWrapper().getFormElement(elementCache().defaultScaleTypeSelect);
+        String scaleTypeString = getWrapper().getFormElement(elementCache().defaultScaleTypeSelect.getWrappedElement());
         return Enum.valueOf(PropertiesEditor.ScaleType.class, scaleTypeString);
     }
 
@@ -346,42 +349,69 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public DomainFieldRow setLookup(FieldDefinition.LookupInfo lookupInfo)
+    {
+        setType(FieldDefinition.ColumnType.Lookup);
+        setFromFolder(lookupInfo.getFolder());
+        setFromSchema(lookupInfo.getSchema());
+        String tableType = lookupInfo.getTableType();
+        if (tableType == null)
+            throw new IllegalArgumentException("No lookup type specified for " + lookupInfo.getTable());
+        setFromTargetTable(lookupInfo.getTable() + " (" + tableType + ")");
+        return this;
+    }
+
     public String getFromFolder()
     {
         expand();
-        return getWrapper().getFormElement(elementCache().fromFolderInput);
+        return elementCache().fromFolderInput.getFirstSelectedOption().getText();
     }
 
-    public DomainFieldRow setFromFolder(String formatString)
+    public DomainFieldRow setFromFolder(String containerPath)
     {
         expand();
-        getWrapper().setFormElement(elementCache().fromFolderInput, formatString);
+        if (StringUtils.isEmpty(containerPath) || containerPath.equals("Current Folder"))
+        {
+            containerPath = getWrapper().getCurrentContainerPath();
+        }
+
+//        String previousValue = elementCache().getFromTargetTableInput().getFirstSelectedOption().getAttribute("value");
+//        if (!containerPath.equals(previousValue))
+//        {
+//            WebElement schemaSelect = elementCache().getFromSchemaInput().getWrappedElement();
+//            elementCache().fromFolderInput.selectByValue(containerPath);
+//            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(schemaSelect));
+//        }
+
+        elementCache().fromFolderInput.selectByValue(containerPath);
+
         return this;
     }
 
     public String getFromSchema()
     {
         expand();
-        return getWrapper().getFormElement(elementCache().fromSchemaInput);
+        return elementCache().getFromSchemaInput().getFirstSelectedOption().getText();
     }
 
-    public DomainFieldRow setFromSchema(String formatString)
+    public DomainFieldRow setFromSchema(String schemaName)
     {
         expand();
-        getWrapper().setFormElement(elementCache().fromSchemaInput, formatString);
+        elementCache().getFromSchemaInput().selectByVisibleText(schemaName);
         return this;
     }
 
     public String getFromTargetTable()
     {
         expand();
-        return getWrapper().getFormElement(elementCache().fromTargetTableInput);
+        return elementCache().getFromTargetTableInput().getFirstSelectedOption().getText();
     }
 
-    public DomainFieldRow setFromTargetTable(String formatString)
+    public DomainFieldRow setFromTargetTable(String targetTable)
     {
         expand();
-        getWrapper().setFormElement(elementCache().fromTargetTableInput, formatString);
+
+        elementCache().getFromTargetTableInput().selectByVisibleText(targetTable);
         return this;
     }
 
@@ -542,7 +572,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // numeric field options
         public Input numericFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
                 .refindWhenNeeded(this), getDriver());
-        public WebElement defaultScaleTypeSelect = Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-defaultScale-")
+        public Select defaultScaleTypeSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-defaultScale"))
                 .findWhenNeeded(this);
 
         // text field options
@@ -560,12 +590,18 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this));
 
         //lookup field options
-        public WebElement fromFolderInput = Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-lookupContainer-")
+        public Select fromFolderInput = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
                 .findWhenNeeded(this);
-        public WebElement fromSchemaInput = Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-lookupSchema-")
-                .findWhenNeeded(this);
-        public WebElement fromTargetTableInput = Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-lookupQueryValue-")
-                .findWhenNeeded(this);
+
+        public Select getFromSchemaInput()
+        {
+            return SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
+        }
+
+        public Select getFromTargetTableInput()
+        {
+            return SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
+        }
 
 
     }
