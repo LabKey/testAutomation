@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 
 import java.util.Map;
-import java.util.Optional;
 
 public class FieldDefinition
 {
@@ -28,17 +27,17 @@ public class FieldDefinition
     private ColumnType _type;
     private String _description;
     private String _format;
-    private boolean _mvEnabled;
-    private boolean _required;
+    private Boolean _mvEnabled;
+    private Boolean _required;
     private LookupInfo _lookup;
     private FieldValidator _validator;
     private String _url;
     private Integer _scale;
-    private Optional<Boolean> _hidden = Optional.empty();
-    private Optional<Boolean> _shownInDetailsView = Optional.empty();;
-    private Optional<Boolean> _shownInInsertView = Optional.empty();;
-    private Optional<Boolean> _shownInUpdateView = Optional.empty();;
-    private Optional<Boolean> _isPrimaryKey = Optional.empty();;
+    private Boolean _hidden;
+    private Boolean _shownInDetailsView;
+    private Boolean _shownInInsertView;
+    private Boolean _shownInUpdateView;
+    private Boolean _isPrimaryKey;
 
     public FieldDefinition(String name, ColumnType type)
     {
@@ -111,7 +110,7 @@ public class FieldDefinition
         return _mvEnabled;
     }
 
-    public FieldDefinition setMvEnabled(boolean mvEnabled)
+    public FieldDefinition setMvEnabled(Boolean mvEnabled)
     {
         _mvEnabled = mvEnabled;
         return this;
@@ -122,7 +121,7 @@ public class FieldDefinition
         return _required;
     }
 
-    public FieldDefinition setRequired(boolean required)
+    public FieldDefinition setRequired(Boolean required)
     {
         _required = required;
         return this;
@@ -166,53 +165,53 @@ public class FieldDefinition
         return _scale;
     }
 
-    public Optional<Boolean> isHidden()
+    public Boolean isHidden()
     {
         return _hidden;
     }
     public FieldDefinition isHidden(Boolean hidden)
     {
-        _hidden = Optional.of(hidden);
+        _hidden = hidden;
         return this;
     }
 
-    public Optional<Boolean> isPrimaryKey()
+    public Boolean isPrimaryKey()
     {
         return  _isPrimaryKey;
     }
     public FieldDefinition isPrimaryKey(Boolean isPrimaryKey)
     {
-        _isPrimaryKey = Optional.of(isPrimaryKey);
+        _isPrimaryKey = isPrimaryKey;
         return this;
     }
 
-    public Optional<Boolean> shownInDetailsView()
+    public Boolean shownInDetailsView()
     {
         return _shownInDetailsView;
     }
-    public FieldDefinition shownInDetailsView(boolean showInDetailsView)
+    public FieldDefinition shownInDetailsView(Boolean showInDetailsView)
     {
-        _shownInDetailsView = Optional.of(showInDetailsView);
+        _shownInDetailsView = showInDetailsView;
         return this;
     }
 
-    public Optional<Boolean> shownInInsertView()
+    public Boolean shownInInsertView()
     {
         return _shownInInsertView;
     }
-    public FieldDefinition shownInInsertView(boolean showInDetailsView)
+    public FieldDefinition shownInInsertView(Boolean showInDetailsView)
     {
-        _shownInInsertView = Optional.of(showInDetailsView);
+        _shownInInsertView = showInDetailsView;
         return this;
     }
 
-    public Optional<Boolean> shownInUpdateView()
+    public Boolean shownInUpdateView()
     {
         return _shownInUpdateView;
     }
-    public FieldDefinition shownInUpdateView(boolean showInUpdateView)
+    public FieldDefinition shownInUpdateView(Boolean showInUpdateView)
     {
-        _shownInUpdateView = Optional.of(showInUpdateView);
+        _shownInUpdateView = showInUpdateView;
         return this;
     }
 
@@ -251,16 +250,16 @@ public class FieldDefinition
         map.put("required", isRequired());
         if (getScale() != null)
             map.put("scale", getScale());
-        if (isHidden().isPresent())
-            map.put("hidden", isHidden().get());
-        if (isPrimaryKey().isPresent())
-            map.put("isPrimaryKey", isPrimaryKey().get());
-        if (shownInDetailsView().isPresent())
-            map.put("shownInDetailsView", shownInDetailsView().get());
-        if (shownInInsertView().isPresent())
-            map.put("shownInInsertView", shownInInsertView().get());
-        if (shownInUpdateView().isPresent())
-            map.put("shownInUpdateView", shownInUpdateView().get());
+        if (isHidden() != null)
+            map.put("hidden", isHidden());
+        if (isPrimaryKey() != null)
+            map.put("isPrimaryKey", isPrimaryKey());
+        if (shownInDetailsView() != null)
+            map.put("shownInDetailsView", shownInDetailsView());
+        if (shownInInsertView() != null)
+            map.put("shownInInsertView", shownInInsertView());
+        if (shownInUpdateView() != null)
+            map.put("shownInUpdateView", shownInUpdateView());
 
         return map;
     }
