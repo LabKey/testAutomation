@@ -146,12 +146,12 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
     }
 
     /**
-     * Is this tabId marked as currently active?
+     * Is the &lt;li> element associated with this tabId marked as active?
      */
     private boolean isActiveTab(String tabId)
     {
         WebElement element = elementCache().findTab(tabId);
-        return "labkey-tab-action".equals(element.getAttribute("class"));
+        return "labkey-tab-active".equals(element.getAttribute("class"));
     }
 
     public ReorderFoldersPage clickChangeDisplayOrder()
