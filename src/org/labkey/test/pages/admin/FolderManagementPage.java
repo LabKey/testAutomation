@@ -140,7 +140,7 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
     public void selectTab(String tabId)
     {
-        if (isActiveTab(tabId))
+        if (!isActiveTab(tabId))
             clickAndWait(elementCache().findTabLink(tabId));
         assertTrue("On wrong folder management tab - expected " + tabId, isActiveTab(tabId));
     }
