@@ -27,7 +27,7 @@ public class FieldDefinition
     private ColumnType _type;
     private String _description;
     private String _format;
-    private Boolean _mvEnabled = false;
+    private boolean _mvEnabled;
     private boolean _required;
     private LookupInfo _lookup;
     private FieldValidator _validator;
@@ -105,7 +105,7 @@ public class FieldDefinition
         return this;
     }
 
-    public Boolean isMvEnabled()
+    public boolean isMvEnabled()
     {
         return _mvEnabled;
     }
@@ -169,7 +169,8 @@ public class FieldDefinition
     {
         return _hidden;
     }
-    public FieldDefinition isHidden(Boolean hidden)
+
+    public FieldDefinition setHidden(Boolean hidden)
     {
         _hidden = hidden;
         return this;
@@ -179,7 +180,8 @@ public class FieldDefinition
     {
         return  _isPrimaryKey;
     }
-    public FieldDefinition isPrimaryKey(Boolean isPrimaryKey)
+
+    public FieldDefinition setPrimaryKey(Boolean isPrimaryKey)
     {
         _isPrimaryKey = isPrimaryKey;
         return this;
@@ -249,8 +251,7 @@ public class FieldDefinition
             map.put("description", getDescription());
         if (getFormat() != null)
             map.put("format", getFormat());
-        if (isMvEnabled() != null)
-            map.put("mvEnabled", isMvEnabled());
+        map.put("mvEnabled", isMvEnabled());
         map.put("required", isRequired());
         if (getScale() != null)
             map.put("scale", getScale());
