@@ -45,18 +45,18 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class})
 public class DomainDesignerTest extends BaseWebDriverTest
 {
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+    }
+
     @BeforeClass
     public static void setupProject()
     {
         DomainDesignerTest init = (DomainDesignerTest) getCurrentTest();
 
         init.doSetup();
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
     }
 
     private void doSetup()
@@ -80,7 +80,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)     // just make the list
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("Number", FieldDefinition.ColumnType.Integer)
                 ));
         dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
@@ -107,7 +107,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickSave();
 
         dgen = new TestDataGenerator(lookupInfo)        // now put some test data in the new fields
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("Key", FieldDefinition.ColumnType.Integer),
                         TestDataGenerator.simpleFieldDef("integerField", FieldDefinition.ColumnType.Integer)
                 ));
@@ -143,7 +143,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+            .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("stringField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("multilineField", FieldDefinition.ColumnType.MultiLine)
@@ -189,7 +189,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("deleteMe", FieldDefinition.ColumnType.String)
                 ));
@@ -231,7 +231,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
@@ -277,7 +277,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
@@ -319,7 +319,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
@@ -359,7 +359,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
@@ -383,7 +383,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
@@ -424,9 +424,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // create the list
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)
-                                .setRequired(true),                                                                 // <-- marked 'required'
+                            .setRequired(true),                                                                 // <-- marked 'required'
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
 
@@ -460,7 +460,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
@@ -481,7 +481,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
@@ -525,7 +525,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
@@ -568,7 +568,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
@@ -600,7 +600,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
@@ -633,7 +633,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
@@ -667,7 +667,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
@@ -710,7 +710,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
@@ -739,7 +739,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
@@ -767,7 +767,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
@@ -796,7 +796,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
@@ -825,14 +825,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
 
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo1)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
@@ -869,14 +869,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", lookUplistName);
         TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
 
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "lists", mainListName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo1)
-                .withColumnSet(List.of(
+                .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse1 = dgen.createDomain(createDefaultConnection(true), "VarList", Map.of("keyName", "id"));

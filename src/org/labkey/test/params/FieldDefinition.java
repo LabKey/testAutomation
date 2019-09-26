@@ -33,6 +33,11 @@ public class FieldDefinition
     private FieldValidator _validator;
     private String _url;
     private Integer _scale;
+    private Boolean _hidden;
+    private Boolean _shownInDetailsView;
+    private Boolean _shownInInsertView;
+    private Boolean _shownInUpdateView;
+    private Boolean _isPrimaryKey;
 
     public FieldDefinition(String name, ColumnType type)
     {
@@ -160,6 +165,61 @@ public class FieldDefinition
         return _scale;
     }
 
+    public Boolean isHidden()
+    {
+        return _hidden;
+    }
+
+    public FieldDefinition setHidden(Boolean hidden)
+    {
+        _hidden = hidden;
+        return this;
+    }
+
+    public Boolean isPrimaryKey()
+    {
+        return  _isPrimaryKey;
+    }
+
+    public FieldDefinition setPrimaryKey(Boolean isPrimaryKey)
+    {
+        _isPrimaryKey = isPrimaryKey;
+        return this;
+    }
+
+    public Boolean getShownInDetailsView()
+    {
+        return _shownInDetailsView;
+    }
+
+    public FieldDefinition setShownInDetailsView(Boolean shownInDetailsView)
+    {
+        _shownInDetailsView = shownInDetailsView;
+        return this;
+    }
+
+    public Boolean getShownInInsertView()
+    {
+        return _shownInInsertView;
+    }
+
+    public FieldDefinition setShownInInsertView(Boolean shownInInsertView)
+    {
+        _shownInInsertView = shownInInsertView;
+        return this;
+    }
+
+    public Boolean getShownInUpdateView()
+    {
+        return _shownInUpdateView;
+    }
+
+    public FieldDefinition setShownInUpdateView(Boolean shownInUpdateView)
+    {
+        _shownInUpdateView = shownInUpdateView;
+        return this;
+    }
+
     public FieldDefinition setScale(Integer scale)
     {
         _scale = scale;
@@ -190,11 +250,21 @@ public class FieldDefinition
         if (getDescription() != null)
             map.put("description", getDescription());
         if (getFormat() != null)
-            map.put("formatString", getFormat());
+            map.put("format", getFormat());
         map.put("mvEnabled", isMvEnabled());
         map.put("required", isRequired());
         if (getScale() != null)
             map.put("scale", getScale());
+        if (isHidden() != null)
+            map.put("hidden", isHidden());
+        if (isPrimaryKey() != null)
+            map.put("isPrimaryKey", isPrimaryKey());
+        if (getShownInDetailsView() != null)
+            map.put("shownInDetailsView", getShownInDetailsView());
+        if (getShownInInsertView() != null)
+            map.put("shownInInsertView", getShownInInsertView());
+        if (getShownInUpdateView() != null)
+            map.put("shownInUpdateView", getShownInUpdateView());
 
         return map;
     }
@@ -227,7 +297,7 @@ public class FieldDefinition
         File("File", null),
         AutoInteger("Auto-Increment Integer", "int"),
         Flag("Flag (String)", null),
-        Attachment("Attachment", null),
+        Attachment("Attachment", "attachment"),
         User("User", "int"),
         Lookup("Lookup", null);
 
@@ -285,9 +355,15 @@ public class FieldDefinition
             return _tableType;
         }
 
+        @Deprecated
         public LookupInfo setTableType(String tableType)
         {
             _tableType = tableType;
+            return this;
+        }
+        public LookupInfo setTableType(ColumnType tableType)
+        {
+            _tableType = tableType._jsonType;
             return this;
         }
 
