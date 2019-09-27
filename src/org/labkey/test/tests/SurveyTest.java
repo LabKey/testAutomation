@@ -248,6 +248,10 @@ public class SurveyTest extends BaseWebDriverTest
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Submit completed form"));
         stopImpersonating();
         clickProject(getProjectName());
+
+        // remove the webpart
+        clickFolder(folderName);
+        removeSurveyWebpart(projectSurveyDesign);
     }
 
     @LogMethod
