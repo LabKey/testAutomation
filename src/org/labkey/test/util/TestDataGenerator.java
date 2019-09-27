@@ -54,8 +54,8 @@ public class TestDataGenerator
     // chose a Character random from this String
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
 
-    private final Map<Integer, FieldDefinition> _indices = new HashMap<>();  // used to keep columns and row keys aligned
-    private final Map<String, FieldDefinition> _columns = new CaseInsensitiveHashMap<>();
+    private final Map<Integer, PropertyDescriptor> _indices = new HashMap<>();  // used to keep columns and row keys aligned
+    private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
     private List<Map<String, Object>> _rows = new ArrayList<>();
 
@@ -88,13 +88,32 @@ public class TestDataGenerator
      * @param columns   The fieldSet for the domain/sampleset/list.
      * @return
      */
+    public TestDataGenerator withColumns(List<PropertyDescriptor> columns)
+    {
+        int index = 0;
+        for (PropertyDescriptor fieldDef : columns)
+        {
+            _columns.put(fieldDef.getName(), fieldDef);
+            _indices.put(index, fieldDef);
+            index++;
+        }
+        return this;
+    }
+
+    @Deprecated
+    /**
+     * use withColumns (list<PropertyDescriptor> columns) instead
+     */
     public TestDataGenerator withColumnSet(List<FieldDefinition> columns)
     {
         int index = 0;
         for (FieldDefinition fieldDef : columns)
         {
-            _columns.put(fieldDef.getName(), fieldDef);
-            _indices.put(index, fieldDef);
+            JSONObject json = new JSONObject();
+            json.putAll(fieldDef.toMap());
+            PropertyDescriptor field = new PropertyDescriptor(json);
+            _columns.put(fieldDef.getName(), field);
+            _indices.put(index, field);
             index++;
         }
         return this;
@@ -175,11 +194,9 @@ public class TestDataGenerator
     private List<PropertyDescriptor> getColumns()
     {
         List<PropertyDescriptor> cols = new ArrayList<>();
-        for (FieldDefinition field : _columns.values())
+        for (PropertyDescriptor field : _columns.values())
         {
-            JSONObject json = new JSONObject();
-            json.putAll(field.toMap());
-            cols.add(new PropertyDescriptor(json));
+            cols.add(field);
         }
         return cols;
     }
@@ -195,10 +212,10 @@ public class TestDataGenerator
 
             for (String key : _columns.keySet())
             {
-                Map<String, Object> columnDefinition = _columns.get(key).toMap();
+                PropertyDescriptor columnDefinition = _columns.get(key);
                 // get the column definition
-                String columnName = columnDefinition.get("name").toString().toLowerCase();
-                String columnType = columnDefinition.get("rangeURI").toString().toLowerCase();
+                String columnName = columnDefinition.getName().toLowerCase();
+                String columnType = columnDefinition.getRangeURI().toLowerCase();
 
                 Object columnValue;
                 columnValue = _dataSuppliers.getOrDefault(columnName, getDefaultDataSupplier(columnType)).get();
@@ -311,6 +328,11 @@ public class TestDataGenerator
         return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
+    public DomainResponse createList(Connection cn, String keyName) throws IOException, CommandException
+    {
+        return createDomain(cn, "IntList", Map.of("keyName", keyName));
+    }
+
     public DomainResponse getDomain(Connection cn) throws IOException, CommandException
     {
         GetDomainCommand cmd = new GetDomainCommand(getSchema(), getQueryName());
@@ -384,8 +406,8 @@ public class TestDataGenerator
     }
 
     // helper to generate a column or field definition
-    static public FieldDefinition simpleFieldDef(String name, FieldDefinition.ColumnType type)
+    static public PropertyDescriptor simpleFieldDef(String name, FieldDefinition.ColumnType type)
     {
-        return new FieldDefinition(name).setType(type);
+        return new PropertyDescriptor(name, type.getJsonType());
     }
 }

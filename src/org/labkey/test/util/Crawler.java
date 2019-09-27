@@ -239,6 +239,11 @@ public class Crawler
             new ControllerActionId("harvest", "formatInvoice"),
             new ControllerActionId("targetedms", "downloadDocument"),
 
+                // Disable crawler for single-page apps until we make `beginAt` work with them
+                new ControllerActionId("biologics", "app"),
+                new ControllerActionId("cds", "app"),
+                new ControllerActionId("samplemanagement", "app"),
+
                 // Actions that error with no parameters. Generally linked from admin-spider.view
                 new ControllerActionId("user", "changeEmail"), // NotFoundException from changeEmail.jsp
 
@@ -487,7 +492,7 @@ public class Crawler
                     urlText.startsWith("javascript:") ||
                     urlText.startsWith("ftp://"))
             {
-                if (!urlText.contains(WebTestHelper.getBaseURL()) || urlText.equals(WebTestHelper.getBaseURL()))
+                if (!urlText.contains(WebTestHelper.getBaseURL()) || urlText.equals(WebTestHelper.getBaseURL()) || isLabKeyShortUrl(urlText))
                 {
                     _relativeURL = null;
                     _actionId = null;
@@ -524,6 +529,11 @@ public class Crawler
             if (null != getActionId() && StringUtils.isBlank(StringUtils.strip(getActionId().getFolder(),"/")))
                 p += (_prioritizeAdminPages ? -1 : 1);
             priority = p + random.nextFloat();
+        }
+
+        private boolean isLabKeyShortUrl(String urlText)
+        {
+            return urlText.startsWith(WebTestHelper.getBaseURL()) && urlText.endsWith(".url");
         }
 
         public boolean isFromForm()
