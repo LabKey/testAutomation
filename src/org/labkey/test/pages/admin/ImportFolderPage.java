@@ -47,7 +47,7 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
 
     public static ImportFolderPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("admin", containerPath));
+        driver.beginAt(WebTestHelper.buildURL("admin", containerPath,"importFolder"));
         ImportFolderPage page = new ImportFolderPage(driver.getDriver());
         page.setDriver(driver.getDriver());
         return page;
