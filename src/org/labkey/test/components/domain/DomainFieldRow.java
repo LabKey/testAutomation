@@ -140,16 +140,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return new AdvancedSettingsDialog(this, getDriver());
     }
 
-    public DomainFieldRow clickCancelCross()
-    {
-        expand();
-        getWrapper().waitFor(() -> elementCache().cancelCross.isEnabled(),
-                "Cancel cross icon did not become enabled", 1500);
-        elementCache().cancelCross.click();
-        return this;
-
-    }
-
     public DomainFieldRow expand()
     {
         if (!isExpanded())
@@ -165,7 +155,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (isExpanded())
         {
-            elementCache().expandToggle.click();
+            elementCache().closeButton.click();
             getWrapper().waitFor(() -> !isExpanded(),
                     "the field row did not collapse", 1500);
         }
@@ -555,7 +545,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement advancedSettingsBtn = Locator.button("Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        public WebElement cancelCross = Locator.tagWithAttribute("svg", "data-icon", "times")
+        public WebElement closeButton = Locator.tagWithAttribute("svg", "data-icon", "times")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
 

@@ -10,6 +10,7 @@ import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCache>
 {
@@ -26,15 +27,19 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public DomainDesignerPage clickSave()
     {
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
+        String currentURL = getDriver().getCurrentUrl();
         elementCache().saveButton.click();
+
+        waitFor(()-> !getDriver().getCurrentUrl().equals(currentURL)||
+                anyAlert() != null,
+                "expected either navigation or an alert with error or info to appear", 1000);
 
         if (isAlertVisible())
         {
             String msg = waitForAnyAlert();
             log("Clicking save.  Waited until alert with message [" + msg + "] appeared");
         }
-        else
-           sleep(500); //TODO: wait for page load default
 
         return this;
     }
@@ -110,6 +115,15 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         WebElement alert = Locator.waitForAnyElement(shortWait(),
                 BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
         return alert.getText();
+    }
+    public String anyAlert()
+    {
+        WebElement alert = Locator.findAnyElementOrNull(getDriver(),
+                BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
+        if (alert !=null)
+            return alert.getText();
+        else
+            return null;
     }
 
     @Override
