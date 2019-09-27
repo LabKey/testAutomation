@@ -44,7 +44,7 @@ public class FileRootsManagementPage extends FolderManagementPage
 
     public static FileRootsManagementPage beginAt(WebDriverWrapper wrapper, String containerPath)
     {
-        wrapper.beginAt(WebTestHelper.buildURL("admin", containerPath));
+        wrapper.beginAt(WebTestHelper.buildURL("admin", containerPath, "fileRoots"));
         return new FileRootsManagementPage(wrapper.getDriver());
     }
 
