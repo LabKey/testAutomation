@@ -26,7 +26,7 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
 
     public static ExportFolderPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("admin", containerPath, "exportFolder", Maps.of("tabId", "export")));
+        driver.beginAt(WebTestHelper.buildURL("admin", containerPath, "exportFolder"));
         return new ExportFolderPage(driver.getDriver());
     }
 
