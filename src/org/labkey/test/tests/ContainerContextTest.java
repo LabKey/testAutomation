@@ -121,8 +121,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         _containerHelper.enableModules(Arrays.asList("simpletest", "ViscStudies"));
         _portalHelper.addWebPart("Workbooks");
 
-        _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies"});
-        _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies"});
+        _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies", "Wiki"});
+        _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies", "Wiki"});
     }
 
     @Test

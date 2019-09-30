@@ -25,7 +25,7 @@ import org.openqa.selenium.WebElement;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FolderManagementPage extends LabKeyPage<FolderManagementPage.ElementCache>
 {
@@ -140,18 +140,21 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
     public void selectTab(String tabId)
     {
-        if (!tabId.equals(getCurrentTabIdFromUrl()))
+        if (!isActiveTab(tabId))
+        {
             clickAndWait(elementCache().findTabLink(tabId));
-        assertEquals("On wrong folder management tab", tabId, getCurrentTabIdFromUrl());
+            clearCache();
+        }
+        assertTrue("On wrong folder management tab - expected " + tabId, isActiveTab(tabId));
     }
 
     /**
-     * This isn't totally cosmetic. Url parameter is mostly cosmetic.
-     *
+     * Is the &lt;li> element associated with this tabId marked as active?
      */
-    private String getCurrentTabIdFromUrl()
+    private boolean isActiveTab(String tabId)
     {
-        return getUrlParam("tabId");
+        WebElement element = elementCache().findTab(tabId);
+        return "labkey-tab-active".equals(element.getAttribute("class"));
     }
 
     public ReorderFoldersPage clickChangeDisplayOrder()
