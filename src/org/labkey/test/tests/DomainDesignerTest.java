@@ -966,8 +966,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertEquals("Exactly what it sounds like. A new dang field", newFieldRow.getDescription());
     }
 
+    /**
+     * verifies that when a user marks a field 'required' (and that field already has empty values in it) they are warned
+     * @throws Exception
+     */
     @Test
-    public void verifyWarningForMarkingExistingSampleSetFieldRequired() throws Exception
+    public void testUserWarningOnRequiredFieldWithEmptyValues() throws Exception
     {
         String sampleSetName = "hasRowsWithBlankValuesWarnSampleSet";
 
@@ -1042,6 +1046,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertEquals("expect row to be marked 'required'", true, manufacturerRow.getRequired());
     }
 
+    /**
+     * confirms that clicking the name field also expands the field row
+     * @throws Exception
+     */
     @Test
     public void verifyNameFieldClickExpandsRow() throws Exception
     {
