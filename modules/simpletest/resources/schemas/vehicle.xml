@@ -38,6 +38,61 @@
     </columns>
   </table>
 
+<!--  <table tableName="SelfReferencingPrimary" tableDbType="TABLE">-->
+<!--    <pkColumnName>RowId</pkColumnName>-->
+<!--    <columns>-->
+<!--      <column columnName="RowId">-->
+<!--        <datatype>int</datatype>-->
+<!--      </column>-->
+<!--      <column columnName="refCol">-->
+<!--        <datatype>int</datatype>-->
+<!--        <fk>-->
+<!--          <fkColumnName>refCol</fkColumnName>-->
+<!--          <fkTable>SelfReferencingSecondary</fkTable>-->
+<!--          <fkDbSchema>vehicle</fkDbSchema>-->
+<!--        </fk>-->
+<!--      </column>-->
+<!--    </columns>-->
+<!--  </table>-->
+
+<!--  <table tableName="SelfReferencingSecondary" tableDbType="TABLE">-->
+<!--    <pkColumnName>RowId</pkColumnName>-->
+<!--    <columns>-->
+<!--      <column columnName="RowId">-->
+<!--        <datatype>int</datatype>-->
+<!--      </column>-->
+<!--      <column columnName="refCol">-->
+<!--        <datatype>int</datatype>-->
+<!--        <fk>-->
+<!--          <fkColumnName>refCol</fkColumnName>-->
+<!--          <fkTable>SelfReferencingPrimary</fkTable>-->
+<!--          <fkDbSchema>vehicle</fkDbSchema>-->
+<!--        </fk>-->
+<!--      </column>-->
+<!--    </columns>-->
+<!--  </table>-->
+
+    <table tableName="SelfReferencing" tableDbType="TABLE">
+      <pkColumnName>RowId</pkColumnName>
+      <columns>
+        <column columnName="RowId">
+          <datatype>int</datatype>
+        </column>
+        <column columnName="RowId2">
+          <datatype>int</datatype>
+        </column>
+        <column columnName="refCol">
+          <datatype>int</datatype>
+          <fk>
+            <fkColumnName>RowId2</fkColumnName>
+            <fkTable>SelfReferencing</fkTable>
+            <fkDbSchema>vehicle</fkDbSchema>
+          </fk>
+        </column>
+      </columns>
+    </table>
+
+
   <table tableName="Manufacturers" tableDbType="TABLE">
     <pkColumnName>RowId</pkColumnName>
     <auditLogging>SUMMARY</auditLogging>
