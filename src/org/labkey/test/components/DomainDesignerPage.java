@@ -6,10 +6,12 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.domain.UnsavedChangesModalDialog;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCache>
 {
@@ -26,26 +28,36 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public DomainDesignerPage clickSave()
     {
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
+        String currentURL = getDriver().getCurrentUrl();
         elementCache().saveButton.click();
+
+        waitFor(()-> !getDriver().getCurrentUrl().equals(currentURL)||
+                anyAlert() != null,
+                "expected either navigation or an alert with error or info to appear", 1000);
 
         if (isAlertVisible())
         {
             String msg = waitForAnyAlert();
             log("Clicking save.  Waited until alert with message [" + msg + "] appeared");
         }
-        else
-           sleep(500); //TODO: wait for page load default
 
         return this;
     }
 
-    public DomainDesignerPage clickCancel()
+    public UnsavedChangesModalDialog clickCancel()
     {
         elementCache().cancelBtn.click();
-        ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?")
-                .waitFor();
-        confirmDeletionDlg.dismiss("No, Discard Changes");
-        return this;
+        UnsavedChangesModalDialog unsavedChangesModal = new UnsavedChangesModalDialog(
+                new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"),
+                getDriver());
+        return unsavedChangesModal;
+    }
+
+    public DomainDesignerPage clickCancelAndDiscardChanges()
+    {
+        clickCancel().discardChanges();
+        return new DomainDesignerPage(getDriver());
     }
 
     public boolean isAlertVisible()
@@ -111,6 +123,15 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                 BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
         return alert.getText();
     }
+    public String anyAlert()
+    {
+        WebElement alert = Locator.findAnyElementOrNull(getDriver(),
+                BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
+        if (alert !=null)
+            return alert.getText();
+        else
+            return null;
+    }
 
     @Override
     protected ElementCache newElementCache()
@@ -129,9 +150,9 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                     .withTitle(domainName).findWhenNeeded(this);
         }
         WebElement saveButton = Locator.button("Save")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement cancelBtn = Locator.button("Cancel")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
     public static class Locators

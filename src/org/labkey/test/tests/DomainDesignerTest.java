@@ -28,6 +28,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -309,7 +310,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect field-level warning to contain [" + expectedWarning + "] but was[" + warningfieldMessage + "]",
                 warning.contains(expectedWarning));
 
-        domainDesignerPage.clickCancel();
+        domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
     @Test
@@ -349,7 +350,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect field-level warning to contain [" + expectedError + "] but was[" + dupeColErrorStatus + "]",
                 dupeColErrorStatus.contains(expectedError));
 
-        domainDesignerPage.clickCancel();
+        domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
     @Test
@@ -510,7 +511,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect error for duplicate field names", blarg2.hasFieldError());
         assertTrue("expect warning for field name with spaces or special characters", clientFieldWarning.hasFieldWarning());
 
-        domainDesignerPage.clickCancel();
+        domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
     /**
@@ -552,7 +553,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 CoreMatchers.allOf(hasItems("Name", "testCol", "extraField"),
                         CoreMatchers.not(CoreMatchers.hasItem("modified"))));
 
-        domainDesignerPage.clickCancel();
+        domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
     /**
@@ -848,16 +849,17 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setFromSchema("lists")
                 .setFromTargetTable("lookUpList1 (Integer)")
                 .setDescription("LookUp in same container")
-                .clickCancelCross();
+                .collapse();
 
         assertEquals("Incorrect detail message", "Current Folder > lists > lookUpList1", lookUpRow.detailsMessage());
 
-        domainDesignerPage.saveButton().click();
+        domainDesignerPage.clickSave();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
-        assertEquals("lookUpField from folder is incorrect", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupContainer"));
-        assertEquals("lookUpField schema name is incorrect", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupSchema"));
-        assertEquals("lookUpField target table is incorrect", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupQuery"));
+        PropertyDescriptor lookupFieldDescriptor = getColumn(domainResponse.getDomain(), "lookUpField");
+        assertEquals("lookUpField from folder is incorrect", null, lookupFieldDescriptor.getAllProperties().get("lookupContainer"));
+        assertEquals("lookUpField schema name is incorrect", "lists", lookupFieldDescriptor.getAllProperties().get("lookupSchema"));
+        assertEquals("lookUpField target table is incorrect", listName, lookupFieldDescriptor.getAllProperties().get("lookupQuery"));
 
     }
 
@@ -891,19 +893,184 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setFromSchema("lists")
                 .setFromTargetTable("lookUpList (Integer)")
                 .setDescription("LookUp in same container")
-                .clickCancelCross();
+                .collapse();
 
         assertEquals("Incorrect detail message", "Current Folder > lists > lookUpList", lookUpRow.detailsMessage());
         domainDesignerPage.clickSave();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
-        assertEquals("lookUpField from folder should be present", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupContainer"));
-        assertEquals("lookUpField schema name should be present", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupSchema"));
-        assertEquals("lookUpField target table should be present", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupQuery"));
-        domainDesignerPage.clickCancel();
+        PropertyDescriptor lookupColumn = getColumn(domainResponse.getDomain(), "lookUpField"); // getColumn asserts the column is non-null
 
+        assertEquals("lookUpField schema name should be present", "lists", lookupColumn.getAllProperties().get("lookupSchema"));
+        assertEquals("lookUpField target table should be present", "lookUpList", lookupColumn.getAllProperties().get("lookupQuery"));
+        assertNull("lookUpField target table should be null for current container", lookupColumn.getAllProperties().get("lookupContainer"));
     }
 
+    /**
+     * verifies that a sampleset field with data (and blank values) will warn the user if they attempt to mark that field
+     * 'required'
+     * @throws Exception
+     */
+    @Test
+    public void verifyExpectedWarningOnNavigateWithUncomittedChanges() throws Exception
+    {
+        goToProjectHome();
+        String homeUrl = getDriver().getCurrentUrl();
+        String listName = "dirtyListNavigationTest";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+
+        // edit an existing field
+        domainFormPanel.getField("favoriteSnack")
+                .setDescription("Exactly what it sounds like. Someone's fave frozen dairy goodness")
+                .collapse();
+        // create a new field
+        domainFormPanel.addField("newField")
+                .setDescription("Exactly what it sounds like. A new dang field");
+
+        // capture the current url; ensure we don't navigate anywhere when we refresh or browse
+        String currentUrl = getDriver().getCurrentUrl();
+
+        // now refresh view, without saving
+        getDriver().navigate().refresh();
+        // dismiss the alert
+        shortWait().until(ExpectedConditions.alertIsPresent());     // currently alert does not appear in FF; this is a known issue
+        getDriver().switchTo().alert().dismiss();
+
+        // make sure we are still here
+        assertEquals(currentUrl, getDriver().getCurrentUrl());
+
+        // now navigate away
+        getDriver().navigate().to(homeUrl);
+        // dismiss the alert
+        shortWait().until(ExpectedConditions.alertIsPresent());
+        getDriver().switchTo().alert().dismiss();
+        // ensure current location
+        assertEquals(currentUrl, getDriver().getCurrentUrl());
+
+        domainDesignerPage.clickCancel().saveChanges(); // this should save the changes
+
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+
+        PropertyDescriptor faveSnackRow = getColumn(response.getDomain(), "favoriteSnack");
+        PropertyDescriptor newFieldRow = getColumn(response.getDomain(), "newField");
+        assertEquals("Exactly what it sounds like. Someone's fave frozen dairy goodness", faveSnackRow.getDescription());
+        assertEquals("Exactly what it sounds like. A new dang field", newFieldRow.getDescription());
+    }
+
+    /**
+     * verifies that when a user marks a field 'required' (and that field already has empty values in it) they are warned
+     * @throws Exception
+     */
+    @Test
+    public void testUserWarningOnRequiredFieldWithEmptyValues() throws Exception
+    {
+        String sampleSetName = "hasRowsWithBlankValuesWarnSampleSet";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("manufacturer", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+
+        dgen.addCustomRow(Map.of("name", "agar", "color", "green", "manufacturer", "glaxo", "volume", 2.34));
+        dgen.addCustomRow(Map.of("name", "stuff", "color", "clear", "manufacturer", "glaxo", "volume", 2.34));
+        dgen.addCustomRow(Map.of("name", "icecream", "color", "blue", "manufacturer", "glaxo", "volume", 2.34));
+        dgen.addCustomRow(Map.of("name", "pbs", "color", "yellow", "manufacturer", "glaxo", "volume", 2.34));
+        dgen.addCustomRow(Map.of("name", "slurm", "color", "orange",                                  "volume", 2.34));  //<-- no value for manufacturer
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSetName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSetName);
+
+        // now attempt to mark 'manufacturer' field 'required'
+        domainFormPanel.getField("manufacturer")
+                .setRequiredField(true);
+        domainDesignerPage.clickSave();     // expect error warning here; this should warn the user
+        String expectedWarning = domainDesignerPage.waitForAnyAlert();
+        assertTrue(expectedWarning.contains("cannot be required when it contains rows with blank values."));
+        domainDesignerPage.clickCancel().discardChanges();  // discard the changes to free the browser to go on to the next page
+    }
+
+    /**
+     * verifies that a field with data (and no blank values) can be marked as 'required'
+     * @throws Exception
+     */
+    @Test
+    public void testMarkFieldRequired() throws Exception
+    {
+        String sampleSetName = "testSampleSetWithRequiredField";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("manufacturer", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
+
+        dgen.addCustomRow(Map.of("name", "agar", "color", "green", "manufacturer", "glaxo", "volume", 2.34));
+        dgen.addCustomRow(Map.of("name", "stuff", "color", "clear", "manufacturer", "glaxo", "volume", 2.34));
+        dgen.addCustomRow(Map.of("name", "icecream", "color", "blue", "manufacturer", "glaxo", "volume", 2.34));
+        dgen.addCustomRow(Map.of("name", "pbs", "color", "yellow", "manufacturer", "glaxo", "volume", 2.34));
+        dgen.addCustomRow(Map.of("name", "slurm", "color", "orange","manufacturer", "slurmCo","volume", 2.34));
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSetName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSetName);
+
+        // capture the current URL
+        String domainDesignerPageUrl = getDriver().getCurrentUrl();
+
+        // now attempt to mark 'manufacturer' field 'required'
+        domainFormPanel.getField("manufacturer")
+                .setRequiredField(true);
+        domainDesignerPage.clickSave();
+        waitFor(()-> !getDriver().getCurrentUrl().equals(domainDesignerPageUrl),
+                "expect to browse away after clicking 'save'", 1500);
+
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor manufacturerRow = getColumn(response.getDomain(), "manufacturer");
+        assertEquals("expect row to be marked 'required'", true, manufacturerRow.getRequired());
+    }
+
+    /**
+     * confirms that clicking the name field also expands the field row
+     * @throws Exception
+     */
+    @Test
+    public void verifyNameFieldClickExpandsRow() throws Exception
+    {
+        String listName = "sillyListJustHereForTestPurposes";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+
+        DomainFieldRow snackRow = domainFormPanel.getField("favoriteSnack");
+        snackRow.nameInput()
+                .getComponentElement().click();
+
+        waitFor(()->  snackRow.isExpanded(), "clicking the name field should expand the field row", 1000);
+    }
 
     public PropertyDescriptor getColumn(Domain domain, String columnName)
     {
