@@ -15,6 +15,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCache>
@@ -136,18 +137,17 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         getWrapper().waitFor(() -> elementCache().advancedSettingsBtn.isEnabled(),
                 "the Advanced Settings button did not become enabled", 5000);
-        elementCache().advancedSettingsBtn.click();
+        int trycount = 0;
+        do
+        {
+            getWrapper().log("clicking advanced settings button try=["+trycount+"]");
+            elementCache().advancedSettingsBtn.click();
+            getWrapper().sleep(250);
+            trycount++;
+            assertTrue("advanced settings dialog did not appear in time",trycount < 4);
+        }while (!Locator.tagWithClass("div", "modal-backdrop").existsIn(getDriver()));
+
         return new AdvancedSettingsDialog(this, getDriver());
-    }
-
-    public DomainFieldRow clickCancelCross()
-    {
-        expand();
-        getWrapper().waitFor(() -> elementCache().cancelCross.isEnabled(),
-                "Cancel cross icon did not become enabled", 1500);
-        elementCache().cancelCross.click();
-        return this;
-
     }
 
     public DomainFieldRow expand()
@@ -165,7 +165,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (isExpanded())
         {
-            elementCache().expandToggle.click();
+            elementCache().closeButton.click();
             getWrapper().waitFor(() -> !isExpanded(),
                     "the field row did not collapse", 1500);
         }
@@ -410,7 +410,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setFromTargetTable(String targetTable)
     {
         expand();
-
         elementCache().getFromTargetTableInput().selectByVisibleText(targetTable);
         return this;
     }
@@ -555,7 +554,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement advancedSettingsBtn = Locator.button("Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        public WebElement cancelCross = Locator.tagWithAttribute("svg", "data-icon", "times")
+        public WebElement closeButton = Locator.tagWithAttribute("svg", "data-icon", "times")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
 
@@ -595,12 +594,18 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public Select getFromSchemaInput()
         {
-            return SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
+            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
+            getWrapper().waitFor(()-> select.getOptions().size() > 0,
+                    "select did not have options in the expected time", 1500);
+            return select;
         }
 
         public Select getFromTargetTableInput()
         {
-            return SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
+            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
+            getWrapper().waitFor(()-> select.getOptions().size() > 0,
+                    "select did not have options in the expected time", 1500);
+            return select;
         }
 
 
