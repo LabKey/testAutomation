@@ -6,6 +6,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.domain.UnsavedChangesModalDialog;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
@@ -44,13 +45,19 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return this;
     }
 
-    public DomainDesignerPage clickCancel()
+    public UnsavedChangesModalDialog clickCancel()
     {
         elementCache().cancelBtn.click();
-        ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?")
-                .waitFor();
-        confirmDeletionDlg.dismiss("No, Discard Changes");
-        return this;
+        UnsavedChangesModalDialog unsavedChangesModal = new UnsavedChangesModalDialog(
+                new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"),
+                getDriver());
+        return unsavedChangesModal;
+    }
+
+    public DomainDesignerPage clickCancelAndDiscardChanges()
+    {
+        clickCancel().discardChanges();
+        return new DomainDesignerPage(getDriver());
     }
 
     public boolean isAlertVisible()
@@ -143,9 +150,9 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                     .withTitle(domainName).findWhenNeeded(this);
         }
         WebElement saveButton = Locator.button("Save")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement cancelBtn = Locator.button("Cancel")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
     public static class Locators

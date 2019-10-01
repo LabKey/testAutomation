@@ -6,6 +6,7 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class AdvancedSettingsDialog extends ModalDialog
 {
@@ -49,6 +50,8 @@ public class AdvancedSettingsDialog extends ModalDialog
     public AdvancedSettingsDialog showOnUpdateView(boolean checked)
     {
         elementCache().showInUpdateView.set(checked);
+        getWrapper().waitFor(()-> elementCache().showInUpdateView.get().equals(checked),
+                "showInUpdateView checkbox was not set as expected", 1000);
         return this;
     }
 
@@ -59,6 +62,8 @@ public class AdvancedSettingsDialog extends ModalDialog
     public AdvancedSettingsDialog showOnDetailsView(boolean checked)
     {
         elementCache().showInDetailsView.set(checked);
+        getWrapper().waitFor(()-> elementCache().showInDetailsView.get().equals(checked),
+                "showInDetailsView checkbox was not set as expected", 1000);
         return this;
     }
 
@@ -68,6 +73,8 @@ public class AdvancedSettingsDialog extends ModalDialog
     }
     public AdvancedSettingsDialog setPHILevel(PropertiesEditor.PhiSelectType phiLevel)
     {
+        getWrapper().waitFor(()->  elementCache().phiSelect.isEnabled(),
+                "phiSelect did not become enabled in time", 1500);
         getWrapper().setFormElement(elementCache().phiSelect, phiLevel.getText());
         return this;
     }
@@ -78,6 +85,8 @@ public class AdvancedSettingsDialog extends ModalDialog
     }
     public AdvancedSettingsDialog enableMeasure(boolean checked)
     {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(
+                elementCache().enableMeasure.getComponentElement()));
         elementCache().enableMeasure.set(checked);
         return this;
     }
@@ -88,7 +97,11 @@ public class AdvancedSettingsDialog extends ModalDialog
     }
     public AdvancedSettingsDialog enableDimension(boolean checked)
     {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(
+                elementCache().enableDimension.getComponentElement()));
         elementCache().enableDimension.set(checked);
+        getWrapper().waitFor(()-> elementCache().enableDimension.get().equals(checked),
+                "enableDimension checkbox was not set as expected", 1000);
         return this;
     }
 
@@ -99,6 +112,8 @@ public class AdvancedSettingsDialog extends ModalDialog
     public AdvancedSettingsDialog enableRecommendedVariable(boolean checked)
     {
         elementCache().recommendedVariable.set(checked);
+        getWrapper().waitFor(()-> elementCache().recommendedVariable.get().equals(checked),
+                "recommendedVariable checkbox was not set as expected", 1000);
         return this;
     }
 
@@ -109,6 +124,8 @@ public class AdvancedSettingsDialog extends ModalDialog
     public AdvancedSettingsDialog enableMissingValue(boolean checked)
     {
         elementCache().enableMissingValues.set(checked);
+        getWrapper().waitFor(()-> elementCache().enableMissingValues.get().equals(checked),
+                "missingValue checkbox was not set as expected", 1000);
         return this;
     }
 

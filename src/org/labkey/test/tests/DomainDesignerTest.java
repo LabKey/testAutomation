@@ -28,6 +28,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -309,7 +310,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect field-level warning to contain [" + expectedWarning + "] but was[" + warningfieldMessage + "]",
                 warning.contains(expectedWarning));
 
-        domainDesignerPage.clickCancel();
+        domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
     @Test
@@ -349,7 +350,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect field-level warning to contain [" + expectedError + "] but was[" + dupeColErrorStatus + "]",
                 dupeColErrorStatus.contains(expectedError));
 
-        domainDesignerPage.clickCancel();
+        domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
     @Test
@@ -510,7 +511,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect error for duplicate field names", blarg2.hasFieldError());
         assertTrue("expect warning for field name with spaces or special characters", clientFieldWarning.hasFieldWarning());
 
-        domainDesignerPage.clickCancel();
+        domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
     /**
@@ -552,7 +553,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 CoreMatchers.allOf(hasItems("Name", "testCol", "extraField"),
                         CoreMatchers.not(CoreMatchers.hasItem("modified"))));
 
-        domainDesignerPage.clickCancel();
+        domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
     /**
@@ -855,9 +856,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickSave();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
-        assertEquals("lookUpField from folder is incorrect", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupContainer"));
-        assertEquals("lookUpField schema name is incorrect", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupSchema"));
-        assertEquals("lookUpField target table is incorrect", true, getColumn(domainResponse.getDomain(), "lookUpField").getAllProperties().get("lookupQuery"));
+        PropertyDescriptor lookupFieldDescriptor = getColumn(domainResponse.getDomain(), "lookUpField");
+        assertEquals("lookUpField from folder is incorrect", null, lookupFieldDescriptor.getAllProperties().get("lookupContainer"));
+        assertEquals("lookUpField schema name is incorrect", "lists", lookupFieldDescriptor.getAllProperties().get("lookupSchema"));
+        assertEquals("lookUpField target table is incorrect", listName, lookupFieldDescriptor.getAllProperties().get("lookupQuery"));
 
     }
 
@@ -900,15 +902,15 @@ public class DomainDesignerTest extends BaseWebDriverTest
         PropertyDescriptor lookupColumn = getColumn(domainResponse.getDomain(), "lookUpField"); // getColumn asserts the column is non-null
 
         assertEquals("lookUpField schema name should be present", "lists", lookupColumn.getAllProperties().get("lookupSchema"));
-        assertEquals("lookUpField target table should be present", "lookupList", lookupColumn.getAllProperties().get("lookupQuery"));
-        //assertEquals("lookUpField target table should be present", "lookupList", lookupColumn.getAllProperties().get("lookupContainer")); todo: get the container
-        domainDesignerPage.clickCancel();
-
+        assertEquals("lookUpField target table should be present", "lookUpList", lookupColumn.getAllProperties().get("lookupQuery"));
+        assertNull("lookUpField target table should be null for current container", lookupColumn.getAllProperties().get("lookupContainer"));
     }
 
     @Test
     public void verifyExpectedWarningOnNavigateWithUncomittedChanges() throws Exception
     {
+        goToProjectHome();
+        String homeUrl = getDriver().getCurrentUrl();
         String listName = "dirtyListNavigationTest";
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
@@ -921,15 +923,36 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
 
+        // edit an existing field
         domainFormPanel.getField("favoriteSnack")
-                .setDescription("Exactly what it sounds like. Someone's fave frozen dairy goodness");
+                .setDescription("Exactly what it sounds like. Someone's fave frozen dairy goodness")
+                .collapse();
+        // create a new field
         domainFormPanel.addField("newField")
                 .setDescription("Exactly what it sounds like. A new dang field");
 
-        // now navigate away, without saving
-        goToProjectHome();
+        // capture the current url; ensure we don't navigate anywhere when we refresh or browse
+        String currentUrl = getDriver().getCurrentUrl();
 
-        // expect navigation to fail/be blocked with prompt/warning  todo: verify the prompt
+        // now refresh view, without saving
+        getDriver().navigate().refresh();
+        // dismiss the alert
+        shortWait().until(ExpectedConditions.alertIsPresent());     // currently alert does not appear in FF; this is a known issue
+        getDriver().switchTo().alert().dismiss();
+
+        // make sure we are still here
+        assertEquals(currentUrl, getDriver().getCurrentUrl());
+
+        // now navigate away
+        getDriver().navigate().to(homeUrl);
+        // dismiss the alert
+        shortWait().until(ExpectedConditions.alertIsPresent());
+        getDriver().switchTo().alert().dismiss();
+        // ensure current location
+        assertEquals(currentUrl, getDriver().getCurrentUrl());
+
+        domainDesignerPage = new DomainDesignerPage(getDriver()); // we've been refreshing; things are possibly stale
+        domainDesignerPage.clickCancel().saveChanges();
     }
 
     @Test
@@ -959,10 +982,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now attempt to mark 'manufacturer' field 'required'
         domainFormPanel.getField("manufacturer")
                 .setRequiredField(true);
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickSave();     // expect error warning here; this should warn the user
         String expectedWarning = domainDesignerPage.waitForAnyAlert();
         assertTrue(expectedWarning.contains("cannot be required when it contains rows with blank values."));
-
+        domainDesignerPage.clickCancel().discardChanges();  // discard the changes to free the browser to go on to the next page
     }
 
     @Test
