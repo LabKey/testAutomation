@@ -23,18 +23,4 @@ public class UnsavedChangesModalDialog extends ModalDialog
         dismiss("Yes, Save Changes");
     }
 
-    protected ElementCache newElementCache()
-    {
-        return new ElementCache();
-    }
-
-    protected class ElementCache extends ModalDialog.ElementCache
-    {
-//        final WebElement yesSaveChangesBtn = Locator.css("button").withText("Yes, Save Changes")
-//                .findWhenNeeded(this);
-//
-//        final WebElement noDiscardChangesBtn = Locator.css("button").withText("No, Discard Changes")
-//                .findWhenNeeded(this);
-    }
-
 }
