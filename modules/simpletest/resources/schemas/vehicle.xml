@@ -35,6 +35,14 @@
         <datatype>varchar</datatype>
         <isHidden>true</isHidden>
       </column>
+      <column columnName="CycleCol">
+        <fk>
+          <fkColumnName>CycleCol</fkColumnName>
+          <fkTable>Manufacturers</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+        <datatype>int</datatype>
+      </column>
     </columns>
   </table>
 
@@ -49,7 +57,7 @@
 <!--        <fk>-->
 <!--          <fkColumnName>refCol</fkColumnName>-->
 <!--          <fkTable>SelfReferencingSecondary</fkTable>-->
-<!--          <fkDbSchema>vehicle</fkDbSchema>-->
+<!--          <fkDbSchema>simple</fkDbSchema>-->
 <!--        </fk>-->
 <!--      </column>-->
 <!--    </columns>-->
@@ -66,31 +74,31 @@
 <!--        <fk>-->
 <!--          <fkColumnName>refCol</fkColumnName>-->
 <!--          <fkTable>SelfReferencingPrimary</fkTable>-->
-<!--          <fkDbSchema>vehicle</fkDbSchema>-->
+<!--          <fkDbSchema>simple</fkDbSchema>-->
 <!--        </fk>-->
 <!--      </column>-->
 <!--    </columns>-->
 <!--  </table>-->
 
-    <table tableName="SelfReferencing" tableDbType="TABLE">
-      <pkColumnName>RowId</pkColumnName>
-      <columns>
-        <column columnName="RowId">
-          <datatype>int</datatype>
-        </column>
-        <column columnName="RowId2">
-          <datatype>int</datatype>
-        </column>
-        <column columnName="refCol">
-          <datatype>int</datatype>
-          <fk>
-            <fkColumnName>RowId2</fkColumnName>
-            <fkTable>SelfReferencing</fkTable>
-            <fkDbSchema>vehicle</fkDbSchema>
-          </fk>
-        </column>
-      </columns>
-    </table>
+<!--    <table tableName="SelfReferencing" tableDbType="TABLE">-->
+<!--      <pkColumnName>RowId</pkColumnName>-->
+<!--      <columns>-->
+<!--        <column columnName="RowId">-->
+<!--          <datatype>int</datatype>-->
+<!--        </column>-->
+<!--        <column columnName="RowId2">-->
+<!--          <datatype>int</datatype>-->
+<!--        </column>-->
+<!--        <column columnName="refCol">-->
+<!--          <datatype>int</datatype>-->
+<!--          <fk>-->
+<!--            <fkColumnName>RowId2</fkColumnName>-->
+<!--            <fkTable>SelfReferencing</fkTable>-->
+<!--            <fkDbSchema>vehicle</fkDbSchema>-->
+<!--          </fk>-->
+<!--        </column>-->
+<!--      </columns>-->
+<!--    </table>-->
 
 
   <table tableName="Manufacturers" tableDbType="TABLE">
@@ -109,6 +117,14 @@
       <column columnName="Name">
         <datatype>varchar</datatype>
         <scale>255</scale>
+      </column>
+      <column columnName="CycleCol">
+        <datatype>int</datatype>
+        <fk>
+          <fkColumnName>CycleCol</fkColumnName>
+          <fkTable>Vehicles</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
       </column>
     </columns>
   </table>
