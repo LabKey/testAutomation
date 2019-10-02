@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.AssumptionViolatedException;
@@ -35,12 +36,14 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -80,6 +83,34 @@ public abstract class AbstractContainerHelper
     {
         doCreateProject(projectName, folderType);
         _createdProjects.add(projectName);
+    }
+
+    public final void ensureContainer(String containerPath)
+    {
+        List<String> pathParts = Arrays.stream(containerPath.split("/"))
+                .map(StringUtils::trimToEmpty)
+                .filter(part -> !part.isEmpty())
+                .collect(Collectors.toList());
+
+        StringBuilder currentPath = new StringBuilder();
+
+        for (String currentLeaf : pathParts)
+        {
+            String parent = currentPath.toString();
+            currentPath.append("/").append(currentLeaf);
+            boolean exists = doesContainerExist(currentPath.toString());
+            if (!exists)
+            {
+                if (parent.isEmpty())
+                {
+                    createProject(currentLeaf);
+                }
+                else
+                {
+                    createSubfolder(parent, currentLeaf);
+                }
+            }
+        }
     }
 
     public final void createProject(String projectName)
