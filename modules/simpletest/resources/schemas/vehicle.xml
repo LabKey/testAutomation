@@ -38,6 +38,22 @@
     </columns>
   </table>
 
+  <table tableName="Manufacturers" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <auditLogging>SUMMARY</auditLogging>
+    <columns>
+      <column columnName="RowId">
+        <datatype>serial</datatype>
+        <isAutoInc>true</isAutoInc>
+        <scale>10</scale>
+        <nullable>false</nullable>
+        <isReadOnly>true</isReadOnly>
+        <isKeyField>true</isKeyField>
+        <isHidden>true</isHidden>
+      </column>
+    </columns>
+  </table>
+
   <table tableName="FirstFKTable" tableDbType="TABLE">
     <pkColumnName>RowId</pkColumnName>
     <columns>
