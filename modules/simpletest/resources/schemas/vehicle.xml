@@ -35,10 +35,44 @@
         <datatype>varchar</datatype>
         <isHidden>true</isHidden>
       </column>
+    </columns>
+  </table>
+
+  <table tableName="FirstFKTable" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <columns>
+      <column columnName="RowId">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="StartCycleCol">
+        <datatype>int</datatype>
+        <fk>
+          <fkColumnName>StartCycleCol</fkColumnName>
+          <fkTable>ThirdFKTable</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+      </column>
+    </columns>
+  </table>
+
+  <table tableName="SecondFKTable" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <columns>
+      <column columnName="RowId">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="StartCycleCol">
+        <fk>
+          <fkColumnName>StartCycleCol</fkColumnName>
+          <fkTable>SecondFKTable</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+        <datatype>int</datatype>
+      </column>
       <column columnName="CycleCol">
         <fk>
           <fkColumnName>CycleCol</fkColumnName>
-          <fkTable>Manufacturers</fkTable>
+          <fkTable>ThirdFKTable</fkTable>
           <fkDbSchema>vehicle</fkDbSchema>
         </fk>
         <datatype>int</datatype>
@@ -46,30 +80,19 @@
     </columns>
   </table>
 
-  <table tableName="Manufacturers" tableDbType="TABLE">
+  <table tableName="ThirdFKTable" tableDbType="TABLE">
     <pkColumnName>RowId</pkColumnName>
-    <auditLogging>SUMMARY</auditLogging>
     <columns>
       <column columnName="RowId">
-        <datatype>serial</datatype>
-        <isAutoInc>true</isAutoInc>
-        <scale>10</scale>
-        <nullable>false</nullable>
-        <isReadOnly>true</isReadOnly>
-        <isKeyField>true</isKeyField>
-        <isHidden>true</isHidden>
-      </column>
-      <column columnName="Name">
-        <datatype>varchar</datatype>
-        <scale>255</scale>
+        <datatype>int</datatype>
       </column>
       <column columnName="CycleCol">
-        <datatype>int</datatype>
         <fk>
           <fkColumnName>CycleCol</fkColumnName>
-          <fkTable>Vehicles</fkTable>
+          <fkTable>SecondFKTable</fkTable>
           <fkDbSchema>vehicle</fkDbSchema>
         </fk>
+        <datatype>int</datatype>
       </column>
     </columns>
   </table>
