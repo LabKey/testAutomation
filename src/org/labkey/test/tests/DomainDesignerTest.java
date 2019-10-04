@@ -12,6 +12,7 @@ import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -21,8 +22,11 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.domain.RangeValidatorDialog;
+import org.labkey.test.components.domain.RangeValidatorPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -1070,6 +1074,71 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .getComponentElement().click();
 
         waitFor(()->  snackRow.isExpanded(), "clicking the name field should expand the field row", 1000);
+    }
+
+    @Test
+    public void testRangeValidator() throws Exception
+    {
+        String listName = "listForRangeValidator";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+
+        DomainFieldRow sizeRow = domainFormPanel.getField("size");
+        RangeValidatorDialog rangeDlg = sizeRow.clickAddRange();
+        RangeValidatorPanel rangePanel = rangeDlg.getValidationPanel()
+                .setName("midsize")
+                .setDescription("falls between 2 and 3")
+                .setErrorMessage("value must be 2 or 3")
+                .setFirstCondition(Filter.Operator.GTE)
+                .setFirstValue("2")
+                .setSecondCondition(Filter.Operator.LTE)
+                .setSecondValue("3");
+        rangeDlg.clickApply();
+
+        // todo: navigate to the new domain, add values
+    }
+
+    @Test
+    public void testConditionalFormat() throws Exception
+    {
+        String listName = "conditionalFormatList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+        dgen.addCustomRow(Map.of("name", "billy", "favoriteIceCream", "vanilla", "favoriteSnack", "apple", "size", 12));
+        dgen.addCustomRow(Map.of("name", "jeffy", "favoriteIceCream", "chocolate", "favoriteSnack", "almond brittle", "size", 12));
+        dgen.addCustomRow(Map.of("name", "alex", "favoriteIceCream", "strawberry", "favoriteSnack", "peanuts", "size", 12));
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows()); // insert test data into the list
+
+        DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
+        ConditionalFormatDialog formatDlg = favoriteSnack.clickAddFormat();
+        formatDlg.getOpenFormatPanel()
+                .setFirstCondition(Filter.Operator.DOES_NOT_CONTAIN)
+                .setFirstValue("almond")
+                .setItalicsCheckbox(true);
+        formatDlg.clickApply();
+        domainDesignerPage.clickSave();
+
+        //todo: now validate the format
+        goToManageLists();
+
     }
 
     public PropertyDescriptor getColumn(Domain domain, String columnName)

@@ -410,7 +410,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setFromTargetTable(String targetTable)
     {
         expand();
-        elementCache().getFromTargetTableInput().selectByVisibleText(targetTable);
+        Select select = elementCache().getFromTargetTableInput();
+        select.selectByVisibleText(targetTable);
         return this;
     }
 
@@ -490,6 +491,24 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public boolean hasFieldWarning()
     {
         return getComponentElement().getAttribute("class").contains("domain-row-border-warning");
+    }
+
+    // conditional formatting and validation options
+
+    public RangeValidatorDialog clickAddRange()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().rangeExpressionValidatorButton()));
+        elementCache().rangeExpressionValidatorButton().click();
+        return new RangeValidatorDialog(this, getDriver());
+    }
+
+    public ConditionalFormatDialog clickAddFormat()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().conditionalFormatButton()));
+        elementCache().conditionalFormatButton().click();
+        return new ConditionalFormatDialog(this, getDriver());
     }
 
     @Override
@@ -594,7 +613,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public Select getFromSchemaInput()
         {
-            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
+            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(getComponentElement());
             getWrapper().waitFor(()-> select.getOptions().size() > 0,
                     "select did not have options in the expected time", 1500);
             return select;
@@ -602,12 +621,20 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public Select getFromTargetTableInput()
         {
-            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
+            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(getComponentElement());
             getWrapper().waitFor(()-> select.getOptions().size() > 0,
                     "select did not have options in the expected time", 1500);
             return select;
         }
 
+        public WebElement rangeExpressionValidatorButton()
+        {
+            return Locator.button("Add Range").waitForElement(getComponentElement(), 2000);
+        }
 
+        public WebElement conditionalFormatButton()
+        {
+            return Locator.button("Add Format").waitForElement(getComponentElement(), 2000);
+        }
     }
 }
