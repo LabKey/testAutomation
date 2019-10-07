@@ -188,7 +188,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         protected WebElement sectionServerInfo = Locator.linkWithText("Server Information").findWhenNeeded(this);
-        protected WebElement sectionAdminConsoleLinks = Locator.linkWithText("Admin Console Links").findWhenNeeded(this);
+        protected WebElement sectionAdminConsoleLinks = Locator.linkWithText("Settings").findWhenNeeded(this);
         protected WebElement sectionModuleInfo = Locator.linkWithText("Module Information").findWhenNeeded(this);
         protected WebElement sectionActiveUsers = Locator.linkWithText("Active Users").findWhenNeeded(this);
 
