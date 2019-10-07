@@ -573,7 +573,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement advancedSettingsBtn = Locator.button("Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        public WebElement closeButton = Locator.tagWithAttribute("svg", "data-icon", "times")
+        public WebElement closeButton = Locator.tagWithAttribute("svg", "data-icon", "minus-square")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
 

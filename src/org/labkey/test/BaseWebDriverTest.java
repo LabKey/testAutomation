@@ -936,7 +936,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     private void doPostamble()
     {
-        disablePageUnloadEvents();
+//        disablePageUnloadEvents();
 
         ensureSignedInAsPrimaryTestUser();
 
