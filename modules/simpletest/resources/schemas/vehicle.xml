@@ -68,7 +68,7 @@
         <datatype>int</datatype>
         <fk>
           <fkColumnName>StartCycleCol</fkColumnName>
-          <fkTable>ThirdFKTable</fkTable>
+          <fkTable>SecondFKTable</fkTable>
           <fkDbSchema>vehicle</fkDbSchema>
         </fk>
       </column>
@@ -81,12 +81,7 @@
       <column columnName="RowId">
         <datatype>int</datatype>
       </column>
-      <column columnName="StartCycleCol">
-        <fk>
-          <fkColumnName>StartCycleCol</fkColumnName>
-          <fkTable>SecondFKTable</fkTable>
-          <fkDbSchema>vehicle</fkDbSchema>
-        </fk>
+        <column columnName="StartCycleCol">
         <datatype>int</datatype>
       </column>
       <column columnName="CycleCol">
