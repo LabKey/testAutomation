@@ -3432,7 +3432,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         try
         {
-            Assert.assertEquals("Failed to set checkbox to requested state.", check, el.isSelected());
+
+            // Have to balance between the state is now as expected and hitting a race condition between clicking
+            // the element and having the isSelected attribute change.
+            selected = el.isSelected();
+            if (check != selected)
+            {
+                sleep(500);
+                Assert.assertEquals("Failed to set checkbox to requested state.", check, el.isSelected());
+            }
+
         }
         catch (StaleElementReferenceException ignore)
         {
