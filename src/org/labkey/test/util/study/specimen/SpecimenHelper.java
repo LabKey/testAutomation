@@ -2,7 +2,7 @@ package org.labkey.test.util.study.specimen;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.study.SpecimenDetailGrid;
+import org.labkey.test.components.study.specimen.SpecimenDetailGrid;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WrapsDriver;
 

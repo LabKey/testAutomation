@@ -1,6 +1,6 @@
-package org.labkey.test.components.study;
+package org.labkey.test.components.study.specimen;
 
-import org.labkey.test.pages.study.samples.ShowCreateSampleRequestPage;
+import org.labkey.test.pages.study.specimen.ShowCreateSampleRequestPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 

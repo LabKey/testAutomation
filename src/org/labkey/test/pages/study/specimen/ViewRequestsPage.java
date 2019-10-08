@@ -1,4 +1,4 @@
-package org.labkey.test.pages.study.samples;
+package org.labkey.test.pages.study.specimen;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
