@@ -14,15 +14,15 @@ public class ShowCreateSampleRequestPage extends LabKeyPage<ShowCreateSampleRequ
         super(driver);
     }
 
-    public static ShowCreateSampleRequestPage beginAt(WebDriverWrapper driver)
+    public static ShowCreateSampleRequestPage beginAt(WebDriverWrapper webDriverWrapper)
     {
-        return beginAt(driver, driver.getCurrentContainerPath());
+        return beginAt(webDriverWrapper, webDriverWrapper.getCurrentContainerPath());
     }
 
-    public static ShowCreateSampleRequestPage beginAt(WebDriverWrapper driver, String containerPath)
+    public static ShowCreateSampleRequestPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("study-samples", containerPath, "showCreateSampleRequest"));
-        return new ShowCreateSampleRequestPage(driver.getDriver());
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("study-samples", containerPath, "showCreateSampleRequest"));
+        return new ShowCreateSampleRequestPage(webDriverWrapper.getDriver());
     }
 
     public ShowCreateSampleRequestPage setDetails(String... values)
@@ -59,8 +59,8 @@ public class ShowCreateSampleRequestPage extends LabKeyPage<ShowCreateSampleRequ
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement createAndReturnButton = Locator.lkButton("Create And Return To Specimens").findWhenNeeded(this);
-        WebElement createAndViewButton = Locator.lkButton("Create And View Details").findWhenNeeded(this);
+        WebElement createAndReturnButton = Locator.lkButton("Create and Return To Specimens").findWhenNeeded(this);
+        WebElement createAndViewButton = Locator.lkButton("Create and View Details").findWhenNeeded(this);
         WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
     }
 }
