@@ -56,7 +56,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
 
     protected void goToSiteLookAndFeel()
     {
-        goToAdminConsole().goToAdminConsoleLinksSection().clickLookAndFeelSettings();
+        goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
     }
 
     //this project's properties will be altered and so should not copy site properties

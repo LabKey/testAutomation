@@ -110,7 +110,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         clickButton("Submit");
 
         // verify that all of the following links are visible to AppAdmin:
-        goToAdminConsole().goToAdminConsoleLinksSection();
+        goToAdminConsole().goToSettingsSection();
         List<String> expectedLinkTexts = new ArrayList<>(Arrays.asList("change user properties",
                 "folder types",
                 "look and feel settings",
