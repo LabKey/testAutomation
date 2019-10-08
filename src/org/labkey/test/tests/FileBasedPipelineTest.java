@@ -73,6 +73,30 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testScriptBasedFilewatchers()
+    {
+        String pipelineTaskWithHelpText = "Pipeline task with help text";
+        String helpText = "Hello! I am help text.";
+        String pipelineTaskNoHelpText = "two-steps";
+        String pipelineTaskInvisible = "Task that is not evokable by filewatcher";
+
+        goToFolderManagement().goToImportTab();
+        clickAndWait(Locator.lkButton("Manage file watcher triggers"));
+        DataRegionTable pipelineTable = new DataRegionTable("query", getDriver());
+        pipelineTable.clickInsertNewRow();
+
+        setFormElement(Locator.name("pipelineId"), pipelineTaskWithHelpText);
+        assertTextPresent(helpText);
+
+        assertTextNotPresent(pipelineTaskInvisible);
+
+        setFormElement(Locator.name("pipelineId"), pipelineTaskNoHelpText);
+        // assert null is not on page within top bubble
+    }
+
+
+
+    @Test
     public void testRCopyPipeline()
     {
         final String folderName = "rCopy";
