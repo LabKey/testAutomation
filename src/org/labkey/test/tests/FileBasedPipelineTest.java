@@ -35,6 +35,7 @@ import org.labkey.test.util.PipelineAnalysisHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
@@ -85,16 +86,14 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         DataRegionTable pipelineTable = new DataRegionTable("query", getDriver());
         pipelineTable.clickInsertNewRow();
 
-        setFormElement(Locator.name("pipelineId"), pipelineTaskWithHelpText);
-        assertTextPresent(helpText);
+        selectOptionByText(Locator.id("pipelineTaskSelect"), pipelineTaskWithHelpText);
+        Locator.byClass("lk-trigger-help-text").containing(helpText);
 
-        assertTextNotPresent(pipelineTaskInvisible);
+        Locator.id("pipelineTaskSelect").notContaining(pipelineTaskInvisible);
 
-        setFormElement(Locator.name("pipelineId"), pipelineTaskNoHelpText);
-        // assert null is not on page within top bubble
+        selectOptionByText(Locator.id("pipelineTaskSelect"), pipelineTaskNoHelpText);
+        Locator.byClass("lk-trigger-help-text").notContaining("null");
     }
-
-
 
     @Test
     public void testRCopyPipeline()
