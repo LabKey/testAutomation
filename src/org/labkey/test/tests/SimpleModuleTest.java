@@ -1810,7 +1810,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestCustomLogin()
     {
         log("Test basic override of login page");
-        goToAdminConsole().goToAdminConsoleLinksSection().clickLookAndFeelSettings();
+        goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
         LookAndFeelSettingsPage lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
         lookAndFeelSettingsPage.setAltLoginPage("simpletest-testCustomLogin");
         lookAndFeelSettingsPage.save();
@@ -1824,7 +1824,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertEquals("This should redirect to /home", "/home", getCurrentContainerPath());
 
         log("Test override of login page using a hard-coded returnUrl");
-        goToAdminConsole().goToAdminConsoleLinksSection().clickLookAndFeelSettings();
+        goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
         lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
         lookAndFeelSettingsPage.setAltLoginPage("simpletest-testCustomLoginWithReturnUrl");
         lookAndFeelSettingsPage.save();
@@ -1838,7 +1838,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertEquals("This should redirect to /Shared", "/Shared", getCurrentContainerPath());
 
         log("ensure we dont get an IllegalArgumentException if an empty string is saved as login page");
-        goToAdminConsole().goToAdminConsoleLinksSection().clickLookAndFeelSettings();
+        goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
         lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
         lookAndFeelSettingsPage.setAltLoginPage("");
         lookAndFeelSettingsPage.save();
@@ -1847,7 +1847,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         signIn();
 
         log("restore original login page");
-        goToAdminConsole().goToAdminConsoleLinksSection().clickLookAndFeelSettings();
+        goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
         lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
         lookAndFeelSettingsPage.setAltLoginPage("login-login");
         lookAndFeelSettingsPage.save();
