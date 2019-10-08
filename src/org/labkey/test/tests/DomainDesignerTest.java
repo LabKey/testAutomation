@@ -27,6 +27,8 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.RangeValidatorDialog;
 import org.labkey.test.components.domain.RangeValidatorPanel;
+import org.labkey.test.components.domain.RegexValidatorDialog;
+import org.labkey.test.components.domain.RegexValidatorPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -1105,6 +1107,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         rangeDlg.clickApply();
 
         // todo: navigate to the new domain, add values
+        domainDesignerPage.clickSave();
     }
 
     @Test
@@ -1139,6 +1142,36 @@ public class DomainDesignerTest extends BaseWebDriverTest
         //todo: now validate the format
         goToManageLists();
 
+    }
+
+    @Test
+    public void testRegexValidator() throws Exception
+    {
+        String listName = "regexValidatorList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
+
+        RegexValidatorDialog validatorDialog = favoriteSnack.clickAddRegex();
+        RegexValidatorPanel panel = validatorDialog.getValidationPanel();
+        panel.setExpression("[!@#$%^&*(),.?\":{}|<>]")
+                .setDescription("contains special characters")
+                .setErrorMessage("favorite snack cannot contain special characters, yo")
+                .setFailOnMatch(true)
+                .setName("specialCharacters");
+        validatorDialog.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now go try to insert matching
     }
 
     public PropertyDescriptor getColumn(Domain domain, String columnName)

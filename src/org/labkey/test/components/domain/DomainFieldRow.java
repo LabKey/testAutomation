@@ -410,8 +410,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setFromTargetTable(String targetTable)
     {
         expand();
-        Select select = elementCache().getFromTargetTableInput();
-        select.selectByVisibleText(targetTable);
+        // give the option some time to appear before attempting to select it
+        getWrapper().waitFor(()-> elementCache().getFromTargetTableInput().getOptions().stream().anyMatch(a-> a.getText().equals(targetTable)),
+                "the select option [" + targetTable + "] did not appear in time", 3000);
+        elementCache().getFromTargetTableInput().selectByVisibleText(targetTable);
         return this;
     }
 
@@ -501,6 +503,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().rangeExpressionValidatorButton()));
         elementCache().rangeExpressionValidatorButton().click();
         return new RangeValidatorDialog(this, getDriver());
+    }
+
+    public RegexValidatorDialog clickAddRegex()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().regexValidatorButton()));
+        elementCache().regexValidatorButton().click();
+        return new RegexValidatorDialog(this, getDriver());
     }
 
     public ConditionalFormatDialog clickAddFormat()
@@ -630,6 +640,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public WebElement rangeExpressionValidatorButton()
         {
             return Locator.button("Add Range").waitForElement(getComponentElement(), 2000);
+        }
+
+        public WebElement regexValidatorButton()
+        {
+            return Locator.button("Add Regex").waitForElement(getComponentElement(), 2000);
         }
 
         public WebElement conditionalFormatButton()
