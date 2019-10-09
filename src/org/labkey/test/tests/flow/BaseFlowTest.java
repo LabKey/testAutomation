@@ -85,7 +85,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     private void init()
     {
         beginAt("/admin/begin.view");
-        goToAdminConsole().goToAdminConsoleLinksSection();
+        goToAdminConsole().goToSettingsSection();
         clickAndWait(Locator.linkWithText("flow cytometry"));
         getPipelineWorkDirectory().mkdir();
         setFormElement(Locator.id("workingDirectory"), getPipelineWorkDirectory().toString());

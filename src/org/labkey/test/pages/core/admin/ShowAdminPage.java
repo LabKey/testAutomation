@@ -45,7 +45,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return this;
     }
 
-    public ShowAdminPage goToAdminConsoleLinksSection()
+    public ShowAdminPage goToSettingsSection()
     {
         elementCache().sectionAdminConsoleLinks.click();
         return this;
@@ -71,111 +71,111 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 
     public void clickAnalyticsSettings()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().analyticsSettingsLink);
     }
 
     public void clickExternalRedirectHosts()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().externalRedirectHostLink);
     }
 
     public ShowAuditLogPage clickAuditLog()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().auditLogLink);
         return new ShowAuditLogPage(getDriver());
     }
 
     public void clickAuthentication()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().authenticationLink);
     }
 
     public void clickConfigurePageElements()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().configurePageElements);
     }
 
     public void clickEmailCustomization()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().emailCustomizationLink);
     }
 
     public void clickNotificationServiceAdmin()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().notificationServiceAdminLink);
     }
     public ConfigureFileSystemAccessPage clickFiles()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().filesLink);
         return new ConfigureFileSystemAccessPage(getDriver());
     }
 
     public void clickFullTextSearch()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().fullTextSearchLink);
     }
 
     public void clickLookAndFeelSettings()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().lookAndFeelSettingsLink);
     }
 
     public void clickMasterPatientIndex()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().masterPatientIndex);
     }
 
     public void clickProfiler()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().profilerLink);
     }
 
     public void clickRunningThreads()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().runningThreadsLink);
     }
 
     public CustomizeSitePage clickSiteSettings()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().siteSettingsLink);
         return new CustomizeSitePage(getDriver());
     }
 
     public void clickSiteWideTerms()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().siteWideTermsLink);
     }
 
     public void clickSystemMaintenance()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().systemMaintenanceLink);
     }
 
     public void clickSystemProperties()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().systemPropertiesLink);
     }
 
     public ConfigureReportsAndScriptsPage clickViewsAndScripting()
     {
-        goToAdminConsoleLinksSection();
+        goToSettingsSection();
         clickAndWait(elementCache().viewsAndScriptingLink);
         return new ConfigureReportsAndScriptsPage(this);
     }
@@ -188,7 +188,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         protected WebElement sectionServerInfo = Locator.linkWithText("Server Information").findWhenNeeded(this);
-        protected WebElement sectionAdminConsoleLinks = Locator.linkWithText("Admin Console Links").findWhenNeeded(this);
+        protected WebElement sectionAdminConsoleLinks = Locator.linkWithText("Settings").findWhenNeeded(this);
         protected WebElement sectionModuleInfo = Locator.linkWithText("Module Information").findWhenNeeded(this);
         protected WebElement sectionActiveUsers = Locator.linkWithText("Active Users").findWhenNeeded(this);
 

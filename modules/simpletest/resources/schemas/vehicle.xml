@@ -58,6 +58,60 @@
     </columns>
   </table>
 
+  <table tableName="FirstFKTable" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <columns>
+      <column columnName="RowId">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="StartCycleCol">
+        <datatype>int</datatype>
+        <fk>
+          <fkColumnName>StartCycleCol</fkColumnName>
+          <fkTable>SecondFKTable</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+      </column>
+    </columns>
+  </table>
+
+  <table tableName="SecondFKTable" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <columns>
+      <column columnName="RowId">
+        <datatype>int</datatype>
+      </column>
+        <column columnName="StartCycleCol">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="CycleCol">
+        <fk>
+          <fkColumnName>CycleCol</fkColumnName>
+          <fkTable>ThirdFKTable</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+        <datatype>int</datatype>
+      </column>
+    </columns>
+  </table>
+
+  <table tableName="ThirdFKTable" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <columns>
+      <column columnName="RowId">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="CycleCol">
+        <fk>
+          <fkColumnName>CycleCol</fkColumnName>
+          <fkTable>SecondFKTable</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+        <datatype>int</datatype>
+      </column>
+    </columns>
+  </table>
+
   <table tableName="Models" tableDbType="TABLE">
     <pkColumnName>RowId</pkColumnName>
     <auditLogging>DETAILED</auditLogging>
