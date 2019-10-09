@@ -3420,41 +3420,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
             throw new IllegalArgumentException("Element not a checkbox: " + el.toString() + "\nTry Ext4Helper or ExtHelper.");
         }
 
-
-        // TODO This log statement is for debugging on TeamCity runs, remove once issue is fixed.
-        log("WebDriverWrapper.setCheckbox: Checking state.");
-
         Boolean indeterminate = executeScript("return arguments[0].indeterminate;", Boolean.class, el);
         if (indeterminate != null && indeterminate)
         {
-
-            // TODO This log statement is for debugging on TeamCity runs, remove once issue is fixed.
-            log("WebDriverWrapper.setCheckbox: 'indeterminate' != null && 'indeterminate' == true so going to click the checkbox.");
-
+            scrollIntoView(el);
             el.click();
         }
 
         boolean selected = el.isSelected();
-
-        // TODO This log statement is for debugging on TeamCity runs, remove once issue is fixed.
-        log("WebDriverWrapper.setCheckbox: 'check': " + check + " 'selected': " + selected);
-
         if (check != selected)
         {
-
-            // TODO This log statement is for debugging on TeamCity runs, remove once issue is fixed.
-            log("WebDriverWrapper.setCheckbox: check != selected so going to click the check box.");
-
             scrollIntoView(el);
             el.click();
         }
 
         try
         {
-
-
-            // TODO This log statement is for debugging on TeamCity runs, remove once issue is fixed.
-            log("WebDriverWrapper.setCheckbox: 'selected': " + el.isSelected() + "." );
 
             // Have to balance between the state is now as expected and hitting a race condition between clicking
             // the element and having the isSelected attribute change.
