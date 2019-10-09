@@ -54,7 +54,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     @Test
     public void validateDomainsTest()
     {
-        goToAdminConsole().goToAdminConsoleLinksSection();
+        goToAdminConsole().goToSettingsSection();
 
         clickAndWait(Locator.linkWithText("check database"));
 
