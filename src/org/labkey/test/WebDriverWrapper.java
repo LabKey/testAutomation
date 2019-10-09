@@ -3445,6 +3445,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             // TODO This log statement is for debugging on TeamCity runs, remove once issue is fixed.
             log("WebDriverWrapper.setCheckbox: check != selected so going to click the check box.");
 
+            scrollIntoView(el);
             el.click();
         }
 
