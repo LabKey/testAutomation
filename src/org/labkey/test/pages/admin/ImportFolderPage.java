@@ -70,6 +70,8 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
         clickButton("Import Folder");
     }
 
+    public void clickManageFileWatcherTriggers() { clickAndWait(elementCache().manageFileWatcherTriggersButton); }
+
     @NotNull
     @Override
     public WebDriver getWrappedDriver()
@@ -116,5 +118,6 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
 
         WebElement importFolderButton = Locator.lkButton("Import Folder").findWhenNeeded(this);
         WebElement usePipelineButton = Locator.lkButton("Use Pipeline").findWhenNeeded(this);
+        WebElement manageFileWatcherTriggersButton = Locator.lkButton("Manage File Watcher Triggers").findWhenNeeded(this);
     }
 }
