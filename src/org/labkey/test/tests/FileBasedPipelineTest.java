@@ -35,7 +35,6 @@ import org.labkey.test.util.PipelineAnalysisHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
@@ -71,28 +70,6 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
     public void startTest()
     {
         goToProjectHome();
-    }
-
-    @Test
-    public void testScriptBasedFilewatchers()
-    {
-        String pipelineTaskWithHelpText = "Pipeline task with help text";
-        String helpText = "Hello! I am help text.";
-        String pipelineTaskNoHelpText = "two-steps";
-        String pipelineTaskInvisible = "Task that is not evokable by filewatcher";
-
-        goToFolderManagement().goToImportTab();
-        clickAndWait(Locator.lkButton("Manage file watcher triggers"));
-        DataRegionTable pipelineTable = new DataRegionTable("query", getDriver());
-        pipelineTable.clickInsertNewRow();
-
-        selectOptionByText(Locator.id("pipelineTaskSelect"), pipelineTaskWithHelpText);
-        Locator.byClass("lk-trigger-help-text").containing(helpText);
-
-        Locator.id("pipelineTaskSelect").notContaining(pipelineTaskInvisible);
-
-        selectOptionByText(Locator.id("pipelineTaskSelect"), pipelineTaskNoHelpText);
-        Locator.byClass("lk-trigger-help-text").notContaining("null");
     }
 
     @Test
