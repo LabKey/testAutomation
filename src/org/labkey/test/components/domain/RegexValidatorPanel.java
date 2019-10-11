@@ -39,7 +39,7 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
         {
             elementCache().collapseIconLocator.findElement(this).click();
             getWrapper().waitFor(()-> isExpanded(),
-                    "validator panel did not become expanded", 1000);
+                    "validator panel did not become expanded", 2000);
         }
         return this;
     }
@@ -52,22 +52,26 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
 
     public RegexValidatorPanel setExpression(String expression)
     {
+        expand();
         elementCache().expressionInput().setValue(expression);
         return this;
     }
 
     public RegexValidatorPanel setDescription(String description)
     {
+        expand();
         elementCache().descriptionInput().setValue(description);
         return this;
     }
     public String getDescription()
     {
+        expand();
         return elementCache().descriptionInput().getValue();
     }
 
     public RegexValidatorPanel setErrorMessage(String message)
     {
+        expand();
         elementCache().errorMessageInput().setValue(message);
         return this;
     }
@@ -78,6 +82,7 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
 
     public RegexValidatorPanel setFailOnMatch(boolean checked)
     {
+        expand();
         elementCache().failOnMatchCheckbox().set(checked);
         return this;
     }
@@ -88,6 +93,7 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
 
     public RegexValidatorPanel setName(String name)
     {
+        expand();
         elementCache().nameInput().setValue(name);
         return this;
     }
@@ -98,6 +104,7 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
 
     public void clickRemove()
     {
+        expand();
         elementCache().removeButton.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
     }
@@ -141,16 +148,16 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
     public static class RegexValidatorPanelFinder extends WebDriverComponentFinder<RegexValidatorPanel, RegexValidatorPanelFinder>
     {
         private Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-validator-panel");
-        private String _name = null;
+        private String _id = null;
 
         public RegexValidatorPanelFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public RegexValidatorPanelFinder withName(String name)
+        public RegexValidatorPanelFinder withIndex(int index)
         {
-            _name = name;
+            _id = "domain-regex-validator-" + Integer.toString(index);
             return this;
         }
         public RegexValidatorPanelFinder openedByName(String name)          //finds the currently-expanded
@@ -166,17 +173,11 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
             return new RegexValidatorPanel(el, driver);
         }
 
-        /**
-         * TODO:
-         * Add methods and fields, as appropriate, to build a Locator that will find the element(s)
-         * that this component represents
-         */
         @Override
         protected Locator locator()
         {
-            if (_name != null)
-                return _baseLocator.withDescendant(Locator.tagWithClass("div", "domain-validator-collapse-icon"))
-                        .startsWith(_name + ":");
+            if (_id != null)
+                return Locator.id(_id);
             else
                 return _baseLocator;
         }

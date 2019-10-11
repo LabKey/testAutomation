@@ -5,6 +5,8 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 public class RegexValidatorDialog extends ModalDialog
 {
     private DomainFieldRow _row;
@@ -20,17 +22,33 @@ public class RegexValidatorDialog extends ModalDialog
         this(row, new ModalDialogFinder(driver).withTitle("" + row.getName()), driver);
     }
 
-    public RegexValidatorPanel getValidationPanel()
+
+    List<RegexValidatorPanel> validationPanels()
     {
         return new RegexValidatorPanel.RegexValidatorPanelFinder(getDriver())
-                .find(this);
+                .findAll(this);
+    }
+    public RegexValidatorPanel getValidationPanel()
+    {
+        return validationPanels().get(0);
+    }
+    public RegexValidatorPanel getValidationPanel(int index)
+    {
+        return new RegexValidatorPanel.RegexValidatorPanelFinder(getDriver())
+                .withIndex(index).find(this);
+    }
+    public RegexValidatorPanel getValidationPanel(String name)
+    {
+        return new RegexValidatorPanel.RegexValidatorPanelFinder(getDriver())
+                .openedByName(name).find(this);
     }
 
     public RegexValidatorPanel addValidationPanel(String name)
     {
-        elementCache().addValidatorButton.click();
+        int targetIndex = validationPanels().size();
+        elementCache().addValidatorButton.click();      // adds a new validator clause panel to the dialog
         RegexValidatorPanel panel = new RegexValidatorPanel.RegexValidatorPanelFinder(getDriver())
-                .openedByName(null).find(this);
+                .withIndex(targetIndex).find(this);     // find it by assuming its ID will have index lastId +1
         panel.setName(name);
         return panel;
     }

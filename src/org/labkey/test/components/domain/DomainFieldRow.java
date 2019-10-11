@@ -397,6 +397,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setFromSchema(String schemaName)
     {
         expand();
+        getWrapper().waitFor(()-> elementCache().getFromSchemaInput().getOptions().stream().anyMatch(a-> a.getText().equals(schemaName)),
+                "the select option [" + schemaName + "] did not appear in time", 3000);
         elementCache().getFromSchemaInput().selectByVisibleText(schemaName);
         return this;
     }
@@ -508,8 +510,15 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public RegexValidatorDialog clickAddRegex()
     {
         expand();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().regexValidatorButton()));
-        elementCache().regexValidatorButton().click();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addRegexValidatorButton()));
+        elementCache().addRegexValidatorButton().click();
+        return new RegexValidatorDialog(this, getDriver());
+    }
+    public RegexValidatorDialog clickEditRegex()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editRegexValidatorButton()));
+        elementCache().editRegexValidatorButton().click();
         return new RegexValidatorDialog(this, getDriver());
     }
 
@@ -623,6 +632,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public Select getFromSchemaInput()
         {
+            expand();
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(getComponentElement());
             getWrapper().waitFor(()-> select.getOptions().size() > 0,
                     "select did not have options in the expected time", 1500);
@@ -631,6 +641,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public Select getFromTargetTableInput()
         {
+            expand();
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(getComponentElement());
             getWrapper().waitFor(()-> select.getOptions().size() > 0,
                     "select did not have options in the expected time", 1500);
@@ -642,9 +653,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             return Locator.button("Add Range").waitForElement(getComponentElement(), 2000);
         }
 
-        public WebElement regexValidatorButton()
+        public WebElement addRegexValidatorButton()
         {
             return Locator.button("Add Regex").waitForElement(getComponentElement(), 2000);
+        }
+        public WebElement editRegexValidatorButton()
+        {
+            return Locator.button("Edit Regex").waitForElement(getComponentElement(), 2000);
         }
 
         public WebElement conditionalFormatButton()

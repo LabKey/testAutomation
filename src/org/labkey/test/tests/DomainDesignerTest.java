@@ -26,7 +26,6 @@ import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.RangeValidatorDialog;
-import org.labkey.test.components.domain.RangeValidatorPanel;
 import org.labkey.test.components.domain.RegexValidatorDialog;
 import org.labkey.test.components.domain.RegexValidatorPanel;
 import org.labkey.test.params.FieldDefinition;
@@ -37,6 +36,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -1084,19 +1084,19 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String listName = "listForRangeValidator";
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
-        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
 
         DomainFieldRow sizeRow = domainFormPanel.getField("size");
         RangeValidatorDialog rangeDlg = sizeRow.clickAddRange();
-        RangeValidatorPanel rangePanel = rangeDlg.getValidationPanel()
+        rangeDlg.getValidationPanel()
                 .setName("midsize")
                 .setDescription("falls between 2 and 3")
                 .setErrorMessage("value must be 2 or 3")
@@ -1105,9 +1105,18 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setSecondCondition(Filter.Operator.LTE)
                 .setSecondValue("3");
         rangeDlg.clickApply();
-
-        // todo: navigate to the new domain, add values
         domainDesignerPage.clickSave();
+
+        // now verify the expected validator is formed and added to the field's validator array
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor sizeCol = getColumn(response.getDomain(), "size");
+        Map<String, Object> validator = getPropertyValidator(sizeCol, "midsize");
+        assertEquals("expect expression to be ", "~gte=2&~lte=3", validator.get("expression"));
+        assertEquals("validator we just created should be new", true, validator.get("new"));
+        assertEquals("expected description should be on the field",
+                "falls between 2 and 3", validator.get("description"));
+        assertEquals("expected error message should be on the field",
+                "value must be 2 or 3", validator.get("errorMessage"));
     }
 
     @Test
@@ -1139,9 +1148,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         formatDlg.clickApply();
         domainDesignerPage.clickSave();
 
-        //todo: now validate the format
-        goToManageLists();
-
+        // now verify the expected validator is formed and added to the field's validator array
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor faveSnackCol = getColumn(response.getDomain(), "favoriteSnack");
+        Map<String, Object> validator = getConditionalFormats(faveSnackCol, "format.column~doesnotcontain=almond");
+        assertEquals("expect italics to be set", true, validator.get("italic"));
+        assertEquals("expect bold not to be set", false, validator.get("bold"));
+        assertEquals("expect strikethrough not to be set", false, validator.get("strikethrough"));
     }
 
     @Test
@@ -1163,15 +1176,105 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         RegexValidatorDialog validatorDialog = favoriteSnack.clickAddRegex();
         RegexValidatorPanel panel = validatorDialog.getValidationPanel();
-        panel.setExpression("[!@#$%^&*(),.?\":{}|<>]")
-                .setDescription("contains special characters")
-                .setErrorMessage("favorite snack cannot contain special characters, yo")
+        String expression = "twizzler";
+        panel.setExpression(expression)
+                .setDescription("twizzler is not a snack")
+                .setErrorMessage("favorite snack cannot be twizzlers, yo")
                 .setFailOnMatch(true)
-                .setName("specialCharacters");
+                .setName("neverTwizzlers");
         validatorDialog.clickApply();
         domainDesignerPage.clickSave();
 
-        // now go try to insert matching
+        // now verify the expected validator is formed and added to the field's validator array
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor faveSnackCol = getColumn(response.getDomain(), "favoriteSnack");
+        Map<String, Object> specialCharsValidator = getPropertyValidator(faveSnackCol, "neverTwizzlers");
+        assertEquals("validator we just created should be new", true, specialCharsValidator.get("new"));
+        assertEquals("expected expression should be on the field", expression, specialCharsValidator.get("expression"));
+        assertEquals("expected description should be on the field",
+                "twizzler is not a snack", specialCharsValidator.get("description"));
+        assertEquals("expected error message should be on the field",
+                "favorite snack cannot be twizzlers, yo", specialCharsValidator.get("errorMessage"));
+
+        // this test does not verify that attempts to insert values that match will get an error
+    }
+
+    @Test
+    public void addUpdateRemoveRegexValidator() throws Exception
+    {
+        String listName = "regexCrudList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
+
+        RegexValidatorDialog validatorDialog = favoriteSnack.clickAddRegex();
+        RegexValidatorPanel panel1 = validatorDialog.getValidationPanel();
+        String expression1 = ".*[twizzler]+.*";
+        panel1.setExpression(expression1)
+                .setDescription("twizzler is not a snack")
+                .setErrorMessage("favorite snack cannot be twizzlers, yo")
+                .setFailOnMatch(true)
+                .setName("neverTwizzlers");
+        String expression2 = ".*[!@#$%^]+.*";
+        RegexValidatorPanel panel2 = validatorDialog.addValidationPanel("specialChars")
+                .setDescription("matches on any special character substrings in the input")
+                .setExpression(expression2)
+                .setFailOnMatch(false)
+                .setErrorMessage("no special characters in this field, please");
+        String expression3 = ".*[<>]+.*";
+        RegexValidatorPanel panel3 = validatorDialog.addValidationPanel("angleBrackets")
+                .setDescription("matches on any angle bracket substrings in the input")
+                .setExpression(expression3)
+                .setFailOnMatch(false)
+                .setName("angleBrackets")
+                .setErrorMessage("no angle brackets in this field, please");
+        validatorDialog.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now verify the expected validator is formed and added to the field's validator array
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor faveSnackCol = getColumn(response.getDomain(), "favoriteSnack");
+        Map<String, Object> specialCharsValidator = getPropertyValidator(faveSnackCol, "specialChars");
+        assertEquals("validator we just created should be new", true, specialCharsValidator.get("new"));
+        assertEquals("expected expression should be on the field", expression2, specialCharsValidator.get("expression"));
+        assertEquals("expected description should be on the field",
+                "matches on any special character substrings in the input", specialCharsValidator.get("description"));
+        assertEquals("expected error message should be on the field",
+                "no special characters in this field, please", specialCharsValidator.get("errorMessage"));
+
+        // reopen, edit one, remove another
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        RegexValidatorDialog valDialog = domainDesignerPage.fieldProperties()
+                .getField("favoriteSnack")
+                .clickEditRegex();
+        valDialog.getValidationPanel(2) // will get 'angleBrackets' field, it's 3rd
+                .clickRemove();
+        RegexValidatorPanel specialValidatorPanel = valDialog
+                .getValidationPanel(1)  // will get the 'specialChars' field, it's 2nd
+                .setFailOnMatch(true);
+
+        valDialog.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now confirm 2 validators on the field
+        DomainResponse newResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor snackField = getColumn(newResponse.getDomain(), "favoriteSnack");
+        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)snackField.getAllProperties().get("propertyValidators");
+        Map<String, Object> twiz = getPropertyValidator(snackField, "neverTwizzlers");
+        Map<String, Object> spec = getPropertyValidator(snackField, "specialChars");
+
+        // no validator with name 'angleBrackets' exists now
+        assertEquals(0, validators.stream().filter(a-> a.get("name").equals("angleBrackets")).collect(Collectors.toList()).size());
+        // why not just verify just 2 validators on the field now?  ...because apparently when removed, it becomes a filter on text size is less-than-or-equal-to field cap
+        // ...but that looks like a regression of issue 38598, we're tracking it as 38662
+        assertEquals("issue 38662", 2, validators.size());
     }
 
     public PropertyDescriptor getColumn(Domain domain, String columnName)
@@ -1180,6 +1283,27 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertNotNull("Didn't find expected columns", descriptor);
 
         return descriptor;
+    }
+
+
+    public Map<String, Object> getPropertyValidator(PropertyDescriptor column, String name)
+    {
+        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("propertyValidators");
+        Map<String, Object> validator = validators.stream()
+                .filter(a-> a.get("name").equals(name))
+                .collect(Collectors.toList())
+                .get(0);
+        return validator;
+    }
+
+    public Map<String, Object> getConditionalFormats(PropertyDescriptor column, String filterExpression)
+    {
+        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
+        Map<String, Object> validator = validators.stream()
+                .filter(a-> a.get("filter").equals(filterExpression))
+                .collect(Collectors.toList())
+                .get(0);
+        return validator;
     }
 
     @Override
