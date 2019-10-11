@@ -199,7 +199,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         protected Locator locator()
         {
             if (_title != null)
-                return _baseLocator.withDescendant(Locator.tagWithClass("div", "panel-heading").withText( _title));
+                return _baseLocator.withDescendant(Locator.tagWithClass("div", "panel-heading").startsWith( _title));
             else
                 return _baseLocator;
         }
