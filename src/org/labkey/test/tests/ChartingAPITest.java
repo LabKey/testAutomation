@@ -270,7 +270,7 @@ public class ChartingAPITest extends BaseWebDriverTest
         checkExportedChart(BOX_TWO, BOX_TWO_TEXT, true);
 
         click(Locator.input("next-btn"));
-        assertErrorMessage("The measure Cohort was not found. It may have been renamed or removed.", true);
+        assertErrorMessage("The measure, ParticipantId/Cohort, was not found. It may have been renamed or removed.", true);
         checkExportedChart(BOX_THREE, null, true, 0);
     }
 

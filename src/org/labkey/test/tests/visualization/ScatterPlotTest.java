@@ -549,8 +549,8 @@ public class ScatterPlotTest extends GenericChartsTest
                 .waitForReportRender()
                 .clickEdit();
 
-        waitForText("The saved color measure, " + MEASURE_7_NECK + ", is not available. It may have been renamed or removed.");
-        assertTextPresent("The saved shape measure, " + MEASURE_16_EVAL_SUM + ", is not available. It may have been renamed or removed.");
+        waitForText("The saved color measure, APXneck, is not available. It may have been renamed or removed.");
+        assertTextPresent("The saved shape measure, APXcemh, is not available. It may have been renamed or removed.");
         chartTypeDialog = chartWizard.clickChartTypeButton();
         assertTrue(chartTypeDialog.getColorValue() == null || "".equals(chartTypeDialog.getColorValue()));
         assertTrue(chartTypeDialog.getShapeValue() == null || "".equals(chartTypeDialog.getShapeValue()));
@@ -582,7 +582,7 @@ public class ScatterPlotTest extends GenericChartsTest
         chartWizard.waitForReportRender();
 
         // Issue 18186: When not in edit mode, there shouldn't be a pop up message.
-        String formLanguageError = "The saved x measure, " + MEASURE_FORM_LANGUAGE + ", is not available. It may have been renamed or removed.";
+        String formLanguageError = "The saved x measure, formlang, is not available. It may have been renamed or removed.";
         waitForText(formLanguageError);
         final Window errorWindow = chartWizard.clickEditExpectingError();
         assertEquals("Wrong error message", formLanguageError, errorWindow.getBody());
