@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +65,7 @@ public abstract class AbstractAssayHelper
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
     @LogMethod
+    @Deprecated // uses old GWT assay designer, use createAssayDesignWithDefaults instead
     public void createAssayWithDefaults(String type, String name)
     {
         createAssayAndEdit(type, name).saveAndClose();
@@ -71,6 +73,7 @@ public abstract class AbstractAssayHelper
         DataRegionTable.DataRegion(_test.getDriver()).withName("AssayList").waitFor();
     }
 
+    @Deprecated // uses old GWT assay designer, use createAssayDesign instead
     public AssayDesignerPage createAssayAndEdit(String type, String name)
     {
         _test.clickButton("New Assay Design");
@@ -81,6 +84,33 @@ public abstract class AbstractAssayHelper
         assayDesigner.setName(name);
         assayDesigner.save();
 
+        return assayDesigner;
+    }
+
+    public void createAssayDesignWithDefaults(String type, String name)
+    {
+        ReactAssayDesignerPage assayDesigner = createAssayDesign(type, name);
+
+        // skip over the field properties panels, leaving as defaults
+        for (int i = 0; i < assayDesigner.getFieldPropertiesPanelCount(); i++)
+            assayDesigner.clickNext();
+
+        assayDesigner.clickFinish();
+
+        // TODO add a check that the new assay name is in list?
+        DataRegionTable.DataRegion(_test.getDriver()).withName("AssayList").waitFor();
+    }
+
+    public ReactAssayDesignerPage createAssayDesign(String type, String name)
+    {
+        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.clickButton("New Assay Design");
+        _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
+        _test.clickButton("Next");
+        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+
+        ReactAssayDesignerPage assayDesigner = new ReactAssayDesignerPage(_test.getDriver());
+        assayDesigner.setName(name);
         return assayDesigner;
     }
 
