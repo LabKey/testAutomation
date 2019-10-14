@@ -912,6 +912,87 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertNull("lookUpField target table should be null for current container", lookupColumn.getAllProperties().get("lookupContainer"));
     }
 
+    @Test
+    public void testLookupPropertyValidator() throws Exception
+    {
+        String listName = "lookupValidatorTestList";            // this is the main list
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        String listName1 = "lookupValidatorLookupList";         // this list will contain lookup values
+        String lookupList1Item = listName1 + " (Integer)";
+        FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName1);
+        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo1)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse1 = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        dgen1.addCustomRow(Map.of("name", "joey", "color", "green"));
+        dgen1.addCustomRow(Map.of("name", "billy", "color", "red"));
+        dgen1.addCustomRow(Map.of("name", "eddie", "color", "blue"));
+        dgen1.insertRows(createDefaultConnection(true), dgen1.getRows());
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+
+        // add a lookup field to the test list
+        DomainFieldRow row = domainFormPanel.addField("looky")
+                .setType(FieldDefinition.ColumnType.Lookup)
+                .setFromFolder("Current Folder")
+                .setFromSchema("lists")
+                .setFromTargetTable(lookupList1Item)
+                .setLookupValidatorEnabled(true)
+                .setDescription("should validate lookup value contents");
+        domainDesignerPage.clickSave();
+
+        // now make sure the validator is set
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor lookupColumn = getColumn(domainResponse.getDomain(), "looky");
+        Map<String, Object> propertyValidator = getPropertyValidator(lookupColumn, "Lookup Validator");
+    }
+
+    @Test
+    public void testDefaultValues() throws Exception
+    {
+        String listName = "defaultValuesTestList";
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+
+        DomainFieldRow testRow = domainFormPanel.getField("color");
+        testRow.clickAdvancedSettings()
+                .setDefaultValueType("Editable default")
+                .apply();
+        domainDesignerPage.clickSave();
+
+        // now make sure the validator is not yet set
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor colorCol = getColumn(domainResponse.getDomain(), "color");
+        assertNull("expect default value to not be set yet", colorCol.getAllProperties().get("defaultValue"));
+
+        // now re-open the domain designer, go set the default values
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel newPanel = domainDesignerPage.fieldProperties(listName);
+        newPanel.getField("color")
+                .clickAdvancedSettings()
+                .clickDefaultValuesLink();  // should land us in
+        setFormElement(Locator.input("color"), "green");
+        clickButton("Save Defaults");
+
+        DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor updatedColor = getColumn(updatedResponse.getDomain(), "color");
+        assertEquals("expect default value to be green", "green", updatedColor.getAllProperties().get("defaultValue"));
+    }
+
     /**
      * verifies that a sampleset field with data (and blank values) will warn the user if they attempt to mark that field
      * 'required'
@@ -1096,7 +1177,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         DomainFieldRow sizeRow = domainFormPanel.getField("size");
         RangeValidatorDialog rangeDlg = sizeRow.clickAddRange();
-        rangeDlg.getValidationPanel()
+        rangeDlg.getValidationPanel(0)
                 .setName("midsize")
                 .setDescription("falls between 2 and 3")
                 .setErrorMessage("value must be 2 or 3")
@@ -1280,6 +1361,133 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // why not just verify just 2 validators on the field now?  ...because apparently when removed, it becomes a filter on text size is less-than-or-equal-to field cap
         // ...but that looks like a regression of issue 38598, we're tracking it as 38662
         assertEquals("issue 38662", 2, validators.size());
+    }
+
+    @Test
+    public void addUpdateRemoveRangeValidator() throws Exception
+    {
+        String listName = "rangeValidatorCrudList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFieldRow size = domainFormPanel.getField("size");
+
+        RangeValidatorDialog sizeDialog = size.clickAddRange();
+        sizeDialog.getValidationPanel(0)
+                .setFirstCondition(Filter.Operator.LTE)
+                .setFirstValue("2")
+                .setName("lte2");
+        sizeDialog.addValidationPanel("equals3")
+                .setFirstCondition(Filter.Operator.EQUAL)
+                .setFirstValue("3");
+        sizeDialog.addValidationPanel("gte4")
+                .setFirstCondition(Filter.Operator.GTE)
+                .setFirstValue("4");
+        sizeDialog.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now verify we have 3 formats on the size field
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor sizeCol = getColumn(response.getDomain(), "size");
+        Map<String, Object> lte2 = getPropertyValidator(sizeCol, "lte2");
+        Map<String, Object> equals3 = getPropertyValidator(sizeCol, "equals3");
+        Map<String, Object> gte4 = getPropertyValidator(sizeCol, "gte4");
+
+        // now reopen the page, edit 2 delete another
+        // get back to the domain designer
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        RangeValidatorDialog dlg = domainDesignerPage.fieldProperties().getField("size")
+                .clickEditRanges();
+        dlg.getValidationPanel(0)       //lte2
+                .setDescription("2 or less");
+        dlg.getValidationPanel(1)       //equals3
+                .setDescription("equals 3");
+        dlg.getValidationPanel(2)       //gte4
+                .clickRemove();
+        dlg.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now verify we have 2 formats on the size field
+        DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor updatedSizeCol = getColumn(updatedResponse.getDomain(), "size");
+        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)updatedSizeCol.getAllProperties().get("propertyValidators");
+        assertEquals("expect only 2 validators on the field",2, validators.size());
+        Map<String, Object> editedLte2 = getPropertyValidator(updatedSizeCol, "lte2");
+        Map<String, Object> editedEquals3 = getPropertyValidator(updatedSizeCol, "equals3");
+
+        assertEquals("expect description edit to take","2 or less", editedLte2.get("description"));
+        assertEquals("expect description edit to take","equals 3", editedEquals3.get("description"));
+    }
+
+    @Test
+    public void addUpdateRemoveConditionalFormat() throws Exception
+    {
+        String listName = "conditionalFormatCrudList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("superHero", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFieldRow superHero = domainFormPanel.getField("superHero");
+
+        ConditionalFormatDialog formatDialog = superHero.clickAddFormat();
+        formatDialog.getOpenFormatPanel()
+                .setFirstCondition(Filter.Operator.EQUAL)
+                .setFirstValue("Thor")
+                .setBoldCheckbox(true);
+        formatDialog.addFormatPanel()
+                .setFirstCondition(Filter.Operator.EQUAL)
+                .setFirstValue("Aquaman")
+                .setItalicsCheckbox(true);
+        formatDialog.addFormatPanel()
+                .setFirstCondition(Filter.Operator.EQUAL)
+                .setFirstValue("IronMan")
+                .setStrikethroughCheckbox(true);
+        formatDialog.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now verify we have 3
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor heroCol = getColumn(response.getDomain(), "superHero");
+        Map<String, Object> thorMap = getConditionalFormats(heroCol, "format.column~=Thor");
+        Map<String, Object> aquaMap = getConditionalFormats(heroCol, "format.column~=Aquaman");
+        Map<String, Object> ironMap = getConditionalFormats(heroCol, "format.column~=IronMan");
+
+        // get back to the domain designer
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        ConditionalFormatDialog dlg = domainDesignerPage.fieldProperties().getField("superHero")
+                .clickEditFormats();
+        dlg.getPanelByIndex(2)  // ironman
+            .clickRemove();
+        dlg.getPanelByIndex(0) // thor
+            .setItalicsCheckbox(true);
+        dlg.getPanelByIndex(1)  // aquaman
+            .setBoldCheckbox(true);
+        dlg.clickApply();
+        domainDesignerPage.clickSave();
+
+        DomainResponse validationResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor editedHeroCol = getColumn(validationResponse.getDomain(), "superHero");
+
+        List<Map<String, Object>> formats = (ArrayList<Map<String, Object>>)editedHeroCol.getAllProperties().get("conditionalFormats");
+        assertEquals(2, formats.size());
+
+        Map<String, Object> editedThor = getConditionalFormats(editedHeroCol, "format.column~=Thor");
+        assertEquals(true, editedThor.get("bold"));
+        assertEquals(true, editedThor.get("italic"));
+        Map<String, Object> editedAquamap = getConditionalFormats(editedHeroCol, "format.column~=Aquaman");
+        assertEquals(true, editedAquamap.get("bold"));
+        assertEquals(true, editedAquamap.get("bold"));
     }
 
     public PropertyDescriptor getColumn(Domain domain, String columnName)

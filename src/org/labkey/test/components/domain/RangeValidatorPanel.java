@@ -38,48 +38,56 @@ public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.
 
     public RangeValidatorPanel setFirstCondition(Filter.Operator operator)
     {
+        expand();
         elementCache().firstConditionSelect().selectByValue(operator.getUrlKey());
         return this;
     }
 
     public RangeValidatorPanel setFirstValue(String value)
     {
+        expand();
         elementCache().firstFilterValueInput().setValue(value);
         return this;
     }
 
     public RangeValidatorPanel setSecondCondition(Filter.Operator operator)
     {
+        expand();
         elementCache().secondConditionSelect().selectByValue(operator.getUrlKey());
         return this;
     }
 
     public RangeValidatorPanel setSecondValue(String value)
     {
+        expand();
         elementCache().secondFilterValueInput().setValue(value);
         return this;
     }
 
     public RangeValidatorPanel setDescription(String value)
     {
+        expand();
         elementCache().descriptionInput().setValue(value);
         return this;
     }
 
     public RangeValidatorPanel setErrorMessage(String value)
     {
+        expand();
         elementCache().errorMessageInput().setValue(value);
         return this;
     }
 
     public RangeValidatorPanel setName(String name)
     {
+        expand();
         elementCache().nameInput().setValue(name);
         return this;
     }
 
     public void clickRemove()
     {
+        expand();
         elementCache().removeButton.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
     }
@@ -153,6 +161,7 @@ public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.
     {
         private Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-validator-panel");
         private String _name = null;
+        private String _id = null;
 
         public RangeValidatorPanelFinder(WebDriver driver)
         {
@@ -170,6 +179,11 @@ public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.
                     .withAttribute("value", name));
             return this;
         }
+        public RangeValidatorPanelFinder byIndex(int index)
+        {
+            _id = "domain-range-validator-" + Integer.toString(index);
+            return this;
+        }
 
         @Override
         protected RangeValidatorPanel construct(WebElement el, WebDriver driver)
@@ -184,6 +198,8 @@ public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.
             if (_name != null)
                 return _baseLocator.withDescendant(Locator.tagWithClass("div", "domain-validator-collapse-icon"))
                         .startsWith(_name + ":");
+            else if (_id != null)
+                return Locator.id(_id);
             else
                 return _baseLocator;
         }

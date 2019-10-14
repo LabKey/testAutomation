@@ -37,7 +37,9 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
     {
         if (!isExpanded())
         {
-            elementCache().collapseIconLocator.findElement(this).click();
+            WebElement expando = elementCache().collapseIconLocator.findElement(this);
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(expando));
+            expando.click();
             getWrapper().waitFor(()-> isExpanded(),
                     "validator panel did not become expanded", 2000);
         }

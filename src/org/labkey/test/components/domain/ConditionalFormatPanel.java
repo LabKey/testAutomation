@@ -26,44 +26,52 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
 
     public ConditionalFormatPanel setFirstCondition(Filter.Operator operator)
     {
+        expand();
         elementCache().firstConditionSelect().selectByValue(operator.getUrlKey());
         return this;
     }
     public ConditionalFormatPanel setFirstValue(String value)
     {
+        expand();
         elementCache().firstFilterValueInput().setValue(value);
         return this;
     }
 
     public ConditionalFormatPanel setSecondCondition(Filter.Operator operator)
     {
+        expand();
         elementCache().secondConditionSelect().selectByValue(operator.getUrlKey());
         return this;
     }
     public ConditionalFormatPanel setSecondValue(String value)
     {
+        expand();
         elementCache().secondFilterValueInput().setValue(value);
         return this;
     }
 
     public ConditionalFormatPanel setBoldCheckbox(boolean checked)
     {
+        expand();
         elementCache().boldCheckbox().set(checked);
         return this;
     }
     public ConditionalFormatPanel setItalicsCheckbox(boolean checked)
     {
+        expand();
         elementCache().italicsCheckbox().set(checked);
         return this;
     }
     public ConditionalFormatPanel setStrikethroughCheckbox(boolean checked)
     {
+        expand();
         elementCache().strikethroughCheckbox().set(checked);
         return this;
     }
 
     public void clickRemove()
     {
+        expand();
         elementCache().removeButton.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
     }
@@ -72,6 +80,7 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
     {
         if (!isExpanded())
         {
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().collapseIconLocator));
             elementCache().collapseIconLocator.findElement(this).click();
             getWrapper().waitFor(()-> isExpanded(),
                     "conditional format panel did not become expanded", 1000);
@@ -148,16 +157,16 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
     public static class ConditionalFormatPanelFinder extends WebDriverComponentFinder<ConditionalFormatPanel, ConditionalFormatPanelFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-validator-panel");
-        private String _title = null;
+        private String _id = null;
 
         public ConditionalFormatPanelFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public ConditionalFormatPanelFinder withTitle(String title)
+        public ConditionalFormatPanelFinder withIndex(int index)
         {
-            _title = title;
+            _id = "domain-condition-format-" + Integer.toString(index);
             return this;
         }
 
@@ -167,16 +176,11 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
             return new ConditionalFormatPanel(el, driver);
         }
 
-        /**
-         * TODO:
-         * Add methods and fields, as appropriate, to build a Locator that will find the element(s)
-         * that this component represents
-         */
         @Override
         protected Locator locator()
         {
-            if (_title != null)
-                return _baseLocator.withAttribute("title", _title);
+            if (_id != null)
+                return Locator.id(_id);
             else
                 return _baseLocator;
         }

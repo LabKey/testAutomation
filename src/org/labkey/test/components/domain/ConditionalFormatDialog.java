@@ -2,11 +2,10 @@ package org.labkey.test.components.domain;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.html.Input;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.components.html.Input.Input;
+import java.util.List;
 
 public class ConditionalFormatDialog extends ModalDialog
 {
@@ -23,9 +22,27 @@ public class ConditionalFormatDialog extends ModalDialog
        this(row, new ModalDialogFinder(driver).withTitle("Conditional Formatting for " + row.getName()), driver);
     }
 
+    public List<ConditionalFormatPanel> formatPanels()
+    {
+        return new ConditionalFormatPanel.ConditionalFormatPanelFinder(getDriver()).findAll(this);
+    }
+
     public ConditionalFormatPanel getOpenFormatPanel()
     {
         return new ConditionalFormatPanel.ConditionalFormatPanelFinder(getDriver()).find(this);
+    }
+
+    public ConditionalFormatPanel addFormatPanel()
+    {
+        int targetIndex = formatPanels().size();
+        elementCache().addformattingButton.click();
+        return getPanelByIndex(targetIndex);
+    }
+
+    public ConditionalFormatPanel getPanelByIndex(int index)
+    {
+        return new ConditionalFormatPanel.ConditionalFormatPanelFinder(getDriver())
+                .withIndex(index).find(this);
     }
 
     public DomainFieldRow clickApply()
@@ -53,9 +70,8 @@ public class ConditionalFormatDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        // TODO: Add elements that are in the component
-        final Input input = Input(Locator.css("input"), getDriver()).findWhenNeeded(this);
-        final WebElement button = Locator.css("button").findWhenNeeded(this);
+        final WebElement addformattingButton = Locator.tagWithClass("div", "domain-validation-add-btn")
+                .findWhenNeeded(this);
     }
 
 }

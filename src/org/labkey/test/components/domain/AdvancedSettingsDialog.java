@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -65,6 +66,25 @@ public class AdvancedSettingsDialog extends ModalDialog
         getWrapper().waitFor(()-> elementCache().showInDetailsView.get().equals(checked),
                 "showInDetailsView checkbox was not set as expected", 1000);
         return this;
+    }
+
+    // default value options
+    public String getDefaultValueType()
+    {
+        return getWrapper().getFormElement(elementCache().defaultTypeSelect);
+    }
+    public AdvancedSettingsDialog setDefaultValueType(String type)
+    {
+        getWrapper().waitFor(()->  elementCache().defaultTypeSelect.isEnabled(),
+                "phiSelect did not become enabled in time", 1500);
+        getWrapper().setFormElement(elementCache().defaultTypeSelect, type);
+        return this;
+    }
+
+    public LabKeyPage clickDefaultValuesLink()
+    {
+        getWrapper().clickAndWait(Locator.linkWithText("Set Default Values"));
+        return new LabKeyPage(getDriver());  // todo: return more strongly-typed page
     }
 
     public String getPHILevel()
@@ -164,6 +184,10 @@ public class AdvancedSettingsDialog extends ModalDialog
                 Locator.input("domainpropertiesrow-shownInInsertView").findWhenNeeded(this));
         public Checkbox showInDetailsView = new Checkbox(
                 Locator.input("domainpropertiesrow-showInDetailsView").findWhenNeeded(this));
+
+        // default value options
+        public WebElement defaultTypeSelect = Locator.tagWithName("select", "domainpropertiesrow-defaultValueType")
+                .findWhenNeeded(this);
 
         // misc options
         public WebElement phiSelect = Locator.tagWithAttribute("select", "name", "domainpropertiesrow-PHI")

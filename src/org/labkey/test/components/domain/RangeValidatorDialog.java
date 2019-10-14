@@ -5,6 +5,8 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 public class RangeValidatorDialog extends ModalDialog
 {
     private DomainFieldRow _row;
@@ -20,19 +22,23 @@ public class RangeValidatorDialog extends ModalDialog
         this(row, new ModalDialogFinder(driver).withTitle("Range Validator for " + row.getName()), driver);
     }
 
-    public RangeValidatorPanel getValidationPanel()
+    public List<RangeValidatorPanel> validators()
     {
         return new RangeValidatorPanel.RangeValidatorPanelFinder(getDriver())
-                .find(this);
+                .findAll(this);
     }
 
     public RangeValidatorPanel addValidationPanel(String name)
     {
+        int targetIndex = validators().size();
         elementCache().addValidatorButton.click();
-        RangeValidatorPanel panel = new RangeValidatorPanel.RangeValidatorPanelFinder(getDriver())
-                .openedByName(null).find(this);
-        panel.setName(name);
-        return panel;
+        return getValidationPanel(targetIndex).setName(name);
+    }
+
+    public RangeValidatorPanel getValidationPanel(int index)
+    {
+        return new RangeValidatorPanel.RangeValidatorPanelFinder(getDriver())
+                .byIndex(index).find(this);
     }
 
     public DomainFieldRow clickApply()

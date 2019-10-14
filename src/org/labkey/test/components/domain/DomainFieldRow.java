@@ -374,15 +374,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         {
             containerPath = getWrapper().getCurrentContainerPath();
         }
-
-//        String previousValue = elementCache().getFromTargetTableInput().getFirstSelectedOption().getAttribute("value");
-//        if (!containerPath.equals(previousValue))
-//        {
-//            WebElement schemaSelect = elementCache().getFromSchemaInput().getWrappedElement();
-//            elementCache().fromFolderInput.selectByValue(containerPath);
-//            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(schemaSelect));
-//        }
-
         elementCache().fromFolderInput.selectByValue(containerPath);
 
         return this;
@@ -414,9 +405,21 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         // give the option some time to appear before attempting to select it
         getWrapper().waitFor(()-> elementCache().getFromTargetTableInput().getOptions().stream().anyMatch(a-> a.getText().equals(targetTable)),
-                "the select option [" + targetTable + "] did not appear in time", 3000);
+                "the select option [" + targetTable + "] did not appear in time", 5000);
         elementCache().getFromTargetTableInput().selectByVisibleText(targetTable);
         return this;
+    }
+
+    public DomainFieldRow setLookupValidatorEnabled(boolean checked)
+    {
+        expand();
+        elementCache().getLookupValidatorEnabledCheckbox().set(checked);
+        return this;
+    }
+    public boolean getLookupValidatorEnabled()
+    {
+        expand();
+        return elementCache().getLookupValidatorEnabledCheckbox().get();
     }
 
     // advanced settings
@@ -502,8 +505,15 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public RangeValidatorDialog clickAddRange()
     {
         expand();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().rangeExpressionValidatorButton()));
-        elementCache().rangeExpressionValidatorButton().click();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addRangeButton()));
+        elementCache().addRangeButton().click();
+        return new RangeValidatorDialog(this, getDriver());
+    }
+    public RangeValidatorDialog clickEditRanges()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editRangesButton()));
+        elementCache().editRangesButton().click();
         return new RangeValidatorDialog(this, getDriver());
     }
 
@@ -525,8 +535,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public ConditionalFormatDialog clickAddFormat()
     {
         expand();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().conditionalFormatButton()));
-        elementCache().conditionalFormatButton().click();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addFormatButton()));
+        elementCache().addFormatButton().click();
+        return new ConditionalFormatDialog(this, getDriver());
+    }
+
+    public ConditionalFormatDialog clickEditFormats()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editFormatButton()));
+        elementCache().editFormatButton().click();
         return new ConditionalFormatDialog(this, getDriver());
     }
 
@@ -648,9 +666,20 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             return select;
         }
 
-        public WebElement rangeExpressionValidatorButton()
+        public Checkbox getLookupValidatorEnabledCheckbox()
+        {
+            expand();
+            return new Checkbox(Locator.checkboxByName("domainpropertiesrow-lookupValidator").findWhenNeeded(this));
+        }
+
+
+        public WebElement addRangeButton()
         {
             return Locator.button("Add Range").waitForElement(getComponentElement(), 2000);
+        }
+        public WebElement editRangesButton()
+        {
+            return Locator.button("Edit Ranges").waitForElement(getComponentElement(), 2000);
         }
 
         public WebElement addRegexValidatorButton()
@@ -662,9 +691,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             return Locator.button("Edit Regex").waitForElement(getComponentElement(), 2000);
         }
 
-        public WebElement conditionalFormatButton()
+        public WebElement addFormatButton()
         {
             return Locator.button("Add Format").waitForElement(getComponentElement(), 2000);
+        }
+        public WebElement editFormatButton()
+        {
+            return Locator.button("Edit Formats").waitForElement(getComponentElement(), 2000);
         }
     }
 }
