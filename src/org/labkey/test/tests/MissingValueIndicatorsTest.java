@@ -19,7 +19,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -164,17 +165,22 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         goToManageAssays();
 
-        AssayDesignerPage assay = _assayHelper.createAssayAndEdit("General", assayName);
-        assay.addDataField("age", "Age", FieldDefinition.ColumnType.Integer);
-        assay.addDataField("sex", "Sex", FieldDefinition.ColumnType.String);
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
+        DomainFormPanel resultsPanel = assayDesignerPage.goToFieldProperties("Results Properties");
 
-        log("setting fields to enable missing values and look up");
-        assay.dataFields().selectField(4).setType(new ListHelper.LookupInfo(null, "lists", "Ages"));
-        assay.dataFields().fieldProperties().selectAdvancedTab().setMvEnabled(true);
-        assay.dataFields().selectField(5);
-        assay.dataFields().fieldProperties().selectAdvancedTab().setMvEnabled(true);
+        resultsPanel.addField("age")
+            .setLabel("Age")
+            .setType(FieldDefinition.ColumnType.Lookup)
+            .setFromSchema("lists")
+            .setFromTargetTable("Ages (Integer)")
+            .setMissingValue(true);
 
-        assay.saveAndClose();
+        resultsPanel.addField("sex")
+            .setLabel("Sex")
+            .setType(FieldDefinition.ColumnType.String)
+            .setMissingValue(true);
+
+        assayDesignerPage.clickFinish();
     }
 
     @Override

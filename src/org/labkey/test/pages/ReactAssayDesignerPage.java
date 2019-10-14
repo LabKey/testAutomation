@@ -27,6 +27,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
+import java.io.File;
+
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.Input.Input;
 import static org.labkey.test.components.html.SelectWrapper.Select;
@@ -111,6 +114,25 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public ReactAssayDesignerPage addTransformScript(File transformScript)
+    {
+        int index = Locator.xpath("//input[starts-with(@id, 'assay-design-protocolTransformScripts')]").findElements(getDriver()).size();
+        click(Locator.tagWithClass("span", "btn").containing("Add Script"));
+        return setTransformScript(transformScript, index);
+    }
+
+    public ReactAssayDesignerPage setTransformScript(File transformScript)
+    {
+        return setTransformScript(transformScript, 0);
+    }
+
+    public ReactAssayDesignerPage setTransformScript(File transformScript, int index)
+    {
+        assertTrue("Unable to locate the transform script: " + transformScript, transformScript.exists());
+        setFormElement(Locator.xpath("//input[@id='assay-design-protocolTransformScripts" + index + "']"), transformScript.getAbsolutePath());
+        return this;
+    }
+
     public enum MetadataInputFormat implements OptionSelect.SelectOption
     {
         MANUAL,
@@ -164,14 +186,13 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
-    public DomainDesignerPage clickFinish()
+    public void clickFinish()
     {
         scrollIntoView(elementCache().finishButton);
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton));
         String currentURL = getDriver().getCurrentUrl();
         elementCache().finishButton.click();
         afterSaveOrFinishClick(currentURL);
-        return this;
     }
 
     @Override
