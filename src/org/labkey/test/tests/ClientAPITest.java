@@ -42,7 +42,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.dumbster.EmailRecordTable;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -916,17 +916,14 @@ public class ClientAPITest extends BaseWebDriverTest
 
         //copied from old test
         clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "General"));
-        clickButton("Next");
-
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(getDriver());
-        assayDesigner
-                .setName(TEST_ASSAY)
-                .setDescription(TEST_ASSAY_DESC);
-        assayDesigner.runFields()
-                .addField(new FieldDefinition("RunDate").setLabel("Run Date").setType(FieldDefinition.ColumnType.DateTime));
-        assayDesigner.saveAndClose();
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", TEST_ASSAY);
+        assayDesignerPage.setDescription(TEST_ASSAY_DESC)
+            .clickNext().clickNext();
+        assayDesignerPage.fieldProperties("Run Properties")
+            .addField("RunDate")
+            .setType(FieldDefinition.ColumnType.DateTime)
+            .setLabel("Run Date");
+        assayDesignerPage.clickFinish();
 
         setSourceFromFile("assayTest.js");
 

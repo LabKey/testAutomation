@@ -18,7 +18,6 @@ package org.labkey.test.pages;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
@@ -26,8 +25,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-
-import java.util.List;
 
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.Input.Input;
@@ -134,6 +131,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public ReactAssayDesignerPage clickBack()
     {
+        scrollIntoView(elementCache().backBtn);
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().backBtn));
         elementCache().backBtn.click();
         return this;
@@ -141,8 +139,19 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public ReactAssayDesignerPage clickNext()
     {
+        scrollIntoView(elementCache().nextBtn);
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().nextBtn));
         elementCache().nextBtn.click();
+        return this;
+    }
+
+    public DomainDesignerPage clickFinish()
+    {
+        scrollIntoView(elementCache().finishButton);
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton));
+        String currentURL = getDriver().getCurrentUrl();
+        elementCache().finishButton.click();
+        afterSaveOrFinishClick(currentURL);
         return this;
     }
 
@@ -163,6 +172,8 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         WebElement backBtn = Locator.button("Back")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement nextBtn = Locator.button("Next")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement finishButton = Locator.button("Finish")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         final Input nameInput = Input(Locator.id("assay-design-name"), getDriver()).findWhenNeeded(this);

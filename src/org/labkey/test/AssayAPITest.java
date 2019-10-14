@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.util.APIAssayHelper;
@@ -41,7 +42,7 @@ import java.util.Map;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category({DailyA.class})
+@Category({DailyA.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class AssayAPITest extends BaseWebDriverTest
 {

@@ -35,16 +35,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return this;
     }
 
-    public DomainDesignerPage clickFinish()
-    {
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton));
-        String currentURL = getDriver().getCurrentUrl();
-        elementCache().finishButton.click();
-        afterSaveOrFinishClick(currentURL);
-        return this;
-    }
-
-    private void afterSaveOrFinishClick(String currentURL)
+    protected void afterSaveOrFinishClick(String currentURL)
     {
         waitFor(()-> !getDriver().getCurrentUrl().equals(currentURL)|| anyAlert() != null,
                 "expected either navigation or an alert with error or info to appear", 5000);
@@ -157,8 +148,6 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                     .withTitle(title).findWhenNeeded(this);
         }
 
-        WebElement finishButton = Locator.button("Finish")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement saveButton = Locator.button("Save")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement cancelBtn = Locator.button("Cancel")

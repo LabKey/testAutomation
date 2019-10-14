@@ -62,7 +62,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         if (fieldDefinition.getValidator() != null)
             throw new IllegalArgumentException("Validators are not yet supported");
         if (fieldDefinition.isMvEnabled())
-            throw new IllegalArgumentException("Missing Value indicators are not yet supported");
+            fieldRow.setMissingValue(fieldDefinition.isMvEnabled());
         if (fieldDefinition.isRequired())
             fieldRow.setRequiredField(fieldDefinition.isRequired());
 

@@ -38,7 +38,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.params.FieldDefinition;
@@ -468,10 +470,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         // create assay
         String assaySubfolder = "TestAssayFolder";
         String assayName = "AssayForSampleDerivation";
-        generateAssay(assaySubfolder, assayName)
-                .addDataField("SampleName", "SampleName", FieldDefinition.ColumnType.String)
-                .addDataField("SampleVolume", "SampleVolume", FieldDefinition.ColumnType.Double)
-                .saveAndClose();
+        generateAssay(assaySubfolder, assayName);
         List<TestDataGenerator> dataGenerators = generateAssayData(new FieldDefinition.LookupInfo(getProjectName() + "/" + assaySubfolder,
                 "assay.General.AssayForSampleDerivation_assay", "Runs"));
         insertAssayData(assayName, dataGenerators);
@@ -607,10 +606,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         // create assay
         String assaySubfolder = "DeriveAssayFolder";
         String assayName = "AssayForSaveBatchDerivation";
-        generateAssay(assaySubfolder, assayName)
-                .addDataField("SampleName", "SampleName", FieldDefinition.ColumnType.String)
-                .addDataField("SampleVolume", "SampleVolume", FieldDefinition.ColumnType.Double)
-                .saveAndClose();
+        generateAssay(assaySubfolder, assayName);
         List<TestDataGenerator> dataGenerators = generateAssayData(new FieldDefinition.LookupInfo(getProjectName() + "/" + assaySubfolder,
                 "assay.General.AssayForSaveBatchDerivation_assay", "Runs"));
         insertAssayData(assayName, dataGenerators);
@@ -725,14 +721,17 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
 
     }
 
-    private AssayDesignerPage generateAssay(String subfolderName, String assayName)
+    private void generateAssay(String subfolderName, String assayName)
     {
         _containerHelper.createSubfolder(getProjectName(), subfolderName);
         navigateToFolder(getProjectName(), subfolderName);
         goToManageAssays();
-        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("General", assayName);
-
-        return designerPage;
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
+        assayDesignerPage.clickNext().clickNext().clickNext(); // skip over the batch and run properties panels
+        DomainFormPanel dataPropertiesPanel = assayDesignerPage.fieldProperties("Results Properties");
+        dataPropertiesPanel.addField("SampleName");
+        dataPropertiesPanel.addField("SampleVolume").setType("Decimal");
+        assayDesignerPage.clickFinish();
     }
 
     /**

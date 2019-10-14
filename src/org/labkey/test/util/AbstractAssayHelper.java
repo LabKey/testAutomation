@@ -64,15 +64,6 @@ public abstract class AbstractAssayHelper
 
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
-    @LogMethod
-    @Deprecated // uses old GWT assay designer, use createAssayDesignWithDefaults instead
-    public void createAssayWithDefaults(String type, String name)
-    {
-        createAssayAndEdit(type, name).saveAndClose();
-
-        DataRegionTable.DataRegion(_test.getDriver()).withName("AssayList").waitFor();
-    }
-
     @Deprecated // uses old GWT assay designer, use createAssayDesign instead
     public AssayDesignerPage createAssayAndEdit(String type, String name)
     {
@@ -87,6 +78,7 @@ public abstract class AbstractAssayHelper
         return assayDesigner;
     }
 
+    @LogMethod
     public void createAssayDesignWithDefaults(String type, String name)
     {
         ReactAssayDesignerPage assayDesigner = createAssayDesign(type, name);
@@ -101,6 +93,7 @@ public abstract class AbstractAssayHelper
         DataRegionTable.DataRegion(_test.getDriver()).withName("AssayList").waitFor();
     }
 
+    @LogMethod
     public ReactAssayDesignerPage createAssayDesign(String type, String name)
     {
         ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
