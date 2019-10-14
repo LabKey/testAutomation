@@ -180,23 +180,19 @@ public class AssayAPITest extends BaseWebDriverTest
     private void createAssayWithFileFields(String assayName)
     {
         ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", assayName);
-        assayDesigner.clickNext();
-
-        log("Skip over the Batch Properties panel");
-        assayDesigner.clickNext();
 
         log("Create a 'File' column for the assay run.");
-        assayDesigner.fieldProperties("Run Properties")
+        assayDesigner.goToFieldProperties("Run Properties")
                 .addField("RunFileField")
                 .setType("File")
                 .setLabel("Run File Field");
-        assayDesigner.clickNext();
 
         log("Create a 'File' column for the assay data.");
-        assayDesigner.fieldProperties("Results Properties")
+        assayDesigner.goToFieldProperties("Results Properties")
                 .addField("DataFileField")
                 .setType("File")
                 .setLabel("Data File Field");
+
         assayDesigner.clickFinish();
     }
 

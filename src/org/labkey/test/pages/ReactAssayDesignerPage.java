@@ -18,6 +18,7 @@ package org.labkey.test.pages;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
@@ -127,6 +128,24 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         {
             return null;
         }
+    }
+
+    public DomainFormPanel goToFieldProperties(String title)
+    {
+        int attempts = 0; // don't try clicking next forever
+
+        DomainFormPanel panel = fieldProperties(title, true);
+        while (panel == null)
+        {
+            if (attempts > 10)
+                break;
+
+            clickNext();
+            panel = fieldProperties(title, true);
+            attempts++;
+        }
+
+        return panel;
     }
 
     public ReactAssayDesignerPage clickBack()

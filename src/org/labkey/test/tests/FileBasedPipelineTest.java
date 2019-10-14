@@ -172,11 +172,8 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         portalHelper.addWebPart("Assay List");
         clickButton("Manage Assays");
 
-        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", "myassay")
-            .clickNext() // done with assay properties
-            .clickNext() // leave batch properties as is
-            .clickNext(); // leave run properties empty
-        DomainFormPanel dataFields = assayDesignerPage.fieldProperties("Results Properties")
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", "myassay");
+        DomainFormPanel dataFields = assayDesignerPage.goToFieldProperties("Results Properties")
                 .removeField("Date")
                 .removeField("VisitID")
                 .removeField("ParticipantID")

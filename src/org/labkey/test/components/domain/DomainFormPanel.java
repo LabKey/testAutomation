@@ -192,16 +192,19 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
     {
         final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-form-panel");
+        final Locator.XPathLocator _activeLocator = Locator.tagWithClass("div", "domain-form-panel").withClass("panel-active");
         private String _title = null;
+        private boolean _active;
 
         public DomainFormPanelFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public DomainFormPanelFinder withTitle(String title)
+        public DomainFormPanelFinder withTitle(String title, boolean active)
         {
             _title = title;
+            _active = active;
             return this;
         }
 
@@ -215,7 +218,10 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         protected Locator locator()
         {
             if (_title != null)
-                return getBaseLocator().withDescendant(Locator.tagWithClass("div", "panel-heading").startsWith( _title));
+            {
+                Locator.XPathLocator titleLoc = Locator.tagWithClass("div", "panel-heading").startsWith(_title);
+                return _active ? _activeLocator.withDescendant(titleLoc) : getBaseLocator().withDescendant(titleLoc);
+            }
             else
                 return getBaseLocator();
         }

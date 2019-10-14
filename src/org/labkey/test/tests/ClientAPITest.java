@@ -916,14 +916,13 @@ public class ClientAPITest extends BaseWebDriverTest
 
         //copied from old test
         clickButton("Manage Assays");
-        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", TEST_ASSAY);
-        assayDesignerPage.setDescription(TEST_ASSAY_DESC)
-            .clickNext().clickNext();
-        assayDesignerPage.fieldProperties("Run Properties")
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", TEST_ASSAY)
+            .setDescription(TEST_ASSAY_DESC);
+        assayDesignerPage.goToFieldProperties("Run Properties")
             .addField("RunDate")
-            .setType(FieldDefinition.ColumnType.DateTime)
+            .setType(FieldDefinition.ColumnType.DateAndTime)
             .setLabel("Run Date");
-        assayDesignerPage.clickFinish();
+        assayDesignerPage.clickNext().clickFinish();
 
         setSourceFromFile("assayTest.js");
 

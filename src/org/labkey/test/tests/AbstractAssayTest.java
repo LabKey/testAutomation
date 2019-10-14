@@ -350,11 +350,10 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         portalHelper.addWebPart("Assay List");
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", TEST_ASSAY)
-                .setDescription(TEST_ASSAY_DESC)
-                .clickNext();
+                .setDescription(TEST_ASSAY_DESC);
 
         log("Assay batch properties");
-        DomainFormPanel propertiesPanel = assayDesignerPage.fieldProperties("Batch Properties");
+        DomainFormPanel propertiesPanel = assayDesignerPage.goToFieldProperties("Batch Properties");
         for (int i = TEST_ASSAY_SET_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + TEST_ASSAY_SET_PROP_TYPES.length; i++)
         {
             propertiesPanel.addField(TEST_ASSAY_SET_PROP_NAME + i).setLabel(TEST_ASSAY_SET_PROP_NAME + i).setType(TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
@@ -362,20 +361,18 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         // Set some to required
         propertiesPanel.getField(TEST_ASSAY_SET_PREDEFINED_PROP_COUNT).setRequiredField(true);
         propertiesPanel.getField(TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1).setRequiredField(true);
-        assayDesignerPage.clickNext();
 
         log("Assay run properties");
-        propertiesPanel = assayDesignerPage.fieldProperties("Run Properties");
+        propertiesPanel = assayDesignerPage.goToFieldProperties("Run Properties");
         for (int i = TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT + TEST_ASSAY_RUN_PROP_TYPES.length; i++)
         {
             propertiesPanel.addField(TEST_ASSAY_RUN_PROP_NAME + i).setLabel(TEST_ASSAY_RUN_PROP_NAME + i).setType(TEST_ASSAY_RUN_PROP_TYPES[i - TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT]);
         }
         // Set some to required
         propertiesPanel.getField(0).setRequiredField(true);
-        assayDesignerPage.clickNext();
 
         log("Assay results properties");
-        propertiesPanel = assayDesignerPage.fieldProperties("Results Properties");
+        propertiesPanel = assayDesignerPage.goToFieldProperties("Results Properties");
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
             propertiesPanel.addField(TEST_ASSAY_DATA_PROP_NAME + i).setLabel(TEST_ASSAY_DATA_PROP_NAME + i).setType(TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);

@@ -71,9 +71,15 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     {
         return elementCache().firstDomainFormPanel;
     }
+
     public DomainFormPanel fieldProperties(String title)
     {
-        return elementCache().domainFormPanel(title);
+        return fieldProperties(title, false);
+    }
+
+    public DomainFormPanel fieldProperties(String title, boolean active)
+    {
+        return elementCache().domainFormPanel(title, active);
     }
 
     public int getFieldPropertiesPanelCount()
@@ -142,10 +148,10 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         DomainFormPanel firstDomainFormPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())   // for situations where there's only one on the page
                 .findWhenNeeded(this);                                                          // and the caller is too lazy to specify which one they want
 
-        DomainFormPanel domainFormPanel(String title) // for situations with multiple domainformpanels on the same page
+        DomainFormPanel domainFormPanel(String title, boolean active) // for situations with multiple domainformpanels on the same page
         {
             return new DomainFormPanel.DomainFormPanelFinder(getDriver())
-                    .withTitle(title).findWhenNeeded(this);
+                    .withTitle(title, active).findOrNull(this);
         }
 
         WebElement saveButton = Locator.button("Save")

@@ -105,18 +105,15 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         log("Mark the assay as editable.");
         assayDesigner.setEditableRuns(true).setEditableResults(true);
-        assayDesigner.clickNext();
 
         log("Add Batch file field");
-        assayDesigner.fieldProperties("Batch Properties").addField("BatchFileField").setType("File").setLabel("Batch File Field");
-        assayDesigner.clickNext();
+        assayDesigner.goToFieldProperties("Batch Properties").addField("BatchFileField").setLabel("Batch File Field").setType("File");
 
         log("Add Run file field");
-        assayDesigner.fieldProperties("Run Properties").addField("RunFileField").setType("File").setLabel("Run File Field");
-        assayDesigner.clickNext();
+        assayDesigner.goToFieldProperties("Run Properties").addField("RunFileField").setLabel("Run File Field").setType("File");
 
         log("Add Results file field");
-        assayDesigner.fieldProperties("Results Properties").addField("DataFileField").setType("File").setLabel("Data File Field");
+        assayDesigner.goToFieldProperties("Results Properties").addField("DataFileField").setLabel("Data File Field").setType("File");
         assayDesigner.clickFinish();
 
         log("upload inline files to the pipeline root");

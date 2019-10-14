@@ -727,8 +727,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), subfolderName);
         goToManageAssays();
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
-        assayDesignerPage.clickNext().clickNext().clickNext(); // skip over the batch and run properties panels
-        DomainFormPanel dataPropertiesPanel = assayDesignerPage.fieldProperties("Results Properties");
+        DomainFormPanel dataPropertiesPanel = assayDesignerPage.goToFieldProperties("Results Properties");
         dataPropertiesPanel.addField("SampleName");
         dataPropertiesPanel.addField("SampleVolume").setType("Decimal");
         assayDesignerPage.clickFinish();
