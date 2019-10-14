@@ -1267,6 +1267,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse newResponse = dgen.getDomain(createDefaultConnection(true));
         PropertyDescriptor snackField = getColumn(newResponse.getDomain(), "favoriteSnack");
         List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)snackField.getAllProperties().get("propertyValidators");
+
+        // Domain designer UI only handles Range, Regex and Lookup validators
+        validators = validators.stream().filter(val ->
+                (val.get("type").equals("RegEx") || val.get("type").equals("Range") || val.get("type").equals("Lookup"))).collect(Collectors.toList());
+
         Map<String, Object> twiz = getPropertyValidator(snackField, "neverTwizzlers");
         Map<String, Object> spec = getPropertyValidator(snackField, "specialChars");
 
