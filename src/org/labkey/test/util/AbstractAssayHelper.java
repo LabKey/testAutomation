@@ -78,6 +78,15 @@ public abstract class AbstractAssayHelper
         return assayDesigner;
     }
 
+    /**
+     * @deprecated Use {@link #createAssayDesignWithDefaults(String, String)}
+     */
+    @Deprecated
+    public void createAssayWithDefaults(String type, String name)
+    {
+        createAssayAndEdit(type, name).saveAndClose();
+    }
+
     @LogMethod
     public void createAssayDesignWithDefaults(String type, String name)
     {
