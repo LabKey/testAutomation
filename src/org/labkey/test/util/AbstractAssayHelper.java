@@ -64,7 +64,10 @@ public abstract class AbstractAssayHelper
 
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
-    @Deprecated // uses old GWT assay designer, use createAssayDesign instead
+    /**
+     * @deprecated Use {@link #createAssayDesign(String, String)}
+     */
+    @Deprecated
     public AssayDesignerPage createAssayAndEdit(String type, String name)
     {
         _test.clickButton("New Assay Design");
