@@ -21,6 +21,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -85,10 +86,11 @@ public class DrugSensitivityAssayTest extends AbstractAssayTest
         //create a new assay
         log("Setting up Drug Sensitivity assay");
         goToProjectHome();
-        _assayHelper.createAssayAndEdit("Drug Sensitivity", TEST_ASSAY_NAME)
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("Drug Sensitivity", TEST_ASSAY_NAME)
                 .setDescription(TEST_ASSAY_DESC)
-                .setPlateTemplate(PLATE_TEMPLATE_NAME)
-                .save();
+                .setPlateTemplate(PLATE_TEMPLATE_NAME);
+        assayDesignerPage.goToFieldProperties("Results Properties");
+        assayDesignerPage.clickFinish();
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Assay List"));

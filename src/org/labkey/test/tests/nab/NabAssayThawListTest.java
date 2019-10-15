@@ -26,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AssayImportOptions;
@@ -114,9 +115,10 @@ public class NabAssayThawListTest extends AbstractAssayTest
         portalHelper.addWebPart("Assay List");
 
         //create a new nab assay
-        _assayHelper.createAssayAndEdit("TZM-bl Neutralization (NAb)", TEST_ASSAY_NAB)
-                .setDescription(TEST_ASSAY_NAB_DESC)
-                .save();
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("TZM-bl Neutralization (NAb)", TEST_ASSAY_NAB)
+                .setDescription(TEST_ASSAY_NAB_DESC);
+        assayDesignerPage.goToFieldProperties("Virus Properties");
+        assayDesignerPage.clickFinish();
 
         log("Set default for ParticipantVisitResolver at Project level");
         // We'll override it later at the folder level.
@@ -283,10 +285,11 @@ public class NabAssayThawListTest extends AbstractAssayTest
             portalHelper.addWebPart("Lists");
         });
 
-        _assayHelper.createAssayAndEdit("General", ASSAY_NAME)
-                .setDescription("Validating fix for issue 26774.")
-                .setBackgroundImport(true)
-                .saveAndClose();
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", ASSAY_NAME)
+            .setDescription("Validating fix for issue 26774.")
+            .setBackgroundImport(true);
+        assayDesignerPage.goToFieldProperties("Results Properties");
+        assayDesignerPage.clickFinish();
 
         log("Create a list with data coming from the test file.");
 

@@ -170,6 +170,13 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return panel;
     }
 
+    public DomainFormPanel expandFieldProperties(String title)
+    {
+        DomainFormPanel panel = fieldProperties(title);
+        panel.expand();
+        return panel;
+    }
+
     public ReactAssayDesignerPage clickBack()
     {
         scrollIntoView(elementCache().backBtn);

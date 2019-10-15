@@ -29,6 +29,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PlateGrid;
 import org.labkey.test.components.labkey.LabKeyAlert;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.tests.AbstractAssayTest;
@@ -185,9 +186,10 @@ public class NabAssayTest extends AbstractAssayTest
         portalHelper.addWebPart("Assay List");
 
         //create a new nab assay
-        _assayHelper.createAssayAndEdit("TZM-bl Neutralization (NAb)", TEST_ASSAY_NAB)
-                .setDescription(TEST_ASSAY_NAB_DESC)
-                .save();
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("TZM-bl Neutralization (NAb)", TEST_ASSAY_NAB)
+            .setDescription(TEST_ASSAY_NAB_DESC);
+        assayDesignerPage.goToFieldProperties("Virus Properties");
+        assayDesignerPage.clickFinish();
 
         clickAndWait(Locator.lkButton("configure templates"));
 

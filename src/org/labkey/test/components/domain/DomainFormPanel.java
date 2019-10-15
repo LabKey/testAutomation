@@ -109,6 +109,12 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return elementCache().findFieldRows().get(tabIndex);
     }
 
+    public DomainFormPanel expand()
+    {
+        elementCache().expandIcon.click();
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -186,6 +192,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         }
 
         WebElement startNewDesignLink = Locator.tagWithClass("span", "domain-form-add-link")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement expandIcon = Locator.tagWithClass("svg", "fa-plus-square")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 

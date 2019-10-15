@@ -37,8 +37,8 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     protected void afterSaveOrFinishClick(String currentURL)
     {
-        waitFor(()-> !getDriver().getCurrentUrl().equals(currentURL)|| anyAlert() != null,
-                "expected either navigation or an alert with error or info to appear", 5000);
+        waitFor(()-> !getDriver().getCurrentUrl().equals(currentURL) || anyAlert() != null,
+                "expected either navigation or an alert with error or info to appear", WAIT_FOR_JAVASCRIPT);
 
         if (isAlertVisible())
         {

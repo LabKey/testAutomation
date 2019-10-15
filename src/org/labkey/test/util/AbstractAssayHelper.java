@@ -131,21 +131,22 @@ public abstract class AbstractAssayHelper
         return new AssayDesignerPage(_test.getDriver());
     }
 
-    public AssayDesignerPage copyAssayDesign()
+    public ReactAssayDesignerPage copyAssayDesign()
     {
         return copyAssayDesign(null);
     }
 
-    public AssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
+    public ReactAssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
     {
+        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
         clickManageOption(true, "Copy assay design");
-
         if (destinationFolder == null)
             _test.clickButton("Copy to Current Folder");
         else
             _test.clickAndWait(Locator.tag("tr").append(Locator.linkWithText(destinationFolder)));
+        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
 
-        return new AssayDesignerPage(_test.getDriver());
+        return new ReactAssayDesignerPage(_test.getDriver());
     }
 
     public void deleteAssayDesign()
