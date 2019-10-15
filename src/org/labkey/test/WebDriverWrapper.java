@@ -1827,6 +1827,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return System.currentTimeMillis() - startTime;
     }
 
+    public long doAndAcceptUnloadAlert(Runnable func, String partialAlertText)
+    {
+        return doAndWaitForPageToLoad(() ->
+        {
+            func.run();
+            assertAlertContains(partialAlertText);
+        });
+    }
+
+    public long doAndAcceptUnloadAlert(Runnable func)
+    {
+        return doAndAcceptUnloadAlert(func, "");
+    }
+
     private static final MultiMap<String, Set<String>> actionWarnings = MultiValueMap.multiValueMap(new HashMap<>(), HashSet::new);
 
     public static void addActionWarning(String warning, Crawler.ControllerActionId action)
@@ -3425,16 +3439,29 @@ public abstract class WebDriverWrapper implements WrapsDriver
         Boolean indeterminate = executeScript("return arguments[0].indeterminate;", Boolean.class, el);
         if (indeterminate != null && indeterminate)
         {
+            scrollIntoView(el);
             el.click();
         }
 
         boolean selected = el.isSelected();
         if (check != selected)
+        {
+            scrollIntoView(el);
             el.click();
+        }
 
         try
         {
-            Assert.assertEquals("Failed to set checkbox to requested state.", check, el.isSelected());
+
+            // Have to balance between the state is now as expected and hitting a race condition between clicking
+            // the element and having the isSelected attribute change.
+            selected = el.isSelected();
+            if (check != selected)
+            {
+                sleep(500);
+                Assert.assertEquals("Failed to set checkbox to requested state.", check, el.isSelected());
+            }
+
         }
         catch (StaleElementReferenceException ignore)
         {

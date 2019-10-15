@@ -1,0 +1,8 @@
+<pipeline xmlns="http://labkey.org/pipeline/xml"
+          name="filewatcher-test" version="0.1">
+    <description> Pipeline task with help text</description>
+    <help>Hello! I am help text.</help>
+    <tasks>
+      <taskref ref="pipelinetest:task:r-copy-inline"/>
+    </tasks>
+</pipeline>
