@@ -116,7 +116,8 @@ public class NabAssayThawListTest extends AbstractAssayTest
 
         //create a new nab assay
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("TZM-bl Neutralization (NAb)", TEST_ASSAY_NAB)
-                .setDescription(TEST_ASSAY_NAB_DESC);
+                .setDescription(TEST_ASSAY_NAB_DESC)
+                .setPlateTemplate("NAb: 5 specimens in duplicate");
         assayDesignerPage.goToFieldProperties("Virus Properties");
         assayDesignerPage.clickFinish();
 
