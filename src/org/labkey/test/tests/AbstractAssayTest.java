@@ -69,6 +69,8 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
             FieldDefinition.ColumnType.Integer,
             FieldDefinition.ColumnType.DateAndTime
     };
+    protected static final String[] TEST_ASSAY_SET_PROPERTIES = { "false", "100.0", "200", "2001-10-10" };
+    protected static final String TEST_ASSAY_RUN_PROP1 = "TestRunProp";
     protected static final String TEST_ASSAY_RUN_PROP_NAME = "testAssayRunProp";
     protected static final int TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT = 0;
     protected static final FieldDefinition.ColumnType[] TEST_ASSAY_RUN_PROP_TYPES = {
@@ -79,8 +81,6 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
             FieldDefinition.ColumnType.DateAndTime,
             FieldDefinition.ColumnType.File
     };
-    protected static final String[] TEST_ASSAY_SET_PROPERTIES = { "false", "100.0", "200", "2001-10-10" };
-    protected static final String TEST_ASSAY_RUN_PROP1 = "TestRunProp";
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
     protected static final String TEST_ASSAY_DATA_ALIASED_PROP_NAME = "testAssayAliasedData";
     protected static final String ALIASED_DATA = "aliasedData";
@@ -356,7 +356,9 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         DomainFormPanel propertiesPanel = assayDesignerPage.goToBatchFields();
         for (int i = TEST_ASSAY_SET_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + TEST_ASSAY_SET_PROP_TYPES.length; i++)
         {
-            propertiesPanel.addField(TEST_ASSAY_SET_PROP_NAME + i).setLabel(TEST_ASSAY_SET_PROP_NAME + i).setType(TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
+            propertiesPanel.addField(TEST_ASSAY_SET_PROP_NAME + i)
+                .setType(TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT])
+                .setLabel(TEST_ASSAY_SET_PROP_NAME + i);
         }
         // Set some to required
         propertiesPanel.getField(TEST_ASSAY_SET_PREDEFINED_PROP_COUNT).setRequiredField(true);
@@ -366,7 +368,9 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         propertiesPanel = assayDesignerPage.goToRunFields();
         for (int i = TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT + TEST_ASSAY_RUN_PROP_TYPES.length; i++)
         {
-            propertiesPanel.addField(TEST_ASSAY_RUN_PROP_NAME + i).setLabel(TEST_ASSAY_RUN_PROP_NAME + i).setType(TEST_ASSAY_RUN_PROP_TYPES[i - TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT]);
+            propertiesPanel.addField(TEST_ASSAY_RUN_PROP_NAME + i)
+                .setType(TEST_ASSAY_RUN_PROP_TYPES[i - TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT])
+                .setLabel(TEST_ASSAY_RUN_PROP_NAME + i);
         }
         // Set some to required
         propertiesPanel.getField(0).setRequiredField(true);
@@ -375,7 +379,9 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         propertiesPanel = assayDesignerPage.goToResultFields();
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
-            propertiesPanel.addField(TEST_ASSAY_DATA_PROP_NAME + i).setLabel(TEST_ASSAY_DATA_PROP_NAME + i).setType(TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+            propertiesPanel.addField(TEST_ASSAY_DATA_PROP_NAME + i)
+                .setType(TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT])
+                .setLabel(TEST_ASSAY_DATA_PROP_NAME + i);
         }
         propertiesPanel.addField("Flags").setType(FieldDefinition.ColumnType.Flag);
         // Set some to required
