@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -55,6 +56,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "MessagesVerifyProject";
     private static final String MSG1_TITLE = "test message 1";
+    private static final String MSG1_TITLE_2 = "test message 2";
     private static final String MSG1_BODY = "this is a test message to Banana";
     private static final String RESP1_TITLE = "test response 1";
     private static final String RESP1_BODY = "this is another test, thanks";
@@ -143,6 +145,29 @@ public class MessagesLongTest extends BaseWebDriverTest
         - Use EmailPrefsPage
      */
 
+
+    @BeforeClass
+    public static void setupProject()
+    {
+        MessagesLongTest init = (MessagesLongTest) getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        log("Open new project, add group, alter permissions");
+        _containerHelper.createProject(PROJECT_NAME, "Collaboration");
+        navBar().goToPermissionsPage()
+                .createPermissionsGroup("Administrators")
+                .setPermissions("Administrators", "Project Administrator")
+                .createPermissionsGroup("testers1")
+                .assertPermissionSetting("testers1", "No Permissions")
+                .clickSaveAndFinish();
+        _containerHelper.enableModule(PROJECT_NAME, "Dumbster");
+
+
+    }
+
     @Test
     public void testSteps()
     {
@@ -150,16 +175,6 @@ public class MessagesLongTest extends BaseWebDriverTest
         // This is done to test Issue 23934: Allow customization of email template for message board notifications
         modifyTemplate(true);
         goToHome();
-
-        log("Open new project, add group, alter permissions");
-        _containerHelper.createProject(PROJECT_NAME, "Collaboration");
-        navBar().goToPermissionsPage()
-            .createPermissionsGroup("Administrators")
-            .setPermissions("Administrators", "Project Administrator")
-            .createPermissionsGroup("testers1")
-            .assertPermissionSetting("testers1", "No Permissions")
-            .clickSaveAndFinish();
-        _containerHelper.enableModule(PROJECT_NAME, "Dumbster");
 
         enableEmailRecorder();
         basicMessageTests();
@@ -424,6 +439,37 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent("The following new posts were made yesterday");
     }
 
+    @Test
+    public void testDailyDigestMessage()
+    {
+        goToProjectHome();
+        log("Check email preferences");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
+        checkCheckbox(Locator.radioButtonByName("notificationType").index(1));
+        clickButton("Update");
+        clickButton("Done");
+
+        SiteNavBar siteNavBar = new SiteNavBar(getDriver());
+        siteNavBar.enterPageAdminMode();
+        log("Customize message board");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
+        new AdminPage(getDriver())
+                .includeGroups(true)
+                .save();
+        siteNavBar.exitPageAdminMode();
+
+       goToProjectHome();
+       log("Check message works in Wiki");
+       _portalHelper.clickWebpartMenuItem("Messages", true, "New");
+       new org.labkey.test.pages.announcements.InsertPage(getDriver())
+                .setRenderAs(WikiHelper.WikiRendererType.RADEOX) // "Wiki Page"
+                .setTitle(MSG1_TITLE_2)
+                .setBody("<b>Daily digest message testing with groups enabled</b>")
+                .submit();
+
+        invokeApiAction("home", "announcements", "sendDailyDigest.api", "Failed to send messages daily digest");
+
+    }
     private void verifyAdmin()
     {
         log("Check email admin works");
@@ -617,7 +663,10 @@ public class MessagesLongTest extends BaseWebDriverTest
     private void basicMessageTests()
     {
         log("Add search to project");
+        SiteNavBar siteNavBar = new SiteNavBar(getDriver());
+        siteNavBar.enterPageAdminMode();
         _portalHelper.addWebPart("Search");
+        siteNavBar.exitPageAdminMode();
 
         _messageUserId = _userHelper.createUser(USER).getUserId().toString();
         goToHome();
