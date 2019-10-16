@@ -108,7 +108,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
-    public ReactAssayDesignerPage enableQCStates(boolean checked)
+    public ReactAssayDesignerPage setQCStates(boolean checked)
     {
         elementCache().qcEnabledCheckbox.set(checked);
         return this;
@@ -152,18 +152,30 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         }
     }
 
+    public DomainFormPanel goToBatchFields()
+    {
+        return goToFieldProperties("Batch Properties");
+    }
+
+    public DomainFormPanel goToRunFields()
+    {
+        return goToFieldProperties("Run Properties");
+    }
+
+    public DomainFormPanel goToResultFields()
+    {
+        return goToFieldProperties("Results Properties");
+    }
+
     public DomainFormPanel goToFieldProperties(String title)
     {
+        DomainFormPanel panel = activeFieldProperties(title);
+
         int attempts = 0; // don't try clicking next forever
-
-        DomainFormPanel panel = fieldProperties(title, true);
-        while (panel == null)
+        while (panel == null && attempts < 10)
         {
-            if (attempts > 10)
-                break;
-
             clickNext();
-            panel = fieldProperties(title, true);
+            panel = activeFieldProperties(title);
             attempts++;
         }
 
@@ -195,10 +207,18 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public void clickFinish()
     {
-        scrollIntoView(elementCache().finishButton);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton));
+        // if we are in create mode, click next until we get to the end (but don't try forever)
+        int attempts = 0;
+        while (!isElementPresent(elementCache().finishBtnLoc) && isElementPresent(elementCache().nextBtnLoc) && attempts < 10)
+        {
+            clickNext();
+            attempts++;
+        }
+
+        scrollIntoView(elementCache().finishBtn);
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishBtn));
         String currentURL = getDriver().getCurrentUrl();
-        elementCache().finishButton.click();
+        elementCache().finishBtn.click();
         afterSaveOrFinishClick(currentURL);
     }
 
@@ -216,12 +236,12 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public class ElementCache extends DomainDesignerPage.ElementCache
     {
-        WebElement backBtn = Locator.button("Back")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement nextBtn = Locator.button("Next")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement finishButton = Locator.button("Finish")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator backBtnLoc = Locator.button("Back");
+        WebElement backBtn = backBtnLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator nextBtnLoc = Locator.button("Next");
+        WebElement nextBtn = nextBtnLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator finishBtnLoc = Locator.button("Finish");
+        WebElement finishBtn = finishBtnLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         final Input nameInput = Input(Locator.id("assay-design-name"), getDriver()).findWhenNeeded(this);
         final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(this);

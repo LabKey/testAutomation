@@ -29,6 +29,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -107,13 +108,14 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assayDesigner.setEditableRuns(true).setEditableResults(true);
 
         log("Add Batch file field");
-        assayDesigner.goToFieldProperties("Batch Properties").addField("BatchFileField").setLabel("Batch File Field").setType("File");
+        assayDesigner.goToBatchFields().addField("BatchFileField").setLabel("Batch File Field").setType(FieldDefinition.ColumnType.File);
 
         log("Add Run file field");
-        assayDesigner.goToFieldProperties("Run Properties").addField("RunFileField").setLabel("Run File Field").setType("File");
+        assayDesigner.goToRunFields().addField("RunFileField").setLabel("Run File Field").setType(FieldDefinition.ColumnType.File);
 
         log("Add Results file field");
-        assayDesigner.goToFieldProperties("Results Properties").addField("DataFileField").setLabel("Data File Field").setType("File");
+        assayDesigner.goToResultFields().addField("DataFileField").setLabel("Data File Field").setType(FieldDefinition.ColumnType.File);
+
         assayDesigner.clickFinish();
 
         log("upload inline files to the pipeline root");

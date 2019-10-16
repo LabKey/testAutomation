@@ -116,11 +116,10 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
 
         goToProjectHome();
 
-        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("TZM-bl Neutralization (NAb)", MULTI_VIRUS_ASSAY_NAB)
-                .setDescription(MULTI_VIRUS_ASSAY_NAB_DESC)
-                .setPlateTemplate(PLATE_TEMPLATE_NAME);
-        assayDesignerPage.goToFieldProperties("Virus Properties");
-        assayDesignerPage.clickFinish();
+        _assayHelper.createAssayDesign("TZM-bl Neutralization (NAb)", MULTI_VIRUS_ASSAY_NAB)
+            .setDescription(MULTI_VIRUS_ASSAY_NAB_DESC)
+            .setPlateTemplate(PLATE_TEMPLATE_NAME)
+            .clickFinish();
     }
 
     @Before
@@ -217,11 +216,10 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
         {
             clickAndWait(Locator.linkWithText(MULTI_VIRUS_ASSAY_NAB));
 
-            ReactAssayDesignerPage assayDesigner = _assayHelper.copyAssayDesign();
-            assayDesigner.setName(fileBasedMetadataAssay);
-            assayDesigner.setMetaDataInputFormat(ReactAssayDesignerPage.MetadataInputFormat.FILE_BASED);
-            assayDesigner.goToFieldProperties("Virus Properties");
-            assayDesigner.clickFinish();
+            _assayHelper.copyAssayDesign()
+                .setName(fileBasedMetadataAssay)
+                .setMetaDataInputFormat(ReactAssayDesignerPage.MetadataInputFormat.FILE_BASED)
+                .clickFinish();
         }
 
         return fileBasedMetadataAssay;

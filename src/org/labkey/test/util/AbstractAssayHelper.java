@@ -93,13 +93,7 @@ public abstract class AbstractAssayHelper
     @LogMethod
     public void createAssayDesignWithDefaults(String type, String name)
     {
-        ReactAssayDesignerPage assayDesigner = createAssayDesign(type, name);
-
-        // skip over the field properties panels, leaving as defaults
-        for (int i = 0; i < assayDesigner.getFieldPropertiesPanelCount(); i++)
-            assayDesigner.clickNext();
-
-        assayDesigner.clickFinish();
+        createAssayDesign(type, name).clickFinish();
 
         // TODO add a check that the new assay name is in list?
         DataRegionTable.DataRegion(_test.getDriver()).withName("AssayList").waitFor();

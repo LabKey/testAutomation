@@ -94,7 +94,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFormPanel removeField(String name)
     {
-        getField(name).expand().clickRemoveField().dismiss("Yes");
+        getField(name).clickRemoveField().dismiss("Yes");
         clearElementCache();
         return this;
     }
@@ -193,6 +193,9 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
         WebElement startNewDesignLink = Locator.tagWithClass("span", "domain-form-add-link")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+
+        // TODO since the Assay Properties panel also has the notion of expand/collapse,
+        //  we should split that part out into an Abstract test class that both can use
         WebElement expandIcon = Locator.tagWithClass("svg", "fa-plus-square")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
@@ -209,10 +212,15 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             super(driver);
         }
 
-        public DomainFormPanelFinder withTitle(String title, boolean active)
+        public DomainFormPanelFinder withTitle(String title)
         {
             _title = title;
-            _active = active;
+            return this;
+        }
+
+        public DomainFormPanelFinder active()
+        {
+            _active = true;
             return this;
         }
 

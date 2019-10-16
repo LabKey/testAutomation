@@ -120,7 +120,6 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         if (singleFile)
             assayDesignerPage.setMetaDataInputFormat(ReactAssayDesignerPage.MetadataInputFormat.COMBINED);
 
-        assayDesignerPage.goToFieldProperties("Sample Properties");
         assayDesignerPage.clickFinish();
     }
 

@@ -25,6 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
@@ -182,10 +183,10 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", name);
 
         // add the lookup field to the Results Properties panel
-        assayDesigner.goToFieldProperties("Results Properties")
+        assayDesigner.goToResultFields()
                 .addField(SAMPLE_ID_FIELD_NAME)
                 .setLabel(SAMPLE_ID_FIELD_LABEL)
-                .setType("Lookup")
+                .setType(FieldDefinition.ColumnType.Lookup)
                 .setFromFolder(sampleSetFolder)
                 .setFromSchema("samples")
                 .setFromTargetTable(lookupTableValue + " (" + lookupTableType + ")");

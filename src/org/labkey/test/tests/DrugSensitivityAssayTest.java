@@ -89,7 +89,6 @@ public class DrugSensitivityAssayTest extends AbstractAssayTest
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("Drug Sensitivity", TEST_ASSAY_NAME)
                 .setDescription(TEST_ASSAY_DESC)
                 .setPlateTemplate(PLATE_TEMPLATE_NAME);
-        assayDesignerPage.goToFieldProperties("Results Properties");
         assayDesignerPage.clickFinish();
 
         goToProjectHome();

@@ -39,7 +39,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.domain.DomainFormPanel;
-import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
@@ -727,9 +726,9 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), subfolderName);
         goToManageAssays();
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
-        DomainFormPanel dataPropertiesPanel = assayDesignerPage.goToFieldProperties("Results Properties");
+        DomainFormPanel dataPropertiesPanel = assayDesignerPage.goToResultFields();
         dataPropertiesPanel.addField("SampleName");
-        dataPropertiesPanel.addField("SampleVolume").setType("Decimal");
+        dataPropertiesPanel.addField("SampleVolume").setType(FieldDefinition.ColumnType.Decimal);
         assayDesignerPage.clickFinish();
     }
 

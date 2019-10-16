@@ -84,7 +84,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return Enum.valueOf(FieldDefinition.ColumnType.class, typeString);
     }
 
-    public DomainFieldRow setType(String columnType)
+    private DomainFieldRow setType(String columnType)
     {
         expand();
         getWrapper().setFormElement(elementCache().fieldTypeSelectInput, columnType);

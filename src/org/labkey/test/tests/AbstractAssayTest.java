@@ -353,7 +353,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
                 .setDescription(TEST_ASSAY_DESC);
 
         log("Assay batch properties");
-        DomainFormPanel propertiesPanel = assayDesignerPage.goToFieldProperties("Batch Properties");
+        DomainFormPanel propertiesPanel = assayDesignerPage.goToBatchFields();
         for (int i = TEST_ASSAY_SET_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + TEST_ASSAY_SET_PROP_TYPES.length; i++)
         {
             propertiesPanel.addField(TEST_ASSAY_SET_PROP_NAME + i).setLabel(TEST_ASSAY_SET_PROP_NAME + i).setType(TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
@@ -363,7 +363,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         propertiesPanel.getField(TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1).setRequiredField(true);
 
         log("Assay run properties");
-        propertiesPanel = assayDesignerPage.goToFieldProperties("Run Properties");
+        propertiesPanel = assayDesignerPage.goToRunFields();
         for (int i = TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT + TEST_ASSAY_RUN_PROP_TYPES.length; i++)
         {
             propertiesPanel.addField(TEST_ASSAY_RUN_PROP_NAME + i).setLabel(TEST_ASSAY_RUN_PROP_NAME + i).setType(TEST_ASSAY_RUN_PROP_TYPES[i - TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT]);
@@ -372,7 +372,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         propertiesPanel.getField(0).setRequiredField(true);
 
         log("Assay results properties");
-        propertiesPanel = assayDesignerPage.goToFieldProperties("Results Properties");
+        propertiesPanel = assayDesignerPage.goToResultFields();
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
             propertiesPanel.addField(TEST_ASSAY_DATA_PROP_NAME + i).setLabel(TEST_ASSAY_DATA_PROP_NAME + i).setType(TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);

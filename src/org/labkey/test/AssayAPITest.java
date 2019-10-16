@@ -24,6 +24,7 @@ import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
@@ -182,15 +183,15 @@ public class AssayAPITest extends BaseWebDriverTest
         ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", assayName);
 
         log("Create a 'File' column for the assay run.");
-        assayDesigner.goToFieldProperties("Run Properties")
+        assayDesigner.goToRunFields()
                 .addField("RunFileField")
-                .setType("File")
+                .setType(FieldDefinition.ColumnType.File)
                 .setLabel("Run File Field");
 
         log("Create a 'File' column for the assay data.");
-        assayDesigner.goToFieldProperties("Results Properties")
+        assayDesigner.goToResultFields()
                 .addField("DataFileField")
-                .setType("File")
+                .setType(FieldDefinition.ColumnType.File)
                 .setLabel("Data File Field");
 
         assayDesigner.clickFinish();
