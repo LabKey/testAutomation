@@ -13,12 +13,12 @@ import static org.labkey.test.components.html.Input.Input;
 public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.ElementCache>
 {
     final WebElement _el;
-    final WebDriver _driver;
+    final RegexValidatorDialog _dialog;
 
-    public RegexValidatorPanel(WebElement element, WebDriver driver)
+    public RegexValidatorPanel(WebElement element, RegexValidatorDialog dialog)
     {
         _el = element;
-        _driver = driver;
+        _dialog = dialog;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
     @Override
     public WebDriver getDriver()
     {
-        return _driver;
+        return _dialog.getDriver();
     }
 
     public RegexValidatorPanel expand()
@@ -104,11 +104,12 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
         return elementCache().nameInput().getValue();
     }
 
-    public void clickRemove()
+    public RegexValidatorDialog clickRemove()
     {
         expand();
         elementCache().removeButton.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
+        return _dialog;
     }
 
     protected ElementCache newElementCache()
@@ -147,14 +148,16 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
     }
 
 
-    public static class RegexValidatorPanelFinder extends WebDriverComponentFinder<RegexValidatorPanel, RegexValidatorPanelFinder>
+    static class RegexValidatorPanelFinder extends WebDriverComponentFinder<RegexValidatorPanel, RegexValidatorPanelFinder>
     {
+        private RegexValidatorDialog _dialog;
         private Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-validator-panel");
         private String _id = null;
 
-        public RegexValidatorPanelFinder(WebDriver driver)
+        public RegexValidatorPanelFinder(RegexValidatorDialog dialog)
         {
-            super(driver);
+            super(dialog.getDriver());
+            _dialog = dialog;
         }
 
         public RegexValidatorPanelFinder withIndex(int index)
@@ -172,7 +175,7 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
         @Override
         protected RegexValidatorPanel construct(WebElement el, WebDriver driver)
         {
-            return new RegexValidatorPanel(el, driver);
+            return new RegexValidatorPanel(el, _dialog);
         }
 
         @Override

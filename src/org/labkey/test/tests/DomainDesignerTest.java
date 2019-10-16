@@ -1176,7 +1176,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
 
         DomainFieldRow sizeRow = domainFormPanel.getField("size");
-        RangeValidatorDialog rangeDlg = sizeRow.clickAddRange();
+        RangeValidatorDialog rangeDlg = sizeRow.clickRangeButton();
         rangeDlg.getValidationPanel(0)
                 .setName("midsize")
                 .setDescription("falls between 2 and 3")
@@ -1221,7 +1221,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.insertRows(createDefaultConnection(true), dgen.getRows()); // insert test data into the list
 
         DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
-        ConditionalFormatDialog formatDlg = favoriteSnack.clickAddFormat();
+        ConditionalFormatDialog formatDlg = favoriteSnack.clickConditionalFormatButton();
         formatDlg.getOpenFormatPanel()
                 .setFirstCondition(Filter.Operator.DOES_NOT_CONTAIN)
                 .setFirstValue("almond")
@@ -1255,7 +1255,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
         DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
 
-        RegexValidatorDialog validatorDialog = favoriteSnack.clickAddRegex();
+        RegexValidatorDialog validatorDialog = favoriteSnack.clickRegexButton();
         RegexValidatorPanel panel = validatorDialog.getValidationPanel();
         String expression = "twizzler";
         panel.setExpression(expression)
@@ -1295,7 +1295,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
         DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
 
-        RegexValidatorDialog validatorDialog = favoriteSnack.clickAddRegex();
+        RegexValidatorDialog validatorDialog = favoriteSnack.clickRegexButton();
         RegexValidatorPanel panel1 = validatorDialog.getValidationPanel();
         String expression1 = ".*[twizzler]+.*";
         panel1.setExpression(expression1)
@@ -1334,7 +1334,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         RegexValidatorDialog valDialog = domainDesignerPage.fieldProperties()
                 .getField("favoriteSnack")
-                .clickEditRegex();
+                .clickRegexButton();
         valDialog.getValidationPanel(2) // will get 'angleBrackets' field, it's 3rd
                 .clickRemove();
         RegexValidatorPanel specialValidatorPanel = valDialog
@@ -1378,7 +1378,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
         DomainFieldRow size = domainFormPanel.getField("size");
 
-        RangeValidatorDialog sizeDialog = size.clickAddRange();
+        RangeValidatorDialog sizeDialog = size.clickRangeButton();
         sizeDialog.getValidationPanel(0)
                 .setFirstCondition(Filter.Operator.LTE)
                 .setFirstValue("2")
@@ -1403,7 +1403,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // get back to the domain designer
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         RangeValidatorDialog dlg = domainDesignerPage.fieldProperties().getField("size")
-                .clickEditRanges();
+                .clickRangeButton();
         dlg.getValidationPanel(0)       //lte2
                 .setDescription("2 or less");
         dlg.getValidationPanel(1)       //equals3
@@ -1440,7 +1440,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
         DomainFieldRow superHero = domainFormPanel.getField("superHero");
 
-        ConditionalFormatDialog formatDialog = superHero.clickAddFormat();
+        ConditionalFormatDialog formatDialog = superHero.clickConditionalFormatButton();
         formatDialog.getOpenFormatPanel()
                 .setFirstCondition(Filter.Operator.EQUAL)
                 .setFirstValue("Thor")
@@ -1466,7 +1466,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // get back to the domain designer
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         ConditionalFormatDialog dlg = domainDesignerPage.fieldProperties().getField("superHero")
-                .clickEditFormats();
+                .clickConditionalFormatButton();
         dlg.getPanelByIndex(2)  // ironman
             .clickRemove();
         dlg.getPanelByIndex(0) // thor

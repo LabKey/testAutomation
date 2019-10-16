@@ -24,7 +24,7 @@ public class RangeValidatorDialog extends ModalDialog
 
     public List<RangeValidatorPanel> validators()
     {
-        return new RangeValidatorPanel.RangeValidatorPanelFinder(getDriver())
+        return new RangeValidatorPanel.RangeValidatorPanelFinder(this)
                 .findAll(this);
     }
 
@@ -37,7 +37,7 @@ public class RangeValidatorDialog extends ModalDialog
 
     public RangeValidatorPanel getValidationPanel(int index)
     {
-        return new RangeValidatorPanel.RangeValidatorPanelFinder(getDriver())
+        return new RangeValidatorPanel.RangeValidatorPanelFinder(this)
                 .byIndex(index).find(this);
     }
 

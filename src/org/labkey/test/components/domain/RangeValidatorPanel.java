@@ -15,12 +15,12 @@ import static org.labkey.test.components.html.Input.Input;
 public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.ElementCache>
 {
     final WebElement _el;
-    final WebDriver _driver;
+    final RangeValidatorDialog _dialog;
 
-    public RangeValidatorPanel(WebElement element, WebDriver driver)
+    public RangeValidatorPanel(WebElement element, RangeValidatorDialog dialog)
     {
         _el = element;
-        _driver = driver;
+        _dialog = dialog;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.
     @Override
     public WebDriver getDriver()
     {
-        return _driver;
+        return _dialog.getDriver();
     }
 
 
@@ -85,11 +85,12 @@ public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.
         return this;
     }
 
-    public void clickRemove()
+    public RangeValidatorDialog clickRemove()
     {
         expand();
         elementCache().removeButton.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
+        return _dialog;
     }
 
     public RangeValidatorPanel expand() // note: there isn't a corresponding 'collapse' on this object;
@@ -157,15 +158,17 @@ public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.
     }
 
 
-    public static class RangeValidatorPanelFinder extends WebDriverComponentFinder<RangeValidatorPanel, RangeValidatorPanelFinder>
+    static class RangeValidatorPanelFinder extends WebDriverComponentFinder<RangeValidatorPanel, RangeValidatorPanelFinder>
     {
+        private RangeValidatorDialog _dialog;
         private Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-validator-panel");
         private String _name = null;
         private String _id = null;
 
-        public RangeValidatorPanelFinder(WebDriver driver)
+        public RangeValidatorPanelFinder(RangeValidatorDialog dialog)
         {
-            super(driver);
+            super(dialog.getDriver());
+            _dialog = dialog;
         }
 
         public RangeValidatorPanelFinder closedByName(String name)          //finds
@@ -188,7 +191,7 @@ public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.
         @Override
         protected RangeValidatorPanel construct(WebElement el, WebDriver driver)
         {
-            return new RangeValidatorPanel(el, driver);
+            return new RangeValidatorPanel(el, _dialog);
         }
 
 

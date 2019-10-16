@@ -4,10 +4,14 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+
+import java.util.stream.Collectors;
 
 public class AdvancedSettingsDialog extends ModalDialog
 {
@@ -71,13 +75,14 @@ public class AdvancedSettingsDialog extends ModalDialog
     // default value options
     public String getDefaultValueType()
     {
-        return getWrapper().getFormElement(elementCache().defaultTypeSelect);
+        return elementCache().defaultTypeSelect.getFirstSelectedOption().getText();
     }
     public AdvancedSettingsDialog setDefaultValueType(String type)
     {
-        getWrapper().waitFor(()->  elementCache().defaultTypeSelect.isEnabled(),
-                "phiSelect did not become enabled in time", 1500);
-        getWrapper().setFormElement(elementCache().defaultTypeSelect, type);
+        getWrapper().waitFor(()->  elementCache().defaultTypeSelect.getOptions()
+                        .stream().map(WebElement::getText).collect(Collectors.toList()).contains(type),
+                "default value select did not contain expected option in time", 1500);
+        elementCache().defaultTypeSelect.selectByVisibleText(type);
         return this;
     }
 
@@ -89,13 +94,14 @@ public class AdvancedSettingsDialog extends ModalDialog
 
     public String getPHILevel()
     {
-        return getWrapper().getFormElement(elementCache().phiSelect);
+        return elementCache().phiSelect.getFirstSelectedOption().getText();
     }
     public AdvancedSettingsDialog setPHILevel(PropertiesEditor.PhiSelectType phiLevel)
     {
-        getWrapper().waitFor(()->  elementCache().phiSelect.isEnabled(),
-                "phiSelect did not become enabled in time", 1500);
-        getWrapper().setFormElement(elementCache().phiSelect, phiLevel.getText());
+        getWrapper().waitFor(()->  elementCache().phiSelect.getOptions()
+                        .stream().map(WebElement::getText).collect(Collectors.toList()).contains(phiLevel.getText()),
+                "phiSelect did not contain phiLevel ["+phiLevel.getText()+"] in time", 1500);
+        elementCache().phiSelect.selectByVisibleText(phiLevel.getText());
         return this;
     }
 
@@ -186,11 +192,11 @@ public class AdvancedSettingsDialog extends ModalDialog
                 Locator.input("domainpropertiesrow-showInDetailsView").findWhenNeeded(this));
 
         // default value options
-        public WebElement defaultTypeSelect = Locator.tagWithName("select", "domainpropertiesrow-defaultValueType")
+        public Select defaultTypeSelect = SelectWrapper.Select(Locator.tagWithName("select", "domainpropertiesrow-defaultValueType"))
                 .findWhenNeeded(this);
 
         // misc options
-        public WebElement phiSelect = Locator.tagWithAttribute("select", "name", "domainpropertiesrow-PHI")
+        public Select phiSelect = SelectWrapper.Select(Locator.tagWithAttribute("select", "name", "domainpropertiesrow-PHI"))
                 .findWhenNeeded(this);
 
         public Checkbox enableMeasure = new Checkbox(

@@ -10,10 +10,15 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
+
+import java.time.Duration;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -165,7 +170,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (isExpanded())
         {
-            elementCache().closeButton.click();
+            elementCache().collapseToggle.click();
             getWrapper().waitFor(() -> !isExpanded(),
                     "the field row did not collapse", 1500);
         }
@@ -502,49 +507,38 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     // conditional formatting and validation options
 
-    public RangeValidatorDialog clickAddRange()
+    public RangeValidatorDialog clickRangeButton()
     {
         expand();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addRangeButton()));
-        elementCache().addRangeButton().click();
-        return new RangeValidatorDialog(this, getDriver());
-    }
-    public RangeValidatorDialog clickEditRanges()
-    {
-        expand();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editRangesButton()));
-        elementCache().editRangesButton().click();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().rangeButton()));
+        elementCache().rangeButton().click();
         return new RangeValidatorDialog(this, getDriver());
     }
 
-    public RegexValidatorDialog clickAddRegex()
+    public DomainFieldRow addRegularExpressions(List<FieldDefinition.RegExValidator> validators)
     {
-        expand();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addRegexValidatorButton()));
-        elementCache().addRegexValidatorButton().click();
-        return new RegexValidatorDialog(this, getDriver());
+        RegexValidatorDialog dialog = clickRegexButton();
+        for (FieldDefinition.RegExValidator val : validators)
+        {
+            dialog.addValidator(val);
+        }
+        dialog.clickApply();
+        return this;
     }
-    public RegexValidatorDialog clickEditRegex()
+
+    public RegexValidatorDialog clickRegexButton()
     {
         expand();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editRegexValidatorButton()));
-        elementCache().editRegexValidatorButton().click();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().regexValidatorButton()));
+        elementCache().regexValidatorButton().click();
         return new RegexValidatorDialog(this, getDriver());
     }
 
-    public ConditionalFormatDialog clickAddFormat()
+    public ConditionalFormatDialog clickConditionalFormatButton()
     {
         expand();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addFormatButton()));
-        elementCache().addFormatButton().click();
-        return new ConditionalFormatDialog(this, getDriver());
-    }
-
-    public ConditionalFormatDialog clickEditFormats()
-    {
-        expand();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editFormatButton()));
-        elementCache().editFormatButton().click();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().conditionalFormatButton()));
+        elementCache().conditionalFormatButton().click();
         return new ConditionalFormatDialog(this, getDriver());
     }
 
@@ -610,7 +604,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement advancedSettingsBtn = Locator.button("Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        public WebElement closeButton = Locator.tagWithAttribute("svg", "data-icon", "minus-square")
+        public WebElement collapseToggle = Locator.tagWithAttribute("svg", "data-icon", "minus-square")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
 
@@ -651,7 +645,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Select getFromSchemaInput()
         {
             expand();
-            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(getComponentElement());
+            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
             getWrapper().waitFor(()-> select.getOptions().size() > 0,
                     "select did not have options in the expected time", 1500);
             return select;
@@ -660,7 +654,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Select getFromTargetTableInput()
         {
             expand();
-            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(getComponentElement());
+            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
             getWrapper().waitFor(()-> select.getOptions().size() > 0,
                     "select did not have options in the expected time", 1500);
             return select;
@@ -669,35 +663,25 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Checkbox getLookupValidatorEnabledCheckbox()
         {
             expand();
-            return new Checkbox(Locator.checkboxByName("domainpropertiesrow-lookupValidator").findWhenNeeded(this));
+            return new Checkbox(Locator.checkboxByName("domainpropertiesrow-lookupValidator").findElement(this));
         }
 
-
-        public WebElement addRangeButton()
+        public WebElement rangeButton()
         {
-            return Locator.button("Add Range").waitForElement(getComponentElement(), 2000);
-        }
-        public WebElement editRangesButton()
-        {
-            return Locator.button("Edit Ranges").waitForElement(getComponentElement(), 2000);
+            return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                    Locator.button("Add Range"), Locator.button("Edit Ranges"));
         }
 
-        public WebElement addRegexValidatorButton()
+        public WebElement regexValidatorButton()
         {
-            return Locator.button("Add Regex").waitForElement(getComponentElement(), 2000);
-        }
-        public WebElement editRegexValidatorButton()
-        {
-            return Locator.button("Edit Regex").waitForElement(getComponentElement(), 2000);
+            return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                    Locator.button("Add Regex"), Locator.button("Edit Regex"));
         }
 
-        public WebElement addFormatButton()
+        public WebElement conditionalFormatButton()
         {
-            return Locator.button("Add Format").waitForElement(getComponentElement(), 2000);
-        }
-        public WebElement editFormatButton()
-        {
-            return Locator.button("Edit Formats").waitForElement(getComponentElement(), 2000);
+            return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                    Locator.button("Add Format"),  Locator.button("Edit Formats"));
         }
     }
 }

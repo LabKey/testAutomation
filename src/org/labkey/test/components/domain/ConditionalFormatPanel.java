@@ -16,12 +16,12 @@ import static org.labkey.test.components.html.Input.Input;
 public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormatPanel.ElementCache>
 {
     final WebElement _el;
-    final WebDriver _driver;
+    final ConditionalFormatDialog _dialog;
 
-    public ConditionalFormatPanel(WebElement element, WebDriver driver)
+    public ConditionalFormatPanel(WebElement element, ConditionalFormatDialog dialog)
     {
         _el = element;
-        _driver = driver;
+        _dialog = dialog;
     }
 
     public ConditionalFormatPanel setFirstCondition(Filter.Operator operator)
@@ -69,11 +69,12 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         return this;
     }
 
-    public void clickRemove()
+    public ConditionalFormatDialog clickRemove()
     {
         expand();
         elementCache().removeButton.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
+        return _dialog;
     }
 
     public ConditionalFormatPanel expand()
@@ -102,7 +103,7 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
     @Override
     public WebDriver getDriver()
     {
-        return _driver;
+        return _dialog.getDriver();
     }
 
 
@@ -154,14 +155,16 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
     }
 
 
-    public static class ConditionalFormatPanelFinder extends WebDriverComponentFinder<ConditionalFormatPanel, ConditionalFormatPanelFinder>
+    static class ConditionalFormatPanelFinder extends WebDriverComponentFinder<ConditionalFormatPanel, ConditionalFormatPanelFinder>
     {
+        private ConditionalFormatDialog _dialog;
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-validator-panel");
         private String _id = null;
 
-        public ConditionalFormatPanelFinder(WebDriver driver)
+        public ConditionalFormatPanelFinder(ConditionalFormatDialog dialog)
         {
-            super(driver);
+            super(dialog.getDriver());
+            _dialog = dialog;
         }
 
         public ConditionalFormatPanelFinder withIndex(int index)
@@ -173,7 +176,7 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         @Override
         protected ConditionalFormatPanel construct(WebElement el, WebDriver driver)
         {
-            return new ConditionalFormatPanel(el, driver);
+            return new ConditionalFormatPanel(el, _dialog);
         }
 
         @Override

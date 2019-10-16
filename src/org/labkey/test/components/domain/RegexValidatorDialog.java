@@ -2,6 +2,7 @@ package org.labkey.test.components.domain;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -25,7 +26,7 @@ public class RegexValidatorDialog extends ModalDialog
 
     List<RegexValidatorPanel> validationPanels()
     {
-        return new RegexValidatorPanel.RegexValidatorPanelFinder(getDriver())
+        return new RegexValidatorPanel.RegexValidatorPanelFinder(this)
                 .findAll(this);
     }
     public RegexValidatorPanel getValidationPanel()
@@ -34,12 +35,12 @@ public class RegexValidatorDialog extends ModalDialog
     }
     public RegexValidatorPanel getValidationPanel(int index)
     {
-        return new RegexValidatorPanel.RegexValidatorPanelFinder(getDriver())
+        return new RegexValidatorPanel.RegexValidatorPanelFinder(this)
                 .withIndex(index).find(this);
     }
     public RegexValidatorPanel getValidationPanel(String name)
     {
-        return new RegexValidatorPanel.RegexValidatorPanelFinder(getDriver())
+        return new RegexValidatorPanel.RegexValidatorPanelFinder(this)
                 .openedByName(name).find(this);
     }
 
@@ -47,10 +48,19 @@ public class RegexValidatorDialog extends ModalDialog
     {
         int targetIndex = validationPanels().size();
         elementCache().addValidatorButton.click();      // adds a new validator clause panel to the dialog
-        RegexValidatorPanel panel = new RegexValidatorPanel.RegexValidatorPanelFinder(getDriver())
+        RegexValidatorPanel panel = new RegexValidatorPanel.RegexValidatorPanelFinder(this)
                 .withIndex(targetIndex).find(this);     // find it by assuming its ID will have index lastId +1
         panel.setName(name);
         return panel;
+    }
+
+    public RegexValidatorDialog addValidator(FieldDefinition.RegExValidator validator)
+    {
+        addValidationPanel(validator.getName())
+                .setExpression(validator.getExpression())
+                .setErrorMessage(validator.getMessage())
+                .setDescription(validator.getDescription());
+        return this;
     }
 
     public DomainFieldRow clickApply()

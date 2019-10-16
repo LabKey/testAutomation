@@ -24,12 +24,12 @@ public class ConditionalFormatDialog extends ModalDialog
 
     public List<ConditionalFormatPanel> formatPanels()
     {
-        return new ConditionalFormatPanel.ConditionalFormatPanelFinder(getDriver()).findAll(this);
+        return new ConditionalFormatPanel.ConditionalFormatPanelFinder(this).findAll(this);
     }
 
     public ConditionalFormatPanel getOpenFormatPanel()
     {
-        return new ConditionalFormatPanel.ConditionalFormatPanelFinder(getDriver()).find(this);
+        return new ConditionalFormatPanel.ConditionalFormatPanelFinder(this).find(this);
     }
 
     public ConditionalFormatPanel addFormatPanel()
@@ -41,7 +41,7 @@ public class ConditionalFormatDialog extends ModalDialog
 
     public ConditionalFormatPanel getPanelByIndex(int index)
     {
-        return new ConditionalFormatPanel.ConditionalFormatPanelFinder(getDriver())
+        return new ConditionalFormatPanel.ConditionalFormatPanelFinder(this)
                 .withIndex(index).find(this);
     }
 
