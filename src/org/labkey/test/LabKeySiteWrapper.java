@@ -1282,6 +1282,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         waitFor(this::onLabKeyPage, "Home project didn't seem to load. JavaScript 'LABKEY' namespace not found.", 10000);
     }
 
+    public void clickPortalTab(String tabText)
+    {
+        new PortalHelper(this).activateTab(tabText);
+    }
+
     /**
      * @deprecated Use {@link #clickButton(String)} or {@link #submit(Locator)}
      */

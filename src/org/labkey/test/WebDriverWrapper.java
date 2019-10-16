@@ -1825,6 +1825,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return System.currentTimeMillis() - startTime;
     }
 
+    public long doAndAcceptUnloadAlert(Runnable func, String partialAlertText)
+    {
+        return doAndWaitForPageToLoad(() ->
+        {
+            func.run();
+            assertAlertContains(partialAlertText);
+        });
+    }
+
+    public long doAndAcceptUnloadAlert(Runnable func)
+    {
+        return doAndAcceptUnloadAlert(func, "");
+    }
+
     private static final MultiMap<String, Set<String>> actionWarnings = MultiValueMap.multiValueMap(new HashMap<>(), HashSet::new);
 
     public static void addActionWarning(String warning, Crawler.ControllerActionId action)

@@ -73,6 +73,10 @@ public class PortalHelper extends WebDriverWrapper
 
     public PortalTab activateTab(String tabText)
     {
+        tabText = tabText.trim();
+        if (tabText.equals("+") || tabText.equals("add"))
+            throw new IllegalArgumentException("Use PortalHelper.addTab()");
+
         return PortalTab.find(tabText, getDriver()).activate();
     }
 

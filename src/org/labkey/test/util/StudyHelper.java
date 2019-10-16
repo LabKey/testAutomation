@@ -419,23 +419,6 @@ public class StudyHelper
         _test.clickButton("Import");
     }
 
-    public void setupRequestStatuses()
-    {
-        _test.clickTab("Manage");
-        _test.clickAndWait(Locator.linkWithText("Manage Request Statuses"));
-        _test.setFormElement(Locator.name("newLabel"), "New Request");
-        _test.clickButton("Save");
-        _test.setFormElement(Locator.name("newLabel"), "Processing");
-        _test.clickButton("Save");
-        _test.setFormElement(Locator.name("newLabel"), "Completed");
-        _test.checkCheckbox(Locator.checkboxByName("newFinalState"));
-        _test.clickButton("Save");
-        _test.setFormElement(Locator.name("newLabel"), "Rejected");
-        _test.checkCheckbox(Locator.checkboxByName("newFinalState"));
-        _test.uncheckCheckbox(Locator.checkboxByName("newSpecimensLocked"));
-        _test.clickButton("Done");
-    }
-
     public ManageDatasetsPage goToManageDatasets()
     {
         _test.goToManageStudy();
