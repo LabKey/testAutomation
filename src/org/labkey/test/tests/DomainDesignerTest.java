@@ -1177,16 +1177,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
 
         DomainFieldRow sizeRow = domainFormPanel.getField("size");
-        RangeValidatorDialog rangeDlg = sizeRow.clickRangeButton();
-        rangeDlg.getValidationPanel(0)
-                .setName("midsize")
-                .setDescription("falls between 2 and 3")
-                .setErrorMessage("value must be 2 or 3")
-                .setFirstCondition(Filter.Operator.GTE)
-                .setFirstValue("2")
-                .setSecondCondition(Filter.Operator.LTE)
-                .setSecondValue("3");
-        rangeDlg.clickApply();
+        FieldDefinition.RangeValidator midsizeValidator = new FieldDefinition.RangeValidator("midsize", "falls between 2 and 3", "value must be 2 or 3",
+                FieldDefinition.RangeType.GTE, "2",
+                FieldDefinition.RangeType.LTE, "3");
+        sizeRow.setRangeValidators(Arrays.asList(midsizeValidator));
         domainDesignerPage.clickSave();
 
         // now verify the expected validator is formed and added to the field's validator array

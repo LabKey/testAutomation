@@ -63,6 +63,16 @@ public class RegexValidatorDialog extends ModalDialog
         return this;
     }
 
+    public RegexValidatorDialog setValidator(int index, FieldDefinition.RegExValidator validator)
+    {
+        getValidationPanel(index)
+                .setName(validator.getName())
+                .setExpression(validator.getExpression())
+                .setErrorMessage(validator.getMessage())
+                .setDescription(validator.getDescription());
+        return this;
+    }
+
     public DomainFieldRow clickApply()
     {
         dismiss("Apply");

@@ -2,6 +2,7 @@ package org.labkey.test.components.domain;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -39,6 +40,35 @@ public class RangeValidatorDialog extends ModalDialog
     {
         return new RangeValidatorPanel.RangeValidatorPanelFinder(this)
                 .byIndex(index).find(this);
+    }
+
+    public RangeValidatorDialog addValidator(FieldDefinition.RangeValidator validator)
+    {
+        RangeValidatorPanel panel = addValidationPanel(validator.getName())
+                .setDescription(validator.getDescription())
+                .setErrorMessage(validator.getMessage())
+                .setFirstCondition(validator.getFirstType().getOperator())
+                .setFirstValue(validator.getFirstRange());
+        if (null != validator.getSecondRange())
+            panel.setSecondCondition(validator.getSecondType().getOperator())
+                    .setSecondValue(validator.getSecondRange());
+
+        return this;
+    }
+
+    public RangeValidatorDialog setValidator(int index, FieldDefinition.RangeValidator validator)
+    {
+        RangeValidatorPanel panel = getValidationPanel(index)
+                .setName(validator.getName())
+                .setDescription(validator.getDescription())
+                .setErrorMessage(validator.getMessage())
+                .setFirstCondition(validator.getFirstType().getOperator())
+                .setFirstValue(validator.getFirstRange());
+        if (null != validator.getSecondRange())
+            panel.setSecondCondition(validator.getSecondType().getOperator())
+                .setSecondValue(validator.getSecondRange());
+
+        return this;
     }
 
     public DomainFieldRow clickApply()

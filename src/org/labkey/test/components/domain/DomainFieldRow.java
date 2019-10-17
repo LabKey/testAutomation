@@ -507,6 +507,38 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     // conditional formatting and validation options
 
+    /**
+     * appends the supplied validators to any existing ones (including any empty default ones that might exist)
+     * @param validators
+     * @return
+     */
+    public DomainFieldRow addRangeValidators(List<FieldDefinition.RangeValidator> validators)
+    {
+        RangeValidatorDialog dialog = clickRangeButton();
+        for (FieldDefinition.RangeValidator val : validators)
+        {
+            dialog.addValidator(val);
+        }
+        dialog.clickApply();
+        return this;
+    }
+
+    /**
+     * sets the supplied validators on the field, assumes none are already present
+     * @param validators
+     * @return
+     */
+    public DomainFieldRow setRangeValidators(List<FieldDefinition.RangeValidator> validators)
+    {
+        RangeValidatorDialog dialog = clickRangeButton();
+        for (int i =0; i< validators.size(); i++)
+        {
+            dialog.setValidator(i, validators.get(i));
+        }
+        dialog.clickApply();
+        return this;
+    }
+
     public RangeValidatorDialog clickRangeButton()
     {
         expand();
@@ -515,12 +547,30 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return new RangeValidatorDialog(this, getDriver());
     }
 
+    /**
+     * adds the specified regexValidators to the field.  Assumes that any range panels in the dialog
+     * are complete (by default, the first one is already shown but is empty)
+     * When adding the first/only regex validators to the field, use setRegularExpressions
+     * @param validators
+     * @return
+     */
     public DomainFieldRow addRegularExpressions(List<FieldDefinition.RegExValidator> validators)
     {
         RegexValidatorDialog dialog = clickRegexButton();
         for (FieldDefinition.RegExValidator val : validators)
         {
             dialog.addValidator(val);
+        }
+        dialog.clickApply();
+        return this;
+    }
+
+    public DomainFieldRow setRegularExpressions(List<FieldDefinition.RegExValidator> validators)
+    {
+        RegexValidatorDialog dialog = clickRegexButton();
+        for (int i =0; i< validators.size(); i++)
+        {
+            dialog.setValidator(i, validators.get(i));
         }
         dialog.clickApply();
         return this;
