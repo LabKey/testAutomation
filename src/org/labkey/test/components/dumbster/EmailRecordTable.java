@@ -200,16 +200,18 @@ public class EmailRecordTable extends Table
 
     private void parseViewCell(EmailMessage emailMessage)
     {
-        String html = getDataAsText(emailMessage.getRowIndex(), EmailColumn.View_HTML.getIndex()).trim();
-        String text = getDataAsText(emailMessage.getRowIndex(), EmailColumn.View_Text.getIndex()).trim();
-        String raw = getDataAsText(emailMessage.getRowIndex(), EmailColumn.View_Raw.getIndex()).trim();
         List<String> views = new ArrayList<>();
-        if (!html.isEmpty())
-            views.add(html);
-        if (!text.isEmpty())
-            views.add(text);
-        if (!raw.isEmpty())
-            views.add(raw);
+        String view;
+        int rowIndex = emailMessage.getRowIndex();
+        int colIndex = EmailColumn.View.getIndex();
+        do
+        {
+            view = StringUtils.trimToNull(getDataAsText(rowIndex, colIndex++));
+            if (view != null)
+            {
+                views.add(view);
+            }
+        } while (view != null);
         emailMessage.setViews(views);
     }
 
@@ -302,9 +304,7 @@ public class EmailRecordTable extends Table
         DateTime(3),
         Message(4),
         Headers(5),
-        View_HTML(6),
-        View_Text(7),
-        View_Raw(8);
+        View(6);
 
         private final int index;
 
