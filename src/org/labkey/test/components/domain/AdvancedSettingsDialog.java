@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.EnumSelect;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -77,12 +78,12 @@ public class AdvancedSettingsDialog extends ModalDialog
     {
         return elementCache().defaultTypeSelect.getFirstSelectedOption().getText();
     }
-    public AdvancedSettingsDialog setDefaultValueType(String type)
+    public AdvancedSettingsDialog setDefaultValueType(PropertiesEditor.DefaultType type)
     {
         getWrapper().waitFor(()->  elementCache().defaultTypeSelect.getOptions()
-                        .stream().map(WebElement::getText).collect(Collectors.toList()).contains(type),
+                        .stream().map(WebElement::getText).collect(Collectors.toList()).contains(type.getText()),
                 "default value select did not contain expected option in time", 1500);
-        elementCache().defaultTypeSelect.selectByVisibleText(type);
+        elementCache().defaultTypeSelect.set(type);
         return this;
     }
 
@@ -192,8 +193,9 @@ public class AdvancedSettingsDialog extends ModalDialog
                 Locator.input("domainpropertiesrow-showInDetailsView").findWhenNeeded(this));
 
         // default value options
-        public Select defaultTypeSelect = SelectWrapper.Select(Locator.tagWithName("select", "domainpropertiesrow-defaultValueType"))
-                .findWhenNeeded(this);
+        private final EnumSelect<PropertiesEditor.DefaultType> defaultTypeSelect =
+                EnumSelect.EnumSelect(Locator.tagWithName("select", "domainpropertiesrow-defaultValueType"), PropertiesEditor.DefaultType.class)
+                        .findWhenNeeded(this);
 
         // misc options
         public Select phiSelect = SelectWrapper.Select(Locator.tagWithAttribute("select", "name", "domainpropertiesrow-PHI"))
@@ -208,6 +210,5 @@ public class AdvancedSettingsDialog extends ModalDialog
         public Checkbox enableMissingValues = new Checkbox(
                 Locator.input("domainpropertiesrow-mvEnabled").findWhenNeeded(this));
     }
-
 
 }

@@ -22,6 +22,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.PropertiesEditor.DefaultType;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -970,7 +971,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         DomainFieldRow testRow = domainFormPanel.getField("color");
         testRow.clickAdvancedSettings()
-                .setDefaultValueType("Editable default")
+                .setDefaultValueType(DefaultType.FIXED_EDITABLE)  //"Editable default"
                 .apply();
         domainDesignerPage.clickSave();
 
