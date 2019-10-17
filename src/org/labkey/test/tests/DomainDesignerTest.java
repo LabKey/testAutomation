@@ -99,7 +99,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel panel = domainDesignerPage.fieldProperties();
         DomainFieldRow integerRow = panel
                 .addField("integerField")
-                .setType("Integer")
+                .setType(FieldDefinition.ColumnType.Integer)
                 .setNumberFormat("###,###,###")
                 .setScaleType(PropertiesEditor.ScaleType.LINEAR)
                 .setDescription("field for an Integer")
@@ -107,7 +107,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         DomainFieldRow decimalRow = panel
                 .addField("decimalField")
-                .setType("Decimal")
+                .setType(FieldDefinition.ColumnType.Decimal)
                 .setNumberFormat("###,###,###.000")
                 .setScaleType(PropertiesEditor.ScaleType.LOG)
                 .setDescription("field for a decimal")
@@ -248,7 +248,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
 
         domainFormPanel.addField("addedField")
-                .setType("Date Time")
+                .setType(FieldDefinition.ColumnType.DateAndTime)
                 .expand()
                 .setDateFormat("yyyy-MM-dd HH:mm")
                 .setDateShift(false)
@@ -850,7 +850,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
 
         DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
-                .setType("Lookup")
+                .setType(FieldDefinition.ColumnType.Lookup)
                 .expand()
                 .setFromFolder("Current Folder")
                 .setFromSchema("lists")
@@ -894,7 +894,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(mainListName);
 
         DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
-                .setType("Lookup")
+                .setType(FieldDefinition.ColumnType.Lookup)
                 .expand()
                 .setFromFolder("Current Folder")
                 .setFromSchema("lists")

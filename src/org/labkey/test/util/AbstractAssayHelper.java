@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,14 +64,10 @@ public abstract class AbstractAssayHelper
 
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
-    @LogMethod
-    public void createAssayWithDefaults(String type, String name)
-    {
-        createAssayAndEdit(type, name).saveAndClose();
-
-        DataRegionTable.DataRegion(_test.getDriver()).withName("AssayList").waitFor();
-    }
-
+    /**
+     * @deprecated Use {@link #createAssayDesign(String, String)}
+     */
+    @Deprecated
     public AssayDesignerPage createAssayAndEdit(String type, String name)
     {
         _test.clickButton("New Assay Design");
@@ -81,6 +78,38 @@ public abstract class AbstractAssayHelper
         assayDesigner.setName(name);
         assayDesigner.save();
 
+        return assayDesigner;
+    }
+
+    /**
+     * @deprecated Use {@link #createAssayDesignWithDefaults(String, String)}
+     */
+    @Deprecated
+    public void createAssayWithDefaults(String type, String name)
+    {
+        createAssayAndEdit(type, name).saveAndClose();
+    }
+
+    @LogMethod
+    public void createAssayDesignWithDefaults(String type, String name)
+    {
+        createAssayDesign(type, name).clickFinish();
+
+        // TODO add a check that the new assay name is in list?
+        DataRegionTable.DataRegion(_test.getDriver()).withName("AssayList").waitFor();
+    }
+
+    @LogMethod
+    public ReactAssayDesignerPage createAssayDesign(String type, String name)
+    {
+        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.clickButton("New Assay Design");
+        _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
+        _test.clickButton("Next");
+        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+
+        ReactAssayDesignerPage assayDesigner = new ReactAssayDesignerPage(_test.getDriver());
+        assayDesigner.setName(name);
         return assayDesigner;
     }
 
@@ -108,21 +137,22 @@ public abstract class AbstractAssayHelper
         return new AssayDesignerPage(_test.getDriver());
     }
 
-    public AssayDesignerPage copyAssayDesign()
+    public ReactAssayDesignerPage copyAssayDesign()
     {
         return copyAssayDesign(null);
     }
 
-    public AssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
+    public ReactAssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
     {
+        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
         clickManageOption(true, "Copy assay design");
-
         if (destinationFolder == null)
             _test.clickButton("Copy to Current Folder");
         else
             _test.clickAndWait(Locator.tag("tr").append(Locator.linkWithText(destinationFolder)));
+        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
 
-        return new AssayDesignerPage(_test.getDriver());
+        return new ReactAssayDesignerPage(_test.getDriver());
     }
 
     public void deleteAssayDesign()

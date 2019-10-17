@@ -304,9 +304,11 @@ public class FieldDefinition
         Integer("Integer", "int"),
         String("Text (String)", "string"),
         Subject("Subject/Participant (String)", "string"),
-        DateTime("DateTime", "date"),
+        DateTime("DateTime", "date"), // TODO remove this after GWT designer removed
+        DateAndTime("Date Time", "date"),
         Boolean("Boolean", "boolean"),
-        Double("Number (Double)", "float"),
+        Double("Number (Double)", "float"), // TODO remove this after GWT designer removed
+        Decimal("Decimal", "float"),
         File("File", null),
         AutoInteger("Auto-Increment Integer", "int"),
         Flag("Flag (String)", null),

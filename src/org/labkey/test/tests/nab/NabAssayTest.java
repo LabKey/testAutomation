@@ -29,6 +29,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PlateGrid;
 import org.labkey.test.components.labkey.LabKeyAlert;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.tests.AbstractAssayTest;
@@ -185,10 +186,14 @@ public class NabAssayTest extends AbstractAssayTest
         portalHelper.addWebPart("Assay List");
 
         //create a new nab assay
-        _assayHelper.createAssayAndEdit("TZM-bl Neutralization (NAb)", TEST_ASSAY_NAB)
-                .setDescription(TEST_ASSAY_NAB_DESC)
-                .save();
+        _assayHelper.createAssayDesign("TZM-bl Neutralization (NAb)", TEST_ASSAY_NAB)
+            .setDescription(TEST_ASSAY_NAB_DESC)
+            .setPlateTemplate("NAb: 5 specimens in duplicate")
+            .clickFinish();
 
+        // go back into assay design to configure templates
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        _assayHelper.clickEditAssayDesign();
         clickAndWait(Locator.lkButton("configure templates"));
 
         clickAndWait(Locator.linkWithText("new 96 well (8x12) NAb single-plate template"));

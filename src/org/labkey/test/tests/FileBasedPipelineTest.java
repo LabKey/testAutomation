@@ -24,7 +24,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserHelper;
@@ -172,14 +173,15 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         portalHelper.addWebPart("Assay List");
         clickButton("Manage Assays");
 
-        AssayDesignerPage assayDesignerPage = _assayHelper.createAssayAndEdit("General", "myassay");
-        assayDesignerPage.dataFields().selectField(0).markForDeletion(); // SpecimenID
-        assayDesignerPage.dataFields().selectField(1).markForDeletion(); // ParticipantID
-        assayDesignerPage.dataFields().selectField(2).markForDeletion(); // VisitID
-        assayDesignerPage.dataFields().selectField(3).markForDeletion(); // Date
-        assayDesignerPage.addDataField("Name", "Name", FieldDefinition.ColumnType.String);
-        assayDesignerPage.addDataField("Age", "Age", FieldDefinition.ColumnType.Integer);
-        assayDesignerPage.save();
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", "myassay");
+        DomainFormPanel dataFields = assayDesignerPage.goToResultFields()
+                .removeField("Date")
+                .removeField("VisitID")
+                .removeField("ParticipantID")
+                .removeField("SpecimenID");
+        dataFields.startNewDesign("Name"); // field defaults to type String
+        dataFields.addField("Age").setType(FieldDefinition.ColumnType.Integer);
+        assayDesignerPage.clickFinish();
 
         navigateToFolder(getProjectName(), folderName);
         goToModule("FileContent");
