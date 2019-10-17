@@ -25,7 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
@@ -113,14 +113,14 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
                 "TZM-bl Neutralization (NAb), High-throughput (Single Plate Dilution)" :
                 "TZM-bl Neutralization (NAb), High-throughput (Cross Plate Dilution)";
 
-        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit(type, name)
-                .setDescription(description)
-                .setPlateTemplate(templateName);
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign(type, name)
+            .setDescription(description)
+            .setPlateTemplate(templateName);
 
         if (singleFile)
-            designerPage.setMetaDataInputFormat(AssayDesignerPage.MetadataInputFormat.COMBINED);
+            assayDesignerPage.setMetaDataInputFormat(ReactAssayDesignerPage.MetadataInputFormat.COMBINED);
 
-        designerPage.saveAndClose();
+        assayDesignerPage.clickFinish();
     }
 
     @Before

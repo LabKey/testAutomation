@@ -75,7 +75,7 @@ public class BaseExpressionMatrixTest extends BaseWebDriverTest
 
             clickProject(getProjectName());
             portalHelper.addWebPart("Assay List");
-            _assayHelper.createAssayWithDefaults("Expression Matrix", ASSAY_NAME);
+            _assayHelper.createAssayDesignWithDefaults("Expression Matrix", ASSAY_NAME);
         }
         portalHelper.exitAdminMode();
 
