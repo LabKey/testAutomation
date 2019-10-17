@@ -596,7 +596,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Select getFromSchemaInput()
         {
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
-            getWrapper().waitFor(()-> select.getOptions().size() > 0,
+            getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
                     "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
             return select;
         }

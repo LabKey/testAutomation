@@ -25,8 +25,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.components.PropertiesEditor;
-import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AssayImportOptions;
@@ -122,13 +120,10 @@ public class NabAssayThawListTest extends AbstractAssayTest
 
         log("Set default for ParticipantVisitResolver at Project level");
         // We'll override it later at the folder level.
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Batch Fields").find();
-        PropertiesEditor.FieldRow row = editor.selectField("ParticipantVisitResolver");
-        row.properties().selectAdvancedTab();
-        clickAndWait(Locator.linkContainingText("value"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        _assayHelper.setDefaultValues(TEST_ASSAY_NAB, AbstractAssayHelper.AssayDefaultAreas.BATCH_FIELDS);
         click(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.ParticipantVisitDate.name()));
         clickButton("Save Defaults");
-        clickButton("Save & Close");
 
         // Add the list we'll use for the thaw list lookup
         new ListHelper(this).importListArchive(TEST_ASSAY_FLDR_NAB, THAW_LIST_ARCHIVE);

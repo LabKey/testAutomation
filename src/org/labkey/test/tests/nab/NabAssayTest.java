@@ -191,6 +191,9 @@ public class NabAssayTest extends AbstractAssayTest
             .setPlateTemplate("NAb: 5 specimens in duplicate")
             .clickFinish();
 
+        // go back into assay design to configure templates
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        _assayHelper.clickEditAssayDesign();
         clickAndWait(Locator.lkButton("configure templates"));
 
         clickAndWait(Locator.linkWithText("new 96 well (8x12) NAb single-plate template"));

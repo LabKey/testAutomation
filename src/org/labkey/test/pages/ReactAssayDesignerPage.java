@@ -217,9 +217,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
         scrollIntoView(elementCache().finishBtn);
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishBtn));
-        String currentURL = getDriver().getCurrentUrl();
-        elementCache().finishBtn.click();
-        afterSaveOrFinishClick(currentURL);
+        clickAndWait(elementCache().finishBtn);
     }
 
     @Override
