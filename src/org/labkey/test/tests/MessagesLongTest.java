@@ -35,12 +35,17 @@ import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.announcements.AdminPage;
 import org.labkey.test.pages.announcements.InsertPage;
 import org.labkey.test.pages.announcements.RespondPage;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
@@ -174,7 +179,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Modify the default email template for message board notification.");
         // This is done to test Issue 23934: Allow customization of email template for message board notifications
         modifyTemplate(true);
-        goToHome();
+        goToProjectHome();
 
         enableEmailRecorder();
         basicMessageTests();
@@ -203,7 +208,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check message works in Wiki");
         _portalHelper.clickWebpartMenuItem("Messages", true, "New");
-        new org.labkey.test.pages.announcements.InsertPage(getDriver())
+        new InsertPage(getDriver())
                 .setRenderAs(WikiHelper.WikiRendererType.RADEOX) // "Wiki Page"
                 .setTitle(MSG1_TITLE)
                 .setBody("<b>first message testing</b>")
@@ -218,7 +223,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Create message using markdown");
         clickButton( "New");
-        InsertPage markdownPage = new org.labkey.test.pages.announcements.InsertPage(getDriver());
+        InsertPage markdownPage = new InsertPage(getDriver());
         assertEquals("default selection should be 'Markdown'",markdownPage.getRenderAs(), WikiHelper.WikiRendererType.MARKDOWN);
         markdownPage.setTitle("Markdown is a thing now")
                 .setBody("# Holy Header, Batman!\n" +
@@ -252,7 +257,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check that HTML message works");
         clickButton("New");
-        new org.labkey.test.pages.announcements.InsertPage(getDriver())
+        new InsertPage(getDriver())
                 .setRenderAs(WikiHelper.WikiRendererType.HTML)
                 .setTitle(MSG1_TITLE)
                 .setBody(HTML_BODY)
@@ -442,6 +447,12 @@ public class MessagesLongTest extends BaseWebDriverTest
     @Test
     public void testDailyDigestMessage()
     {
+        String groupName = "Digest Group";
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        apiPermissionsHelper.createProjectGroup(groupName, getProjectName());
+        apiPermissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), getProjectName(), groupName);
+
+        enableEmailRecorder();
         goToProjectHome();
         log("Check email preferences");
         _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
@@ -449,25 +460,29 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Update");
         clickButton("Done");
 
-        SiteNavBar siteNavBar = new SiteNavBar(getDriver());
-        siteNavBar.enterPageAdminMode();
         log("Customize message board");
-        _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
-        new AdminPage(getDriver())
+        AdminPage.beginAt(this, getProjectName())
                 .includeGroups(true)
                 .save();
-        siteNavBar.exitPageAdminMode();
 
        goToProjectHome();
        log("Check message works in Wiki");
        _portalHelper.clickWebpartMenuItem("Messages", true, "New");
-       new org.labkey.test.pages.announcements.InsertPage(getDriver())
+       new InsertPage(getDriver())
                 .setRenderAs(WikiHelper.WikiRendererType.RADEOX) // "Wiki Page"
                 .setTitle(MSG1_TITLE_2)
-                .setBody("<b>Daily digest message testing with groups enabled</b>")
+                .setBody("Daily digest message testing with groups enabled")
                 .submit();
 
-        invokeApiAction("home", "announcements", "sendDailyDigest.api", "Failed to send messages daily digest");
+       invokeApiAction("home", "announcements", "sendDailyDigest.api", "Failed to send messages daily digest");
+
+       goToModule("Dumbster");
+       waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "New posts");
+       EmailRecordTable announcement = new EmailRecordTable(this);
+       assertEquals("Mismatch in the expected number of message", 1, announcement.getEmailCount());
+       EmailRecordTable.EmailMessage message = announcement.getMessageWithSubjectContaining("New posts to /" + PROJECT_NAME);
+       announcement.clickMessage(message);
+       assertTextPresent("Digest Group"); //Group name should be shown.
 
     }
     private void verifyAdmin()
@@ -587,7 +602,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Submit");
         assertTextPresent(_userHelper.getDisplayNameForEmail("Members: " + USER1));
         assertTextNotPresent(USER1);
-        stopImpersonatingRole();
+        stopImpersonating();
         log("Verify admin user still sees email address");
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
@@ -663,10 +678,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     private void basicMessageTests()
     {
         log("Add search to project");
-        SiteNavBar siteNavBar = new SiteNavBar(getDriver());
-        siteNavBar.enterPageAdminMode();
         _portalHelper.addWebPart("Search");
-        siteNavBar.exitPageAdminMode();
 
         _messageUserId = _userHelper.createUser(USER).getUserId().toString();
         goToHome();
