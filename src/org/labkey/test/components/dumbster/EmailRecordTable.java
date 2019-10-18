@@ -206,10 +206,10 @@ public class EmailRecordTable extends Table
         int colIndex = EmailColumn.View.getIndex();
         do
         {
-            view = StringUtils.trimToNull(getDataAsText(rowIndex, colIndex++));
-            if (view != null)
+            view = getDataAsText(rowIndex, colIndex++);
+            if (view != null && !view.isBlank())
             {
-                views.add(view);
+                views.add(view.trim());
             }
         } while (view != null);
         emailMessage.setViews(views);
