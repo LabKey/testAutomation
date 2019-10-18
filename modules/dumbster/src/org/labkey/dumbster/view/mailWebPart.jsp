@@ -135,7 +135,7 @@ function toggleRecorder(checkbox)
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Date/Time</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Message</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Headers</div></td>
-        <td colspan="2" class="labkey-column-header labkey-col-header-filter" align="center"><div>View</div></td>
+        <td colspan="3" class="labkey-column-header labkey-col-header-filter" align="center"><div>View</div></td>
     </tr>
     <%
     if (messages.length > 0)
@@ -197,8 +197,8 @@ function toggleRecorder(checkbox)
                 <div id="email_body_<%=rowIndex%>" style="display: none;"><hr><%=body%></div></td>
             <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
                 <div id="email_headers_<%=rowIndex%>" style="display: none;"><hr><%=unsafe(headers.toString())%></div></td>
-            <%=hasHtml ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")).at(target, "_messageHtml"), "HTML"))) : unsafe("")%>
-            <%=hasText ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")).at(target, "_messageText"), "Text"))) : unsafe("")%>
+            <%=hasHtml ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")).at(target, "_messageHtml"), "HTML"))) : createHtml(TD())%>
+            <%=hasText ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")).at(target, "_messageText"), "Text"))) : createHtml(TD())%>
             <%=createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "raw")).at(target, "_messageText"), "Raw")))%>
         </tr>
 <%
