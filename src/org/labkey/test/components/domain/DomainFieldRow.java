@@ -69,7 +69,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow setType(FieldDefinition.ColumnType columnType)
     {
-        getWrapper().setFormElement(elementCache().fieldTypeSelectInput, columnType.toString());
+        setType(columnType.toString());
         return this;
     }
 
@@ -84,8 +84,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return Enum.valueOf(FieldDefinition.ColumnType.class, typeString);
     }
 
-    public DomainFieldRow setType(String columnType)
+    private DomainFieldRow setType(String columnType)
     {
+        expand();
         getWrapper().setFormElement(elementCache().fieldTypeSelectInput, columnType);
         return this;
     }
@@ -595,16 +596,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Select getFromSchemaInput()
         {
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
-            getWrapper().waitFor(()-> select.getOptions().size() > 0,
-                    "select did not have options in the expected time", 1500);
+            getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
+                    "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
             return select;
         }
 
         public Select getFromTargetTableInput()
         {
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
-            getWrapper().waitFor(()-> select.getOptions().size() > 0,
-                    "select did not have options in the expected time", 1500);
+            getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
+                    "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
             return select;
         }
 
