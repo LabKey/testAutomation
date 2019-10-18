@@ -28,9 +28,9 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public DomainDesignerPage clickSave()
     {
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton()));
         String currentURL = getDriver().getCurrentUrl();
-        elementCache().saveButton.click();
+        elementCache().saveButton().click();
         afterSaveOrFinishClick(currentURL);
         return this;
     }
