@@ -411,10 +411,15 @@ public class FileBrowserHelper extends WebDriverWrapper
         return new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitleContaining("File Properties").waitFor();
     }
 
-    public void selectImportDataAction(@LoggedParam String actionName)
+    public Window clickImportData()
     {
         doAndWaitForPageSignal(() -> clickFileBrowserButton(BrowserAction.IMPORT_DATA), IMPORT_SIGNAL_NAME);
-        Window importWindow = Window(getDriver()).withTitle("Import Data").waitFor();
+        return Window(getDriver()).withTitle("Import Data").waitFor();
+    }
+
+    public void selectImportDataAction(@LoggedParam String actionName)
+    {
+        Window importWindow = clickImportData();
         RadioButton actionRadioButton = RadioButton().withLabelContaining(actionName).find(importWindow);
         actionRadioButton.check();
         if (!actionRadioButton.isSelected())

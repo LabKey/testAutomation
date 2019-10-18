@@ -18,6 +18,8 @@ package org.labkey.test.components.pipeline;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -39,6 +41,17 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
     {
         _el = Locator.tagWithId("form", "pipelineForm").findWhenNeeded(driver);
         _driver = driver;
+    }
+
+    public static PipelineTriggerWizard beginAt(WebDriverWrapper driver)
+    {
+        return beginAt(driver, driver.getCurrentContainerPath());
+    }
+
+    public static PipelineTriggerWizard beginAt(WebDriverWrapper driver, String containerPath)
+    {
+        driver.beginAt(WebTestHelper.buildURL("pipeline", containerPath, "createPipelineTrigger"));
+        return new PipelineTriggerWizard(driver.getDriver());
     }
 
     @Override
