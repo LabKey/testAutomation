@@ -1092,11 +1092,11 @@ public class ClientAPITest extends BaseWebDriverTest
         assertTextNotPresent(EMAIL_SUBJECT_ERROR);
         EmailRecordTable.EmailMessage emailMessage;
         emailMessage = mailTable.getMessage(EMAIL_SUBJECT_ALL);
-        assertEquals("Wrong views available for: " + EMAIL_SUBJECT_ALL, Arrays.asList("HTML", "Text"), emailMessage.getViews());
+        assertEquals("Wrong views available for: " + EMAIL_SUBJECT_ALL, Arrays.asList("HTML", "Text", "Raw"), emailMessage.getViews());
         emailMessage = mailTable.getMessage(EMAIL_SUBJECT_PLAIN);
-        assertEquals("Wrong views available for: " + EMAIL_SUBJECT_PLAIN, Arrays.asList("Text"), emailMessage.getViews());
+        assertEquals("Wrong views available for: " + EMAIL_SUBJECT_PLAIN, Arrays.asList("Text", "Raw"), emailMessage.getViews());
         emailMessage = mailTable.getMessage(EMAIL_SUBJECT_HTML);
-        assertEquals("Wrong views available for: " + EMAIL_SUBJECT_HTML, Arrays.asList("HTML"), emailMessage.getViews());
+        assertEquals("Wrong views available for: " + EMAIL_SUBJECT_HTML, Arrays.asList("HTML", "Raw"), emailMessage.getViews());
         emailMessage = mailTable.getMessage("");
         assertEquals("Wrong recipients for email with blank subject", Arrays.asList(EMAIL_RECIPIENTS), Arrays.asList(emailMessage.getTo()));
         emailMessage = mailTable.getMessage(EMAIL_SUBJECT_NON_USER);
