@@ -37,7 +37,6 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 
 public class SampleSetHelper extends WebDriverWrapper
 {
@@ -170,7 +169,12 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public SampleSetHelper selectImportOption(String label, int index)
     {
-        RadioButton().withLabel(label).index(index).find(getDriver()).check();
+        waitForText("Import Lookups by Alternate Key");
+        boolean merge = MERGE_DATA_LABEL.equals(label);
+        String componentId = "insertOption" + index;
+        String script = "Ext4.ComponentManager.get('" + componentId + "').setValue(" + (merge?"1":"0") + ")";
+        System.err.println(script);
+        executeScript(script);
         return this;
     }
 
