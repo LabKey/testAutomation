@@ -23,7 +23,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
-import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -60,7 +59,7 @@ public class MultiplePKUploadAssayTest extends BaseWebDriverTest
         goToProjectHome();
         log("Create GPAT assay");
         String assayName = "ThawList Assay";
-        AssayDesignerPage assayDesigner = _assayHelper.createAssayAndEdit("General", assayName);
+        _assayHelper.createAssayDesignWithDefaults("General", assayName);
 
         log("Creating individual lists");
         File List1 = TestFileUtils.getSampleData("ThawLists/List1.xlsx");

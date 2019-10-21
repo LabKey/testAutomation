@@ -173,7 +173,11 @@ public class DumbsterController extends SpringActionController
             String output;
             String desiredContentType = "text/plain";
 
-            if ("html".equals(form.getType()))
+            if ("raw".equals(form.getType()))
+            {
+                output = message.toString();
+            }
+            else if ("html".equals(form.getType()))
             {
                 String html = map.get("text/html");
 
