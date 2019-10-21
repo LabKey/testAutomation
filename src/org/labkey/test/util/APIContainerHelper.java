@@ -24,6 +24,7 @@ import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.security.CreateContainerCommand;
 import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
+import org.labkey.remoteapi.security.GetContainersCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -36,9 +37,16 @@ import static org.junit.Assert.fail;
 
 public class APIContainerHelper extends AbstractContainerHelper
 {
+    private boolean navigateToCreatedFolders = true;
+
     public APIContainerHelper(BaseWebDriverTest test)
     {
         super(test);
+    }
+
+    public void setNavigateToCreatedFolders(boolean navigateToCreatedFolders)
+    {
+        this.navigateToCreatedFolders = navigateToCreatedFolders;
     }
 
     @Override
@@ -65,7 +73,10 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         fullPath.append(folderName);
 
-        _test.beginAt(WebTestHelper.buildURL("project", fullPath.toString(), "begin"));
+        if (navigateToCreatedFolders)
+        {
+            _test.beginAt(WebTestHelper.buildURL("project", fullPath.toString(), "begin"));
+        }
     }
 
     public CreateContainerResponse doCreateContainer(String parentPath, @Nullable String name, String title, String folderType, boolean isWorkbook)
@@ -196,6 +207,20 @@ public class APIContainerHelper extends AbstractContainerHelper
         catch (IOException fail)
         {
             throw new RuntimeException("Failed to move '" + containerPath + "' to '" + newParent + "'", fail);
+        }
+    }
+
+    public String getContainerId(String containerPath) throws CommandException
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+
+        try
+        {
+            return new GetContainersCommand().execute(connection, containerPath).getContainerId();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Unable to get container ID for: " + containerPath, e);
         }
     }
 }

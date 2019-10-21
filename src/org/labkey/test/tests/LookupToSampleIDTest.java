@@ -24,11 +24,9 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.components.PropertiesEditor;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 
@@ -182,16 +180,18 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
 
     private void createAssay(String name, String lookupTableValue, String lookupTableType, String sampleSetFolder)
     {
-        AssayDesignerPage assayDesigner = _assayHelper.createAssayAndEdit("General", name);
+        ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", name);
 
-        ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo(sampleSetFolder, "samples", lookupTableValue);
-        lookupInfo.setTableType(lookupTableType);
-
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(name + " Data Fields").find();
-        editor.addField(new FieldDefinition(SAMPLE_ID_FIELD_NAME)
+        // add the lookup field to the Results Properties panel
+        assayDesigner.goToResultFields()
+                .addField(SAMPLE_ID_FIELD_NAME)
                 .setLabel(SAMPLE_ID_FIELD_LABEL)
-                .setLookup(lookupInfo));
-        assayDesigner.saveAndClose();
+                .setType(FieldDefinition.ColumnType.Lookup)
+                .setFromFolder(sampleSetFolder)
+                .setFromSchema("samples")
+                .setFromTargetTable(lookupTableValue + " (" + lookupTableType + ")");
+
+        assayDesigner.clickFinish();
     }
 
     private void importDataInAssay(String assayName, File assayImportFile)

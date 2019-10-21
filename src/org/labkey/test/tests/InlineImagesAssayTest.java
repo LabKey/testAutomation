@@ -28,6 +28,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -101,15 +102,21 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
                 "102\t3A2B\t3";
 
         log("Create an Assay.");
-        AssayDesignerPage assayDesigner = _assayHelper.createAssayAndEdit("General", assayName);
+        ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", assayName);
 
         log("Mark the assay as editable.");
-        assayDesigner.setEditableRuns(true);
-        assayDesigner.setEditableResults(true);
-        assayDesigner.addBatchField("BatchFileField", "Batch File Field", FieldDefinition.ColumnType.File);
-        assayDesigner.addRunField("RunFileField", "Run File Field", FieldDefinition.ColumnType.File);
-        assayDesigner.addDataField("DataFileField", "Data File Field", FieldDefinition.ColumnType.File);
-        assayDesigner.saveAndClose();
+        assayDesigner.setEditableRuns(true).setEditableResults(true);
+
+        log("Add Batch file field");
+        assayDesigner.goToBatchFields().addField("BatchFileField").setLabel("Batch File Field").setType(FieldDefinition.ColumnType.File);
+
+        log("Add Run file field");
+        assayDesigner.goToRunFields().addField("RunFileField").setLabel("Run File Field").setType(FieldDefinition.ColumnType.File);
+
+        log("Add Results file field");
+        assayDesigner.goToResultFields().addField("DataFileField").setLabel("Data File Field").setType(FieldDefinition.ColumnType.File);
+
+        assayDesigner.clickFinish();
 
         log("upload inline files to the pipeline root");
         goToModule("FileContent");
@@ -193,9 +200,9 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         log("Remove the 'File' (last) column from the batch and see that things still work.");
 
-        assayDesigner = _assayHelper.clickEditAssayDesign();
-        assayDesigner.batchFields().selectField("BatchFileField").markForDeletion();
-        assayDesigner.saveAndClose();
+        AssayDesignerPage gwtAassayDesigner = _assayHelper.clickEditAssayDesign();
+        gwtAassayDesigner.batchFields().selectField("BatchFileField").markForDeletion();
+        gwtAassayDesigner.saveAndClose();
         waitAndClickAndWait(Locator.linkWithText("view results"));
 
         log("Verify that the file fields from the batch are no longer present.");

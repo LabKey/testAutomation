@@ -21,8 +21,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -42,7 +43,7 @@ import java.util.Map;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category({DailyA.class})
+@Category({DailyA.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class AssayAPITest extends BaseWebDriverTest
 {
@@ -116,7 +117,7 @@ public class AssayAPITest extends BaseWebDriverTest
         int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
         if (assayId == 0)
         {
-            assayHelper.createAssayWithDefaults("General", assayName);
+            assayHelper.createAssayDesignWithDefaults("General", assayName);
             assayId = assayHelper.getIdFromAssayName(assayName, getProjectName());
         }
 
@@ -177,22 +178,34 @@ public class AssayAPITest extends BaseWebDriverTest
         return pipelinePath;
     }
 
+    private void createAssayWithFileFields(String assayName)
+    {
+        ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", assayName);
+
+        log("Create a 'File' column for the assay run.");
+        assayDesigner.goToRunFields()
+                .addField("RunFileField")
+                .setType(FieldDefinition.ColumnType.File)
+                .setLabel("Run File Field");
+
+        log("Create a 'File' column for the assay data.");
+        assayDesigner.goToResultFields()
+                .addField("DataFileField")
+                .setType(FieldDefinition.ColumnType.File)
+                .setLabel("Data File Field");
+
+        assayDesigner.clickFinish();
+    }
+
     // Issue 22632: import runs into GPAT assay using LABKEY.Assay.importRun() API with data rows
     @Test
     public void testImportRun_dataRows() throws Exception
     {
-        goToManageAssays();
+        goToProjectHome();
+
+        log("create GPAT assay");
         String assayName = "GPAT-ImportRunApi-dataRows" + TRICKY_CHARACTERS;
-        APIAssayHelper assayHelper = new APIAssayHelper(this);
-        AssayDesignerPage assayDesigner = assayHelper.createAssayAndEdit("General", assayName);
-        log("Create a 'File' column for the assay run.");
-        assayDesigner.addRunField("RunFileField", "Run File Field", FieldDefinition.ColumnType.File);
-
-        log("Create a 'File' column for the assay data.");
-        assayDesigner.addDataField("DataFileField", "Data File Field", FieldDefinition.ColumnType.File);
-        assayDesigner.saveAndClose();
-
-        int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
+        createAssayWithFileFields(assayName);
 
         File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         Path fullPath = fileRoot.toPath().resolve("screenshot.png");
@@ -203,6 +216,8 @@ public class AssayAPITest extends BaseWebDriverTest
         );
 
         // import the file using a relative path
+        APIAssayHelper assayHelper = new APIAssayHelper(this);
+        int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName());
         ImportRunResponse resp = assayHelper.importAssay(assayId, "x", dataRows, getProjectName(), Collections.singletonMap("RunFileField", "foo.xls"), Collections.emptyMap());
         beginAt(resp.getSuccessURL());
         assertTextPresent("p01", "p02");
@@ -239,10 +254,7 @@ public class AssayAPITest extends BaseWebDriverTest
 
         log("create GPAT assay");
         String assayName = "GPAT-SaveBatch" + TRICKY_CHARACTERS;
-        AssayDesignerPage assayDesigner = _assayHelper.createAssayAndEdit("General", assayName);
-        assayDesigner.addRunField("RunFileField", "Run File Field", FieldDefinition.ColumnType.File);
-        assayDesigner.addDataField("DataFileField", "Data File Field", FieldDefinition.ColumnType.File);
-        assayDesigner.saveAndClose();
+        createAssayWithFileFields(assayName);
 
         log("create run via saveBatch");
         String runName = "created-via-saveBatch";

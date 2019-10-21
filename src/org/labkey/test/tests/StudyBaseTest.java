@@ -31,6 +31,7 @@ import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.study.specimen.SpecimenHelper;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
@@ -68,19 +69,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void setupRequestStatuses()
     {
-        goToManageStudy();
-        clickAndWait(Locator.linkWithText("Manage Request Statuses"));
-        setFormElement(Locator.name("newLabel"), "New Request");
-        clickButton("Save");
-        setFormElement(Locator.name("newLabel"), "Processing");
-        clickButton("Save");
-        setFormElement(Locator.name("newLabel"), "Completed");
-        checkCheckbox(Locator.checkboxByName("newFinalState"));
-        clickButton("Save");
-        setFormElement(Locator.name("newLabel"), "Rejected");
-        checkCheckbox(Locator.checkboxByName("newFinalState"));
-        uncheckCheckbox(Locator.checkboxByName("newSpecimensLocked"));
-        clickButton("Done");
+        new SpecimenHelper(this).setupRequestStatuses();
     }
 
     public List<String> getAssociatedModules()

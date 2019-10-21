@@ -31,18 +31,20 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
         String currentURL = getDriver().getCurrentUrl();
         elementCache().saveButton.click();
+        afterSaveOrFinishClick(currentURL);
+        return this;
+    }
 
-        waitFor(()-> !getDriver().getCurrentUrl().equals(currentURL)||
-                anyAlert() != null,
-                "expected either navigation or an alert with error or info to appear", 1000);
+    protected void afterSaveOrFinishClick(String currentURL)
+    {
+        waitFor(()-> !getDriver().getCurrentUrl().equals(currentURL) || anyAlert() != null,
+                "expected either navigation or an alert with error or info to appear", WAIT_FOR_JAVASCRIPT);
 
         if (isAlertVisible())
         {
             String msg = waitForAnyAlert();
             log("Clicking save.  Waited until alert with message [" + msg + "] appeared");
         }
-
-        return this;
     }
 
     public UnsavedChangesModalDialog clickCancel()
@@ -65,23 +67,25 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return Locators.alert.findOptionalElement(getDriver()).map(WebElement::isDisplayed).orElse(false);
     }
 
-    public WebElement saveButton()
-    {
-        return elementCache().saveButton;
-    }
-
-    public WebElement saveAndFinishButton()
-    {
-        return elementCache().saveButton;
-    }
-
     public DomainFormPanel fieldProperties()
     {
         return elementCache().firstDomainFormPanel;
     }
-    public DomainFormPanel fieldProperties(String queryName)
+
+    public DomainFormPanel fieldProperties(String title)
     {
-        return elementCache().domainFormPanel(queryName);
+        return elementCache().domainFormPanel(title);
+    }
+
+    public DomainFormPanel activeFieldProperties(String title)
+    {
+        return elementCache().activeDomainFormPanel(title);
+    }
+
+    public int getFieldPropertiesPanelCount()
+    {
+        Locator panelLoc = new DomainFormPanel.DomainFormPanelFinder(getDriver()).getBaseLocator();
+        return panelLoc.findElements(getDriver()).size() - 1; // minus 1 because of top level Assay Properties panel
     }
 
     public String waitForError()
@@ -144,11 +148,16 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         DomainFormPanel firstDomainFormPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())   // for situations where there's only one on the page
                 .findWhenNeeded(this);                                                          // and the caller is too lazy to specify which one they want
 
-        DomainFormPanel domainFormPanel(String domainName)                                              // for situations with multiple domainformpanels on the same page
+        DomainFormPanel domainFormPanel(String title) // for situations with multiple domainformpanels on the same page
         {
-            return new DomainFormPanel.DomainFormPanelFinder(getDriver())
-                    .withTitle(domainName).findWhenNeeded(this);
+            return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).findWhenNeeded(this);
+        }                                                     // and the caller is too lazy to specify which one they want
+
+        DomainFormPanel activeDomainFormPanel(String title) // for situations with multiple domainformpanels on the same page and only one is active
+        {
+            return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).active().findOrNull(this);
         }
+
         WebElement saveButton = Locator.button("Save")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement cancelBtn = Locator.button("Cancel")

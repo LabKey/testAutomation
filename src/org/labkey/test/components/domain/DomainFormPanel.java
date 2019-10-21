@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementCache>
 {
     private final WebElement _el;
@@ -60,7 +62,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         if (fieldDefinition.getValidator() != null)
             throw new IllegalArgumentException("Validators are not yet supported");
         if (fieldDefinition.isMvEnabled())
-            throw new IllegalArgumentException("Missing Value indicators are not yet supported");
+            fieldRow.setMissingValue(fieldDefinition.isMvEnabled());
         if (fieldDefinition.isRequired())
             fieldRow.setRequiredField(fieldDefinition.isRequired());
 
@@ -75,6 +77,17 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         List<DomainFieldRow> fieldRows = elementCache().findFieldRows();
         DomainFieldRow newFieldRow = fieldRows.get(fieldRows.size() - 1);
 
+        newFieldRow.setName(name);
+        return newFieldRow;
+    }
+
+    public DomainFieldRow startNewDesign(String name)
+    {
+        getWrapper().scrollIntoView(elementCache().startNewDesignLink, true);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().startNewDesignLink)); // give modal dialogs time to disappear
+        elementCache().startNewDesignLink.click();
+
+        DomainFieldRow newFieldRow = elementCache().findFieldRows().get(0);
         newFieldRow.setName(name);
         return newFieldRow;
     }
@@ -94,6 +107,12 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFieldRow getField(int tabIndex)
     {
         return elementCache().findFieldRows().get(tabIndex);
+    }
+
+    public DomainFormPanel expand()
+    {
+        elementCache().expandIcon.click();
+        return this;
     }
 
     @Override
@@ -171,12 +190,22 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
                 return null;
             return fieldRows.get(fieldNames.get(name));
         }
+
+        WebElement startNewDesignLink = Locator.tagWithClass("span", "domain-form-add-link")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+
+        // TODO since the Assay Properties panel also has the notion of expand/collapse,
+        //  we should split that part out into an Abstract test class that both can use
+        WebElement expandIcon = Locator.tagWithClass("svg", "fa-plus-square")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-form-panel");
+        final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-form-panel");
+        final Locator.XPathLocator _activeLocator = Locator.tagWithClass("div", "domain-form-panel").withClass("panel-active");
         private String _title = null;
+        private boolean _active;
 
         public DomainFormPanelFinder(WebDriver driver)
         {
@@ -186,6 +215,12 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         public DomainFormPanelFinder withTitle(String title)
         {
             _title = title;
+            return this;
+        }
+
+        public DomainFormPanelFinder active()
+        {
+            _active = true;
             return this;
         }
 
@@ -199,9 +234,17 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         protected Locator locator()
         {
             if (_title != null)
-                return _baseLocator.withDescendant(Locator.tagWithClass("div", "panel-heading").withText( _title));
+            {
+                Locator.XPathLocator titleLoc = Locator.tagWithClass("div", "panel-heading").startsWith(_title);
+                return _active ? _activeLocator.withDescendant(titleLoc) : getBaseLocator().withDescendant(titleLoc);
+            }
             else
-                return _baseLocator;
+                return getBaseLocator();
+        }
+
+        public Locator.XPathLocator getBaseLocator()
+        {
+            return _baseLocator;
         }
     }
 }
