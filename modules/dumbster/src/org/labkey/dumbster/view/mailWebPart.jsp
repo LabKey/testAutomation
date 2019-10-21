@@ -29,10 +29,12 @@
 <%@ page import="org.labkey.dumbster.DumbsterController" %>
 <%@ page import="org.labkey.dumbster.model.DumbsterManager" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
-<%@ page import="java.util.Iterator" %>
-<%@ page import="java.util.Set" %>
+<%@ page import="javax.mail.MessagingException" %>
+<%@ page import="javax.mail.internet.MimeMessage" %>
 <%@ page import="static org.labkey.api.util.DOM.Attribute.*" %>
 <%@ page import="static org.labkey.api.util.DOM.*" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.Map" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%!
@@ -133,7 +135,7 @@ function toggleRecorder(checkbox)
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Date/Time</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Message</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Headers</div></td>
-        <td colspan="2" class="labkey-column-header labkey-col-header-filter" align="center"><div>View</div></td>
+        <td colspan="3" class="labkey-column-header labkey-col-header-filter" align="center"><div>View</div></td>
     </tr>
     <%
     if (messages.length > 0)
@@ -146,11 +148,6 @@ function toggleRecorder(checkbox)
             else
             {    %><tr class="labkey-row"><% }
 
-            String[] lines = m.getBody().split("\n");
-            StringBuilder body = new StringBuilder();
-            boolean sawHtml = false;
-            boolean inHtml = false;
-            boolean inMessageBody = false;
 
             StringBuilder headers = new StringBuilder();
             Iterator i = m.getHeaderNames();
@@ -162,46 +159,47 @@ function toggleRecorder(checkbox)
                 headers.append(": ");
                 headers.append(h(m.getHeaderValue(header)));
                 headers.append("<br/>\n");
-                if (header.equals("Content-Type") && m.getHeaderValue(header).indexOf("text/html") == 0)
-                    sawHtml = true;
             }
 
-            for (String line : lines)
+            boolean hasHtml = false;
+            boolean hasText = false;
+            HtmlString body;
+            try
             {
-                if (line.indexOf("Content-Type: text/html") == 0)
-                    sawHtml = true;
-                else if (sawHtml && "".equals(line))
-                    inHtml = true;    
-                else if (line.indexOf("------=") == 0)
-                    sawHtml = inHtml = false;
-                else if (inHtml && line.trim().equals("</td></tr>"))
-                    inMessageBody = false;
+                MimeMessage mimeMessage = DumbsterManager.convertToMimeMessage(m);
+                Map<String, String> map = MailHelper.getBodyParts(mimeMessage);
 
-                if (inHtml && !inMessageBody)
-                    body.append(line).append('\n');
+                hasHtml = map.get("text/html") != null;
+                hasText = map.get("text/plain") != null;
+
+                if (hasHtml)
+                {
+                    body = unsafe(map.get("text/html"));
+                }
+                else if (hasText)
+                {
+                    body = h(map.get("text/plain"));
+                }
                 else
-                    body.append(h(line)).append("<br>\n");
-
-                if (inHtml && line.indexOf("id=\"message-body\"") > 0)
-                    inMessageBody = true;
+                {
+                    body = createHtml(DIV(cl("labkey-error"), "No message body"));
+                }
             }
-
-            Set<String> contentTypes = MailHelper.getBodyPartContentTypes(DumbsterManager.convertToMimeMessage(m));
-
+            catch (MessagingException e)
+            {
+                body = createHtml(DIV(cl("labkey-error"), "Error parsing email: " + e.getMessage()));
+            }
 %>
             <td><%=h(m.getHeaderValue("To"))%></td>
             <td><%=h(m.getHeaderValue("From"))%></td>
             <td><%=formatDateTime(m.getCreatedTimestamp())%></td>
             <td><a onclick="toggleBody('email_body_<%=rowIndex%>'); return false;"><%=h(m.getHeaderValue("Subject"))%></a>
-                <div id="email_body_<%=rowIndex%>" style="display: none;"><br><%=HtmlString.unsafe(body.toString())%></div></td>
+                <div id="email_body_<%=rowIndex%>" style="display: none;"><hr><%=body%></div></td>
             <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
-                <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=unsafe(headers.toString())%></div></td>
-            <td>
-                <%=contentTypes.contains("text/html") ? createHtml(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")).at(target, "_messageHtml"), "HTML")) : unsafe("&nbsp;")%>
-            </td>
-            <td>
-                <%=contentTypes.contains("text/plain") ? createHtml(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")).at(target, "_messageText"), "Text")) : unsafe("&nbsp;")%>
-            </td>
+                <div id="email_headers_<%=rowIndex%>" style="display: none;"><hr><%=unsafe(headers.toString())%></div></td>
+            <%=hasHtml ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")).at(target, "_messageHtml"), "HTML"))) : createHtml(TD())%>
+            <%=hasText ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")).at(target, "_messageText"), "Text"))) : createHtml(TD())%>
+            <%=createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "raw")).at(target, "_messageText"), "Raw")))%>
         </tr>
 <%
         }
