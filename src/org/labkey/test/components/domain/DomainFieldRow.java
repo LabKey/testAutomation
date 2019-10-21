@@ -695,7 +695,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public Select getFromSchemaInput()
         {
-            expand();
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
             getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
                     "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
@@ -704,7 +703,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public Select getFromTargetTableInput()
         {
-            expand();
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
             getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
                     "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
@@ -713,7 +711,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public Checkbox getLookupValidatorEnabledCheckbox()
         {
-            expand();
             return new Checkbox(Locator.checkboxByName("domainpropertiesrow-lookupValidator").findElement(this));
         }
 

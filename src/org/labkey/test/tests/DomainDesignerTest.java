@@ -77,7 +77,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Before
     public void preTest() throws Exception
     {
-//        disablePageUnloadEvents();
         goToProjectHome();
     }
 
@@ -416,7 +415,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickSave();
 
         // there should just be the key field (id) now:
-//        disablePageUnloadEvents();
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
         domainFormPanel = domainDesignerPage.fieldProperties(list); // re-find the panel to work around field caching silliness
         assertNotNull(domainFormPanel.getField("id"));
