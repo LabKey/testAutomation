@@ -29,6 +29,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PlateGrid;
 import org.labkey.test.components.labkey.LabKeyAlert;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.tests.AbstractAssayTest;
@@ -192,9 +193,10 @@ public class NabAssayTest extends AbstractAssayTest
 
         // go back into assay design to configure templates
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        _assayHelper.clickEditAssayDesign();
-        clickAndWait(Locator.lkButton("configure templates"));
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
+        assayDesignerPage.goToConfigureTemplates();
 
+        // todo: implement in/refactor to use template page
         clickAndWait(Locator.linkWithText("new 96 well (8x12) NAb single-plate template"));
 
         setFormElement(Locator.inputById("templateName"), PLATE_TEMPLATE_NAME);
@@ -229,9 +231,10 @@ public class NabAssayTest extends AbstractAssayTest
                 .setPlateTemplate(PLATE_TEMPLATE_NAME)
                 .clickFinish();
 
-        clickAndWait(Locator.lkButton("configure templates"));
+        _assayHelper.clickEditAssayDesign()
+                .goToConfigureTemplates();
 
-        doAndWaitForPageToLoad(() ->
+        doAndWaitForPageToLoad(() ->                // todo: add page class method of removing first template
         {
             click(Locator.linkWithText("delete"));
 

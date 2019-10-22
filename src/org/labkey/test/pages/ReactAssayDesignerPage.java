@@ -71,6 +71,12 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public void goToConfigureTemplates()
+    {
+        clickAndWait(elementCache().configureTemplatesLink);
+        // todo: return the class that wraps this page
+    }
+
     public ReactAssayDesignerPage setDetectionMethod(String method)
     {
         elementCache().detectionMethodSelect.selectByVisibleText(method);
@@ -244,6 +250,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(this);
         final Select autoCopyTargetSelect = Select(Locator.id("assay-design-autoCopyTargetContainerId")).findWhenNeeded(this);
         final Select plateTemplateSelect = Select(Locator.id("assay-design-selectedPlateTemplate")).findWhenNeeded(this);
+        final WebElement configureTemplatesLink = Locator.linkContainingText("Configure Templates").findWhenNeeded(this);
         final Select detectionMethodSelect = Select(Locator.id("assay-design-selectedDetectionMethod")).findWhenNeeded(this);
         final OptionSelect<MetadataInputFormat> metadataInputSelect = OptionSelect.finder(Locator.id("assay-design-selectedMetadataInputFormat"), MetadataInputFormat.class).findWhenNeeded(this);
         final Checkbox saveScriptFilesCheckbox = Checkbox(Locator.checkboxById("assay-design-saveScriptFiles")).findWhenNeeded(this);
