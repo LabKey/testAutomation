@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
@@ -816,6 +817,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Site Users")))
             clickAdminMenuItem("Site", "Site Users");
         return new ShowUsersPage(getDriver());
+    }
+
+    public DomainFormPanel goToChangeUserProperties()
+    {
+        enableUxDomainDesigner();
+        goToSiteUsers();
+        clickButton("Change User Properties", defaultWaitForPage);
+        disableUxDomainDesigner();
+        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Users").find();
     }
 
     public void goToSiteGroups()
