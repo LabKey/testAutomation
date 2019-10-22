@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -44,7 +43,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     @Override
     public void waitForPage()
     {
-        waitForElement(Locator.button("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("assay-design-description"), WAIT_FOR_JAVASCRIPT);
         elementCache().descriptionInput.get();
     }
 

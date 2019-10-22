@@ -243,9 +243,8 @@ public class ViabilityTest extends AbstractViabilityTest
 
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
-        _assayHelper.clickEditAssayDesign(true);
+        ReactAssayDesignerPage assayDesigner = _assayHelper.clickEditAssayDesign(true);
 
-        ReactAssayDesignerPage assayDesigner = new ReactAssayDesignerPage(getDriver());
         assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
         assayDesigner.clickFinish();
 
