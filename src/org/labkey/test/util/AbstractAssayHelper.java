@@ -113,13 +113,14 @@ public abstract class AbstractAssayHelper
         return assayDesigner;
     }
 
-    public AssayDesignerPage clickEditAssayDesign()
+    public ReactAssayDesignerPage clickEditAssayDesign()
     {
         return clickEditAssayDesign(false);
     }
 
-    public AssayDesignerPage clickEditAssayDesign(boolean confirmEditInOtherContainer)
+    public ReactAssayDesignerPage clickEditAssayDesign(boolean confirmEditInOtherContainer)
     {
+        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
         _test.doAndWaitForPageToLoad(() ->
         {
             clickManageOption(false, "Edit assay design");
@@ -132,9 +133,10 @@ public abstract class AbstractAssayHelper
                         alertText.contains("Would you still like to edit it?"));
             }
         });
-        _test.waitForElement(Locator.id("AssayDesignerDescription"));
-
-        return new AssayDesignerPage(_test.getDriver());
+        // use the assayDesignerPage to synchronize
+        ReactAssayDesignerPage page = new ReactAssayDesignerPage(_test.getDriver());
+        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        return page;
     }
 
     public ReactAssayDesignerPage copyAssayDesign()

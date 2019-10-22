@@ -31,6 +31,7 @@ import org.labkey.test.components.CrosstabDataRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -505,9 +506,9 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
 
 
-        AssayDesignerPage assayDesigner = _assayHelper.clickEditAssayDesign();
+        ReactAssayDesignerPage assayDesigner = _assayHelper.clickEditAssayDesign();
         assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
-        assayDesigner.saveAndClose();
+        assayDesigner.clickFinish();
         DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
 
         clickProject(TEST_ASSAY_PRJ_ELISPOT);

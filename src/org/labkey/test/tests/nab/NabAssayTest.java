@@ -29,7 +29,6 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PlateGrid;
 import org.labkey.test.components.labkey.LabKeyAlert;
-import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.tests.AbstractAssayTest;
@@ -228,7 +227,7 @@ public class NabAssayTest extends AbstractAssayTest
 
         _assayHelper.clickEditAssayDesign()
                 .setPlateTemplate(PLATE_TEMPLATE_NAME)
-                .save();
+                .clickFinish();
 
         clickAndWait(Locator.lkButton("configure templates"));
 
@@ -348,7 +347,7 @@ public class NabAssayTest extends AbstractAssayTest
         assertEquals("No rows should be editable", 0, DataRegionTable.updateLinkLocator().findElements(table.getComponentElement()).size());
         _assayHelper.clickEditAssayDesign(true)
                 .setEditableRuns(true)
-                .saveAndClose();
+                .clickFinish();
 
         // Edit the first run
         doAndWaitForPageToLoad(() ->
@@ -693,7 +692,7 @@ public class NabAssayTest extends AbstractAssayTest
 
         _assayHelper.clickEditAssayDesign()
                 .addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"))
-                .saveAndClose();
+                .clickFinish();
 
         navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));

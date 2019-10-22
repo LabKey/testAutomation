@@ -23,7 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -245,9 +245,9 @@ public class ViabilityTest extends AbstractViabilityTest
         clickAndWait(Locator.linkWithText(getAssayName()));
         _assayHelper.clickEditAssayDesign(true);
 
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(getDriver());
+        ReactAssayDesignerPage assayDesigner = new ReactAssayDesignerPage(getDriver());
         assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
-        assayDesigner.saveAndClose();
+        assayDesigner.clickFinish();
 
         final String runName = "transformed assayId";
         uploadViabilityRun("/sampledata/viability/small.VIA.csv", runName, false);
@@ -299,13 +299,12 @@ public class ViabilityTest extends AbstractViabilityTest
 
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
-        AssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign(true);
-        waitForElement(Locator.lkButton("Add Script"));
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign(true);
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
-        assayDesignerPage.batchFields().selectField(0).markForDeletion();
-        assayDesignerPage.resultFields().addField(new FieldDefinition("TargetStudy").setLabel("Target Study").setType(FieldDefinition.ColumnType.String));
-        assayDesignerPage.saveAndClose();
+        assayDesignerPage.goToBatchFields().removeField("TargetStudy");
+        assayDesignerPage.goToResultFields().addField(new FieldDefinition("TargetStudy").setLabel("Target Study").setType(FieldDefinition.ColumnType.String));
+        assayDesignerPage.clickFinish();
 
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
