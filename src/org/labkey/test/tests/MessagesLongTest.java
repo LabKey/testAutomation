@@ -421,9 +421,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToModule("Dumbster");
         assertTextPresent("RE: " + MSG1_TITLE, 6);
         click(Locator.linkWithText(MSG1_TITLE));
-        assertTextPresent(
-                "1 <b>x</b>",
-                "<a class=\"labkey-text-link\" href=\"/labkey" + WebTestHelper.buildRelativeUrl("list", getProjectName(), "begin") + "?\">manage lists</a>");
+        assertElementPresent(Locator.linkWithText("manage lists"));
         click(Locator.linkWithText(MSG1_TITLE).index(1));
         assertTextPresent("first message testing");
         assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
@@ -439,7 +437,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         invokeApiAction("home", "announcements", "sendDailyDigest.api", "Failed to send messages daily digest");
         goToHome();
         goToModule("Dumbster");
-        assertTextPresent("New posts to /" + PROJECT_NAME, 2);
+        waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "New posts");
+        assertTextPresent("New posts to /" + PROJECT_NAME, 1);
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
         assertTextPresent("The following new posts were made yesterday");
     }
@@ -652,6 +651,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         goToModule("Dumbster");
+        waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "responder@messages.test");
         EmailRecordTable record = new EmailRecordTable(this);
         List<String> subject = record.getColumnDataAsText("Message");
         assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(0));
