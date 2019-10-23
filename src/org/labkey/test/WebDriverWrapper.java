@@ -321,6 +321,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     profile.setPreference("browser.ssl_override_behavior", 0);
 
+                    profile.setPreference("dom.disable_beforeunload", false);
+
                     profile.setAcceptUntrustedCertificates(true);
                     profile.setAssumeUntrustedCertificateIssuer(false);
 

@@ -10,10 +10,15 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
+
+import java.time.Duration;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -166,7 +171,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (isExpanded())
         {
-            elementCache().closeButton.click();
+            elementCache().collapseToggle.click();
             getWrapper().waitFor(() -> !isExpanded(),
                     "the field row did not collapse", 1500);
         }
@@ -375,15 +380,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         {
             containerPath = getWrapper().getCurrentContainerPath();
         }
-
-//        String previousValue = elementCache().getFromTargetTableInput().getFirstSelectedOption().getAttribute("value");
-//        if (!containerPath.equals(previousValue))
-//        {
-//            WebElement schemaSelect = elementCache().getFromSchemaInput().getWrappedElement();
-//            elementCache().fromFolderInput.selectByValue(containerPath);
-//            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(schemaSelect));
-//        }
-
         elementCache().fromFolderInput.selectByValue(containerPath);
 
         return this;
@@ -398,6 +394,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setFromSchema(String schemaName)
     {
         expand();
+        getWrapper().waitFor(()-> elementCache().getFromSchemaInput().getOptions().stream().anyMatch(a-> a.getText().equals(schemaName)),
+                "the select option [" + schemaName + "] did not appear in time", 3000);
         elementCache().getFromSchemaInput().selectByVisibleText(schemaName);
         return this;
     }
@@ -411,8 +409,23 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setFromTargetTable(String targetTable)
     {
         expand();
+        // give the option some time to appear before attempting to select it
+        getWrapper().waitFor(()-> elementCache().getFromTargetTableInput().getOptions().stream().anyMatch(a-> a.getText().equals(targetTable)),
+                "the select option [" + targetTable + "] did not appear in time", 5000);
         elementCache().getFromTargetTableInput().selectByVisibleText(targetTable);
         return this;
+    }
+
+    public DomainFieldRow setLookupValidatorEnabled(boolean checked)
+    {
+        expand();
+        elementCache().getLookupValidatorEnabledCheckbox().set(checked);
+        return this;
+    }
+    public boolean getLookupValidatorEnabled()
+    {
+        expand();
+        return elementCache().getLookupValidatorEnabledCheckbox().get();
     }
 
     // advanced settings
@@ -493,6 +506,93 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getComponentElement().getAttribute("class").contains("domain-row-border-warning");
     }
 
+    // conditional formatting and validation options
+
+    /**
+     * appends the supplied validators to any existing ones (including any empty default ones that might exist)
+     * @param validators
+     * @return
+     */
+    public DomainFieldRow addRangeValidators(List<FieldDefinition.RangeValidator> validators)
+    {
+        RangeValidatorDialog dialog = clickRangeButton();
+        for (FieldDefinition.RangeValidator val : validators)
+        {
+            dialog.addValidator(val);
+        }
+        dialog.clickApply();
+        return this;
+    }
+
+    /**
+     * sets the supplied validators on the field, assumes none are already present
+     * @param validators
+     * @return
+     */
+    public DomainFieldRow setRangeValidators(List<FieldDefinition.RangeValidator> validators)
+    {
+        RangeValidatorDialog dialog = clickRangeButton();
+        for (int i =0; i< validators.size(); i++)
+        {
+            dialog.setValidator(i, validators.get(i));
+        }
+        dialog.clickApply();
+        return this;
+    }
+
+    public RangeValidatorDialog clickRangeButton()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().rangeButton()));
+        elementCache().rangeButton().click();
+        return new RangeValidatorDialog(this, getDriver());
+    }
+
+    /**
+     * adds the specified regexValidators to the field.  Assumes that any range panels in the dialog
+     * are complete (by default, the first one is already shown but is empty)
+     * When adding the first/only regex validators to the field, use setRegularExpressions
+     * @param validators
+     * @return
+     */
+    public DomainFieldRow addRegularExpressions(List<FieldDefinition.RegExValidator> validators)
+    {
+        RegexValidatorDialog dialog = clickRegexButton();
+        for (FieldDefinition.RegExValidator val : validators)
+        {
+            dialog.addValidator(val);
+        }
+        dialog.clickApply();
+        return this;
+    }
+
+    public DomainFieldRow setRegularExpressions(List<FieldDefinition.RegExValidator> validators)
+    {
+        RegexValidatorDialog dialog = clickRegexButton();
+        for (int i =0; i< validators.size(); i++)
+        {
+            dialog.setValidator(i, validators.get(i));
+        }
+        dialog.clickApply();
+        return this;
+    }
+
+    public RegexValidatorDialog clickRegexButton()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().regexValidatorButton()));
+        elementCache().regexValidatorButton().click();
+        return new RegexValidatorDialog(this, getDriver());
+    }
+
+    public ConditionalFormatDialog clickConditionalFormatButton()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().conditionalFormatButton()));
+        elementCache().conditionalFormatButton().click();
+        return new ConditionalFormatDialog(this, getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -555,7 +655,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement advancedSettingsBtn = Locator.button("Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        public WebElement closeButton = Locator.tagWithAttribute("svg", "data-icon", "times")
+        public WebElement collapseToggle = Locator.tagWithAttribute("svg", "data-icon", "minus-square")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
 
@@ -609,6 +709,27 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             return select;
         }
 
+        public Checkbox getLookupValidatorEnabledCheckbox()
+        {
+            return new Checkbox(Locator.checkboxByName("domainpropertiesrow-lookupValidator").findElement(this));
+        }
 
+        public WebElement rangeButton()
+        {
+            return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                    Locator.button("Add Range"), Locator.button("Edit Ranges"));
+        }
+
+        public WebElement regexValidatorButton()
+        {
+            return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                    Locator.button("Add Regex"), Locator.button("Edit Regex"));
+        }
+
+        public WebElement conditionalFormatButton()
+        {
+            return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                    Locator.button("Add Format"),  Locator.button("Edit Formats"));
+        }
     }
 }

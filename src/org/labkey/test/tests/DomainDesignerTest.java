@@ -12,6 +12,7 @@ import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -21,8 +22,13 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.PropertiesEditor.DefaultType;
+import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.domain.RangeValidatorDialog;
+import org.labkey.test.components.domain.RegexValidatorDialog;
+import org.labkey.test.components.domain.RegexValidatorPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -31,6 +37,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +77,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Before
     public void preTest() throws Exception
     {
-        disablePageUnloadEvents();
         goToProjectHome();
     }
 
@@ -409,7 +415,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickSave();
 
         // there should just be the key field (id) now:
-        disablePageUnloadEvents();
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
         domainFormPanel = domainDesignerPage.fieldProperties(list); // re-find the panel to work around field caching silliness
         assertNotNull(domainFormPanel.getField("id"));
@@ -906,6 +911,87 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertNull("lookUpField target table should be null for current container", lookupColumn.getAllProperties().get("lookupContainer"));
     }
 
+    @Test
+    public void testLookupPropertyValidator() throws Exception
+    {
+        String listName = "lookupValidatorTestList";            // this is the main list
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        String listName1 = "lookupValidatorLookupList";         // this list will contain lookup values
+        String lookupList1Item = listName1 + " (Integer)";
+        FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName1);
+        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo1)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse1 = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        dgen1.addCustomRow(Map.of("name", "joey", "color", "green"));
+        dgen1.addCustomRow(Map.of("name", "billy", "color", "red"));
+        dgen1.addCustomRow(Map.of("name", "eddie", "color", "blue"));
+        dgen1.insertRows(createDefaultConnection(true), dgen1.getRows());
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+
+        // add a lookup field to the test list
+        DomainFieldRow row = domainFormPanel.addField("looky")
+                .setType(FieldDefinition.ColumnType.Lookup)
+                .setFromFolder("Current Folder")
+                .setFromSchema("lists")
+                .setFromTargetTable(lookupList1Item)
+                .setLookupValidatorEnabled(true)
+                .setDescription("should validate lookup value contents");
+        domainDesignerPage.clickSave();
+
+        // now make sure the validator is set
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor lookupColumn = getColumn(domainResponse.getDomain(), "looky");
+        Map<String, Object> propertyValidator = getPropertyValidator(lookupColumn, "Lookup Validator");
+    }
+
+    @Test
+    public void testDefaultValues() throws Exception
+    {
+        String listName = "defaultValuesTestList";
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+
+        DomainFieldRow testRow = domainFormPanel.getField("color");
+        testRow.clickAdvancedSettings()
+                .setDefaultValueType(DefaultType.FIXED_EDITABLE)  //"Editable default"
+                .apply();
+        domainDesignerPage.clickSave();
+
+        // now make sure the validator is not yet set
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor colorCol = getColumn(domainResponse.getDomain(), "color");
+        assertNull("expect default value to not be set yet", colorCol.getAllProperties().get("defaultValue"));
+
+        // now re-open the domain designer, go set the default values
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel newPanel = domainDesignerPage.fieldProperties(listName);
+        newPanel.getField("color")
+                .clickAdvancedSettings()
+                .clickDefaultValuesLink();  // should land us in
+        setFormElement(Locator.input("color"), "green");
+        clickButton("Save Defaults");
+
+        DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor updatedColor = getColumn(updatedResponse.getDomain(), "color");
+        assertEquals("expect default value to be green", "green", updatedColor.getAllProperties().get("defaultValue"));
+    }
+
     /**
      * verifies that a sampleset field with data (and blank values) will warn the user if they attempt to mark that field
      * 'required'
@@ -1072,12 +1158,358 @@ public class DomainDesignerTest extends BaseWebDriverTest
         waitFor(()->  snackRow.isExpanded(), "clicking the name field should expand the field row", 1000);
     }
 
+    @Test
+    public void testRangeValidator() throws Exception
+    {
+        String listName = "listForRangeValidator";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+
+        DomainFieldRow sizeRow = domainFormPanel.getField("size");
+        FieldDefinition.RangeValidator midsizeValidator = new FieldDefinition.RangeValidator("midsize", "falls between 2 and 3", "value must be 2 or 3",
+                FieldDefinition.RangeType.GTE, "2",
+                FieldDefinition.RangeType.LTE, "3");
+        sizeRow.setRangeValidators(Arrays.asList(midsizeValidator));
+        domainDesignerPage.clickSave();
+
+        // now verify the expected validator is formed and added to the field's validator array
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor sizeCol = getColumn(response.getDomain(), "size");
+        Map<String, Object> validator = getPropertyValidator(sizeCol, "midsize");
+        assertEquals("expect expression to be ", "~gte=2&~lte=3", validator.get("expression"));
+        assertEquals("validator we just created should be new", true, validator.get("new"));
+        assertEquals("expected description should be on the field",
+                "falls between 2 and 3", validator.get("description"));
+        assertEquals("expected error message should be on the field",
+                "value must be 2 or 3", validator.get("errorMessage"));
+    }
+
+    @Test
+    public void testConditionalFormat() throws Exception
+    {
+        String listName = "conditionalFormatList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+        dgen.addCustomRow(Map.of("name", "billy", "favoriteIceCream", "vanilla", "favoriteSnack", "apple", "size", 12));
+        dgen.addCustomRow(Map.of("name", "jeffy", "favoriteIceCream", "chocolate", "favoriteSnack", "almond brittle", "size", 12));
+        dgen.addCustomRow(Map.of("name", "alex", "favoriteIceCream", "strawberry", "favoriteSnack", "peanuts", "size", 12));
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows()); // insert test data into the list
+
+        DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
+        ConditionalFormatDialog formatDlg = favoriteSnack.clickConditionalFormatButton();
+        formatDlg.getOpenFormatPanel()
+                .setFirstCondition(Filter.Operator.DOES_NOT_CONTAIN)
+                .setFirstValue("almond")
+                .setItalicsCheckbox(true);
+        formatDlg.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now verify the expected validator is formed and added to the field's validator array
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor faveSnackCol = getColumn(response.getDomain(), "favoriteSnack");
+        Map<String, Object> validator = getConditionalFormats(faveSnackCol, "format.column~doesnotcontain=almond");
+        assertEquals("expect italics to be set", true, validator.get("italic"));
+        assertEquals("expect bold not to be set", false, validator.get("bold"));
+        assertEquals("expect strikethrough not to be set", false, validator.get("strikethrough"));
+    }
+
+    @Test
+    public void testRegexValidator() throws Exception
+    {
+        String listName = "regexValidatorList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
+
+        RegexValidatorDialog validatorDialog = favoriteSnack.clickRegexButton();
+        RegexValidatorPanel panel = validatorDialog.getValidationPanel();
+        String expression = "twizzler";
+        panel.setExpression(expression)
+                .setDescription("twizzler is not a snack")
+                .setErrorMessage("favorite snack cannot be twizzlers, yo")
+                .setFailOnMatch(true)
+                .setName("neverTwizzlers");
+        validatorDialog.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now verify the expected validator is formed and added to the field's validator array
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor faveSnackCol = getColumn(response.getDomain(), "favoriteSnack");
+        Map<String, Object> specialCharsValidator = getPropertyValidator(faveSnackCol, "neverTwizzlers");
+        assertEquals("validator we just created should be new", true, specialCharsValidator.get("new"));
+        assertEquals("expected expression should be on the field", expression, specialCharsValidator.get("expression"));
+        assertEquals("expected description should be on the field",
+                "twizzler is not a snack", specialCharsValidator.get("description"));
+        assertEquals("expected error message should be on the field",
+                "favorite snack cannot be twizzlers, yo", specialCharsValidator.get("errorMessage"));
+
+        // this test does not verify that attempts to insert values that match will get an error
+    }
+
+    @Test
+    public void addUpdateRemoveRegexValidator() throws Exception
+    {
+        String listName = "regexCrudList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
+
+        RegexValidatorDialog validatorDialog = favoriteSnack.clickRegexButton();
+        RegexValidatorPanel panel1 = validatorDialog.getValidationPanel();
+        String expression1 = ".*[twizzler]+.*";
+        panel1.setExpression(expression1)
+                .setDescription("twizzler is not a snack")
+                .setErrorMessage("favorite snack cannot be twizzlers, yo")
+                .setFailOnMatch(true)
+                .setName("neverTwizzlers");
+        String expression2 = ".*[!@#$%^]+.*";
+        RegexValidatorPanel panel2 = validatorDialog.addValidationPanel("specialChars")
+                .setDescription("matches on any special character substrings in the input")
+                .setExpression(expression2)
+                .setFailOnMatch(false)
+                .setErrorMessage("no special characters in this field, please");
+        String expression3 = ".*[<>]+.*";
+        RegexValidatorPanel panel3 = validatorDialog.addValidationPanel("angleBrackets")
+                .setDescription("matches on any angle bracket substrings in the input")
+                .setExpression(expression3)
+                .setFailOnMatch(false)
+                .setName("angleBrackets")
+                .setErrorMessage("no angle brackets in this field, please");
+        validatorDialog.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now verify the expected validator is formed and added to the field's validator array
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor faveSnackCol = getColumn(response.getDomain(), "favoriteSnack");
+        Map<String, Object> specialCharsValidator = getPropertyValidator(faveSnackCol, "specialChars");
+        assertEquals("validator we just created should be new", true, specialCharsValidator.get("new"));
+        assertEquals("expected expression should be on the field", expression2, specialCharsValidator.get("expression"));
+        assertEquals("expected description should be on the field",
+                "matches on any special character substrings in the input", specialCharsValidator.get("description"));
+        assertEquals("expected error message should be on the field",
+                "no special characters in this field, please", specialCharsValidator.get("errorMessage"));
+
+        // reopen, edit one, remove another
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        RegexValidatorDialog valDialog = domainDesignerPage.fieldProperties()
+                .getField("favoriteSnack")
+                .clickRegexButton();
+        valDialog.getValidationPanel(2) // will get 'angleBrackets' field, it's 3rd
+                .clickRemove();
+        RegexValidatorPanel specialValidatorPanel = valDialog
+                .getValidationPanel(1)  // will get the 'specialChars' field, it's 2nd
+                .setFailOnMatch(true);
+
+        valDialog.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now confirm 2 validators on the field
+        DomainResponse newResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor snackField = getColumn(newResponse.getDomain(), "favoriteSnack");
+        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)snackField.getAllProperties().get("propertyValidators");
+
+        // Domain designer UI only handles Range, Regex and Lookup validators
+        validators = validators.stream().filter(val ->
+                (val.get("type").equals("RegEx") || val.get("type").equals("Range") || val.get("type").equals("Lookup"))).collect(Collectors.toList());
+
+        Map<String, Object> twiz = getPropertyValidator(snackField, "neverTwizzlers");
+        Map<String, Object> spec = getPropertyValidator(snackField, "specialChars");
+
+        // no validator with name 'angleBrackets' exists now
+        assertEquals(0, validators.stream().filter(a-> a.get("name").equals("angleBrackets")).collect(Collectors.toList()).size());
+        // why not just verify just 2 validators on the field now?  ...because apparently when removed, it becomes a filter on text size is less-than-or-equal-to field cap
+        // ...but that looks like a regression of issue 38598, we're tracking it as 38662
+        assertEquals("issue 38662", 2, validators.size());
+    }
+
+    @Test
+    public void addUpdateRemoveRangeValidator() throws Exception
+    {
+        String listName = "rangeValidatorCrudList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFieldRow size = domainFormPanel.getField("size");
+
+        RangeValidatorDialog sizeDialog = size.clickRangeButton();
+        sizeDialog.getValidationPanel(0)
+                .setFirstCondition(Filter.Operator.LTE)
+                .setFirstValue("2")
+                .setName("lte2");
+        sizeDialog.addValidationPanel("equals3")
+                .setFirstCondition(Filter.Operator.EQUAL)
+                .setFirstValue("3");
+        sizeDialog.addValidationPanel("gte4")
+                .setFirstCondition(Filter.Operator.GTE)
+                .setFirstValue("4");
+        sizeDialog.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now verify we have 3 formats on the size field
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor sizeCol = getColumn(response.getDomain(), "size");
+        Map<String, Object> lte2 = getPropertyValidator(sizeCol, "lte2");
+        Map<String, Object> equals3 = getPropertyValidator(sizeCol, "equals3");
+        Map<String, Object> gte4 = getPropertyValidator(sizeCol, "gte4");
+
+        // now reopen the page, edit 2 delete another
+        // get back to the domain designer
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        RangeValidatorDialog dlg = domainDesignerPage.fieldProperties().getField("size")
+                .clickRangeButton();
+        dlg.getValidationPanel(0)       //lte2
+                .setDescription("2 or less");
+        dlg.getValidationPanel(1)       //equals3
+                .setDescription("equals 3");
+        dlg.getValidationPanel(2)       //gte4
+                .clickRemove();
+        dlg.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now verify we have 2 formats on the size field
+        DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor updatedSizeCol = getColumn(updatedResponse.getDomain(), "size");
+        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)updatedSizeCol.getAllProperties().get("propertyValidators");
+        assertEquals("expect only 2 validators on the field",2, validators.size());
+        Map<String, Object> editedLte2 = getPropertyValidator(updatedSizeCol, "lte2");
+        Map<String, Object> editedEquals3 = getPropertyValidator(updatedSizeCol, "equals3");
+
+        assertEquals("expect description edit to take","2 or less", editedLte2.get("description"));
+        assertEquals("expect description edit to take","equals 3", editedEquals3.get("description"));
+    }
+
+    @Test
+    public void addUpdateRemoveConditionalFormat() throws Exception
+    {
+        String listName = "conditionalFormatCrudList";
+
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("superHero", FieldDefinition.ColumnType.String)));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFieldRow superHero = domainFormPanel.getField("superHero");
+
+        ConditionalFormatDialog formatDialog = superHero.clickConditionalFormatButton();
+        formatDialog.getOpenFormatPanel()
+                .setFirstCondition(Filter.Operator.EQUAL)
+                .setFirstValue("Thor")
+                .setBoldCheckbox(true);
+        formatDialog.addFormatPanel()
+                .setFirstCondition(Filter.Operator.EQUAL)
+                .setFirstValue("Aquaman")
+                .setItalicsCheckbox(true);
+        formatDialog.addFormatPanel()
+                .setFirstCondition(Filter.Operator.EQUAL)
+                .setFirstValue("IronMan")
+                .setStrikethroughCheckbox(true);
+        formatDialog.clickApply();
+        domainDesignerPage.clickSave();
+
+        // now verify we have 3
+        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor heroCol = getColumn(response.getDomain(), "superHero");
+        Map<String, Object> thorMap = getConditionalFormats(heroCol, "format.column~eq=Thor");
+        Map<String, Object> aquaMap = getConditionalFormats(heroCol, "format.column~eq=Aquaman");
+        Map<String, Object> ironMap = getConditionalFormats(heroCol, "format.column~eq=IronMan");
+
+        // get back to the domain designer
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        ConditionalFormatDialog dlg = domainDesignerPage.fieldProperties().getField("superHero")
+                .clickConditionalFormatButton();
+        dlg.getPanelByIndex(2)  // ironman
+            .clickRemove();
+        dlg.getPanelByIndex(0) // thor
+            .setItalicsCheckbox(true);
+        dlg.getPanelByIndex(1)  // aquaman
+            .setBoldCheckbox(true);
+        dlg.clickApply();
+        domainDesignerPage.clickSave();
+
+        DomainResponse validationResponse = dgen.getDomain(createDefaultConnection(true));
+        PropertyDescriptor editedHeroCol = getColumn(validationResponse.getDomain(), "superHero");
+
+        List<Map<String, Object>> formats = (ArrayList<Map<String, Object>>)editedHeroCol.getAllProperties().get("conditionalFormats");
+        assertEquals(2, formats.size());
+
+        Map<String, Object> editedThor = getConditionalFormats(editedHeroCol, "format.column~eq=Thor");
+        assertEquals(true, editedThor.get("bold"));
+        assertEquals(true, editedThor.get("italic"));
+        Map<String, Object> editedAquamap = getConditionalFormats(editedHeroCol, "format.column~eq=Aquaman");
+        assertEquals(true, editedAquamap.get("bold"));
+        assertEquals(true, editedAquamap.get("bold"));
+    }
+
     public PropertyDescriptor getColumn(Domain domain, String columnName)
     {
         PropertyDescriptor descriptor = domain.getFields().stream().filter(desc -> desc.getName().equals(columnName)).findFirst().orElse(null);
         assertNotNull("Didn't find expected columns", descriptor);
 
         return descriptor;
+    }
+
+
+    public Map<String, Object> getPropertyValidator(PropertyDescriptor column, String name)
+    {
+        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("propertyValidators");
+        Map<String, Object> validator = validators.stream()
+                .filter(a-> a.get("name").equals(name))
+                .collect(Collectors.toList())
+                .get(0);
+        return validator;
+    }
+
+    public Map<String, Object> getConditionalFormats(PropertyDescriptor column, String filterExpression)
+    {
+        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
+        Map<String, Object> validator = validators.stream()
+                .filter(a-> a.get("filter").equals(filterExpression))
+                .collect(Collectors.toList())
+                .get(0);
+        return validator;
     }
 
     @Override
