@@ -1452,9 +1452,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now verify we have 3
         DomainResponse response = dgen.getDomain(createDefaultConnection(true));
         PropertyDescriptor heroCol = getColumn(response.getDomain(), "superHero");
-        Map<String, Object> thorMap = getConditionalFormats(heroCol, "format.column~=Thor");
-        Map<String, Object> aquaMap = getConditionalFormats(heroCol, "format.column~=Aquaman");
-        Map<String, Object> ironMap = getConditionalFormats(heroCol, "format.column~=IronMan");
+        Map<String, Object> thorMap = getConditionalFormats(heroCol, "format.column~eq=Thor");
+        Map<String, Object> aquaMap = getConditionalFormats(heroCol, "format.column~eq=Aquaman");
+        Map<String, Object> ironMap = getConditionalFormats(heroCol, "format.column~eq=IronMan");
 
         // get back to the domain designer
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
@@ -1475,10 +1475,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         List<Map<String, Object>> formats = (ArrayList<Map<String, Object>>)editedHeroCol.getAllProperties().get("conditionalFormats");
         assertEquals(2, formats.size());
 
-        Map<String, Object> editedThor = getConditionalFormats(editedHeroCol, "format.column~=Thor");
+        Map<String, Object> editedThor = getConditionalFormats(editedHeroCol, "format.column~eq=Thor");
         assertEquals(true, editedThor.get("bold"));
         assertEquals(true, editedThor.get("italic"));
-        Map<String, Object> editedAquamap = getConditionalFormats(editedHeroCol, "format.column~=Aquaman");
+        Map<String, Object> editedAquamap = getConditionalFormats(editedHeroCol, "format.column~eq=Aquaman");
         assertEquals(true, editedAquamap.get("bold"));
         assertEquals(true, editedAquamap.get("bold"));
     }
