@@ -64,23 +64,6 @@ public abstract class AbstractAssayHelper
 
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
-    /**
-     * @deprecated Use {@link #createAssayDesign(String, String)}
-     */
-    @Deprecated
-    public AssayDesignerPage createAssayAndEdit(String type, String name)
-    {
-        _test.clickButton("New Assay Design");
-        _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
-        _test.clickButton("Next");
-
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(_test.getDriver());
-        assayDesigner.setName(name);
-        assayDesigner.save();
-
-        return assayDesigner;
-    }
-
     @LogMethod
     public void createAssayDesignWithDefaults(String type, String name)
     {

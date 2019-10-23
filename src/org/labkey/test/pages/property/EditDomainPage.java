@@ -33,6 +33,7 @@ public class EditDomainPage extends LabKeyPage<EditDomainPage.ElementCache>
 
     public void clickSave()
     {
+        waitForElement(Locator.lkButton("Save"));
         clickAndWait(elementCache().saveButton);
     }
 

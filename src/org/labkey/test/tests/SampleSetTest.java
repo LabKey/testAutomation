@@ -41,7 +41,7 @@ import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -122,12 +122,15 @@ public class SampleSetTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment"});
         _containerHelper.createSubfolder(PROJECT_NAME, LINEAGE_FOLDER, new String[]{"Experiment"});
 
+        goToProjectHome();
         projectMenu().navigateToProject(PROJECT_NAME);
         portalHelper.addWebPart("Sample Sets");
 
+        goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
         portalHelper.addWebPart("Sample Sets");
 
+        goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
         portalHelper.addWebPart("Sample Sets");
     }
@@ -826,7 +829,6 @@ public class SampleSetTest extends BaseWebDriverTest
 //  Note that we currently will not find runs where the batch id references a sampleId.  See Issue 37918.
 //        log("Create an assay with sampleId in the batch fields");
 //        goToProjectHome();
-//        clickAndWait(Locator.linkWithText("Assay List"));
 //        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("General", BATCH_ID_ASSAY);
 //        designerPage.addLookupBatchField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
 //        designerPage.save();
@@ -853,12 +855,15 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Create an assay with sampleId in the data field");
         goToProjectHome();
-        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("General", DATA_ID_ASSAY);
-        designerPage.addLookupDataField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
-        designerPage.save();
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", DATA_ID_ASSAY);
+        assayDesignerPage.goToResultFields()
+            .addField(SAMPLE_ID_FIELD_NAME)
+            .setType(FieldDefinition.ColumnType.Lookup)
+            .setFromSchema("samples")
+            .setFromTargetTable(SAMPLE_SET_NAME + " (Integer)");
+        assayDesignerPage.clickFinish();
 
         log("Upload assay data referencing sampleId");
-        clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(DATA_ID_ASSAY));
         clickButton("Import Data");
         clickButton("Next");
@@ -883,13 +888,15 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Create an assay with sampleId in the run fields");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText("Assay List"));
-        designerPage = _assayHelper.createAssayAndEdit("General", RUN_ID_ASSAY);
-        designerPage.addLookupRunField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
-        designerPage.save();
+        assayDesignerPage = _assayHelper.createAssayDesign("General", RUN_ID_ASSAY);
+        assayDesignerPage.goToRunFields()
+                .addField(SAMPLE_ID_FIELD_NAME)
+                .setType(FieldDefinition.ColumnType.Lookup)
+                .setFromSchema("samples")
+                .setFromTargetTable(SAMPLE_SET_NAME + " (Integer)");
+        assayDesignerPage.clickFinish();
 
         log("Upload assay data for run-level sampleId");
-        clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(RUN_ID_ASSAY));
         clickButton("Import Data");
         clickButton("Next");
