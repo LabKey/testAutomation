@@ -871,6 +871,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new ManageStudyPage(getDriver());
     }
 
+    public DomainFormPanel goToStudyEditAdditionalProperties()
+    {
+        enableUxDomainDesigner();
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Edit Additional Properties"));
+        disableUxDomainDesigner();
+        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Study").find();
+    }
+
     public void goToManageAssays()
     {
         clickAdminMenuItem("Manage Assays");
