@@ -30,7 +30,6 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.CrosstabDataRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
-import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.DataRegionTable;
@@ -115,17 +114,13 @@ public class ElispotAssayTest extends AbstractAssayTest
         //create a new elispot assay
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "ELISpot"));
-        clickButton("Next");
 
         log("Setting up Elispot assay");
 
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
-        assayDesigner.setName(TEST_ASSAY_ELISPOT);
+        ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("ELISpot", TEST_ASSAY_ELISPOT);
         assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
         assayDesigner.setDescription(TEST_ASSAY_ELISPOT_DESC);
-        assayDesigner.saveAndClose();
+        assayDesigner.clickFinish();
 
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText("Assay List"));
@@ -160,18 +155,14 @@ public class ElispotAssayTest extends AbstractAssayTest
         //create a new fluorospot assay
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "ELISpot"));
-        clickButton("Next");
 
         log("Setting up Fluorospot assay");
+        ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("ELISpot", TEST_ASSAY_FLUOROSPOT);
 
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
-        assayDesigner.setName(TEST_ASSAY_FLUOROSPOT);
         assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
         assayDesigner.setDescription(TEST_ASSAY_FLUOROSPOT_DESC);
         assayDesigner.setDetectionMethod(FLUOROSPOT_DETECTION_METHOD);
-        assayDesigner.saveAndClose();
+        assayDesigner.clickFinish();
 
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText("Assay List"));
