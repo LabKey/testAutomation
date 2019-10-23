@@ -81,15 +81,6 @@ public abstract class AbstractAssayHelper
         return assayDesigner;
     }
 
-    /**
-     * @deprecated Use {@link #createAssayDesignWithDefaults(String, String)}
-     */
-    @Deprecated
-    public void createAssayWithDefaults(String type, String name)
-    {
-        createAssayAndEdit(type, name).saveAndClose();
-    }
-
     @LogMethod
     public void createAssayDesignWithDefaults(String type, String name)
     {
@@ -102,11 +93,11 @@ public abstract class AbstractAssayHelper
     @LogMethod
     public ReactAssayDesignerPage createAssayDesign(String type, String name)
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.enableUxDomainDesigner();
         _test.clickButton("New Assay Design");
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
         _test.clickButton("Next");
-        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.disableUxDomainDesigner();
 
         ReactAssayDesignerPage assayDesigner = new ReactAssayDesignerPage(_test.getDriver());
         assayDesigner.setName(name);
@@ -120,7 +111,7 @@ public abstract class AbstractAssayHelper
 
     public ReactAssayDesignerPage clickEditAssayDesign(boolean confirmEditInOtherContainer)
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.enableUxDomainDesigner();
         _test.doAndWaitForPageToLoad(() ->
         {
             clickManageOption(false, "Edit assay design");
@@ -135,7 +126,7 @@ public abstract class AbstractAssayHelper
         });
         // use the assayDesignerPage to synchronize
         ReactAssayDesignerPage page = new ReactAssayDesignerPage(_test.getDriver());
-        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.disableUxDomainDesigner();
         return page;
     }
 
@@ -146,13 +137,13 @@ public abstract class AbstractAssayHelper
 
     public ReactAssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.enableUxDomainDesigner();
         clickManageOption(true, "Copy assay design");
         if (destinationFolder == null)
             _test.clickButton("Copy to Current Folder");
         else
             _test.clickAndWait(Locator.tag("tr").append(Locator.linkWithText(destinationFolder)));
-        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.disableUxDomainDesigner();
 
         return new ReactAssayDesignerPage(_test.getDriver());
     }
