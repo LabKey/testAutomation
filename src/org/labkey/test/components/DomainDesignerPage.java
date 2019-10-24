@@ -28,9 +28,9 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public DomainDesignerPage clickSave()
     {
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton()));
         String currentURL = getDriver().getCurrentUrl();
-        elementCache().saveButton.click();
+        elementCache().saveButton().click();
         afterSaveOrFinishClick(currentURL);
         return this;
     }
@@ -49,7 +49,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public UnsavedChangesModalDialog clickCancel()
     {
-        elementCache().cancelBtn.click();
+        elementCache().cancelBtn().click();
         UnsavedChangesModalDialog unsavedChangesModal = new UnsavedChangesModalDialog(
                 new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"),
                 getDriver());
@@ -65,6 +65,16 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     public boolean isAlertVisible()
     {
         return Locators.alert.findOptionalElement(getDriver()).map(WebElement::isDisplayed).orElse(false);
+    }
+
+    public WebElement saveButton()
+    {
+        return elementCache().saveButton();
+    }
+
+    public WebElement saveAndFinishButton()
+    {
+        return elementCache().saveButton();
     }
 
     public DomainFormPanel fieldProperties()
@@ -157,11 +167,16 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         {
             return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).active().findOrNull(this);
         }
-
-        WebElement saveButton = Locator.button("Save")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement cancelBtn = Locator.button("Cancel")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement saveButton()
+        {
+            return Locator.button("Save")
+                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        }
+        WebElement cancelBtn()
+        {
+            return Locator.button("Cancel")
+                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     public static class Locators
