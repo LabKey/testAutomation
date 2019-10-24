@@ -3,14 +3,13 @@ package org.labkey.test.pages.experiment;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.pages.property.EditDomainPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.List;
 
 public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementCache>
 {
@@ -90,10 +89,10 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return new Select(elementCache().parentAliasSelect(index)).getFirstSelectedOption().getText();
     }
 
-    public EditDomainPage clickCreate()
+    public DomainFormPanel clickCreate(boolean createFailureExpected)
     {
         clickAndWait(elementCache().createButton);
-        return new EditDomainPage(getDriver());
+        return createFailureExpected ? null : new DomainFormPanel.DomainFormPanelFinder(getDriver()).waitFor();
     }
 
     public void clickCancel()
