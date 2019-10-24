@@ -25,6 +25,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -53,7 +55,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
     public static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
-    protected static final ListHelper.ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListHelper.ListColumnType.Boolean, ListHelper.ListColumnType.Integer, ListHelper.ListColumnType.DateTime };
+    protected static final FieldDefinition.ColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { FieldDefinition.ColumnType.Boolean, FieldDefinition.ColumnType.Integer, FieldDefinition.ColumnType.DateAndTime };
 
     protected static final String TEST_RUN1_DATA1 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "20\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
             "s1\ta\t1\ttrue\t20\t2000-01-01\n" +
@@ -119,10 +121,10 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
         goToProjectHome();
         clickAndWait(Locator.linkContainingText("QC Assay"));
-        _assayHelper.clickEditAssayDesign();
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
+
+        ReactAssayDesignerPage assayDesigner = _assayHelper.clickEditAssayDesign();
         assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/validator.jar"));
-        assayDesigner.saveAndClose();
+        assayDesigner.clickFinish();
         goToProjectHome();
         _listHelper.importListArchive(getProjectName(), TestFileUtils.getSampleData("ProgrammaticQC/Programmatic QC.lists.zip"));
     }
@@ -134,16 +136,8 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         goToProjectHome(TEST_PROGRAMMATIC_QC_PRJ);
         new PortalHelper(this).addWebPart("Assay List");
 
-        clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "General"));
-        clickButton("Next");
+        ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", assayName);
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), assayName);
-
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(this.getDriver());
         assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
         if (addQCScript)
         {
@@ -152,14 +146,14 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
-            _listHelper.addField("Data Fields", TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+            assayDesigner.goToResultFields().addField(new FieldDefinition (TEST_ASSAY_DATA_PROP_NAME + i,TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT])
+                    .setLabel(TEST_ASSAY_DATA_PROP_NAME + i));
         }
 
         // add an 'animal' field which will be populated by the transform script
-        _listHelper.addField("Data Fields", "Animal", "Animal", ListHelper.ListColumnType.String);
-
-        sleep(1000);
-        clickButton("Save & Close");
+        assayDesigner.fieldProperties("Results")
+                .addField(new FieldDefinition( "Animal", FieldDefinition.ColumnType.String).setLabel("Animal"));
+        assayDesigner.clickFinish();
     }
 
     private void uploadQCRuns()

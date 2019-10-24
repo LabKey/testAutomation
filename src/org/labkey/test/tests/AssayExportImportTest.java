@@ -29,6 +29,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.DataRegionTable;
@@ -119,14 +120,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         _containerHelper.createProject(projectName, "Assay");
         goToProjectHome(projectName);
 
-        clickAndWait(Locator.lkButton("New Assay Design"));
-        click(Locator.radioButtonById("providerName_General"));
-        clickAndWait(Locator.lkButton("Next"));
-
-        AssayDesignerPage assayDesignerPage = new AssayDesignerPage(getDriver());
-        assayDesignerPage.waitForReady();
-
-        assayDesignerPage.setName(assayName);
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
 
         assayDesignerPage.addTransformScript(new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + PERL_SCRIPT));
         assayDesignerPage.setSaveScriptData(true);
@@ -134,41 +128,24 @@ public class AssayExportImportTest extends BaseWebDriverTest
         assayDesignerPage.setEditableResults(true);
         assayDesignerPage.setEditableRuns(true);
 
-        assayDesignerPage.dataFields().findElement(Locator.lkButton("Infer Fields from File")).click();
-        waitForElement(Locator.tagWithName("input", "uploadFormElement"));
-
-        setFormElement(Locator.tagWithName("input", "uploadFormElement").findElement(getDriver()),
-                new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE));
-
-        click(Locator.lkButton("Submit"));
-        waitForElementToDisappear(Locator.lkButton("Submit"));
-
-        assayDesignerPage.dataFields().addField(
-                new FieldDefinition("adjustedM1").setType(FieldDefinition.ColumnType.Integer));
-
-        // Working around a bug that is preventing me adding a field and deleting a field in the same region.
-        assayDesignerPage = new AssayDesignerPage(getDriver());
-
-        assayDesignerPage.dataFields()
-                .selectField("column5").markForDeletion()
-                .selectField("column6").markForDeletion();
-
-        assayDesignerPage.batchFields().addField(
-                new FieldDefinition("operatorEmail")
-                        .setType(FieldDefinition.ColumnType.String));
-
-        assayDesignerPage.batchFields().addField(
-                new FieldDefinition("instrument")
-                        .setType(FieldDefinition.ColumnType.String)
+        assayDesignerPage.goToBatchFields()
+                .addField(new FieldDefinition("operatorEmail").setType(FieldDefinition.ColumnType.String))
+                .addField(new FieldDefinition("instrument").setType(FieldDefinition.ColumnType.String)
                         .setDescription("The diagnostic test instrument."));
 
-        assayDesignerPage.runFields().addField(
-                new FieldDefinition("instrumentSetting")
-                        .setType(FieldDefinition.ColumnType.Integer)
-                        .setDescription("The configuration setting on the instrument."));
+        assayDesignerPage.goToRunFields()
+                .addField(new FieldDefinition("instrumentSetting").setType(FieldDefinition.ColumnType.Integer)
+                        .setDescription("The configuration setting on the instrument."))
+                .addField(new FieldDefinition("adjustedM1").setType(FieldDefinition.ColumnType.Integer));
 
-        assayDesignerPage.saveAndClose();
+        assayDesignerPage.goToResultFields()
+                .removeAllFields()
+                .setInferFieldFile(new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE));
 
+        assayDesignerPage.fieldProperties("Results")
+                .removeField("column5")
+                .removeField("column6");
+        assayDesignerPage.clickFinish();
     }
 
     public void addNewField(String projectName, String assayName, String runId, FieldDefinition newField)
@@ -178,18 +155,12 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(projectName);
         clickAndWait(Locator.linkWithText(assayName));
         waitForElement(Locator.linkWithText(runId));
-
         click(Locator.linkWithText("Manage assay design"));
-        waitForElementToBeVisible(Locator.linkWithText("Edit assay design"));
-        clickAndWait(Locator.linkWithText("Edit assay design"));
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
 
-        AssayDesignerPage assayDesignerPage = new AssayDesignerPage(getDriver());
-        assayDesignerPage.waitForReady();
+        assayDesignerPage.expandFieldProperties("Results").addField(newField);
 
-        assayDesignerPage.dataFields().addField(newField);
-
-        assayDesignerPage.saveAndClose();
-
+        assayDesignerPage.clickFinish();
     }
 
     public void populateAssay(String projectName, String assayName, boolean useFilesWebPart, List<String> runFiles, @Nullable Map<String, String> batchProperties, @Nullable List<Map<String, String>> runProperties)
@@ -555,29 +526,16 @@ public class AssayExportImportTest extends BaseWebDriverTest
     {
         log("Create an Assay with no transform, no run properties.");
 
-        clickAndWait(Locator.lkButton("New Assay Design"));
-        click(Locator.radioButtonById("providerName_General"));
-        clickAndWait(Locator.lkButton("Next"));
-
-        AssayDesignerPage assayDesignerPage = new AssayDesignerPage(getDriver());
-        assayDesignerPage.waitForReady();
-
-        assayDesignerPage.setName(assayName);
-
-        assayDesignerPage.dataFields().findElement(Locator.lkButton("Infer Fields from File")).click();
-        waitForElement(Locator.tagWithName("input", "uploadFormElement"));
-
-        setFormElement(Locator.tagWithName("input", "uploadFormElement").findElement(getDriver()),
-                new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE));
-
-        click(Locator.lkButton("Submit"));
-        waitForElementToDisappear(Locator.lkButton("Submit"));
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
 
         log("Remove the batch fields we don't care about.");
-        assayDesignerPage.batchFields().selectField("ParticipantVisitResolver").markForDeletion();
-        assayDesignerPage.batchFields().selectField("TargetStudy").markForDeletion();
+        assayDesignerPage.goToBatchFields().removeField("ParticipantVisitResolver")
+                .removeField("TargetStudy");
 
-        assayDesignerPage.saveAndClose();
+        assayDesignerPage.goToResultFields()
+                .removeAllFields()
+                .setInferFieldFile(new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE));
+        assayDesignerPage.clickFinish();
     }
 
     @Test

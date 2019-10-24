@@ -10,10 +10,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -66,6 +68,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         if (fieldDefinition.isRequired())
             fieldRow.setRequiredField(fieldDefinition.isRequired());
 
+        fieldRow.collapse();
+
         return this;
     }
 
@@ -94,6 +98,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFormPanel removeField(String name)
     {
+        getWrapper().log("attempting to remove field " + name);
         getField(name).clickRemoveField().dismiss("Yes");
         clearElementCache();
         return this;
@@ -101,12 +106,44 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFieldRow getField(String name)
     {
-        return elementCache().findFieldRow(name);
+        DomainFieldRow row = elementCache().findFieldRow(name);
+        if (null != row)    // only do this if it's non-null
+            getWrapper().scrollIntoView(row.getComponentElement(), true);
+        return row;
     }
 
     public DomainFieldRow getField(int tabIndex)
     {
-        return elementCache().findFieldRows().get(tabIndex);
+        DomainFieldRow row = elementCache().findFieldRows().get(tabIndex);
+        if (null != row)    // only do this if it's non-null
+            getWrapper().scrollIntoView(row.getComponentElement(), true);
+        return row;
+    }
+
+    public DomainFormPanel removeAllFields()
+    {
+        List<String> fieldNames = fieldNames();
+        for (String name : fieldNames)
+        {
+            removeField(name);
+        }
+        return this;
+    }
+
+    public DomainFormPanel setInferFieldFile(File file)
+    {
+        getWrapper().setFormElement(elementCache().fileUploadInput, file);
+        getWrapper().waitFor(()-> elementCache().findFieldRows().size() > 0,
+                "fields were not inferred from file in time", WAIT_FOR_JAVASCRIPT);
+        return this;
+    }
+
+    public List<String> fieldNames()
+    {
+        return elementCache().findFieldRows()
+                .stream()
+                .map(DomainFieldRow::getName)
+                .collect(Collectors.toList());
     }
 
     public DomainFormPanel expand()
@@ -158,32 +195,28 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
         private List<DomainFieldRow> findFieldRows()
         {
-            if (fieldRows == null)
-            {
-                fieldRows = new ArrayList<>();
-                rowLoc.findElements(DomainFormPanel.this.getComponentElement())
-                        .forEach(e -> fieldRows.add(new DomainFieldRow(DomainFormPanel.this, e, getDriver())));
-            }
+            fieldRows = new ArrayList<>();          // this method used to cache this arraylist,
+                                                    // but it was too fragile and didn't save us much runtime
+                                                    // now we look for it when we ask for it
+            rowLoc.findElements(DomainFormPanel.this.getComponentElement())
+                    .forEach(e -> fieldRows.add(new DomainFieldRow(DomainFormPanel.this, e, getDriver())));
             return fieldRows;
         }
 
         private DomainFieldRow findFieldRow(String name)
         {
-            if (!fieldNames.containsKey(name))
+            List<DomainFieldRow> fieldRows = findFieldRows();
+            for (int i = 0; i < fieldRows.size(); i++)
             {
-                List<DomainFieldRow> fieldRows = findFieldRows();
-                for (int i = 0; i < fieldRows.size(); i++)
+                DomainFieldRow fieldRow = fieldRows.get(i);
+                String fieldRowName = fieldRow.getName();
+                if (!fieldNames.containsValue(i) && !StringUtils.trimToEmpty(fieldRowName).isEmpty())
                 {
-                    DomainFieldRow fieldRow = fieldRows.get(i);
-                    String fieldRowName = fieldRow.getName();
-                    if (!fieldNames.containsValue(i) && !StringUtils.trimToEmpty(fieldRowName).isEmpty())
-                    {
-                        fieldNames.put(fieldRowName, i);
-                    }
-                    if (name.equalsIgnoreCase(fieldRowName))
-                    {
-                        return fieldRow;
-                    }
+                    fieldNames.put(fieldRowName, i);
+                }
+                if (name.equalsIgnoreCase(fieldRowName))
+                {
+                    return fieldRow;
                 }
             }
             if (!fieldNames.containsKey(name))
@@ -193,6 +226,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
         WebElement startNewDesignLink = Locator.tagWithClass("span", "domain-form-add-link")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+
+        WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
 
         // TODO since the Assay Properties panel also has the notion of expand/collapse,
         //  we should split that part out into an Abstract test class that both can use
