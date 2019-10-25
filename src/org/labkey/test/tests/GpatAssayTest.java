@@ -202,15 +202,15 @@ public class GpatAssayTest extends BaseWebDriverTest
         disableUxDomainDesigner();
 
         ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
-        DomainFormPanel results = assayDesignerPage.goToResultFields();
+        DomainFormPanel results = assayDesignerPage.expandFieldProperties("Results");
         results.getField(4)
                 .setLabel("Blank");
         results.getField(7)
                 .setName("Result")
                 .setLabel("Result")
                 .setImportAliases("Score");
-
         assayDesignerPage.clickFinish();
+
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_TSV));
