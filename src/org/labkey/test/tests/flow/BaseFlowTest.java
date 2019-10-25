@@ -244,9 +244,12 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             nameExpression.append("-${").append(idCol).append("}");
         }
         helper.setNameExpression(nameExpression.toString().substring(1));
-        clickButton("Create");
 
+        enableUxDomainDesigner();
+        clickButton("Create");
+        disableUxDomainDesigner();
         helper.addFields(fields);
+
         clickAndWait(Locator.linkWithText("Upload More Samples"));
         helper.setTsvData(TestFileUtils.getFileContents(sampleFilePath));
         clickButton("Submit");
