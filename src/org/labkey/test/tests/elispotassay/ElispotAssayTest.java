@@ -118,8 +118,9 @@ public class ElispotAssayTest extends AbstractAssayTest
         log("Setting up Elispot assay");
 
         ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("ELISpot", TEST_ASSAY_ELISPOT);
-        assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
         assayDesigner.setDescription(TEST_ASSAY_ELISPOT_DESC);
+        assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
+        assayDesigner.setDetectionMethod("colorimetric");
         assayDesigner.clickFinish();
 
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
@@ -158,7 +159,6 @@ public class ElispotAssayTest extends AbstractAssayTest
 
         log("Setting up Fluorospot assay");
         ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("ELISpot", TEST_ASSAY_FLUOROSPOT);
-
         assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
         assayDesigner.setDescription(TEST_ASSAY_FLUOROSPOT_DESC);
         assayDesigner.setDetectionMethod(FLUOROSPOT_DETECTION_METHOD);
