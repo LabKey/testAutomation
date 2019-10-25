@@ -321,7 +321,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     profile.setPreference("browser.ssl_override_behavior", 0);
 
-                    profile.setPreference("dom.disable_beforeunload", false);
+                    // TODO: Issue 38785: dom.disable_beforeunload FireFox preference is causing numerous test failures
+                    // profile.setPreference("dom.disable_beforeunload", false);
 
                     profile.setAcceptUntrustedCertificates(true);
                     profile.setAssumeUntrustedCertificateIssuer(false);
