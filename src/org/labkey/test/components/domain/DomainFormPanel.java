@@ -107,17 +107,24 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFieldRow getField(String name)
     {
         DomainFieldRow row = elementCache().findFieldRow(name);
-        if (null != row)    // only do this if it's non-null
-            getWrapper().scrollIntoView(row.getComponentElement(), true);
+        scrollRowIntoView(row);
         return row;
     }
 
     public DomainFieldRow getField(int tabIndex)
     {
         DomainFieldRow row = elementCache().findFieldRows().get(tabIndex);
-        if (null != row)    // only do this if it's non-null
-            getWrapper().scrollIntoView(row.getComponentElement(), true);
+        scrollRowIntoView(row);
         return row;
+    }
+
+    private void scrollRowIntoView(DomainFieldRow row)
+    {
+        if (null != row)    // only do this if it's non-null
+        {
+            getWrapper().scrollIntoView(row.getComponentElement(), true);
+            getWrapper().scrollBy(0, -75); // if the header lock is showing, need to scroll below that
+        }
     }
 
     public DomainFormPanel removeAllFields()
