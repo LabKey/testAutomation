@@ -159,7 +159,8 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickButton("Manage Assays");
 
         log("Setting up simple assay");
-        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("Noblis Simple", ASSAY_NAME);
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("Noblis Simple", ASSAY_NAME)
+            .setDescription("My Simple Assay Description");
 
         if (_useTransform)
         {
