@@ -527,9 +527,9 @@ public class ElispotAssayTest extends AbstractAssayTest
     {
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
-        _assayHelper.clickEditAssayDesign();
-        waitAndClick(Locator.css("div#partdelete_removeTransformScript0 span"));
-        clickButton("Save & Close");
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
+        waitAndClick(Locator.tagWithClass("i", "container--removal-icon")); // TODO add a specific class to the transform script removal icon
+        assayDesignerPage.clickFinish();
         DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
     }
 

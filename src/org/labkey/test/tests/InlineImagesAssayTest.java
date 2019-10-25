@@ -200,7 +200,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Remove the 'File' (last) column from the batch and see that things still work.");
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
-        assayDesignerPage.goToBatchFields().removeField("BatchFileField");
+        assayDesignerPage.expandFieldProperties("Batch").removeField("BatchFileField");
         assayDesignerPage.clickFinish();
         waitAndClickAndWait(Locator.linkWithText("view results"));
 
