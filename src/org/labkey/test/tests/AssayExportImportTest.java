@@ -134,12 +134,12 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         assayDesignerPage.goToRunFields()
                 .addField(new FieldDefinition("instrumentSetting").setType(FieldDefinition.ColumnType.Integer)
-                        .setDescription("The configuration setting on the instrument."))
-                .addField(new FieldDefinition("adjustedM1").setType(FieldDefinition.ColumnType.Integer));
+                        .setDescription("The configuration setting on the instrument."));
 
         assayDesignerPage.goToResultFields()
                 .removeAllFields()
-                .setInferFieldFile(new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE));
+                .setInferFieldFile(new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE))
+                .addField(new FieldDefinition("adjustedM1").setType(FieldDefinition.ColumnType.Integer));
 
         assayDesignerPage.fieldProperties("Results")
                 .removeField("column5")
