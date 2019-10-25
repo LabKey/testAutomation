@@ -20,7 +20,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 
 import java.io.File;

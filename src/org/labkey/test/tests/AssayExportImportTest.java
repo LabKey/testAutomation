@@ -28,7 +28,6 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.ext4.Checkbox;
-import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ArtifactCollector;

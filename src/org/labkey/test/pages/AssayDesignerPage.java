@@ -34,6 +34,7 @@ import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.Input.Input;
 import static org.labkey.test.components.html.SelectWrapper.Select;
 
+// TODO delete this once all usages are removed
 public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.ElementCache>
 {
     public AssayDesignerPage(WebDriver driver)

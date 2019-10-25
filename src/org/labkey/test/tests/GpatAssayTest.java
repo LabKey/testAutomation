@@ -29,7 +29,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.domain.DomainFormPanel;
-import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
