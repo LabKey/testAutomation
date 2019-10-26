@@ -132,6 +132,12 @@ public class AdminPage extends LabKeyPage<AdminPage.ElementCache>
         return this;
     }
 
+    public AdminPage includeGroups(boolean checked)
+    {
+        elementCache().includeGroups.set(checked);
+        return this;
+    }
+
     public AdminPage includeAssignedTo(boolean checked)
     {
         elementCache().includeAssignedTo.set(checked);
