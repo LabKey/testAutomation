@@ -44,6 +44,7 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.study.CreateStudyPage;
+import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -945,7 +946,10 @@ public class ClientAPITest extends BaseWebDriverTest
         // next page
         clickButton("Create Study");
 
-        DomainFormPanel domainFormPanel = goToStudyEditAdditionalProperties(false);
+        enableUxDomainDesigner();
+        ManageStudyPage manageStudyPage = new ManageStudyPage(getDriver());
+        DomainFormPanel domainFormPanel = manageStudyPage.clickEditAdditionalProperties();
+        disableUxDomainDesigner();
         domainFormPanel.addField("customfield1").setType(FieldDefinition.ColumnType.String).setLabel("Custom Field 1");
         domainFormPanel.addField("color").setType(FieldDefinition.ColumnType.String).setLabel("Color");
         clickButton("Save");

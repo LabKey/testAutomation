@@ -112,7 +112,9 @@ public class UserTest extends BaseWebDriverTest
 
         _userHelper.deleteUsers(false, CHANGE_EMAIL_USER, CHANGE_EMAIL_USER_ALTERNATE, NORMAL_USER, DEACTIVATED_USER, PASSWORD_RESET_USER, BLANK_USER, SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED);
 
-        DomainFormPanel domainFormPanel = goToChangeUserProperties();
+        enableUxDomainDesigner();
+        DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+        disableUxDomainDesigner();
         for (String field : REQUIRED_FIELDS)
         {
             domainFormPanel.getField(field).setRequiredField(false);
@@ -421,6 +423,14 @@ public class UserTest extends BaseWebDriverTest
             }
             clickButton("Save");
         }
+    }
+
+    private DomainFormPanel goToChangeUserProperties()
+    {
+        enableUxDomainDesigner();
+        DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+        disableUxDomainDesigner();
+        return domainFormPanel;
     }
 
     /**

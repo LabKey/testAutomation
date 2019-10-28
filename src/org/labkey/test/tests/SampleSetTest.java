@@ -121,15 +121,12 @@ public class SampleSetTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment"});
         _containerHelper.createSubfolder(PROJECT_NAME, LINEAGE_FOLDER, new String[]{"Experiment"});
 
-        goToProjectHome();
         projectMenu().navigateToProject(PROJECT_NAME);
         portalHelper.addWebPart("Sample Sets");
 
-        goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
         portalHelper.addWebPart("Sample Sets");
 
-        goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
         portalHelper.addWebPart("Sample Sets");
     }

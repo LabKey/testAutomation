@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -711,7 +712,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         errorMsgLocator = Locator.tagWithClass("div", "alert-danger");
         waitForElement(errorMsgLocator);
         String errorMsgExpectedTxt = "'" + GOOD_PARENT_NAME + "' is a reserved field name in '" + SAMPLE_SET_NAME + "'.";
-        Assert.assertTrue("Error message not as expected.", errorMsgLocator.findElement(getDriver()).getText().contains(errorMsgExpectedTxt));
+        Assert.assertThat("Error message", errorMsgLocator.findElement(getDriver()).getText(), CoreMatchers.containsString(errorMsgExpectedTxt));
 
         domainFormPanel.removeField(GOOD_PARENT_NAME);
         clickButton("Save");

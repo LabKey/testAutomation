@@ -27,7 +27,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
-import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
@@ -822,15 +821,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new ShowUsersPage(getDriver());
     }
 
-    public DomainFormPanel goToChangeUserProperties()
-    {
-        enableUxDomainDesigner();
-        goToSiteUsers();
-        clickButton("Change User Properties", defaultWaitForPage);
-        disableUxDomainDesigner();
-        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Users").find();
-    }
-
     public void goToSiteGroups()
     {
         if (!isElementPresent(tag("a").withClass("x4-tab-active").withText("Site Groups")))
@@ -872,16 +862,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         clickAdminMenuItem("Manage Study");
         return new ManageStudyPage(getDriver());
-    }
-
-    public DomainFormPanel goToStudyEditAdditionalProperties(boolean goThroughManageStudy)
-    {
-        enableUxDomainDesigner();
-        if (goThroughManageStudy)
-            goToManageStudy();
-        waitAndClickAndWait(Locator.linkWithText("Edit Additional Properties"));
-        disableUxDomainDesigner();
-        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Study").find();
     }
 
     public void goToManageAssays()

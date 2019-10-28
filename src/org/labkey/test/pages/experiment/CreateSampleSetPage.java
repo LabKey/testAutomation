@@ -89,10 +89,16 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return new Select(elementCache().parentAliasSelect(index)).getFirstSelectedOption().getText();
     }
 
-    public DomainFormPanel clickCreate(boolean createFailureExpected)
+    public DomainFormPanel clickCreate()
     {
         clickAndWait(elementCache().createButton);
-        return createFailureExpected ? null : new DomainFormPanel.DomainFormPanelFinder(getDriver()).waitFor();
+        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).waitFor();
+    }
+
+    public CreateSampleSetPage clickCreateExpectingError()
+    {
+        clickAndWait(elementCache().createButton);
+        return this;
     }
 
     public void clickCancel()
