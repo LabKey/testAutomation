@@ -992,12 +992,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertEquals("expect default value to be green", "green", updatedColor.getAllProperties().get("defaultValue"));
     }
 
-    /**
-     * verifies that a sampleset field with data (and blank values) will warn the user if they attempt to mark that field
-     * 'required'
-     * @throws Exception
-     */
     @Test
+    @Ignore("Issue 38785: dom.disable_beforeunload FireFox preference is causing numerous test failures")
     public void verifyExpectedWarningOnNavigateWithUncomittedChanges() throws Exception
     {
         goToProjectHome();
