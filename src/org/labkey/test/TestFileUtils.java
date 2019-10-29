@@ -21,7 +21,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -38,6 +37,7 @@ import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilde
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.serverapi.writer.PrintWriters;
+import org.labkey.test.util.ProcessHelper;
 import org.labkey.test.util.TestLogger;
 
 import java.io.BufferedInputStream;
@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -101,7 +102,7 @@ public abstract class TestFileUtils
 
     public static String getStreamContentsAsString(InputStream is) throws IOException
     {
-        return StringUtils.join(IOUtils.readLines(is).toArray(), System.lineSeparator());
+        return StringUtils.join(IOUtils.readLines(is, Charset.defaultCharset()).toArray(), System.lineSeparator());
     }
 
     public static String getLabKeyRoot()
@@ -234,18 +235,13 @@ public abstract class TestFileUtils
         return foundFile;
     }
 
+    /**
+     * @deprecated Use {@link ProcessHelper#getProcessOutput()}
+     */
+    @Deprecated
     public static String getProcessOutput(File executable, String... args) throws IOException
     {
-        ProcessBuilder pb = new ProcessBuilder();
-        pb.command(ArrayUtils.addAll(new String[]{executable.toPath().normalize().toAbsolutePath().toString()}, args));
-        pb.redirectErrorStream(true);
-        Process p = pb.start();
-
-        try (InputStream inputStream = p.getInputStream())
-        {
-            // Different platforms output version info differently; just combine all std/err output
-            return StringUtils.trim(getStreamContentsAsString(inputStream));
-        }
+        return new ProcessHelper(executable, args).getProcessOutput().trim();
     }
 
     public static File getTestTempDir()

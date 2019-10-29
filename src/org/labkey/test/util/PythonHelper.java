@@ -44,7 +44,8 @@ public class PythonHelper
     {
         try
         {
-            return TestFileUtils.getProcessOutput(getPythonExecutable(), ArrayUtils.addAll(new String[]{scriptFile.getAbsolutePath()}, args));
+            String[] scriptAndArgs = ArrayUtils.addAll(new String[]{scriptFile.getAbsolutePath()}, args);
+            return new ProcessHelper(getPythonExecutable(), scriptAndArgs).getProcessOutput().trim();
         }
         catch (IOException e)
         {
