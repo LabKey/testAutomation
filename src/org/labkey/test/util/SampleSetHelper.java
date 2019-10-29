@@ -88,10 +88,7 @@ public class SampleSetHelper extends WebDriverWrapper
             i++;
         }
 
-        enableUxDomainDesigner();
         DomainFormPanel domainFormPanel = createPage.clickCreate();
-        disableUxDomainDesigner();
-
         for (FieldDefinition fieldDefinition : props.getFields())
         {
             domainFormPanel.addField(fieldDefinition);
@@ -122,15 +119,9 @@ public class SampleSetHelper extends WebDriverWrapper
         }
 
         if (createFailureExpected)
-        {
-            enableUxDomainDesigner();
-            createSampleSetPage.clickCreate();
-            disableUxDomainDesigner();
-        }
-        else
-        {
             createSampleSetPage.clickCreateExpectingError();
-        }
+        else
+            createSampleSetPage.clickCreate();
 
         return this;
     }
@@ -258,11 +249,8 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public DomainFormPanel goToEditSampleSetFields(String name)
     {
-        enableUxDomainDesigner();
         goToSampleSet(name);
         waitAndClickAndWait(Locator.lkButton("Edit Fields"));
-        disableUxDomainDesigner();
-
         return getDomainFormPanel();
     }
 

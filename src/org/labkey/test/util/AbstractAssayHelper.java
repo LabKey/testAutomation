@@ -81,11 +81,9 @@ public abstract class AbstractAssayHelper
     @LogMethod
     public ReactAssayDesignerPage createAssayDesign(String type, String name)
     {
-        _test.enableUxDomainDesigner();
         _test.clickButton("New Assay Design");
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
         _test.clickButton("Next");
-        _test.disableUxDomainDesigner();
 
         ReactAssayDesignerPage assayDesigner = new ReactAssayDesignerPage(_test.getDriver());
         assayDesigner.setName(name);
@@ -99,7 +97,6 @@ public abstract class AbstractAssayHelper
 
     public ReactAssayDesignerPage clickEditAssayDesign(boolean confirmEditInOtherContainer)
     {
-        _test.enableUxDomainDesigner();
         _test.doAndWaitForPageToLoad(() ->
         {
             clickManageOption(false, "Edit assay design");
@@ -112,10 +109,8 @@ public abstract class AbstractAssayHelper
                         alertText.contains("Would you still like to edit it?"));
             }
         });
-        // use the assayDesignerPage to synchronize
-        ReactAssayDesignerPage page = new ReactAssayDesignerPage(_test.getDriver());
-        _test.disableUxDomainDesigner();
-        return page;
+
+        return new ReactAssayDesignerPage(_test.getDriver());
     }
 
     public ReactAssayDesignerPage copyAssayDesign()
@@ -125,13 +120,11 @@ public abstract class AbstractAssayHelper
 
     public ReactAssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
     {
-        _test.enableUxDomainDesigner();
         clickManageOption(true, "Copy assay design");
         if (destinationFolder == null)
             _test.clickButton("Copy to Current Folder");
         else
             _test.clickAndWait(Locator.tag("tr").append(Locator.linkWithText(destinationFolder)));
-        _test.disableUxDomainDesigner();
 
         return new ReactAssayDesignerPage(_test.getDriver());
     }
