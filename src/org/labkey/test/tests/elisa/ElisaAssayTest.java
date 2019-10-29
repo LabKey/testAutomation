@@ -22,7 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.PropertiesEditor.DefaultType;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.PortalHelper;
@@ -101,7 +101,8 @@ public class ElisaAssayTest extends AbstractAssayTest
         assayDesignerPage.goToFieldProperties("Sample Properties")
             .getField("SpecimenId")
             .clickAdvancedSettings()
-            .setDefaultValueType(PropertiesEditor.DefaultType.LAST_ENTERED);
+            .setDefaultValueType(DefaultType.LAST_ENTERED)
+            .apply();
         assayDesignerPage.clickFinish();
 
         clickProject(TEST_ASSAY_PRJ_ELISA);
