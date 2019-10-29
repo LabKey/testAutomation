@@ -75,7 +75,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow setType(FieldDefinition.ColumnType columnType)
     {
-        setType(columnType.toString());
+        setType(columnType.getLabel());
         return this;
     }
 
