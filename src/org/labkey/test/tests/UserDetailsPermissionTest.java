@@ -27,7 +27,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -89,11 +89,13 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
     private void doSetup()
     {
-        PropertiesEditor userProperties = goToSiteUsers().clickChangeUserProperties();
-        if (!userProperties.getFieldNames().contains(CUSTOM_USER_COLUMN))
+        enableUxDomainDesigner();
+        DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+        disableUxDomainDesigner();
+        if (domainFormPanel.getField(CUSTOM_USER_COLUMN) == null)
         {
-            userProperties.addField(new FieldDefinition(CUSTOM_USER_COLUMN));
-            clickAndWait(Locator.lkButton("Save"));
+            domainFormPanel.addField(CUSTOM_USER_COLUMN).setType(FieldDefinition.ColumnType.String);
+            clickButton("Save");
         }
 
         _userHelper.createUser(ADMIN_USER, true, true);

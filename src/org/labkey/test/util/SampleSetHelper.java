@@ -19,11 +19,10 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
-import org.labkey.test.pages.property.EditDomainPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.openqa.selenium.NoSuchElementException;
@@ -68,7 +67,7 @@ public class SampleSetHelper extends WebDriverWrapper
         return _driver;
     }
 
-    public SampleSetHelper createSampleSet(SampleSetDefinition props)
+    private SampleSetHelper createSampleSet(SampleSetDefinition props)
     {
         CreateSampleSetPage createPage = goToCreateNewSampleSet();
 
@@ -89,14 +88,15 @@ public class SampleSetHelper extends WebDriverWrapper
             i++;
         }
 
-        EditDomainPage editDomainPage = createPage.clickCreate();
+        enableUxDomainDesigner();
+        DomainFormPanel domainFormPanel = createPage.clickCreate();
+        disableUxDomainDesigner();
 
-        PropertiesEditor fieldEditor = editDomainPage.getFieldEditor();
         for (FieldDefinition fieldDefinition : props.getFields())
         {
-            fieldEditor.addField(fieldDefinition);
+            domainFormPanel.addField(fieldDefinition);
         }
-        editDomainPage.clickSave();
+        clickButton("Save");
 
         return this;
     }
@@ -108,6 +108,11 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression)
     {
+        return createSampleSet(name, nameExpression, false);
+    }
+
+    public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression, boolean createFailureExpected)
+    {
         CreateSampleSetPage createSampleSetPage = goToCreateNewSampleSet();
 
         createSampleSetPage.setName(name);
@@ -116,11 +121,21 @@ public class SampleSetHelper extends WebDriverWrapper
             createSampleSetPage.setNameExpression(nameExpression);
         }
 
-        createSampleSetPage.clickCreate();
+        if (createFailureExpected)
+        {
+            enableUxDomainDesigner();
+            createSampleSetPage.clickCreate();
+            disableUxDomainDesigner();
+        }
+        else
+        {
+            createSampleSetPage.clickCreateExpectingError();
+        }
+
         return this;
     }
 
-    public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields)
+    public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields)
     {
         SampleSetDefinition props = new SampleSetDefinition();
         props.setName(name);
@@ -135,6 +150,7 @@ public class SampleSetHelper extends WebDriverWrapper
         }
 
         createSampleSet(props);
+        return this;
     }
 
     public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields, File dataFile)
@@ -153,6 +169,11 @@ public class SampleSetHelper extends WebDriverWrapper
     {
         createSampleSet(name, nameExpression, fields);
         goToSampleSet(name).bulkImport(data);
+    }
+
+    public DomainFormPanel getDomainFormPanel()
+    {
+        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).find();
     }
 
     public CreateSampleSetPage goToCreateNewSampleSet()
@@ -235,6 +256,16 @@ public class SampleSetHelper extends WebDriverWrapper
         return new UpdateSampleSetPage(getDriver());
     }
 
+    public DomainFormPanel goToEditSampleSetFields(String name)
+    {
+        enableUxDomainDesigner();
+        goToSampleSet(name);
+        waitAndClickAndWait(Locator.lkButton("Edit Fields"));
+        disableUxDomainDesigner();
+
+        return getDomainFormPanel();
+    }
+
     public void setFields(Map<String, FieldDefinition.ColumnType> fields)
     {
         _fields = fields;
@@ -246,10 +277,8 @@ public class SampleSetHelper extends WebDriverWrapper
         _fields = fields;
         if (fields != null && !fields.isEmpty())
         {
-            PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-            fields.forEach((name, type) -> {
-                fieldProperties.addField(new FieldDefinition(name).setType(type));
-            });
+            DomainFormPanel domainFormPanel = getDomainFormPanel();
+            fields.forEach((name, type) -> domainFormPanel.addField(new FieldDefinition(name, type)));
             clickButton("Save");
         }
         else
@@ -259,12 +288,10 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public SampleSetHelper addFields(List<FieldDefinition> fields)
     {
-        if(null != fields && !fields.isEmpty())
+        if (null != fields && !fields.isEmpty())
         {
-            PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-            fields.forEach(fieldDefinition -> {
-                fieldProperties.addField(fieldDefinition);
-            });
+            DomainFormPanel domainFormPanel = getDomainFormPanel();
+            fields.forEach(fieldDefinition -> domainFormPanel.addField(fieldDefinition));
             clickButton("Save");
         }
         else

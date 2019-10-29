@@ -26,20 +26,19 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.dumbster.EmailRecordTable;
-import org.labkey.test.pages.user.ShowUsersPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.UIUserHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -112,22 +111,22 @@ public class UserTest extends BaseWebDriverTest
         _containerHelper.deleteProject(getProjectName(), afterTest);
 
         _userHelper.deleteUsers(false, CHANGE_EMAIL_USER, CHANGE_EMAIL_USER_ALTERNATE, NORMAL_USER, DEACTIVATED_USER, PASSWORD_RESET_USER, BLANK_USER, SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED);
-        waitAndClickAndWait(Locator.tagContainingText("span", "Change User Properties"));
+
+        enableUxDomainDesigner();
+        DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+        disableUxDomainDesigner();
         for (String field : REQUIRED_FIELDS)
         {
-            checkRequiredField(field, false);
+            domainFormPanel.getField(field).setRequiredField(false);
         }
-        List<Integer> customFieldIds = new ArrayList<>();
-        for (WebElement deleteButton : Locator.tag("div").attributeStartsWith("id", "partdelete").findElements(getDriver()))
+
+        for (String field : Arrays.asList(PROP_NAME2, PROP_NAME1))
         {
-            int index = Integer.parseInt(deleteButton.getAttribute("id").replace("partdelete_", ""));
-            customFieldIds.add(index);
-        }
-        PropertiesEditor field_properties = new PropertiesEditor.PropertiesEditorFinder(_listHelper.getDriver()).withTitle("Field Properties").find();
-        for (Integer index : customFieldIds)
-        {
-            field_properties.selectField(index)
-                    .markForDeletion();
+            DomainFieldRow domainFieldRow = domainFormPanel.getField(field);
+            if (domainFieldRow != null)
+            {
+                domainFormPanel.removeField(field);
+            }
         }
         clickButton("Save");
     }
@@ -381,24 +380,24 @@ public class UserTest extends BaseWebDriverTest
             _userHelper.createUserAndNotify(BLANK_USER);
             setInitialPassword(BLANK_USER, TEST_PASSWORD);
 
-            goToSiteUsers();
-            clickButton("Change User Properties");
-
-            for (String field : REQUIRED_FIELDS)
-                checkRequiredField(field, true);
-
-            clickButton("Save");
-            clickButton("Change User Properties", defaultWaitForPage);
-
+            DomainFormPanel domainFormPanel = goToChangeUserProperties();
             for (String field : REQUIRED_FIELDS)
             {
-                verifyFieldChecked(field);
-                checkRequiredField(field, false);
+                domainFormPanel.getField(field).setRequiredField(true);
             }
-            clickButton("Save", 0);
-            clickButton("Change User Properties", defaultWaitForPage);
+            clickButton("Save");
 
-            checkRequiredField("FirstName", true);
+            domainFormPanel = goToChangeUserProperties();
+            for (String field : REQUIRED_FIELDS)
+            {
+                DomainFieldRow domainFieldRow = domainFormPanel.getField(field);
+                assertTrue("Field should be set to required: " + field, domainFieldRow.getRequiredField());
+                domainFieldRow.setRequiredField(false);
+            }
+            clickButton("Save");
+
+            domainFormPanel = goToChangeUserProperties();
+            domainFormPanel.getField("FirstName").setRequiredField(true);
             clickButton("Save");
 
             signOut();
@@ -409,25 +408,29 @@ public class UserTest extends BaseWebDriverTest
             assertTextPresent("This field is required");
             setFormElement(Locator.name("quf_FirstName"), "*");
             clickButton("Submit");
-
-        }finally
+        }
+        finally
         {
             // now sign out, and sign in as a user with sufficient privilege to un-set those required fields
             signOut();
             signIn();
 
             // go to Users page, mark 'required fields' as no longer required so other tests aren't affected
-            PropertiesEditor propertiesEditor = ShowUsersPage.beginAt(this, "")
-                .clickChangeUserProperties();
+            DomainFormPanel domainFormPanel = goToChangeUserProperties();
             for (String field : REQUIRED_FIELDS)
             {
-                propertiesEditor
-                 .selectField(field).properties()
-                    .selectValidatorsTab()
-                        .setRequired(false);
+                domainFormPanel.getField(field).setRequiredField(false);
             }
             clickButton("Save");
         }
+    }
+
+    private DomainFormPanel goToChangeUserProperties()
+    {
+        enableUxDomainDesigner();
+        DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+        disableUxDomainDesigner();
+        return domainFormPanel;
     }
 
     /**
@@ -444,26 +447,6 @@ public class UserTest extends BaseWebDriverTest
                 setFormElement(el, getDisplayName());
         }
         clickAndWait(Locator.lkButton("Submit"));
-    }
-
-    private void checkRequiredField(String name, boolean select)
-    {
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-        fieldProperties
-                .selectField(name).properties()
-                .selectValidatorsTab()
-                .setRequired(select);
-    }
-
-    private void verifyFieldChecked(String name)
-    {
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-        Boolean isChecked = fieldProperties
-                .selectField(name).properties()
-                .selectValidatorsTab()
-                .isRequired();
-
-        assertTrue("Field should be set to required: " + name, isChecked);
     }
 
     private void navigateToUserDetails(String userEmail)
@@ -549,13 +532,9 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testCustomProperties()
     {
-        goToSiteUsers();
-        clickButton("Change User Properties");
-
-        waitForText("Add Field");
-        _listHelper.addField("Field Properties", PROP_NAME1, PROP_NAME1, ListHelper.ListColumnType.String);
-        _listHelper.addField("Field Properties", PROP_NAME2, PROP_NAME2, ListHelper.ListColumnType.Integer);
-
+        DomainFormPanel domainFormPanel = goToChangeUserProperties();
+        domainFormPanel.addField(PROP_NAME1).setType(FieldDefinition.ColumnType.String).setLabel(PROP_NAME1);
+        domainFormPanel.addField(PROP_NAME2).setType(FieldDefinition.ColumnType.Integer).setLabel(PROP_NAME2);
         clickButton("Save");
 
         assertTextPresent(PROP_NAME1, PROP_NAME2);

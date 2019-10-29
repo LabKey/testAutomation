@@ -20,7 +20,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 
 import java.io.File;
@@ -28,6 +27,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public abstract class AbstractAssayHelper
@@ -64,30 +64,9 @@ public abstract class AbstractAssayHelper
 
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
-    /**
-     * @deprecated Use {@link #createAssayDesign(String, String)}
-     */
-    @Deprecated
-    public AssayDesignerPage createAssayAndEdit(String type, String name)
+    public void createAssayWithDefaults(String provider, String name)
     {
-        _test.clickButton("New Assay Design");
-        _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
-        _test.clickButton("Next");
-
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(_test.getDriver());
-        assayDesigner.setName(name);
-        assayDesigner.save();
-
-        return assayDesigner;
-    }
-
-    /**
-     * @deprecated Use {@link #createAssayDesignWithDefaults(String, String)}
-     */
-    @Deprecated
-    public void createAssayWithDefaults(String type, String name)
-    {
-        createAssayAndEdit(type, name).saveAndClose();
+        fail("Please change your test to use the new assay designer by using createAssayDesignWithDefaults().");
     }
 
     @LogMethod
@@ -102,24 +81,25 @@ public abstract class AbstractAssayHelper
     @LogMethod
     public ReactAssayDesignerPage createAssayDesign(String type, String name)
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.enableUxDomainDesigner();
         _test.clickButton("New Assay Design");
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
         _test.clickButton("Next");
-        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.disableUxDomainDesigner();
 
         ReactAssayDesignerPage assayDesigner = new ReactAssayDesignerPage(_test.getDriver());
         assayDesigner.setName(name);
         return assayDesigner;
     }
 
-    public AssayDesignerPage clickEditAssayDesign()
+    public ReactAssayDesignerPage clickEditAssayDesign()
     {
         return clickEditAssayDesign(false);
     }
 
-    public AssayDesignerPage clickEditAssayDesign(boolean confirmEditInOtherContainer)
+    public ReactAssayDesignerPage clickEditAssayDesign(boolean confirmEditInOtherContainer)
     {
+        _test.enableUxDomainDesigner();
         _test.doAndWaitForPageToLoad(() ->
         {
             clickManageOption(false, "Edit assay design");
@@ -132,9 +112,10 @@ public abstract class AbstractAssayHelper
                         alertText.contains("Would you still like to edit it?"));
             }
         });
-        _test.waitForElement(Locator.id("AssayDesignerDescription"));
-
-        return new AssayDesignerPage(_test.getDriver());
+        // use the assayDesignerPage to synchronize
+        ReactAssayDesignerPage page = new ReactAssayDesignerPage(_test.getDriver());
+        _test.disableUxDomainDesigner();
+        return page;
     }
 
     public ReactAssayDesignerPage copyAssayDesign()
@@ -144,13 +125,13 @@ public abstract class AbstractAssayHelper
 
     public ReactAssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.enableUxDomainDesigner();
         clickManageOption(true, "Copy assay design");
         if (destinationFolder == null)
             _test.clickButton("Copy to Current Folder");
         else
             _test.clickAndWait(Locator.tag("tr").append(Locator.linkWithText(destinationFolder)));
-        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
+        _test.disableUxDomainDesigner();
 
         return new ReactAssayDesignerPage(_test.getDriver());
     }
