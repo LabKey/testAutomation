@@ -112,9 +112,7 @@ public class UserTest extends BaseWebDriverTest
 
         _userHelper.deleteUsers(false, CHANGE_EMAIL_USER, CHANGE_EMAIL_USER_ALTERNATE, NORMAL_USER, DEACTIVATED_USER, PASSWORD_RESET_USER, BLANK_USER, SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED);
 
-        enableUxDomainDesigner();
         DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
-        disableUxDomainDesigner();
         for (String field : REQUIRED_FIELDS)
         {
             domainFormPanel.getField(field).setRequiredField(false);
@@ -380,14 +378,14 @@ public class UserTest extends BaseWebDriverTest
             _userHelper.createUserAndNotify(BLANK_USER);
             setInitialPassword(BLANK_USER, TEST_PASSWORD);
 
-            DomainFormPanel domainFormPanel = goToChangeUserProperties();
+            DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
             for (String field : REQUIRED_FIELDS)
             {
                 domainFormPanel.getField(field).setRequiredField(true);
             }
             clickButton("Save");
 
-            domainFormPanel = goToChangeUserProperties();
+            domainFormPanel = goToSiteUsers().clickChangeUserProperties();
             for (String field : REQUIRED_FIELDS)
             {
                 DomainFieldRow domainFieldRow = domainFormPanel.getField(field);
@@ -396,7 +394,7 @@ public class UserTest extends BaseWebDriverTest
             }
             clickButton("Save");
 
-            domainFormPanel = goToChangeUserProperties();
+            domainFormPanel = goToSiteUsers().clickChangeUserProperties();
             domainFormPanel.getField("FirstName").setRequiredField(true);
             clickButton("Save");
 
@@ -416,21 +414,13 @@ public class UserTest extends BaseWebDriverTest
             signIn();
 
             // go to Users page, mark 'required fields' as no longer required so other tests aren't affected
-            DomainFormPanel domainFormPanel = goToChangeUserProperties();
+            DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
             for (String field : REQUIRED_FIELDS)
             {
                 domainFormPanel.getField(field).setRequiredField(false);
             }
             clickButton("Save");
         }
-    }
-
-    private DomainFormPanel goToChangeUserProperties()
-    {
-        enableUxDomainDesigner();
-        DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
-        disableUxDomainDesigner();
-        return domainFormPanel;
     }
 
     /**
@@ -532,7 +522,7 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testCustomProperties()
     {
-        DomainFormPanel domainFormPanel = goToChangeUserProperties();
+        DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
         domainFormPanel.addField(PROP_NAME1).setType(FieldDefinition.ColumnType.String).setLabel(PROP_NAME1);
         domainFormPanel.addField(PROP_NAME2).setType(FieldDefinition.ColumnType.Integer).setLabel(PROP_NAME2);
         clickButton("Save");

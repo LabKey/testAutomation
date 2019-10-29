@@ -19,8 +19,10 @@ package org.labkey.test.tests.viability;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AbstractAssayTest;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.openqa.selenium.WebDriverException;
@@ -92,26 +94,20 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
 
     protected void createViabilityAssay()
     {
-        PortalHelper portalHelper = new PortalHelper(this);
         log("** Create viability assay");
+        PortalHelper portalHelper = new PortalHelper(this);
         clickFolder(getFolderName());
         portalHelper.addWebPart("Assay List");
+
         clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "Viability"));
-        clickButton("Next");
-
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), getAssayName());
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("Viability", getAssayName());
 
         // Add 'Unreliable' field to Results domain
-        _listHelper.addField("Result Fields", "Unreliable", "Unreliable?", ListHelper.ListColumnType.Boolean);
-        _listHelper.addField("Result Fields", "IntValue", "IntValue", ListHelper.ListColumnType.Integer);
+        DomainFormPanel resultsPanel = assayDesignerPage.goToFieldProperties("Result Properties");
+        resultsPanel.addField("Unreliable").setType(FieldDefinition.ColumnType.Boolean).setLabel("Unreliable?");
+        resultsPanel.addField("IntValue").setType(FieldDefinition.ColumnType.Integer).setLabel("IntValue");
 
-        sleep(1000);
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
+        assayDesignerPage.clickFinish();
     }
 
     protected void setupPipeline() throws Exception

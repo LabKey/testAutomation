@@ -197,10 +197,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
         assertEquals("DrawDt", getFormElement(Locator.name("Date")));
-        enableUxDomainDesigner();
-        clickButton("Show Assay Designer");     // todo: map this page
-        disableUxDomainDesigner();
 
+        clickButton("Show Assay Designer");     // todo: map this page
         ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
         DomainFormPanel results = assayDesignerPage.expandFieldProperties("Results");
         results.getField(4)

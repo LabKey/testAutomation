@@ -428,9 +428,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             actionRadioButton.check();
             assertTrue("Failed to select action: " + actionName, actionRadioButton.isSelected());
         }
-        enableUxDomainDesigner();
         importWindow.clickButton("Import");
-        disableUxDomainDesigner();
     }
 
     /** If the upload panel isn't visible, click the "Upload Files" button in the toolbar. */

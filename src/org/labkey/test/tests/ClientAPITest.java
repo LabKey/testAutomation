@@ -946,10 +946,8 @@ public class ClientAPITest extends BaseWebDriverTest
         // next page
         clickButton("Create Study");
 
-        enableUxDomainDesigner();
         ManageStudyPage manageStudyPage = new ManageStudyPage(getDriver());
         DomainFormPanel domainFormPanel = manageStudyPage.clickEditAdditionalProperties();
-        disableUxDomainDesigner();
         domainFormPanel.addField("customfield1").setType(FieldDefinition.ColumnType.String).setLabel("Custom Field 1");
         domainFormPanel.addField("color").setType(FieldDefinition.ColumnType.String).setLabel("Color");
         clickButton("Save");

@@ -245,9 +245,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         }
         helper.setNameExpression(nameExpression.toString().substring(1));
 
-        enableUxDomainDesigner();
         clickButton("Create");
-        disableUxDomainDesigner();
         helper.addFields(fields);
 
         clickAndWait(Locator.linkWithText("Upload More Samples"));

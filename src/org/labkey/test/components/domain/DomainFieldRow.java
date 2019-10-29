@@ -110,7 +110,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public String detailsMessage()
     {
-        return elementCache().domainFieldDetailsSpan.getText();
+        return elementCache().fieldDetailsMessage.getText();
     }
 
     public int getIndex()
@@ -664,7 +664,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Checkbox fieldRequiredCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-required-")
                 .findWhenNeeded(this));
 
-        public WebElement domainFieldDetailsSpan = Locator.tagWithClass("div", "domain-field-details")
+        public WebElement fieldDetailsMessage = Locator.css(".domain-field-details, .domain-field-details-expanded")
                 .findWhenNeeded(this);
 
 
