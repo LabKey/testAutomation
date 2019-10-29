@@ -397,9 +397,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setFromFolder(String containerPath)
     {
         expand();
-        if (StringUtils.isEmpty(containerPath) || containerPath.equals("Current Folder"))
+        if (StringUtils.isEmpty(containerPath) || containerPath.equals("Current Folder") || containerPath.equals("Current Project"))
         {
-            containerPath = getWrapper().getCurrentContainerPath();
+            containerPath = "";
         }
         elementCache().fromFolderInput.selectByValue(containerPath);
 
