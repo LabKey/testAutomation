@@ -21,7 +21,6 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 
@@ -45,7 +44,7 @@ public class PythonHelper
         try
         {
             String[] scriptAndArgs = ArrayUtils.addAll(new String[]{scriptFile.getAbsolutePath()}, args);
-            return new ProcessHelper(getPythonExecutable(), scriptAndArgs).getProcessOutput().trim();
+            return new ProcessHelper(getPythonExecutable(), scriptAndArgs).getProcessOutput(true).trim();
         }
         catch (IOException e)
         {
@@ -140,7 +139,7 @@ public class PythonHelper
         String versionOutput = "";
         try
         {
-            versionOutput = TestFileUtils.getProcessOutput(python, "--version");
+            versionOutput = new ProcessHelper(python, "--version").getProcessOutput().trim();
 
             Pattern versionPattern = Pattern.compile("Python ([1-9]\\.\\d+\\.\\d)");
             Matcher matcher = versionPattern.matcher(versionOutput);

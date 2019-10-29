@@ -36,8 +36,13 @@ public class ProcessHelper
 
     public String getProcessOutput() throws IOException
     {
+        return getProcessOutput(false);
+    }
+
+    public String getProcessOutput(boolean logOutput) throws IOException
+    {
         StringBuffer output = new StringBuffer();
-        runProcess(pb, output, timeout);
+        runProcess(output, logOutput);
         return output.toString();
     }
 
@@ -47,7 +52,7 @@ public class ProcessHelper
      * @return the exit code for the invocation - 0 if the process completed successfully.
      */
     @LogMethod
-    public static int runProcess(ProcessBuilder pb, StringBuffer output, Duration timeout) throws IOException
+    public int runProcess(StringBuffer output, boolean logOutput) throws IOException
     {
         TestLogger.log("Running process: '" + pb.command() + "'");
         Process proc;
@@ -77,7 +82,8 @@ public class ProcessHelper
                     count++;
                     output.append(line);
                     output.append('\n');
-                    TestLogger.log(line);
+                    if (logOutput)
+                        TestLogger.log(line);
                 }
                 return count;
             }

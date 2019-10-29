@@ -37,7 +37,6 @@ import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilde
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.serverapi.writer.PrintWriters;
-import org.labkey.test.util.ProcessHelper;
 import org.labkey.test.util.TestLogger;
 
 import java.io.BufferedInputStream;
@@ -160,12 +159,6 @@ public abstract class TestFileUtils
         return getTestRoot().getName();
     }
 
-    @Deprecated (forRemoval = true)
-    public static File getApiScriptFolder()
-    {
-        return new File(getTestRoot(), "data/api");
-    }
-
     public static File getTestBuildDir()
     {
         if (_buildDir == null)
@@ -233,15 +226,6 @@ public abstract class TestFileUtils
                 "Run `./gradlew :server:test:build :server:test:writeSampleDataFile` once to locate all sampledata" + "\n" +
                 "Currently known sample data locations: " + String.join("\n", sampledataDirs), foundFile);
         return foundFile;
-    }
-
-    /**
-     * @deprecated Use {@link ProcessHelper#getProcessOutput()}
-     */
-    @Deprecated
-    public static String getProcessOutput(File executable, String... args) throws IOException
-    {
-        return new ProcessHelper(executable, args).getProcessOutput().trim();
     }
 
     public static File getTestTempDir()
