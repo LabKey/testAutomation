@@ -27,6 +27,7 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +37,7 @@ public class PythonHelper
 
     private final BaseWebDriverTest _test;
     private File pythonExecutable = null;
+    private Duration defaultScriptTimeout = null;
 
     public PythonHelper(BaseWebDriverTest test)
     {
@@ -49,6 +51,8 @@ public class PythonHelper
             String[] scriptAndArgs = ArrayUtils.addAll(new String[]{scriptFile.getAbsolutePath()}, args);
             ProcessHelper processHelper = new ProcessHelper(getPythonExecutable(), scriptAndArgs);
             applyPyenv(processHelper);
+            if (defaultScriptTimeout != null)
+                processHelper.setTimeout(defaultScriptTimeout);
             return processHelper.getProcessOutput(true).trim();
         }
         catch (IOException e)
@@ -64,6 +68,12 @@ public class PythonHelper
             processHelper.environment().put(PYENV_KEY, System.getenv(PYENV_KEY));
         }
         return processHelper;
+    }
+
+    public PythonHelper setDefaultScriptTimeout(Duration defaultScriptTimeout)
+    {
+        this.defaultScriptTimeout = defaultScriptTimeout;
+        return this;
     }
 
     @LogMethod
