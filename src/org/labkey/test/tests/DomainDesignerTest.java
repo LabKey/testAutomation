@@ -159,7 +159,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.getField("stringField")
                 .expand()
@@ -206,7 +206,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.getField("deleteMe")
                 .clickRemoveField()
@@ -244,7 +244,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.addField("addedField")
                 .setType(FieldDefinition.ColumnType.DateAndTime)
@@ -291,7 +291,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // add a new field, but leave the name field blank
         DomainFieldRow noNameRow = domainFormPanel.addField("");
@@ -333,7 +333,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // add a new field, but leave the name field blank
         DomainFieldRow firstcol = domainFormPanel.getField("firstCol");
@@ -373,7 +373,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // confirm the field name/data type edits are disabled
         DomainFieldRow keyRow = domainFormPanel.getField("id");
@@ -402,7 +402,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow nameRow = domainFormPanel.getField("name");
         // first, delete 'name' column
@@ -416,7 +416,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // there should just be the key field (id) now:
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
-        domainFormPanel = domainDesignerPage.fieldsPanel(list); // re-find the panel to work around field caching silliness
+        domainFormPanel = domainDesignerPage.fieldsPanel(); // re-find the panel to work around field caching silliness
         assertNotNull(domainFormPanel.getField("id"));
         assertNull(domainFormPanel.getField("color"));
         assertNull(domainFormPanel.getField("name"));
@@ -443,7 +443,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow nameRow = domainFormPanel.getField("name");
         // confirm the UI shows its expected 'required' status
@@ -473,7 +473,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow nameField = domainFormPanel.getField("name");
         assertNull("expect the 'name' field not to be shown in the domain editor", nameField);
@@ -494,7 +494,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow modifiedRow = domainFormPanel.addField("modified");
         DomainFieldRow blarg1 = domainFormPanel.addField("blarg");
@@ -539,7 +539,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow testCol = domainFormPanel.getField("testCol");
         testCol.setName("modified");
@@ -581,7 +581,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow defaultViewRow = domainFormPanel.addField("defaultViewField");
         defaultViewRow.showFieldOnDefaultView(false);
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
@@ -613,7 +613,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow hiddenRow = domainFormPanel.addField("hiddenField");
         hiddenRow.showFieldOnInsertView(false);
         DomainFieldRow shownRow = domainFormPanel.addField("shownField");
@@ -648,7 +648,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow hiddenRow = domainFormPanel.addField("hiddenField");
         hiddenRow.showFieldOnUpdateView(false);
         DomainFieldRow shownRow = domainFormPanel.addField("shownField");
@@ -686,7 +686,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 "notPHI", "notPHI", "limitedPHI", "limitedPHI", "fullPHI", "fullPHI", "restrictedPHI", "restrictedPHI"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow notPhi = domainFormPanel.addField("notPHI");
         notPhi.setPHILevel(PropertiesEditor.PhiSelectType.NotPHI);
         DomainFieldRow limitedPHI = domainFormPanel.addField("limitedPHI");
@@ -725,7 +725,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow missingValueRow = domainFormPanel.addField("missingValue");
         missingValueRow.setMissingValue(true);
         // explicitly set missingValue false on extraField
@@ -752,7 +752,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow dimensionField = domainFormPanel.addField("dimensionField");
         dimensionField.setDimension(true);
         // explicitly set dimension false on extraField
@@ -780,7 +780,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow measureField = domainFormPanel.addField("measureField");
         measureField.setMeasure(true);
         // explicitly set measure false on extraField
@@ -809,7 +809,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow variableField = domainFormPanel.addField("variableField");
         variableField.setRecommendedVariable(true);
         // explicitly set recommended variable false on extraField
@@ -845,7 +845,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
                 .setType(FieldDefinition.ColumnType.Lookup)
@@ -889,7 +889,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse1 = dgen.createDomain(createDefaultConnection(true), "VarList", Map.of("keyName", "id"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", mainListName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(mainListName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
                 .setType(FieldDefinition.ColumnType.Lookup)
@@ -935,7 +935,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen1.insertRows(createDefaultConnection(true), dgen1.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // add a lookup field to the test list
         DomainFieldRow row = domainFormPanel.addField("looky")
@@ -965,7 +965,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow testRow = domainFormPanel.getField("color");
         testRow.clickAdvancedSettings()
@@ -980,7 +980,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // now re-open the domain designer, go set the default values
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel newPanel = domainDesignerPage.fieldsPanel(listName);
+        DomainFormPanel newPanel = domainDesignerPage.fieldsPanel();
         newPanel.getField("color")
                 .clickAdvancedSettings()
                 .clickDefaultValuesLink();  // should land us in
@@ -1008,7 +1008,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // edit an existing field
         domainFormPanel.getField("favoriteSnack")
@@ -1074,7 +1074,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSetName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSetName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // now attempt to mark 'manufacturer' field 'required'
         domainFormPanel.getField("manufacturer")
@@ -1111,7 +1111,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSetName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(sampleSetName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // capture the current URL
         String domainDesignerPageUrl = getDriver().getCurrentUrl();
@@ -1145,7 +1145,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow snackRow = domainFormPanel.getField("favoriteSnack");
         snackRow.nameInput()
@@ -1168,7 +1168,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow sizeRow = domainFormPanel.getField("size");
         FieldDefinition.RangeValidator midsizeValidator = new FieldDefinition.RangeValidator("midsize", "falls between 2 and 3", "value must be 2 or 3",
@@ -1203,7 +1203,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         dgen.addCustomRow(Map.of("name", "billy", "favoriteIceCream", "vanilla", "favoriteSnack", "apple", "size", 12));
         dgen.addCustomRow(Map.of("name", "jeffy", "favoriteIceCream", "chocolate", "favoriteSnack", "almond brittle", "size", 12));
         dgen.addCustomRow(Map.of("name", "alex", "favoriteIceCream", "strawberry", "favoriteSnack", "peanuts", "size", 12));
