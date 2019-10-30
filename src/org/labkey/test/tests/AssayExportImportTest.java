@@ -136,7 +136,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
                 .addField(new FieldDefinition("instrumentSetting").setType(FieldDefinition.ColumnType.Integer)
                         .setDescription("The configuration setting on the instrument."));
 
-        assayDesignerPage.goToResultFields()
+        assayDesignerPage.goToResultsFields()
                 .removeAllFields()
                 .setInferFieldFile(new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE))
                 .addField(new FieldDefinition("adjustedM1").setType(FieldDefinition.ColumnType.Integer));
@@ -157,7 +157,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         click(Locator.linkWithText("Manage assay design"));
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
 
-        assayDesignerPage.expandFieldProperties("Results").addField(newField);
+        assayDesignerPage.expandFieldsPanel("Results").addField(newField);
 
         assayDesignerPage.clickFinish();
     }
@@ -531,7 +531,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         assayDesignerPage.goToBatchFields().removeField("ParticipantVisitResolver")
                 .removeField("TargetStudy");
 
-        assayDesignerPage.goToResultFields()
+        assayDesignerPage.goToResultsFields()
                 .removeAllFields()
                 .setInferFieldFile(new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE));
         assayDesignerPage.clickFinish();

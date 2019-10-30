@@ -856,7 +856,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Create an assay with sampleId in the data field");
         goToProjectHome();
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", DATA_ID_ASSAY);
-        assayDesignerPage.goToResultFields()
+        assayDesignerPage.goToResultsFields()
             .addField(SAMPLE_ID_FIELD_NAME)
             .setType(FieldDefinition.ColumnType.Lookup)
             .setFromSchema("samples")
