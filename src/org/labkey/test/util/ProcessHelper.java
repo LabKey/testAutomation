@@ -21,11 +21,21 @@ public class ProcessHelper
     private final ProcessBuilder pb;
     private Duration timeout = Duration.ofSeconds(60);
 
-    public ProcessHelper(File executable, String... args)
+    public ProcessHelper(String executable, String... args)
     {
         pb = new ProcessBuilder();
-        pb.command(ArrayUtils.addAll(new String[]{executable.toPath().normalize().toAbsolutePath().toString()}, args));
+        pb.command(ArrayUtils.addAll(new String[]{executable}, args));
         pb.redirectErrorStream(true);
+    }
+
+    public ProcessHelper(File executable, String... args)
+    {
+        this(executable.toPath().normalize().toAbsolutePath().toString(), args);
+    }
+
+    public Map<String, String> environment()
+    {
+        return pb.environment();
     }
 
     public ProcessHelper setTimeout(@NotNull Duration timeout)

@@ -18,6 +18,7 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.hamcrest.CoreMatchers;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -31,6 +32,8 @@ import java.util.regex.Pattern;
 
 public class PythonHelper
 {
+    private static final String PYENV_KEY = "PYENV_VERSION";
+
     private final BaseWebDriverTest _test;
     private File pythonExecutable = null;
 
@@ -44,12 +47,23 @@ public class PythonHelper
         try
         {
             String[] scriptAndArgs = ArrayUtils.addAll(new String[]{scriptFile.getAbsolutePath()}, args);
-            return new ProcessHelper(getPythonExecutable(), scriptAndArgs).getProcessOutput(true).trim();
+            ProcessHelper processHelper = new ProcessHelper(getPythonExecutable(), scriptAndArgs);
+            applyPyenv(processHelper);
+            return processHelper.getProcessOutput(true).trim();
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
         }
+    }
+
+    private ProcessHelper applyPyenv(@NotNull ProcessHelper processHelper)
+    {
+        if (System.getenv().containsKey(PYENV_KEY))
+        {
+            processHelper.environment().put(PYENV_KEY, System.getenv(PYENV_KEY));
+        }
+        return processHelper;
     }
 
     @LogMethod
@@ -139,7 +153,7 @@ public class PythonHelper
         String versionOutput = "";
         try
         {
-            versionOutput = new ProcessHelper(python, "--version").getProcessOutput().trim();
+            versionOutput = applyPyenv(new ProcessHelper(python, "--version")).getProcessOutput().trim();
 
             Pattern versionPattern = Pattern.compile("Python ([1-9]\\.\\d+\\.\\d)");
             Matcher matcher = versionPattern.matcher(versionOutput);
