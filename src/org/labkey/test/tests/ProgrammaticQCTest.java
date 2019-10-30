@@ -149,8 +149,8 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         }
 
         // add an 'animal' field which will be populated by the transform script
-        assayDesigner.fieldProperties("Results")
-                .addField(new FieldDefinition( "Animal", FieldDefinition.ColumnType.String).setLabel("Animal"));
+        assayDesigner.fieldsPanel("Results")
+            .addField(new FieldDefinition( "Animal", FieldDefinition.ColumnType.String).setLabel("Animal"));
         assayDesigner.clickFinish();
     }
 

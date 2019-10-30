@@ -18,7 +18,7 @@ package org.labkey.test.pages.study;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -59,10 +59,10 @@ public class ManageStudyPage extends LabKeyPage<ManageStudyPage.ElementCache>
         return new ManageDatasetQCStatesPage(getDriver());
     }
 
-    public DomainFormPanel clickEditAdditionalProperties()
+    public DomainDesignerPage clickEditAdditionalProperties()
     {
         waitAndClickAndWait(Locator.linkWithText("Edit Additional Properties"));
-        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).waitFor();
+        return new DomainDesignerPage(getDriver());
     }
 
     protected ElementCache newElementCache()

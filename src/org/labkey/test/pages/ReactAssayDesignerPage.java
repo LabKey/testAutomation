@@ -174,13 +174,13 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public DomainFormPanel goToFieldsPanel(String title)
     {
-        DomainFormPanel panel = activeFieldProperties(title);
+        DomainFormPanel panel = activeFieldsPanel(title);
 
         int attempts = 0; // don't try clicking next forever
         while (panel == null && attempts < 10)
         {
             clickNext();
-            panel = activeFieldProperties(title);
+            panel = activeFieldsPanel(title);
             attempts++;
         }
 
@@ -189,7 +189,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public DomainFormPanel expandFieldsPanel(String title)
     {
-        DomainFormPanel panel = fieldProperties(title);
+        DomainFormPanel panel = fieldsPanel(title);
         panel.expand();
         return panel;
     }
@@ -210,7 +210,8 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
-    public void clickFinish()
+    @Override
+    public DomainDesignerPage clickFinish()
     {
         // if we are in create mode, click next until we get to the end (but don't try forever)
         int attempts = 0;
@@ -223,6 +224,8 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         scrollIntoView(elementCache().finishBtn);
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishBtn));
         clickAndWait(elementCache().finishBtn);
+
+        return null; // the page has navigated
     }
 
     @Override
