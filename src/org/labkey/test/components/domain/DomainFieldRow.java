@@ -296,7 +296,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setScaleType(PropertiesEditor.ScaleType scaleType)
     {
         expand();
-        elementCache().defaultScaleTypeSelect.selectByVisibleText(scaleType.toString());
+        elementCache().defaultScaleTypeSelect.selectByVisibleText(scaleType.getText());
         return this;
     }
 
@@ -304,7 +304,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
         String scaleTypeString = getWrapper().getFormElement(elementCache().defaultScaleTypeSelect.getWrappedElement());
-        return Enum.valueOf(PropertiesEditor.ScaleType.class, scaleTypeString);
+        return Enum.valueOf(PropertiesEditor.ScaleType.class, scaleTypeString.toUpperCase());
     }
 
     //
