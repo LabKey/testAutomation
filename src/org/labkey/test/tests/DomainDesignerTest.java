@@ -210,7 +210,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         domainFormPanel.getField("deleteMe")
                 .clickRemoveField()
-                .dismiss("Yes");
+                .dismiss("Yes, Remove Field");
         domainDesignerPage.clickSave();
 
         GetDomainCommand domainCommand = new GetDomainCommand("exp.materials", sampleSet);
@@ -407,11 +407,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow nameRow = domainFormPanel.getField("name");
         // first, delete 'name' column
         nameRow.clickRemoveField()
-                .dismiss("Yes");
+                .dismiss("Yes, Remove Field");
 
         DomainFieldRow colorRow = domainFormPanel.getField("color");
         colorRow.clickRemoveField()
-                .dismiss("Yes");
+                .dismiss("Yes, Remove Field");
         domainDesignerPage.clickSave();
 
         // there should just be the key field (id) now:
@@ -450,7 +450,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertEquals(true, nameRow.getRequiredField());
 
         nameRow.clickRemoveField()
-                .dismiss("Yes");
+                .dismiss("Yes, Remove Field");
         domainDesignerPage.clickSave();
     }
 

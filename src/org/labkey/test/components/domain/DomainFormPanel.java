@@ -99,7 +99,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFormPanel removeField(String name)
     {
         getWrapper().log("attempting to remove field " + name);
-        getField(name).clickRemoveField().dismiss("Yes");
+        getField(name).clickRemoveField().dismiss("Yes, Remove Field");
         clearElementCache();
         return this;
     }
