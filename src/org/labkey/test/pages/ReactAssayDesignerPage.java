@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -44,7 +43,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     @Override
     public void waitForPage()
     {
-        waitForElement(Locator.button("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("assay-design-description"), WAIT_FOR_JAVASCRIPT);
         elementCache().descriptionInput.get();
     }
 
@@ -70,6 +69,12 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     {
         elementCache().plateTemplateSelect.selectByVisibleText(template);
         return this;
+    }
+
+    public void goToConfigureTemplates()
+    {
+        clickAndWait(elementCache().configureTemplatesLink);
+        // todo: return the class that wraps this page
     }
 
     public ReactAssayDesignerPage setDetectionMethod(String method)
@@ -245,6 +250,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(this);
         final Select autoCopyTargetSelect = Select(Locator.id("assay-design-autoCopyTargetContainerId")).findWhenNeeded(this);
         final Select plateTemplateSelect = Select(Locator.id("assay-design-selectedPlateTemplate")).findWhenNeeded(this);
+        final WebElement configureTemplatesLink = Locator.linkContainingText("Configure Templates").findWhenNeeded(this);
         final Select detectionMethodSelect = Select(Locator.id("assay-design-selectedDetectionMethod")).findWhenNeeded(this);
         final OptionSelect<MetadataInputFormat> metadataInputSelect = OptionSelect.finder(Locator.id("assay-design-selectedMetadataInputFormat"), MetadataInputFormat.class).findWhenNeeded(this);
         final Checkbox saveScriptFilesCheckbox = Checkbox(Locator.checkboxById("assay-design-saveScriptFiles")).findWhenNeeded(this);

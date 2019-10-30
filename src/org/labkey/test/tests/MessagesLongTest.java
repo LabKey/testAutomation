@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -34,12 +35,17 @@ import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.announcements.AdminPage;
 import org.labkey.test.pages.announcements.InsertPage;
 import org.labkey.test.pages.announcements.RespondPage;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
@@ -55,6 +61,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "MessagesVerifyProject";
     private static final String MSG1_TITLE = "test message 1";
+    private static final String MSG1_TITLE_2 = "test message 2";
     private static final String MSG1_BODY = "this is a test message to Banana";
     private static final String RESP1_TITLE = "test response 1";
     private static final String RESP1_BODY = "this is another test, thanks";
@@ -143,23 +150,36 @@ public class MessagesLongTest extends BaseWebDriverTest
         - Use EmailPrefsPage
      */
 
+
+    @BeforeClass
+    public static void setupProject()
+    {
+        MessagesLongTest init = (MessagesLongTest) getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        log("Open new project, add group, alter permissions");
+        _containerHelper.createProject(PROJECT_NAME, "Collaboration");
+        navBar().goToPermissionsPage()
+                .createPermissionsGroup("Administrators")
+                .setPermissions("Administrators", "Project Administrator")
+                .createPermissionsGroup("testers1")
+                .assertPermissionSetting("testers1", "No Permissions")
+                .clickSaveAndFinish();
+        _containerHelper.enableModule(PROJECT_NAME, "Dumbster");
+
+
+    }
+
     @Test
     public void testSteps()
     {
         log("Modify the default email template for message board notification.");
         // This is done to test Issue 23934: Allow customization of email template for message board notifications
         modifyTemplate(true);
-        goToHome();
-
-        log("Open new project, add group, alter permissions");
-        _containerHelper.createProject(PROJECT_NAME, "Collaboration");
-        navBar().goToPermissionsPage()
-            .createPermissionsGroup("Administrators")
-            .setPermissions("Administrators", "Project Administrator")
-            .createPermissionsGroup("testers1")
-            .assertPermissionSetting("testers1", "No Permissions")
-            .clickSaveAndFinish();
-        _containerHelper.enableModule(PROJECT_NAME, "Dumbster");
+        goToProjectHome();
 
         enableEmailRecorder();
         basicMessageTests();
@@ -188,7 +208,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check message works in Wiki");
         _portalHelper.clickWebpartMenuItem("Messages", true, "New");
-        new org.labkey.test.pages.announcements.InsertPage(getDriver())
+        new InsertPage(getDriver())
                 .setRenderAs(WikiHelper.WikiRendererType.RADEOX) // "Wiki Page"
                 .setTitle(MSG1_TITLE)
                 .setBody("<b>first message testing</b>")
@@ -203,7 +223,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Create message using markdown");
         clickButton( "New");
-        InsertPage markdownPage = new org.labkey.test.pages.announcements.InsertPage(getDriver());
+        InsertPage markdownPage = new InsertPage(getDriver());
         assertEquals("default selection should be 'Markdown'",markdownPage.getRenderAs(), WikiHelper.WikiRendererType.MARKDOWN);
         markdownPage.setTitle("Markdown is a thing now")
                 .setBody("# Holy Header, Batman!\n" +
@@ -237,7 +257,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check that HTML message works");
         clickButton("New");
-        new org.labkey.test.pages.announcements.InsertPage(getDriver())
+        new InsertPage(getDriver())
                 .setRenderAs(WikiHelper.WikiRendererType.HTML)
                 .setTitle(MSG1_TITLE)
                 .setBody(HTML_BODY)
@@ -401,9 +421,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToModule("Dumbster");
         assertTextPresent("RE: " + MSG1_TITLE, 6);
         click(Locator.linkWithText(MSG1_TITLE));
-        assertTextPresent(
-                "1 <b>x</b>",
-                "<a class=\"labkey-text-link\" href=\"/labkey" + WebTestHelper.buildRelativeUrl("list", getProjectName(), "begin") + "?\">manage lists</a>");
+        assertElementPresent(Locator.linkWithText("manage lists"));
         click(Locator.linkWithText(MSG1_TITLE).index(1));
         assertTextPresent("first message testing");
         assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
@@ -419,11 +437,53 @@ public class MessagesLongTest extends BaseWebDriverTest
         invokeApiAction("home", "announcements", "sendDailyDigest.api", "Failed to send messages daily digest");
         goToHome();
         goToModule("Dumbster");
-        assertTextPresent("New posts to /" + PROJECT_NAME, 2);
+        waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "New posts");
+        assertTextPresent("New posts to /" + PROJECT_NAME, 1);
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
         assertTextPresent("The following new posts were made yesterday");
     }
 
+    @Test
+    public void testDailyDigestMessage()
+    {
+        String groupName = "Digest Group";
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        apiPermissionsHelper.createProjectGroup(groupName, getProjectName());
+        apiPermissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), getProjectName(), groupName);
+
+        enableEmailRecorder();
+        goToProjectHome();
+        log("Check email preferences");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
+        checkCheckbox(Locator.radioButtonByName("notificationType").index(1));
+        clickButton("Update");
+        clickButton("Done");
+
+        log("Customize message board");
+        AdminPage.beginAt(this, getProjectName())
+                .includeGroups(true)
+                .save();
+
+       goToProjectHome();
+       log("Check message works in Wiki");
+       _portalHelper.clickWebpartMenuItem("Messages", true, "New");
+       new InsertPage(getDriver())
+                .setRenderAs(WikiHelper.WikiRendererType.RADEOX) // "Wiki Page"
+                .setTitle(MSG1_TITLE_2)
+                .setBody("Daily digest message testing with groups enabled")
+                .submit();
+
+       invokeApiAction("home", "announcements", "sendDailyDigest.api", "Failed to send messages daily digest");
+
+       goToModule("Dumbster");
+       waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "New posts");
+       EmailRecordTable announcement = new EmailRecordTable(this);
+       assertEquals("Mismatch in the expected number of message", 1, announcement.getEmailCount());
+       EmailRecordTable.EmailMessage message = announcement.getMessageWithSubjectContaining("New posts to /" + PROJECT_NAME);
+       announcement.clickMessage(message);
+       assertTextPresent("Digest Group"); //Group name should be shown.
+
+    }
     private void verifyAdmin()
     {
         log("Check email admin works");
@@ -541,7 +601,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Submit");
         assertTextPresent(_userHelper.getDisplayNameForEmail("Members: " + USER1));
         assertTextNotPresent(USER1);
-        stopImpersonatingRole();
+        stopImpersonating();
         log("Verify admin user still sees email address");
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
@@ -591,6 +651,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         goToModule("Dumbster");
+        waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "responder@messages.test");
         EmailRecordTable record = new EmailRecordTable(this);
         List<String> subject = record.getColumnDataAsText("Message");
         assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(0));

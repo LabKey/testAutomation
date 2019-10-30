@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -9,13 +10,12 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.labkey.test.util.TestDataGenerator;
-import org.openqa.selenium.NoSuchElementException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -692,42 +692,32 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         log("Add a parent alias column to the sample set that conflicts with a given column name.");
         sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
-
         sampleHelper.addParentColumnAlias(Map.of(ALIAS_NAME_CONFLICT, CURRENT_SAMPLE_SET_OPTION));
-
         clickButton("Update");
 
         Locator errorMsgLocator = Locator.tagWithClass("div", "labkey-error");
-
         Assert.assertTrue("Error message is not present.", isElementPresent(errorMsgLocator));
         Assert.assertTrue("Error message is not visible.", isElementVisible(errorMsgLocator));
         Assert.assertEquals("Error message not as expected.", "A sample set property already exists with parent alias header: " + ALIAS_NAME_CONFLICT, errorMsgLocator.findElement(getDriver()).getText());
 
         log("Now add a valid parent column and check that you cannot now add a field in the sample set with the same name.");
-
         sampleHelper.addParentColumnAlias(Map.of(GOOD_PARENT_NAME, CURRENT_SAMPLE_SET_OPTION));
-
         clickButton("Update");
 
-        clickButton("Edit Fields");
+        clickFolder(SUB_FOLDER_NAME);
+        DomainFormPanel domainFormPanel = sampleHelper.goToEditSampleSetFields(SAMPLE_SET_NAME);
+        domainFormPanel.addField(GOOD_PARENT_NAME);
+        clickButton("Save", 0);
 
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getWrappedDriver()).withTitle("Field Properties").waitFor();
+        errorMsgLocator = Locator.tagWithClass("div", "alert-danger");
+        waitForElement(errorMsgLocator);
+        String errorMsgExpectedTxt = "'" + GOOD_PARENT_NAME + "' is a reserved field name in '" + SAMPLE_SET_NAME + "'.";
+        Assert.assertThat("Error message", errorMsgLocator.findElement(getDriver()).getText(), CoreMatchers.containsString(errorMsgExpectedTxt));
 
-        fieldProperties.addField();
-
-        // New field will be ff_name1 because there should already be a field there.
-        setFormElement(Locator.tagWithName("input", "ff_name1"), GOOD_PARENT_NAME);
-        try
-        {
-            waitForElementToBeVisible(Locator.xpath("//input[@title=\"'" + GOOD_PARENT_NAME + "' is reserved\"]"));
-        }
-        catch (NoSuchElementException nse)
-        {
-            Assert.fail(GOOD_PARENT_NAME + " is not marked as a reserved field name.");
-        }
+        domainFormPanel.removeField(GOOD_PARENT_NAME);
+        clickButton("Save");
 
         log("Validated name conflicts.");
-
     }
 
     @Test

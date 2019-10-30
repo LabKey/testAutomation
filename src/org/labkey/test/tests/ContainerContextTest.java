@@ -457,37 +457,27 @@ public class ContainerContextTest extends BaseWebDriverTest
     {
         goToProjectHome();
         clickFolder(SUB_FOLDER_A);
-        log("Defining a test assay at subfolder A");
         _portalHelper.addWebPart("Assay List");
-        //clickButton("Manage Assays");
         clickButton("New Assay Design");
         assertElementNotPresent(Locator.radioButtonByNameAndValue("providerName", "Flow"));
-        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "General"));
-        clickButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY_A);
-        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_DESC_A);
-        clickButton("Save", 0);
-        waitForText("Save successful");
+        log("Defining a test assay at subfolder A");
+        goToManageAssays();
+        _assayHelper.createAssayDesign("General", TEST_ASSAY_A)
+            .setDescription(TEST_ASSAY_DESC_A)
+            .clickFinish();
 
         goToProjectHome();
         clickFolder(SUB_FOLDER_B);
-        log("Defining a test assay at subfolder B");
         _portalHelper.addWebPart("Assay List");
-        //clickButton("Manage Assays");
         clickButton("New Assay Design");
         assertElementNotPresent(Locator.radioButtonByNameAndValue("providerName", "Flow"));
-        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "General"));
-        clickButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY_B);
-        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_DESC_B);
-        clickButton("Save", 0);
-        waitForText("Save successful");
+        log("Defining a test assay at subfolder B");
+        goToManageAssays();
+        _assayHelper.createAssayDesign("General", TEST_ASSAY_B)
+            .setDescription(TEST_ASSAY_DESC_B)
+            .clickFinish();
 
         goToProjectHome();
         _portalHelper.addWebPart("Assay List");

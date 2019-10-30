@@ -28,9 +28,9 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public DomainDesignerPage clickSave()
     {
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton()));
         String currentURL = getDriver().getCurrentUrl();
-        elementCache().saveButton.click();
+        elementCache().saveButton().click();
         afterSaveOrFinishClick(currentURL);
         return this;
     }
@@ -49,7 +49,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public UnsavedChangesModalDialog clickCancel()
     {
-        elementCache().cancelBtn.click();
+        elementCache().cancelBtn().click();
         UnsavedChangesModalDialog unsavedChangesModal = new UnsavedChangesModalDialog(
                 new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"),
                 getDriver());
@@ -67,6 +67,11 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return Locators.alert.findOptionalElement(getDriver()).map(WebElement::isDisplayed).orElse(false);
     }
 
+    public WebElement saveButton()
+    {
+        return elementCache().saveButton();
+    }
+
     public DomainFormPanel fieldProperties()
     {
         return elementCache().firstDomainFormPanel;
@@ -80,12 +85,6 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     public DomainFormPanel activeFieldProperties(String title)
     {
         return elementCache().activeDomainFormPanel(title);
-    }
-
-    public int getFieldPropertiesPanelCount()
-    {
-        Locator panelLoc = new DomainFormPanel.DomainFormPanelFinder(getDriver()).getBaseLocator();
-        return panelLoc.findElements(getDriver()).size() - 1; // minus 1 because of top level Assay Properties panel
     }
 
     public String waitForError()
@@ -157,11 +156,16 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         {
             return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).active().findOrNull(this);
         }
-
-        WebElement saveButton = Locator.button("Save")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement cancelBtn = Locator.button("Cancel")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement saveButton()
+        {
+            return Locator.button("Save")
+                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        }
+        WebElement cancelBtn()
+        {
+            return Locator.button("Cancel")
+                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     public static class Locators

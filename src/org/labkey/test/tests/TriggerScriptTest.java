@@ -35,6 +35,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
@@ -803,13 +804,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
         drt.clickInsertNewRow();
         setFormElement(Locator.name("name"), DATA_CLASSES_NAME);
         clickButton("Create");
-        clickButton("Add Field", 0);
-        clickButton("Add Field", 0);
-        setFormElement(Locator.input("ff_name0"), COMMENTS_FIELD);
-        setFormElement(Locator.input("ff_name1"), COUNTRY_FIELD);
-
-        setFormElement(Locator.input("ff_label0"), COMMENTS_FIELD);
-        setFormElement(Locator.input("ff_label1"), COUNTRY_FIELD);
+        DomainFormPanel domainFormPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).waitFor();
+        domainFormPanel.addField(COMMENTS_FIELD).setLabel(COMMENTS_FIELD);
+        domainFormPanel.addField(COUNTRY_FIELD).setLabel(COUNTRY_FIELD);
         clickButton("Save");
     }
 }
