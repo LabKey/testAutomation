@@ -144,7 +144,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         clickFolder(FOLDER_NAME);
         sampleHelper.goToEditSampleSetFields(SAMPLESET_NAME)
             .addField(new FieldDefinition("File", FieldDefinition.ColumnType.File));
-        clickButton("Save");
+        clickButton("Finish");
 
         StringBuilder sb = new StringBuilder("Name\tcolor\tfile\n");
         for (File file : DATAFILE_DIRECTORY.listFiles())

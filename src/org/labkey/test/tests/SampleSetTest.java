@@ -1954,7 +1954,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 .setFromSchema("lists")
                 .setFromTargetTable(listName + " (Integer)")
                 .setLookupValidatorEnabled(true);
-        clickButton("Save");
+        clickButton("Finish");
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(SAMPLE_SET));
@@ -2017,7 +2017,7 @@ public class SampleSetTest extends BaseWebDriverTest
         clickFolder(FOLDER_NAME);
         DomainFormPanel domainFormPanel = sampleHelper.goToEditSampleSetFields(sampleSetName);
         domainFormPanel.removeField("FileAttachment");
-        clickButton("Save");
+        clickButton("Finish");
 
         expectedHeaders.remove("File Attachment");
         exportGridVerifyRowCountAndHeader(3, expectedHeaders);

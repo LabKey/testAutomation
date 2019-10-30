@@ -93,7 +93,7 @@ public class SampleSetHelper extends WebDriverWrapper
         {
             domainFormPanel.addField(fieldDefinition);
         }
-        clickButton("Save");
+        clickButton("Finish");
 
         return this;
     }
@@ -267,7 +267,7 @@ public class SampleSetHelper extends WebDriverWrapper
         {
             DomainFormPanel domainFormPanel = getDomainFormPanel();
             fields.forEach((name, type) -> domainFormPanel.addField(new FieldDefinition(name, type)));
-            clickButton("Save");
+            clickButton("Finish");
         }
         else
             clickButton("Cancel");
@@ -280,7 +280,7 @@ public class SampleSetHelper extends WebDriverWrapper
         {
             DomainFormPanel domainFormPanel = getDomainFormPanel();
             fields.forEach(fieldDefinition -> domainFormPanel.addField(fieldDefinition));
-            clickButton("Save");
+            clickButton("Finish");
         }
         else
             clickButton("Cancel");

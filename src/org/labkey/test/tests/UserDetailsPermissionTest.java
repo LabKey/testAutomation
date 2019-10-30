@@ -92,7 +92,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
         if (domainFormPanel.getField(CUSTOM_USER_COLUMN) == null)
             domainFormPanel.addField(CUSTOM_USER_COLUMN).setType(FieldDefinition.ColumnType.String);
-        clickButton("Save");
+        clickButton("Finish");
 
         _userHelper.createUser(ADMIN_USER, true, true);
         _userHelper.createUser(USER_INFO_VIEWER, true, true);

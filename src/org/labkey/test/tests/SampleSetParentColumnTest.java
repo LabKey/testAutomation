@@ -707,7 +707,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         clickFolder(SUB_FOLDER_NAME);
         DomainFormPanel domainFormPanel = sampleHelper.goToEditSampleSetFields(SAMPLE_SET_NAME);
         domainFormPanel.addField(GOOD_PARENT_NAME);
-        clickButton("Save", 0);
+        clickButton("Finish", 0);
 
         errorMsgLocator = Locator.tagWithClass("div", "alert-danger");
         waitForElement(errorMsgLocator);
@@ -715,7 +715,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         Assert.assertThat("Error message", errorMsgLocator.findElement(getDriver()).getText(), CoreMatchers.containsString(errorMsgExpectedTxt));
 
         domainFormPanel.removeField(GOOD_PARENT_NAME);
-        clickButton("Save");
+        clickButton("Finish");
 
         log("Validated name conflicts.");
     }

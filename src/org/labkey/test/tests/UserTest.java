@@ -126,7 +126,7 @@ public class UserTest extends BaseWebDriverTest
                 domainFormPanel.removeField(field);
             }
         }
-        clickButton("Save");
+        clickButton("Finish");
     }
 
     @Before
@@ -383,7 +383,7 @@ public class UserTest extends BaseWebDriverTest
             {
                 domainFormPanel.getField(field).setRequiredField(true);
             }
-            clickButton("Save");
+            clickButton("Finish");
 
             domainFormPanel = goToSiteUsers().clickChangeUserProperties();
             for (String field : REQUIRED_FIELDS)
@@ -392,11 +392,11 @@ public class UserTest extends BaseWebDriverTest
                 assertTrue("Field should be set to required: " + field, domainFieldRow.getRequiredField());
                 domainFieldRow.setRequiredField(false);
             }
-            clickButton("Save");
+            clickButton("Finish");
 
             domainFormPanel = goToSiteUsers().clickChangeUserProperties();
             domainFormPanel.getField("FirstName").setRequiredField(true);
-            clickButton("Save");
+            clickButton("Finish");
 
             signOut();
             attemptSignIn(BLANK_USER, TEST_PASSWORD);
@@ -419,7 +419,7 @@ public class UserTest extends BaseWebDriverTest
             {
                 domainFormPanel.getField(field).setRequiredField(false);
             }
-            clickButton("Save");
+            clickButton("Finish");
         }
     }
 
@@ -525,7 +525,7 @@ public class UserTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
         domainFormPanel.addField(PROP_NAME1).setType(FieldDefinition.ColumnType.String).setLabel(PROP_NAME1);
         domainFormPanel.addField(PROP_NAME2).setType(FieldDefinition.ColumnType.Integer).setLabel(PROP_NAME2);
-        clickButton("Save");
+        clickButton("Finish");
 
         assertTextPresent(PROP_NAME1, PROP_NAME2);
 

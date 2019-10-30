@@ -950,7 +950,7 @@ public class ClientAPITest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = manageStudyPage.clickEditAdditionalProperties();
         domainFormPanel.addField("customfield1").setType(FieldDefinition.ColumnType.String).setLabel("Custom Field 1");
         domainFormPanel.addField("color").setType(FieldDefinition.ColumnType.String).setLabel("Color");
-        clickButton("Save");
+        clickButton("Finish");
 
         setSourceFromFile("domainTest.js");
         waitForElement(Locator.id(TEST_DIV_NAME).containing("Finished DomainTests."), 30000);
