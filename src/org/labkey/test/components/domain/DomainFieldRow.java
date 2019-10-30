@@ -19,6 +19,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -109,7 +110,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public String detailsMessage()
     {
-        return elementCache().domainFieldDetailsSpan.getText();
+        return elementCache().fieldDetailsMessage.getText();
     }
 
     public int getIndex()
@@ -120,7 +121,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public boolean isExpanded()
     {
-        return getComponentElement().getAttribute("class").contains("domain-row-expanded");
+        return elementCache().collapseToggleLoc.existsIn(this);
     }
 
     /**
@@ -131,10 +132,23 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public ModalDialog clickRemoveField()
     {
         expand();
-        elementCache().removeFieldBtn.click();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().removeFieldBtn));
+        getWrapper().mouseOver(elementCache().removeFieldBtn);
 
-        ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Confirm Field Deletion")
-                .waitFor();
+        // re-try until the dialog appears or until attempts are exhausted
+        for (int i=0; i < 3; i++)
+        {
+            try
+            {
+                elementCache().removeFieldBtn.click();
+                new ModalDialog.ModalDialogFinder(getDriver())
+                        .withTitle("Confirm Field Deletion").timeout(1000).waitFor();
+                break;
+            }catch (NoSuchElementException notFound) {}
+        }
+
+        ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver())
+                .withTitle("Confirm Field Deletion").find();
         return confirmDeletionDlg;
     }
 
@@ -160,7 +174,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (!isExpanded())
         {
-            elementCache().expandToggle.click();
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().expandToggle));
+
+            for (int i=0; i < 3; i++)
+            {
+                elementCache().expandToggle.click();
+                if (getWrapper().waitFor(() -> isExpanded(), 1000))
+                    break;
+            }
             getWrapper().waitFor(() -> isExpanded(),
                     "the field row did not become expanded", 1500);
         }
@@ -172,7 +193,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         if (isExpanded())
         {
             elementCache().collapseToggle.click();
-            getWrapper().waitFor(() -> !isExpanded(),
+            getWrapper().waitFor(() -> elementCache().expandToggleLoc.existsIn(this),
                     "the field row did not collapse", 1500);
         }
         return this;
@@ -643,20 +664,23 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Checkbox fieldRequiredCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-required-")
                 .findWhenNeeded(this));
 
-        public WebElement domainFieldDetailsSpan = Locator.tagWithClass("div", "domain-field-details")
+        public WebElement fieldDetailsMessage = Locator.css(".domain-field-details, .domain-field-details-expanded")
                 .findWhenNeeded(this);
 
-        public WebElement expandToggle = Locator.tagWithClass("div", "domain-field-icon")
-                .child(Locator.tagWithAttribute("svg", "data-icon", "plus-square"))
-                .findWhenNeeded(this);
+
+        public Locator expandToggleLoc = Locator.tagWithClass("div", "domain-field-icon")
+                .child(Locator.tagWithAttribute("svg", "data-icon", "plus-square"));
+        public Locator collapseToggleLoc = Locator.tagWithAttribute("svg", "data-icon", "minus-square");
+
+        public WebElement expandToggle = expandToggleLoc.findWhenNeeded(this);
+
 
         // controls revealed when expanded
         public WebElement removeFieldBtn = Locator.tagWithAttributeContaining("button", "id", "domainpropertiesrow-delete-")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement advancedSettingsBtn = Locator.button("Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        public WebElement collapseToggle = Locator.tagWithAttribute("svg", "data-icon", "minus-square")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        public WebElement collapseToggle = collapseToggleLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
 
         // common field options

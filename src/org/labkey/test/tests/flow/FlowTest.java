@@ -507,7 +507,7 @@ public class FlowTest extends BaseFlowTest
         fields.put("Stim", FieldDefinition.ColumnType.String);
         fields.put("Comp", FieldDefinition.ColumnType.String);
         fields.put("Replicate", FieldDefinition.ColumnType.Integer);
-        fields.put("Thaw Date", FieldDefinition.ColumnType.DateTime);
+        fields.put("Thaw Date", FieldDefinition.ColumnType.DateAndTime);
         fields.put("Comment", FieldDefinition.ColumnType.String);
 
         uploadSampleDescriptions("/sampledata/flow/8color/sample-set.tsv", fields, new String[]{"Exp Name", "Well Id"}, new String[]{"EXPERIMENT NAME", "WELL ID"});

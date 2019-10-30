@@ -24,7 +24,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -141,10 +140,10 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         sampleHelper.createSampleSet(SAMPLESET_NAME, null, Map.of("color", FieldDefinition.ColumnType.String), Collections.singletonList(Map.of("Name", "ed", "color", "green")));
 
         // add a 'file' column
-        log("editing fields in Vial Groups");
-        waitAndClickAndWait(Locator.lkButton("Edit Fields"));
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-        fieldProperties.addField(new FieldDefinition("File").setType(FieldDefinition.ColumnType.File));
+        log("editing fields for sample set");
+        clickFolder(FOLDER_NAME);
+        sampleHelper.goToEditSampleSetFields(SAMPLESET_NAME)
+            .addField(new FieldDefinition("File", FieldDefinition.ColumnType.File));
         clickButton("Save");
 
         StringBuilder sb = new StringBuilder("Name\tcolor\tfile\n");

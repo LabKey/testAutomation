@@ -72,11 +72,6 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return elementCache().saveButton();
     }
 
-    public WebElement saveAndFinishButton()
-    {
-        return elementCache().saveButton();
-    }
-
     public DomainFormPanel fieldProperties()
     {
         return elementCache().firstDomainFormPanel;
@@ -90,12 +85,6 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     public DomainFormPanel activeFieldProperties(String title)
     {
         return elementCache().activeDomainFormPanel(title);
-    }
-
-    public int getFieldPropertiesPanelCount()
-    {
-        Locator panelLoc = new DomainFormPanel.DomainFormPanelFinder(getDriver()).getBaseLocator();
-        return panelLoc.findElements(getDriver()).size() - 1; // minus 1 because of top level Assay Properties panel
     }
 
     public String waitForError()

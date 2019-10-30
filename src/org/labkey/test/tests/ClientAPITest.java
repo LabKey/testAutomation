@@ -40,10 +40,11 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.study.CreateStudyPage;
+import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -944,15 +945,12 @@ public class ClientAPITest extends BaseWebDriverTest
         clickButton("Create Study");
         // next page
         clickButton("Create Study");
-        clickAndWait(Locator.linkWithText("Edit Additional Properties"));
-        waitForText(10000, "No fields have been defined.");
 
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").find();
-        fieldProperties.addField(new FieldDefinition("customfield1").setLabel("Custom Field 1"));
-        fieldProperties.addField(new FieldDefinition("color").setLabel("Color"));
-
-        sleep(1000);
-        clickButton("Save", WAIT_FOR_JAVASCRIPT);
+        ManageStudyPage manageStudyPage = new ManageStudyPage(getDriver());
+        DomainFormPanel domainFormPanel = manageStudyPage.clickEditAdditionalProperties();
+        domainFormPanel.addField("customfield1").setType(FieldDefinition.ColumnType.String).setLabel("Custom Field 1");
+        domainFormPanel.addField("color").setType(FieldDefinition.ColumnType.String).setLabel("Color");
+        clickButton("Save");
 
         setSourceFromFile("domainTest.js");
         waitForElement(Locator.id(TEST_DIV_NAME).containing("Finished DomainTests."), 30000);
