@@ -1129,7 +1129,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
     }
 
     /**
-     * confirms that clicking the name field also expands the field row
+     * confirms that clicking the name field does not expand the field row
      * @throws Exception
      */
     @Test
@@ -1151,7 +1151,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         snackRow.nameInput()
                 .getComponentElement().click();
 
-        waitFor(()->  snackRow.isExpanded(), "clicking the name field should expand the field row", 1000);
+        sleep(500); // wait just to be sure we are checking for expanded state correctly
+        assertFalse("clicking the name field should not expand the field row", snackRow.isExpanded());
     }
 
     @Test

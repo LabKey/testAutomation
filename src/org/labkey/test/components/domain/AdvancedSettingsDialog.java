@@ -106,6 +106,18 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
+    public boolean enableDateShift()
+    {
+        return elementCache().dateShift.get();
+    }
+    public AdvancedSettingsDialog enableDateShift(boolean checked)
+    {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(
+                elementCache().dateShift.getComponentElement()));
+        elementCache().dateShift.set(checked);
+        return this;
+    }
+
     public boolean enableMeasure()
     {
         return elementCache().enableMeasure.get();
@@ -200,7 +212,8 @@ public class AdvancedSettingsDialog extends ModalDialog
         // misc options
         public Select phiSelect = SelectWrapper.Select(Locator.tagWithAttribute("select", "name", "domainpropertiesrow-PHI"))
                 .findWhenNeeded(this);
-
+        public Checkbox dateShift = new Checkbox(
+                Locator.input("domainpropertiesrow-excludeFromShifting").findWhenNeeded(this));
         public Checkbox enableMeasure = new Checkbox(
                 Locator.input("domainpropertiesrow-measure").findWhenNeeded(this));
         public Checkbox enableDimension = new Checkbox(

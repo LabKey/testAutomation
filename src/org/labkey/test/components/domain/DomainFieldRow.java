@@ -362,19 +362,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    public boolean getDateShift()
-    {
-        expand();
-        return elementCache().dateShiftBox.get();
-    }
-
-    public DomainFieldRow setDateShift(boolean shift)
-    {
-        expand();
-        elementCache().dateShiftBox.set(shift);
-        return this;
-    }
-
     public DomainFieldRow setLookup(FieldDefinition.LookupInfo lookupInfo)
     {
         setType(FieldDefinition.ColumnType.Lookup);
@@ -478,6 +465,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .setPHILevel(phiLevel)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow setDateShift(boolean shift)
+    {
+        clickAdvancedSettings()
+                .enableDateShift(shift)
                 .apply();
         return this;
     }
@@ -709,8 +704,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // date field options
         public Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
                 .refindWhenNeeded(this), getDriver());
-        public Checkbox dateShiftBox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-excludeFromShifting")
-                .refindWhenNeeded(this));
 
         //lookup field options
         public Select fromFolderInput = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
