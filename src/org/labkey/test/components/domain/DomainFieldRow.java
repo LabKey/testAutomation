@@ -472,7 +472,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setDateShift(boolean shift)
     {
         clickAdvancedSettings()
-                .enableDateShift(shift)
+                .enableExcludeDateShifting(shift)
                 .apply();
         return this;
     }
