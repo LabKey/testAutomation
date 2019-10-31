@@ -26,25 +26,23 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return new DomainDesignerPage(driver.getDriver());
     }
 
-    public DomainDesignerPage clickSave()
+    public DomainDesignerPage clickFinish()
     {
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton()));
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton()));
         String currentURL = getDriver().getCurrentUrl();
-        elementCache().saveButton().click();
-        afterSaveOrFinishClick(currentURL);
-        return this;
-    }
+        elementCache().finishButton().click();
 
-    protected void afterSaveOrFinishClick(String currentURL)
-    {
         waitFor(()-> !getDriver().getCurrentUrl().equals(currentURL) || anyAlert() != null,
                 "expected either navigation or an alert with error or info to appear", WAIT_FOR_JAVASCRIPT);
 
         if (isAlertVisible())
         {
             String msg = waitForAnyAlert();
-            log("Clicking save.  Waited until alert with message [" + msg + "] appeared");
+            log("Clicking finish.  Waited until alert with message [" + msg + "] appeared");
+            return this;
         }
+
+        return null; // the page has navigated
     }
 
     public UnsavedChangesModalDialog clickCancel()
@@ -67,22 +65,24 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return Locators.alert.findOptionalElement(getDriver()).map(WebElement::isDisplayed).orElse(false);
     }
 
-    public WebElement saveButton()
+    public WebElement finishButton()
     {
-        return elementCache().saveButton();
+        return elementCache().finishButton();
     }
 
-    public DomainFormPanel fieldProperties()
+    // this will return the first domain fields panel if there are multiple on the page
+    // if you are looking for a specific one, use the fieldsPanel(title) helper
+    public DomainFormPanel fieldsPanel()
     {
         return elementCache().firstDomainFormPanel;
     }
 
-    public DomainFormPanel fieldProperties(String title)
+    public DomainFormPanel fieldsPanel(String title)
     {
         return elementCache().domainFormPanel(title);
     }
 
-    public DomainFormPanel activeFieldProperties(String title)
+    public DomainFormPanel activeFieldsPanel(String title)
     {
         return elementCache().activeDomainFormPanel(title);
     }
@@ -156,9 +156,9 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         {
             return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).active().findOrNull(this);
         }
-        WebElement saveButton()
+        WebElement finishButton()
         {
-            return Locator.button("Save")
+            return Locator.button("Finish")
                     .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         }
         WebElement cancelBtn()

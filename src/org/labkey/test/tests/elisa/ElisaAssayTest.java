@@ -98,7 +98,7 @@ public class ElisaAssayTest extends AbstractAssayTest
             .setDescription(TEST_ASSAY_ELISA_DESC)
             .setPlateTemplate(PLATE_TEMPLATE_NAME);
         // set the specimenId field default value to be : last entered
-        assayDesignerPage.goToFieldProperties("Sample Properties")
+        assayDesignerPage.goToFieldsPanel("Sample")
             .getField("SpecimenId")
             .clickAdvancedSettings()
             .setDefaultValueType(DefaultType.LAST_ENTERED)

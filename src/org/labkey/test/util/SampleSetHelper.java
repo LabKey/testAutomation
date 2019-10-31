@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.experiment.CreateSampleSetPage;
@@ -88,12 +89,13 @@ public class SampleSetHelper extends WebDriverWrapper
             i++;
         }
 
-        DomainFormPanel domainFormPanel = createPage.clickCreate();
+        DomainDesignerPage domainDesignerPage = createPage.clickCreate();
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         for (FieldDefinition fieldDefinition : props.getFields())
         {
             domainFormPanel.addField(fieldDefinition);
         }
-        clickButton("Save");
+        domainDesignerPage.clickFinish();
 
         return this;
     }
@@ -160,11 +162,6 @@ public class SampleSetHelper extends WebDriverWrapper
     {
         createSampleSet(name, nameExpression, fields);
         goToSampleSet(name).bulkImport(data);
-    }
-
-    public DomainFormPanel getDomainFormPanel()
-    {
-        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).find();
     }
 
     public CreateSampleSetPage goToCreateNewSampleSet()
@@ -247,11 +244,11 @@ public class SampleSetHelper extends WebDriverWrapper
         return new UpdateSampleSetPage(getDriver());
     }
 
-    public DomainFormPanel goToEditSampleSetFields(String name)
+    public DomainDesignerPage goToEditSampleSetFields(String name)
     {
         goToSampleSet(name);
         waitAndClickAndWait(Locator.lkButton("Edit Fields"));
-        return getDomainFormPanel();
+        return new DomainDesignerPage(getDriver());
     }
 
     public void setFields(Map<String, FieldDefinition.ColumnType> fields)
@@ -262,25 +259,30 @@ public class SampleSetHelper extends WebDriverWrapper
     @LogMethod
     public SampleSetHelper addFields(Map<String, FieldDefinition.ColumnType> fields)
     {
+        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
+
         _fields = fields;
         if (fields != null && !fields.isEmpty())
         {
-            DomainFormPanel domainFormPanel = getDomainFormPanel();
+            DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
             fields.forEach((name, type) -> domainFormPanel.addField(new FieldDefinition(name, type)));
-            clickButton("Save");
+            domainDesignerPage.clickFinish();
         }
         else
             clickButton("Cancel");
+
         return this;
     }
 
     public SampleSetHelper addFields(List<FieldDefinition> fields)
     {
+        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
+
         if (null != fields && !fields.isEmpty())
         {
-            DomainFormPanel domainFormPanel = getDomainFormPanel();
+            DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
             fields.forEach(fieldDefinition -> domainFormPanel.addField(fieldDefinition));
-            clickButton("Save");
+            domainDesignerPage.clickFinish();
         }
         else
             clickButton("Cancel");
