@@ -185,7 +185,6 @@ public class SampleSetHelper extends WebDriverWrapper
         boolean merge = MERGE_DATA_LABEL.equals(label);
         String componentId = "insertOption" + index;
         String script = "Ext4.ComponentManager.get('" + componentId + "').setValue(" + (merge?"1":"0") + ")";
-        System.err.println(script);
         executeScript(script);
         return this;
     }
