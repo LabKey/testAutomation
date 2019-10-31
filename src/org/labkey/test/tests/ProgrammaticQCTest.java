@@ -144,13 +144,13 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
-            assayDesigner.goToResultFields().addField(new FieldDefinition (TEST_ASSAY_DATA_PROP_NAME + i,TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT])
+            assayDesigner.goToResultsFields().addField(new FieldDefinition (TEST_ASSAY_DATA_PROP_NAME + i,TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT])
                     .setLabel(TEST_ASSAY_DATA_PROP_NAME + i));
         }
 
         // add an 'animal' field which will be populated by the transform script
-        assayDesigner.fieldProperties("Results")
-                .addField(new FieldDefinition( "Animal", FieldDefinition.ColumnType.String).setLabel("Animal"));
+        assayDesigner.fieldsPanel("Results")
+            .addField(new FieldDefinition( "Animal", FieldDefinition.ColumnType.String).setLabel("Animal"));
         assayDesigner.clickFinish();
     }
 

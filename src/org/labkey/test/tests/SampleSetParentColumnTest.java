@@ -10,7 +10,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
-import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -705,17 +705,17 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         clickButton("Update");
 
         clickFolder(SUB_FOLDER_NAME);
-        DomainFormPanel domainFormPanel = sampleHelper.goToEditSampleSetFields(SAMPLE_SET_NAME);
-        domainFormPanel.addField(GOOD_PARENT_NAME);
-        clickButton("Save", 0);
+        DomainDesignerPage domainDesignerPage = sampleHelper.goToEditSampleSetFields(SAMPLE_SET_NAME);
+        domainDesignerPage.fieldsPanel().addField(GOOD_PARENT_NAME);
+        domainDesignerPage.clickFinish();
 
         errorMsgLocator = Locator.tagWithClass("div", "alert-danger");
         waitForElement(errorMsgLocator);
         String errorMsgExpectedTxt = "'" + GOOD_PARENT_NAME + "' is a reserved field name in '" + SAMPLE_SET_NAME + "'.";
         Assert.assertThat("Error message", errorMsgLocator.findElement(getDriver()).getText(), CoreMatchers.containsString(errorMsgExpectedTxt));
 
-        domainFormPanel.removeField(GOOD_PARENT_NAME);
-        clickButton("Save");
+        domainDesignerPage.fieldsPanel().removeField(GOOD_PARENT_NAME);
+        domainDesignerPage.clickFinish();
 
         log("Validated name conflicts.");
     }

@@ -95,7 +95,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
 
-        DomainFormPanel panel = domainDesignerPage.fieldProperties();
+        DomainFormPanel panel = domainDesignerPage.fieldsPanel();
         DomainFieldRow integerRow = panel
                 .addField("integerField")
                 .setType(FieldDefinition.ColumnType.Integer)
@@ -111,7 +111,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setScaleType(PropertiesEditor.ScaleType.LOG)
                 .setDescription("field for a decimal")
                 .setLabel("DecimalField");
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         dgen = new TestDataGenerator(lookupInfo)        // now put some test data in the new fields
                 .withColumns(List.of(
@@ -159,7 +159,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.getField("stringField")
                 .expand()
@@ -172,7 +172,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setDescription("basic multiline field")
                 .setLabel("MultiLineField")
                 .allowMaxChar();
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         dgen.addCustomRow(Map.of("name", "first", "stringField", "baaaaaasic string heeeeeeeeeeere", "multiLineField", "multi\nline\nfield"));
         dgen.addCustomRow(Map.of("name", "second", "stringField", "basic string heeeeere", "multiLineField", "multi\nline\nfield with extra"));
@@ -206,12 +206,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.getField("deleteMe")
                 .clickRemoveField()
-                .dismiss("Yes");
-        domainDesignerPage.clickSave();
+                .dismiss("Yes, Remove Field");
+        domainDesignerPage.clickFinish();
 
         GetDomainCommand domainCommand = new GetDomainCommand("exp.materials", sampleSet);
         DomainResponse afterResponse = domainCommand.execute(createDefaultConnection(true), getProjectName());
@@ -244,7 +244,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.addField("addedField")
                 .setType(FieldDefinition.ColumnType.DateAndTime)
@@ -253,7 +253,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setDateShift(false)
                 .setDescription("simplest date format of all")
                 .setLabel("DateTime");
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // insert sample dates, confirm expected formats
 
@@ -291,11 +291,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // add a new field, but leave the name field blank
         DomainFieldRow noNameRow = domainFormPanel.addField("");
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         domainDesignerPage.waitForError();
         assertTrue("field should report error if saved without a name", noNameRow.hasFieldError());
@@ -333,12 +333,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // add a new field, but leave the name field blank
         DomainFieldRow firstcol = domainFormPanel.getField("firstCol");
         DomainFieldRow dupeNameRow = domainFormPanel.addField("firstCol");
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // confirm the page shows the summary error
         String dupeError = domainDesignerPage.waitForError();
@@ -373,7 +373,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // confirm the field name/data type edits are disabled
         DomainFieldRow keyRow = domainFormPanel.getField("id");
@@ -402,21 +402,21 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow nameRow = domainFormPanel.getField("name");
         // first, delete 'name' column
         nameRow.clickRemoveField()
-                .dismiss("Yes");
+                .dismiss("Yes, Remove Field");
 
         DomainFieldRow colorRow = domainFormPanel.getField("color");
         colorRow.clickRemoveField()
-                .dismiss("Yes");
-        domainDesignerPage.clickSave();
+                .dismiss("Yes, Remove Field");
+        domainDesignerPage.clickFinish();
 
         // there should just be the key field (id) now:
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
-        domainFormPanel = domainDesignerPage.fieldProperties(list); // re-find the panel to work around field caching silliness
+        domainFormPanel = domainDesignerPage.fieldsPanel(); // re-find the panel to work around field caching silliness
         assertNotNull(domainFormPanel.getField("id"));
         assertNull(domainFormPanel.getField("color"));
         assertNull(domainFormPanel.getField("name"));
@@ -443,15 +443,15 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow nameRow = domainFormPanel.getField("name");
         // confirm the UI shows its expected 'required' status
         assertEquals(true, nameRow.getRequiredField());
 
         nameRow.clickRemoveField()
-                .dismiss("Yes");
-        domainDesignerPage.clickSave();
+                .dismiss("Yes, Remove Field");
+        domainDesignerPage.clickFinish();
     }
 
     /**
@@ -473,7 +473,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow nameField = domainFormPanel.getField("name");
         assertNull("expect the 'name' field not to be shown in the domain editor", nameField);
@@ -494,14 +494,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow modifiedRow = domainFormPanel.addField("modified");
         DomainFieldRow blarg1 = domainFormPanel.addField("blarg");
         DomainFieldRow blarg2 = domainFormPanel.addField("blarg");
         DomainFieldRow clientFieldWarning = domainFormPanel.addField("select * from table");
 
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
         String clientWarning = domainDesignerPage.waitForWarning();
         String multipleIssuesError = domainDesignerPage.waitForError();
         String expectedErrMsg = "Multiple fields contain issues that need to be fixed. Review the red highlighted fields below for more information.";
@@ -539,11 +539,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow testCol = domainFormPanel.getField("testCol");
         testCol.setName("modified");
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // confirm expected error warning
         String expectedError = "'modified' is a reserved field name";
@@ -581,13 +581,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow defaultViewRow = domainFormPanel.addField("defaultViewField");
         defaultViewRow.showFieldOnDefaultView(false);
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
         extraFieldRow.showFieldOnDefaultView(true); // true is default behavior
 
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // expect to arrive at project home, with a list of 'sampleSets'
         clickAndWait(Locator.linkWithText(sampleSet));
@@ -613,13 +613,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow hiddenRow = domainFormPanel.addField("hiddenField");
         hiddenRow.showFieldOnInsertView(false);
         DomainFieldRow shownRow = domainFormPanel.addField("shownField");
         shownRow.showFieldOnInsertView(true);
 
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // expect to arrive at project home, with a list of 'sampleSets'
         waitForElement(Locator.linkWithText(sampleSet));
@@ -648,13 +648,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow hiddenRow = domainFormPanel.addField("hiddenField");
         hiddenRow.showFieldOnUpdateView(false);
         DomainFieldRow shownRow = domainFormPanel.addField("shownField");
         shownRow.showFieldOnUpdateView(true);
 
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
         // expect to arrive at project home, with a list of 'sampleSets'
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
         clickAndWait(Locator.linkWithText(sampleSet));
@@ -686,7 +686,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 "notPHI", "notPHI", "limitedPHI", "limitedPHI", "fullPHI", "fullPHI", "restrictedPHI", "restrictedPHI"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow notPhi = domainFormPanel.addField("notPHI");
         notPhi.setPHILevel(PropertiesEditor.PhiSelectType.NotPHI);
         DomainFieldRow limitedPHI = domainFormPanel.addField("limitedPHI");
@@ -696,7 +696,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow restrictedPHI = domainFormPanel.addField("restrictedPHI");
         restrictedPHI.setPHILevel(PropertiesEditor.PhiSelectType.Restricted);
 
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
         clickAndWait(Locator.linkWithText(sampleSet));
 
@@ -725,14 +725,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow missingValueRow = domainFormPanel.addField("missingValue");
         missingValueRow.setMissingValue(true);
         // explicitly set missingValue false on extraField
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
         extraFieldRow.setMissingValue(false);
 
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
         assertEquals("expect column to have MissingValue enabled", true, getColumn(domainResponse.getDomain(), "missingValue").getAllProperties().get("mvEnabled"));
         assertEquals("expect column not to have MissingValue enabled", false, getColumn(domainResponse.getDomain(), "extraField").getAllProperties().get("mvEnabled"));
@@ -752,14 +752,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow dimensionField = domainFormPanel.addField("dimensionField");
         dimensionField.setDimension(true);
         // explicitly set dimension false on extraField
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
         extraFieldRow.setDimension(false);
 
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
         assertEquals("dimensionField should have dimension marked true", true, getColumn(domainResponse.getDomain(), "dimensionField").getDimension());
@@ -780,14 +780,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow measureField = domainFormPanel.addField("measureField");
         measureField.setMeasure(true);
         // explicitly set measure false on extraField
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
         extraFieldRow.setMeasure(false);
 
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
 
@@ -809,14 +809,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow variableField = domainFormPanel.addField("variableField");
         variableField.setRecommendedVariable(true);
         // explicitly set recommended variable false on extraField
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
         extraFieldRow.setRecommendedVariable(false);
 
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
         assertEquals("variableField should have recommendedVariable marked true", true, getColumn(domainResponse.getDomain(), "variableField").getAllProperties().get("recommendedVariable"));
@@ -845,7 +845,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSet);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
                 .setType(FieldDefinition.ColumnType.Lookup)
@@ -858,7 +858,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         assertEquals("Incorrect detail message", "Current Folder > lists > lookUpList1", lookUpRow.detailsMessage());
 
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
         PropertyDescriptor lookupFieldDescriptor = getColumn(domainResponse.getDomain(), "lookUpField");
@@ -889,7 +889,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse1 = dgen.createDomain(createDefaultConnection(true), "VarList", Map.of("keyName", "id"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", mainListName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(mainListName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
                 .setType(FieldDefinition.ColumnType.Lookup)
@@ -901,7 +901,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .collapse();
 
         assertEquals("Incorrect detail message", "Current Folder > lists > lookUpList", lookUpRow.detailsMessage());
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
         PropertyDescriptor lookupColumn = getColumn(domainResponse.getDomain(), "lookUpField"); // getColumn asserts the column is non-null
@@ -935,7 +935,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen1.insertRows(createDefaultConnection(true), dgen1.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // add a lookup field to the test list
         DomainFieldRow row = domainFormPanel.addField("looky")
@@ -945,7 +945,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setFromTargetTable(lookupList1Item)
                 .setLookupValidatorEnabled(true)
                 .setDescription("should validate lookup value contents");
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // now make sure the validator is set
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
@@ -965,13 +965,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow testRow = domainFormPanel.getField("color");
         testRow.clickAdvancedSettings()
                 .setDefaultValueType(DefaultType.FIXED_EDITABLE)  //"Editable default"
                 .apply();
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // now make sure the validator is not yet set
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
@@ -980,7 +980,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // now re-open the domain designer, go set the default values
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel newPanel = domainDesignerPage.fieldProperties(listName);
+        DomainFormPanel newPanel = domainDesignerPage.fieldsPanel();
         newPanel.getField("color")
                 .clickAdvancedSettings()
                 .clickDefaultValuesLink();  // should land us in
@@ -1008,7 +1008,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // edit an existing field
         domainFormPanel.getField("favoriteSnack")
@@ -1074,12 +1074,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSetName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSetName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // now attempt to mark 'manufacturer' field 'required'
         domainFormPanel.getField("manufacturer")
                 .setRequiredField(true);
-        domainDesignerPage.clickSave();     // expect error warning here; this should warn the user
+        domainDesignerPage.clickFinish();     // expect error warning here; this should warn the user
         String expectedWarning = domainDesignerPage.waitForAnyAlert();
         assertTrue(expectedWarning.contains("cannot be required when it contains rows with blank values."));
         domainDesignerPage.clickCancel().discardChanges();  // discard the changes to free the browser to go on to the next page
@@ -1111,7 +1111,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSetName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(sampleSetName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // capture the current URL
         String domainDesignerPageUrl = getDriver().getCurrentUrl();
@@ -1119,7 +1119,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now attempt to mark 'manufacturer' field 'required'
         domainFormPanel.getField("manufacturer")
                 .setRequiredField(true);
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
         waitFor(()-> !getDriver().getCurrentUrl().equals(domainDesignerPageUrl),
                 "expect to browse away after clicking 'save'", 1500);
 
@@ -1129,7 +1129,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
     }
 
     /**
-     * confirms that clicking the name field also expands the field row
+     * confirms that clicking the name field does not expand the field row
      * @throws Exception
      */
     @Test
@@ -1145,13 +1145,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow snackRow = domainFormPanel.getField("favoriteSnack");
         snackRow.nameInput()
                 .getComponentElement().click();
 
-        waitFor(()->  snackRow.isExpanded(), "clicking the name field should expand the field row", 1000);
+        sleep(500); // wait just to be sure we are checking for expanded state correctly
+        assertFalse("clicking the name field should not expand the field row", snackRow.isExpanded());
     }
 
     @Test
@@ -1168,14 +1169,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow sizeRow = domainFormPanel.getField("size");
         FieldDefinition.RangeValidator midsizeValidator = new FieldDefinition.RangeValidator("midsize", "falls between 2 and 3", "value must be 2 or 3",
                 FieldDefinition.RangeType.GTE, "2",
                 FieldDefinition.RangeType.LTE, "3");
         sizeRow.setRangeValidators(Arrays.asList(midsizeValidator));
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // now verify the expected validator is formed and added to the field's validator array
         DomainResponse response = dgen.getDomain(createDefaultConnection(true));
@@ -1203,7 +1204,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties(listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         dgen.addCustomRow(Map.of("name", "billy", "favoriteIceCream", "vanilla", "favoriteSnack", "apple", "size", 12));
         dgen.addCustomRow(Map.of("name", "jeffy", "favoriteIceCream", "chocolate", "favoriteSnack", "almond brittle", "size", 12));
         dgen.addCustomRow(Map.of("name", "alex", "favoriteIceCream", "strawberry", "favoriteSnack", "peanuts", "size", 12));
@@ -1216,7 +1217,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setFirstValue("almond")
                 .setItalicsCheckbox(true);
         formatDlg.clickApply();
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // now verify the expected validator is formed and added to the field's validator array
         DomainResponse response = dgen.getDomain(createDefaultConnection(true));
@@ -1241,7 +1242,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
 
         RegexValidatorDialog validatorDialog = favoriteSnack.clickRegexButton();
@@ -1253,7 +1254,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setFailOnMatch(true)
                 .setName("neverTwizzlers");
         validatorDialog.clickApply();
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // now verify the expected validator is formed and added to the field's validator array
         DomainResponse response = dgen.getDomain(createDefaultConnection(true));
@@ -1281,7 +1282,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
 
         RegexValidatorDialog validatorDialog = favoriteSnack.clickRegexButton();
@@ -1306,7 +1307,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setName("angleBrackets")
                 .setErrorMessage("no angle brackets in this field, please");
         validatorDialog.clickApply();
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // now verify the expected validator is formed and added to the field's validator array
         DomainResponse response = dgen.getDomain(createDefaultConnection(true));
@@ -1321,7 +1322,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // reopen, edit one, remove another
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        RegexValidatorDialog valDialog = domainDesignerPage.fieldProperties()
+        RegexValidatorDialog valDialog = domainDesignerPage.fieldsPanel()
                 .getField("favoriteSnack")
                 .clickRegexButton();
         valDialog.getValidationPanel(2) // will get 'angleBrackets' field, it's 3rd
@@ -1331,7 +1332,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setFailOnMatch(true);
 
         valDialog.clickApply();
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // now confirm 2 validators on the field
         DomainResponse newResponse = dgen.getDomain(createDefaultConnection(true));
@@ -1364,7 +1365,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow size = domainFormPanel.getField("size");
 
         RangeValidatorDialog sizeDialog = size.clickRangeButton();
@@ -1379,7 +1380,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setFirstCondition(Filter.Operator.GTE)
                 .setFirstValue("4");
         sizeDialog.clickApply();
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // now verify we have 3 formats on the size field
         DomainResponse response = dgen.getDomain(createDefaultConnection(true));
@@ -1391,7 +1392,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now reopen the page, edit 2 delete another
         // get back to the domain designer
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        RangeValidatorDialog dlg = domainDesignerPage.fieldProperties().getField("size")
+        RangeValidatorDialog dlg = domainDesignerPage.fieldsPanel().getField("size")
                 .clickRangeButton();
         dlg.getValidationPanel(0)       //lte2
                 .setDescription("2 or less");
@@ -1400,7 +1401,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dlg.getValidationPanel(2)       //gte4
                 .clickRemove();
         dlg.clickApply();
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // now verify we have 2 formats on the size field
         DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection(true));
@@ -1426,7 +1427,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("superHero", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldProperties();
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow superHero = domainFormPanel.getField("superHero");
 
         ConditionalFormatDialog formatDialog = superHero.clickConditionalFormatButton();
@@ -1443,7 +1444,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setFirstValue("IronMan")
                 .setStrikethroughCheckbox(true);
         formatDialog.clickApply();
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         // now verify we have 3
         DomainResponse response = dgen.getDomain(createDefaultConnection(true));
@@ -1454,7 +1455,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // get back to the domain designer
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        ConditionalFormatDialog dlg = domainDesignerPage.fieldProperties().getField("superHero")
+        ConditionalFormatDialog dlg = domainDesignerPage.fieldsPanel().getField("superHero")
                 .clickConditionalFormatButton();
         dlg.getPanelByIndex(2)  // ironman
             .clickRemove();
@@ -1463,7 +1464,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dlg.getPanelByIndex(1)  // aquaman
             .setBoldCheckbox(true);
         dlg.clickApply();
-        domainDesignerPage.clickSave();
+        domainDesignerPage.clickFinish();
 
         DomainResponse validationResponse = dgen.getDomain(createDefaultConnection(true));
         PropertyDescriptor editedHeroCol = getColumn(validationResponse.getDomain(), "superHero");

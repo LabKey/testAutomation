@@ -39,7 +39,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
-import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
@@ -856,7 +856,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Create an assay with sampleId in the data field");
         goToProjectHome();
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", DATA_ID_ASSAY);
-        assayDesignerPage.goToResultFields()
+        assayDesignerPage.goToResultsFields()
             .addField(SAMPLE_ID_FIELD_NAME)
             .setType(FieldDefinition.ColumnType.Lookup)
             .setFromSchema("samples")
@@ -1947,14 +1947,15 @@ public class SampleSetTest extends BaseWebDriverTest
         goToProjectHome();
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         sampleHelper.createSampleSet(SAMPLE_SET);
-        sampleHelper.getDomainFormPanel()
+        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
+        domainDesignerPage.fieldsPanel()
                 .addField("Key")
                 .setLabel(lookupColumnLabel)
                 .setType(FieldDefinition.ColumnType.Lookup)
                 .setFromSchema("lists")
                 .setFromTargetTable(listName + " (Integer)")
                 .setLookupValidatorEnabled(true);
-        clickButton("Save");
+        domainDesignerPage.clickFinish();
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(SAMPLE_SET));
@@ -2015,9 +2016,9 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Remove the attachment columns and validate that everything still works.");
         clickFolder(FOLDER_NAME);
-        DomainFormPanel domainFormPanel = sampleHelper.goToEditSampleSetFields(sampleSetName);
-        domainFormPanel.removeField("FileAttachment");
-        clickButton("Save");
+        DomainDesignerPage domainDesignerPage = sampleHelper.goToEditSampleSetFields(sampleSetName);
+        domainDesignerPage.fieldsPanel().removeField("FileAttachment");
+        domainDesignerPage.clickFinish();
 
         expectedHeaders.remove("File Attachment");
         exportGridVerifyRowCountAndHeader(3, expectedHeaders);
