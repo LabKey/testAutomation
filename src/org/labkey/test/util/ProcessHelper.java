@@ -136,5 +136,10 @@ public class ProcessHelper
 
             throw new RuntimeException(cause);
         }
+        finally
+        {
+            if (proc.isAlive())
+                proc.destroyForcibly();
+        }
     }
 }
