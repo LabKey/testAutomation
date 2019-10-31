@@ -70,6 +70,8 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return elementCache().finishButton();
     }
 
+    // this will return the first domain fields panel if there are multiple on the page
+    // if you are looking for a specific one, use the fieldsPanel(title) helper
     public DomainFormPanel fieldsPanel()
     {
         return elementCache().firstDomainFormPanel;
