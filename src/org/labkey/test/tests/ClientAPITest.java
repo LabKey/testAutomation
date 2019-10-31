@@ -40,6 +40,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.ReactAssayDesignerPage;
@@ -947,10 +948,11 @@ public class ClientAPITest extends BaseWebDriverTest
         clickButton("Create Study");
 
         ManageStudyPage manageStudyPage = new ManageStudyPage(getDriver());
-        DomainFormPanel domainFormPanel = manageStudyPage.clickEditAdditionalProperties();
+        DomainDesignerPage domainDesignerPage = manageStudyPage.clickEditAdditionalProperties();
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         domainFormPanel.addField("customfield1").setType(FieldDefinition.ColumnType.String).setLabel("Custom Field 1");
         domainFormPanel.addField("color").setType(FieldDefinition.ColumnType.String).setLabel("Color");
-        clickButton("Save");
+        domainDesignerPage.clickFinish();
 
         setSourceFromFile("domainTest.js");
         waitForElement(Locator.id(TEST_DIV_NAME).containing("Finished DomainTests."), 30000);

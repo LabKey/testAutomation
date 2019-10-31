@@ -300,27 +300,29 @@ public class FieldDefinition
 
     public enum ColumnType
     {
-        MultiLine("Multi-Line Text", "string"),
-        Integer("Integer", "int"),
-        String("Text (String)", "string"),
-        Subject("Subject/Participant (String)", "string"),
-        DateTime("DateTime", "date"), // TODO remove this after GWT designer removed
-        DateAndTime("Date Time", "date"),
-        Boolean("Boolean", "boolean"),
-        Double("Number (Double)", "float"), // TODO remove this after GWT designer removed
-        Decimal("Decimal", "float"),
-        File("File", null),
-        AutoInteger("Auto-Increment Integer", "int"),
-        Flag("Flag (String)", null),
-        Attachment("Attachment", "attachment"),
-        User("User", "int"),
-        Lookup("Lookup", null);
+        MultiLine("Multi-Line Text", "Multi-Line Text", "string"),
+        Integer("Integer", "Integer", "int"),
+        String("Text", "Text (String)", "string"),
+        Subject("Subject/Participant", "Subject/Participant (String)", "string"),
+        DateTime("DateTime", "DateTime", "date"), // TODO remove this after GWT designer removed
+        DateAndTime("Date Time", "Date Time", "date"),
+        Boolean("Boolean", "Boolean", "boolean"),
+        Double("Number (Double)", "Number (Double)", "float"), // TODO remove this after GWT designer removed
+        Decimal("Decimal", "Decimal", "float"),
+        File("File", "File", null),
+        AutoInteger("Auto-Increment Integer", "Auto-Increment Integer", "int"),
+        Flag("Flag", "Flag (String)", null),
+        Attachment("Attachment", "Attachment", "attachment"),
+        User("User", "User", "int"),
+        Lookup("Lookup", "Lookup", null);
 
-        private final String _description;  // the display value in the UI for this kind of field
+        private final String _label; // the display value in the UI for this kind of field
+        private final String _description; // TODO remove this after GWT designer removed
         private final String _jsonType;     // the key used inside the API
 
-        ColumnType(String description, String jsonType)
+        ColumnType(String label, String description, String jsonType)
         {
+            _label = label;
             _description = description;
             _jsonType = jsonType;
         }
@@ -329,6 +331,12 @@ public class FieldDefinition
         {
             return _description;
         }
+
+        public String getLabel()
+        {
+            return _label;
+        }
+
         public String getJsonType() { return _jsonType; }
     }
 

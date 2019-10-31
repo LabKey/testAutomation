@@ -113,7 +113,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assayDesigner.goToRunFields().addField("RunFileField").setLabel("Run File Field").setType(FieldDefinition.ColumnType.File);
 
         log("Add Results file field");
-        assayDesigner.goToResultFields().addField("DataFileField").setLabel("Data File Field").setType(FieldDefinition.ColumnType.File);
+        assayDesigner.goToResultsFields().addField("DataFileField").setLabel("Data File Field").setType(FieldDefinition.ColumnType.File);
 
         assayDesigner.clickFinish();
 
@@ -200,7 +200,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Remove the 'File' (last) column from the batch and see that things still work.");
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
-        assayDesignerPage.expandFieldProperties("Batch").removeField("BatchFileField");
+        assayDesignerPage.expandFieldsPanel("Batch").removeField("BatchFileField");
         assayDesignerPage.clickFinish();
         waitAndClickAndWait(Locator.linkWithText("view results"));
 
