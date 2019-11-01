@@ -123,7 +123,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         if (null != row)    // only do this if it's non-null
         {
             getWrapper().scrollIntoView(row.getComponentElement(), true);
-            getWrapper().scrollBy(0, 100); // if the header lock is showing, need to scroll below that
+            getWrapper().scrollBy(0, -150); // if the header lock is showing, need to scroll below that
         }
     }
 
