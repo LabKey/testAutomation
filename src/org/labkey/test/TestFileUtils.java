@@ -21,7 +21,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -50,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -101,7 +101,7 @@ public abstract class TestFileUtils
 
     public static String getStreamContentsAsString(InputStream is) throws IOException
     {
-        return StringUtils.join(IOUtils.readLines(is).toArray(), System.lineSeparator());
+        return StringUtils.join(IOUtils.readLines(is, Charset.defaultCharset()).toArray(), System.lineSeparator());
     }
 
     public static String getLabKeyRoot()
@@ -157,12 +157,6 @@ public abstract class TestFileUtils
     private static String getTestProjectName()
     {
         return getTestRoot().getName();
-    }
-
-    @Deprecated (forRemoval = true)
-    public static File getApiScriptFolder()
-    {
-        return new File(getTestRoot(), "data/api");
     }
 
     public static File getTestBuildDir()
@@ -232,20 +226,6 @@ public abstract class TestFileUtils
                 "Run `./gradlew :server:test:build :server:test:writeSampleDataFile` once to locate all sampledata" + "\n" +
                 "Currently known sample data locations: " + String.join("\n", sampledataDirs), foundFile);
         return foundFile;
-    }
-
-    public static String getProcessOutput(File executable, String... args) throws IOException
-    {
-        ProcessBuilder pb = new ProcessBuilder();
-        pb.command(ArrayUtils.addAll(new String[]{executable.toPath().normalize().toAbsolutePath().toString()}, args));
-        pb.redirectErrorStream(true);
-        Process p = pb.start();
-
-        try (InputStream inputStream = p.getInputStream())
-        {
-            // Different platforms output version info differently; just combine all std/err output
-            return StringUtils.trim(getStreamContentsAsString(inputStream));
-        }
     }
 
     public static File getTestTempDir()

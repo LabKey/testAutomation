@@ -424,7 +424,7 @@ public class RReportHelper
         String versionOutput = "";
         try
         {
-            versionOutput = TestFileUtils.getProcessOutput(r, "--version");
+            versionOutput = new ProcessHelper(r, "--version").getProcessOutput().trim();
 
             Pattern versionPattern = Pattern.compile("R version ([1-9]\\.\\d+\\.\\d)");
             Matcher matcher = versionPattern.matcher(versionOutput);
@@ -445,7 +445,7 @@ public class RReportHelper
 
     public String getRScriptOutput(String scriptContents) throws IOException
     {
-        return TestFileUtils.getProcessOutput(getRScriptExecutable(), "-e", scriptContents);
+        return new ProcessHelper(getRScriptExecutable(), "-e", scriptContents).getProcessOutput().trim();
     }
 
     public void saveReport(String name, boolean isSaveAs, int wait)
