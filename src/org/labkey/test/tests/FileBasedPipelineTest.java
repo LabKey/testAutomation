@@ -174,7 +174,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         clickButton("Manage Assays");
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", "myassay");
-        DomainFormPanel dataFields = assayDesignerPage.goToResultFields()
+        DomainFormPanel dataFields = assayDesignerPage.goToResultsFields()
                 .removeField("Date")
                 .removeField("VisitID")
                 .removeField("ParticipantID")

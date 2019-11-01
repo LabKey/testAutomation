@@ -75,7 +75,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow setType(FieldDefinition.ColumnType columnType)
     {
-        setType(columnType.toString());
+        setType(columnType.getLabel());
         return this;
     }
 
@@ -92,7 +92,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     private DomainFieldRow setType(String columnType)
     {
-        expand();
         getWrapper().setFormElement(elementCache().fieldTypeSelectInput, columnType);
         return this;
     }
@@ -297,7 +296,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setScaleType(PropertiesEditor.ScaleType scaleType)
     {
         expand();
-        elementCache().defaultScaleTypeSelect.selectByVisibleText(scaleType.toString());
+        elementCache().defaultScaleTypeSelect.selectByVisibleText(scaleType.getText());
         return this;
     }
 
@@ -305,7 +304,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
         String scaleTypeString = getWrapper().getFormElement(elementCache().defaultScaleTypeSelect.getWrappedElement());
-        return Enum.valueOf(PropertiesEditor.ScaleType.class, scaleTypeString);
+        return Enum.valueOf(PropertiesEditor.ScaleType.class, scaleTypeString.toUpperCase());
     }
 
     //
@@ -363,19 +362,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    public boolean getDateShift()
-    {
-        expand();
-        return elementCache().dateShiftBox.get();
-    }
-
-    public DomainFieldRow setDateShift(boolean shift)
-    {
-        expand();
-        elementCache().dateShiftBox.set(shift);
-        return this;
-    }
-
     public DomainFieldRow setLookup(FieldDefinition.LookupInfo lookupInfo)
     {
         setType(FieldDefinition.ColumnType.Lookup);
@@ -397,9 +383,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setFromFolder(String containerPath)
     {
         expand();
-        if (StringUtils.isEmpty(containerPath) || containerPath.equals("Current Folder"))
+        if (StringUtils.isEmpty(containerPath) || containerPath.equals("Current Folder") || containerPath.equals("Current Project"))
         {
-            containerPath = getWrapper().getCurrentContainerPath();
+            containerPath = "";
         }
         elementCache().fromFolderInput.selectByValue(containerPath);
 
@@ -479,6 +465,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .setPHILevel(phiLevel)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow setDateShift(boolean shift)
+    {
+        clickAdvancedSettings()
+                .enableExcludeDateShifting(shift)
                 .apply();
         return this;
     }
@@ -710,8 +704,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // date field options
         public Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
                 .refindWhenNeeded(this), getDriver());
-        public Checkbox dateShiftBox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-excludeFromShifting")
-                .refindWhenNeeded(this));
 
         //lookup field options
         public Select fromFolderInput = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))

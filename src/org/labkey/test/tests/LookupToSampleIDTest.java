@@ -183,7 +183,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", name);
 
         // add the lookup field to the Results Properties panel
-        assayDesigner.goToResultFields()
+        assayDesigner.goToResultsFields()
                 .addField(SAMPLE_ID_FIELD_NAME)
                 .setLabel(SAMPLE_ID_FIELD_LABEL)
                 .setType(FieldDefinition.ColumnType.Lookup)

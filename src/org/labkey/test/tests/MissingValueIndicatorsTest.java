@@ -166,7 +166,7 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
         goToManageAssays();
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
-        DomainFormPanel resultsPanel = assayDesignerPage.goToResultFields();
+        DomainFormPanel resultsPanel = assayDesignerPage.goToResultsFields();
 
         resultsPanel.addField("age")
             .setLabel("Age")

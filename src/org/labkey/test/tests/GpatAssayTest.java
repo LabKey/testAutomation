@@ -200,7 +200,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         clickButton("Show Assay Designer");     // todo: map this page
         ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
-        DomainFormPanel results = assayDesignerPage.expandFieldProperties("Results");
+        DomainFormPanel results = assayDesignerPage.expandFieldsPanel("Results");
         results.getField(4)
                 .setLabel("Blank");
         results.getField(7)

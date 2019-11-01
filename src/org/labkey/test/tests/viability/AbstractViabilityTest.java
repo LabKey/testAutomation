@@ -103,7 +103,7 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("Viability", getAssayName());
 
         // Add 'Unreliable' field to Results domain
-        DomainFormPanel resultsPanel = assayDesignerPage.goToFieldProperties("Result Properties");
+        DomainFormPanel resultsPanel = assayDesignerPage.goToFieldsPanel("Result");
         resultsPanel.addField("Unreliable").setType(FieldDefinition.ColumnType.Boolean).setLabel("Unreliable?");
         resultsPanel.addField("IntValue").setType(FieldDefinition.ColumnType.Integer).setLabel("IntValue");
 
