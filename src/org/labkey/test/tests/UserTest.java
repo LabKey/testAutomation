@@ -26,6 +26,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.dumbster.EmailRecordTable;
@@ -112,7 +113,8 @@ public class UserTest extends BaseWebDriverTest
 
         _userHelper.deleteUsers(false, CHANGE_EMAIL_USER, CHANGE_EMAIL_USER_ALTERNATE, NORMAL_USER, DEACTIVATED_USER, PASSWORD_RESET_USER, BLANK_USER, SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED);
 
-        DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+        DomainDesignerPage domainDesignerPage = goToSiteUsers().clickChangeUserProperties();
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         for (String field : REQUIRED_FIELDS)
         {
             domainFormPanel.getField(field).setRequiredField(false);
@@ -126,7 +128,7 @@ public class UserTest extends BaseWebDriverTest
                 domainFormPanel.removeField(field);
             }
         }
-        clickButton("Save");
+        domainDesignerPage.clickFinish();
     }
 
     @Before
@@ -378,25 +380,28 @@ public class UserTest extends BaseWebDriverTest
             _userHelper.createUserAndNotify(BLANK_USER);
             setInitialPassword(BLANK_USER, TEST_PASSWORD);
 
-            DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+            DomainDesignerPage domainDesignerPage = goToSiteUsers().clickChangeUserProperties();
+            DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
             for (String field : REQUIRED_FIELDS)
             {
                 domainFormPanel.getField(field).setRequiredField(true);
             }
-            clickButton("Save");
+            domainDesignerPage.clickFinish();
 
-            domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+            domainDesignerPage = goToSiteUsers().clickChangeUserProperties();
+            domainFormPanel = domainDesignerPage.fieldsPanel();
             for (String field : REQUIRED_FIELDS)
             {
                 DomainFieldRow domainFieldRow = domainFormPanel.getField(field);
                 assertTrue("Field should be set to required: " + field, domainFieldRow.getRequiredField());
                 domainFieldRow.setRequiredField(false);
             }
-            clickButton("Save");
+            domainDesignerPage.clickFinish();
 
-            domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+            domainDesignerPage = goToSiteUsers().clickChangeUserProperties();
+            domainFormPanel = domainDesignerPage.fieldsPanel();
             domainFormPanel.getField("FirstName").setRequiredField(true);
-            clickButton("Save");
+            domainDesignerPage.clickFinish();
 
             signOut();
             attemptSignIn(BLANK_USER, TEST_PASSWORD);
@@ -414,12 +419,13 @@ public class UserTest extends BaseWebDriverTest
             signIn();
 
             // go to Users page, mark 'required fields' as no longer required so other tests aren't affected
-            DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+            DomainDesignerPage domainDesignerPage = goToSiteUsers().clickChangeUserProperties();
+            DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
             for (String field : REQUIRED_FIELDS)
             {
                 domainFormPanel.getField(field).setRequiredField(false);
             }
-            clickButton("Save");
+            domainDesignerPage.clickFinish();
         }
     }
 
@@ -522,10 +528,11 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testCustomProperties()
     {
-        DomainFormPanel domainFormPanel = goToSiteUsers().clickChangeUserProperties();
+        DomainDesignerPage domainDesignerPage = goToSiteUsers().clickChangeUserProperties();
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         domainFormPanel.addField(PROP_NAME1).setType(FieldDefinition.ColumnType.String).setLabel(PROP_NAME1);
         domainFormPanel.addField(PROP_NAME2).setType(FieldDefinition.ColumnType.Integer).setLabel(PROP_NAME2);
-        clickButton("Save");
+        domainDesignerPage.clickFinish();
 
         assertTextPresent(PROP_NAME1, PROP_NAME2);
 

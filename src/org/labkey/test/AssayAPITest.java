@@ -189,7 +189,7 @@ public class AssayAPITest extends BaseWebDriverTest
                 .setLabel("Run File Field");
 
         log("Create a 'File' column for the assay data.");
-        assayDesigner.goToResultFields()
+        assayDesigner.goToResultsFields()
                 .addField("DataFileField")
                 .setType(FieldDefinition.ColumnType.File)
                 .setLabel("Data File Field");

@@ -376,7 +376,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         propertiesPanel.getField(0).setRequiredField(true);
 
         log("Assay results properties");
-        propertiesPanel = assayDesignerPage.goToResultFields();
+        propertiesPanel = assayDesignerPage.goToResultsFields();
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
             propertiesPanel.addField(TEST_ASSAY_DATA_PROP_NAME + i)
