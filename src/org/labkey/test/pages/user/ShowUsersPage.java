@@ -18,7 +18,7 @@ package org.labkey.test.pages.user;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
@@ -46,10 +46,10 @@ public class ShowUsersPage extends LabKeyPage<ShowUsersPage.ElementCache>
         return elementCache().usersTable;
     }
 
-    public DomainFormPanel clickChangeUserProperties()
+    public DomainDesignerPage clickChangeUserProperties()
     {
         waitAndClickAndWait(Locator.linkWithSpan( "Change User Properties"));
-        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).find();
+        return new DomainDesignerPage(getDriver());
     }
 
     protected ElementCache newElementCache()
