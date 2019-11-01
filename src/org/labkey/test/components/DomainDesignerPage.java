@@ -33,6 +33,15 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         clickAndWait(elementCache().finishButton());
     }
 
+    public DomainDesignerPage clickFinishExpectingError()
+    {
+        scrollIntoView(elementCache().finishButton());
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton()));
+        elementCache().finishButton().click();
+        waitForError();
+        return this;
+    }
+
     public UnsavedChangesModalDialog clickCancel()
     {
         elementCache().cancelBtn().click();
