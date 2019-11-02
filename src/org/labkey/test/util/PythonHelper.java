@@ -18,22 +18,26 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.hamcrest.CoreMatchers;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PythonHelper
 {
+    private static final String PYENV_KEY = "PYENV_VERSION";
+
     private final BaseWebDriverTest _test;
     private File pythonExecutable = null;
+    private Duration defaultScriptTimeout = null;
 
     public PythonHelper(BaseWebDriverTest test)
     {
@@ -44,12 +48,32 @@ public class PythonHelper
     {
         try
         {
-            return TestFileUtils.getProcessOutput(getPythonExecutable(), ArrayUtils.addAll(new String[]{scriptFile.getAbsolutePath()}, args));
+            String[] scriptAndArgs = ArrayUtils.addAll(new String[]{scriptFile.getAbsolutePath()}, args);
+            ProcessHelper processHelper = new ProcessHelper(getPythonExecutable(), scriptAndArgs);
+            applyPyenv(processHelper);
+            if (defaultScriptTimeout != null)
+                processHelper.setTimeout(defaultScriptTimeout);
+            return processHelper.getProcessOutput(true).trim();
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
         }
+    }
+
+    private ProcessHelper applyPyenv(@NotNull ProcessHelper processHelper)
+    {
+        if (System.getenv().containsKey(PYENV_KEY))
+        {
+            processHelper.environment().put(PYENV_KEY, System.getenv(PYENV_KEY));
+        }
+        return processHelper;
+    }
+
+    public PythonHelper setDefaultScriptTimeout(Duration defaultScriptTimeout)
+    {
+        this.defaultScriptTimeout = defaultScriptTimeout;
+        return this;
     }
 
     @LogMethod
@@ -139,7 +163,7 @@ public class PythonHelper
         String versionOutput = "";
         try
         {
-            versionOutput = TestFileUtils.getProcessOutput(python, "--version");
+            versionOutput = applyPyenv(new ProcessHelper(python, "--version")).getProcessOutput().trim();
 
             Pattern versionPattern = Pattern.compile("Python ([1-9]\\.\\d+\\.\\d)");
             Matcher matcher = versionPattern.matcher(versionOutput);
