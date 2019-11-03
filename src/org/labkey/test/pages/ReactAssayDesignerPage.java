@@ -174,17 +174,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public DomainFormPanel goToFieldsPanel(String title)
     {
-        DomainFormPanel panel = activeFieldsPanel(title);
-
-        int attempts = 0; // don't try clicking next forever
-        while (panel == null && attempts < 10)
-        {
-            clickNext();
-            panel = activeFieldsPanel(title);
-            attempts++;
-        }
-
-        return panel;
+        return expandFieldsPanel(title);
     }
 
     public DomainFormPanel expandFieldsPanel(String title)
@@ -192,36 +182,6 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         DomainFormPanel panel = fieldsPanel(title);
         panel.expand();
         return panel;
-    }
-
-    public ReactAssayDesignerPage clickBack()
-    {
-        scrollIntoView(elementCache().backBtn);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().backBtn));
-        elementCache().backBtn.click();
-        return this;
-    }
-
-    public ReactAssayDesignerPage clickNext()
-    {
-        scrollIntoView(elementCache().nextBtn);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().nextBtn));
-        elementCache().nextBtn.click();
-        return this;
-    }
-
-    @Override
-    public void clickFinish()
-    {
-        // if we are in create mode, click next until we get to the end (but don't try forever)
-        int attempts = 0;
-        while (!isElementPresent(elementCache().finishBtnLoc) && isElementPresent(elementCache().nextBtnLoc) && attempts < 10)
-        {
-            clickNext();
-            attempts++;
-        }
-
-        super.clickFinish();
     }
 
     @Override
@@ -238,12 +198,6 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public class ElementCache extends DomainDesignerPage.ElementCache
     {
-        Locator.XPathLocator backBtnLoc = Locator.button("Back");
-        WebElement backBtn = backBtnLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        Locator.XPathLocator nextBtnLoc = Locator.button("Next");
-        WebElement nextBtn = nextBtnLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        Locator.XPathLocator finishBtnLoc = Locator.button("Finish");
-
         final Input nameInput = Input(Locator.id("assay-design-name"), getDriver()).findWhenNeeded(this);
         final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(this);
         final Select autoCopyTargetSelect = Select(Locator.id("assay-design-autoCopyTargetContainerId")).findWhenNeeded(this);

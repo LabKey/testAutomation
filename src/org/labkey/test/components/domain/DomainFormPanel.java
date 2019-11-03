@@ -155,6 +155,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFormPanel expand()
     {
         elementCache().expandIcon.click();
+        getWrapper().sleep(250); // wait for transition to happen
         return this;
     }
 
