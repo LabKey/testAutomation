@@ -1342,6 +1342,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // Domain designer UI only handles Range, Regex and Lookup validators
         validators = validators.stream().filter(val ->
                 (val.get("type").equals("RegEx") || val.get("type").equals("Range") || val.get("type").equals("Lookup"))).collect(Collectors.toList());
+        assertEquals("expect 2",2, validators.size());
 
         Map<String, Object> twiz = getPropertyValidator(snackField, "neverTwizzlers");
         Map<String, Object> spec = getPropertyValidator(snackField, "specialChars");

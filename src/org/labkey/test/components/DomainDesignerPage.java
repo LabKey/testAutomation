@@ -9,6 +9,7 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.UnsavedChangesModalDialog;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -62,7 +63,13 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public boolean isAlertVisible()
     {
-        return Locators.alert.findOptionalElement(getDriver()).map(WebElement::isDisplayed).orElse(false);
+        try
+        {
+            return Locators.alert.findOptionalElement(getDriver()).map(WebElement::isDisplayed).orElse(false);
+        }catch(StaleElementReferenceException retry)
+        {
+            return Locators.alert.findOptionalElement(getDriver()).map(WebElement::isDisplayed).orElse(false);
+        }
     }
 
     public WebElement finishButton()
@@ -122,10 +129,21 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public String waitForAnyAlert()
     {
-        WebElement alert = Locator.waitForAnyElement(shortWait(),
-                BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
-        return alert.getText();
+        String alertText = null;
+        try
+        {
+            WebElement alert = Locator.waitForAnyElement(shortWait(),
+                    BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
+            alertText = alert.getText();
+        }catch(StaleElementReferenceException retry)
+        {
+            WebElement alert = Locator.waitForAnyElement(shortWait(),
+                    BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
+            alertText = alert.getText();
+        }
+        return alertText;
     }
+
     public String anyAlert()
     {
         WebElement alert = Locator.findAnyElementOrNull(getDriver(),
