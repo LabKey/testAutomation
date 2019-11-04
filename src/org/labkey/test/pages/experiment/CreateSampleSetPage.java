@@ -3,7 +3,7 @@ package org.labkey.test.pages.experiment;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -89,10 +89,10 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return new Select(elementCache().parentAliasSelect(index)).getFirstSelectedOption().getText();
     }
 
-    public DomainFormPanel clickCreate()
+    public DomainDesignerPage clickCreate()
     {
         clickAndWait(elementCache().createButton);
-        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).waitFor();
+        return new DomainDesignerPage(getDriver());
     }
 
     public CreateSampleSetPage clickCreateExpectingError()
