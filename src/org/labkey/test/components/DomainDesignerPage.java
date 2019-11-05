@@ -26,23 +26,20 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return new DomainDesignerPage(driver.getDriver());
     }
 
-    public DomainDesignerPage clickFinish()
+    public void clickFinish()
     {
+        scrollIntoView(elementCache().finishButton());
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton()));
-        String currentURL = getDriver().getCurrentUrl();
+        clickAndWait(elementCache().finishButton());
+    }
+
+    public DomainDesignerPage clickFinishExpectingError()
+    {
+        scrollIntoView(elementCache().finishButton());
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton()));
         elementCache().finishButton().click();
-
-        waitFor(()-> !getDriver().getCurrentUrl().equals(currentURL) || anyAlert() != null,
-                "expected either navigation or an alert with error or info to appear", WAIT_FOR_JAVASCRIPT);
-
-        if (isAlertVisible())
-        {
-            String msg = waitForAnyAlert();
-            log("Clicking finish.  Waited until alert with message [" + msg + "] appeared");
-            return this;
-        }
-
-        return null; // the page has navigated
+        waitForError();
+        return this;
     }
 
     public UnsavedChangesModalDialog clickCancel()
