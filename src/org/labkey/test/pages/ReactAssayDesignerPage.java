@@ -211,7 +211,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     }
 
     @Override
-    public DomainDesignerPage clickFinish()
+    public void clickFinish()
     {
         // if we are in create mode, click next until we get to the end (but don't try forever)
         int attempts = 0;
@@ -221,11 +221,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
             attempts++;
         }
 
-        scrollIntoView(elementCache().finishBtn);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishBtn));
-        clickAndWait(elementCache().finishBtn);
-
-        return null; // the page has navigated
+        super.clickFinish();
     }
 
     @Override
@@ -247,7 +243,6 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         Locator.XPathLocator nextBtnLoc = Locator.button("Next");
         WebElement nextBtn = nextBtnLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         Locator.XPathLocator finishBtnLoc = Locator.button("Finish");
-        WebElement finishBtn = finishBtnLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         final Input nameInput = Input(Locator.id("assay-design-name"), getDriver()).findWhenNeeded(this);
         final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(this);
