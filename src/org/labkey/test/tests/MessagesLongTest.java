@@ -438,7 +438,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToHome();
         goToModule("Dumbster");
         waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "New posts");
-        assertTextPresent("New posts to /" + PROJECT_NAME, 1);
+        assertTextPresent("New posts to /" + PROJECT_NAME, 2);
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
         assertTextPresent("The following new posts were made yesterday");
     }
@@ -468,7 +468,6 @@ public class MessagesLongTest extends BaseWebDriverTest
        log("Check message works in Wiki");
        _portalHelper.clickWebpartMenuItem("Messages", true, "New");
        new InsertPage(getDriver())
-                .setRenderAs(WikiHelper.WikiRendererType.RADEOX) // "Wiki Page"
                 .setTitle(MSG1_TITLE_2)
                 .setBody("Daily digest message testing with groups enabled")
                 .submit();
