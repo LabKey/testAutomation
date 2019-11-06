@@ -1321,6 +1321,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     protected void checkLinks()
     {
+        // Temp. Crawl AttachmentsAction after every test to figure out what attachment type is causing crawler failures
+        new Crawler(this, TestProperties.getCrawlerTimeout(), isInjectionCheckEnabled()).validatePage(WebTestHelper.buildURL("admin", "attachments"));
+
         if (isLinkCheckEnabled())
         {
             checkErrors(); // Check for errors that happened before crawler
