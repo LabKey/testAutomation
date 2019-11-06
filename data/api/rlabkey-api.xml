@@ -1,9 +1,9 @@
 <ApiTests xmlns="http://labkey.org/query/xml">
-    <test name="Rlabkey version check" type="post">
+    <test name="Rlabkey version check" type="debug">
         <url>
             <![CDATA[
                 library(Rlabkey)
-                cat("Found Rlabkey\nVersion:", installed.packages()["Rlabkey","Version"])
+                cat("Found Rlabkey\nVersion:", installed.packages()["Rlabkey","Version"], '\n')
             ]]>
         </url>
         <response>
