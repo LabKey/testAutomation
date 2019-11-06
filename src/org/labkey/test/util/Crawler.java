@@ -977,6 +977,11 @@ public class Crawler
         return new CrawlStats(maxDepth, linkCount, _actionsVisited.size(), crawlTimer.elapsed(), _warnings);
     }
 
+    public void validatePage(String url)
+    {
+        crawlLink(new UrlToCheck(null, url, -1));
+    }
+
     private List<UrlToCheck> crawlLink(final UrlToCheck urlToCheck)
     {
         String relativeURL = urlToCheck.getRelativeURL();
@@ -1041,7 +1046,7 @@ public class Crawler
                 if (code == 200 && _test.getDriver().getTitle().isEmpty())
                     _warnings.add("Action does not specify title: " + actionId.toString());
 
-                if (!_terminalActions.contains(actionId))
+                if (depth >= 0 && !_terminalActions.contains(actionId)) // Negative depth indicates a one-off check
                 {
                     List<String> linkAddresses = _test.getLinkAddresses();
                     List<String> formAddresses = _test.getFormAddresses();
