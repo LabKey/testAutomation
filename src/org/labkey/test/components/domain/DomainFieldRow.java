@@ -11,6 +11,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -711,17 +712,25 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public Select getFromSchemaInput()
         {
-            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
-            getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
-                    "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
+            Locator selectLoc = Locator.name("domainpropertiesrow-lookupSchema")
+                    .withoutPredicate(Locator.tagWithText("option", "Loading..."));
+            Select select = SelectWrapper.Select(selectLoc).waitFor(this);
+            getWrapper().shortWait().ignoring(StaleElementReferenceException.class).withMessage("select did not have options in time")
+                    .until(driver -> {
+                        return select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading...");
+                    });
             return select;
         }
 
         public Select getFromTargetTableInput()
         {
-            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
-            getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
-                    "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
+            Locator selectLoc = Locator.name("domainpropertiesrow-lookupQueryValue")
+                    .withoutPredicate(Locator.tagWithText("option", "Loading..."));
+            Select select  = SelectWrapper.Select(selectLoc).waitFor(this);
+            getWrapper().shortWait().ignoring(StaleElementReferenceException.class).withMessage("select did not have options in time")
+                    .until(driver -> {
+                        return select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading...");
+                    });
             return select;
         }
 
