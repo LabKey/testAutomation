@@ -270,6 +270,11 @@ public class RlabkeyTest extends BaseWebDriverTest
                     TestLogger.error("Script for failed test case: " + test.getName() + ":\n" + sb.toString());
                     errors.add(test.getName());
                 }
+                else if ("DEBUG".equalsIgnoreCase(test.getType()))
+                {
+                    String reportText = _rReportHelper.getReportText();
+                    TestLogger.log("Report Output:\n" + reportText);
+                }
                 TestLogger.decreaseIndent();
             }
             _rReportHelper.clickSourceTab();
