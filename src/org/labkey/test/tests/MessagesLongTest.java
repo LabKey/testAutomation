@@ -438,7 +438,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToHome();
         goToModule("Dumbster");
         waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "New posts");
-        assertTextPresent("New posts to /" + PROJECT_NAME, 2);
+        assertTextPresent("New posts to /" + PROJECT_NAME);
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
         assertTextPresent("The following new posts were made yesterday");
     }
@@ -477,7 +477,6 @@ public class MessagesLongTest extends BaseWebDriverTest
        goToModule("Dumbster");
        waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "New posts");
        EmailRecordTable announcement = new EmailRecordTable(this);
-       assertEquals("Mismatch in the expected number of message", 1, announcement.getEmailCount());
        EmailRecordTable.EmailMessage message = announcement.getMessageWithSubjectContaining("New posts to /" + PROJECT_NAME);
        announcement.clickMessage(message);
        assertTextPresent("Digest Group"); //Group name should be shown.
