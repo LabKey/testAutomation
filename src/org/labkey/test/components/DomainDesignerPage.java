@@ -146,7 +146,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
         WebElement finishButton()
         {
-            return Locator.button("Save") // TODO if this stays as save we need to change the method names in this class
+            return Locator.button("Save")
                     .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         }
 
