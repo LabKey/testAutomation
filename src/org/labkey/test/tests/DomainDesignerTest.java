@@ -305,16 +305,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect error to contain [Please provide a name for each field.] but was[" + hasNoNameError + "]",
                 hasNoNameError.contains("Please provide a name for each field."));
 
-        // now give the field a name with characters that will get a warning
-        noNameRow.setName("&foolishness!");
-        String warning = domainDesignerPage.waitForWarning();
-        String warningfieldMessage = noNameRow.detailsMessage();
-        String expectedWarning = "&foolishness! : SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore";
-        assertTrue("expect error to contain [" + expectedWarning + "] but was[" + warning + "]",
-                warning.contains(expectedWarning));
-        assertTrue("expect field-level warning to contain [" + expectedWarning + "] but was[" + warningfieldMessage + "]",
-                warning.contains(expectedWarning));
-
         domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
