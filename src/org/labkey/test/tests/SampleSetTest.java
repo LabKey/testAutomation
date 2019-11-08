@@ -46,6 +46,7 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.core.admin.ExperimentalFeaturesPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -134,30 +135,14 @@ public class SampleSetTest extends BaseWebDriverTest
         projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
         portalHelper.addWebPart("Sample Sets");
 
-        log("Enabling the experimental feature");
-        goToAdminConsole().clickExperimentalFeatures();
-        if (Locator.tagWithAttribute("a", "data-exp-flag", "resolve-lookups-by-value").findElement(getDriver()).getText().equalsIgnoreCase("Enable"))
-        {
-            click(Locator.tagWithAttribute("a", "data-exp-flag", "resolve-lookups-by-value"));
-        }
-
+        ExperimentalFeaturesPage.beginAt(this).enableResolveLookupsByValue();
     }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        disableExpFeature();
-    }
-
-    public void disableExpFeature()
-    {
-        log("Disabling the experimental feature");
-        goToAdminConsole().clickExperimentalFeatures();
-        if (Locator.tagWithAttribute("a", "data-exp-flag", "resolve-lookups-by-value").findElement(getDriver()).getText().equalsIgnoreCase("Disable"))
-        {
-            click(Locator.tagWithAttribute("a", "data-exp-flag", "resolve-lookups-by-value"));
-        }
+        ExperimentalFeaturesPage.beginAt(this).disableResolveLookupsByValue();
     }
 
     // Uncomment this function (after you run once) it will make iterating on tests much easier.
@@ -670,7 +655,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Waiting for the sample data to get generated");
         goToProjectHome();
         waitAndClickAndWait(Locator.linkWithText(sampleSetName));
-        waitForTextWithRefresh(500000, "1 - 100 of 10,000");
+        waitForTextWithRefresh(400000, "1 - 100 of 10,000");
 
         log("Creating the list");
         goToProjectHome();
