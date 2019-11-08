@@ -667,7 +667,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Locator expandToggleLoc = Locator.tagWithClass("div", "field-icon")
                 .child(Locator.tagWithClassContaining("svg", "fa-plus-square"));
         public Locator collapseToggleLoc = Locator.tagWithClass("div", "field-icon")
-                .child(Locator.tagWithClassContaining("svg",  "minus-square"));
+                .child(Locator.tagWithClassContaining("svg",  "fa-minus-square"));
 
         public WebElement expandToggle = expandToggleLoc.findWhenNeeded(this);
 
