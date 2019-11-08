@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
@@ -36,12 +37,16 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.core.admin.ExperimentalFeaturesPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -129,6 +134,15 @@ public class SampleSetTest extends BaseWebDriverTest
 
         projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
         portalHelper.addWebPart("Sample Sets");
+
+        ExperimentalFeaturesPage.beginAt(this).enableResolveLookupsByValue();
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+        ExperimentalFeaturesPage.beginAt(this).disableResolveLookupsByValue();
     }
 
     // Uncomment this function (after you run once) it will make iterating on tests much easier.
@@ -615,6 +629,85 @@ public class SampleSetTest extends BaseWebDriverTest
                 0, linResponse.getSeed().getParents().size());
 
         dgen.deleteDomain(createDefaultConnection(true));
+    }
+
+
+    @Test
+    public void testStringLookupFields() throws IOException, CommandException
+    {
+        String sampleSetName = "10000Samples";
+        String listName = "MainList";
+
+        goToProjectHome();
+        new PortalHelper(this).addWebPart("Lists");
+
+        log("Creating the sample set of 10000 samples");
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
+        dgen.addDataSupplier("label", () -> dgen.randomString(10))
+                .withGeneratedRows(10000);
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+
+        log("Waiting for the sample data to get generated");
+        goToProjectHome();
+        waitAndClickAndWait(Locator.linkWithText(sampleSetName));
+        waitForTextWithRefresh(400000, "1 - 100 of 10,000");
+
+        log("Inserting 10,001 row in the sampleset");
+        DataRegionTable table = new DataRegionTable("Material", getDriver());
+        table.clickInsertNewRow();
+
+        setFormElement(Locator.name("quf_Name"), "Sample1");
+        setFormElement(Locator.name("quf_label"), "Sample1");
+        clickButton("Submit");
+
+        log("Creating the list");
+        goToProjectHome();
+        lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)));
+
+        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "VarList", Map.of("keyName", "id"));
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
+
+        log("Adding the lookUp field in the list");
+        DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
+                .setType(FieldDefinition.ColumnType.Lookup)
+                .expand()
+                .setFromFolder("Current Folder")
+                .setFromSchema("exp.materials")
+                .setFromTargetTable("10000Samples (Integer)")
+                .setDescription("LookUp in same container with 10000 samples");
+
+        domainDesignerPage.clickFinish();
+
+        log("Inserting the new row in the list with the newly created sample as lookup");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        table = new DataRegionTable("query", getDriver());
+        table.clickInsertNewRow();
+        setFormElement(Locator.name("quf_id"), "1");
+        setFormElement(Locator.name("quf_name"), "1");
+        setFormElement(Locator.name("quf_lookUpField"), "Sample2");
+        clickButton("Submit");
+
+        String errMsg = Locator.tagWithAttribute("font","class","labkey-error").findElement(getDriver()).getText();
+        assertEquals("Expecpted error is different","Could not convert value: Sample2",errMsg);
+
+        setFormElement(Locator.name("quf_lookUpField"), "Sample1");
+        clickButton("Submit");
+
+        log("Verifying row is inserted correctly");
+        table = new DataRegionTable("query", getDriver());
+        assertEquals("Lookup field value is incorrect", Arrays.asList("Sample1"), table.getColumnDataAsText("lookUpField"));
+
     }
 
     @Test
