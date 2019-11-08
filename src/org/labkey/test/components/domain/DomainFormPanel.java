@@ -238,8 +238,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
         // TODO since the Assay Properties panel also has the notion of expand/collapse,
         //  we should split that part out into an Abstract test class that both can use
-        WebElement expandIcon = Locator.tagWithClass("svg", "fa-plus-square")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator expandIconLoc = Locator.tagWithClass("svg", "domain-form-expand-btn");
+        WebElement expandIcon = expandIconLoc.refindWhenNeeded(DomainFormPanel.this);
     }
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
@@ -277,7 +277,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         {
             if (_title != null)
             {
-                Locator.XPathLocator titleLoc = Locator.tagWithClass("div", "panel-heading").startsWith(_title);
+                Locator.XPathLocator titleLoc = Locator.tagWithClass("div", "domain-panel-header").child(Locator.tag("span")).startsWith(_title);
                 return _active ? _activeLocator.withDescendant(titleLoc) : getBaseLocator().withDescendant(titleLoc);
             }
             else
