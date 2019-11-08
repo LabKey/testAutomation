@@ -1512,7 +1512,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "DomainDesignerTest Project";
+        return "DomainDesignerTest Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     @Override
