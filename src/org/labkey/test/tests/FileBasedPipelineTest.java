@@ -316,6 +316,11 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
                 "INFO : hello Nashorn timeout world!",
+                // ${pipeline, protocol name} token replacement
+                "arg[3]=" + protocolName,
+                // ${httpSessionId} token replacement. Expect apikey prefix
+                "arg[4]=apikey|",
+                "sleeping for 8 seconds",
                 "Process killed after exceeding timeout of 3 seconds");
         assertTextNotPresent("goodbye Nashorn timeout world!");
     }

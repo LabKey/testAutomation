@@ -12,7 +12,8 @@
             </outputs>
             <!-- jjs is the command-line frontend to Nashorn included in the JDK -->
             <exec installPath="${JAVA_HOME}/bin" timeout="3">
-                jjs pipeline/pipelines/timeout-exec-test.js
+                jjs pipeline/pipelines/timeout-exec-test.js -- -t 8
+                    ${pipeline, protocol name} "${httpSessionId}"
             </exec>
         </task>
     </tasks>
