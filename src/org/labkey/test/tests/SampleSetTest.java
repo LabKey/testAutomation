@@ -657,6 +657,14 @@ public class SampleSetTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkWithText(sampleSetName));
         waitForTextWithRefresh(400000, "1 - 100 of 10,000");
 
+        log("Inserting 10,001 row in the sampleset");
+        DataRegionTable table = new DataRegionTable("Material", getDriver());
+        table.clickInsertNewRow();
+
+        setFormElement(Locator.name("quf_Name"), "Sample1");
+        setFormElement(Locator.name("quf_label"), "Sample1");
+        clickButton("Submit");
+
         log("Creating the list");
         goToProjectHome();
         lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
@@ -679,16 +687,6 @@ public class SampleSetTest extends BaseWebDriverTest
                 .setDescription("LookUp in same container with 10000 samples");
 
         domainDesignerPage.clickFinish();
-
-        log("Inserting 10,001 row in the sampleset");
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(sampleSetName));
-        DataRegionTable table = new DataRegionTable("Material", getDriver());
-        table.clickInsertNewRow();
-
-        setFormElement(Locator.name("quf_Name"), "Sample1");
-        setFormElement(Locator.name("quf_label"), "Sample1");
-        clickButton("Submit");
 
         log("Inserting the new row in the list with the newly created sample as lookup");
         goToProjectHome();
