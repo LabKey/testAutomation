@@ -1490,25 +1490,21 @@ public class DomainDesignerTest extends BaseWebDriverTest
     public Map<String, Object> getPropertyValidator(PropertyDescriptor column, String name)
     {
         List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("propertyValidators");
-        List<Map<String, Object>> filteredList = validators.stream()
+        Map<String, Object> validator = validators.stream()
                 .filter(a-> a.get("name").equals(name))
-                .collect(Collectors.toList());
-        if (filteredList.size() == 0)
-            return null;
-        else
-            return filteredList.get(0);
+                .findFirst().orElse(null);
+        assertNotNull("did not find expected validator on column", validator);
+        return validator;
     }
 
     public Map<String, Object> getConditionalFormats(PropertyDescriptor column, String filterExpression)
     {
         List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
-        List<Map<String, Object>> list = validators.stream()
+        Map<String, Object> conditionalFormat = validators.stream()
                 .filter(a-> a.get("filter").equals(filterExpression))
-                .collect(Collectors.toList());
-        if (list.size() == 0)
-            return null;
-        else
-            return list.get(0);
+                .findFirst().orElse(null);
+        assertNotNull("did not find expected conditionalFormat on column", conditionalFormat);
+        return conditionalFormat;
     }
 
     @Override
