@@ -154,9 +154,32 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFormPanel expand()
     {
-        elementCache().expandIcon.click();
-        getWrapper().sleep(250); // wait for transition to happen
+        if (isCollapsed())
+        {
+            elementCache().expandIcon.click();
+            getWrapper().sleep(250); // wait for transition to happen
+        }
         return this;
+    }
+
+    public boolean isExpanded()
+    {
+        return elementCache().collapseIconLoc.existsIn(this);
+    }
+
+    public DomainFormPanel collapse()
+    {
+        if (isExpanded())
+        {
+            elementCache().collapseIcon.click();
+            getWrapper().sleep(250); // wait for transition to happen
+        }
+        return this;
+    }
+
+    public boolean isCollapsed()
+    {
+        return elementCache().expandIconLoc.existsIn(this);
     }
 
     @Override
@@ -240,6 +263,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         //  we should split that part out into an Abstract test class that both can use
         Locator.XPathLocator expandIconLoc = Locator.tagWithClass("svg", "domain-form-expand-btn");
         WebElement expandIcon = expandIconLoc.refindWhenNeeded(DomainFormPanel.this);
+        Locator.XPathLocator collapseIconLoc = Locator.tagWithClass("svg", "domain-form-collapse-btn");
+        WebElement collapseIcon = collapseIconLoc.refindWhenNeeded(DomainFormPanel.this);
     }
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
