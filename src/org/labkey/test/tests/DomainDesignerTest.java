@@ -1317,6 +1317,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         valDialog.clickApply();
         domainDesignerPage.clickFinish();
+        waitAndClickAndWait(Locator.linkWithText(listName));    // give it time by navigating to the list
+        DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
 
         // now confirm 2 validators on the field
         DomainResponse newResponse = dgen.getDomain(createDefaultConnection(true));
@@ -1386,6 +1388,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .clickRemove();
         dlg.clickApply();
         domainDesignerPage.clickFinish();
+        waitAndClickAndWait(Locator.linkWithText(listName));        // wait for navigation and page load before using the API call to get the domain
+        DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
 
         // now verify we have 2 formats on the size field
         DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection(true));
@@ -1478,19 +1482,19 @@ public class DomainDesignerTest extends BaseWebDriverTest
         List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("propertyValidators");
         Map<String, Object> validator = validators.stream()
                 .filter(a-> a.get("name").equals(name))
-                .collect(Collectors.toList())
-                .get(0);
+                .findFirst().orElse(null);
+        assertNotNull("did not find expected validator ["+name+"] on column", validator);
         return validator;
     }
 
     public Map<String, Object> getConditionalFormats(PropertyDescriptor column, String filterExpression)
     {
-        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
-        Map<String, Object> validator = validators.stream()
+        List<Map<String, Object>> formats = (ArrayList<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
+        Map<String, Object> conditionalFormat = formats.stream()
                 .filter(a-> a.get("filter").equals(filterExpression))
-                .collect(Collectors.toList())
-                .get(0);
-        return validator;
+                .findFirst().orElse(null);
+        assertNotNull("did not find expected conditionalFormat ["+filterExpression+"] on column", conditionalFormat);
+        return conditionalFormat;
     }
 
     @Override
@@ -1502,7 +1506,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "DomainDesignerTest Project";
+        return "DomainDesignerTest Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     @Override
