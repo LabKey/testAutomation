@@ -157,7 +157,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         if (isCollapsed())
         {
             elementCache().expandIcon.click();
-            getWrapper().sleep(250); // wait for transition to happen
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
         }
         return this;
     }
@@ -172,7 +172,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         if (isExpanded())
         {
             elementCache().collapseIcon.click();
-            getWrapper().sleep(250); // wait for transition to happen
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
         }
         return this;
     }
