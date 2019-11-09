@@ -10,6 +10,7 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -161,7 +162,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         {
             getWrapper().log("clicking advanced settings button try=["+trycount+"]");
             elementCache().advancedSettingsBtn.click();
-            getWrapper().sleep(250);
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement()));
             trycount++;
             assertTrue("advanced settings dialog did not appear in time",trycount < 4);
         }while (!Locator.tagWithClass("div", "modal-backdrop").existsIn(getDriver()));
