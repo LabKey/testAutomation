@@ -193,7 +193,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         if (isExpanded())
         {
             elementCache().collapseToggle.click();
-            getWrapper().sleep(250); // wait for transition to happen
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
             getWrapper().waitFor(() -> elementCache().expandToggleLoc.existsIn(this),
                     "the field row did not collapse", 1500);
         }
