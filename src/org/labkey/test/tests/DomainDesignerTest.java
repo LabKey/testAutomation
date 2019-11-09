@@ -491,14 +491,15 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow clientFieldWarning = domainFormPanel.addField("select * from table");
 
         domainDesignerPage.clickFinishExpectingError();
-        String clientWarning = domainDesignerPage.waitForWarning();
-        String multipleIssuesError = domainDesignerPage.waitForError();
-        String expectedErrMsg = "Multiple fields contain issues that need to be fixed. Review the red highlighted fields below for more information.";
-        String expectedWarningMsg = " SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore.";
-        assertTrue("expect error message to contain [" + expectedErrMsg + "] but was [" + multipleIssuesError + "]",
-                multipleIssuesError.contains(expectedErrMsg));
-        assertTrue("expect warning message to contain [" + expectedWarningMsg + "] but was [" + clientWarning + "]",
-                clientWarning.contains(expectedWarningMsg));
+        // TODO: Look for warning on row instead of banner.  We're not doing warning banners anymore
+//        String clientWarning = domainDesignerPage.waitForWarning();
+//        String multipleIssuesError = domainDesignerPage.waitForError();
+//        String expectedErrMsg = "Multiple fields contain issues that need to be fixed. Review the red highlighted fields below for more information.";
+//        String expectedWarningMsg = " SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore.";
+//        assertTrue("expect error message to contain [" + expectedErrMsg + "] but was [" + multipleIssuesError + "]",
+//                multipleIssuesError.contains(expectedErrMsg));
+//        assertTrue("expect warning message to contain [" + expectedWarningMsg + "] but was [" + clientWarning + "]",
+//                clientWarning.contains(expectedWarningMsg));
 
         assertTrue("expect field error when using reserved field names", modifiedRow.hasFieldError());
         assertTrue("expect error for duplicate field names", blarg1.hasFieldError());
