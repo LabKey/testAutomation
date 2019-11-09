@@ -1494,7 +1494,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         Map<String, Object> conditionalFormat = formats.stream()
                 .filter(a-> a.get("filter").equals(filterExpression))
                 .findFirst().orElse(null);
-        assertNotNull("did not find expected conditionalFormat ["+filterExpression+"] on column", conditionalFormat);
+        assertNotNull("did not find conditionalFormat ["+name+"] on column. Column properties: " + column.getAllProperties().toString(), validator);
         return conditionalFormat;
     }
 
