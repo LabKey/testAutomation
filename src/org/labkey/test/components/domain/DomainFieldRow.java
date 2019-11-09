@@ -10,6 +10,7 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -161,7 +162,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         {
             getWrapper().log("clicking advanced settings button try=["+trycount+"]");
             elementCache().advancedSettingsBtn.click();
-            getWrapper().sleep(250);
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement()));
             trycount++;
             assertTrue("advanced settings dialog did not appear in time",trycount < 4);
         }while (!Locator.tagWithClass("div", "modal-backdrop").existsIn(getDriver()));
@@ -178,6 +179,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             for (int i=0; i < 3; i++)
             {
                 elementCache().expandToggle.click();
+                getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
                 if (getWrapper().waitFor(() -> isExpanded(), 1000))
                     break;
             }
@@ -192,6 +194,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         if (isExpanded())
         {
             elementCache().collapseToggle.click();
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
             getWrapper().waitFor(() -> elementCache().expandToggleLoc.existsIn(this),
                     "the field row did not collapse", 1500);
         }
@@ -662,9 +665,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .findWhenNeeded(this);
 
 
-        public Locator expandToggleLoc = Locator.tagWithClass("div", "domain-field-icon")
-                .child(Locator.tagWithAttribute("svg", "data-icon", "plus-square"));
-        public Locator collapseToggleLoc = Locator.tagWithAttribute("svg", "data-icon", "minus-square");
+        public Locator expandToggleLoc = Locator.tagWithClass("div", "field-icon")
+                .child(Locator.tagWithClassContaining("svg", "fa-plus-square"));
+        public Locator collapseToggleLoc = Locator.tagWithClass("div", "field-icon")
+                .child(Locator.tagWithClassContaining("svg",  "fa-minus-square"));
 
         public WebElement expandToggle = expandToggleLoc.findWhenNeeded(this);
 
