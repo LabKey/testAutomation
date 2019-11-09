@@ -178,7 +178,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             for (int i=0; i < 3; i++)
             {
                 elementCache().expandToggle.click();
-                getWrapper().sleep(250); // wait for transition to happen
+                getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
                 if (getWrapper().waitFor(() -> isExpanded(), 1000))
                     break;
             }
