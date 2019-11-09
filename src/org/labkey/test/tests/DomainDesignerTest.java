@@ -1484,7 +1484,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         Map<String, Object> validator = validators.stream()
                 .filter(a-> a.get("name").equals(name))
                 .findFirst().orElse(null);
-        assertNotNull("did not find expected validator ["+name+"] on column", validator);
+        assertNotNull("did not find property validator ["+name+"] on column. Column properties: " + column.getAllProperties().toString(), validator);
         return validator;
     }
 
