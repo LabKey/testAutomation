@@ -159,22 +159,17 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public DomainFormPanel goToBatchFields()
     {
-        return goToFieldsPanel("Batch");
+        return expandFieldsPanel("Batch");
     }
 
     public DomainFormPanel goToRunFields()
     {
-        return goToFieldsPanel("Run");
+        return expandFieldsPanel("Run");
     }
 
     public DomainFormPanel goToResultsFields()
     {
-        return goToFieldsPanel("Results");
-    }
-
-    public DomainFormPanel goToFieldsPanel(String title)
-    {
-        return expandFieldsPanel(title);
+        return expandFieldsPanel("Results");
     }
 
     public DomainFormPanel expandFieldsPanel(String title)
