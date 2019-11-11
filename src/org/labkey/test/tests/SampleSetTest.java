@@ -46,11 +46,11 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
-import org.labkey.test.pages.core.admin.ExperimentalFeaturesPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
@@ -135,14 +135,16 @@ public class SampleSetTest extends BaseWebDriverTest
         projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
         portalHelper.addWebPart("Sample Sets");
 
-        ExperimentalFeaturesPage.beginAt(this).enableResolveLookupsByValue();
+        Connection cn = createDefaultConnection(false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", true);
     }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        ExperimentalFeaturesPage.beginAt(this).disableResolveLookupsByValue();
+        Connection cn = createDefaultConnection(false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", false);
     }
 
     // Uncomment this function (after you run once) it will make iterating on tests much easier.
