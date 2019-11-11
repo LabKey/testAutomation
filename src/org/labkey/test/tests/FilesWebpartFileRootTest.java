@@ -29,7 +29,6 @@ import org.labkey.test.categories.DailyC;
 import org.labkey.test.pages.files.CustomizeFilesWebPartPage;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.WikiHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,15 +38,13 @@ import java.util.List;
 public class FilesWebpartFileRootTest extends BaseWebDriverTest
 {
     private static final String CHILD_CONTAINER = "ChildContainerNotForFileRootSelection";
-    private static final String WIKI_NAME = "helloWiki";
     PortalHelper portalHelper = new PortalHelper(this);
-    WikiHelper wikiHelper = new WikiHelper(this);
     FileBrowserHelper fileBrowserHelper = new FileBrowserHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("filecontent", "wiki");
+        return Arrays.asList("filecontent");
     }
 
     @Override
@@ -66,18 +63,10 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
     private void doInit()
     {
         _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.enableModule("Wiki");
         _containerHelper.createSubfolder(getProjectName(), CHILD_CONTAINER);
 
         goToProjectHome();
         portalHelper.addWebPart("Files");
-        portalHelper.addWebPart("Wiki");
-
-        wikiHelper.createNewWikiPage();
-        setFormElement(Locator.name("name"), WIKI_NAME);
-        setFormElement(Locator.name("title"), WIKI_NAME);
-        wikiHelper.setWikiBody("Wiki node @wiki and it's child nodes are also valid file roots");
-        wikiHelper.saveWikiPage();
     }
 
     @Before
@@ -97,16 +86,7 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
 
         portalHelper.clickWebpartMenuItem("Files", true, "Customize");
         customizePage.verifyFileRootNodeNotPresent(CHILD_CONTAINER); //child container shouldn't show up as file root options
-
-        log("Set webpart file root to @wiki/helloWiki");
-        customizePage.setFileRoot("@wiki", WIKI_NAME);
-        String wikiHTML = WIKI_NAME + ".html";
-        Assert.assertTrue("File " + wikiHTML + " should be present in files webpart with @wiki/hello as file root", fileBrowserHelper.fileIsPresent(wikiHTML));
-
-        log("Set webpart file root back to @files");
-        portalHelper.clickWebpartMenuItem("Files", true, "Customize");
         customizePage.setFileRoot("@files");
-        Assert.assertFalse("File " + wikiHTML + " should not be present in files webpart with @files file root", fileBrowserHelper.fileIsPresent(wikiHTML));
         Locator.XPathLocator importDataBtn = Locator.tagWithClass("a", "importDataBtn");
         Assert.assertTrue("Import Data button should be present when file root is @files and no pipeline override exists", isElementPresent(importDataBtn));
 
