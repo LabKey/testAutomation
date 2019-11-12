@@ -305,6 +305,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect error to contain [Please provide a name for each field.] but was[" + hasNoNameError + "]",
                 hasNoNameError.contains("Please provide a name for each field."));
 
+        String warningfieldMessage = noNameRow.setName("&totally not a sketchy sql injection attack")
+                .waitForWarning()
+                .detailsMessage();
+        String expectedWarning = "New field. Warning: SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore";
+        assertTrue("expect error to contain [" + expectedWarning + "] but was[" + warningfieldMessage + "]",
+                warningfieldMessage.contains(expectedWarning));
+
         domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
@@ -491,15 +498,23 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow clientFieldWarning = domainFormPanel.addField("select * from table");
 
         domainDesignerPage.clickFinishExpectingError();
-        // TODO: Look for warning on row instead of banner.  We're not doing warning banners anymore
-//        String clientWarning = domainDesignerPage.waitForWarning();
-//        String multipleIssuesError = domainDesignerPage.waitForError();
-//        String expectedErrMsg = "Multiple fields contain issues that need to be fixed. Review the red highlighted fields below for more information.";
-//        String expectedWarningMsg = " SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore.";
-//        assertTrue("expect error message to contain [" + expectedErrMsg + "] but was [" + multipleIssuesError + "]",
-//                multipleIssuesError.contains(expectedErrMsg));
-//        assertTrue("expect warning message to contain [" + expectedWarningMsg + "] but was [" + clientWarning + "]",
-//                clientWarning.contains(expectedWarningMsg));
+        String expectedWarnMsg = "New field. Warning: SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore.";
+        String blargErrMsg = "New field. Error: The field name 'blarg' is already taken. Please provide a unique name for each field.";
+        String reservedErrMsg = "New field. Error: 'modified' is a reserved field name in 'fieldsWithReservedNamesSampleSet'.";
+        String modRowDetailsMsg = modifiedRow.waitForError()
+                .detailsMessage();
+        String blarg1DetailsMsg = blarg1.waitForError().detailsMessage();
+        String blarg2DetailsMsg = blarg2.waitForError().detailsMessage();
+        String clientFieldWarningMsg = clientFieldWarning.waitForWarning().detailsMessage();
+
+        assertTrue("expect error message to contain [" + reservedErrMsg + "] but was [" + modRowDetailsMsg + "]",
+                modRowDetailsMsg.contains(reservedErrMsg));
+        assertTrue("expect error message to contain [" + blargErrMsg + "] but was [" + blarg1DetailsMsg + "]",
+                blarg1DetailsMsg.contains(blargErrMsg));
+        assertTrue("expect error message to contain [" + blargErrMsg + "] but was [" + blarg2DetailsMsg + "]",
+                blarg2DetailsMsg.contains(blargErrMsg));
+        assertTrue("expect warning message to contain [" + expectedWarnMsg + "] but was [" + clientFieldWarningMsg + "]",
+                clientFieldWarningMsg.contains(expectedWarnMsg));
 
         assertTrue("expect field error when using reserved field names", modifiedRow.hasFieldError());
         assertTrue("expect error for duplicate field names", blarg1.hasFieldError());

@@ -12,6 +12,7 @@ import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -518,10 +519,26 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         return getComponentElement().getAttribute("class").contains("domain-row-border-error");
     }
+    public DomainFieldRow waitForError()
+    {
+        getWrapper().shortWait().ignoring(StaleElementReferenceException.class)
+                .until(driver -> {
+                   return this.hasFieldError();
+                });
+        return this;
+    }
 
     public boolean hasFieldWarning()
     {
         return getComponentElement().getAttribute("class").contains("domain-row-border-warning");
+    }
+    public DomainFieldRow waitForWarning()
+    {
+        getWrapper().shortWait().ignoring(StaleElementReferenceException.class)
+                .until(driver -> {
+                    return this.hasFieldWarning();
+                });
+        return this;
     }
 
     // conditional formatting and validation options
