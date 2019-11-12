@@ -79,11 +79,6 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return elementCache().domainFormPanel(title);
     }
 
-    public DomainFormPanel activeFieldsPanel(String title)
-    {
-        return elementCache().activeDomainFormPanel(title);
-    }
-
     public String waitForError()
     {
         waitFor(()-> BootstrapLocators.dangerAlert.existsIn(getDriver()),
@@ -142,6 +137,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         DomainFormPanel firstDomainFormPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())   // for situations where there's only one on the page
+                .timeout(WAIT_FOR_JAVASCRIPT)
                 .findWhenNeeded(this);                                                          // and the caller is too lazy to specify which one they want
 
         DomainFormPanel domainFormPanel(String title) // for situations with multiple domainformpanels on the same page
@@ -149,15 +145,12 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
             return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).findWhenNeeded(this);
         }                                                     // and the caller is too lazy to specify which one they want
 
-        DomainFormPanel activeDomainFormPanel(String title) // for situations with multiple domainformpanels on the same page and only one is active
-        {
-            return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).active().findOrNull(this);
-        }
         WebElement finishButton()
         {
-            return Locator.button("Finish")
+            return Locator.button("Save")
                     .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         }
+
         WebElement cancelBtn()
         {
             return Locator.button("Cancel")
