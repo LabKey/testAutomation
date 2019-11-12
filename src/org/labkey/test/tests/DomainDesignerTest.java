@@ -480,7 +480,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAddFieldsWithReservedNames() throws Exception
+    public void testFieldNameErrors() throws Exception
     {
         String sampleSet = "fieldsWithReservedNamesSampleSet";
 
