@@ -12,7 +12,6 @@ import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -521,10 +520,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     }
     public DomainFieldRow waitForError()
     {
-        getWrapper().shortWait().ignoring(StaleElementReferenceException.class)
-                .until(driver -> {
-                   return this.hasFieldError();
-                });
+        getWrapper().waitFor(()-> this.hasFieldError(), WAIT_FOR_JAVASCRIPT);
         return this;
     }
 
@@ -534,10 +530,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     }
     public DomainFieldRow waitForWarning()
     {
-        getWrapper().shortWait().ignoring(StaleElementReferenceException.class)
-                .until(driver -> {
-                    return this.hasFieldWarning();
-                });
+        getWrapper().waitFor(()-> this.hasFieldWarning(), WAIT_FOR_JAVASCRIPT);
         return this;
     }
 

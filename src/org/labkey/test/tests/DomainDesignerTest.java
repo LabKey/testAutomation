@@ -43,7 +43,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -305,13 +307,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect error to contain [Please provide a name for each field.] but was[" + hasNoNameError + "]",
                 hasNoNameError.contains("Please provide a name for each field."));
 
-        String warningfieldMessage = noNameRow.setName("&totally not a sketchy sql injection attack")
+        String warningFieldMessage = noNameRow.setName("&has weird characters that make scripts hard to write")
                 .waitForWarning()
                 .detailsMessage();
         String expectedWarning = "New field. Warning: SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore";
-        assertTrue("expect error to contain [" + expectedWarning + "] but was[" + warningfieldMessage + "]",
-                warningfieldMessage.contains(expectedWarning));
+        assertThat("expected error", warningFieldMessage, containsString(expectedWarning));
 
+        assertEquals("save button should be disabled with field errors present", "true",
+                domainDesignerPage.finishButton().getAttribute("disabled"));
         domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
@@ -507,20 +510,18 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String blarg2DetailsMsg = blarg2.waitForError().detailsMessage();
         String clientFieldWarningMsg = clientFieldWarning.waitForWarning().detailsMessage();
 
-        assertTrue("expect error message to contain [" + reservedErrMsg + "] but was [" + modRowDetailsMsg + "]",
-                modRowDetailsMsg.contains(reservedErrMsg));
-        assertTrue("expect error message to contain [" + blargErrMsg + "] but was [" + blarg1DetailsMsg + "]",
-                blarg1DetailsMsg.contains(blargErrMsg));
-        assertTrue("expect error message to contain [" + blargErrMsg + "] but was [" + blarg2DetailsMsg + "]",
-                blarg2DetailsMsg.contains(blargErrMsg));
-        assertTrue("expect warning message to contain [" + expectedWarnMsg + "] but was [" + clientFieldWarningMsg + "]",
-                clientFieldWarningMsg.contains(expectedWarnMsg));
+        assertThat("expected warning", clientFieldWarningMsg, containsString(expectedWarnMsg));
+        assertThat("expected error", blarg1DetailsMsg, containsString(blargErrMsg));
+        assertThat("expected error", blarg2DetailsMsg, containsString(blargErrMsg));
+        assertThat("expected error", modRowDetailsMsg, containsString(reservedErrMsg));
 
         assertTrue("expect field error when using reserved field names", modifiedRow.hasFieldError());
         assertTrue("expect error for duplicate field names", blarg1.hasFieldError());
         assertTrue("expect error for duplicate field names", blarg2.hasFieldError());
         assertTrue("expect warning for field name with spaces or special characters", clientFieldWarning.hasFieldWarning());
 
+        assertFalse("'save' button should not be enabled when field errors are present",
+                domainDesignerPage.finishButton().isEnabled());
         domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
