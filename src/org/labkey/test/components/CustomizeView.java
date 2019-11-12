@@ -534,7 +534,10 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     //enable customize view grid to show hidden fields
     public void showHiddenItems()
     {
-        _driver.click(Locator.tagWithText("Label", "Show Hidden Fields"));
+        Checkbox hiddenFields = Ext4Checkbox().withLabel("Show Hidden Fields").find(this);
+        hiddenFields.check();
+        WebDriverWrapper.waitFor(hiddenFields::isChecked, "Hidden Fields not shown", 1000);
+
         BaseWebDriverTest.sleep(250); // wait for columns to display
     }
 
