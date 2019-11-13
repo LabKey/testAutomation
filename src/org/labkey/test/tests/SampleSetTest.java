@@ -637,7 +637,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testStringLookupFields() throws IOException, CommandException
     {
-        String sampleSetName = "10000Samples";
+        String sampleSetName = "10000Samples"; // Testing with 10,000 samples because as per the product the lookup is converted into text field only when the samples exceed 10,000 samples
         String listName = "MainList";
 
         goToProjectHome();
@@ -652,12 +652,12 @@ public class SampleSetTest extends BaseWebDriverTest
         dgen.addDataSupplier("label", () -> dgen.randomString(10))
                 .withGeneratedRows(10000);
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        log("Successfully  inserted " + saveRowsResponse.getRowsAffected());
 
         log("Waiting for the sample data to get generated");
         goToProjectHome();
         waitAndClickAndWait(Locator.linkWithText(sampleSetName));
-        waitForTextWithRefresh(400000, "1 - 100 of 10,000");
 
         log("Inserting 10,001 row in the sampleset");
         DataRegionTable table = new DataRegionTable("Material", getDriver());
