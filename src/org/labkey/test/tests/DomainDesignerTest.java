@@ -313,8 +313,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String expectedWarning = "New field. Warning: SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore";
         assertThat("expected error", warningFieldMessage, containsString(expectedWarning));
 
-        assertEquals("save button should be disabled with field errors present", "true",
-                domainDesignerPage.finishButton().getAttribute("disabled"));
         domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
@@ -520,8 +518,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect error for duplicate field names", blarg2.hasFieldError());
         assertTrue("expect warning for field name with spaces or special characters", clientFieldWarning.hasFieldWarning());
 
-        assertFalse("'save' button should not be enabled when field errors are present",
-                domainDesignerPage.finishButton().isEnabled());
         domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
