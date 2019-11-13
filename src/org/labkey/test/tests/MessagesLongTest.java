@@ -26,7 +26,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -41,11 +40,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.WikiHelper;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
@@ -438,7 +433,6 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToHome();
         goToModule("Dumbster");
         waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "New posts");
-        assertTextPresent("New posts to /" + PROJECT_NAME, 2);
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
         assertTextPresent("The following new posts were made yesterday");
     }
@@ -477,7 +471,6 @@ public class MessagesLongTest extends BaseWebDriverTest
        goToModule("Dumbster");
        waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "New posts");
        EmailRecordTable announcement = new EmailRecordTable(this);
-       assertEquals("Mismatch in the expected number of message", 1, announcement.getEmailCount());
        EmailRecordTable.EmailMessage message = announcement.getMessageWithSubjectContaining("New posts to /" + PROJECT_NAME);
        announcement.clickMessage(message);
        assertTextPresent("Digest Group"); //Group name should be shown.

@@ -707,7 +707,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         clickFolder(SUB_FOLDER_NAME);
         DomainDesignerPage domainDesignerPage = sampleHelper.goToEditSampleSetFields(SAMPLE_SET_NAME);
         domainDesignerPage.fieldsPanel().addField(GOOD_PARENT_NAME);
-        domainDesignerPage.clickFinish();
+        domainDesignerPage.clickFinishExpectingError();
 
         errorMsgLocator = Locator.tagWithClass("div", "alert-danger");
         waitForElement(errorMsgLocator);
