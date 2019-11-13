@@ -535,6 +535,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     public void showHiddenItems()
     {
         Checkbox hiddenFields = Ext4Checkbox().withLabel("Show Hidden Fields").find(this);
+        getWrapper().scrollIntoView(hiddenFields.getComponentElement());
         hiddenFields.check();
         WebDriverWrapper.waitFor(hiddenFields::isChecked, "Hidden Fields not shown", 1000);
 
