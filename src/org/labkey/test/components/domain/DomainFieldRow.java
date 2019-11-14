@@ -518,10 +518,20 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         return getComponentElement().getAttribute("class").contains("domain-row-border-error");
     }
+    public DomainFieldRow waitForError()
+    {
+        getWrapper().waitFor(()-> this.hasFieldError(), WAIT_FOR_JAVASCRIPT);
+        return this;
+    }
 
     public boolean hasFieldWarning()
     {
         return getComponentElement().getAttribute("class").contains("domain-row-border-warning");
+    }
+    public DomainFieldRow waitForWarning()
+    {
+        getWrapper().waitFor(()-> this.hasFieldWarning(), WAIT_FOR_JAVASCRIPT);
+        return this;
     }
 
     // conditional formatting and validation options
