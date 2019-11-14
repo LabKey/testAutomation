@@ -154,6 +154,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected static boolean _testFailed = false;
     protected static boolean _anyTestFailed = false;
     private final ArtifactCollector _artifactCollector;
+    private DeferredErrorCollector _errorCollector;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public final CustomizeView _customizeViewsHelper;
@@ -279,6 +280,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public ArtifactCollector getArtifactCollector()
     {
         return _artifactCollector;
+    }
+
+    public final DeferredErrorCollector checker()
+    {
+        if (_errorCollector == null)
+        {
+            throw new IllegalStateException("Default error collector only available within '@Test' methods.");
+        }
+        return _errorCollector;
     }
 
     /**
@@ -624,13 +634,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (_testFailed)
                     resetErrors(); // Clear errors from a previously failed test
                 _testFailed = false;
+                _errorCollector = new DeferredErrorCollector(getArtifactCollector());
             }
 
             @Override
             protected void succeeded(Description description)
             {
                 closeExtraWindows();
-                checkErrors();
+                checker().wrapAssertion(() -> checkErrors());
+                checker().recordResults();
             }
         };
 
