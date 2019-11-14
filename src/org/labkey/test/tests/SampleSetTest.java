@@ -700,7 +700,7 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_lookUpField"), "Sample2");
         clickButton("Submit");
 
-        String errMsg = Locator.tagWithAttribute("font","class","labkey-error").findElement(getDriver()).getText();
+        String errMsg = Locators.labkeyError().findElement(getDriver()).getText();
         assertEquals("Expecpted error is different","Could not convert value: Sample2",errMsg);
 
         setFormElement(Locator.name("quf_lookUpField"), "Sample1");
