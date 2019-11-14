@@ -36,6 +36,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -700,7 +701,7 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_lookUpField"), "Sample2");
         clickButton("Submit");
 
-        String errMsg = Locators.labkeyError().findElement(getDriver()).getText();
+        String errMsg = Locators.labkeyError.findElement(getDriver()).getText();
         assertEquals("Expecpted error is different", "Could not convert value: Sample2", errMsg);
 
         setFormElement(Locator.name("quf_lookUpField"), "Sample1");
