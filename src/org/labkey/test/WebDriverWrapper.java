@@ -3331,6 +3331,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         setInput(dropZone, files);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.FileBrowserHelper#dragAndDropFileInDropZone(File)} or
+     * {@link org.labkey.test.util.FileBrowserHelper#dragDropUpload(File)}
+     */
+    @Deprecated
     public void dragAndDropFileInDropZone(File fileName)
     {
         //Offsets for the drop zone
@@ -3350,6 +3355,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         //setting the input
         input.sendKeys(fileName.getAbsolutePath());
+
+        executeScript("LABKEY.internal.FileDrop.hideDropzones()");
     }
 
     public void setFormElement(Locator loc, File file)
