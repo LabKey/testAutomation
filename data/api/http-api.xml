@@ -5,7 +5,6 @@
         <formData>{ "schemaName": "lists",
             "queryName": "Test List",
             "command": "insert",
-            "rowsAffected": 1,
             "rows": [ {
             "Color": "Purple",
             "Like": "Magenta",
@@ -176,7 +175,6 @@
         <formData>{ "schemaName": "lists",
             "queryName": "Test List",
             "command": "insert",
-            "rowsAffected": 3,
             "rows": [ {
             "Color": "Pink",
             "Like": "Rose",
@@ -368,7 +366,6 @@
         <formData>{ "schemaName": "lists",
             "queryName": "Test List",
             "command": "insert",
-            "rowsAffected": 2,
             "rows": [ {
             "Color": "Green",
             "Like": "Jungle Green",
@@ -546,7 +543,6 @@
         <formData>{ "schemaName": "lists",
             "queryName": "Test List",
             "command": "delete",
-            "rowsAffected": 3,
             "rows": [ {
             "Color": "Green"},
             {
@@ -684,6 +680,86 @@
     "Color": "Yellow"
 }],
 "rowCount":5}]]></response>
+    </test>
+
+    <test name="apiVersion=17.1, includeMetadata=false, includeUpdateColumn=true" type="post">
+        <url>
+            <![CDATA[query/HTTPApiVerifyProject/selectRows.api]]></url>
+        <formData>{
+            "schemaName": "lists",
+            "queryName": "Test List",
+            "query.Good~eq": 2,
+            "apiVersion": 17.1,
+            "includeMetadata": false,
+            "includeUpdateColumn": true,
+            }
+        </formData>
+        <response><![CDATA[{
+  "schemaName" : [ "lists" ],
+  "queryName" : "Test List",
+  "rows" : [ {
+    "data" : {
+      "Month" : {
+        "formattedValue" : "4",
+        "value" : "2000-04-01 00:00:00.000"
+      },
+      "Like" : {
+        "url" : "/labkey/HTTPApiVerifyProject/list-details.view?listId=1&pk=Gray",
+        "value" : "Black"
+      },
+      "Color" : {
+        "value" : "Gray"
+      },
+      "Good" : {
+        "value" : 2
+      }
+    },
+    "links" : {
+      "edit" : {
+        "href" : "/labkey/HTTPApiVerifyProject/query-updateQueryRow.view?schemaName=lists&query.queryName=Test%20List&Color=Gray",
+        "title" : "edit"
+      }
+    }
+  } ],
+  "rowCount" : 1
+}]]></response>
+    </test>
+
+    <test name="apiVersion=17.1, includeMetadata=false, columns=*, includeUpdateColumn=true" type="post">
+        <url>
+            <![CDATA[query/HTTPApiVerifyProject/selectRows.api]]></url>
+        <formData>{
+            "schemaName": "lists",
+            "queryName": "Test List",
+            "query.Good~eq": 2,
+            "apiVersion": 17.1,
+            "query.columns": "Month,Good",
+            "includeMetadata": false,
+            "includeUpdateColumn": true,
+            }
+        </formData>
+        <response><![CDATA[{
+  "schemaName" : [ "lists" ],
+  "queryName" : "Test List",
+  "rows" : [ {
+    "data" : {
+      "Month" : {
+        "formattedValue" : "4",
+        "value" : "2000-04-01 00:00:00.000"
+      },
+      "Good" : {
+        "value" : 2
+      }
+    },
+    "links" : {
+      "edit" : {
+        "href" : "/labkey/HTTPApiVerifyProject/query-updateQueryRow.view?schemaName=lists&query.queryName=Test%20List&Color=Gray",
+        "title" : "edit"
+      }
+    }
+  } ],
+  "rowCount" : 1
+}]]></response>
     </test>
 
 </ApiTests>
