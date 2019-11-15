@@ -305,16 +305,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect error to contain [Please provide a name for each field.] but was[" + hasNoNameError + "]",
                 hasNoNameError.contains("Please provide a name for each field."));
 
-        // now give the field a name with characters that will get a warning
-        noNameRow.setName("&foolishness!");
-        String warning = domainDesignerPage.waitForWarning();
-        String warningfieldMessage = noNameRow.detailsMessage();
-        String expectedWarning = "&foolishness! : SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore";
-        assertTrue("expect error to contain [" + expectedWarning + "] but was[" + warning + "]",
-                warning.contains(expectedWarning));
-        assertTrue("expect field-level warning to contain [" + expectedWarning + "] but was[" + warningfieldMessage + "]",
-                warning.contains(expectedWarning));
-
         domainDesignerPage.clickCancelAndDiscardChanges();
     }
 
@@ -501,14 +491,15 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow clientFieldWarning = domainFormPanel.addField("select * from table");
 
         domainDesignerPage.clickFinishExpectingError();
-        String clientWarning = domainDesignerPage.waitForWarning();
-        String multipleIssuesError = domainDesignerPage.waitForError();
-        String expectedErrMsg = "Multiple fields contain issues that need to be fixed. Review the red highlighted fields below for more information.";
-        String expectedWarningMsg = " SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore.";
-        assertTrue("expect error message to contain [" + expectedErrMsg + "] but was [" + multipleIssuesError + "]",
-                multipleIssuesError.contains(expectedErrMsg));
-        assertTrue("expect warning message to contain [" + expectedWarningMsg + "] but was [" + clientWarning + "]",
-                clientWarning.contains(expectedWarningMsg));
+        // TODO: Look for warning on row instead of banner.  We're not doing warning banners anymore
+//        String clientWarning = domainDesignerPage.waitForWarning();
+//        String multipleIssuesError = domainDesignerPage.waitForError();
+//        String expectedErrMsg = "Multiple fields contain issues that need to be fixed. Review the red highlighted fields below for more information.";
+//        String expectedWarningMsg = " SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore.";
+//        assertTrue("expect error message to contain [" + expectedErrMsg + "] but was [" + multipleIssuesError + "]",
+//                multipleIssuesError.contains(expectedErrMsg));
+//        assertTrue("expect warning message to contain [" + expectedWarningMsg + "] but was [" + clientWarning + "]",
+//                clientWarning.contains(expectedWarningMsg));
 
         assertTrue("expect field error when using reserved field names", modifiedRow.hasFieldError());
         assertTrue("expect error for duplicate field names", blarg1.hasFieldError());
@@ -1327,6 +1318,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         valDialog.clickApply();
         domainDesignerPage.clickFinish();
+        waitAndClickAndWait(Locator.linkWithText(listName));    // give it time by navigating to the list
+        DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
 
         // now confirm 2 validators on the field
         DomainResponse newResponse = dgen.getDomain(createDefaultConnection(true));
@@ -1396,6 +1389,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .clickRemove();
         dlg.clickApply();
         domainDesignerPage.clickFinish();
+        waitAndClickAndWait(Locator.linkWithText(listName));        // wait for navigation and page load before using the API call to get the domain
+        DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
 
         // now verify we have 2 formats on the size field
         DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection(true));
@@ -1488,19 +1483,19 @@ public class DomainDesignerTest extends BaseWebDriverTest
         List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("propertyValidators");
         Map<String, Object> validator = validators.stream()
                 .filter(a-> a.get("name").equals(name))
-                .collect(Collectors.toList())
-                .get(0);
+                .findFirst().orElse(null);
+        assertNotNull("did not find property validator ["+name+"] on column. Column properties: " + column.getAllProperties().toString(), validator);
         return validator;
     }
 
     public Map<String, Object> getConditionalFormats(PropertyDescriptor column, String filterExpression)
     {
-        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
-        Map<String, Object> validator = validators.stream()
+        List<Map<String, Object>> formats = (ArrayList<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
+        Map<String, Object> conditionalFormat = formats.stream()
                 .filter(a-> a.get("filter").equals(filterExpression))
-                .collect(Collectors.toList())
-                .get(0);
-        return validator;
+                .findFirst().orElse(null);
+        assertNotNull("did not find conditionalFormat ["+filterExpression+"] on column. Column properties: " + column.getAllProperties().toString(), conditionalFormat);
+        return conditionalFormat;
     }
 
     @Override
@@ -1512,7 +1507,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "DomainDesignerTest Project";
+        return "DomainDesignerTest Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     @Override

@@ -279,11 +279,11 @@ public class FileContentUploadTest extends BaseWebDriverTest
         final File testFile = TestFileUtils.getSampleData("security/InlineFile_drop.html");
 
         log("Dropping the file object in drop zone");
-        dragAndDropFileInDropZone(testFile.getAbsoluteFile());
+        _fileBrowserHelper.dragDropUpload(testFile.getAbsoluteFile());
 
         log("Verifying file is uploaded");
-        waitForElement(Locator.tagWithText("span",testFile.getName()));
-        assertElementPresent(Locator.tagWithText("span",testFile.getName()));
+        waitForElement(Locator.tagWithText("span", testFile.getName()));
+        assertElementPresent(Locator.tagWithText("span", testFile.getName()));
     }
 
     @NotNull
