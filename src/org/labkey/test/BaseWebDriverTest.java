@@ -118,6 +118,7 @@ import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.TestProperties.isViewCheckSkipped;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
+import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.components.PropertiesEditor.PhiSelectType;
 import static org.labkey.test.components.PropertiesEditor.PhiSelectType.NotPHI;
@@ -436,8 +437,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             Statement createFailOnTimeoutStatement(Statement statement, Class<?> testClass)
             {
-                // No class timeout when running through IntelliJ
-                if ("true".equals(System.getProperty("intellij.debug.agent")))
+                double timeoutMultiplier = TestProperties.getTimeoutMultiplier();
+
+                // No class timeout when running through IntelliJ or when multiplier is zero
+                if ("true".equals(System.getProperty("intellij.debug.agent")) || timeoutMultiplier == 0)
                     return statement;
 
                 long minutes;
@@ -447,10 +450,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 else
                     minutes = ClassTimeout.DEFAULT;
 
-                minutes *= TestProperties.getTimeoutMultiplier();
+                minutes *= timeoutMultiplier;
 
-                // Don't disable timeout unless multiplier is exactly zero
-                if (minutes == 0 && TestProperties.getTimeoutMultiplier() > 0)
+                if (minutes == 0)
                     minutes = 1;
 
                 if (isLinkCheckEnabled())
@@ -458,6 +460,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     // Increase timeout to account for crawler
                     minutes += TestProperties.getCrawlerTimeout().toMinutes();
                     minutes++;
+                }
+
+                if (!canConnectWithPrimaryUser())
+                {
+                    // Increase timeout to allow initial user creation and testing
+                    minutes += 3;
                 }
 
                 return FailOnTimeout.builder()
@@ -536,6 +544,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         return RuleChain.outerRule(lock).around(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
 //        return RuleChain.outerRule(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
+    }
+
+    private static boolean canConnectWithPrimaryUser()
+    {
+        try
+        {
+            String startPage = buildURL("project", "home", "start");
+            SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(startPage);
+            return httpResponse.getResponseCode() < 400;
+        }
+        catch (RuntimeException re)
+        {
+            return false; // Probably a connection timeout
+        }
     }
 
     private void doPreamble()
