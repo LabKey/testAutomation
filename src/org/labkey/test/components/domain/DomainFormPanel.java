@@ -6,6 +6,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -154,8 +155,32 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFormPanel expand()
     {
-        elementCache().expandIcon.click();
+        if (isCollapsed())
+        {
+            elementCache().expandIcon.click();
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
+        }
         return this;
+    }
+
+    public boolean isExpanded()
+    {
+        return elementCache().collapseIconLoc.existsIn(this);
+    }
+
+    public DomainFormPanel collapse()
+    {
+        if (isExpanded())
+        {
+            elementCache().collapseIcon.click();
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
+        }
+        return this;
+    }
+
+    public boolean isCollapsed()
+    {
+        return elementCache().expandIconLoc.existsIn(this);
     }
 
     @Override
@@ -237,8 +262,10 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
         // TODO since the Assay Properties panel also has the notion of expand/collapse,
         //  we should split that part out into an Abstract test class that both can use
-        WebElement expandIcon = Locator.tagWithClass("svg", "fa-plus-square")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator expandIconLoc = Locator.tagWithClass("svg", "domain-form-expand-btn");
+        WebElement expandIcon = expandIconLoc.refindWhenNeeded(DomainFormPanel.this);
+        Locator.XPathLocator collapseIconLoc = Locator.tagWithClass("svg", "domain-form-collapse-btn");
+        WebElement collapseIcon = collapseIconLoc.refindWhenNeeded(DomainFormPanel.this);
     }
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
@@ -276,7 +303,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         {
             if (_title != null)
             {
-                Locator.XPathLocator titleLoc = Locator.tagWithClass("div", "panel-heading").startsWith(_title);
+                Locator.XPathLocator titleLoc = Locator.tagWithClass("div", "domain-panel-header").child(Locator.tag("span")).startsWith(_title);
                 return _active ? _activeLocator.withDescendant(titleLoc) : getBaseLocator().withDescendant(titleLoc);
             }
             else
