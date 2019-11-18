@@ -10,6 +10,8 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 public class NavBar extends WebDriverComponent<NavBar.ElementCache>
 {
     private final WebDriver _driver;
@@ -85,7 +87,7 @@ public class NavBar extends WebDriverComponent<NavBar.ElementCache>
     {
         public WebElement headerLogo = Locator.tagWithClass("a", "header-logo__link").findWhenNeeded(this);
         public WebElement headerLogoImage = Locator.tagWithClass("img", "header-logo__image").findWhenNeeded(this);
-        public WebElement userMenuButton = Locator.tagWithId("a", "user-menu-dropdown").findWhenNeeded(this);
+        public WebElement userMenuButton = Locator.tagWithId("a", "user-menu-dropdown").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement userIcon = Locator.tagWithAttribute("img", "alt", "User Avatar").findWhenNeeded(this);
         ProductMenu productMenu = ProductMenu.finder(getDriver()).findWhenNeeded(this);
         public WebElement projectNameDisplay = Locator.tagWithClass("span", "project-name").findWhenNeeded(this);

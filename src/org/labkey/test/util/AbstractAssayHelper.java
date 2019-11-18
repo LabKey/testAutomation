@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public abstract class AbstractAssayHelper
@@ -64,10 +63,7 @@ public abstract class AbstractAssayHelper
 
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
-    public void createAssayWithDefaults(String provider, String name)
-    {
-        fail("Please change your test to use the new assay designer by using createAssayDesignWithDefaults().");
-    }
+    public abstract void importAssay(String assayName, File file, Map<String, Object> batchProperties, Map<String, Object> runProperties) throws CommandException, IOException;
 
     @LogMethod
     public void createAssayDesignWithDefaults(String type, String name)
