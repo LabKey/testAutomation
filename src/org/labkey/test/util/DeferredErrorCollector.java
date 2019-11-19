@@ -1,6 +1,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.Matcher;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
@@ -38,6 +39,7 @@ public class DeferredErrorCollector
 
     /**
      * Create temporary error collector that allows `AssertionError`s to propagate normally.
+     *
      * @return Wrapped error collector. Intended to be used only once.
      */
     public DeferredErrorCollector fatal()
@@ -47,6 +49,7 @@ public class DeferredErrorCollector
 
     /**
      * Create temporary error collector that takes a screenshot for any recorded errors.
+     *
      * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
      * @return Wrapped error collector. Intended to be used only once.
      */
@@ -57,6 +60,7 @@ public class DeferredErrorCollector
 
     /**
      * Check if any errors have been recorded.
+     *
      * @return Return true if an error has been recorded.
      */
     public boolean hasErrorBeenRecorded()
@@ -66,6 +70,7 @@ public class DeferredErrorCollector
 
     /**
      * Get the count of recorded errors.
+     *
      * @return Number of times errors have been recorded.
      */
     public int getErrorCount()
@@ -83,6 +88,7 @@ public class DeferredErrorCollector
 
     /**
      * Check the number of errors that have been recorded since last time {@link #setErrorMark()} was called.
+     *
      * @return Current error count minus the error count set by {@link #setErrorMark()}.
      */
     public int errorsSinceMark()
@@ -92,6 +98,7 @@ public class DeferredErrorCollector
 
     /**
      * Record any {@link AssertionError}s thrown by the provided {@link Runnable}.
+     *
      * @param wrappedAssertion {@link Runnable} that might throw an {@link AssertionError}
      */
     public void wrapAssertion(Runnable wrappedAssertion)
@@ -108,10 +115,11 @@ public class DeferredErrorCollector
 
     /**
      * Record an error if the two objects are not equal.
-     * Wraps {@link Assert#assertEquals(String, Object, Object)}
+     *
      * @param message Message to show if check fails.
      * @param expected Expected value.
      * @param actual Actual value.
+     * @see Assert#assertEquals(String, Object, Object)
      */
     public void verifyEqual(String message, Object expected, Object actual)
     {
@@ -120,10 +128,11 @@ public class DeferredErrorCollector
 
     /**
      * Record an error if the two objects are equal.
-     * Wraps {@link Assert#assertNotEquals(String, Object, Object)}
+     *
      * @param message Message to show if check fails.
      * @param unexpected Unexpected value.
      * @param actual Actual value.
+     * @see Assert#assertNotEquals(String, Object, Object)
      */
     public void verifyNotEqual(String message, Object unexpected, Object actual)
     {
@@ -132,9 +141,10 @@ public class DeferredErrorCollector
 
     /**
      * Record an error if the condition is 'false'.
-     * Wraps {@link Assert#assertTrue(String, boolean)}
+     *
      * @param message Message to show if check fails.
      * @param condition Conditional check (ex: element.isDisplayed())
+     * @see Assert#assertTrue(String, boolean)
      */
     public void verifyTrue(String message, boolean condition)
     {
@@ -143,9 +153,10 @@ public class DeferredErrorCollector
 
     /**
      * Record an error if the condition is 'true'.
-     * Wraps {@link Assert#assertFalse(String, boolean)}
+     *
      * @param message Message to show if the conditional test is false.
      * @param condition Conditional check (ex: element.isDisplayed())
+     * @see Assert#assertFalse(String, boolean)
      */
     public void verifyFalse(String message, boolean condition)
     {
@@ -153,10 +164,11 @@ public class DeferredErrorCollector
     }
 
     /**
-     * Record an error if the object is 'null'
-     * Wraps {@link Assert#assertNull(String, Object)}
+     * Record an error if the object is not 'null'.
+     *
      * @param message Message to show if check fails.
      * @param object Object to check
+     * @see Assert#assertNull(String, Object)
      */
     public void verifyNull(String message, Object object)
     {
@@ -164,9 +176,36 @@ public class DeferredErrorCollector
     }
 
     /**
+     * Record an error if the object is 'null'.
+     *
+     * @param message Message to show if check fails.
+     * @param object Object to check
+     * @see Assert#assertNotNull(String, Object)
+     */
+    public void verifyNotNull(String message, Object object)
+    {
+        wrapAssertion(() -> Assert.assertNotNull(message, object));
+    }
+
+    /**
+     * Record an error if the object doesn't satisfy the specified condition.
+     *
+     * @param reason additional information about the error
+     * @param actual the computed value being compared
+     * @param matcher an expression, built of {@link Matcher}s, specifying allowed
+     * values
+     * @see Assert#assertThat(String, Object, Matcher)
+     */
+    public <T> void verifyThat(String reason, T actual, Matcher<? super T> matcher)
+    {
+        wrapAssertion(() -> Assert.assertThat(reason, actual, matcher));
+    }
+
+    /**
      * Record an error message.
-     * Wraps {@link Assert#fail()}
+     *
      * @param message Message to record.
+     * @see Assert#fail()
      */
     public void error(String message)
     {
@@ -175,6 +214,7 @@ public class DeferredErrorCollector
 
     /**
      * Log an error message, take a screen shot and record the call stack.
+     *
      * @param errorMessage Message to log.
      */
     protected void recordError(String errorMessage)
@@ -237,6 +277,7 @@ public class DeferredErrorCollector
 
     /**
      * Get the 'roll-up' of the errors messages that have been recorded.
+     *
      * @return String of all of the errors that have been recorded.
      */
     private String getFailureMessage()
@@ -271,6 +312,7 @@ public class DeferredErrorCollector
     /**
      * Take a screen shot and HTML dump of the current page.
      * See {@link ArtifactCollector#dumpPageSnapshot(String, String)} for details.
+     *
      * @param snapShotName A string to identify screenshots; Will be included in screenshot filenames.
      * @return The name of the file used. Basically the snapShotName parameter with a counter added to the end.
      */
