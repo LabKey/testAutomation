@@ -141,18 +141,24 @@ public class UserTest extends BaseWebDriverTest
     public void testSiteUsersPermission()
     {
         goToSiteUsers();
-        assertTextPresent("Last Login", "Last Name", "Active");
+        assertTextPresent("Email", "Display Name", "First Name", "Last Login", "Has Password");
 
         goToMyAccount();
-        assertTextPresent("First Name", "Last Login");
+        for (String label : Arrays.asList("Email", "Display Name", "First Name", "Last Login", "Has Password", "Avatar"))
+            assertTrue(hasUserProfileFormLabel(label));
 
         impersonate(NORMAL_USER);
-
         goToMyAccount();
-        assertTextPresent("First Name");
-        assertTextNotPresent("Last Login");
-
+        for (String label : Arrays.asList("Display Name", "First Name", "Last Login", "Avatar"))
+            assertTrue(hasUserProfileFormLabel(label));
+        for (String label : Arrays.asList("Email", "Has Password"))
+            assertFalse(hasUserProfileFormLabel(label));
         stopImpersonating();
+    }
+
+    private boolean hasUserProfileFormLabel(String label)
+    {
+        return isElementPresent(Locator.tagWithClass("td", "lk-form-label").withText(label + ":"));
     }
 
     @Test
