@@ -1090,9 +1090,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void enableEmailRecorder()
     {
         int responseCode = getHttpResponse(buildURL("dumbster", "setRecordEmail", Maps.of("record", "true")), "POST").getResponseCode();
-//        skipTestForMissingDumbster(responseCode);
-//        if(!TestProperties.isIgnoreMissingDumbster())
-//            assertEquals("Failed to enable email recording", HttpStatus.SC_OK, responseCode);
+        skipTestForMissingDumbster(responseCode);
+        if(!TestProperties.isIgnoreMissingDumbster())
+            assertEquals("Failed to enable email recording", HttpStatus.SC_OK, responseCode);
     }
 
     protected void skipTestForMissingDumbster(int responseCode)
