@@ -109,14 +109,22 @@ public class APIAssayHelper extends AbstractAssayHelper
         return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
     }
 
+    @Override
     public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {
         importAssay(assayName, file, projectPath, Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
     }
 
+    @Override
     public void importAssay(String assayName, File file, String projectPath, @Nullable Map<String, Object> batchProperties) throws CommandException, IOException
     {
         importAssay(getIdFromAssayName(assayName, projectPath), file, projectPath, batchProperties);
+    }
+
+    @Override
+    public void importAssay(String assayName, File file, Map<String, Object> batchProperties, Map<String, Object> runProperties) throws CommandException, IOException
+    {
+        importAssay(assayName, "", file, _test.getCurrentContainerPath(), runProperties, batchProperties);
     }
 
     @LogMethod(quiet = true)
