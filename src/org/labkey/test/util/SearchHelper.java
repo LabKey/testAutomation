@@ -173,7 +173,7 @@ public class SearchHelper
                 throw new IllegalArgumentException("Search result crawling not yet implemented");
         }
 
-        errorCollector.recordResults();
+        errorCollector.recordResults(); // Should no-op unless failOnError == true
 
         if (notFound.isEmpty())
             _test.log("All items were found");
