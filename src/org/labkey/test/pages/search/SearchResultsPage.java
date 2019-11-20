@@ -22,6 +22,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,14 +50,14 @@ public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements>
         return Integer.parseInt(matcher.group(1));
     }
 
-    public WebElement getResultsPanel()
+    public Optional<WebElement> getResultsPanel()
     {
-        return elementCache().searchResultsPanel;
+        return elementCache().getSearchResultsPanel();
     }
 
-    public WebElement getFolderResultsPanel()
+    public Optional<WebElement> getFolderResultsPanel()
     {
-        return elementCache().folderSearchResultsPanel;
+        return elementCache().getFolderSearchResultsPanel();
     }
 
     public List<WebElement> getResults()
@@ -130,6 +131,15 @@ public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements>
         }
 
         private WebElement searchResultsPanel = Locator.byClass("labkey-search-results").findWhenNeeded(this);
-        private WebElement folderSearchResultsPanel = Locator.byClass("labkey-folders-search-results").findWhenNeeded(this);
+
+        public Optional<WebElement> getSearchResultsPanel()
+        {
+            return Locator.byClass("labkey-search-results").findOptionalElement(this);
+        }
+
+        public Optional<WebElement> getFolderSearchResultsPanel()
+        {
+            return Locator.byClass("labkey-folders-search-results").findOptionalElement(this);
+        }
     }
 }

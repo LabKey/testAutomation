@@ -53,7 +53,7 @@ public class SearchHelper
 
     public SearchHelper(BaseWebDriverTest test)
     {
-        this(test, 12);
+        this(test, 1);
     }
     private static final Locator noResultsLocator = Locator.byClass("labkey-search-results-counts").withText("Found 0 results");
     private static final String unsearchableValue = "UNSEARCHABLE";
@@ -86,8 +86,22 @@ public class SearchHelper
         assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
     }
 
+    /**
+     * @deprecated We have no immediate plans to implement search result crawling
+     */
+    @Deprecated
+    public void verifySearchResults(String container, boolean crawlResults)
+    {
+        verifySearchResults(container);
+    }
+
+    public void verifySearchResults(@LoggedParam String container)
+    {
+        verifySearchResults(container, "searchResults");
+    }
+
     @LogMethod
-    public void verifySearchResults(@LoggedParam String container, boolean crawlResults)
+    public void verifySearchResults(@LoggedParam String container, @LoggedParam String description)
     {
         // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retry below.
         waitForIndexer();
@@ -95,21 +109,25 @@ public class SearchHelper
         for (int i = 1; i <= maxTries; i++)
         {
             _test.log("Verify search results, attempt " + i);
-            Map<String, SearchItem> notFound = verifySearchItems(_searchQueue, container, i == maxTries, crawlResults);
+            final boolean lastTry = i == maxTries;
+            List<String> notFound = verifySearchItems(_searchQueue, container, lastTry, description);
             if (notFound.isEmpty())
                 break;
 
-            _test.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound.keySet().toString(), i*5));
-            WebDriverWrapper.sleep(i*5000);
+            if (!lastTry)
+            {
+                _test.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound.toString(), i*5));
+                WebDriverWrapper.sleep(i*5000);
+            }
         }
     }
 
     // Does not wait for indexer... caller should do so
-    private Map<String, SearchItem> verifySearchItems(Map<String, SearchItem> items, String container, boolean failOnError, boolean crawlResults)
+    private List<String> verifySearchItems(Map<String, SearchItem> items, String container, boolean failOnError, String description)
     {
         _test.log("Verifying " + items.size() + " items");
-        Map<String, SearchItem> notFound = new HashMap<>();
-        DeferredErrorCollector errorCollector = new DeferredErrorCollector(_test).withScreenshot("searchResults");
+        List<String> notFound = new ArrayList<>();
+        DeferredErrorCollector errorCollector = _test.checker().withScreenshot(description);
         for (String searchTerm : items.keySet())
         {
             SearchItem item = items.get(searchTerm);
@@ -145,7 +163,8 @@ public class SearchHelper
 
             for (Locator loc : expectedResults)
             {
-                if (!loc.existsIn(resultsPage.getResultsPanel()) && !loc.existsIn(resultsPage.getFolderResultsPanel()))
+                if ((resultsPage.getResultsPanel().isEmpty() || !loc.existsIn(resultsPage.getResultsPanel().get()))
+                        && (resultsPage.getFolderResultsPanel().isEmpty() || !loc.existsIn(resultsPage.getFolderResultsPanel().get())))
                 {
                     missingResults.add(loc);
                     if (!failOnError)
@@ -164,16 +183,10 @@ public class SearchHelper
                 }
                 else
                 {
-                    notFound.put(searchTerm, item);
-                    continue;
+                    notFound.add(searchTerm);
                 }
             }
-
-            if (crawlResults)
-                throw new IllegalArgumentException("Search result crawling not yet implemented");
         }
-
-        errorCollector.recordResults(); // Should no-op unless failOnError == true
 
         if (notFound.isEmpty())
             _test.log("All items were found");
