@@ -2,6 +2,7 @@ package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -11,6 +12,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,7 +22,6 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -76,25 +77,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow setType(FieldDefinition.ColumnType columnType)
     {
-        setType(columnType.getLabel());
+        elementCache().fieldTypeSelectInput.selectByVisibleText(columnType.getLabel());
         return this;
     }
 
     public WebElement typeInput()
     {
-        return elementCache().fieldTypeSelectInput;
+        return elementCache().fieldTypeSelectInput.getWrappedElement();
     }
 
     public FieldDefinition.ColumnType getType()
     {
-        String typeString = getWrapper().getFormElement(elementCache().fieldTypeSelectInput);
+        String typeString = getWrapper().getFormElement(elementCache().fieldTypeSelectInput.getWrappedElement());
         return Enum.valueOf(FieldDefinition.ColumnType.class, typeString);
-    }
-
-    private DomainFieldRow setType(String columnType)
-    {
-        getWrapper().setFormElement(elementCache().fieldTypeSelectInput, columnType);
-        return this;
     }
 
     public boolean getRequiredField()
@@ -380,17 +375,23 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public String getFromFolder()
     {
         expand();
-        return elementCache().fromFolderInput.getFirstSelectedOption().getText();
+        return elementCache().lookupContainerSelect.getFirstSelectedOption().getText();
     }
 
     public DomainFieldRow setFromFolder(String containerPath)
     {
         expand();
-        if (StringUtils.isEmpty(containerPath) || containerPath.equals("Current Folder") || containerPath.equals("Current Project"))
+        if (StringUtils.isBlank(containerPath) || containerPath.equals("Current Folder") || containerPath.equals("Current Project"))
         {
             containerPath = "";
         }
-        elementCache().fromFolderInput.selectByValue(containerPath);
+        String initialValue = elementCache().lookupContainerSelect.getFirstSelectedOption().getAttribute("value");
+        if (!containerPath.equals(initialValue))
+        {
+            elementCache().lookupContainerSelect.selectByValue(containerPath);
+            getWrapper().shortWait().withMessage("Schema select didn't clear after selecting lookup container")
+                    .until(ExpectedConditions.attributeToBe(elementCache().getLookupSchemaSelect().getWrappedElement(), "value", ""));
+        }
 
         return this;
     }
@@ -398,31 +399,32 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public String getFromSchema()
     {
         expand();
-        return elementCache().getFromSchemaInput().getFirstSelectedOption().getText();
+        return elementCache().getLookupSchemaSelect().getFirstSelectedOption().getText();
     }
 
     public DomainFieldRow setFromSchema(String schemaName)
     {
         expand();
-        getWrapper().waitFor(()-> elementCache().getFromSchemaInput().getOptions().stream().anyMatch(a-> a.getText().equals(schemaName)),
-                "the select option [" + schemaName + "] did not appear in time", 3000);
-        elementCache().getFromSchemaInput().selectByVisibleText(schemaName);
+        String initialValue = elementCache().getLookupSchemaSelect().getFirstSelectedOption().getText();
+        if (!schemaName.equals(initialValue))
+        {
+            elementCache().getLookupSchemaSelect().selectByVisibleText(schemaName);
+                getWrapper().shortWait().withMessage("Query select didn't update after selecting lookup schema")
+                        .until(ExpectedConditions.attributeToBe(elementCache().getLookupQuerySelect().getWrappedElement(), "value", ""));
+        }
         return this;
     }
 
     public String getFromTargetTable()
     {
         expand();
-        return elementCache().getFromTargetTableInput().getFirstSelectedOption().getText();
+        return elementCache().getLookupQuerySelect().getFirstSelectedOption().getText();
     }
 
     public DomainFieldRow setFromTargetTable(String targetTable)
     {
         expand();
-        // give the option some time to appear before attempting to select it
-        getWrapper().waitFor(()-> elementCache().getFromTargetTableInput().getOptions().stream().anyMatch(a-> a.getText().equals(targetTable)),
-                "the select option [" + targetTable + "] did not appear in time", 5000);
-        elementCache().getFromTargetTableInput().selectByVisibleText(targetTable);
+        elementCache().getLookupQuerySelect().selectByVisibleText(targetTable);
         return this;
     }
 
@@ -666,7 +668,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // base row controls
         public Input fieldNameInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-name-")
                 .findWhenNeeded(this), getDriver());
-        public WebElement fieldTypeSelectInput = Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-type-")
+        public Select fieldTypeSelectInput = SelectWrapper.Select(Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-type-"))
                 .findWhenNeeded(this);
         public Checkbox fieldRequiredCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-required-")
                 .findWhenNeeded(this));
@@ -720,22 +722,28 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this), getDriver());
 
         //lookup field options
-        public Select fromFolderInput = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
+        public Select lookupContainerSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
                 .findWhenNeeded(this);
 
-        public Select getFromSchemaInput()
+        public Select getLookupSchemaSelect()
         {
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
-            getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
-                    "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
-            return select;
+            return waitForSelectToLoad(select);
         }
 
-        public Select getFromTargetTableInput()
+        public Select getLookupQuerySelect()
         {
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
-            getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
-                    "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
+            return waitForSelectToLoad(select);
+        }
+
+        private Select waitForSelectToLoad(Select select)
+        {
+            Locator.XPathLocator loadingOption = Locator.tagWithText("option", "Loading...");
+            if (!WebDriverWrapper.waitFor(() -> !loadingOption.existsIn(select.getWrappedElement()), WAIT_FOR_JAVASCRIPT))
+            {
+                throw new NoSuchElementException("Select got stuck loading: " + select.getWrappedElement().toString());
+            }
             return select;
         }
 
