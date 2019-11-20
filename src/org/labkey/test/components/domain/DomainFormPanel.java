@@ -183,6 +183,11 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return elementCache().expandIconLoc.existsIn(this);
     }
 
+    public String getPanelTitle()
+    {
+        return elementCache().panelTitle.getText();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -266,6 +271,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         WebElement expandIcon = expandIconLoc.refindWhenNeeded(DomainFormPanel.this);
         Locator.XPathLocator collapseIconLoc = Locator.tagWithClass("svg", "domain-form-collapse-btn");
         WebElement collapseIcon = collapseIconLoc.refindWhenNeeded(DomainFormPanel.this);
+        WebElement panelTitle = Locator.xpath("//div//span[not(@class)]").findWhenNeeded(DomainFormPanel.this);
     }
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>

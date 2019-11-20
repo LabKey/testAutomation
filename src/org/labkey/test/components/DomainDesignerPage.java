@@ -13,6 +13,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCache>
 {
     public DomainDesignerPage(WebDriver driver)
@@ -77,6 +80,21 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     public DomainFormPanel fieldsPanel(String title)
     {
         return elementCache().domainFormPanel(title);
+    }
+
+    public List<DomainFormPanel> getPanels()
+    {
+        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).findAll();
+    }
+
+    public List<String> getPanelTitles()
+    {
+        List<String> titles = new ArrayList<>();
+        for(DomainFormPanel formPanel : getPanels())
+        {
+            titles.add(formPanel.getPanelTitle());
+        }
+        return titles;
     }
 
     public String waitForError()
