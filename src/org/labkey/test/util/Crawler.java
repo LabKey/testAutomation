@@ -242,7 +242,7 @@ public class Crawler
                 // Disable crawler for single-page apps until we make `beginAt` work with them
                 new ControllerActionId("biologics", "app"),
                 new ControllerActionId("cds", "app"),
-                new ControllerActionId("samplemanagement", "app"),
+                new ControllerActionId("samplemanager", "app"),
 
                 // Actions that error with no parameters. Generally linked from admin-spider.view
                 new ControllerActionId("user", "changeEmail"), // NotFoundException from changeEmail.jsp
