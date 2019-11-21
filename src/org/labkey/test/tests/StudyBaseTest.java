@@ -31,6 +31,7 @@ import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.study.specimen.SpecimenHelper;
 import org.openqa.selenium.support.ui.Select;
 
@@ -254,7 +255,9 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
             portalHelper.addWebPart("Specimens");
             portalHelper.addWebPart("Views");
         });
-        setPipelineRoot(pipelinePath);
+
+        WebDavUploadHelper uploadHelper = new WebDavUploadHelper(getProjectName());
+        uploadHelper.uploadDirectoryContents(new File(pipelinePath));
     }
 
     // Must be on study home page or "manage study" page
