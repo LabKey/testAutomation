@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 
@@ -258,11 +257,11 @@ public class SearchHelper
 
         _test.log("Searching for: '" + searchTerm + "'.");
 
-        Optional<WebElement> bodyInput = Locators.bodyPanel().append(Locator.input("q")).findOptionalElement(_test.getDriver());
-        if (bodyInput.isPresent()) // Search results page or search webpart
+        WebElement searchInput = Locator.input("q").findElementOrNull(Locators.bodyPanel().findElement(_test.getDriver()));
+        if (searchInput != null) // Search results page or search webpart
         {
-            _test.setFormElement(bodyInput.get(), searchTerm);
-            _test.doAndWaitForPageToLoad(() -> bodyInput.get().sendKeys(Keys.ENTER));
+            _test.setFormElement(searchInput, searchTerm);
+            _test.doAndWaitForPageToLoad(() -> searchInput.sendKeys(Keys.ENTER));
             return new SearchResultsPage(_test.getDriver());
         }
         else // Use header search
