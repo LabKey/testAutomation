@@ -169,7 +169,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(newFileName));
         _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true, Locator.linkContainingText(newFileName));
 
-        _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName);
+        _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName, "searchAfterRename");
 
         // Delete file.
         clickProject(getProjectName());
@@ -179,7 +179,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _searchHelper.enqueueSearchItem(FILE_DESCRIPTION);
         _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE);
 
-        _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName);
+        _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName, "searchAfterDelete");
 
         clickProject(getProjectName());
         _fileBrowserHelper.clickFileBrowserButton(BrowserAction.AUDIT_HISTORY);

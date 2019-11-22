@@ -53,7 +53,7 @@ public class SearchHelper
 
     public SearchHelper(BaseWebDriverTest test)
     {
-        this(test, 1);
+        this(test, 6);
     }
     private static final Locator noResultsLocator = Locator.byClass("labkey-search-results-counts").withText("Found 0 results");
     private static final String unsearchableValue = "UNSEARCHABLE";
@@ -163,8 +163,9 @@ public class SearchHelper
 
             for (Locator loc : expectedResults)
             {
-                if ((resultsPage.getResultsPanel().isEmpty() || !loc.existsIn(resultsPage.getResultsPanel().get()))
-                        && (resultsPage.getFolderResultsPanel().isEmpty() || !loc.existsIn(resultsPage.getFolderResultsPanel().get())))
+                boolean inResultsPanel = resultsPage.getResultsPanel().map(loc::existsIn).orElse(false);
+                boolean inFolderResultsPanel = resultsPage.getFolderResultsPanel().map(loc::existsIn).orElse(false);
+                if (!inResultsPanel && !inFolderResultsPanel)
                 {
                     missingResults.add(loc);
                     if (!failOnError)
