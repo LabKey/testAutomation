@@ -10,6 +10,7 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -60,16 +61,48 @@ public class MultiMenu extends BootstrapMenu
         }
     }
 
+    private List<String> waitForDataThenGetMenuText()
+    {
+        List<WebElement> topMenuList;
+        List<String> menuText = new ArrayList<>();
+
+        boolean stale;
+
+        do {
+
+            stale = false;
+
+            try
+            {
+
+                topMenuList = Locator.tagWithAttribute("a", "role", "menuitem").findElements(this);
+                menuText = new ArrayList<>();
+
+                for (WebElement menuItem : topMenuList) {
+                    menuText.add(menuItem.getText());
+                }
+
+            }
+            catch(StaleElementReferenceException staleExc)
+            {
+                stale = true;
+            }
+
+            // Keep trying until we get valid menu text.
+            // TODO I'm not sure about the "loading" text. The test failed for me once with this message but I
+            //  didn't get a chance to capture the actual text. I will leave as is, and if it fails in TC because
+            //  of  a loading text value this can be updated.
+        } while(stale || menuText.contains("Loading..."));
+
+        return menuText;
+    }
+
     private void expandAll()
     {
         expand();
 
-        List<WebElement> topMenuList = Locator.tagWithAttribute("a", "role", "menuitem").findElements(this);
-        List<String> menuText = new ArrayList<>();
-        for(WebElement menuItem : topMenuList)
-        {
-            menuText.add(menuItem.getText());
-        }
+        List<String> menuText = waitForDataThenGetMenuText();
+
         WebElement menuList = Locator.tagWithClass("ul", "dropdown-menu").findElement(this);
 
         for (int i = 0; i < menuText.size(); i++)

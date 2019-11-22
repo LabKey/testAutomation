@@ -23,7 +23,6 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
@@ -53,10 +52,26 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public String getName()
+    {
+        return elementCache().nameInput.get();
+    }
+
+    // I think the name field is the only field that can be enabled/disabled.
+    public boolean isNameEnabled()
+    {
+        return null == elementCache().nameInput.getComponentElement().getAttribute( "disabled");
+    }
+
     public ReactAssayDesignerPage setDescription(String description)
     {
         elementCache().descriptionInput.set(description);
         return this;
+    }
+
+    public String getDescription()
+    {
+        return elementCache().descriptionInput.get();
     }
 
     public ReactAssayDesignerPage setAutoCopyTarget(String containerPath)
@@ -101,10 +116,20 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public boolean getEditableRuns()
+    {
+        return elementCache().editableRunsCheckbox.get();
+    }
+
     public ReactAssayDesignerPage setEditableResults(boolean checked)
     {
         elementCache().editableResultCheckbox.set(checked);
         return this;
+    }
+
+    public boolean getEditableResults()
+    {
+        return elementCache().editableResultCheckbox.get();
     }
 
     public ReactAssayDesignerPage setBackgroundImport(boolean checked)

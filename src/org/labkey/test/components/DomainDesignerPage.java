@@ -103,6 +103,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                 "the error alert did not appear as expected", 1000);
         return  errorAlert().getText();
     }
+
     public WebElement errorAlert()
     {
         return BootstrapLocators.dangerAlert.existsIn(getDriver()) ? BootstrapLocators.dangerAlert.findElement(getDriver()) : null;
@@ -114,6 +115,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                 "the warning alert did not appear as expected", 1000);
         return  warningAlert().getText();
     }
+
     public WebElement warningAlert()
     {
         return BootstrapLocators.warningAlert.existsIn(getDriver()) ? BootstrapLocators.warningAlert.findElement(getDriver()) : null;
@@ -125,6 +127,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                 "the info alert did not appear as expected", 1000);
         return  infoAlert().getText();
     }
+
     public WebElement infoAlert()
     {
         return BootstrapLocators.infoAlert.existsIn(getDriver()) ? BootstrapLocators.infoAlert.findElement(getDriver()) : null;
@@ -136,6 +139,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                 BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
         return alert.getText();
     }
+
     public String anyAlert()
     {
         WebElement alert = Locator.findAnyElementOrNull(getDriver(),
