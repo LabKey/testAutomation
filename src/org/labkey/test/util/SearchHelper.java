@@ -52,7 +52,7 @@ public class SearchHelper
 
     public SearchHelper(BaseWebDriverTest test)
     {
-        this(test, 6);
+        this(test, 4);
     }
     private static final Locator noResultsLocator = Locator.byClass("labkey-search-results-counts").withText("Found 0 results");
     private static final String unsearchableValue = "UNSEARCHABLE";
@@ -126,7 +126,7 @@ public class SearchHelper
     {
         _test.log("Verifying " + items.size() + " items");
         List<String> notFound = new ArrayList<>();
-        DeferredErrorCollector errorCollector = _test.checker().withScreenshot(description);
+        DeferredErrorCollector errorCollector = new DeferredErrorCollector(_test).withScreenshot(description);
         for (String searchTerm : items.keySet())
         {
             SearchItem item = items.get(searchTerm);
@@ -192,6 +192,8 @@ public class SearchHelper
             _test.log("All items were found");
         else
             _test.log(notFound.size() + " items were not found.");
+
+        errorCollector.recordResults();
 
         return notFound;
     }
