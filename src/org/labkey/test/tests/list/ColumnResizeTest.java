@@ -198,7 +198,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         changeScale(propertiesEditor, MAX_ROW, LT_SCALE, false);
         clickButton("Save", 0);
         assertAlert("The property \"" + MAX_COLUMN_NAME + "\" cannot be scaled down. It contains existing values exceeding [" + LT_SCALE + "] characters.\n");
-        checkExpectedErrors(2);
+        checkExpectedErrors(0);  // Shouldn't log any SQLExceptions - product should detect inability to scale and not issue an alter query
 
         //Cancel changes
         clickButton("Cancel",0);
