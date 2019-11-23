@@ -196,7 +196,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         PropertiesEditor propertiesEditor = _listHelper.clickEditDesign().listFields();
         changeScale(propertiesEditor, MAX_ROW, LT_SCALE, false);
         clickButton("Save", 0);
-        assertAlertContains("A data error occurred");
+        assertAlert("The property \"" + MAX_COLUMN_NAME + "\" cannot be scaled down. It contains existing values exceeding [" + LT_SCALE + "] characters.");
         checkExpectedErrors(2);
 
         //Cancel changes
