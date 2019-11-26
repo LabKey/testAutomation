@@ -6,6 +6,7 @@ package org.labkey.test.components.glassLibrary.components;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -67,10 +68,13 @@ public class MultiMenu extends BootstrapMenu
         List<String> menuText = new ArrayList<>();
 
         boolean stale;
+        boolean loading;
+        int tries = 1;
 
         do {
 
             stale = false;
+            loading = false;
 
             try
             {
@@ -79,7 +83,15 @@ public class MultiMenu extends BootstrapMenu
                 menuText = new ArrayList<>();
 
                 for (WebElement menuItem : topMenuList) {
+
+                    String menuItemText = menuItem.getText();
+
+                    // Check to see if we are still loading data.
+                    if(menuItemText.toLowerCase().contains("loading"))
+                        loading = true;
+
                     menuText.add(menuItem.getText());
+
                 }
 
             }
@@ -88,11 +100,16 @@ public class MultiMenu extends BootstrapMenu
                 stale = true;
             }
 
+            if(stale || loading )
+                WebDriverWrapper.sleep(500);
+
+            tries++;
+
             // Keep trying until we get valid menu text.
-            // TODO I'm not sure about the "loading" text. The test failed for me once with this message but I
-            //  didn't get a chance to capture the actual text. I will leave as is, and if it fails in TC because
-            //  of  a loading text value this can be updated.
-        } while(stale || menuText.contains("Loading assays...") || menuText.contains("Loading sample sets..."));
+        } while((stale || loading) && (tries <= 10));
+
+        if(tries > 10)
+            throw new RuntimeException("Menu text never returned.");
 
         return menuText;
     }
