@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -77,6 +78,9 @@ public class SearchHelper
         return unsearchableValue;
     }
 
+    /**
+     * Wait for search indexer to be idle via SearchController.WaitForIndexerAction
+     */
     @LogMethod(quiet = true)
     public static void waitForIndexer()
     {
@@ -88,19 +92,29 @@ public class SearchHelper
     /**
      * @deprecated We have no immediate plans to implement search result crawling
      */
-    @Deprecated
+    @Deprecated (forRemoval = true)
     public void verifySearchResults(String container, boolean crawlResults)
     {
         verifySearchResults(container);
     }
 
-    public void verifySearchResults(@LoggedParam String container)
+    /**
+     * @see #verifySearchResults(String, String)
+     */
+    public void verifySearchResults(@LoggedParam String expectedResultsContainer)
     {
-        verifySearchResults(container, "searchResults");
+        verifySearchResults(expectedResultsContainer, "searchResults");
     }
 
+    /**
+     * Search for all enqueued search items and verify expected results. If any searches don't produce the expected
+     * results within a set number of retries (see constructor), takes screenshots of each failed search and throws
+     * {@link AssertionError}
+     * @param expectedResultsContainer Full container path of expected search results
+     * @param baseScreenshotName Short description to identify screenshots
+     */
     @LogMethod
-    public void verifySearchResults(@LoggedParam String container, @LoggedParam String description)
+    public void verifySearchResults(@LoggedParam String expectedResultsContainer, @LoggedParam @NotNull String baseScreenshotName)
     {
         // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retry below.
         waitForIndexer();
@@ -109,7 +123,7 @@ public class SearchHelper
         {
             _test.log("Verify search results, attempt " + i);
             final boolean lastTry = i == maxTries;
-            List<String> notFound = verifySearchItems(_searchQueue, container, lastTry, description);
+            List<String> notFound = verifySearchItems(_searchQueue, expectedResultsContainer, lastTry, baseScreenshotName);
             if (notFound.isEmpty())
                 break;
 
@@ -122,11 +136,11 @@ public class SearchHelper
     }
 
     // Does not wait for indexer... caller should do so
-    private List<String> verifySearchItems(Map<String, SearchItem> items, String container, boolean failOnError, String description)
+    private List<String> verifySearchItems(Map<String, SearchItem> items, String expectedResultsContainer, boolean failOnError, String baseScreenshotName)
     {
         _test.log("Verifying " + items.size() + " items");
         List<String> notFound = new ArrayList<>();
-        DeferredErrorCollector errorCollector = new DeferredErrorCollector(_test).withScreenshot(description);
+        DeferredErrorCollector errorCollector = new DeferredErrorCollector(_test).withScreenshot(baseScreenshotName);
         for (String searchTerm : items.keySet())
         {
             SearchItem item = items.get(searchTerm);
@@ -135,22 +149,22 @@ public class SearchHelper
             SearchResultsPage resultsPage = searchFor(searchTerm, false); // We already waited for the indexer in calling method
 
             final boolean expectResults = expectedResults.size() > 0 && expectedResults.get(0) != noResultsLocator;
-            if (container != null && expectResults)
+            if (expectedResultsContainer != null && expectResults)
             {
                 if ( _test.isElementPresent(Locator.linkContainingText("@files")) )
                 {
-                    if(container.contains("@files"))
+                    if(expectedResultsContainer.contains("@files"))
                     {
-                        expectedResults.add(Locator.linkWithText(container));
+                        expectedResults.add(Locator.linkWithText(expectedResultsContainer));
                     }
                     else
                     {
-                        expectedResults.add(Locator.linkWithText(container + (item._file ? "/@files" : "")));
+                        expectedResults.add(Locator.linkWithText(expectedResultsContainer + (item._file ? "/@files" : "")));
                     }
                 }
                 else
                 {
-                    expectedResults.add(Locator.linkWithText(container));
+                    expectedResults.add(Locator.linkWithText(expectedResultsContainer));
                 }
             }
             else if (expectResults && item._file)
@@ -229,7 +243,8 @@ public class SearchHelper
     /**
      * Add searchTerm and all expected results to list of terms to search for.
      * If searchTerm is already in the list, replaces the expected results.
-     * @param expectedResults Omit if expecting 0 results for the search
+     * @param expectedResults Elements expected to be found. If empty, verifySearchResults will assert that there are no results
+     * @see #verifySearchResults(String, String)
      */
     public void enqueueSearchItem(String searchTerm, Locator... expectedResults)
     {
