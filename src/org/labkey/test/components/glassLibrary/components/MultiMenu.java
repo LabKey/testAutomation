@@ -92,7 +92,7 @@ public class MultiMenu extends BootstrapMenu
             // TODO I'm not sure about the "loading" text. The test failed for me once with this message but I
             //  didn't get a chance to capture the actual text. I will leave as is, and if it fails in TC because
             //  of  a loading text value this can be updated.
-        } while(stale || menuText.contains("Loading..."));
+        } while(stale || menuText.contains("Loading assays...") || menuText.contains("Loading sample sets..."));
 
         return menuText;
     }
