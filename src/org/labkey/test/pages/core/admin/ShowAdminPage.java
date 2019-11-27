@@ -88,10 +88,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ShowAuditLogPage(getDriver());
     }
 
-    public void clickAuthentication()
+    public LoginConfigurePage clickAuthentication()
     {
         goToSettingsSection();
         clickAndWait(elementCache().authenticationLink);
+        return new LoginConfigurePage(getDriver());
     }
 
     public void clickConfigurePageElements()
