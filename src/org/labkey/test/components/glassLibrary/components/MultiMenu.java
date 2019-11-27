@@ -99,6 +99,7 @@ public class MultiMenu extends BootstrapMenu
             {
                 // This happens in the time between the change of the menu content from containing "loading"
                 // to having data (like "sample sets").
+                getComponentElement().isDisplayed(); // will throw an uncaught 'StaleReferenceException' if the entire menu went stale
                 stale = true;
             }
 
@@ -111,8 +112,14 @@ public class MultiMenu extends BootstrapMenu
             // Keep trying until we get valid menu text.
         } while((stale || loading) && (tries <= 10));
 
-        if(tries > 10)
-            throw new RuntimeException("Menu text never returned.");
+        if (stale)
+        {
+            throw new RuntimeException("Menu items kept going stale");
+        }
+        if (loading)
+        {
+            throw new RuntimeException("Menu items still loading. " + menuText.toString());
+        }
 
         return menuText;
     }
