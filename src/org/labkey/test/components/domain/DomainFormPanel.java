@@ -188,6 +188,35 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return elementCache().panelTitle.getText();
     }
 
+    /**
+     * Get the alert message that is shown only in the alert panel. An example of this is the Results Field in
+     * Sample Manager requires a field that is a sample look-up, if it missing an alert is shown.
+     * This alert can only be dismissed by adding the field.
+     * @return String of the alert message, empty if not present.
+     */
+    public String getPanelAlertText()
+    {
+        if(elementCache().panelAlertText.isDisplayed())
+            return elementCache().panelAlertText.getText();
+        else
+            return "";
+    }
+
+    /**
+     * There may be an element in the alert that a test will need to interact with so return the alert element and let
+     * the test find the control it needs.
+     * @return The div wrapping the alert in the panel, null otherwise.
+     */
+    public WebElement getPanelAlertWebElement()
+    {
+        // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
+        // may show different controls.
+        if(elementCache().panelAlertText.isDisplayed())
+            return elementCache().panelAlert;
+        else
+            return null;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -272,6 +301,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         Locator.XPathLocator collapseIconLoc = Locator.tagWithClass("svg", "domain-form-collapse-btn");
         WebElement collapseIcon = collapseIconLoc.refindWhenNeeded(DomainFormPanel.this);
         WebElement panelTitle = Locator.xpath("//div//span[not(@class)]").findWhenNeeded(DomainFormPanel.this);
+        WebElement panelAlert = Locator.css("div.alert-info").findWhenNeeded(DomainFormPanel.this);
+        WebElement panelAlertText = Locator.css("div.alert-info > div > div").findWhenNeeded(DomainFormPanel.this);
     }
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
