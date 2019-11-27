@@ -15,22 +15,20 @@
  */
 package org.labkey.test.pages.search;
 
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
-import org.labkey.test.components.ComponentElements;
 import org.labkey.test.components.search.SearchForm;
 import org.labkey.test.pages.LabKeyPage;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
 
-public class SearchResultsPage extends LabKeyPage
+public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements>
 {
     public SearchResultsPage(WebDriver test)
     {
@@ -44,7 +42,7 @@ public class SearchResultsPage extends LabKeyPage
 
     public Integer getResultCount()
     {
-        String countStr = elements().resultsCount().getText();
+        String countStr = elementCache().resultsCount().getText();
         Pattern pattern = Pattern.compile("Found (\\d+) results?");
         Matcher matcher = pattern.matcher(countStr);
 
@@ -52,23 +50,37 @@ public class SearchResultsPage extends LabKeyPage
         return Integer.parseInt(matcher.group(1));
     }
 
+    public Optional<WebElement> getResultsPanel()
+    {
+        return elementCache().getSearchResultsPanel();
+    }
+
+    public Optional<WebElement> getFolderResultsPanel()
+    {
+        return elementCache().getFolderSearchResultsPanel();
+    }
+
     public List<WebElement> getResults()
     {
-        return elements().searchResultCards();
+        return elementCache().searchResultCards();
     }
 
     public void openAdvancedOptions()
     {
         if (!isAdvancedOptionsOpen())
-            elements().advancedOptionsToggle.click();
-            waitFor(()-> isAdvancedOptionsOpen(), WAIT_FOR_JAVASCRIPT);
+        {
+            elementCache().advancedOptionsToggle.click();
+            waitFor(this::isAdvancedOptionsOpen, "Advanced options panel did not expand", WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     public void closeAdvancedOptions()
     {
         if (isAdvancedOptionsOpen())
-            elements().advancedOptionsToggle.click();
-        waitFor(()-> !isAdvancedOptionsOpen(), WAIT_FOR_JAVASCRIPT);
+        {
+            elementCache().advancedOptionsToggle.click();
+            waitFor(()-> !isAdvancedOptionsOpen(), "Advanced options panel did not collapse", WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     public boolean isAdvancedOptionsOpen()
@@ -93,19 +105,14 @@ public class SearchResultsPage extends LabKeyPage
         return this;
     }
 
-    Elements elements()
+    @Override
+    protected Elements newElementCache()
     {
         return new Elements();
     }
 
-    private class Elements extends ComponentElements
+    protected class Elements extends LabKeyPage.ElementCache
     {
-        @Override
-        protected SearchContext getContext()
-        {
-            return getDriver();
-        }
-
         public WebElement advancedOptionsToggle = Locator.tagWithClass("a", "search-advanced-toggle").waitForElement(this, WAIT_FOR_JAVASCRIPT);
 
         WebElement resultsCount()
@@ -121,6 +128,18 @@ public class SearchResultsPage extends LabKeyPage
         List<WebElement> searchResultCards()    // Todo: wrap these into a better component type
         {
             return Locator.tagWithClass("div", "labkey-search-result").findElements(this);
+        }
+
+        private WebElement searchResultsPanel = Locator.byClass("labkey-search-results").findWhenNeeded(this);
+
+        public Optional<WebElement> getSearchResultsPanel()
+        {
+            return Locator.byClass("labkey-search-results").findOptionalElement(this);
+        }
+
+        public Optional<WebElement> getFolderSearchResultsPanel()
+        {
+            return Locator.byClass("labkey-folders-search-results").findOptionalElement(this);
         }
     }
 }

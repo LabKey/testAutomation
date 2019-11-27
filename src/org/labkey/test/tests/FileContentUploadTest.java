@@ -164,20 +164,22 @@ public class FileContentUploadTest extends BaseWebDriverTest
         final String newFileName = "changedFilename.html";
         _fileBrowserHelper.renameFile(folderName + "/" + filename, newFileName);
 
+        _searchHelper.enqueueSearchItem(filename); // No results for old file name
         _searchHelper.enqueueSearchItem(newFileName, true, Locator.linkContainingText(newFileName));
         _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(newFileName));
         _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true, Locator.linkContainingText(newFileName));
 
-        _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName, false);
-        _searchHelper.assertNoSearchResult(filename);
+        _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName, "searchAfterRename");
 
         // Delete file.
         clickProject(getProjectName());
         _fileBrowserHelper.deleteFile(folderName + "/" + newFileName);
         waitForElementToDisappear(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(newFileName));
-        _searchHelper.assertNoSearchResult(newFileName);
-        _searchHelper.assertNoSearchResult(FILE_DESCRIPTION);
-        _searchHelper.assertNoSearchResult(CUSTOM_PROPERTY_VALUE);
+        _searchHelper.enqueueSearchItem(newFileName);
+        _searchHelper.enqueueSearchItem(FILE_DESCRIPTION);
+        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE);
+
+        _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName, "searchAfterDelete");
 
         clickProject(getProjectName());
         _fileBrowserHelper.clickFileBrowserButton(BrowserAction.AUDIT_HISTORY);
