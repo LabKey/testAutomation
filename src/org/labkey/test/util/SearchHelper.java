@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -193,7 +194,8 @@ public class SearchHelper
             {
                 if (failOnError)
                 {
-                    errorCollector.error("Incorrect search results for [\"" + searchTerm + "\"]. Missing results: " + missingResults.toString());
+                    errorCollector.error("Incorrect search results for [\"" + searchTerm + "\"]. Missing results: \n" +
+                            missingResults.stream().map(Locator::toString).collect(Collectors.joining("\n")));
                 }
                 else
                 {
