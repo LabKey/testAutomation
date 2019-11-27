@@ -82,11 +82,19 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return elementCache().domainFormPanel(title);
     }
 
+    /**
+     * Get a list of the Domain Panels on this page.
+     * @return List of DomainFormElement
+     */
     public List<DomainFormPanel> getPanels()
     {
         return new DomainFormPanel.DomainFormPanelFinder(getDriver()).findAll();
     }
 
+    /**
+     * Get the titles of the panels on this page.
+     * @return List of strings with the panel titles.
+     */
     public List<String> getPanelTitles()
     {
         List<String> titles = new ArrayList<>();

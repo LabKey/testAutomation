@@ -97,9 +97,12 @@ public class MultiMenu extends BootstrapMenu
             }
             catch(StaleElementReferenceException staleExc)
             {
+                // This happens in the time between the change of the menu content from containing "loading"
+                // to having data (like "sample sets").
                 stale = true;
             }
 
+            // Just a small pause, no need to keep hitting the DOM if it looks like the server is doing something
             if(stale || loading )
                 WebDriverWrapper.sleep(500);
 
