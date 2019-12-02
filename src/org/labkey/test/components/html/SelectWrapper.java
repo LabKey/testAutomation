@@ -68,6 +68,12 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
     }
 
     @Override
+    public WebElement getWrappedElement()
+    {
+        return wrappedElement;
+    }
+
+    @Override
     public boolean isMultiple()
     {
         return getWrappedSelect().isMultiple();

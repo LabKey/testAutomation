@@ -100,6 +100,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
                 maxCol, gtCol, ltCol, fourCol, textAreaCol, numberCol);
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(PROJECT_NAME, afterTest);
@@ -196,8 +197,8 @@ public class ColumnResizeTest extends BaseWebDriverTest
         PropertiesEditor propertiesEditor = _listHelper.clickEditDesign().listFields();
         changeScale(propertiesEditor, MAX_ROW, LT_SCALE, false);
         clickButton("Save", 0);
-        assertAlertContains("A data error occurred");
-        checkExpectedErrors(2);
+        assertAlert("The property \"" + MAX_COLUMN_NAME + "\" cannot be scaled down. It contains existing values exceeding [" + LT_SCALE + "] characters.\n");
+        checkExpectedErrors(0);  // Shouldn't log any SQLExceptions - product should detect inability to scale and not issue an alter query
 
         //Cancel changes
         clickButton("Cancel",0);
