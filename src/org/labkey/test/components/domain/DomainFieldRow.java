@@ -88,8 +88,20 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public FieldDefinition.ColumnType getType()
     {
-        String typeString = getWrapper().getFormElement(elementCache().fieldTypeSelectInput.getWrappedElement());
-        return Enum.valueOf(FieldDefinition.ColumnType.class, typeString);
+        // The previous code doesn't work:
+        //  String typeString = getWrapper().getFormElement(elementCache().fieldTypeSelectInput);
+        //  return Enum.valueOf(FieldDefinition.ColumnType.class, typeString);
+        // getFormElement get's the value attribute which is not the same as the text shown and not the
+        // same as the Enum.valueOf. To get a match get the text shown in the control and compare it
+        // to the enum's label attribute.
+
+        String typeString = getWrapper().getSelectedOptionText(elementCache().fieldTypeSelectInput.getWrappedElement());
+        for(FieldDefinition.ColumnType ct : FieldDefinition.ColumnType.values())
+        {
+            if(ct.getLabel().equalsIgnoreCase(typeString))
+                return ct;
+        }
+        return null;
     }
 
     public boolean getRequiredField()
@@ -520,6 +532,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         return getComponentElement().getAttribute("class").contains("domain-row-border-error");
     }
+
     public DomainFieldRow waitForError()
     {
         getWrapper().waitFor(()-> this.hasFieldError(), WAIT_FOR_JAVASCRIPT);
@@ -530,6 +543,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         return getComponentElement().getAttribute("class").contains("domain-row-border-warning");
     }
+
     public DomainFieldRow waitForWarning()
     {
         getWrapper().waitFor(()-> this.hasFieldWarning(), WAIT_FOR_JAVASCRIPT);

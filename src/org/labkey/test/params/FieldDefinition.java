@@ -314,7 +314,8 @@ public class FieldDefinition
         Flag("Flag", "Flag (String)", null),
         Attachment("Attachment", "Attachment", "attachment"),
         User("User", "User", "int"),
-        Lookup("Lookup", "Lookup", null);
+        Lookup("Lookup", "Lookup", null),
+        Sample("Sample", "Sample", null);
 
         private final String _label; // the display value in the UI for this kind of field
         private final String _description; // TODO remove this after GWT designer removed

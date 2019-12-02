@@ -6,10 +6,12 @@ package org.labkey.test.components.glassLibrary.components;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -60,16 +62,74 @@ public class MultiMenu extends BootstrapMenu
         }
     }
 
+    private List<String> waitForDataThenGetMenuText()
+    {
+        List<WebElement> topMenuList;
+        List<String> menuText = new ArrayList<>();
+
+        boolean stale;
+        boolean loading;
+        int tries = 1;
+
+        do {
+
+            stale = false;
+            loading = false;
+
+            try
+            {
+
+                topMenuList = Locator.tagWithAttribute("a", "role", "menuitem").findElements(this);
+                menuText = new ArrayList<>();
+
+                for (WebElement menuItem : topMenuList) {
+
+                    String menuItemText = menuItem.getText();
+
+                    // Check to see if we are still loading data.
+                    if(menuItemText.toLowerCase().contains("loading"))
+                        loading = true;
+
+                    menuText.add(menuItem.getText());
+
+                }
+
+            }
+            catch(StaleElementReferenceException staleExc)
+            {
+                // This happens in the time between the change of the menu content from containing "loading"
+                // to having data (like "sample sets").
+                getComponentElement().isDisplayed(); // will throw an uncaught 'StaleReferenceException' if the entire menu went stale
+                stale = true;
+            }
+
+            // Just a small pause, no need to keep hitting the DOM if it looks like the server is doing something
+            if(stale || loading )
+                WebDriverWrapper.sleep(500);
+
+            tries++;
+
+            // Keep trying until we get valid menu text.
+        } while((stale || loading) && (tries <= 10));
+
+        if (stale)
+        {
+            throw new RuntimeException("Menu items kept going stale");
+        }
+        if (loading)
+        {
+            throw new RuntimeException("Menu items still loading. " + menuText.toString());
+        }
+
+        return menuText;
+    }
+
     private void expandAll()
     {
         expand();
 
-        List<WebElement> topMenuList = Locator.tagWithAttribute("a", "role", "menuitem").findElements(this);
-        List<String> menuText = new ArrayList<>();
-        for(WebElement menuItem : topMenuList)
-        {
-            menuText.add(menuItem.getText());
-        }
+        List<String> menuText = waitForDataThenGetMenuText();
+
         WebElement menuList = Locator.tagWithClass("ul", "dropdown-menu").findElement(this);
 
         for (int i = 0; i < menuText.size(); i++)
