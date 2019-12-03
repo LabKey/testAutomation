@@ -769,8 +769,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         selectCmd.setColumns(Arrays.asList("*"));
         SelectRowsResponse selectResp = null;
 
-        String[] queries = {"Announcement", "AnnouncementSubscription", "EmailFormat", "EmailOption", "ForumSubscription"};
-        int[] counts = {2, 0, 2, 5, 1};
+        String[] queries = {"Announcement", "AnnouncementSubscription", "EmailOption", "ForumSubscription"};
+        int[] counts = {2, 0, 5, 1};
 
         for(int i = 0; i<queries.length; i++)
         {

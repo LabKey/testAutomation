@@ -13,6 +13,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCache>
 {
     public DomainDesignerPage(WebDriver driver)
@@ -79,12 +82,36 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return elementCache().domainFormPanel(title);
     }
 
+    /**
+     * Get a list of the Domain Panels on this page.
+     * @return List of DomainFormElement
+     */
+    public List<DomainFormPanel> getPanels()
+    {
+        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).findAll();
+    }
+
+    /**
+     * Get the titles of the panels on this page.
+     * @return List of strings with the panel titles.
+     */
+    public List<String> getPanelTitles()
+    {
+        List<String> titles = new ArrayList<>();
+        for(DomainFormPanel formPanel : getPanels())
+        {
+            titles.add(formPanel.getPanelTitle());
+        }
+        return titles;
+    }
+
     public String waitForError()
     {
         waitFor(()-> BootstrapLocators.dangerAlert.existsIn(getDriver()),
                 "the error alert did not appear as expected", 1000);
         return  errorAlert().getText();
     }
+
     public WebElement errorAlert()
     {
         return BootstrapLocators.dangerAlert.existsIn(getDriver()) ? BootstrapLocators.dangerAlert.findElement(getDriver()) : null;
@@ -96,6 +123,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                 "the warning alert did not appear as expected", 1000);
         return  warningAlert().getText();
     }
+
     public WebElement warningAlert()
     {
         return BootstrapLocators.warningAlert.existsIn(getDriver()) ? BootstrapLocators.warningAlert.findElement(getDriver()) : null;
@@ -107,6 +135,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                 "the info alert did not appear as expected", 1000);
         return  infoAlert().getText();
     }
+
     public WebElement infoAlert()
     {
         return BootstrapLocators.infoAlert.existsIn(getDriver()) ? BootstrapLocators.infoAlert.findElement(getDriver()) : null;
@@ -118,6 +147,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
                 BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
         return alert.getText();
     }
+
     public String anyAlert()
     {
         WebElement alert = Locator.findAnyElementOrNull(getDriver(),
