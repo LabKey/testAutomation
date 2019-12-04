@@ -6,7 +6,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
-import org.labkey.test.pages.ldap.LdapConfigurePage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -55,12 +54,22 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         return this;
     }
 
-    public LdapConfigurePage clickEditConfiguration(String description)
+    public <P extends PrimaryAuthenticationProviderConfigurationPage> P clickEditConfiguration(Class<P> authType, String description)
     {
-        WebElement row = Locator.xpath("//tbody/tr").containing(description).findElement(elementCache().tableElement);
-        clickAndWait(Locator.tagWithClass("a", "labkey-text-link").withText("delete").findElement(row));
+        P page;
+        try
+        {
+            page = authType.getDeclaredConstructor(WebDriver.class).newInstance(getDriver());
+        }
+        catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
+        {
+            throw new RuntimeException("Unable to instantiate page class: " + authType.getName(), e);
+        }
 
-        return new LdapConfigurePage(getDriver());
+        WebElement row = Locator.xpath("//tbody/tr").containing(description).findElement(elementCache().tableElement);
+        clickAndWait(Locator.tagWithClass("a", "labkey-text-link").withText("edit").findElement(row));
+
+        return page;
     }
 
     public ShowAdminPage clickDone()
