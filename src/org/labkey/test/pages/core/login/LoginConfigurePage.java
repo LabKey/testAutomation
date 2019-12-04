@@ -43,14 +43,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         return page;
     }
 
-    public LdapConfigurePage addLdapConfiguration()
-    {
-        elementCache().addMenu.
-                clickSubMenu(true,"LDAP - Uses the LDAP protocol to authenticate against an institution's directory server");
-        return new LdapConfigurePage(getDriver());
-    }
-
-    public LoginConfigurePage removeLdapConfiguration(String description)
+    public LoginConfigurePage removeConfiguration(String description)
     {
         // the html table class does not support finding a row's index correctly; doing it ourself here
         WebElement row = Locator.xpath("//tbody/tr").containing(description).findElement(elementCache().tableElement);
@@ -62,7 +55,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         return this;
     }
 
-    public LdapConfigurePage clickEditLdapConfiguration(String description)
+    public LdapConfigurePage clickEditConfiguration(String description)
     {
         WebElement row = Locator.xpath("//tbody/tr").containing(description).findElement(elementCache().tableElement);
         clickAndWait(Locator.tagWithClass("a", "labkey-text-link").withText("delete").findElement(row));
