@@ -16,18 +16,18 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
+import org.labkey.test.util.search.SearchResultsQueue;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -37,38 +37,52 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-
-public class SearchHelper
+public class SearchHelper extends WebDriverWrapper
 {
-    private final BaseWebDriverTest _test;
-    private final int maxTries;
+    private final WebDriver _driver;
+    private final DeferredErrorCollector _checker;
+    private final SearchResultsQueue _searchResultsQueue;
 
-    private static Map<String, SearchItem> _searchQueue = new HashMap<>();
+    private int maxTries = 4;
 
-    public SearchHelper(BaseWebDriverTest test, int maxTries)
+    public SearchHelper(BaseWebDriverTest test, SearchResultsQueue queue)
     {
-        _test = test;
-        this.maxTries = maxTries;
+        _driver = test.getDriver();
+        _checker = test.checker();
+        _searchResultsQueue = queue;
     }
 
     public SearchHelper(BaseWebDriverTest test)
     {
-        this(test, 4);
+        this(test, new SearchResultsQueue());
     }
-    private static final Locator noResultsLocator = Locator.byClass("labkey-search-results-counts").withText("Found 0 results");
-    private static final String unsearchableValue = "UNSEARCHABLE";
+
+    public SearchHelper setMaxTries(int maxTries)
+    {
+        this.maxTries = Math.max(maxTries, 1);
+        return this;
+    }
 
     public void initialize()
     {
         clearSearchQueue();
-        SearchAdminAPIHelper.deleteIndex(_test.getDriver());
+        SearchAdminAPIHelper.deleteIndex(getDriver());
     }
 
     public void clearSearchQueue()
     {
-        _searchQueue.clear();
-        enqueueSearchItem(getUnsearchableValue());
+        _searchResultsQueue.clearSearchQueue();
+    }
+
+    @Override
+    public WebDriver getWrappedDriver()
+    {
+        return _driver;
+    }
+
+    private Locator getNoResultsLocator()
+    {
+        return Locator.byClass("labkey-search-results-counts").withText("Found 0 results");
     }
 
     /**
@@ -76,18 +90,7 @@ public class SearchHelper
      */
     public static String getUnsearchableValue()
     {
-        return unsearchableValue;
-    }
-
-    /**
-     * Wait for search indexer to be idle via SearchController.WaitForIndexerAction
-     */
-    @LogMethod(quiet = true)
-    public static void waitForIndexer()
-    {
-        // Invoke a special server action that waits until all previous indexer tasks are complete
-        int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("search", "waitForIndexer")).getResponseCode();
-        assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
+        return "UNSEARCHABLE";
     }
 
     /**
@@ -118,9 +121,9 @@ public class SearchHelper
     public void verifySearchResults(@LoggedParam String expectedResultsContainer, @LoggedParam @NotNull String baseScreenshotName)
     {
         // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retry below.
-        waitForIndexer();
+        SearchAdminAPIHelper.waitForIndexer();
 
-        verifySearchResults(expectedResultsContainer, baseScreenshotName, _searchQueue, maxTries);
+        verifySearchResults(expectedResultsContainer, baseScreenshotName, _searchResultsQueue.getQueuedItems(), maxTries);
     }
 
     private void verifySearchResults(String expectedResultsContainer, @NotNull String baseScreenshotName, Map<String, SearchItem> items, int retries)
@@ -149,9 +152,9 @@ public class SearchHelper
     // Does not wait for indexer... caller should do so
     private List<String> verifySearchItems(Map<String, SearchItem> items, String expectedResultsContainer, boolean failOnError, String baseScreenshotName)
     {
-        _test.log("Verifying " + items.size() + " items");
+        TestLogger.log("Verifying " + items.size() + " items");
         List<String> notFound = new ArrayList<>();
-        DeferredErrorCollector errorCollector = _test.checker().withScreenshot(baseScreenshotName);
+        DeferredErrorCollector errorCollector = _checker.withScreenshot(baseScreenshotName);
         for (String searchTerm : items.keySet())
         {
             SearchItem item = items.get(searchTerm);
@@ -159,37 +162,20 @@ public class SearchHelper
 
             SearchResultsPage resultsPage = searchFor(searchTerm, false); // We already waited for the indexer in calling method
 
-            final boolean expectResults = expectedResults.size() > 0 && expectedResults.get(0) != noResultsLocator;
-            if (expectedResultsContainer != null && expectResults)
+            if (expectedResults.isEmpty())
             {
-                if ( _test.isElementPresent(Locator.linkContainingText("@files")) )
-                {
-                    if(expectedResultsContainer.contains("@files"))
-                    {
-                        expectedResults.add(Locator.linkWithText(expectedResultsContainer));
-                    }
-                    else
-                    {
-                        expectedResults.add(Locator.linkWithText(expectedResultsContainer + (item._file ? "/@files" : "")));
-                    }
-                }
-                else
-                {
-                    expectedResults.add(Locator.linkWithText(expectedResultsContainer));
-                }
+                expectedResults.add(getNoResultsLocator());
             }
-            else if (expectResults && item._file)
+            else
             {
-                expectedResults.add(Locator.linkContainingText("/@files"));
+                addExpectedContainerLink(expectedResultsContainer, item, expectedResults);
             }
 
             List<Locator> missingResults = new ArrayList<>();
 
             for (Locator loc : expectedResults)
             {
-                boolean inResultsPanel = resultsPage.getResultsPanel().map(loc::existsIn).orElse(false);
-                boolean inFolderResultsPanel = resultsPage.getFolderResultsPanel().map(loc::existsIn).orElse(false);
-                if (!inResultsPanel && !inFolderResultsPanel)
+                if (resultsPage.hasResultLocatedBy(loc))
                 {
                     missingResults.add(loc);
                     if (!failOnError)
@@ -215,22 +201,49 @@ public class SearchHelper
         }
 
         if (notFound.isEmpty())
-            _test.log("All items were found");
+            TestLogger.log("All items were found");
         else
-            _test.log(notFound.size() + " items were not found.");
+            TestLogger.log(notFound.size() + " items were not found.");
 
         return notFound;
     }
 
+    private void addExpectedContainerLink(String expectedResultsContainer, SearchItem item, List<Locator> expectedResults)
+    {
+        if (expectedResultsContainer != null)
+        {
+            if ( Locator.linkContainingText("@files").findOptionalElement(getDriver()).isPresent() )
+            {
+                if(expectedResultsContainer.contains("@files"))
+                {
+                    expectedResults.add(Locator.linkWithText(expectedResultsContainer));
+                }
+                else
+                {
+                    expectedResults.add(Locator.linkWithText(expectedResultsContainer + (item._file ? "/@files" : "")));
+                }
+            }
+            else
+            {
+                expectedResults.add(Locator.linkWithText(expectedResultsContainer));
+            }
+        }
+        else if (item._file)
+        {
+            expectedResults.add(Locator.linkContainingText("/@files"));
+        }
+    }
+
     public void verifyNoSearchResults()
     {
-        waitForIndexer();
+        SearchAdminAPIHelper.waitForIndexer();
 
-        Map<String, SearchItem> noResultsQueue = new HashMap<>(_searchQueue.size());
-        _test.log("Verify empty search results for previously queued items.");
-        for (String searchTerm : _searchQueue.keySet())
+        Map<String, SearchItem> queuedItems = _searchResultsQueue.getQueuedItems();
+        Map<String, SearchItem> noResultsQueue = new HashMap<>(queuedItems.size());
+        TestLogger.log("Verify empty search results for previously queued items.");
+        for (String searchTerm : queuedItems.keySet())
         {
-            noResultsQueue.put(searchTerm, new SearchItem(false, noResultsLocator));
+            noResultsQueue.put(searchTerm, new SearchItem());
         }
         verifySearchResults(null, "noResults", noResultsQueue, maxTries);
     }
@@ -243,11 +256,11 @@ public class SearchHelper
         do {
             SearchResultsPage searchResultsPage = searchFor(searchTerm);
             results = searchResultsPage.getResults();
-        } while (System.currentTimeMillis() - startTime < _test.defaultWaitForPage && !results.isEmpty());
+        } while (System.currentTimeMillis() - startTime < BaseWebDriverTest.WAIT_FOR_PAGE && !results.isEmpty());
 
         if (!results.isEmpty())
         {
-            Assert.fail("Found unwanted search results for '" + searchTerm + "': ['" + StringUtils.join(_test.getTexts(results).toArray(), "', '") + "']");
+            Assert.fail("Found unwanted search results for '" + searchTerm + "': ['" + StringUtils.join(results.stream().map(WebElement::getText).collect(Collectors.toList()), "', '") + "']");
         }
     }
 
@@ -264,11 +277,7 @@ public class SearchHelper
 
     public void enqueueSearchItem(String searchTerm, boolean isFile, Locator... expectedResults)
     {
-        if(expectedResults.length == 0)
-        {
-            expectedResults = new Locator[] {noResultsLocator};
-        }
-        _searchQueue.put(searchTerm, new SearchItem(isFile, expectedResults));
+        _searchResultsQueue.enqueueSearchItem(searchTerm, isFile, expectedResults);
     }
 
     // This method always waits for the indexer queue to empty before issuing search query
@@ -281,46 +290,37 @@ public class SearchHelper
     public SearchResultsPage searchFor(String searchTerm, boolean waitForIndexer)
     {
         if (waitForIndexer)
-            waitForIndexer();
+            SearchAdminAPIHelper.waitForIndexer();
 
-        _test.log("Searching for: '" + searchTerm + "'.");
+        TestLogger.log("Searching for: '" + searchTerm + "'.");
 
-        WebElement searchInput = Locator.input("q").findElementOrNull(Locators.bodyPanel().findElement(_test.getDriver()));
+        WebElement searchInput = Locator.input("q").findElementOrNull(Locators.bodyPanel().findElement(getDriver()));
         if (searchInput != null) // Search results page or search webpart
         {
-            _test.setFormElement(searchInput, searchTerm);
-            _test.doAndWaitForPageToLoad(() -> searchInput.sendKeys(Keys.ENTER));
-            return new SearchResultsPage(_test.getDriver());
+            setFormElement(searchInput, searchTerm);
+            doAndWaitForPageToLoad(() -> searchInput.sendKeys(Keys.ENTER));
+            return new SearchResultsPage(getDriver());
         }
         else // Use header search
         {
-            return new SiteNavBar(_test.getDriver()).search(searchTerm);
+            return new SiteNavBar(getDriver()).search(searchTerm);
         }
-    }
-
-    public void searchForSubjects(String searchTerm)
-    {
-        _test.log("Searching for subject: '" + searchTerm + "'.");
-        if (!_test.isElementPresent(Locator.id("query")) )
-            _test.goToModule("Search");
-        if (_test.getAttribute(Locator.id("adv-search-btn"), "src").contains("plus"))
-            _test.click(Locator.id("adv-search-btn"));
-
-        _test.checkCheckbox(Locator.checkboxByName("category").index(2));
-
-        _test.setFormElement(Locator.id("query"), searchTerm);
-        _test.clickButton("Search");
     }
 
     public static class SearchItem
     {
-        public final Locator[] _searchResults;
-        public final boolean _file; // is this search expecting a file?
+        private final Locator[] _searchResults;
+        private final boolean _file; // is this search expecting a file?
 
         public SearchItem(boolean file, Locator... results)
         {
             _searchResults = results;
             _file = file;
+        }
+
+        public SearchItem()
+        {
+            this(false);
         }
     }
 }

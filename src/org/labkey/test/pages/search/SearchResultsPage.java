@@ -105,6 +105,14 @@ public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements>
         return this;
     }
 
+    public boolean hasResultLocatedBy(Locator resultLoc)
+    {
+        boolean inResultsPanel = getResultsPanel().map(resultLoc::existsIn).orElse(false);
+        boolean inFolderResultsPanel = getFolderResultsPanel().map(resultLoc::existsIn).orElse(false);
+
+        return inResultsPanel || inFolderResultsPanel;
+    }
+
     @Override
     protected Elements newElementCache()
     {

@@ -175,6 +175,34 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
     }
 
+    @Override
+    public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
+    {
+        String containerPath = project + "/" + folderName;
+        renameFolder(containerPath, newFolderName, createAlias);
+    }
+
+    @LogMethod
+    public void renameFolder(@LoggedParam String containerPath, @LoggedParam String newName, final boolean createAlias)
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+
+        PostCommand command = new PostCommand("admin", "renameFolder");
+        JSONObject params = new JSONObject();
+        params.put("name", newName);
+        params.put("addAlias", createAlias);
+        command.setJsonObject(params);
+
+        try
+        {
+            command.execute(connection, null);
+        }
+        catch (IOException | CommandException fail)
+        {
+            throw new RuntimeException("Failed to rename '" + containerPath + "' to '" + newName + "'", fail);
+        }
+    }
+
     @LogMethod
     @Override
     public void moveFolder(@LoggedParam String projectName, @LoggedParam String folderName, @LoggedParam String newParent, final boolean createAlias) throws CommandException
