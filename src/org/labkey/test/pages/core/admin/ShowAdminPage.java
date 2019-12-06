@@ -20,6 +20,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -88,10 +89,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ShowAuditLogPage(getDriver());
     }
 
-    public void clickAuthentication()
+    public LoginConfigurePage clickAuthentication()
     {
         goToSettingsSection();
         clickAndWait(elementCache().authenticationLink);
+        return new LoginConfigurePage(getDriver());
     }
 
     public void clickConfigurePageElements()
