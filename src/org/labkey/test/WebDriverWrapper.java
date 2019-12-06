@@ -32,6 +32,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.FolderManagementPage;
+import org.labkey.test.pages.assay.AssayBeginPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.query.ExecuteQueryPage;
@@ -864,9 +865,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new ManageStudyPage(getDriver());
     }
 
-    public void goToManageAssays()
+    public AssayBeginPage goToManageAssays()
     {
         clickAdminMenuItem("Manage Assays");
+        return new AssayBeginPage(getDriver());
     }
 
     public BeginPage goToManageLists()

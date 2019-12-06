@@ -120,17 +120,22 @@ public class SearchHelper
         // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retry below.
         waitForIndexer();
 
-        for (int i = 1; i <= maxTries; i++)
+        verifySearchResults(expectedResultsContainer, baseScreenshotName, _searchQueue, maxTries);
+    }
+
+    private void verifySearchResults(String expectedResultsContainer, @NotNull String baseScreenshotName, Map<String, SearchItem> items, int retries)
+    {
+        for (int i = 1; i <= retries; i++)
         {
-            _test.log("Verify search results, attempt " + i);
-            final boolean lastTry = i == maxTries;
-            List<String> notFound = verifySearchItems(_searchQueue, expectedResultsContainer, lastTry, baseScreenshotName);
+            TestLogger.log("Verify search results, attempt " + i);
+            final boolean lastTry = i == retries;
+            List<String> notFound = verifySearchItems(items, expectedResultsContainer, lastTry, baseScreenshotName);
             if (notFound.isEmpty())
                 break;
 
             if (!lastTry)
             {
-                _test.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound.toString(), i*5));
+                TestLogger.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound.toString(), i*5));
                 WebDriverWrapper.sleep(i*5000);
             }
         }
@@ -141,7 +146,7 @@ public class SearchHelper
     {
         _test.log("Verifying " + items.size() + " items");
         List<String> notFound = new ArrayList<>();
-        DeferredErrorCollector errorCollector = new DeferredErrorCollector(_test).withScreenshot(baseScreenshotName);
+        DeferredErrorCollector errorCollector = _test.checker().withScreenshot(baseScreenshotName);
         for (String searchTerm : items.keySet())
         {
             SearchItem item = items.get(searchTerm);
@@ -194,7 +199,7 @@ public class SearchHelper
             {
                 if (failOnError)
                 {
-                    errorCollector.error("Incorrect search results for [\"" + searchTerm + "\"]. Missing results: \n" +
+                    errorCollector.error(baseScreenshotName + ": Incorrect search results for [\"" + searchTerm + "\"]. Missing results: \n" +
                             missingResults.stream().map(Locator::toString).collect(Collectors.joining("\n")));
                 }
                 else
@@ -209,8 +214,6 @@ public class SearchHelper
         else
             _test.log(notFound.size() + " items were not found.");
 
-        errorCollector.recordResults();
-
         return notFound;
     }
 
@@ -218,12 +221,13 @@ public class SearchHelper
     {
         waitForIndexer();
 
-        _test.log("Verify null search results.");
+        Map<String, SearchItem> noResultsQueue = new HashMap<>(_searchQueue.size());
+        _test.log("Verify empty search results for previously queued items.");
         for (String searchTerm : _searchQueue.keySet())
         {
-            searchFor(searchTerm, false);
-            _test.assertElementPresent(noResultsLocator);
+            noResultsQueue.put(searchTerm, new SearchItem(false, noResultsLocator));
         }
+        verifySearchResults(null, "noResults", noResultsQueue, maxTries);
     }
 
     public void assertNoSearchResult(String searchTerm)
