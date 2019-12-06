@@ -125,6 +125,11 @@ public class SearchHelper
 
     private void verifySearchResults(String expectedResultsContainer, @NotNull String baseScreenshotName, Map<String, SearchItem> items, int retries)
     {
+        if (expectedResultsContainer != null && !expectedResultsContainer.startsWith("/"))
+        {
+            expectedResultsContainer = "/" + expectedResultsContainer;
+        }
+
         for (int i = 1; i <= retries; i++)
         {
             TestLogger.log("Verify search results, attempt " + i);
