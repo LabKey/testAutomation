@@ -39,16 +39,14 @@ import java.util.stream.Collectors;
 
 public class SearchHelper extends WebDriverWrapper
 {
-    private final WebDriver _driver;
-    private final DeferredErrorCollector _checker;
+    private final BaseWebDriverTest _test;
     private final SearchResultsQueue _searchResultsQueue;
 
     private int maxTries = 4;
 
     public SearchHelper(BaseWebDriverTest test, SearchResultsQueue queue)
     {
-        _driver = test.getDriver();
-        _checker = test.checker();
+        _test = test;
         _searchResultsQueue = queue;
     }
 
@@ -77,7 +75,7 @@ public class SearchHelper extends WebDriverWrapper
     @Override
     public WebDriver getWrappedDriver()
     {
-        return _driver;
+        return _test.getDriver();
     }
 
     private Locator getNoResultsLocator()
@@ -154,7 +152,7 @@ public class SearchHelper extends WebDriverWrapper
     {
         TestLogger.log("Verifying " + items.size() + " items");
         List<String> notFound = new ArrayList<>();
-        DeferredErrorCollector errorCollector = _checker.withScreenshot(baseScreenshotName);
+        DeferredErrorCollector errorCollector = _test.checker().withScreenshot(baseScreenshotName);
         for (String searchTerm : items.keySet())
         {
             SearchItem item = items.get(searchTerm);
