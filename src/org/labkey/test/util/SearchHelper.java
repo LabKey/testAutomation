@@ -173,7 +173,7 @@ public class SearchHelper extends WebDriverWrapper
 
             for (Locator loc : expectedResults)
             {
-                if (resultsPage.hasResultLocatedBy(loc))
+                if (!resultsPage.hasResultLocatedBy(loc))
                 {
                     missingResults.add(loc);
                     if (!failOnError)
