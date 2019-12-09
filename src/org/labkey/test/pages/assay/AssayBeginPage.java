@@ -41,7 +41,7 @@ public class AssayBeginPage extends LabKeyPage<AssayBeginPage.ElementCache>
         return new ChooseAssayTypePage(getDriver());
     }
 
-    public int getAssayId(String assayName)
+    public long getAssayId(String assayName)
     {
         int rowIndex = elementCache().assaysList.getRowIndex("Name", assayName);
         if (rowIndex < 0)
@@ -52,7 +52,7 @@ public class AssayBeginPage extends LabKeyPage<AssayBeginPage.ElementCache>
         try
         {
             Map<String, String> urlQuery = WebTestHelper.parseUrlQuery(new URL(href));
-            return Integer.parseInt(urlQuery.get("rowId"));
+            return Long.parseLong(urlQuery.get("rowId"));
         }
         catch (MalformedURLException e)
         {

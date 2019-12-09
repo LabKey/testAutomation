@@ -113,6 +113,17 @@ public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements>
         return inResultsPanel || inFolderResultsPanel;
     }
 
+    public static Locator resultsCountLocator(int count)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Found ").append(count).append(" result");
+        if (count != 1)
+        {
+            sb.append("s");
+        }
+        return Locator.byClass("labkey-search-results-counts").childTag("div").withText(sb.toString());
+    }
+
     @Override
     protected Elements newElementCache()
     {

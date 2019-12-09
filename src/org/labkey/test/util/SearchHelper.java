@@ -80,7 +80,7 @@ public class SearchHelper extends WebDriverWrapper
 
     private Locator getNoResultsLocator()
     {
-        return Locator.byClass("labkey-search-results-counts").withText("Found 0 results");
+        return SearchResultsPage.resultsCountLocator(0);
     }
 
     /**
