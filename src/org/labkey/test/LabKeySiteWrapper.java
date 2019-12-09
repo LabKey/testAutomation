@@ -426,7 +426,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             beginAt(resetUrl);
 
         assertTextPresent(username,
-                "Your email address has been verified! Create an account password below.",
+                "has been verified! Create an account password below.",
                 "Passwords must be six non-whitespace characters or more and must not match your email address."
         );
 
