@@ -32,7 +32,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -121,11 +120,15 @@ public class SearchHelper extends WebDriverWrapper
         // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retry below.
         SearchAdminAPIHelper.waitForIndexer();
 
-        verifySearchResults(expectedResultsContainer, baseScreenshotName, _searchResultsQueue.getQueuedItems(), maxTries);
+        verifySearchResults(expectedResultsContainer, baseScreenshotName, _searchResultsQueue, maxTries);
     }
 
-    private void verifySearchResults(String expectedResultsContainer, @NotNull String baseScreenshotName, Map<String, SearchItem> items, int retries)
+    private void verifySearchResults(String expectedResultsContainer, @NotNull String baseScreenshotName, SearchResultsQueue items, int retries)
     {
+        if (items.isEmpty())
+        {
+            throw new IllegalArgumentException("Search queue is empty, nothing to verify");
+        }
         if (expectedResultsContainer != null && !expectedResultsContainer.startsWith("/"))
         {
             expectedResultsContainer = "/" + expectedResultsContainer;
@@ -148,15 +151,16 @@ public class SearchHelper extends WebDriverWrapper
     }
 
     // Does not wait for indexer... caller should do so
-    private List<String> verifySearchItems(Map<String, SearchItem> items, String expectedResultsContainer, boolean failOnError, String baseScreenshotName)
+    private List<String> verifySearchItems(SearchResultsQueue queue, String expectedResultsContainer, boolean failOnError, String baseScreenshotName)
     {
+        Map<String, SearchResultsQueue.SearchItem> items = queue.getQueuedItems();
         TestLogger.log("Verifying " + items.size() + " items");
         List<String> notFound = new ArrayList<>();
         DeferredErrorCollector errorCollector = _test.checker().withScreenshot(baseScreenshotName);
         for (String searchTerm : items.keySet())
         {
-            SearchItem item = items.get(searchTerm);
-            List<Locator> expectedResults = new ArrayList<>(Arrays.asList(item._searchResults));
+            SearchResultsQueue.SearchItem item = items.get(searchTerm);
+            List<Locator> expectedResults = new ArrayList<>(Arrays.asList(item.getExpectedResults()));
 
             SearchResultsPage resultsPage = searchFor(searchTerm, false); // We already waited for the indexer in calling method
 
@@ -206,7 +210,7 @@ public class SearchHelper extends WebDriverWrapper
         return notFound;
     }
 
-    private void addExpectedContainerLink(String expectedResultsContainer, SearchItem item, List<Locator> expectedResults)
+    private void addExpectedContainerLink(String expectedResultsContainer, SearchResultsQueue.SearchItem item, List<Locator> expectedResults)
     {
         if (expectedResultsContainer != null)
         {
@@ -218,7 +222,7 @@ public class SearchHelper extends WebDriverWrapper
                 }
                 else
                 {
-                    expectedResults.add(Locator.linkWithText(expectedResultsContainer + (item._file ? "/@files" : "")));
+                    expectedResults.add(Locator.linkWithText(expectedResultsContainer + (item.expectFileInResults() ? "/@files" : "")));
                 }
             }
             else
@@ -226,7 +230,7 @@ public class SearchHelper extends WebDriverWrapper
                 expectedResults.add(Locator.linkWithText(expectedResultsContainer));
             }
         }
-        else if (item._file)
+        else if (item.expectFileInResults())
         {
             expectedResults.add(Locator.linkContainingText("/@files"));
         }
@@ -236,12 +240,12 @@ public class SearchHelper extends WebDriverWrapper
     {
         SearchAdminAPIHelper.waitForIndexer();
 
-        Map<String, SearchItem> queuedItems = _searchResultsQueue.getQueuedItems();
-        Map<String, SearchItem> noResultsQueue = new HashMap<>(queuedItems.size());
+        Map<String, SearchResultsQueue.SearchItem> queuedItems = _searchResultsQueue.getQueuedItems();
+        SearchResultsQueue noResultsQueue = new SearchResultsQueue();
         TestLogger.log("Verify empty search results for previously queued items.");
         for (String searchTerm : queuedItems.keySet())
         {
-            noResultsQueue.put(searchTerm, new SearchItem());
+            noResultsQueue.enqueueSearchItem(searchTerm);
         }
         verifySearchResults(null, "noResults", noResultsQueue, maxTries);
     }
@@ -302,23 +306,6 @@ public class SearchHelper extends WebDriverWrapper
         else // Use header search
         {
             return new SiteNavBar(getDriver()).search(searchTerm);
-        }
-    }
-
-    public static class SearchItem
-    {
-        private final Locator[] _searchResults;
-        private final boolean _file; // is this search expecting a file?
-
-        public SearchItem(boolean file, Locator... results)
-        {
-            _searchResults = results;
-            _file = file;
-        }
-
-        public SearchItem()
-        {
-            this(false);
         }
     }
 }

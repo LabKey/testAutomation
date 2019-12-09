@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class SearchResultsQueue
 {
-    private final Map<String, SearchHelper.SearchItem> _searchQueue = new HashMap<>();
+    private final Map<String, SearchItem> _searchQueue = new HashMap<>();
 
     public SearchResultsQueue() { }
 
@@ -30,18 +30,45 @@ public class SearchResultsQueue
 
     public void enqueueSearchItem(String searchTerm, boolean isFile, Locator... expectedResults)
     {
-        _searchQueue.put(searchTerm, new SearchHelper.SearchItem(isFile, expectedResults));
+        _searchQueue.put(searchTerm, new SearchItem(isFile, expectedResults));
     }
 
-    public Map<String, SearchHelper.SearchItem> getQueuedItems()
+    public Map<String, SearchItem> getQueuedItems()
     {
-        HashMap<String, SearchHelper.SearchItem> searchQueuePlus = new HashMap<>(_searchQueue);
-        searchQueuePlus.put(SearchHelper.getUnsearchableValue(), new SearchHelper.SearchItem());
+        HashMap<String, SearchItem> searchQueuePlus = new HashMap<>(_searchQueue);
+        searchQueuePlus.put(SearchHelper.getUnsearchableValue(), new SearchItem());
         return searchQueuePlus;
     }
 
     public boolean isEmpty()
     {
         return _searchQueue.isEmpty();
+    }
+
+    public static class SearchItem
+    {
+        private final Locator[] _searchResults;
+        private final boolean _file; // is this search expecting a file?
+
+        private SearchItem(boolean file, Locator... results)
+        {
+            _searchResults = results;
+            _file = file;
+        }
+
+        private SearchItem()
+        {
+            this(false);
+        }
+
+        public Locator[] getExpectedResults()
+        {
+            return _searchResults;
+        }
+
+        public boolean expectFileInResults()
+        {
+            return _file;
+        }
     }
 }
