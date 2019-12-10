@@ -42,33 +42,19 @@ public abstract class AbstractAssayHelper
 
     public abstract void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException;
 
-    protected abstract void goToUploadXarPage();
-
     /**
      * Upload a xar file as an assay configuration
      *
-     * There's no API version of this, so it can go in the absract helper for now.
-     * Preconditions:  on a page with an assay web part
      * @param file   file to upload
      * @param pipelineCount  expected count of successful pipeline jobs including this one
      */
-    public void uploadXarFileAsAssayDesign(File file, int pipelineCount)
-    {
-        uploadXarFileAsAssayDesign(file);
-        _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
-    }
+    public abstract void uploadXarFileAsAssayDesign(File file, int pipelineCount);
 
     /**
      * Upload a xar file as an assay configuration. Does not wait for pipeline jobs to complete.
      * @param file XAR file to upload
      */
-    @LogMethod
-    public void uploadXarFileAsAssayDesign(@LoggedParam File file)
-    {
-        goToUploadXarPage();
-        _test.setFormElement(Locator.name("uploadFile"), file);
-        _test.clickAndWait(Locator.lkButton("Upload"));
-    }
+    public abstract void uploadXarFileAsAssayDesign(File file);
 
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 

@@ -15,8 +15,11 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.assay.AddXarFileCommand;
 import org.labkey.remoteapi.assay.AssayListCommand;
 import org.labkey.remoteapi.assay.AssayListResponse;
 import org.labkey.remoteapi.assay.Batch;
@@ -25,7 +28,6 @@ import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.WebTestHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,15 +93,19 @@ public class APIAssayHelper extends AbstractAssayHelper
             // irc.setProperties is called. To be safe going to remove it from the collection, and so as not to impact
             // the calling function going to use a clone of the parameter passed in.
 
-            Map<String, Object> _runProperties = new HashMap<>();
-            _runProperties.putAll(runProperties);
-            if(_runProperties.containsKey("Comment"))
+            runProperties = new HashMap<>(runProperties);
+            if (runProperties.containsKey("Comment"))
             {
-                irc.setComment(_runProperties.get("Comment").toString());
-                _runProperties.remove("Comment");
+                irc.setComment(runProperties.get("Comment").toString());
+                runProperties.remove("Comment");
+            }
+            if (runProperties.containsKey("name") && StringUtils.isBlank(runName))
+            {
+                irc.setName(runProperties.get("name").toString());
+                runProperties.remove("name");
             }
 
-            irc.setProperties(_runProperties);
+            irc.setProperties(runProperties);
         }
 
         if(null != batchProperties)
@@ -135,9 +141,28 @@ public class APIAssayHelper extends AbstractAssayHelper
     }
 
     @Override
-    protected void goToUploadXarPage()
+    public void uploadXarFileAsAssayDesign(File file, int pipelineCount)
     {
-        _test.beginAt(WebTestHelper.buildURL("experiment", _test.getCurrentContainerPath(), "showAddXarFile"));
+        uploadXarFileAsAssayDesign(file);
+        PipelineStatusTable.viewJobsForContainer(_test, _test.getCurrentContainerPath());
+        _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
+    }
+
+    @LogMethod
+    @Override
+    public void uploadXarFileAsAssayDesign(@LoggedParam File file)
+    {
+        AddXarFileCommand addXarFileCommand = new AddXarFileCommand(file);
+        Connection connection = _test.createDefaultConnection(true);
+
+        try
+        {
+            addXarFileCommand.execute(connection, _test.getCurrentContainerPath());
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to import XAR file", e);
+        }
     }
 
     public int getIdFromAssayName(String assayName, String projectPath)

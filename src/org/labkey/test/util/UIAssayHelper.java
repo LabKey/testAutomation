@@ -129,11 +129,36 @@ public class UIAssayHelper extends AbstractAssayHelper
 
     }
 
-    @Override
     public void goToUploadXarPage()
     {
         _test.goToManageAssays();
         _test.clickButton("New Assay Design");
         _test.clickAndWait(Locator.linkWithText("upload"));
+    }
+
+    /**
+     * Upload a xar file as an assay configuration
+     *
+     * @param file   file to upload
+     * @param pipelineCount  expected count of successful pipeline jobs including this one
+     */
+    @Override
+    public void uploadXarFileAsAssayDesign(File file, int pipelineCount)
+    {
+        uploadXarFileAsAssayDesign(file);
+        _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
+    }
+
+    /**
+     * Upload a xar file as an assay configuration. Does not wait for pipeline jobs to complete.
+     * @param file XAR file to upload
+     */
+    @Override
+    @LogMethod
+    public void uploadXarFileAsAssayDesign(@LoggedParam File file)
+    {
+        goToUploadXarPage();
+        _test.setFormElement(Locator.name("uploadFile"), file);
+        _test.clickAndWait(Locator.lkButton("Upload"));
     }
 }
