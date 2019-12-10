@@ -2289,7 +2289,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         do
         {
-            if (!waitFor(() -> isTextPresent(text), 1000))
+            if (waitFor(() -> isTextPresent(text), 1000))
             {
                 return;
             }
