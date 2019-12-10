@@ -1,6 +1,7 @@
 package org.labkey.test.pages.assay;
 
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.RadioButton;
@@ -51,6 +52,14 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         clickAndWait(elementCache().nextButton);
 
         return new ReactAssayDesignerPage(getDriver());
+    }
+
+    public String clickNextExpectingError()
+    {
+        clickAndWait(elementCache().nextButton);
+
+        clearCache();
+        return Locators.labkeyError.waitForElement(getDriver(), 10000).getText();
     }
 
     @Override
