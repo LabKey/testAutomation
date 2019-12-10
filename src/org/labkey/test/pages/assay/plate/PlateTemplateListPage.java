@@ -7,22 +7,25 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class PlateTemplateList extends LabKeyPage<PlateTemplateList.ElementCache>
+/**
+ * Stub page class. Lacks functionality enabling interaction with the list of existing templates.
+ */
+public class PlateTemplateListPage extends LabKeyPage<PlateTemplateListPage.ElementCache>
 {
-    public PlateTemplateList(WebDriver driver)
+    public PlateTemplateListPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static PlateTemplateList beginAt(WebDriverWrapper webDriverWrapper)
+    public static PlateTemplateListPage beginAt(WebDriverWrapper webDriverWrapper)
     {
         return beginAt(webDriverWrapper, webDriverWrapper.getCurrentContainerPath());
     }
 
-    public static PlateTemplateList beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
+    public static PlateTemplateListPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("plate", containerPath, "plateTemplateList"));
-        return new PlateTemplateList(webDriverWrapper.getDriver());
+        return new PlateTemplateListPage(webDriverWrapper.getDriver());
     }
 
     public PlateDesignerPage clickNewPlate(PlateDesignerPage.PlateDesignerParams params)

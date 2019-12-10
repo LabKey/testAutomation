@@ -3,6 +3,7 @@ package org.labkey.test.pages.assay;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -39,6 +40,13 @@ public class AssayBeginPage extends LabKeyPage<AssayBeginPage.ElementCache>
         elementCache().assaysList.clickHeaderButtonAndWait("New Assay Design");
 
         return new ChooseAssayTypePage(getDriver());
+    }
+
+    public PlateTemplateListPage clickConfigurePlateTemplates()
+    {
+        elementCache().assaysList.clickHeaderButtonAndWait("Configure Plate Templates");
+
+        return new PlateTemplateListPage(getDriver());
     }
 
     public long getAssayId(String assayName)

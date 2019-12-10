@@ -10,6 +10,11 @@ import org.openqa.selenium.WebDriver;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Stub page class. Limited plate designer functionality is implemented in
+ * {@link org.labkey.test.tests.elispotassay.ElispotAssayTest#highlightWells(String, String, String, String)}
+ * TODO: Pull that functionality into this class and expand it
+ */
 public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache>
 {
     public PlateDesignerPage(WebDriver driver)
@@ -24,7 +29,7 @@ public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache
 
     public static PlateDesignerPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath, PlateDesignerParams params)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("controller", containerPath, "action", params.toUrlParams()));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("plate", containerPath, "designer", params.toUrlParams()));
         return new PlateDesignerPage(webDriverWrapper.getDriver());
     }
 
