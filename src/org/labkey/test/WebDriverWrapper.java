@@ -1995,7 +1995,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             sleep(100);
         } while ((System.currentTimeMillis() - startTime) < wait);
 
-        return false;
+        return checker.get();
     }
 
     public void waitForEquals(String message, Supplier expected, Supplier actual, int wait)
@@ -2289,10 +2289,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         do
         {
-            if(isTextPresent(text))
+            if (!waitFor(() -> isTextPresent(text), 1000))
+            {
                 return;
-            else
-                sleep(1000);
+            }
             refresh();
         }while(System.currentTimeMillis() - startTime < wait);
         assertTextPresent(text);
