@@ -206,13 +206,23 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
                 .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public final WebElement searchSubmitInput = Locator.tagWithClass("a", "btn-search")
                 .findWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public final AdminMenu adminMenu = new AdminMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
-        public final UserMenu userMenu = new UserMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
+        public final AdminMenu adminMenu = adminMenuFinder().findWhenNeeded(navbarNavBlock).withExpandRetries(4);
+        public final UserMenu userMenu = userMenuFinder().findWhenNeeded(navbarNavBlock).withExpandRetries(4);
+    }
+
+    protected SimpleWebDriverComponentFinder<AdminMenu> adminMenuFinder()
+    {
+        return new SimpleWebDriverComponentFinder<>(getDriver(), Locator.id("headerAdminDropdown"), AdminMenu::new);
+    }
+
+    protected SimpleWebDriverComponentFinder<UserMenu> userMenuFinder()
+    {
+        return new SimpleWebDriverComponentFinder<>(getDriver(), Locators.userMenu, UserMenu::new);
     }
 
     public class AdminMenu extends BootstrapMenu
     {
-        protected AdminMenu(WebDriver driver, WebElement componentElement)
+        protected AdminMenu(WebElement componentElement, WebDriver driver)
         {
             super(driver, componentElement);
         }
@@ -248,26 +258,9 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         }
     }
 
-    protected class AdminMenuFinder extends SimpleComponentFinder<AdminMenu>
-    {
-        final WebDriver _driver;
-
-        public AdminMenuFinder(WebDriver driver)
-        {
-            super(Locator.id("headerAdminDropdown"));
-            _driver = driver;
-        }
-
-        @Override
-        protected AdminMenu construct(WebElement el)
-        {
-            return new AdminMenu(_driver, el);
-        }
-    }
-
     public class UserMenu extends BootstrapMenu
     {
-        protected UserMenu(WebDriver driver, WebElement componentElement)
+        protected UserMenu(WebElement componentElement, WebDriver driver)
         {
             super(driver, componentElement);
         }
@@ -339,23 +332,6 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         public UserMenu withExpandRetries(int retries)
         {
             return (UserMenu) super.withExpandRetries(retries);
-        }
-    }
-
-    protected class UserMenuFinder extends SimpleComponentFinder<UserMenu>
-    {
-        final WebDriver _driver;
-
-        public UserMenuFinder(WebDriver driver)
-        {
-            super(Locators.userMenu);
-            _driver = driver;
-        }
-
-        @Override
-        protected UserMenu construct(WebElement el)
-        {
-            return new UserMenu(_driver, el);
         }
     }
 

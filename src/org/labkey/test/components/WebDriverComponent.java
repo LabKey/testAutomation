@@ -25,6 +25,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 /**
  * Wrapper for components that need a WebDriver for full functionality (e.g. page navigation or JavaScript execution)
@@ -46,7 +47,7 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
         return getWrapper().doAndWaitForElementToRefresh(func, loc, this, new WebDriverWait(getDriver(), timeout));
     }
 
-    public static abstract class WebDriverComponentFinder<Cmp, Finder extends WebDriverComponentFinder<Cmp, Finder>> extends ComponentFinder<SearchContext, Cmp, Finder>
+    public static abstract class WebDriverComponentFinder<C, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<SearchContext, C, F>
     {
         private final WebDriver driver;
         public WebDriverComponentFinder(WebDriver driver)
@@ -59,22 +60,22 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
             return driver;
         }
 
-        public Cmp findWhenNeeded()
+        public C findWhenNeeded()
         {
             return super.findWhenNeeded(getDriver());
         }
 
-        public Cmp find()
+        public C find()
         {
             return super.find(getDriver());
         }
 
-        public List<Cmp> findAll()
+        public List<C> findAll()
         {
             return super.findAll(getDriver());
         }
 
-        public Cmp waitFor()
+        public C waitFor()
         {
             return super.waitFor(getDriver());
         }
@@ -83,47 +84,60 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
          * @deprecated Use {@link #findOptional()}
          */
         @Deprecated
-        public Cmp findOrNull()
+        public C findOrNull()
         {
             return super.findOrNull(getDriver());
         }
 
-        public Optional<Cmp> findOptional()
+        public Optional<C> findOptional()
         {
             return super.findOptional(getDriver());
         }
 
         @Override
-        protected final Cmp construct(WebElement el)
+        protected final C construct(WebElement el)
         {
             return construct(el, getDriver());
         }
 
-        protected abstract Cmp construct(WebElement el, WebDriver driver);
+        protected abstract C construct(WebElement el, WebDriver driver);
+
+        /**
+         * Use the element that would be found by this class to construct an alternate component.
+         * @param factory Usually the constructor for the alternate component
+         * @param <R> An alternate component type that is found by the same locator as the wrapped finder's
+         * @return A component finder that will find the alternate component type
+         */
+        public <R extends WebDriverComponent<?>> SimpleWebDriverComponentFinder<R> wrap(BiFunction<WebElement, WebDriver, R> factory)
+        {
+            return new SimpleWebDriverComponentFinder<>(getDriver(), locator(), factory)
+                    .index(getIndex())
+                    .timeout(getTimeout());
+        }
     }
 
-    public static abstract class SimpleWebDriverComponentFinder<Cmp> extends WebDriverComponentFinder<Cmp, SimpleWebDriverComponentFinder<Cmp>>
+    public static final class SimpleWebDriverComponentFinder<C extends WebDriverComponent<?>> extends WebDriverComponentFinder<C, SimpleWebDriverComponentFinder<C>>
     {
         private final Locator _locator;
+        private final BiFunction<WebElement, WebDriver, C> _factory;
 
-        public SimpleWebDriverComponentFinder(WebDriverComponentFinder finder)
-        {
-            this(finder.getDriver(), finder.locator());
-            if (finder.getIndex() != null)
-                index(finder.getIndex());
-            timeout(finder.getTimeout());
-        }
-
-        public SimpleWebDriverComponentFinder(WebDriver driver, Locator locator)
+        public SimpleWebDriverComponentFinder(WebDriver driver, Locator locator, BiFunction<WebElement, WebDriver, C> factory)
         {
             super(driver);
-            this._locator = locator;
+            _locator = locator;
+            _factory = factory;
         }
 
         @Override
         protected Locator locator()
         {
             return _locator;
+        }
+
+        @Override
+        protected C construct(WebElement el, WebDriver driver)
+        {
+            return _factory.apply(el, driver);
         }
     }
 }

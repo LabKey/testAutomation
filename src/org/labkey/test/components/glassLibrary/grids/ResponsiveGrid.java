@@ -434,7 +434,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 
         public WebElement button = Locator.xpath("//button[contains(@class,'dropdown-toggle')]").findWhenNeeded(this);
         public Optional<WebElement> selectColumn = Locator.xpath("//th/input[@type='checkbox']").findOptionalElement(getComponentElement());
-        Checkbox selectAllCheckbox = Checkbox.Checkbox().locatedBy(Locator.xpath("//th/input[@type='checkbox']")).findWhenNeeded(this);
+        Checkbox selectAllCheckbox = Checkbox.Checkbox(Locator.xpath("//th/input[@type='checkbox']")).findWhenNeeded(this);
 
         private final Map<String, WebElement> headerCells = new HashMap<>();
         protected final WebElement getColumnHeaderCell(String headerText)
@@ -521,6 +521,12 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         public ResponsiveGridFinder withGridId(String gridId)
         {
             _locator= Locators.responsiveGrid(gridId);
+            return this;
+        }
+
+        @Override
+        protected ResponsiveGridFinder getThis()
+        {
             return this;
         }
 
