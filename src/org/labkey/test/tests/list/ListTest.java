@@ -44,8 +44,8 @@ import org.labkey.test.util.ListHelper.LookupInfo;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -1070,7 +1070,7 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.insertNewRow(row);
 
         startSystemMaintenance("SearchService");
-        SearchHelper.waitForIndexer();
+        SearchAdminAPIHelper.waitForIndexer();
 
         goToProjectHome();
         new PortalHelper(this).addWebPart("Search");

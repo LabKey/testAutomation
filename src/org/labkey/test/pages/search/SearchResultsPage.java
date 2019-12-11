@@ -105,6 +105,25 @@ public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements>
         return this;
     }
 
+    public boolean hasResultLocatedBy(Locator resultLoc)
+    {
+        boolean inResultsPanel = getResultsPanel().map(resultLoc::existsIn).orElse(false);
+        boolean inFolderResultsPanel = getFolderResultsPanel().map(resultLoc::existsIn).orElse(false);
+
+        return inResultsPanel || inFolderResultsPanel;
+    }
+
+    public static Locator resultsCountLocator(int count)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Found ").append(count).append(" result");
+        if (count != 1)
+        {
+            sb.append("s");
+        }
+        return Locator.byClass("labkey-search-results-counts").childTag("div").withText(sb.toString());
+    }
+
     @Override
     protected Elements newElementCache()
     {

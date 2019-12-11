@@ -22,7 +22,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.SearchHelper;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -47,7 +47,7 @@ public class SearchForm extends Component<SearchForm.Elements>
     @LogMethod
     public SearchResultsPage searchFor(@LoggedParam String searchTerm)
     {
-        SearchHelper.waitForIndexer();
+        SearchAdminAPIHelper.waitForIndexer();
 
         _driver.setFormElement(elementCache().searchBox(), searchTerm);
         _driver.clickAndWait(elementCache().searchButton());
