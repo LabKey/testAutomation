@@ -31,6 +31,10 @@ import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -172,6 +176,56 @@ public class APIContainerHelper extends AbstractContainerHelper
         catch (IOException e)
         {
             throw new RuntimeException("Failed to delete container: " + path, e);
+        }
+    }
+
+    @Override
+    public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
+    {
+        String containerPath;
+        if (project.equals(folderName))
+        {
+            containerPath = project;
+        }
+        else
+        {
+            containerPath = project + "/" + folderName;
+        }
+        renameFolder(containerPath, newFolderName, createAlias);
+    }
+
+    @LogMethod
+    public void renameFolder(@LoggedParam String containerPath, @LoggedParam String newName, final boolean createAlias)
+    {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", URLEncoder.encode(newName, StandardCharsets.UTF_8));
+        params.put("addAlias", String.valueOf(createAlias));
+        SimpleHttpRequest simpleHttpRequest = new SimpleHttpRequest(WebTestHelper.buildURL("admin", containerPath, "renameFolder", params), "POST");
+        simpleHttpRequest.copySession(_test.getDriver());
+
+        String expectedContainerPath = containerPath.substring(0, containerPath.lastIndexOf("/") + 1) + newName;
+        String renameErrorMsg = "Failed to rename '" + containerPath + "' to '" + newName + "'";
+        try
+        {
+            SimpleHttpResponse response = simpleHttpRequest.getResponse();
+
+            // RenameFolderAction isn't a proper API and generally won't throw an error. Need to verify rename manually.
+            if (!doesContainerExist(expectedContainerPath))
+            {
+                throw new RuntimeException(renameErrorMsg);
+            }
+            if (createAlias && !doesContainerExist(containerPath))
+            {
+                throw new RuntimeException(renameErrorMsg + ": alias not created");
+            }
+            if (!createAlias && !doesContainerExist(containerPath))
+            {
+                throw new RuntimeException(renameErrorMsg + ": alias created, but not requested");
+            }
+        }
+        catch (IOException fail)
+        {
+            throw new RuntimeException(renameErrorMsg, fail);
         }
     }
 
