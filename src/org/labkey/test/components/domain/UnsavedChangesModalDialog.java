@@ -2,14 +2,13 @@ package org.labkey.test.components.domain;
 
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.openqa.selenium.WebDriver;
 
 public class UnsavedChangesModalDialog extends ModalDialog
 {
 
-    public UnsavedChangesModalDialog(ModalDialogFinder finder, WebDriver driver)
+    public UnsavedChangesModalDialog(ModalDialogFinder finder)
     {
-        super(finder.waitFor().getComponentElement(), driver);
+        super(finder);
     }
 
     public DomainDesignerPage discardChanges()  // should land the user on a domain designer page

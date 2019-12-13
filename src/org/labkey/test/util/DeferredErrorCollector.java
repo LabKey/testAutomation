@@ -99,14 +99,16 @@ public class DeferredErrorCollector
 
     /**
      * Take a screenshot if any errors have been recorded since the last time {@link #setErrorMark()} was called.
+     * Then resets the error mark.
      *
      * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
      * @see #takeScreenShot(String)
      */
-    public void screenShotIfErrorSinceMark(String screenshotName)
+    public void screenShotIfNewError(String screenshotName)
     {
         if (errorsSinceMark() > 0)
             takeScreenShot(screenshotName);
+        setErrorMark();
     }
 
     /**
@@ -127,15 +129,17 @@ public class DeferredErrorCollector
     }
 
     /**
+     * Record any errors thrown by the provided {@link Runnable} if they match any of the specified {@link Throwable}s
+     * or an {@link AssertionError}. Non-matching Throwables will be rethrown.
      *
-     * @param wrappedRunnable
-     * @param errorTypes
+     * @param wrappedRunnable {@link Runnable} that might throw
+     * @param recordedTypes {@link Throwable} types that should be caught and recorded
      */
-    public void recordCustomErrors(Runnable wrappedRunnable, List<Class<? extends Throwable>> errorTypes)
+    public void recordCustomError(Runnable wrappedRunnable, List<Class<? extends Throwable>> recordedTypes)
     {
         List<Class<? extends Throwable>> recordedExceptions = new ArrayList<>();
         recordedExceptions.add(AssertionError.class);
-        recordedExceptions.addAll(errorTypes);
+        recordedExceptions.addAll(recordedTypes);
 
         try
         {
@@ -155,9 +159,12 @@ public class DeferredErrorCollector
         }
     }
 
-    public void recordCustomErrors(Runnable wrappedRunnable, Class<? extends Throwable> errorType)
+    /**
+     * @see #recordCustomError(Runnable, List)
+     */
+    public void recordCustomError(Runnable wrappedRunnable, Class<? extends Throwable> errorType)
     {
-        recordCustomErrors(wrappedRunnable, Arrays.asList(errorType));
+        recordCustomError(wrappedRunnable, Arrays.asList(errorType));
     }
 
     /**

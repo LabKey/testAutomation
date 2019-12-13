@@ -34,11 +34,16 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     final WebElement _el;
     final WebDriver _driver;
 
-    public ModalDialog(WebElement element, WebDriver driver)
+    protected ModalDialog(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
         waitForReady();
+    }
+
+    public ModalDialog(ModalDialogFinder finder)
+    {
+        this(finder.waitFor().getComponentElement(), finder.getDriver());
     }
 
     /**
