@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -87,13 +88,25 @@ public class DeferredErrorCollector
     }
 
     /**
-     * Check the number of errors that have been recorded since last time {@link #setErrorMark()} was called.
+     * Check the number of errors that have been recorded since the last time {@link #setErrorMark()} was called.
      *
      * @return Current error count minus the error count set by {@link #setErrorMark()}.
      */
     public int errorsSinceMark()
     {
         return getErrorCount() - errorMark;
+    }
+
+    /**
+     * Take a screenshot if any errors have been recorded since the last time {@link #setErrorMark()} was called.
+     *
+     * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
+     * @see #takeScreenShot(String)
+     */
+    public void screenShotIfErrorSinceMark(String screenshotName)
+    {
+        if (errorsSinceMark() > 0)
+            takeScreenShot(screenshotName);
     }
 
     /**
@@ -111,6 +124,40 @@ public class DeferredErrorCollector
         {
             recordError(err.getMessage());
         }
+    }
+
+    /**
+     *
+     * @param wrappedRunnable
+     * @param errorTypes
+     */
+    public void recordCustomErrors(Runnable wrappedRunnable, List<Class<? extends Throwable>> errorTypes)
+    {
+        List<Class<? extends Throwable>> recordedExceptions = new ArrayList<>();
+        recordedExceptions.add(AssertionError.class);
+        recordedExceptions.addAll(errorTypes);
+
+        try
+        {
+            wrappedRunnable.run();
+        }
+        catch (Throwable err)
+        {
+            for (Class<? extends Throwable> recordedException : recordedExceptions)
+            {
+                if (recordedException.isInstance(err))
+                {
+                    recordError(err.getMessage());
+                    return;
+                }
+            }
+            throw err; // Not a recordable error
+        }
+    }
+
+    public void recordCustomErrors(Runnable wrappedRunnable, Class<? extends Throwable> errorType)
+    {
+        recordCustomErrors(wrappedRunnable, Arrays.asList(errorType));
     }
 
     /**
@@ -313,12 +360,12 @@ public class DeferredErrorCollector
      * Take a screen shot and HTML dump of the current page.
      * See {@link ArtifactCollector#dumpPageSnapshot(String, String)} for details.
      *
-     * @param snapShotName A string to identify screenshots; Will be included in screenshot filenames.
-     * @return The name of the file used. Basically the snapShotName parameter with a counter added to the end.
+     * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
+     * @return The name of the file used. Basically the screenshotName parameter with a counter added to the end.
      */
-    public String takeScreenShot(String snapShotName)
+    public String takeScreenShot(String screenshotName)
     {
-        String _snapShotNumberedName = snapShotName + "_" + screenShotCount++;
+        String _snapShotNumberedName = screenshotName + "_" + screenShotCount++;
 
         artifactCollector.dumpPageSnapshot(_snapShotNumberedName, null);
 
@@ -365,9 +412,9 @@ public class DeferredErrorCollector
         }
 
         @Override
-        public String takeScreenShot(String snapShotName)
+        public String takeScreenShot(String screenshotName)
         {
-            return getWrappedErrorColloctor().takeScreenShot(snapShotName);
+            return getWrappedErrorColloctor().takeScreenShot(screenshotName);
         }
 
         @Override
