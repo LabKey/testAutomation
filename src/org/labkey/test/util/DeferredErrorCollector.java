@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,8 +18,12 @@ public class DeferredErrorCollector
 {
     private int screenShotCount = 0;
     private int errorMark = 0;
+
     private final ArtifactCollector artifactCollector;
     private final List<String> allErrorMessages = new ArrayList<>();
+    private final List<Class<? extends Throwable>> errorTypes = new ArrayList<>();
+
+    private FatalErrorCollector _fatalErrorCollector;
 
     /**
      * @param artifactCollector An {@link ArtifactCollector} to be used for screenshots
@@ -28,6 +31,7 @@ public class DeferredErrorCollector
     public DeferredErrorCollector(ArtifactCollector artifactCollector)
     {
         this.artifactCollector = artifactCollector;
+        resetErrorTypes();
     }
 
     /**
@@ -39,13 +43,31 @@ public class DeferredErrorCollector
     }
 
     /**
+     * Reset this error checker to
+     */
+    public void resetErrorTypes()
+    {
+        errorTypes.clear();
+        errorTypes.add(AssertionError.class);
+    }
+
+    public void addRecordableErrorType(Class<? extends Throwable> errorType)
+    {
+        errorTypes.add(errorType);
+    }
+
+    /**
      * Create temporary error collector that allows `AssertionError`s to propagate normally.
      *
      * @return Wrapped error collector. Intended to be used only once.
      */
     public DeferredErrorCollector fatal()
     {
-        return new FatalErrorCollector(this);
+        if (_fatalErrorCollector == null)
+        {
+            _fatalErrorCollector = new FatalErrorCollector();
+        }
+        return _fatalErrorCollector;
     }
 
     /**
@@ -56,7 +78,7 @@ public class DeferredErrorCollector
      */
     public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
     {
-        return new DeferredErrorCollectorWithScreenshot(this, screenshotName);
+        return new DeferredErrorCollectorWithScreenshot(screenshotName);
     }
 
     /**
@@ -112,9 +134,11 @@ public class DeferredErrorCollector
     }
 
     /**
-     * Record any {@link AssertionError}s thrown by the provided {@link Runnable}.
+     * Record any errors thrown by the provided {@link Runnable} if they match any of the specified {@link Throwable}s.
+     * Non-matching Throwables will be rethrown. By default, only {@link AssertionError}s will be recorded. Call
+     * {@link #addRecordableErrorType(Class)} to specify additional error types that should be recorded.
      *
-     * @param wrappedAssertion {@link Runnable} that might throw an {@link AssertionError}
+     * @param wrappedAssertion {@link Runnable} that might throw an error that shouldn't fail a test immediately
      */
     public void wrapAssertion(Runnable wrappedAssertion)
     {
@@ -122,49 +146,27 @@ public class DeferredErrorCollector
         {
             wrappedAssertion.run();
         }
-        catch (AssertionError err)
-        {
-            recordError(err.getMessage());
-        }
-    }
-
-    /**
-     * Record any errors thrown by the provided {@link Runnable} if they match any of the specified {@link Throwable}s
-     * or an {@link AssertionError}. Non-matching Throwables will be rethrown.
-     *
-     * @param wrappedRunnable {@link Runnable} that might throw
-     * @param recordedTypes {@link Throwable} types that should be caught and recorded
-     */
-    public void recordCustomError(Runnable wrappedRunnable, List<Class<? extends Throwable>> recordedTypes)
-    {
-        List<Class<? extends Throwable>> recordedExceptions = new ArrayList<>();
-        recordedExceptions.add(AssertionError.class);
-        recordedExceptions.addAll(recordedTypes);
-
-        try
-        {
-            wrappedRunnable.run();
-        }
         catch (Throwable err)
         {
-            for (Class<? extends Throwable> recordedException : recordedExceptions)
+            if (isErrorRecordable(err))
             {
-                if (recordedException.isInstance(err))
-                {
-                    recordError(err.getMessage());
-                    return;
-                }
+                recordError(err.getMessage());
+                return;
             }
             throw err; // Not a recordable error
         }
     }
 
-    /**
-     * @see #recordCustomError(Runnable, List)
-     */
-    public void recordCustomError(Runnable wrappedRunnable, Class<? extends Throwable> errorType)
+    protected boolean isErrorRecordable(Throwable err)
     {
-        recordCustomError(wrappedRunnable, Arrays.asList(errorType));
+        for (Class<? extends Throwable> errorType : errorTypes)
+        {
+            if (errorType.isInstance(err))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -175,7 +177,7 @@ public class DeferredErrorCollector
      * @param actual Actual value.
      * @see Assert#assertEquals(String, Object, Object)
      */
-    public void verifyEqual(String message, Object expected, Object actual)
+    public final void verifyEqual(String message, Object expected, Object actual)
     {
         wrapAssertion(() -> Assert.assertEquals(message, expected, actual));
     }
@@ -188,7 +190,7 @@ public class DeferredErrorCollector
      * @param actual Actual value.
      * @see Assert#assertNotEquals(String, Object, Object)
      */
-    public void verifyNotEqual(String message, Object unexpected, Object actual)
+    public final void verifyNotEqual(String message, Object unexpected, Object actual)
     {
         wrapAssertion(() -> Assert.assertNotEquals(message, unexpected, actual));
     }
@@ -200,7 +202,7 @@ public class DeferredErrorCollector
      * @param condition Conditional check (ex: element.isDisplayed())
      * @see Assert#assertTrue(String, boolean)
      */
-    public void verifyTrue(String message, boolean condition)
+    public final void verifyTrue(String message, boolean condition)
     {
         wrapAssertion(() -> Assert.assertTrue(message, condition));
     }
@@ -212,7 +214,7 @@ public class DeferredErrorCollector
      * @param condition Conditional check (ex: element.isDisplayed())
      * @see Assert#assertFalse(String, boolean)
      */
-    public void verifyFalse(String message, boolean condition)
+    public final void verifyFalse(String message, boolean condition)
     {
         wrapAssertion(() -> Assert.assertFalse(message, condition));
     }
@@ -224,7 +226,7 @@ public class DeferredErrorCollector
      * @param object Object to check
      * @see Assert#assertNull(String, Object)
      */
-    public void verifyNull(String message, Object object)
+    public final void verifyNull(String message, Object object)
     {
         wrapAssertion(() -> Assert.assertNull(message, object));
     }
@@ -236,7 +238,7 @@ public class DeferredErrorCollector
      * @param object Object to check
      * @see Assert#assertNotNull(String, Object)
      */
-    public void verifyNotNull(String message, Object object)
+    public final void verifyNotNull(String message, Object object)
     {
         wrapAssertion(() -> Assert.assertNotNull(message, object));
     }
@@ -250,7 +252,7 @@ public class DeferredErrorCollector
      * values
      * @see Assert#assertThat(String, Object, Matcher)
      */
-    public <T> void verifyThat(String reason, T actual, Matcher<? super T> matcher)
+    public final <T> void verifyThat(String reason, T actual, Matcher<? super T> matcher)
     {
         wrapAssertion(() -> Assert.assertThat(reason, actual, matcher));
     }
@@ -261,7 +263,7 @@ public class DeferredErrorCollector
      * @param message Message to record.
      * @see Assert#fail()
      */
-    public void error(String message)
+    public final void error(String message)
     {
         wrapAssertion(() -> Assert.fail(message));
     }
@@ -379,31 +381,28 @@ public class DeferredErrorCollector
         return _snapShotNumberedName;
     }
 
-    private static abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
+    private abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     {
-        private final DeferredErrorCollector wrappedErrorColloctor;
-
-        protected DeferredErrorCollectorWrapper(DeferredErrorCollector wrappedErrorColloctor)
+        protected DeferredErrorCollectorWrapper()
         {
             super((ArtifactCollector) null);
-            this.wrappedErrorColloctor = wrappedErrorColloctor;
         }
 
         protected DeferredErrorCollector getWrappedErrorColloctor()
         {
-            return wrappedErrorColloctor;
+            return DeferredErrorCollector.this;
         }
 
         @Override
-        public DeferredErrorCollector fatal()
+        public final DeferredErrorCollector fatal()
         {
-            throw new IllegalArgumentException(); // Don't allow double-wrapping
+            return getWrappedErrorColloctor().fatal();
         }
 
         @Override
         public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
         {
-            throw new IllegalArgumentException(); // Don't allow double-wrapping
+            return new DeferredErrorCollectorWithScreenshot(screenshotName);
         }
 
         @Override
@@ -425,6 +424,42 @@ public class DeferredErrorCollector
         }
 
         @Override
+        public void resetErrorTypes()
+        {
+            getWrappedErrorColloctor().resetErrorTypes();
+        }
+
+        @Override
+        public void addRecordableErrorType(Class<? extends Throwable> errorType)
+        {
+            getWrappedErrorColloctor().addRecordableErrorType(errorType);
+        }
+
+        @Override
+        public void setErrorMark()
+        {
+            getWrappedErrorColloctor().setErrorMark();
+        }
+
+        @Override
+        public int errorsSinceMark()
+        {
+            return getWrappedErrorColloctor().errorsSinceMark();
+        }
+
+        @Override
+        public void screenShotIfNewError(String screenshotName)
+        {
+            getWrappedErrorColloctor().screenShotIfNewError(screenshotName);
+        }
+
+        @Override
+        protected boolean isErrorRecordable(Throwable err)
+        {
+            return getWrappedErrorColloctor().isErrorRecordable(err);
+        }
+
+        @Override
         protected void recordError(String errorMessage)
         {
             getWrappedErrorColloctor().recordError(errorMessage);
@@ -437,11 +472,11 @@ public class DeferredErrorCollector
         }
     }
 
-    private static class FatalErrorCollector extends DeferredErrorCollectorWrapper
+    private class FatalErrorCollector extends DeferredErrorCollectorWrapper
     {
-        public FatalErrorCollector(DeferredErrorCollector wrappedErrorColloctor)
+        protected FatalErrorCollector()
         {
-            super(wrappedErrorColloctor);
+            super();
         }
 
         @Override
@@ -451,20 +486,19 @@ public class DeferredErrorCollector
         }
     }
 
-    private static class DeferredErrorCollectorWithScreenshot extends DeferredErrorCollectorWrapper
+    private class DeferredErrorCollectorWithScreenshot extends DeferredErrorCollectorWrapper
     {
-        private final String screenshotName;
+        private final String _screenshotName;
 
-        public DeferredErrorCollectorWithScreenshot(DeferredErrorCollector wrappedErrorColloctor, String screenshotName)
+        protected DeferredErrorCollectorWithScreenshot(String screenshotName)
         {
-            super(wrappedErrorColloctor);
-            this.screenshotName = screenshotName;
+            _screenshotName = screenshotName;
         }
 
         @Override
         protected void recordError(String errorMessage)
         {
-            String shotName = takeScreenShot(this.screenshotName);
+            String shotName = takeScreenShot(_screenshotName);
             errorMessage = errorMessage + "\nScreen shot name: " + shotName + "\n";
             super.recordError(errorMessage);
         }
