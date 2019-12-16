@@ -42,9 +42,9 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
 
     protected abstract WebDriver getDriver();
 
-    public WebElement doAndWaitForElementToRefresh(Runnable func, Locator loc, int timeout)
+    public WebElement doAndWaitForElementToRefresh(Runnable func, Locator loc, int timeoutSeconds)
     {
-        return getWrapper().doAndWaitForElementToRefresh(func, loc, this, new WebDriverWait(getDriver(), timeout));
+        return getWrapper().doAndWaitForElementToRefresh(func, loc, this, new WebDriverWait(getDriver(), timeoutSeconds));
     }
 
     public static abstract class WebDriverComponentFinder<C, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<SearchContext, C, F>
