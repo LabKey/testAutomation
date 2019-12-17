@@ -500,6 +500,11 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
             return responsiveGrid().withAttribute("data-gridid", gridId);
         }
 
+        static public Locator.XPathLocator responsiveGridByBaseId(String baseGridId)
+        {
+            return responsiveGrid().attributeStartsWith("data-gridid", baseGridId);
+        }
+
         static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.css("span i.fa-spinner");
@@ -521,6 +526,12 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         public ResponsiveGridFinder withGridId(String gridId)
         {
             _locator= Locators.responsiveGrid(gridId);
+            return this;
+        }
+
+        public ResponsiveGridFinder withBaseGridId(String gridId)
+        {
+            _locator= Locators.responsiveGridByBaseId(gridId);
             return this;
         }
 

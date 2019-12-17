@@ -6,16 +6,17 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.NoSuchElementException;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
@@ -26,13 +27,21 @@ import static org.labkey.test.util.TestLogger.log;
 
 public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 {
-    final WebElement _componentElement;
-    final WebDriver _driver;
+    private final WebElement _componentElement;
+    private final WebDriver _driver;
+
+    private Function<String, Locator> _optionLocFactory = Locators.option::withText;
 
     public ReactSelect(WebElement element, WebDriver driver)
     {
         _componentElement = element;
         _driver = driver;
+    }
+
+    public ReactSelect setOptionLocator(Function<String, Locator> optionLocFactory)
+    {
+        _optionLocFactory = optionLocFactory;
+        return this;
     }
 
     public boolean isExpanded()
@@ -93,7 +102,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 
     public boolean hasOption(String value)
     {
-        return hasOption(value, ReactSelect.Locators.options.containing(value));
+        return hasOption(value, ReactSelect.Locators.option.containing(value));
     }
 
     public boolean hasOption(String value, Locator optionElement)
@@ -177,9 +186,14 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 
         elementCache().arrow.click(); // collapse the options
 
-        WebDriverWrapper.waitFor(()->!isExpanded(), 1000);
+        waitForClosed();
 
         return this;
+    }
+
+    private void waitForClosed()
+    {
+        WebDriverWrapper.waitFor(()->!isExpanded(), "Select didn't close", 1000);
     }
 
     public ReactSelect clearSelection()
@@ -286,13 +300,13 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         WebElement selectMenu = new EphemeralWebElement(Locators.selectMenu, this).withTimeout(WAIT_FOR_JAVASCRIPT);
         List<WebElement> getOptions()
         {
-            return Locators.options.findElements(selectMenu);
+            return Locators.option.findElements(selectMenu);
         }
 
         @NotNull
         WebElement findOption(String option)
         {
-            Locator loc = Locators.options.withText(option);
+            Locator loc = _optionLocFactory.apply(option);
             return loc.findElement(selectMenu);
         }
     }
@@ -303,6 +317,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
                 .open()
                 .clickOption(option)
                 .getSelections();
+        waitForClosed();
 
         // TODO Comment out this line for the time being. Issue 37897: Sample Management: Lookup field values are not consistently displayed between the edit sample panel and the create sample panel.
 //        assertTrue("Expected '" + option + "' to be selected.  Current selections: " + selections, selections.contains(option));
@@ -360,9 +375,9 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         return this;
     }
 
-    protected static abstract class Locators
+    public static abstract class Locators
     {
-        final public static Locator options = Locator.tagWithClass("div", "Select-option");
+        final public static Locator.XPathLocator option = Locator.tagWithClass("div", "Select-option");
         final public static Locator placeholder = Locator.tagWithClass("div", "Select-placeholder");
         final public static Locator createOptionPlaceholder = Locator.tagWithClass("div", "Select-create-option-placeholder");
         final public static Locator clear = Locator.tagWithClass("span","Select-clear-zone");
