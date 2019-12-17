@@ -116,10 +116,7 @@ public class AssayAPITest extends BaseWebDriverTest
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
         if (assayId == 0)
-        {
-            assayHelper.createAssayDesignWithDefaults("General", assayName);
-            assayId = assayHelper.getIdFromAssayName(assayName, getProjectName());
-        }
+            assayId = assayHelper.createAssayDesignUsingTemplate(getProjectName(), "General", assayName).getProtocolId().intValue();
 
         // First, simulate file already being uploaded to the server by copying to the pipeline root
         List<String> lines1 = Arrays.asList(

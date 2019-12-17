@@ -23,10 +23,14 @@ import org.labkey.remoteapi.assay.AddXarFileCommand;
 import org.labkey.remoteapi.assay.AssayListCommand;
 import org.labkey.remoteapi.assay.AssayListResponse;
 import org.labkey.remoteapi.assay.Batch;
+import org.labkey.remoteapi.assay.GetProtocolCommand;
 import org.labkey.remoteapi.assay.ImportRunCommand;
 import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.remoteapi.assay.Protocol;
+import org.labkey.remoteapi.assay.ProtocolResponse;
 import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
+import org.labkey.remoteapi.assay.SaveProtocolCommand;
 import org.labkey.test.BaseWebDriverTest;
 
 import java.io.File;
@@ -222,5 +226,18 @@ public class APIAssayHelper extends AbstractAssayHelper
         SaveAssayBatchCommand cmd = new SaveAssayBatchCommand(assayId, batch);
         cmd.setTimeout(180000); // Wait 3 minutes for assay import
         cmd.execute(_test.createDefaultConnection(false), "/" + projectPath);
+    }
+
+    public Protocol createAssayDesignUsingTemplate(String containerPath, String providerName, String assayName) throws Exception
+    {
+        Connection connection = _test.createDefaultConnection(true);
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand(providerName);
+        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
+
+        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
+        newAssayProtocol.setName(assayName);
+        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
+        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, containerPath);
+        return saveProtocolResponse.getProtocol();
     }
 }
