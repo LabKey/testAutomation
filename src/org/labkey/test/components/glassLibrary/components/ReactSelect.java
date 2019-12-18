@@ -5,6 +5,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.EphemeralWebElement;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -126,7 +127,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
     /* waits until the 'value' (which can include the placeholder) of the select shows or contains the expected value */
     public ReactSelect expectValue(String value)
     {
-        getWrapper().waitFor(()-> getValue().contains(value),
+        waitFor(()-> getValue().contains(value),
                 "It took too long for the ReactSelect value to contain the expected value:["+value+"]. Actual value:[" + getValue() + "].", WAIT_FOR_JAVASCRIPT);
         return this;
     }
@@ -135,9 +136,9 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
     {
         // wait for the down-caret to be clickable/interactive
         long start = System.currentTimeMillis();
-        getWrapper().waitFor(this::isInteractive, "The select-box did not become interactive in time", 2000);
+        waitFor(this::isInteractive, "The select-box did not become interactive in time", 2000);
         long elapsed = System.currentTimeMillis() - start;
-        getWrapper().log("waited ["+ elapsed + "] msec for select to become interactive");
+        TestLogger.debug("waited ["+ elapsed + "] msec for select to become interactive");
 
         return this;
     }
@@ -287,6 +288,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         return _driver;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -356,18 +358,18 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
                 sleep(500);
             }
         }
-        log("Found optionEl after " + tryCount + " tries");
+        TestLogger.debug("Found optionEl after " + tryCount + " tries");
 
         for (int i = 0; i < 5 && !optionEl.isDisplayed(); i++)
         {
             sleep(500);
             getWrapper().scrollIntoView(optionEl);
-            log("scroll optionEl into view, attempt " + i);
+            TestLogger.debug("scroll optionEl into view, attempt " + i);
         }
 
         assertTrue("Expected '" + option + "' to be displayed.", optionEl.isDisplayed());
         sleep(500); // either react or the test is moving to fast/slow for one another
-        log("optionEl is displayed, clicking");
+        TestLogger.debug("optionEl is displayed, clicking");
         optionEl.click();
 
         new FluentWait<>(getWrapper().getDriver()).withTimeout(Duration.ofSeconds(1)).until(ExpectedConditions.stalenessOf(optionEl));
@@ -422,7 +424,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
             StringBuilder childXpath = new StringBuilder( "//input[@id="+ Locator.xq(inputNames.get(0)) + "");
             for (int i = 1; i < inputNames.size(); i++)
             {
-                childXpath.append(" or @id=" + Locator.xq(inputNames.get(i)) + "");
+                childXpath.append(" or @id=").append(Locator.xq(inputNames.get(i)));
             }
             childXpath.append("]");
             return Locator.tagWithClass("div", "Select").withDescendant(
@@ -434,7 +436,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
             StringBuilder childXpath = new StringBuilder( "//input[starts-with(@id, '"+ inputNames.get(0) + "')");
             for (int i = 1; i < inputNames.size(); i++)
             {
-                childXpath.append(" or starts-with(@id, '"+inputNames.get(i)+"')");
+                childXpath.append(" or starts-with(@id, '").append(inputNames.get(i)).append("')");
             }
             childXpath.append("]");
             return Locator.tagWithClass("div", "Select").withDescendant(
