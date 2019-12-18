@@ -179,7 +179,7 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
 
     public void save()
     {
-        click(elementCache().saveBtn);
+        clickAndWait(elementCache().saveBtn);
     }
 
     public void reset()
@@ -206,7 +206,7 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         WebElement supportLinkTxt = Locator.inputByNameContaining("reportAProblemPath").findWhenNeeded(this);
         WebElement supportEmailTxt = Locator.inputByNameContaining("supportEmail").findWhenNeeded(this);
         WebElement systemEmailTxt = Locator.inputByNameContaining("systemEmailAddress").findWhenNeeded(this);
-        WebElement organizationNameTxt = Locator.inputByNameContaining("systemEmailAddress").findWhenNeeded(this);
+        WebElement organizationNameTxt = Locator.inputByNameContaining("companyName").findWhenNeeded(this);
         WebElement USDateParsingRdio = Locator.xpath("//input[@name='dateParsingMode' and @value='US']").findWhenNeeded(this);
         WebElement NonUSDateParsingRdio = Locator.xpath("//input[@name='dateParsingMode' and @value='NON_US']").findWhenNeeded(this);
         WebElement defaultDateFormatTxt = Locator.inputByNameContaining("defaultDateFormat").findWhenNeeded(this);

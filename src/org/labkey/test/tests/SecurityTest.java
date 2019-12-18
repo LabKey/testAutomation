@@ -346,8 +346,8 @@ public class SecurityTest extends BaseWebDriverTest
         ensureSignedOut();
 
         clickAndWait(Locator.linkWithText("Sign In"));
-        clickAndWait(Locator.linkContainingText("Forgot your password?"));
-        setFormElement(Locator.id("EmailInput"), username);
+        clickAndWait(Locator.linkContainingText("Forgot password"));
+        setFormElement(Locator.id("email"), username);
         clickButtonContainingText("Reset", 0);
 
         signIn();
@@ -843,7 +843,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertFalse("Self-registration button is visible", link != null && link.isDisplayed());
 
         beginAt(buildURL("login", "register"));
-        assertElementPresent(Locators.labkeyError.withText("Registration is not enabled"));
+        assertElementPresent(Locators.labkeyError.withText("Registration is not enabled."));
 
         // cleanup: sign admin back in
         signIn();
