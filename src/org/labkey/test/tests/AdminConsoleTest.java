@@ -107,7 +107,6 @@ public class AdminConsoleTest extends BaseWebDriverTest
         // log out as siteAdmin, log in as appAdmin
         signOut();
         signIn(APP_ADMIN_USER, APP_ADMIN_USER_PASS);
-        clickButton("Submit");
 
         // verify that all of the following links are visible to AppAdmin:
         goToAdminConsole().goToSettingsSection();

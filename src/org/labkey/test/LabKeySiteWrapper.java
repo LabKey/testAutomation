@@ -426,7 +426,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             beginAt(resetUrl);
 
         assertTextPresent(username,
-                "Your email address has been verified! Create an account password below.",
+                "has been verified! Create an account password below.",
                 "Passwords must be six non-whitespace characters or more and must not match your email address."
         );
 
@@ -609,7 +609,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
             log("Register the first user");
             pushLocation();
-            assertTextPresent("Retype Password");
+            assertTextPresent("Confirm Password");
             verifyInitialUserError(email, PasswordUtil.getPassword(), PasswordUtil.getPassword(), null);
 
             // Runner was unable to log the test start prior to initial user creation
@@ -618,7 +618,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             log("Attempting to register another initial user");
             popLocation();
             // Make sure we got redirected to the module status page, since we already have a user
-            assertTextNotPresent("Retype Password");
+            assertTextNotPresent("Confirm Password");
             assertTextPresent("Please wait, this page will automatically update with progress information");
             goToHome();
 
