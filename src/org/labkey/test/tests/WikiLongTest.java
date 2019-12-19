@@ -441,7 +441,7 @@ public class WikiLongTest extends BaseWebDriverTest
         impersonate(USER1);
         assertElementNotPresent(Locator.linkWithText(PROJECT2_NAME));     // Project should not be visible
         popLocation();
-        assertTextPresent("User does not have permission to perform this operation");  // Not authorized
+        assertTextPresent("User does not have permission to perform this operation.");  // Not authorized
         goToHome();
         stopImpersonating();
 
