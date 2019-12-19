@@ -48,9 +48,9 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.URLBuilder;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
-import org.seleniumhq.jetty9.util.URIUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -352,53 +352,9 @@ public class WebTestHelper
 
     public static String buildRelativeUrl(String controller, @Nullable String containerPath, String action, Map<String, String> params)
     {
-        StringBuilder url = new StringBuilder();
-
-        if (!USE_CONTAINER_RELATIVE_URL)
-        {
-            url.append("/");
-            url.append(controller);
-        }
-
-        if (containerPath != null)
-        {
-            if (!containerPath.startsWith("/"))
-                url.append("/");
-            url.append(URIUtil.encodePath(containerPath)
-                    .replace("[", "%5B")
-                    .replace("]", "%5D"));
-        }
-
-        url.append("/");
-        if (USE_CONTAINER_RELATIVE_URL)
-        {
-            url.append(controller);
-            url.append("-");
-        }
-        url.append(action);
-        if (!action.contains("."))
-            url.append(".view");
-
-        if (params != null)
-        {
-            boolean firstParam = true;
-            for (Map.Entry param : params.entrySet())
-            {
-                if (null != param.getKey())
-                {
-                    url.append(firstParam ? "?" : "&");
-                    url.append(param.getKey());
-                    if (null != param.getValue())
-                    {
-                        url.append("=");
-                        url.append(param.getValue());
-                    }
-                    firstParam = false;
-                }
-            }
-        }
-
-        return url.toString();
+        URLBuilder builder = new URLBuilder(controller, action, containerPath);
+        builder.setQuery(params);
+        return builder.buildRelativeURL();
     }
 
     public static Map<String, String> parseUrlQuery(URL url)

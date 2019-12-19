@@ -43,7 +43,7 @@ public class DeferredErrorCollector
     }
 
     /**
-     * Reset this error checker to
+     * Reset this error checker to only record {@link AssertionError}s
      */
     public void resetErrorTypes()
     {
@@ -51,6 +51,14 @@ public class DeferredErrorCollector
         errorTypes.add(AssertionError.class);
     }
 
+    /**
+     * Add an error type that should be recorded when caught by {@link #wrapAssertion(Runnable)}. May be called multiple
+     * times to add more error types.
+     * By default, {@link AssertionError} is the only error type recorded.
+     * Reset instance to default error handling with {@link #resetErrorTypes()}
+     *
+     * @param errorType Additional error type to be recorded.
+     */
     public void addRecordableErrorType(Class<? extends Throwable> errorType)
     {
         errorTypes.add(errorType);

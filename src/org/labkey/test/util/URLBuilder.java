@@ -1,6 +1,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.WebTestHelper;
 import org.seleniumhq.jetty9.util.URIUtil;
 
@@ -11,17 +12,45 @@ import java.util.stream.Collectors;
 
 import static org.labkey.test.WebTestHelper.getBaseURL;
 
+/**
+ * Constructs a LabKey URL for use by tests. LabKey docs have more information about the structure of LabKey URLs:
+ * https://www.labkey.org/Documentation/wiki-page.view?name=url
+
+ * For this builder's purposes, a URL consists of the following:
+ *  - controller
+ *  - action
+ *  - containerPath [optional]
+ *  - query [optional]
+ *  - resourcePath [optional]
+ *  - secondaryQuery [optional]
+ *
+ *  Here is an example builder:
+ *  <pre>
+ *      URLBuilder builder = new URLBuilder("dumbster", "setRecordEmail");
+ *      builder.setQuery(Maps.of("record", true));
+ *      builder.buildRelativeUrl(); // "/dumbster-setRecordEmail.view?record=true"
+ *      builder.buildUrl(); // "http://localhost:8080/labkey/dumbster-setRecordEmail.view?record=true"
+ *  </pre>
+ *
+ *  For an app URL you might use something like:
+ *  <pre>
+ *      URLBuilder builder = new URLBuilder("samplemanager", "app", "testContainer");
+ *      builder.setAppResourcePath("assays", "general", "myassay");
+ *      builder.setSecondaryQuery(Map.of("sort", "Name"));
+ *      builder.buildRelativeUrl(); // "/testContainer/samplemanager-app.view#/assays/general/myassay?sort=Name"
+ *  </pre>
+ */
 public class URLBuilder
 {
     private final String _controller;
     private final String _action;
-    private final String _containerPath;
+    @Nullable private final String _containerPath;
 
-    private Map<String, Object> _query;
+    private Map<String, ?> _query;
     private String _resourcePath;
-    private Map<String, Object> _secondaryQuery;
+    private Map<String, ?> _secondaryQuery;
 
-    public URLBuilder(String controller, String action, String containerPath)
+    public URLBuilder(String controller, String action, @Nullable String containerPath)
     {
         _controller = controller;
         _action = action;
@@ -33,7 +62,7 @@ public class URLBuilder
         this(controller, action, "/");
     }
 
-    public URLBuilder setQuery(Map<String, Object> query)
+    public URLBuilder setQuery(Map<String, ?> query)
     {
         _query = query;
         return this;
@@ -52,7 +81,7 @@ public class URLBuilder
         return this;
     }
 
-    public URLBuilder setSecondaryQuery(Map<String, Object> secondaryQuery)
+    public URLBuilder setSecondaryQuery(Map<String, ?> secondaryQuery)
     {
         _secondaryQuery = secondaryQuery;
         return this;
@@ -105,13 +134,13 @@ public class URLBuilder
         }
         else if (_secondaryQuery != null && !_secondaryQuery.isEmpty())
         {
-            throw new IllegalArgumentException("Must supply a resource path");
+            throw new IllegalArgumentException("Must specify a resource path when using a secondary query");
         }
 
         return url.toString();
     }
 
-    private void appendQueryString(StringBuilder url, Map<String, Object> params)
+    private void appendQueryString(StringBuilder url, Map<String, ?> params)
     {
         if (params != null)
         {

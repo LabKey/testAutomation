@@ -321,8 +321,6 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
                 .getSelections();
         waitForClosed();
 
-        // TODO Comment out this line for the time being. Issue 37897: Sample Management: Lookup field values are not consistently displayed between the edit sample panel and the create sample panel.
-//        assertTrue("Expected '" + option + "' to be selected.  Current selections: " + selections, selections.contains(option));
         return this;
     }
 
