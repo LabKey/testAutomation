@@ -218,7 +218,7 @@ public class APIContainerHelper extends AbstractContainerHelper
             {
                 throw new RuntimeException(renameErrorMsg + ": alias not created");
             }
-            if (!createAlias && !doesContainerExist(containerPath))
+            if (!createAlias && doesContainerExist(containerPath))
             {
                 throw new RuntimeException(renameErrorMsg + ": alias created, but not requested");
             }
