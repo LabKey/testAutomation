@@ -31,14 +31,7 @@ public class EnumSelect<E extends Enum<E>> extends SelectWrapper implements Form
 
     public static <E extends Enum<E>> Component.SimpleComponentFinder<EnumSelect<E>> EnumSelect(Locator loc, Class<E> clazz)
     {
-        return new Component.SimpleComponentFinder<EnumSelect<E>>(loc)
-        {
-            @Override
-            protected EnumSelect<E> construct(WebElement el)
-            {
-                return new EnumSelect<>(el, clazz);
-            }
-        };
+        return new Component.SimpleComponentFinder<>(loc, el -> new EnumSelect<>(el, clazz));
     }
 
     @Override

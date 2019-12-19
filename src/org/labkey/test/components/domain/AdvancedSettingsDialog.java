@@ -7,7 +7,6 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.EnumSelect;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -18,15 +17,15 @@ public class AdvancedSettingsDialog extends ModalDialog
 {
     private DomainFieldRow _row;
 
-    private AdvancedSettingsDialog(DomainFieldRow row, ModalDialogFinder finder, WebDriver driver)
+    private AdvancedSettingsDialog(DomainFieldRow row, ModalDialogFinder finder)
     {
-        super(finder.waitFor().getComponentElement(), driver);
+        super(finder);
         _row = row;
     }
 
-    public AdvancedSettingsDialog(DomainFieldRow row, WebDriver driver)
+    public AdvancedSettingsDialog(DomainFieldRow row)
     {
-        this(row, new ModalDialogFinder(driver).withTitle("Advanced Settings and Properties"), driver);
+        this(row, new ModalDialogFinder(row.getDriver()).withTitle("Advanced Settings and Properties"));
     }
 
     public boolean showInDefaultView()

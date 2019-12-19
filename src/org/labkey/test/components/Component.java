@@ -24,6 +24,7 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public abstract class Component<EC extends Component.ElementCache> implements SearchContext
 {
@@ -85,7 +86,7 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         public F timeout(int timeout)
         {
             this.timeout = timeout;
-            return (F)this;
+            return getThis();
         }
 
         protected final int getTimeout()
@@ -93,10 +94,10 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
             return timeout;
         }
 
-        public F index(int index)
+        public F index(Integer index)
         {
             this.index = index;
-            return (F)this;
+            return getThis();
         }
 
         protected final Integer getIndex()
@@ -106,18 +107,17 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
 
         public SimpleComponentFinder<C> locatedBy(Locator loc)
         {
-            return new SimpleComponentFinder<C>(loc)
-            {
-                @Override
-                protected C construct(WebElement el)
-                {
-                    return ComponentFinder.this.construct(el);
-                }
-            };
+            return new SimpleComponentFinder<>(loc, ComponentFinder.this::construct);
         }
 
         protected abstract Locator locator();
         protected abstract C construct(WebElement el);
+
+        // TODO: Override in all sublasses and make abstract
+        protected F getThis()
+        {
+            return (F) this;
+        }
 
         protected final Locator buildLocator()
         {
@@ -205,23 +205,36 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
             Optional<WebElement> optionalElement = buildLocator().findOptionalElement(context);
             return optionalElement.map(this::construct);
         }
+
+        /**
+         * Use the element that would be found by this class to construct an alternate component.
+         * @param factory Usually the constructor for the alternate component
+         * @param <R> An alternate component type that is found by the same locator as the wrapped finder's
+         * @return A component finder that will find the alternate component type
+         */
+        public <R extends Component<?>> SimpleComponentFinder<R> wrap(Function<WebElement, R> factory)
+        {
+            return new SimpleComponentFinder<>(locator(), factory)
+                    .index(getIndex())
+                    .timeout(getTimeout());
+        }
     }
 
-    public static abstract class SimpleComponentFinder<C> extends ComponentFinder<SearchContext, C, SimpleComponentFinder<C>>
+    public static final class SimpleComponentFinder<C> extends ComponentFinder<SearchContext, C, SimpleComponentFinder<C>>
     {
-        Locator _locator;
+        private final Locator _locator;
+        private final Function<WebElement, C> _factory;
 
-        public SimpleComponentFinder(Locator locator)
+        public SimpleComponentFinder(Locator locator, Function<WebElement, C> factory)
         {
             _locator = locator;
+            _factory = factory;
         }
 
-        public SimpleComponentFinder(ComponentFinder finder)
+        @Override
+        protected C construct(WebElement el)
         {
-            this(finder.locator());
-            if (finder.getIndex() != null)
-                index(finder.getIndex());
-            timeout(finder.getTimeout());
+            return _factory.apply(el);
         }
 
         @Override

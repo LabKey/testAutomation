@@ -24,6 +24,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertTrue;
 
@@ -42,18 +43,10 @@ public class PipelineStatusTable extends DataRegionTable
         super(el, driver);
     }
 
-    public static SimpleWebDriverComponentFinder<PipelineStatusTable> finder(WebDriver driver)
+    public static WebDriverComponentFinder<DataRegionTable, ?> finder(WebDriver driver)
     {
-        return new SimpleWebDriverComponentFinder<>(new DataRegionFinder(driver).withName("StatusFiles"))
-        {
-            @Override
-            protected PipelineStatusTable construct(WebElement el, WebDriver driver)
-            {
-                PipelineStatusTable pipelineStatusTable = new PipelineStatusTable(el, driver);
-                pipelineStatusTable.setRegionName(REGION_NAME);
-                return pipelineStatusTable;
-            }
-        };
+        return new DataRegionFinder(driver).withName(REGION_NAME)
+                .wrap((BiFunction<WebElement, WebDriver, DataRegionTable>) PipelineStatusTable::new);
     }
 
     public static PipelineStatusTable viewJobsForContainer(WebDriverWrapper driverWrapper, String containerPath)
@@ -80,6 +73,12 @@ public class PipelineStatusTable extends DataRegionTable
     {
         disablePipelineRefresh();
         return super.newElementCache();
+    }
+
+    @Override
+    public String getDataRegionName()
+    {
+        return REGION_NAME;
     }
 
     public FileBrowserHelper clickProcessData()

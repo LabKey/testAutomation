@@ -49,6 +49,7 @@ import org.labkey.test.components.api.ProjectMenu;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
+import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -63,7 +64,6 @@ import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.Timer;
-import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
@@ -86,7 +86,6 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestProperties.isDevModeEnabled;
@@ -370,30 +369,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected void setInitialPassword(String user, String password)
     {
+        beginAt(WebTestHelper.buildURL("security", "showRegistrationEmail", Map.of("email", user)));
         // Get setPassword URL from notification email.
-        beginAt("/dumbster/begin.view?");
+        WebElement resetLink = Locator.linkWithHref("setPassword.view").findElement(getDriver());
 
-        //the name of the installation can vary, so we need to infer the email subject
-        WebElement link = null;
-        String linkPrefix = user + " : Welcome to the ";
-        String linkSuffix = "new user registration";
-        for (WebElement el : getDriver().findElements(By.partialLinkText(linkPrefix)))
-        {
-            String text = el.getText();
-            if (text.startsWith(linkPrefix) && text.endsWith(linkSuffix))
-            {
-                link = el;
-                break;
-            }
-        }
-        assertNotNull("Link for '" + user + "' not found", link);
-
-        String emailSubject = link.getText();
-        link.click();
-
-        EmailRecordTable emailRecordTable = new EmailRecordTable(getDriver());
-        WebElement resetLink = Locator.tagWithText("a", emailSubject).append("/..//a[contains(@href, 'setPassword.view')]").findElement(emailRecordTable);
-        scrollIntoView(resetLink);
         clickAndWait(resetLink, WAIT_FOR_PAGE);
 
         setFormElement(Locator.id("password"), password);
@@ -1008,9 +987,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         beginAt("/admin/showAdmin.view");
     }
 
-    public void goToMyAccount()
+    public UserDetailsPage goToMyAccount()
     {
         clickUserMenuItem("My Account");
+        return new UserDetailsPage(getDriver());
     }
 
     public PipelineStatusTable goToDataPipeline()
