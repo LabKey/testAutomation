@@ -49,6 +49,7 @@ import org.labkey.test.components.api.ProjectMenu;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
+import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -986,9 +987,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         beginAt("/admin/showAdmin.view");
     }
 
-    public void goToMyAccount()
+    public UserDetailsPage goToMyAccount()
     {
         clickUserMenuItem("My Account");
+        return new UserDetailsPage(getDriver());
     }
 
     public PipelineStatusTable goToDataPipeline()
