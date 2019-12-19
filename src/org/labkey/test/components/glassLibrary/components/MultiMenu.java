@@ -7,6 +7,7 @@ package org.labkey.test.components.glassLibrary.components;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -186,7 +187,7 @@ public class MultiMenu extends BootstrapMenu
         return Locators.dropdownToggle();
     }
 
-    protected static abstract class Locators
+    public static abstract class Locators
     {
         static public Locator.XPathLocator menuContainer()
         {
@@ -200,15 +201,42 @@ public class MultiMenu extends BootstrapMenu
 
         private static Locator.XPathLocator dropdownToggle()
         {
-            return Locator.tagWithClass("button", "dropdown-toggle");
+            return Locator.byClass("dropdown-toggle");
         }
     }
 
-    public static class MultiMenuFinder extends MenuFinder<MultiMenu>
+    public static class MultiMenuFinder extends WebDriverComponent.WebDriverComponentFinder<MultiMenu, MultiMenuFinder>
     {
+        private Locator _locator;
+
         public MultiMenuFinder(WebDriver driver)
         {
             super(driver);
+            _locator = MultiMenu.Locators.menuContainer();
+        }
+
+        public MultiMenuFinder withText(String text)
+        {
+            _locator = MultiMenu.Locators.menuContainer(text);
+            return this;
+        }
+
+        public MultiMenuFinder withButtonId(String id)
+        {
+            _locator = Locators.menuContainer().withChild(Locator.id(id));
+            return this;
+        }
+
+        @Override
+        protected MultiMenuFinder getThis()
+        {
+            return this;
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return _locator;
         }
 
         @Override

@@ -2,17 +2,17 @@ package org.labkey.test;
 
 public abstract class BootstrapLocators
 {
-    static public Locator infoBanner = Locator.tagWithClass("div", BannerType.INFO.getCss());
-    static public Locator successBanner = Locator.tagWithClass("div", BannerType.SUCCESS.getCss());
-    static public Locator dangerBanner = Locator.tagWithClass("div", BannerType.ERROR.getCss());
-    static public Locator warningBanner = Locator.tagWithClass("div", BannerType.WARNING.getCss());
+    public static final Locator infoBanner = Locator.tagWithClass("div", BannerType.INFO.getCss());
+    public static final Locator successBanner = Locator.tagWithClass("div", BannerType.SUCCESS.getCss());
+    public static final Locator dangerBanner = Locator.tagWithClass("div", BannerType.ERROR.getCss());
+    public static final Locator warningBanner = Locator.tagWithClass("div", BannerType.WARNING.getCss());
 
     public enum BannerType
     {
-        SUCCESS("success-alert"),
-        INFO("info-alert"),
-        WARNING("warning-alert"),
-        ERROR("danger-alert");
+        SUCCESS("alert-success"),
+        INFO("alert-info"),
+        WARNING("alert-warning"),
+        ERROR("alert-danger");
 
         private final String _css;
 
@@ -25,5 +25,10 @@ public abstract class BootstrapLocators
         {
             return _css;
         }
+    }
+
+    public static Locator panel(String panelHeading)
+    {
+        return Locator.byClass("panel").withChild(Locator.byClass("panel-heading").withText(panelHeading));
     }
 }

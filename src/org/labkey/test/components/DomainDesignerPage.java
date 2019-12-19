@@ -49,8 +49,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     {
         elementCache().cancelBtn().click();
         UnsavedChangesModalDialog unsavedChangesModal = new UnsavedChangesModalDialog(
-                new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"),
-                getDriver());
+                new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"));
         return unsavedChangesModal;
     }
 

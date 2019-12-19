@@ -50,14 +50,7 @@ public class LabKeyAlert extends ModalDialog implements Alert
 
     public static SimpleWebDriverComponentFinder<LabKeyAlert> getFinder(WebDriver driver)
     {
-        return new SimpleWebDriverComponentFinder<LabKeyAlert>(driver, Locator.id("lk-utils-modal"))
-        {
-            @Override
-            protected LabKeyAlert construct(WebElement el, WebDriver driver)
-            {
-                return new LabKeyAlert(el, driver);
-            }
-        };
+        return new SimpleWebDriverComponentFinder<>(driver, Locator.id("lk-utils-modal"), LabKeyAlert::new);
     }
 
     public WebElement getFunctionBody()
