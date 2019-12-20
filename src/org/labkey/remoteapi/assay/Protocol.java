@@ -16,6 +16,17 @@ public class Protocol extends ResponseObject
     private String _providerName;
     private List<Domain> _domains = new ArrayList<>();
 
+    private Boolean _allowBackgroundUpload;
+    private Boolean _allowEditableResults;
+    private Boolean _allowQCStates;
+    private Boolean _allowSpacesInPath;
+    private Boolean _allowTransformationScript;
+    private Boolean _backgroundUpload;
+    private Boolean _editableResults;
+    private Boolean _editableRuns;
+    private Boolean _saveScriptFiles;
+    private Boolean _qcEnabled;
+
     public Protocol()
     {
         super(null);
@@ -36,7 +47,25 @@ public class Protocol extends ResponseObject
                 _domains.add(new Domain((JSONObject)domain));
         }
 
-        // TODO lots more properties to be added here
+        if (json.containsKey("allowBackgroundUpload"))
+            _allowBackgroundUpload = (Boolean)json.get("allowBackgroundUpload");
+        if (json.containsKey("allowEditableResults"))
+            _allowEditableResults = (Boolean)json.get("allowEditableResults");
+        if (json.containsKey("editableResults"))
+            _editableResults = (Boolean)json.get("editableResults");
+        if (json.containsKey("editableRuns"))
+            _editableRuns = (Boolean)json.get("editableRuns");
+        if (json.containsKey("saveScriptfiles"))
+            _saveScriptFiles = (Boolean)json.get("saveScriptFiles");
+        if (json.containsKey("qcEnabled"))
+            _qcEnabled = (Boolean)json.get("qcEnabled");
+        if (json.containsKey("allowQCStates"))
+            _allowQCStates = (Boolean)json.get("allowQCStates");
+        if (json.containsKey("allowSpacesInPath"))
+            _allowSpacesInPath = (Boolean)json.get("allowSpacesInPath");
+        if (json.containsKey("allowTransformationScript"))
+            _allowTransformationScript = (Boolean)json.get("allowTransformationScript");
+
     }
 
     public JSONObject toJSONObject()
@@ -46,13 +75,24 @@ public class Protocol extends ResponseObject
         result.put("name", _name);
         result.put("description", _description);
         result.put("providerName", _providerName);
-
         JSONArray domains = new JSONArray();
         result.put("domains", domains);
         for (Domain domain : _domains)
-            domains.add(domain.toJSONObject(true));
+            domains.add(domain.toJSONObject());
 
-        // TODO lots more properties to be added here
+        if (_allowBackgroundUpload != null)
+            result.put("allowBackgroundUpload", _allowBackgroundUpload);
+        if (_backgroundUpload != null)
+            result.put("backgroundUpload", _backgroundUpload);
+        if (_allowEditableResults != null)
+            result.put("allowEditableResults", _allowEditableResults);
+        if (_allowQCStates != null)
+            result.put("allowQCStates", _allowQCStates);
+        if (_allowSpacesInPath != null)
+            result.put("allowSpacesInPath", _allowSpacesInPath);
+        if (_allowTransformationScript != null)
+            result.put("allowTransformationScript", _allowTransformationScript);
+
 
         return result;
     }
@@ -67,9 +107,10 @@ public class Protocol extends ResponseObject
         return _name;
     }
 
-    public void setName(String name)
+    public Protocol setName(String name)
     {
         _name = name;
+        return this;
     }
 
     public String getDescription()
@@ -100,5 +141,105 @@ public class Protocol extends ResponseObject
     public void setDomains(List<Domain> domains)
     {
         _domains = domains;
+    }
+
+    public Protocol setAllowBackgroundUpload(boolean allowBackgroundUpload)
+    {
+        _allowBackgroundUpload = allowBackgroundUpload;
+        return this;
+    }
+    public Boolean getAllowBackgroundUpload()
+    {
+        return _allowBackgroundUpload;
+    }
+
+    public Protocol setAllowEditableResults(boolean allowEditableResults)
+    {
+        _allowEditableResults = allowEditableResults;
+        return this;
+    }
+    public Boolean getAllowEditableResults()
+    {
+        return _allowEditableResults;
+    }
+
+    public Protocol allowQCStates(boolean qcEnabled)
+    {
+        _allowQCStates = qcEnabled;
+        return this;
+    }
+    public Boolean getAllowQCStates()
+    {
+        return _allowQCStates;
+    }
+
+    public Protocol setAllowSpacesInPath(Boolean allowSpacesInPath)
+    {
+        _allowSpacesInPath = allowSpacesInPath;
+        return this;
+    }
+    public boolean getAllowSpacesInPath()
+    {
+        return _allowSpacesInPath;
+    }
+
+    public Protocol setAllowTransformationScript(Boolean allowTransformationScript)
+    {
+        _allowTransformationScript = allowTransformationScript;
+        return this;
+    }
+    public Boolean getAllowTransformationScript()
+    {
+        return _allowTransformationScript;
+    }
+
+    public Protocol setBackgroundUpload(Boolean backgroundUpload)
+    {
+        _backgroundUpload = backgroundUpload;
+        return this;
+    }
+    public boolean getBackgroundUpload()
+    {
+        return _backgroundUpload;
+    }
+
+    public Protocol setEditableResults(Boolean editableResults)
+    {
+        _editableResults = editableResults;
+        return this;
+    }
+    public Boolean getEditableResults()
+    {
+        return _editableResults;
+    }
+
+    public Protocol setEditableRuns(Boolean editableRuns)
+    {
+        _editableRuns = editableRuns;
+        return this;
+    }
+    public Boolean getEditableRuns()
+    {
+        return _editableRuns;
+    }
+
+    public Protocol setSaveScriptFiles(Boolean saveScriptFiles)
+    {
+        _saveScriptFiles = saveScriptFiles;
+        return this;
+    }
+    public Boolean getSaveScriptFiles()
+    {
+        return _saveScriptFiles;
+    }
+
+    public Protocol setQCEnabled(boolean qcEnabled)
+    {
+        _qcEnabled = qcEnabled;
+        return this;
+    }
+    public Boolean getQcEnabled()
+    {
+        return _qcEnabled;
     }
 }

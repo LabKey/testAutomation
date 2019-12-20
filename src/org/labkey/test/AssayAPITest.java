@@ -20,7 +20,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.assay.GetProtocolCommand;
 import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.remoteapi.assay.Protocol;
+import org.labkey.remoteapi.assay.ProtocolResponse;
+import org.labkey.remoteapi.assay.SaveProtocolCommand;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.ReactAssayDesignerPage;
@@ -104,6 +109,26 @@ public class AssayAPITest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText(assayName));
         clickAndWait(Locator.linkContainingText(runName));
         assertTextPresent(textToCheck);
+    }
+
+    @Test
+    public void testAssayOverAPI() throws Exception
+    {
+        String assayName = "testGpatAssay";
+
+        Connection connection = createDefaultConnection(true);
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand("General");
+        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, getCurrentContainerPath());
+
+        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
+        newAssayProtocol.setName(assayName)
+            .allowQCStates(true)
+            .setEditableResults(true)
+            .setEditableRuns(true);
+        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
+        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, getCurrentContainerPath());
+
+        log("foo");
     }
 
     // Issue 30003: support importing assay data relative to pipeline root
