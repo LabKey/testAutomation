@@ -33,14 +33,7 @@ public class OptionSelect<T extends OptionSelect.SelectOption> extends SelectWra
 
     public static <O extends SelectOption> Component.SimpleComponentFinder<OptionSelect<O>> finder(Locator loc, Class<O> optionClass)
     {
-        return new Component.SimpleComponentFinder<OptionSelect<O>>(loc)
-        {
-            @Override
-            protected OptionSelect<O> construct(WebElement el)
-            {
-                return new OptionSelect<>(el);
-            }
-        };
+        return new Component.SimpleComponentFinder<>(loc, OptionSelect::new);
     }
 
     public SelectOption getSelection()

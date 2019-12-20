@@ -18,13 +18,14 @@ package org.labkey.test.components.html;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 
-public class Input extends WebDriverComponent implements FormItem<String>
+public class Input extends WebDriverComponent<Component<?>.ElementCache> implements FormItem<String>
 {
     private final WebElement _el;
     private final WebDriver _driver; // getFormElement uses javascript
@@ -36,28 +37,14 @@ public class Input extends WebDriverComponent implements FormItem<String>
         _driver = driver;
     }
 
-    public static SimpleComponentFinder<Input> Input(Locator loc, WebDriver driver)
+    public static SimpleWebDriverComponentFinder<Input> Input(Locator loc, WebDriver driver)
     {
-        return new SimpleComponentFinder<>(loc)
-        {
-            @Override
-            protected Input construct(WebElement el)
-            {
-                return new Input(el, driver);
-            }
-        };
+        return new SimpleWebDriverComponentFinder<>(driver, loc, Input::new);
     }
 
-    public static SimpleComponentFinder<FileInput> FileInput(Locator loc, WebDriver driver)
+    public static SimpleWebDriverComponentFinder<FileInput> FileInput(Locator loc, WebDriver driver)
     {
-        return new SimpleComponentFinder<>(loc)
-        {
-            @Override
-            protected FileInput construct(WebElement el)
-            {
-                return new FileInput(el, driver);
-            }
-        };
+        return new SimpleWebDriverComponentFinder<>(driver, loc, FileInput::new);
     }
 
     @Override
