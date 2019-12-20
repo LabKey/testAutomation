@@ -98,7 +98,23 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 
     public String getValue()
     {
-        return getComponentElement().getText();
+
+        String value = getComponentElement().getText();
+
+        // With some react select components getting the text value returns the clear icon, trim it from the string.
+        int idx = value.lastIndexOf("\n×");
+        if(idx > 0)
+            value = value.substring(0, idx);
+
+        idx = value.lastIndexOf("\n ×");
+        if(idx > 0)
+            value = value.substring(0, idx);
+
+        // If it is a multi select control each of the individual elements will have a 'remove' option,
+        // so replace them with nothing.
+        value = value.replace("×", "");
+
+        return value;
     }
 
     public boolean hasOption(String value)
