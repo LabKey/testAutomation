@@ -106,14 +106,14 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public String waitForError()
     {
-        waitFor(()-> BootstrapLocators.dangerBanner.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.errorBanner.existsIn(getDriver()),
                 "the error alert did not appear as expected", 1000);
         return  errorAlert().getText();
     }
 
     public WebElement errorAlert()
     {
-        return BootstrapLocators.dangerBanner.existsIn(getDriver()) ? BootstrapLocators.dangerBanner.findElement(getDriver()) : null;
+        return BootstrapLocators.errorBanner.existsIn(getDriver()) ? BootstrapLocators.errorBanner.findElement(getDriver()) : null;
     }
 
     public String waitForWarning()
@@ -143,14 +143,14 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     public String waitForAnyAlert()
     {
         WebElement alert = Locator.waitForAnyElement(shortWait(),
-                BootstrapLocators.dangerBanner, BootstrapLocators.infoBanner, BootstrapLocators.warningBanner, BootstrapLocators.successBanner);
+                BootstrapLocators.errorBanner, BootstrapLocators.infoBanner, BootstrapLocators.warningBanner, BootstrapLocators.successBanner);
         return alert.getText();
     }
 
     public String anyAlert()
     {
         WebElement alert = Locator.findAnyElementOrNull(getDriver(),
-                BootstrapLocators.dangerBanner, BootstrapLocators.infoBanner, BootstrapLocators.warningBanner, BootstrapLocators.successBanner);
+                BootstrapLocators.errorBanner, BootstrapLocators.infoBanner, BootstrapLocators.warningBanner, BootstrapLocators.successBanner);
         if (alert !=null)
             return alert.getText();
         else

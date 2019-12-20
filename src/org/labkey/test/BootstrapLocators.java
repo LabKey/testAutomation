@@ -4,7 +4,7 @@ public abstract class BootstrapLocators
 {
     public static final Locator infoBanner = Locator.tagWithClass("div", BannerType.INFO.getCss());
     public static final Locator successBanner = Locator.tagWithClass("div", BannerType.SUCCESS.getCss());
-    public static final Locator dangerBanner = Locator.tagWithClass("div", BannerType.ERROR.getCss());
+    public static final Locator errorBanner = Locator.tagWithClass("div", BannerType.ERROR.getCss());
     public static final Locator warningBanner = Locator.tagWithClass("div", BannerType.WARNING.getCss());
 
     public enum BannerType
