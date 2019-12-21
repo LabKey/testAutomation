@@ -200,11 +200,17 @@ public class APIContainerHelper extends AbstractContainerHelper
         Map<String, String> params = new HashMap<>();
         params.put("name", URLEncoder.encode(newName, StandardCharsets.UTF_8));
         params.put("addAlias", String.valueOf(createAlias));
+        params.put("titleSameAsName", String.valueOf(true));
         SimpleHttpRequest simpleHttpRequest = new SimpleHttpRequest(WebTestHelper.buildURL("admin", containerPath, "renameFolder", params), "POST");
         simpleHttpRequest.copySession(_test.getDriver());
 
         String expectedContainerPath = containerPath.substring(0, containerPath.lastIndexOf("/") + 1) + newName;
         String renameErrorMsg = "Failed to rename '" + containerPath + "' to '" + newName + "'";
+        if (doesContainerExist(expectedContainerPath))
+        {
+            throw new IllegalArgumentException(renameErrorMsg + ": " + expectedContainerPath + " already exists");
+        }
+
         try
         {
             SimpleHttpResponse response = simpleHttpRequest.getResponse();

@@ -3,7 +3,6 @@ package org.labkey.test.components.domain;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.params.FieldDefinition;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -12,15 +11,15 @@ public class RangeValidatorDialog extends ModalDialog
 {
     private DomainFieldRow _row;
 
-    public RangeValidatorDialog(DomainFieldRow row, ModalDialogFinder finder, WebDriver driver)
+    public RangeValidatorDialog(DomainFieldRow row, ModalDialogFinder finder)
     {
-        super(finder.waitFor().getComponentElement(), driver);
+        super(finder);
         _row = row;
     }
 
-    public RangeValidatorDialog(DomainFieldRow row, WebDriver driver)
+    public RangeValidatorDialog(DomainFieldRow row)
     {
-        this(row, new ModalDialogFinder(driver).withTitle("Range Validator for " + row.getName()), driver);
+        this(row, new ModalDialogFinder(row.getDriver()).withTitle("Range Validator for " + row.getName()));
     }
 
     public List<RangeValidatorPanel> validators()

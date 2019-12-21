@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class APIUserHelper extends AbstractUserHelper
@@ -68,6 +69,7 @@ public class APIUserHelper extends AbstractUserHelper
 
             if (verifySuccess)
             {
+                assertNotNull("User already exists: " + userName, response.getMessage());
                 assertEquals(userName, response.getEmail());
                 assertTrue("Invalid userId", response.getUserId() != null);
             }

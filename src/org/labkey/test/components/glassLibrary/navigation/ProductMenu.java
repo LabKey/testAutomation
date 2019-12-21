@@ -5,7 +5,7 @@
 package org.labkey.test.components.glassLibrary.navigation;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.glassLibrary.components.MenuFinder;
+import org.labkey.test.components.glassLibrary.components.MultiMenu;
 import org.labkey.test.components.html.BaseBootstrapMenu;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -27,16 +27,9 @@ public class ProductMenu extends BaseBootstrapMenu
         super(driver, element);
     }
 
-    public static MenuFinder<ProductMenu> finder(WebDriver driver)
+    public static SimpleWebDriverComponentFinder<ProductMenu> finder(WebDriver driver)
     {
-        return new MenuFinder<ProductMenu>(driver)
-        {
-            @Override
-            protected ProductMenu construct(WebElement el, WebDriver driver)
-            {
-                return new ProductMenu(el, driver);
-            }
-        };
+        return new MultiMenu.MultiMenuFinder(driver).withButtonId("product-menu").wrap(ProductMenu::new);
     }
 
     @Override

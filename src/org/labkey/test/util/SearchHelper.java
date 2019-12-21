@@ -41,7 +41,7 @@ public class SearchHelper extends WebDriverWrapper
     private final BaseWebDriverTest _test;
     private final SearchResultsQueue _searchResultsQueue;
 
-    private int maxTries = 4;
+    private int maxTries = 5;
 
     public SearchHelper(BaseWebDriverTest test, SearchResultsQueue queue)
     {
