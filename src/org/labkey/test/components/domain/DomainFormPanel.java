@@ -300,17 +300,15 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         WebElement expandIcon = expandIconLoc.refindWhenNeeded(DomainFormPanel.this);
         Locator.XPathLocator collapseIconLoc = Locator.tagWithClass("svg", "domain-form-collapse-btn");
         WebElement collapseIcon = collapseIconLoc.refindWhenNeeded(DomainFormPanel.this);
-        WebElement panelTitle = Locator.xpath("//div//span[not(@class)]").findWhenNeeded(DomainFormPanel.this);
+        WebElement panelTitle = Locator.tagWithClass("span", "domain-panel-title").findWhenNeeded(DomainFormPanel.this);
         WebElement panelAlert = Locator.css("div.alert-info").findWhenNeeded(DomainFormPanel.this);
         WebElement panelAlertText = Locator.css("div.alert-info > div > div").findWhenNeeded(DomainFormPanel.this);
     }
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
     {
-        final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-form-panel");
-        final Locator.XPathLocator _activeLocator = Locator.tagWithClass("div", "domain-form-panel").withClass("panel-active");
+        final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-form-panel").withChild(Locator.tagWithClass("div", "domain-panel-header"));
         private String _title = null;
-        private boolean _active;
 
         public DomainFormPanelFinder(WebDriver driver)
         {
@@ -320,12 +318,6 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         public DomainFormPanelFinder withTitle(String title)
         {
             _title = title;
-            return this;
-        }
-
-        public DomainFormPanelFinder active()
-        {
-            _active = true;
             return this;
         }
 
@@ -341,7 +333,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             if (_title != null)
             {
                 Locator.XPathLocator titleLoc = Locator.tagWithClass("div", "domain-panel-header").child(Locator.tag("span")).startsWith(_title);
-                return _active ? _activeLocator.withDescendant(titleLoc) : getBaseLocator().withDescendant(titleLoc);
+                return getBaseLocator().withDescendant(titleLoc);
             }
             else
                 return getBaseLocator();
