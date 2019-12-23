@@ -112,7 +112,7 @@ public class AssayAPITest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAssayOverAPI() throws Exception
+    public void testGpatAssayOverAPI() throws Exception
     {
         String assayName = "testGpatAssay";
 
@@ -123,12 +123,37 @@ public class AssayAPITest extends BaseWebDriverTest
         Protocol newAssayProtocol = getProtocolResponse.getProtocol();
         newAssayProtocol.setName(assayName)
             .allowQCStates(true)
+            .setAllowEditableResults(true)
             .setEditableResults(true)
             .setEditableRuns(true);
         SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
         ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, getCurrentContainerPath());
 
-        log("foo");
+        assertTrue(saveProtocolResponse.getProtocol().getAllowQCStates());
+        assertTrue(saveProtocolResponse.getProtocol().getAllowEditableResults());
+        assertTrue(saveProtocolResponse.getProtocol().getEditableResults());
+        assertTrue(saveProtocolResponse.getProtocol().getEditableRuns());
+    }
+
+    @Test
+    public void testViabilityAssayOverAPI() throws Exception
+    {
+        String assayName = "testViabilityAssay";
+
+        Connection connection = createDefaultConnection(true);
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand("Viability");
+        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, getCurrentContainerPath());
+
+        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
+        newAssayProtocol.setName(assayName)
+                .setSaveScriptFiles(true)
+                .setAllowTransformationScript(false);
+        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
+        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, getCurrentContainerPath());
+
+        assertTrue(saveProtocolResponse.getProtocol().getSaveScriptFiles());
+        assertTrue(saveProtocolResponse.getProtocol().getAllowTransformationScript());
+
     }
 
     // Issue 30003: support importing assay data relative to pipeline root

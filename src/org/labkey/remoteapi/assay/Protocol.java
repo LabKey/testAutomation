@@ -17,14 +17,17 @@ public class Protocol extends ResponseObject
     private List<Domain> _domains = new ArrayList<>();
 
     private Boolean _allowBackgroundUpload;
-    private Boolean _allowEditableResults;
-    private Boolean _allowQCStates;
+
     private Boolean _allowSpacesInPath;
     private Boolean _allowTransformationScript;
     private Boolean _backgroundUpload;
+
+    private Boolean _allowEditableResults;
     private Boolean _editableResults;
     private Boolean _editableRuns;
     private Boolean _saveScriptFiles;
+
+    private Boolean _allowQCStates;
     private Boolean _qcEnabled;
 
     public Protocol()
@@ -55,7 +58,7 @@ public class Protocol extends ResponseObject
             _editableResults = (Boolean)json.get("editableResults");
         if (json.containsKey("editableRuns"))
             _editableRuns = (Boolean)json.get("editableRuns");
-        if (json.containsKey("saveScriptfiles"))
+        if (json.containsKey("saveScriptFiles"))
             _saveScriptFiles = (Boolean)json.get("saveScriptFiles");
         if (json.containsKey("qcEnabled"))
             _qcEnabled = (Boolean)json.get("qcEnabled");
@@ -78,7 +81,7 @@ public class Protocol extends ResponseObject
         JSONArray domains = new JSONArray();
         result.put("domains", domains);
         for (Domain domain : _domains)
-            domains.add(domain.toJSONObject());
+            domains.add(domain.toJSONObject(true));
 
         if (_allowBackgroundUpload != null)
             result.put("allowBackgroundUpload", _allowBackgroundUpload);
@@ -86,13 +89,18 @@ public class Protocol extends ResponseObject
             result.put("backgroundUpload", _backgroundUpload);
         if (_allowEditableResults != null)
             result.put("allowEditableResults", _allowEditableResults);
+        if (_editableResults != null)
+            result.put("editableResults", _editableResults);
         if (_allowQCStates != null)
             result.put("allowQCStates", _allowQCStates);
+        if (_qcEnabled != null)
+            result.put("qcEnabled", _qcEnabled);
         if (_allowSpacesInPath != null)
             result.put("allowSpacesInPath", _allowSpacesInPath);
         if (_allowTransformationScript != null)
             result.put("allowTransformationScript", _allowTransformationScript);
-
+        if (_saveScriptFiles != null)
+            result.put("saveScriptFiles", _saveScriptFiles);
 
         return result;
     }
