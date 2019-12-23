@@ -183,9 +183,14 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return elementCache().expandIconLoc.existsIn(this);
     }
 
+    public boolean hasPanelTitle()
+    {
+        return elementCache().panelTitleLoc.existsIn(this);
+    }
+
     public String getPanelTitle()
     {
-        return elementCache().panelTitle.getText();
+        return hasPanelTitle() ? elementCache().panelTitle.getText() : null;
     }
 
     /**
@@ -300,14 +305,15 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         WebElement expandIcon = expandIconLoc.refindWhenNeeded(DomainFormPanel.this);
         Locator.XPathLocator collapseIconLoc = Locator.tagWithClass("svg", "domain-form-collapse-btn");
         WebElement collapseIcon = collapseIconLoc.refindWhenNeeded(DomainFormPanel.this);
-        WebElement panelTitle = Locator.tagWithClass("span", "domain-panel-title").findWhenNeeded(DomainFormPanel.this);
+        Locator.XPathLocator panelTitleLoc = Locator.tagWithClass("span", "domain-panel-title");
+        WebElement panelTitle = panelTitleLoc.findWhenNeeded(DomainFormPanel.this);
         WebElement panelAlert = Locator.css("div.alert-info").findWhenNeeded(DomainFormPanel.this);
         WebElement panelAlertText = Locator.css("div.alert-info > div > div").findWhenNeeded(DomainFormPanel.this);
     }
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
     {
-        final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-form-panel").withChild(Locator.tagWithClass("div", "domain-panel-header"));
+        final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-form-panel");
         private String _title = null;
 
         public DomainFormPanelFinder(WebDriver driver)
