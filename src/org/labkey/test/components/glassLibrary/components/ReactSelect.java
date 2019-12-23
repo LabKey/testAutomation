@@ -102,11 +102,11 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         String value = getComponentElement().getText();
 
         // With some react select components getting the text value returns the clear icon, trim it from the string.
-        int idx = value.lastIndexOf("\n×");
+        int idx = value.lastIndexOf(System.lineSeparator() + "×");
         if(idx > 0)
             value = value.substring(0, idx);
 
-        idx = value.lastIndexOf("\n ×");
+        idx = value.lastIndexOf(System.lineSeparator() + " ×");
         if(idx > 0)
             value = value.substring(0, idx);
 
