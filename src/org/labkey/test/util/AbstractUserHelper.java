@@ -16,11 +16,11 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.security.CreateUserResponse;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -30,6 +30,11 @@ public abstract class AbstractUserHelper
 {
     private WebDriverWrapper _driverWrapper;
     protected static final Map<String, String> usersAndDisplayNames = new HashMap<>();
+
+    protected AbstractUserHelper(WebDriverWrapper driverWrapper)
+    {
+        _driverWrapper = driverWrapper;
+    }
 
     public WebDriverWrapper getWrapper()
     {
@@ -71,9 +76,8 @@ public abstract class AbstractUserHelper
         if (!newDisplayName.equals(previousDisplayName))
         {
             usersAndDisplayNames.remove(email); // Forget cached display name in case something goes wrong
-            getWrapper().goToSiteUsers();
+            DataRegionTable users = getWrapper().goToSiteUsers().getUsersTable();
 
-            DataRegionTable users = new DataRegionTable("Users", getWrapper().getDriver());
             users.setFilter("Email", "Equals", email);
             int userRow = users.getRowIndex("Email", email);
             assertFalse("No such user: " + email, userRow == -1);
@@ -86,11 +90,6 @@ public abstract class AbstractUserHelper
             getWrapper().clickButton("Submit");
             usersAndDisplayNames.put(email, newDisplayName);
         }
-    }
-
-    public AbstractUserHelper(WebDriverWrapper driverWrapper)
-    {
-        _driverWrapper = driverWrapper;
     }
 
     public CreateUserResponse createUser(String userName)
@@ -130,6 +129,7 @@ public abstract class AbstractUserHelper
         _deleteUsers(failIfNotFound, userEmails);
     }
 
+    public abstract void ensureUsersExist(List<String> userEmails);
     public abstract CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess);
     protected abstract void _deleteUser(String userEmail);
     protected abstract void _deleteUsers(boolean failIfNotFound, String... userEmails);

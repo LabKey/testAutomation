@@ -28,7 +28,7 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     protected DeleteConfirmationDialog(ModalDialogFinder finder, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
-        super(finder.waitFor().getComponentElement(), sourcePage.getDriver());
+        super(finder);
         _sourcePage = sourcePage;
         _confirmPageSupplier = confirmPageSupplier;
     }

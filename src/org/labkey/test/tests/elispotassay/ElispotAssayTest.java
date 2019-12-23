@@ -462,10 +462,6 @@ public class ElispotAssayTest extends AbstractAssayTest
         setFormElement(nameField, PLATE_TEMPLATE_NAME);
         fireEvent(nameField, SeleniumEvent.change);
 
-        Locator.tagWithAttribute("input", "placeholder", "Enter Group Name")
-                .append(Locator.xpath("/../../td/div"))
-                .findElement(this.getDriver()).click();
-        this.waitAndClick(Locator.tag("div").withClass("x-ignore").childTag("div").withText("Background Wells"));
         clickButton("Create", 0);
         waitForElement(Locator.tagWithText("label", "Background Wells"));
 

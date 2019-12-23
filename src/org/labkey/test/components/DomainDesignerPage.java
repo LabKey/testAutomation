@@ -49,8 +49,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     {
         elementCache().cancelBtn().click();
         UnsavedChangesModalDialog unsavedChangesModal = new UnsavedChangesModalDialog(
-                new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"),
-                getDriver());
+                new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"));
         return unsavedChangesModal;
     }
 
@@ -100,7 +99,8 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         List<String> titles = new ArrayList<>();
         for(DomainFormPanel formPanel : getPanels())
         {
-            titles.add(formPanel.getPanelTitle());
+            if (formPanel.hasPanelTitle())
+                titles.add(formPanel.getPanelTitle());
         }
         return titles;
     }
