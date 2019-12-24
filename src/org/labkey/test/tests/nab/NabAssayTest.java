@@ -495,7 +495,7 @@ public class NabAssayTest extends AbstractAssayTest
     {
         log("rename assay folder and verify source file still findable");
         _containerHelper.renameFolder(getProjectName(), TEST_ASSAY_FLDR_NAB, TEST_ASSAY_FLDR_NAB_RENAME, false);
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_NAB_RENAME).notHidden());
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkContainingText("run details"));
 
