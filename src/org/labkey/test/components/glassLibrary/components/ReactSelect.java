@@ -100,25 +100,30 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
     {
 
         String value = getComponentElement().getText();
-        String lineSeparator = System.lineSeparator();
 
-        log("ReactSelect.getvalue: value: " + value);
+        log("ReactSelect.getvalue: value: '" + value + "'.");
         log("ReactSelect.getvalue: value.lastIndexOf(\"\\n\"): " + value.lastIndexOf("\n"));
         log("ReactSelect.getvalue: value.lastIndexOf(\"\\r\"): " + value.lastIndexOf("\r"));
-        log("ReactSelect.getvalue: lineSeparator: " + lineSeparator);
 
-        // With some react select components getting the text value returns the clear icon, trim it from the string.
-        int idx = value.lastIndexOf(System.lineSeparator() + "×");
+        // With some react select components getting the text value can return the clear icon, or it may have multiple items.
+        // In both cases there may be a line separator, so remove it.
+        int idx = value.lastIndexOf(System.lineSeparator());
+        log("ReactSelect.getvalue: value.lastIndexOf(System.lineSeparator(): " + idx);
+
         if(idx > 0)
-            value = value.substring(0, idx);
+            value = value.replaceAll(System.lineSeparator(), "");
 
-        idx = value.lastIndexOf(System.lineSeparator() + " ×");
-        if(idx > 0)
-            value = value.substring(0, idx);
+        log("ReactSelect.getvalue: value: '" + value + "'.");
 
-        // If it is a multi select control each of the individual elements will have a 'remove' option,
-        // so replace them with nothing.
-        value = value.replace("×", "");
+        idx = value.indexOf("×");
+        log("ReactSelect.getvalue: value.indexOf(\"×\"): " + idx);
+
+        // Replace the '×' (remove icon) with nothing.
+        value = value.replaceAll("×", "");
+        log("ReactSelect.getvalue: value: '" + value + "'.");
+
+        value = value.trim();
+        log("ReactSelect.getvalue: value: '" + value + "'.");
 
         return value;
     }
