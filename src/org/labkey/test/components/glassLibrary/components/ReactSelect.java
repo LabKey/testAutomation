@@ -118,6 +118,8 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         idx = value.indexOf("×");
         log("ReactSelect.getvalue: value.indexOf(\"×\"): " + idx);
 
+
+        log("ReactSelect.getvalue: Integer.toHexString((int) value.charAt(value.length() - 1)): " + Integer.toHexString((int) value.charAt(value.length() - 1)));
         // Replace the '×' (remove icon) with nothing.
         value = value.replaceAll("×", "");
         log("ReactSelect.getvalue: value: '" + value + "'.");
