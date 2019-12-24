@@ -69,8 +69,7 @@ public class APIUserHelper extends AbstractUserHelper
 
             if (verifySuccess)
             {
-                // TODO Remove, just commenting out to work around bug.
-//                assertNotNull("User already exists: " + userName, response.getMessage());
+                assertNotNull("User already exists: " + userName, response.getMessage());
                 assertEquals(userName, response.getEmail());
                 assertTrue("Invalid userId", response.getUserId() != null);
             }
