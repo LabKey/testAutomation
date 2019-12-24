@@ -115,6 +115,14 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 
         log("ReactSelect.getvalue: value: '" + value + "'.");
 
+        log("ReactSelect.getvalue: char values--> ");
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < value.length(); i++)
+        {
+            sb.append(value.charAt(i)).append(" : ").append(Integer.toHexString((int) value.charAt(i))).append("\n");
+        }
+        log(sb.toString());
+
         idx = value.indexOf("×");
         log("ReactSelect.getvalue: value.indexOf(\"×\"): " + idx);
 
