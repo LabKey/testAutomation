@@ -6,7 +6,9 @@ import org.labkey.remoteapi.ResponseObject;
 import org.labkey.remoteapi.domain.Domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Protocol extends ResponseObject
 {
@@ -29,6 +31,20 @@ public class Protocol extends ResponseObject
 
     private Boolean _allowQCStates;
     private Boolean _qcEnabled;
+
+    private String _autoCopyTargetContainerId;
+
+    private List<String> _availableDetectionMethods;
+    private String _selectedDetectionMethod;
+
+    private Map<String, String> _availableMetadataInputFormats;
+    private String _selectedMetadataInputFormat;
+
+    private List<String> _availablePlateTemplates;
+    private String _selectedPlateTemplate;
+
+    private Map<String, String> _protocolParameters;
+    private List<String> _protocolTransformScripts;
 
     public Protocol()
     {
@@ -68,7 +84,41 @@ public class Protocol extends ResponseObject
             _allowSpacesInPath = (Boolean)json.get("allowSpacesInPath");
         if (json.containsKey("allowTransformationScript"))
             _allowTransformationScript = (Boolean)json.get("allowTransformationScript");
+        if (json.containsKey("autoCopyTargetContainerId"))
+            _autoCopyTargetContainerId = (String)json.get("autoCopyTargetContainerId");
 
+        if (json.get("availableDetectionMethods") instanceof JSONArray)
+        {
+            for (Object detectionMethod : (JSONArray)json.get("availableDetectionMethods"))
+                _availableDetectionMethods.add((String)detectionMethod);
+        }
+        if (json.containsKey("selectedDetectionMethod"))
+            _selectedDetectionMethod = (String)json.get("selectedDetectionMethod");
+
+        if (json.containsKey("availableMetadataInputFormats"))
+        {
+            _availableMetadataInputFormats = (HashMap<String,String>)json.get("availableMetadataInputFormats");
+        }
+        if (json.containsKey("selectedMetadataInputFormat"))
+            _selectedMetadataInputFormat = (String)json.get("selectedMetadataInputFormat");
+
+        if (json.get("availablePlateTemplates") instanceof JSONArray)
+        {
+            for (Object plateTemplate : (JSONArray)json.get("availablePlateTemplates"))
+                _availablePlateTemplates.add((String)plateTemplate);
+        }
+        if (json.containsKey("selectedPlateTemplate"))
+            _selectedPlateTemplate = (String)json.get("selectedPlateTemplate");
+
+        if (json.get("protocolTransformScripts") instanceof JSONArray)
+        {
+            for (Object transformScript : (JSONArray)json.get("protocolTransformScripts"))
+                _protocolTransformScripts.add((String)transformScript);
+        }
+        if (json.containsKey("protocolParameters"))
+        {
+            _protocolParameters = (HashMap<String,String>)json.get("protocolParameters");
+        }
     }
 
     public JSONObject toJSONObject()
@@ -101,6 +151,46 @@ public class Protocol extends ResponseObject
             result.put("allowTransformationScript", _allowTransformationScript);
         if (_saveScriptFiles != null)
             result.put("saveScriptFiles", _saveScriptFiles);
+        if (_editableRuns != null)
+            result.put("editableRuns", _editableRuns);
+        if (_autoCopyTargetContainerId != null)
+            result.put("autoCopyTargetContainerId", _autoCopyTargetContainerId);
+
+        if (_availableDetectionMethods != null)
+        {
+            JSONArray detectionMethods = new JSONArray();
+            result.put("availableDetectionMethods", detectionMethods);
+            for (String detectionMethod : _availableDetectionMethods)
+                detectionMethods.add(detectionMethod);
+        }
+        if (_selectedDetectionMethod != null)
+            result.put("selectedDetectionMethod", _selectedDetectionMethod);
+
+        if (_availableMetadataInputFormats != null)
+            result.put("availableMetadataInputFormats", _availableMetadataInputFormats);
+        if (_selectedMetadataInputFormat != null)
+            result.put("selectedMetadataInputFormat", _selectedMetadataInputFormat);
+
+        if (_availablePlateTemplates != null)
+        {
+            JSONArray plateTemplates = new JSONArray();
+            result.put("availablePlateTemplates", plateTemplates);
+            for (String plateTemplate : _availablePlateTemplates)
+                plateTemplates.add(plateTemplate);
+        }
+        if (_selectedPlateTemplate != null)
+            result.put("seletedPlateTemplate", _selectedPlateTemplate);
+
+        if (_protocolParameters != null)
+            result.put("protocolParameters", _protocolParameters);
+
+        if (_protocolTransformScripts != null)
+        {
+            JSONArray transformScripts = new JSONArray();
+            result.put("protocolTransformScripts", transformScripts);
+            for (String script : _protocolTransformScripts)
+                transformScripts.add(script);
+        }
 
         return result;
     }
@@ -249,5 +339,75 @@ public class Protocol extends ResponseObject
     public Boolean getQcEnabled()
     {
         return _qcEnabled;
+    }
+
+    public Protocol setAutoCopyTargetContainerId(String autoCopyTargetContainerId)
+    {
+        _autoCopyTargetContainerId = autoCopyTargetContainerId;
+        return this;
+    }
+    public String getAutoCopyTargetContainerId()
+    {
+        return _autoCopyTargetContainerId;
+    }
+
+    public Protocol setAvailableDetectionMethods(List<String> availableDetectionMethods)
+    {
+        _availableDetectionMethods= availableDetectionMethods;
+        return this;
+    }
+    public List<String> getAvailableDetectionMethods()
+    {
+        return _availableDetectionMethods;
+    }
+
+    public Protocol setSelectedDetectionMethod(String selectedDetectionMethod)
+    {
+         _selectedDetectionMethod = selectedDetectionMethod;
+         return this;
+    }
+    public String getSelectedDetectionMethod()
+    {
+        return _selectedDetectionMethod;
+    }
+
+    public Protocol setAvailablePlateTemplates(List<String> availablePlateTemplates)
+    {
+        _availablePlateTemplates = availablePlateTemplates;
+        return this;
+    }
+    public List<String> getAvailablePlateTemplates()
+    {
+        return _availablePlateTemplates;
+    }
+
+    public Protocol setSelectedPlateTemplate(String selectedPlateTemplate)
+    {
+        _selectedPlateTemplate = selectedPlateTemplate;
+        return this;
+    }
+    public String getSelectedPlateTemplate()
+    {
+        return _selectedPlateTemplate;
+    }
+
+    public Protocol setProtocolParameters(Map<String, String> protocolParameters)
+    {
+        _protocolParameters = protocolParameters;
+        return this;
+    }
+    public Map<String,String> getProtocolParameters()
+    {
+        return _protocolParameters;
+    }
+
+    public Protocol setProtocolTransformScripts(List<String> protocolTransformScripts)
+    {
+        _protocolTransformScripts = protocolTransformScripts;
+        return this;
+    }
+    public List<String> getProtocolTransformScripts()
+    {
+        return _protocolTransformScripts;
     }
 }

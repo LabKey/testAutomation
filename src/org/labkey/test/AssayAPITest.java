@@ -117,7 +117,7 @@ public class AssayAPITest extends BaseWebDriverTest
         String assayName = "testGpatAssay";
 
         Connection connection = createDefaultConnection(true);
-        GetProtocolCommand getProtocolCommand = new GetProtocolCommand("General");
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand("General");                      // gets a template from the server
         ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, getCurrentContainerPath());
 
         Protocol newAssayProtocol = getProtocolResponse.getProtocol();
