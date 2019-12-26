@@ -108,6 +108,15 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         // With some react select components getting the text value can return the clear icon, or it may have multiple items.
         // In both cases there may be a line separator, so remove it.
         int idx = value.lastIndexOf(System.lineSeparator());
+
+        log("ReactSelect.getvalue: value in System.lineSeparator->");
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n");
+        for(int i = 0; i < System.lineSeparator().length(); i++)
+        {
+            sb.append(value.charAt(i)).append(" : ").append(Integer.toHexString((int) System.lineSeparator().charAt(i))).append("\n");
+        }
+        log(sb.toString());
         log("ReactSelect.getvalue: value.lastIndexOf(System.lineSeparator(): " + idx);
 
         if(idx > 0)
@@ -116,7 +125,8 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         log("ReactSelect.getvalue: value: '" + value + "'.");
 
         log("ReactSelect.getvalue: char values--> ");
-        StringBuilder sb = new StringBuilder();
+        sb = new StringBuilder();
+        sb.append("\n");
         for(int i = 0; i < value.length(); i++)
         {
             sb.append(value.charAt(i)).append(" : ").append(Integer.toHexString((int) value.charAt(i))).append("\n");
