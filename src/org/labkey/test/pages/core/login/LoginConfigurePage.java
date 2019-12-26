@@ -20,7 +20,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     public static LoginConfigurePage beginAt(WebDriverWrapper webDriverWrapper)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("login",  "configure"));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("login", "oldConfigure"));
         return new LoginConfigurePage(webDriverWrapper.getDriver());
     }
 
