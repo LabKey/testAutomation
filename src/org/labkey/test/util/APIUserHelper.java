@@ -45,6 +45,19 @@ public class APIUserHelper extends AbstractUserHelper
     }
 
     @Override
+    public void ensureUsersExist(List<String> userEmails)
+    {
+        Map<String, Integer> existingUsers = getUserIds(userEmails, true);
+        for (String email : userEmails)
+        {
+            if (!existingUsers.containsKey(email))
+            {
+                createUser(email);
+            }
+        }
+    }
+
+    @Override
     public CreateUserResponse createUser(final String userName, final boolean sendEmail, final boolean verifySuccess)
     {
         CreateUserCommand command = new CreateUserCommand(userName)

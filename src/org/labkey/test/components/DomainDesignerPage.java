@@ -99,7 +99,8 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         List<String> titles = new ArrayList<>();
         for(DomainFormPanel formPanel : getPanels())
         {
-            titles.add(formPanel.getPanelTitle());
+            if (formPanel.hasPanelTitle())
+                titles.add(formPanel.getPanelTitle());
         }
         return titles;
     }
