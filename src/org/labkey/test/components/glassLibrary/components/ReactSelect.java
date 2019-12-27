@@ -98,54 +98,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 
     public String getValue()
     {
-
-        String value = getComponentElement().getText();
-
-        log("ReactSelect.getvalue: value: '" + value + "'.");
-        log("ReactSelect.getvalue: value.lastIndexOf(\"\\n\"): " + value.lastIndexOf("\n"));
-        log("ReactSelect.getvalue: value.lastIndexOf(\"\\r\"): " + value.lastIndexOf("\r"));
-
-        // With some react select components getting the text value can return the clear icon, or it may have multiple items.
-        // In both cases there may be a line separator, so remove it.
-        int idx = value.lastIndexOf(System.lineSeparator());
-
-        log("ReactSelect.getvalue: value in System.lineSeparator->");
-        StringBuilder sb = new StringBuilder();
-        sb.append("\n");
-        for(int i = 0; i < System.lineSeparator().length(); i++)
-        {
-            sb.append(value.charAt(i)).append(" : ").append(Integer.toHexString((int) System.lineSeparator().charAt(i))).append("\n");
-        }
-        log(sb.toString());
-        log("ReactSelect.getvalue: value.lastIndexOf(System.lineSeparator(): " + idx);
-
-        if(idx > 0)
-            value = value.replaceAll(System.lineSeparator(), "");
-
-        log("ReactSelect.getvalue: value: '" + value + "'.");
-
-        log("ReactSelect.getvalue: char values--> ");
-        sb = new StringBuilder();
-        sb.append("\n");
-        for(int i = 0; i < value.length(); i++)
-        {
-            sb.append(value.charAt(i)).append(" : ").append(Integer.toHexString((int) value.charAt(i))).append("\n");
-        }
-        log(sb.toString());
-
-        idx = value.indexOf("×");
-        log("ReactSelect.getvalue: value.indexOf(\"×\"): " + idx);
-
-
-        log("ReactSelect.getvalue: Integer.toHexString((int) value.charAt(value.length() - 1)): " + Integer.toHexString((int) value.charAt(value.length() - 1)));
-        // Replace the '×' (remove icon) with nothing.
-        value = value.replaceAll("×", "");
-        log("ReactSelect.getvalue: value: '" + value + "'.");
-
-        value = value.trim();
-        log("ReactSelect.getvalue: value: '" + value + "'.");
-
-        return value;
+        return getComponentElement().getText();
     }
 
     public boolean hasOption(String value)
@@ -299,6 +252,20 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 
     }
 
+    /**
+     * Get the items that are in the list.
+     * @return List of strings for the values in the list.
+     */
+    public List<String> getListItems()
+    {
+        // Can only get the list of items once the list has been opened.
+        open();
+        List<WebElement> selectedItems = Locators.listItems.findElements(getComponentElement());
+        List<String> rawItems = getWrapper().getTexts(selectedItems);
+        close();
+        return rawItems.stream().map(String::trim).collect(Collectors.toList());
+    }
+
     protected String getName()
     {
         return elementCache().input.getAttribute("name");
@@ -431,6 +398,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         final public static Locator arrow = Locator.tagWithClass("span","Select-arrow-zone");
         final public static Locator selectMenu = Locator.tagWithClass("div", "Select-menu");
         final public static Locator selectedItems = Locator.tagWithClass("span", "Select-value-label");
+        final public static Locator listItems = Locator.tagWithClass("div", "Select-menu-outer");
         final public static Locator loadingSpinner = Locator.tagWithClass("span", "Select-loading");
 
         public static Locator selectContainer()
