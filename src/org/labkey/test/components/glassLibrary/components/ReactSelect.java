@@ -253,7 +253,8 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
     }
 
     /**
-     * Get the items that are in the list.
+     * Get the items that are in the drop down list. That is the items that may be selected.
+     *
      * @return List of strings for the values in the list.
      */
     public List<String> getListItems()
