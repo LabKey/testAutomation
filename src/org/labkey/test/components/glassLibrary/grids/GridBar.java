@@ -4,6 +4,7 @@
  */
 package org.labkey.test.components.glassLibrary.grids;
 
+import com.sun.istack.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -174,24 +175,25 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     /**
      * Click a button on the grid bar with the given text.
      * @param buttonCaption Button caption.
+     * @param doAction The action to perform after the click. Can be null.
      * @return This grid bar.
      */
-    public GridBar clickButton(String buttonCaption)
+    public void clickButton(String buttonCaption, @Nullable Runnable doAction)
     {
-        //TODO This should probably be more complete function that takes a lambda or some other function pointer to
-        // perform an action after the button click and has a generic for the return type (or void).
-        // For now this will have to do.
-
-
         Locator button = Locator.xpath("//button[contains(text(), '" + buttonCaption + "')]");
 
         if(!button.findOptionalElement(this).isEmpty())
         {
             WebElement btn = button.waitForElement(this, 5_000);
             btn.click();
+
+            if(doAction != null)
+            {
+                doAction.run();
+            }
+
         }
 
-        return this;
     }
 
     public OmniBox getOmniBox()
