@@ -492,7 +492,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
-    public ColumnHeaderType[] getExportHeaderTypes()
+    protected ColumnHeaderType[] getExportHeaderTypes()
     {
         return new ColumnHeaderType[]{ColumnHeaderType.Caption};
     }
