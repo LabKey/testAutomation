@@ -68,6 +68,8 @@ public class Protocol extends ResponseObject
 
         if (json.containsKey("allowBackgroundUpload"))
             _allowBackgroundUpload = (Boolean)json.get("allowBackgroundUpload");
+        if (json.containsKey("backgroundUpload"))
+            _backgroundUpload = (Boolean)json.get("backgroundUpload");
         if (json.containsKey("allowEditableResults"))
             _allowEditableResults = (Boolean)json.get("allowEditableResults");
         if (json.containsKey("editableResults"))

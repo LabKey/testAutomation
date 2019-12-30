@@ -137,24 +137,24 @@ public class AssayAPITest extends BaseWebDriverTest
 
     @Test
     public void testViabilityAssayOverAPI() throws Exception
-    {
-        String assayName = "testViabilityAssay";
+{
+    String assayName = "testViabilityAssay";
 
-        Connection connection = createDefaultConnection(true);
-        GetProtocolCommand getProtocolCommand = new GetProtocolCommand("Viability");
-        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, getCurrentContainerPath());
+    Connection connection = createDefaultConnection(true);
+    GetProtocolCommand getProtocolCommand = new GetProtocolCommand("Viability");
+    ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, getCurrentContainerPath());
 
-        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
-        newAssayProtocol.setName(assayName)
-                .setSaveScriptFiles(true)
-                .setAllowTransformationScript(false);
-        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
-        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, getCurrentContainerPath());
+    Protocol newAssayProtocol = getProtocolResponse.getProtocol();
+    newAssayProtocol.setName(assayName)
+            .setSaveScriptFiles(true)
+            .setAllowTransformationScript(false);
+    SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
+    ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, getCurrentContainerPath());
 
-        assertTrue(saveProtocolResponse.getProtocol().getSaveScriptFiles());
-        assertTrue(saveProtocolResponse.getProtocol().getAllowTransformationScript());
+    assertTrue(saveProtocolResponse.getProtocol().getSaveScriptFiles());
+    assertTrue(saveProtocolResponse.getProtocol().getAllowTransformationScript());
 
-    }
+}
 
     // Issue 30003: support importing assay data relative to pipeline root
     @Test
