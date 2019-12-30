@@ -25,6 +25,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PlateGrid;
@@ -495,7 +496,8 @@ public class NabAssayTest extends AbstractAssayTest
     {
         log("rename assay folder and verify source file still findable");
         _containerHelper.renameFolder(getProjectName(), TEST_ASSAY_FLDR_NAB, TEST_ASSAY_FLDR_NAB_RENAME, false);
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
+        String portalUrl = WebTestHelper.buildURL("project", getProjectName() + "/" + TEST_ASSAY_FLDR_NAB_RENAME, "begin");
+        beginAt(portalUrl); // Navigate away from folder that was just renamed
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkContainingText("run details"));
 
