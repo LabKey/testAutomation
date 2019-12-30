@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
@@ -43,6 +44,8 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class AbstractExportTest extends BaseWebDriverTest
 {
+    private static String _dataRegionUrl;
+
     protected DataRegionTable dataRegion;
     protected DataRegionExportHelper exportHelper;
 
@@ -59,17 +62,23 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     protected abstract String getDataRegionId();
     protected abstract void goToDataRegionPage();
 
+    @BeforeClass
+    public static void resetDataRegionUrl()
+    {
+        _dataRegionUrl = null;
+    }
+
     @Before
     public void preTest()
     {
-        if (getSavedLocation() == null)
+        if (_dataRegionUrl == null)
         {
             goToDataRegionPage();
-            saveLocation();
+            _dataRegionUrl = getCurrentRelativeURL();
         }
         else
         {
-            recallLocation();
+            beginAt(_dataRegionUrl);
         }
 
         dataRegion = new DataRegionTable(getDataRegionId(), this);
