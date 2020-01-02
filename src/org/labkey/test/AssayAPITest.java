@@ -124,7 +124,7 @@ public class AssayAPITest extends BaseWebDriverTest
         Protocol newAssayProtocol = getProtocolResponse.getProtocol();
         newAssayProtocol.setName(assayName)
             .setDescription(assayDescription)
-            .allowQCStates(true)
+            .setQCEnabled(true)
             .setEditableResults(true)
             .setEditableRuns(true);
         SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
@@ -132,7 +132,7 @@ public class AssayAPITest extends BaseWebDriverTest
         Long protocolId = saveProtocolResponse.getProtocol().getProtocolId();
 
         assertEquals(assayDescription, saveProtocolResponse.getProtocol().getDescription());
-        assertTrue(saveProtocolResponse.getProtocol().getAllowQCStates());
+        assertTrue(saveProtocolResponse.getProtocol().getQcEnabled());
         assertTrue(saveProtocolResponse.getProtocol().getEditableResults());
         assertTrue(saveProtocolResponse.getProtocol().getEditableRuns());
 
@@ -140,7 +140,7 @@ public class AssayAPITest extends BaseWebDriverTest
         ProtocolResponse doubleCheckProtocolResponse = protocolCommand.execute(connection, getCurrentContainerPath());
 
         assertEquals(assayDescription, doubleCheckProtocolResponse.getProtocol().getDescription());
-        assertTrue(doubleCheckProtocolResponse.getProtocol().getAllowQCStates());
+        assertTrue(doubleCheckProtocolResponse.getProtocol().getQcEnabled());
         assertTrue(doubleCheckProtocolResponse.getProtocol().getEditableResults());
         assertTrue(doubleCheckProtocolResponse.getProtocol().getEditableRuns());
     }

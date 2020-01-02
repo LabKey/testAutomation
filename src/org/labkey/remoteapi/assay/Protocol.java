@@ -145,8 +145,8 @@ public class Protocol extends ResponseObject
         if (_qcEnabled != null)
             result.put("qcEnabled", _qcEnabled);
 
-        if (_allowTransformationScript != null)
-            result.put("allowTransformationScript", _allowTransformationScript);
+        if (_protocolTransformScripts != null)
+            result.put("protocolTransformScripts", _protocolTransformScripts);
         if (_saveScriptFiles != null)
             result.put("saveScriptFiles", _saveScriptFiles);
         if (_editableRuns != null)
@@ -228,11 +228,6 @@ public class Protocol extends ResponseObject
         return _allowEditableResults;
     }
 
-    public Protocol allowQCStates(boolean qcEnabled)
-    {
-        _allowQCStates = qcEnabled;
-        return this;
-    }
     public Boolean getAllowQCStates()
     {
         return _allowQCStates;
@@ -348,6 +343,11 @@ public class Protocol extends ResponseObject
         return _protocolParameters;
     }
 
+    public Protocol setProtocolTransformScripts(List<String> protocolTransformScripts)
+    {
+        _protocolTransformScripts = protocolTransformScripts;
+        return this;
+    }
     public List<String> getProtocolTransformScripts()
     {
         return _protocolTransformScripts;
