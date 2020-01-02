@@ -441,21 +441,24 @@ public class StudyHelper
     public PropertiesEditor goToEditSpecimenProperties(SpecimenPropertyEditors editor)
     {
         String editorTitle;
+        _test.goToManageStudy();
+
         switch(editor)
         {
             case VIAL:
                 editorTitle = "Vial";
+                _test.waitAndClickAndWait(Locator.linkWithText("Edit Vial fields"));
                 break;
             case SPECIMEN:
                 editorTitle = "Specimen";
+                _test.waitAndClickAndWait(Locator.linkWithText("Edit Specimen fields"));
                 break;
             case SPECIMEN_EVENT:
             default:
-                editorTitle = "SpecimenEvent";
+                editorTitle = "Specimen Event";
+                _test.waitAndClickAndWait(Locator.linkWithText("Edit Specimen Event fields"));
         }
 
-        _test.goToManageStudy();
-        _test.waitAndClickAndWait(Locator.linkWithText("Edit specimen properties"));
         return PropertiesEditor.PropertiesEditor(_test.getDriver()).withTitleContaining(editorTitle).waitFor();
     }
 

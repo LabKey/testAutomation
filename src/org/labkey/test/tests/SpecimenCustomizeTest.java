@@ -82,14 +82,16 @@ public class SpecimenCustomizeTest extends SpecimenBaseTest
     private void configureSpecimenProperties()
     {
         goToManageStudy();
-        clickAndWait(Locator.linkContainingText("Edit specimen properties"));
+        clickAndWait(Locator.linkContainingText("Edit Specimen Event fields"));
 
-        PropertiesEditor specimenEventFields = PropertiesEditor.PropertiesEditor(getDriver()).withTitle("SpecimenEvent").waitFor();
+        PropertiesEditor specimenEventFields = PropertiesEditor.PropertiesEditor(getDriver()).withTitle("Specimen Event").waitFor();
         specimenEventFields.addField(new FieldDefinition("Tally").setType(ColumnType.Integer));
         specimenEventFields.addField(new FieldDefinition("Note").setType(ColumnType.String));
         specimenEventFields.addField(new FieldDefinition("Minutes").setType(ColumnType.Double));
         specimenEventFields.addField(new FieldDefinition("Flag").setType(ColumnType.Boolean));
+        clickAndWait(Locator.lkButton("Save & Close"));
 
+        clickAndWait(Locator.linkContainingText("Edit Vial fields"));
         PropertiesEditor vialFields = PropertiesEditor.PropertiesEditor(getDriver()).withTitle("Vial").find();
         vialFields.addField(new FieldDefinition("Tally").setType(ColumnType.Integer));
         vialFields.addField(new FieldDefinition("FirstTally").setType(ColumnType.Integer));
@@ -110,7 +112,9 @@ public class SpecimenCustomizeTest extends SpecimenBaseTest
         vialFields.addField(new FieldDefinition("LatestNonBlankFlag").setType(ColumnType.Boolean));
         vialFields.addField(new FieldDefinition("LatestDrawTimestamp").setType(ColumnType.DateTime));
         vialFields.addField(new FieldDefinition("FirstDrawTimestamp").setType(ColumnType.DateTime));
+        clickAndWait(Locator.lkButton("Save & Close"));
 
+        clickAndWait(Locator.linkContainingText("Edit Specimen fields"));
         PropertiesEditor specimenFields = PropertiesEditor.PropertiesEditor(getDriver()).withTitle("Specimen").find();
         specimenFields.addField(new FieldDefinition("TotalLatestNonBlankTally").setType(ColumnType.Integer));
         specimenFields.addField(new FieldDefinition("SumOfLatestNonBlankMinutes").setType(ColumnType.Double));
