@@ -455,7 +455,7 @@ public class StudyHelper
                 break;
             case SPECIMEN_EVENT:
             default:
-                editorTitle = "Specimen Event";
+                editorTitle = "SpecimenEvent";
                 _test.waitAndClickAndWait(Locator.linkWithText("Edit Specimen Event fields"));
         }
 
