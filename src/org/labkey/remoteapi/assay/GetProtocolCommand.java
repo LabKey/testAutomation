@@ -18,13 +18,13 @@ public class GetProtocolCommand extends Command<ProtocolResponse>
         _providerName = providerName;
     }
 
-    public GetProtocolCommand(Long protocolId)
+    public GetProtocolCommand(long protocolId)
     {
         super("assay", "getProtocol");
         _protocolId = protocolId;
     }
 
-    public GetProtocolCommand(Long protocolId, boolean copy)
+    public GetProtocolCommand(long protocolId, boolean copy)
     {
         super("assay", "getProtocol");
         _protocolId = protocolId;
@@ -67,7 +67,7 @@ public class GetProtocolCommand extends Command<ProtocolResponse>
         return _protocolId;
     }
 
-    public void setProtocolId(Long protocolId)
+    public void setProtocolId(long protocolId)
     {
         _protocolId = protocolId;
     }
