@@ -9,7 +9,7 @@ import java.util.Map;
 public class GetProtocolCommand extends Command<ProtocolResponse>
 {
     private String _providerName;
-    private Integer _protocolId;
+    private Long _protocolId;
     private Boolean _copy;
 
     public GetProtocolCommand(String providerName)
@@ -18,13 +18,13 @@ public class GetProtocolCommand extends Command<ProtocolResponse>
         _providerName = providerName;
     }
 
-    public GetProtocolCommand(Integer protocolId)
+    public GetProtocolCommand(Long protocolId)
     {
         super("assay", "getProtocol");
         _protocolId = protocolId;
     }
 
-    public GetProtocolCommand(Integer protocolId, boolean copy)
+    public GetProtocolCommand(Long protocolId, boolean copy)
     {
         super("assay", "getProtocol");
         _protocolId = protocolId;
@@ -62,12 +62,12 @@ public class GetProtocolCommand extends Command<ProtocolResponse>
         _providerName = providerName;
     }
 
-    public Integer getProtocolId()
+    public Long getProtocolId()
     {
         return _protocolId;
     }
 
-    public void setProtocolId(Integer protocolId)
+    public void setProtocolId(Long protocolId)
     {
         _protocolId = protocolId;
     }

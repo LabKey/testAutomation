@@ -15,7 +15,6 @@
  */
 package org.labkey.test;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -45,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -115,6 +115,7 @@ public class AssayAPITest extends BaseWebDriverTest
     public void testGpatAssayOverAPI() throws Exception
     {
         String assayName = "testGpatAssay";
+        String assayDescription = "generated for test purposes over remoteAPI";
 
         Connection connection = createDefaultConnection(true);
         GetProtocolCommand getProtocolCommand = new GetProtocolCommand("General");                      // gets a template from the server
@@ -122,39 +123,27 @@ public class AssayAPITest extends BaseWebDriverTest
 
         Protocol newAssayProtocol = getProtocolResponse.getProtocol();
         newAssayProtocol.setName(assayName)
+            .setDescription(assayDescription)
             .allowQCStates(true)
-            .setAllowEditableResults(true)
             .setEditableResults(true)
             .setEditableRuns(true);
         SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
         ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, getCurrentContainerPath());
+        Long protocolId = saveProtocolResponse.getProtocol().getProtocolId();
 
+        assertEquals(assayDescription, saveProtocolResponse.getProtocol().getDescription());
         assertTrue(saveProtocolResponse.getProtocol().getAllowQCStates());
-        assertTrue(saveProtocolResponse.getProtocol().getAllowEditableResults());
         assertTrue(saveProtocolResponse.getProtocol().getEditableResults());
         assertTrue(saveProtocolResponse.getProtocol().getEditableRuns());
+
+        GetProtocolCommand protocolCommand = new GetProtocolCommand(protocolId);
+        ProtocolResponse doubleCheckProtocolResponse = protocolCommand.execute(connection, getCurrentContainerPath());
+
+        assertEquals(assayDescription, doubleCheckProtocolResponse.getProtocol().getDescription());
+        assertTrue(doubleCheckProtocolResponse.getProtocol().getAllowQCStates());
+        assertTrue(doubleCheckProtocolResponse.getProtocol().getEditableResults());
+        assertTrue(doubleCheckProtocolResponse.getProtocol().getEditableRuns());
     }
-
-    @Test
-    public void testViabilityAssayOverAPI() throws Exception
-{
-    String assayName = "testViabilityAssay";
-
-    Connection connection = createDefaultConnection(true);
-    GetProtocolCommand getProtocolCommand = new GetProtocolCommand("Viability");
-    ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, getCurrentContainerPath());
-
-    Protocol newAssayProtocol = getProtocolResponse.getProtocol();
-    newAssayProtocol.setName(assayName)
-            .setSaveScriptFiles(true)
-            .setAllowTransformationScript(false);
-    SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
-    ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, getCurrentContainerPath());
-
-    assertTrue(saveProtocolResponse.getProtocol().getSaveScriptFiles());
-    assertTrue(saveProtocolResponse.getProtocol().getAllowTransformationScript());
-
-}
 
     // Issue 30003: support importing assay data relative to pipeline root
     @Test
@@ -316,7 +305,7 @@ public class AssayAPITest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText(assayName));
         clickAndWait(Locator.linkContainingText(runName));
         DataRegionTable table = new DataRegionTable("Data", this);
-        Assert.assertEquals(Arrays.asList("K770K3VY-19", "A770K4W1-15"), table.getColumnDataAsText("SpecimenID"));
+        assertEquals(Arrays.asList("K770K3VY-19", "A770K4W1-15"), table.getColumnDataAsText("SpecimenID"));
 
         // verify images are resolved and rendered properly
         assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 1);

@@ -135,20 +135,16 @@ public class Protocol extends ResponseObject
         for (Domain domain : _domains)
             domains.add(domain.toJSONObject(true));
 
-        if (_allowBackgroundUpload != null)
-            result.put("allowBackgroundUpload", _allowBackgroundUpload);
+
         if (_backgroundUpload != null)
             result.put("backgroundUpload", _backgroundUpload);
-        if (_allowEditableResults != null)
-            result.put("allowEditableResults", _allowEditableResults);
+
         if (_editableResults != null)
             result.put("editableResults", _editableResults);
-        if (_allowQCStates != null)
-            result.put("allowQCStates", _allowQCStates);
+
         if (_qcEnabled != null)
             result.put("qcEnabled", _qcEnabled);
-        if (_allowSpacesInPath != null)
-            result.put("allowSpacesInPath", _allowSpacesInPath);
+
         if (_allowTransformationScript != null)
             result.put("allowTransformationScript", _allowTransformationScript);
         if (_saveScriptFiles != null)
@@ -158,41 +154,17 @@ public class Protocol extends ResponseObject
         if (_autoCopyTargetContainerId != null)
             result.put("autoCopyTargetContainerId", _autoCopyTargetContainerId);
 
-        if (_availableDetectionMethods != null)
-        {
-            JSONArray detectionMethods = new JSONArray();
-            result.put("availableDetectionMethods", detectionMethods);
-            for (String detectionMethod : _availableDetectionMethods)
-                detectionMethods.add(detectionMethod);
-        }
         if (_selectedDetectionMethod != null)
             result.put("selectedDetectionMethod", _selectedDetectionMethod);
 
-        if (_availableMetadataInputFormats != null)
-            result.put("availableMetadataInputFormats", _availableMetadataInputFormats);
         if (_selectedMetadataInputFormat != null)
             result.put("selectedMetadataInputFormat", _selectedMetadataInputFormat);
 
-        if (_availablePlateTemplates != null)
-        {
-            JSONArray plateTemplates = new JSONArray();
-            result.put("availablePlateTemplates", plateTemplates);
-            for (String plateTemplate : _availablePlateTemplates)
-                plateTemplates.add(plateTemplate);
-        }
         if (_selectedPlateTemplate != null)
             result.put("seletedPlateTemplate", _selectedPlateTemplate);
 
         if (_protocolParameters != null)
             result.put("protocolParameters", _protocolParameters);
-
-        if (_protocolTransformScripts != null)
-        {
-            JSONArray transformScripts = new JSONArray();
-            result.put("protocolTransformScripts", transformScripts);
-            for (String script : _protocolTransformScripts)
-                transformScripts.add(script);
-        }
 
         return result;
     }
@@ -218,9 +190,10 @@ public class Protocol extends ResponseObject
         return _description;
     }
 
-    public void setDescription(String description)
+    public Protocol setDescription(String description)
     {
         _description = description;
+        return this;
     }
 
     public String getProviderName()
@@ -228,9 +201,10 @@ public class Protocol extends ResponseObject
         return _providerName;
     }
 
-    public void setProviderName(String providerName)
+    public Protocol setProviderName(String providerName)
     {
         _providerName = providerName;
+        return this;
     }
 
     public List<Domain> getDomains()
@@ -238,26 +212,17 @@ public class Protocol extends ResponseObject
         return _domains;
     }
 
-    public void setDomains(List<Domain> domains)
+    public Protocol setDomains(List<Domain> domains)
     {
         _domains = domains;
-    }
-
-    public Protocol setAllowBackgroundUpload(boolean allowBackgroundUpload)
-    {
-        _allowBackgroundUpload = allowBackgroundUpload;
         return this;
     }
+
     public Boolean getAllowBackgroundUpload()
     {
         return _allowBackgroundUpload;
     }
 
-    public Protocol setAllowEditableResults(boolean allowEditableResults)
-    {
-        _allowEditableResults = allowEditableResults;
-        return this;
-    }
     public Boolean getAllowEditableResults()
     {
         return _allowEditableResults;
@@ -273,21 +238,11 @@ public class Protocol extends ResponseObject
         return _allowQCStates;
     }
 
-    public Protocol setAllowSpacesInPath(Boolean allowSpacesInPath)
-    {
-        _allowSpacesInPath = allowSpacesInPath;
-        return this;
-    }
     public boolean getAllowSpacesInPath()
     {
         return _allowSpacesInPath;
     }
 
-    public Protocol setAllowTransformationScript(Boolean allowTransformationScript)
-    {
-        _allowTransformationScript = allowTransformationScript;
-        return this;
-    }
     public Boolean getAllowTransformationScript()
     {
         return _allowTransformationScript;
@@ -353,11 +308,6 @@ public class Protocol extends ResponseObject
         return _autoCopyTargetContainerId;
     }
 
-    public Protocol setAvailableDetectionMethods(List<String> availableDetectionMethods)
-    {
-        _availableDetectionMethods= availableDetectionMethods;
-        return this;
-    }
     public List<String> getAvailableDetectionMethods()
     {
         return _availableDetectionMethods;
@@ -373,11 +323,6 @@ public class Protocol extends ResponseObject
         return _selectedDetectionMethod;
     }
 
-    public Protocol setAvailablePlateTemplates(List<String> availablePlateTemplates)
-    {
-        _availablePlateTemplates = availablePlateTemplates;
-        return this;
-    }
     public List<String> getAvailablePlateTemplates()
     {
         return _availablePlateTemplates;
@@ -403,11 +348,6 @@ public class Protocol extends ResponseObject
         return _protocolParameters;
     }
 
-    public Protocol setProtocolTransformScripts(List<String> protocolTransformScripts)
-    {
-        _protocolTransformScripts = protocolTransformScripts;
-        return this;
-    }
     public List<String> getProtocolTransformScripts()
     {
         return _protocolTransformScripts;
