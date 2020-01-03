@@ -215,7 +215,7 @@ public class DrugSensitivityAssayTest extends AbstractAssayTest
         table.clickHeaderButtonAndWait("Copy to Study");
 
         selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-        clickButton("Next");
+        clickButton("Next", longWaitForPage);
         table.clickHeaderButtonAndWait("Copy to Study");
 
         DataRegionTable dataset = new DataRegionTable("Dataset", this);
