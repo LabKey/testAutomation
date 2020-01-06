@@ -20,16 +20,17 @@ project.task('validatorJar',
         type: Jar,
         description: "Builds jar for assay validation",
         {
-          from sourceSets.main.output
-          from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-          archiveName "validator.jar"
-          destinationDir = project.projectDir
-          manifest {
-            attributes 'Implementation-Title': 'Assay Validator Jar',
-                    'Implementation-Version': project.version,
-                    'Built-By' : System.getProperty("user.name"),
-                    'Main-Class': 'org.labkey.AssayValidator'
-          }
+            from sourceSets.main.output
+            from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+            duplicatesStrategy = 'exclude'
+            archiveBaseName.set( "validator.jar")
+            destinationDirectory = project.projectDir
+            manifest {
+                attributes 'Implementation-Title': 'Assay Validator Jar',
+                        'Implementation-Version': project.version,
+                        'Built-By' : System.getProperty("user.name"),
+                        'Main-Class': 'org.labkey.AssayValidator'
+            }
         }
 )
 
@@ -37,17 +38,19 @@ project.task('transformJar',
         group: "QC",
         type: Jar,
         description: "Builds jar for doing assay transforms",
+
         {
-          from sourceSets.main.output
-          from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-          archiveName "transform.jar"
-          destinationDir = project.projectDir
-          manifest {
+            from sourceSets.main.output
+            from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+            duplicatesStrategy = 'exclude'
+            archiveBaseName.set("transform.jar")
+            destinationDirectory = project.projectDir
+            manifest {
             attributes 'Implementation-Title': 'Assay Validator Jar',
                     'Implementation-Version': project.version,
                     'Built-By' : System.getProperty("user.name"),
                     'Main-Class': 'org.labkey.AssayTransform'
-          }
+            }
         }
 )
 
@@ -56,16 +59,17 @@ project.task('transformWarningJar',
         type: Jar,
         description: "Builds jar for doing assay transform warnings",
         {
-          from sourceSets.main.output
-          from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-          archiveName "transformWarning.jar"
-          destinationDir = project.projectDir
-          manifest {
+            from sourceSets.main.output
+            from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+            duplicatesStrategy = 'exclude'
+            archiveBaseName.set("transformWarning.jar")
+            destinationDirectory = project.projectDir
+            manifest {
             attributes 'Implementation-Title': 'Assay Validator Jar',
                     'Implementation-Version': project.version,
                     'Built-By' : System.getProperty("user.name"),
                     'Main-Class': 'org.labkey.AssayTransformWarning'
-          }
+            }
         }
 )
 
