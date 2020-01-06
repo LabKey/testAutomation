@@ -12,12 +12,12 @@ import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
-public class NavBar extends WebDriverComponent<NavBar.ElementCache>
+public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
 {
     private final WebDriver _driver;
     private final WebElement _navBarElement;
 
-    public NavBar(WebDriver driver)
+    protected NavBar(WebDriver driver)
     {
         this(Locator.tagWithClass("nav", "navbar-container").findElement(driver), driver);
     }
@@ -49,21 +49,14 @@ public class NavBar extends WebDriverComponent<NavBar.ElementCache>
         return elementCache().projectNameDisplay.getText();
     }
 
-    public ProductMenu getProductMenu()
-    {
-        return elementCache().productMenu;
-    }
-
     public String getUserAvatarSource()
     {
         return elementCache().userIcon.getAttribute("src");
     }
 
-    public UserMenuContent clickUserMenu()
-    {
-        elementCache().userMenuButton.click();
-        return new UserMenuContent(_driver);
-    }
+    public abstract ProductMenu getProductMenu();
+
+    public abstract UserMenu getUserMenu();
 
     @Override
     public WebElement getComponentElement()
@@ -78,20 +71,15 @@ public class NavBar extends WebDriverComponent<NavBar.ElementCache>
     }
 
     @Override
-    protected ElementCache newElementCache()
-    {
-        return new ElementCache();
-    }
+    protected abstract ElementCache newElementCache();
 
-    protected class ElementCache extends Component.ElementCache
+    protected abstract class ElementCache extends Component<ElementCache>.ElementCache
     {
         public WebElement headerLogo = Locator.tagWithClass("a", "header-logo__link").findWhenNeeded(this);
         public WebElement headerLogoImage = Locator.tagWithClass("img", "header-logo__image").findWhenNeeded(this);
         public WebElement userMenuButton = Locator.tagWithId("a", "user-menu-dropdown").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement userIcon = Locator.tagWithAttribute("img", "alt", "User Avatar").findWhenNeeded(this);
-        ProductMenu productMenu = ProductMenu.finder(getDriver()).findWhenNeeded(this);
         public WebElement projectNameDisplay = Locator.tagWithClass("span", "project-name").findWhenNeeded(this);
         public WebElement searchBox = Locator.tagWithAttribute("input", "placeholder","Enter search terms").findWhenNeeded(this);
     }
-
 }

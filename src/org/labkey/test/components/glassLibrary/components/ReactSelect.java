@@ -5,17 +5,19 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.EphemeralWebElement;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.NoSuchElementException;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
@@ -26,13 +28,21 @@ import static org.labkey.test.util.TestLogger.log;
 
 public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 {
-    final WebElement _componentElement;
-    final WebDriver _driver;
+    private final WebElement _componentElement;
+    private final WebDriver _driver;
+
+    private Function<String, Locator> _optionLocFactory = Locators.option::withText;
 
     public ReactSelect(WebElement element, WebDriver driver)
     {
         _componentElement = element;
         _driver = driver;
+    }
+
+    public ReactSelect setOptionLocator(Function<String, Locator> optionLocFactory)
+    {
+        _optionLocFactory = optionLocFactory;
+        return this;
     }
 
     public boolean isExpanded()
@@ -93,7 +103,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 
     public boolean hasOption(String value)
     {
-        return hasOption(value, ReactSelect.Locators.options.containing(value));
+        return hasOption(value, ReactSelect.Locators.option.containing(value));
     }
 
     public boolean hasOption(String value, Locator optionElement)
@@ -117,7 +127,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
     /* waits until the 'value' (which can include the placeholder) of the select shows or contains the expected value */
     public ReactSelect expectValue(String value)
     {
-        getWrapper().waitFor(()-> getValue().contains(value),
+        waitFor(()-> getValue().contains(value),
                 "It took too long for the ReactSelect value to contain the expected value:["+value+"]. Actual value:[" + getValue() + "].", WAIT_FOR_JAVASCRIPT);
         return this;
     }
@@ -126,9 +136,9 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
     {
         // wait for the down-caret to be clickable/interactive
         long start = System.currentTimeMillis();
-        getWrapper().waitFor(this::isInteractive, "The select-box did not become interactive in time", 2000);
+        waitFor(this::isInteractive, "The select-box did not become interactive in time", 2000);
         long elapsed = System.currentTimeMillis() - start;
-        getWrapper().log("waited ["+ elapsed + "] msec for select to become interactive");
+        TestLogger.debug("waited ["+ elapsed + "] msec for select to become interactive");
 
         return this;
     }
@@ -177,9 +187,14 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 
         elementCache().arrow.click(); // collapse the options
 
-        WebDriverWrapper.waitFor(()->!isExpanded(), 1000);
+        waitForClosed();
 
         return this;
+    }
+
+    private void waitForClosed()
+    {
+        WebDriverWrapper.waitFor(()->!isExpanded(), "Select didn't close", 1000);
     }
 
     public ReactSelect clearSelection()
@@ -237,6 +252,21 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 
     }
 
+    /**
+     * Get the items that are in the drop down list. That is the items that may be selected.
+     *
+     * @return List of strings for the values in the list.
+     */
+    public List<String> getListItems()
+    {
+        // Can only get the list of items once the list has been opened.
+        open();
+        List<WebElement> selectedItems = Locators.listItems.findElements(getComponentElement());
+        List<String> rawItems = getWrapper().getTexts(selectedItems);
+        close();
+        return rawItems.stream().map(String::trim).collect(Collectors.toList());
+    }
+
     protected String getName()
     {
         return elementCache().input.getAttribute("name");
@@ -273,6 +303,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         return _driver;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -286,13 +317,13 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         WebElement selectMenu = new EphemeralWebElement(Locators.selectMenu, this).withTimeout(WAIT_FOR_JAVASCRIPT);
         List<WebElement> getOptions()
         {
-            return Locators.options.findElements(selectMenu);
+            return Locators.option.findElements(selectMenu);
         }
 
         @NotNull
         WebElement findOption(String option)
         {
-            Locator loc = Locators.options.withText(option);
+            Locator loc = _optionLocFactory.apply(option);
             return loc.findElement(selectMenu);
         }
     }
@@ -303,9 +334,8 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
                 .open()
                 .clickOption(option)
                 .getSelections();
+        waitForClosed();
 
-        // TODO Comment out this line for the time being. Issue 37897: Sample Management: Lookup field values are not consistently displayed between the edit sample panel and the create sample panel.
-//        assertTrue("Expected '" + option + "' to be selected.  Current selections: " + selections, selections.contains(option));
         return this;
     }
 
@@ -341,18 +371,18 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
                 sleep(500);
             }
         }
-        log("Found optionEl after " + tryCount + " tries");
+        TestLogger.debug("Found optionEl after " + tryCount + " tries");
 
         for (int i = 0; i < 5 && !optionEl.isDisplayed(); i++)
         {
             sleep(500);
             getWrapper().scrollIntoView(optionEl);
-            log("scroll optionEl into view, attempt " + i);
+            TestLogger.debug("scroll optionEl into view, attempt " + i);
         }
 
         assertTrue("Expected '" + option + "' to be displayed.", optionEl.isDisplayed());
         sleep(500); // either react or the test is moving to fast/slow for one another
-        log("optionEl is displayed, clicking");
+        TestLogger.debug("optionEl is displayed, clicking");
         optionEl.click();
 
         new FluentWait<>(getWrapper().getDriver()).withTimeout(Duration.ofSeconds(1)).until(ExpectedConditions.stalenessOf(optionEl));
@@ -360,15 +390,16 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         return this;
     }
 
-    protected static abstract class Locators
+    public static abstract class Locators
     {
-        final public static Locator options = Locator.tagWithClass("div", "Select-option");
+        final public static Locator.XPathLocator option = Locator.tagWithClass("div", "Select-option");
         final public static Locator placeholder = Locator.tagWithClass("div", "Select-placeholder");
         final public static Locator createOptionPlaceholder = Locator.tagWithClass("div", "Select-create-option-placeholder");
         final public static Locator clear = Locator.tagWithClass("span","Select-clear-zone");
         final public static Locator arrow = Locator.tagWithClass("span","Select-arrow-zone");
         final public static Locator selectMenu = Locator.tagWithClass("div", "Select-menu");
         final public static Locator selectedItems = Locator.tagWithClass("span", "Select-value-label");
+        final public static Locator listItems = Locator.tagWithClass("div", "Select-menu-outer");
         final public static Locator loadingSpinner = Locator.tagWithClass("span", "Select-loading");
 
         public static Locator selectContainer()
@@ -407,7 +438,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
             StringBuilder childXpath = new StringBuilder( "//input[@id="+ Locator.xq(inputNames.get(0)) + "");
             for (int i = 1; i < inputNames.size(); i++)
             {
-                childXpath.append(" or @id=" + Locator.xq(inputNames.get(i)) + "");
+                childXpath.append(" or @id=").append(Locator.xq(inputNames.get(i)));
             }
             childXpath.append("]");
             return Locator.tagWithClass("div", "Select").withDescendant(
@@ -419,7 +450,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
             StringBuilder childXpath = new StringBuilder( "//input[starts-with(@id, '"+ inputNames.get(0) + "')");
             for (int i = 1; i < inputNames.size(); i++)
             {
-                childXpath.append(" or starts-with(@id, '"+inputNames.get(i)+"')");
+                childXpath.append(" or starts-with(@id, '").append(inputNames.get(i)).append("')");
             }
             childXpath.append("]");
             return Locator.tagWithClass("div", "Select").withDescendant(

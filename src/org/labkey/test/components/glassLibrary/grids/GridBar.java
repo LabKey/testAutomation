@@ -4,6 +4,7 @@
  */
 package org.labkey.test.components.glassLibrary.grids;
 
+import com.sun.istack.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -123,23 +124,76 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return _responsiveGrid;
     }
 
-    public GridBar selectAllInSet(boolean checked)
+    /**
+     * Click the 'Select All' button in the grid bar.
+     *
+     * @return This grid bar.
+     */
+    public GridBar selectAllInSet()
     {
-        _responsiveGrid.selectAllOnPage(checked);
-        if (checked)
+        _responsiveGrid.selectAllOnPage(true);
+
+        Locator selectBtn = Locator.xpath("//button[contains(text(), 'Select all')]");      // Select all n
+        Locator selectedText = Locator.xpath("//span[contains(text(),'Selected all ')]");   // Selected all n on this page
+        Locator allSelected = Locator.xpath("//span[contains(text(), 'All ')]");            // All n selected
+        WebElement btn = selectBtn.waitForElement(this, 5_000);
+        btn.click();
+
+        getWrapper().waitFor(() -> allSelected.findOptionalElement(this).isPresent() ||
+                        selectBtn.findOptionalElement(this).isEmpty() &&
+                                selectedText.findOptionalElement(this).isPresent() ,
+                WAIT_FOR_JAVASCRIPT);
+
+        return this;
+    }
+
+    /**
+     * Click the 'Clear All' button in the grid bar.
+     * @return This grid bar.
+     */
+    public GridBar clearAllInSet()
+    {
+        _responsiveGrid.selectAllOnPage(false);
+
+        // Clear button can have text values of 'Clear', 'Clear both' or 'Clear all ' so just look for clear.
+        Locator clearBtn = Locator.xpath("//button[contains(text(), 'Clear')]");
+
+        if(!clearBtn.findOptionalElement(this).isEmpty())
         {
-            Locator selectBtn = Locator.xpath("//button[contains(text(), 'Select all')]");      // Select all n
-            Locator selectedText = Locator.xpath("//span[contains(text(),'Selected all ')]");   // Selected all n on this page
-            Locator allSelected = Locator.xpath("//span[contains(text(), 'All ')]");            // All n selected
-            WebElement btn = selectBtn.waitForElement(this, 4000);
+
+            WebElement btn = clearBtn.waitForElement(this, 5_000);
             btn.click();
 
-            getWrapper().waitFor(() -> allSelected.findOptionalElement(this).isPresent() ||
-                            selectBtn.findOptionalElement(this).isEmpty() &&
-                                    selectedText.findOptionalElement(this).isPresent() ,
+            getWrapper().waitFor(() -> clearBtn.findOptionalElement(this).isEmpty(),
                     WAIT_FOR_JAVASCRIPT);
+
         }
+
         return this;
+    }
+
+    /**
+     * Click a button on the grid bar with the given text.
+     * @param buttonCaption Button caption.
+     * @param doAction The action to perform after the click. Can be null.
+     * @return This grid bar.
+     */
+    public void clickButton(String buttonCaption, @Nullable Runnable doAction)
+    {
+        Locator button = Locator.xpath("//button[contains(text(), '" + buttonCaption + "')]");
+
+        if(!button.findOptionalElement(this).isEmpty())
+        {
+            WebElement btn = button.waitForElement(this, 5_000);
+            btn.click();
+
+            if(doAction != null)
+            {
+                doAction.run();
+            }
+
+        }
+
     }
 
     public OmniBox getOmniBox()

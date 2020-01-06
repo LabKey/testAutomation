@@ -15,8 +15,8 @@
  */
 package org.labkey.test;
 
-import org.apache.commons.collections4.MultiMap;
-import org.apache.commons.collections4.map.MultiValueMap;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -104,11 +104,11 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -1821,9 +1821,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
             });
             if (getDriver().getTitle().isEmpty() && onLabKeyPage())
             {
-                Crawler.ControllerActionId action = new Crawler.ControllerActionId(getDriver().getCurrentUrl());
                 String warning = "Action doesn't define a page title";
-                addActionWarning(warning, action);
+                addActionWarning(warning, getDriver().getCurrentUrl());
             }
         }
 
@@ -1844,17 +1843,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return doAndAcceptUnloadAlert(func, "");
     }
 
-    private static final MultiMap<String, Set<String>> actionWarnings = MultiValueMap.multiValueMap(new HashMap<>(), HashSet::new);
+    private static final MultiValuedMap<String, String> actionWarnings = new HashSetValuedHashMap<>();
 
-    public static void addActionWarning(String warning, Crawler.ControllerActionId action)
+    public static void addActionWarning(String warning, String url)
     {
-        TestLogger.warn(warning + ": " + action);
-        actionWarnings.put(warning, action.toString());
+        Crawler.ControllerActionId action = new Crawler.ControllerActionId(url);
+        if (!action.getAction().equals("app")) // App actions generally define their title dynamically
+        {
+            TestLogger.warn(warning + ": " + url);
+            actionWarnings.put(warning, action.toString());
+        }
     }
 
-    public static Map<String, Set<String>> getActionWarnings()
+    public static Map<String, Collection<String>> getActionWarnings()
     {
-        return new HashMap(actionWarnings);
+        return actionWarnings.asMap();
     }
 
     private static final WeakHashMap<WebDriver, Set<PageLoadListener>> _pageLoadListeners = new WeakHashMap<>();

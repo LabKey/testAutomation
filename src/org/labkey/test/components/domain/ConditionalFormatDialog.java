@@ -2,7 +2,6 @@ package org.labkey.test.components.domain;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -11,15 +10,15 @@ public class ConditionalFormatDialog extends ModalDialog
 {
     private DomainFieldRow _row;
 
-    private ConditionalFormatDialog(DomainFieldRow row, ModalDialogFinder finder, WebDriver driver)
+    private ConditionalFormatDialog(DomainFieldRow row, ModalDialogFinder finder)
     {
-        super(finder.waitFor().getComponentElement(), driver);
+        super(finder);
         _row = row;
     }
 
-    public ConditionalFormatDialog(DomainFieldRow row, WebDriver driver)
+    public ConditionalFormatDialog(DomainFieldRow row)
     {
-       this(row, new ModalDialogFinder(driver).withTitle("Conditional Formatting for " + row.getName()), driver);
+       this(row, new ModalDialogFinder(row.getDriver()).withTitle("Conditional Formatting for " + row.getName()));
     }
 
     public List<ConditionalFormatPanel> formatPanels()

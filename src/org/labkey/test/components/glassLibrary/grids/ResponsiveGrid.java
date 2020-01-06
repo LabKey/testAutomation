@@ -434,7 +434,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 
         public WebElement button = Locator.xpath("//button[contains(@class,'dropdown-toggle')]").findWhenNeeded(this);
         public Optional<WebElement> selectColumn = Locator.xpath("//th/input[@type='checkbox']").findOptionalElement(getComponentElement());
-        Checkbox selectAllCheckbox = Checkbox.Checkbox().locatedBy(Locator.xpath("//th/input[@type='checkbox']")).findWhenNeeded(this);
+        Checkbox selectAllCheckbox = Checkbox.Checkbox(Locator.xpath("//th/input[@type='checkbox']")).findWhenNeeded(this);
 
         private final Map<String, WebElement> headerCells = new HashMap<>();
         protected final WebElement getColumnHeaderCell(String headerText)
@@ -500,6 +500,11 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
             return responsiveGrid().withAttribute("data-gridid", gridId);
         }
 
+        static public Locator.XPathLocator responsiveGridByBaseId(String baseGridId)
+        {
+            return responsiveGrid().attributeStartsWith("data-gridid", baseGridId);
+        }
+
         static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.css("span i.fa-spinner");
@@ -521,6 +526,18 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         public ResponsiveGridFinder withGridId(String gridId)
         {
             _locator= Locators.responsiveGrid(gridId);
+            return this;
+        }
+
+        public ResponsiveGridFinder withBaseGridId(String gridId)
+        {
+            _locator= Locators.responsiveGridByBaseId(gridId);
+            return this;
+        }
+
+        @Override
+        protected ResponsiveGridFinder getThis()
+        {
             return this;
         }
 

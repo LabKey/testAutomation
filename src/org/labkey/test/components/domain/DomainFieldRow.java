@@ -174,7 +174,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             assertTrue("advanced settings dialog did not appear in time",trycount < 4);
         }while (!Locator.tagWithClass("div", "modal-backdrop").existsIn(getDriver()));
 
-        return new AdvancedSettingsDialog(this, getDriver());
+        return new AdvancedSettingsDialog(this);
     }
 
     public DomainFieldRow expand()
@@ -589,7 +589,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().rangeButton()));
         elementCache().rangeButton().click();
-        return new RangeValidatorDialog(this, getDriver());
+        return new RangeValidatorDialog(this);
     }
 
     /**
@@ -626,7 +626,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().regexValidatorButton()));
         elementCache().regexValidatorButton().click();
-        return new RegexValidatorDialog(this, getDriver());
+        return new RegexValidatorDialog(this);
     }
 
     public ConditionalFormatDialog clickConditionalFormatButton()
@@ -634,7 +634,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().conditionalFormatButton()));
         elementCache().conditionalFormatButton().click();
-        return new ConditionalFormatDialog(this, getDriver());
+        return new ConditionalFormatDialog(this);
     }
 
     @Override

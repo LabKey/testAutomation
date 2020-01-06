@@ -694,7 +694,7 @@ public class Runner extends TestSuite
                 System.out.println(" " + stat + " = " + valueStr);
             }
         }
-        Map<String, Set<String>> actionWarnings = WebDriverWrapper.getActionWarnings();
+        Map<String, Collection<String>> actionWarnings = WebDriverWrapper.getActionWarnings();
         if (!actionWarnings.isEmpty())
         {
             System.out.println("---------------------- Test Warnings -----------------------");
