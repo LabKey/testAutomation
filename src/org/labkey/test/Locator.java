@@ -310,9 +310,9 @@ public abstract class Locator extends By
         return wrappedContext.getValue();
     }
 
-    public LazyWebElement findWhenNeeded(SearchContext context)
+    public LazyWebElement<?> findWhenNeeded(SearchContext context)
     {
-        return new LazyWebElement(this, context);
+        return new LazyWebElement<>(this, context);
     }
 
     public RefindingWebElement refindWhenNeeded(SearchContext context)
@@ -320,6 +320,7 @@ public abstract class Locator extends By
         return new RefindingWebElement(this, context);
     }
 
+    @Override
     public WebElement findElement(SearchContext context)
     {
         Optional<WebElement> optionalElement = findOptionalElement(context);
@@ -327,10 +328,6 @@ public abstract class Locator extends By
                 new NoSuchElementException("Unable to find element: " + getFindDescription(context)));
     }
 
-    /**
-     * @deprecated Use {@link #findOptionalElement(SearchContext)}
-     */
-    @Deprecated
     public WebElement findElementOrNull(SearchContext context)
     {
         return findOptionalElement(context).orElse(null);
@@ -344,6 +341,7 @@ public abstract class Locator extends By
         return Optional.of(elements.get(0));
     }
 
+    @Override
     public List<WebElement> findElements(SearchContext context)
     {
         List<WebElement> elements = context.findElements(this.getBy());
@@ -922,29 +920,29 @@ public abstract class Locator extends By
         } else if (!value.contains("\"")) {
             return '"' + value + '"';
         } else {
-            String result = "concat(";
+            StringBuilder result = new StringBuilder("concat(");
             while (true) {
                 int apos = value.indexOf("'");
                 int quot = value.indexOf('"');
                 if (apos < 0) {
-                    result += "'" + value + "'";
+                    result.append("'").append(value).append("'");
                     break;
                 } else if (quot < 0) {
-                    result += '"' + value + '"';
+                    result.append('"').append(value).append('"');
                     break;
                 } else if (quot < apos) {
                     String part = value.substring(0, apos);
-                    result += "'" + part + "'";
+                    result.append("'").append(part).append("'");
                     value = value.substring(part.length());
                 } else {
                     String part = value.substring(0, quot);
-                    result += '"' + part + '"';
+                    result.append('"').append(part).append('"');
                     value = value.substring(part.length());
                 }
-                result += ',';
+                result.append(',');
             }
-            result += ')';
-            return result;
+            result.append(')');
+            return result.toString();
         }
     }
 
@@ -1157,6 +1155,7 @@ public abstract class Locator extends By
             super(loc);
         }
 
+        @Override
         public XPathLocator containing(String contains)
         {
             if (contains != null && !contains.isEmpty())
@@ -1186,6 +1185,7 @@ public abstract class Locator extends By
                 return this;
         }
 
+        @Override
         public XPathLocator withText(String text)
         {
             return this.withPredicate("normalize-space()="+xq(text));
@@ -1216,11 +1216,13 @@ public abstract class Locator extends By
             return this.withPredicate("starts-with(normalize-space(), "+xq(text)+")");
         }
 
+        @Override
         public XPathLocator index(Integer index)
         {
             return new XPathLocator("("+getLoc()+")["+(index+1)+"]");
         }
 
+        @Override
         protected By getBy()
         {
             return By.xpath(getLoc());
@@ -1502,6 +1504,7 @@ public abstract class Locator extends By
             _id = id.contains(" ") ? null : id;
         }
 
+        @Override
         protected By getBy()
         {
             return _id == null ? super.getBy() : By.id(_id);
@@ -1553,6 +1556,7 @@ public abstract class Locator extends By
             return new WrappedLocator(new CssLocator(unionedLocators.toString()));
         }
 
+        @Override
         public Locator containing(String contains)
         {
             if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
@@ -1561,6 +1565,7 @@ public abstract class Locator extends By
             return new CssLocator(getLoc(), _index, contains, _text);
         }
 
+        @Override
         public Locator withText(String text)
         {
             if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
@@ -1574,6 +1579,7 @@ public abstract class Locator extends By
          * @param index zero-based index of desired element
          * @return Locator to find the nth instance of the base selector
          */
+        @Override
         public Locator index(Integer index)
         {
             if (_index != null && _index != 0)
@@ -1676,6 +1682,7 @@ public abstract class Locator extends By
             return "css=" + getLoc();
         }
 
+        @Override
         protected By getBy()
         {
             if (getLoc().contains(":contains("))
@@ -1739,6 +1746,7 @@ public abstract class Locator extends By
             return "link=" + _linkText;
         }
 
+        @Override
         protected By getBy()
         {
             return By.linkText(_linkText);

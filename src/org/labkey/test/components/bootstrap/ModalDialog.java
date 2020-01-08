@@ -34,11 +34,16 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     final WebElement _el;
     final WebDriver _driver;
 
-    public ModalDialog(WebElement element, WebDriver driver)
+    protected ModalDialog(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
         waitForReady();
+    }
+
+    public ModalDialog(ModalDialogFinder finder)
+    {
+        this(finder.waitFor().getComponentElement(), finder.getDriver());
     }
 
     /**
@@ -109,13 +114,16 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     protected void waitForClose(Integer waitSeconds)
     {
-        List<WebElement> elements = new ArrayList<>();
-        elements.add(getComponentElement());
-        WebElement modalBackdrop = Locator.byClass("modal-backdrop").findElementOrNull(getDriver());
-        if (modalBackdrop != null)
-            elements.add(modalBackdrop);
-        new WebDriverWait(getDriver(), waitSeconds)
-                .until(ExpectedConditions.invisibilityOfAllElements(elements));
+        if (waitSeconds > 0) // Zero to not expect dialog to close
+        {
+            List<WebElement> elements = new ArrayList<>();
+            elements.add(getComponentElement());
+            WebElement modalBackdrop = Locator.byClass("modal-backdrop").findElementOrNull(getDriver());
+            if (modalBackdrop != null)
+                elements.add(modalBackdrop);
+            new WebDriverWait(getDriver(), waitSeconds)
+                    .until(ExpectedConditions.invisibilityOfAllElements(elements));
+        }
     }
 
     protected ElementCache newElementCache()
@@ -125,11 +133,11 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     protected class ElementCache extends Component.ElementCache
     {
-        WebElement title = Locators.title.findWhenNeeded(getComponentElement());
-        WebElement closeButton = Locator.tagWithClass("button", "close")
+        public final WebElement title = Locators.title.findWhenNeeded(getComponentElement());
+        public final WebElement closeButton = Locator.tagWithClass("button", "close")
                 .withAttribute("data-dismiss", "modal")
                 .findWhenNeeded(getComponentElement());
-        WebElement body = Locators.body
+        public final WebElement body = Locators.body
                 .findWhenNeeded(getComponentElement()).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 

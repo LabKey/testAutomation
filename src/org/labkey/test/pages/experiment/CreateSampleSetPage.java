@@ -13,6 +13,7 @@ import org.openqa.selenium.support.ui.Select;
 
 public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementCache>
 {
+    public final static String CURRENT_SAMPLE_TYPE_OPTION_TEXT = "(Current Sample Type)";
     public final static String CURRENT_SAMPLE_SET_OPTION_TEXT = "(Current Sample Set)";
     public CreateSampleSetPage(WebDriver driver)
     {

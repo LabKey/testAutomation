@@ -65,6 +65,14 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
         _elementCache = null;
     }
 
+    @Override
+    public void refresh(int millis)
+    {
+        super.refresh(millis);
+        clearCache();
+        waitForPage();
+    }
+
     protected EC elementCache()
     {
         if (null == _elementCache)

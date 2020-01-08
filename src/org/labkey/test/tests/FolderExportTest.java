@@ -335,10 +335,7 @@ public class FolderExportTest extends BaseWebDriverTest
     private void createUsers(String...users)
     {
         log("Creating " + users.length + " users");
-        for (String user : users)
-        {
-            _userHelper.createUser(user);
-        }
+        _userHelper.ensureUsersExist(Arrays.asList(users));
     }
 
     @LogMethod
