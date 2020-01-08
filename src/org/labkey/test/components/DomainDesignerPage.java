@@ -107,51 +107,51 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public String waitForError()
     {
-        waitFor(()-> BootstrapLocators.dangerAlert.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.errorBanner.existsIn(getDriver()),
                 "the error alert did not appear as expected", 1000);
         return  errorAlert().getText();
     }
 
     public WebElement errorAlert()
     {
-        return BootstrapLocators.dangerAlert.existsIn(getDriver()) ? BootstrapLocators.dangerAlert.findElement(getDriver()) : null;
+        return BootstrapLocators.errorBanner.existsIn(getDriver()) ? BootstrapLocators.errorBanner.findElement(getDriver()) : null;
     }
 
     public String waitForWarning()
     {
-        waitFor(()-> BootstrapLocators.warningAlert.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.warningBanner.existsIn(getDriver()),
                 "the warning alert did not appear as expected", 1000);
         return  warningAlert().getText();
     }
 
     public WebElement warningAlert()
     {
-        return BootstrapLocators.warningAlert.existsIn(getDriver()) ? BootstrapLocators.warningAlert.findElement(getDriver()) : null;
+        return BootstrapLocators.warningBanner.existsIn(getDriver()) ? BootstrapLocators.warningBanner.findElement(getDriver()) : null;
     }
 
     public String waitForInfo()
     {
-        waitFor(()-> BootstrapLocators.infoAlert.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
                 "the info alert did not appear as expected", 1000);
         return  infoAlert().getText();
     }
 
     public WebElement infoAlert()
     {
-        return BootstrapLocators.infoAlert.existsIn(getDriver()) ? BootstrapLocators.infoAlert.findElement(getDriver()) : null;
+        return BootstrapLocators.infoBanner.existsIn(getDriver()) ? BootstrapLocators.infoBanner.findElement(getDriver()) : null;
     }
 
     public String waitForAnyAlert()
     {
         WebElement alert = Locator.waitForAnyElement(shortWait(),
-                BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
+                BootstrapLocators.errorBanner, BootstrapLocators.infoBanner, BootstrapLocators.warningBanner, BootstrapLocators.successBanner);
         return alert.getText();
     }
 
     public String anyAlert()
     {
         WebElement alert = Locator.findAnyElementOrNull(getDriver(),
-                BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
+                BootstrapLocators.errorBanner, BootstrapLocators.infoBanner, BootstrapLocators.warningBanner, BootstrapLocators.successBanner);
         if (alert !=null)
             return alert.getText();
         else

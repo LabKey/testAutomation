@@ -252,6 +252,21 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
 
     }
 
+    /**
+     * Get the items that are in the drop down list. That is the items that may be selected.
+     *
+     * @return List of strings for the values in the list.
+     */
+    public List<String> getListItems()
+    {
+        // Can only get the list of items once the list has been opened.
+        open();
+        List<WebElement> selectedItems = Locators.listItems.findElements(getComponentElement());
+        List<String> rawItems = getWrapper().getTexts(selectedItems);
+        close();
+        return rawItems.stream().map(String::trim).collect(Collectors.toList());
+    }
+
     protected String getName()
     {
         return elementCache().input.getAttribute("name");
@@ -384,6 +399,7 @@ public class ReactSelect extends WebDriverComponent<ReactSelect.ElementCache>
         final public static Locator arrow = Locator.tagWithClass("span","Select-arrow-zone");
         final public static Locator selectMenu = Locator.tagWithClass("div", "Select-menu");
         final public static Locator selectedItems = Locator.tagWithClass("span", "Select-value-label");
+        final public static Locator listItems = Locator.tagWithClass("div", "Select-menu-outer");
         final public static Locator loadingSpinner = Locator.tagWithClass("span", "Select-loading");
 
         public static Locator selectContainer()

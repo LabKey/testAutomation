@@ -1254,7 +1254,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         expectedProps = new HashMap<>();
         expectedProps.put("success", false);
-        expectedProps.put("exception", "User does not have permission to perform this operation");
+        expectedProps.put("exception", "User does not have permission to perform this operation.");
 
         runCommand(cn, command, "application/json", 401, null);
         runCommand(cn, command, "text/xml", 401, null);
