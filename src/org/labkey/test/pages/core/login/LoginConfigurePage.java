@@ -3,13 +3,13 @@ package org.labkey.test.pages.core.login;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.glassLibrary.components.MultiMenu;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
+import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCache>
 {
@@ -20,61 +20,58 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     public static LoginConfigurePage beginAt(WebDriverWrapper webDriverWrapper)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("login", "oldConfigure"));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("login", "configure"));
         return new LoginConfigurePage(webDriverWrapper.getDriver());
     }
 
-    public <P extends PrimaryAuthenticationProviderConfigurationPage> P addConfiguration(Class<P> authType)
+    public <D extends AuthDialogBase> D addConfiguration(AuthenticationProvider<D> authenticationProvider)
     {
-        P page;
-        try
-        {
-            page = authType.getDeclaredConstructor(WebDriver.class).newInstance(getDriver());
-        }
-        catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
-        {
-            throw new RuntimeException("Unable to instantiate page class: " + authType.getName(), e);
-        }
+        elementCache().addPrimaryMenu.
+                clickSubMenu(false, authenticationProvider.getProviderName() + " : " + authenticationProvider.getProviderDescription());
 
-        elementCache().addMenu.
-                clickSubMenu(true, page.getProviderName() + " - " + page.getProviderDescription());
-
-        return page;
+        return authenticationProvider.getNewDialog(getDriver());
     }
 
-    public LoginConfigurePage removeConfiguration(String description)
+    public LoginConfigurePage togglePrimaryConfiguration()
     {
-        // the html table class does not support finding a row's index correctly; doing it ourself here
-        WebElement row = Locator.xpath("//tbody/tr").containing(description).findElement(elementCache().tableElement);
-        Locator.tagWithClass("a", "labkey-text-link").withText("delete").findElement(row).click();
-        // handle dialog
-        acceptAlert();
-        // pause, because that works
+        if (!elementCache().panelTab1.getAttribute("aria-selected").equals("true"))
+            elementCache().panelTab1.click();
+        waitFor(()-> elementCache().panelTab1.getAttribute("aria-selected").equals("true"), 1000);
+        return this;
+    }
+
+    public LoginConfigRow getPrimaryConfigurationRow(String description)
+    {
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor();
+    }
+
+    public LoginConfigurePage toggleSecondaryConfiguration()
+    {
+        if (!elementCache().panelTab2.getAttribute("aria-selected").equals("true"))
+            elementCache().panelTab2.click();
+        waitFor(()-> elementCache().panelTab2.getAttribute("aria-selected").equals("true"), 1000);
+        return this;
+    }
+
+    public LoginConfigurePage removeConfiguration(String description)      // assumes for now we're doing primary only
+    {
+        new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor()
+                .clickDelete();
+
+        // pause, because that works?
         sleep(1000);
         return this;
     }
 
-    public <P extends PrimaryAuthenticationProviderConfigurationPage> P clickEditConfiguration(Class<P> authType, String description)
+    public <D extends AuthDialogBase> D clickEditConfiguration(String description, AuthenticationProvider<D> authenticationProvider)
     {
-        P page;
-        try
-        {
-            page = authType.getDeclaredConstructor(WebDriver.class).newInstance(getDriver());
-        }
-        catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
-        {
-            throw new RuntimeException("Unable to instantiate page class: " + authType.getName(), e);
-        }
-
-        WebElement row = Locator.xpath("//tbody/tr").containing(description).findElement(elementCache().tableElement);
-        clickAndWait(Locator.tagWithClass("a", "labkey-text-link").withText("edit").findElement(row));
-
-        return page;
+        LoginConfigRow row = new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor(getDriver());
+        return row.clickEdit(authenticationProvider);
     }
 
-    public ShowAdminPage clickDone()
+    public ShowAdminPage clickSaveAndFinish()
     {
-        clickAndWait(elementCache().doneBtn());
+        clickAndWait(elementCache().saveAndFinishBtn());
         return new ShowAdminPage(getDriver());
     }
 
@@ -86,25 +83,39 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement primaryConfigsPanel()
+        WebElement globalSettingsPanel()
         {
             return Locator.tagWithClass("div", "panel-default")
-                    .withDescendant(Locator.tagWithClass("h3", "panel-title").withText("Primary authentication configurations"))
+                    .withDescendant(Locator.tagWithClass("div", "panel-heading").withChild(Locator.tag("span").withText("Global Settings")))
                     .waitForElement(this, WAIT_FOR_JAVASCRIPT);
         }
 
-        BootstrapMenu addMenu = new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
-                .withChild(Locator.tagWithAttribute("a", "data-toggle", "dropdown").withText("Add..."))
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+        Locator checkBoxLoc(String label)
+        {
+            return Locator.tagWithClass("div", "bottom-margin").withChild(Locator.tagWithText("span", label))
+                    .child(Locator.tagWithClassContaining("svg", "svg-inline--fa"));
+        }
+
+        WebElement configurationsPanel()
+        {
+            return Locator.tagWithClass("div", "panel-default")
+                    .withDescendant(Locator.tagWithClass("div", "panel-heading").withChild(Locator.tag("span").withText("Configurations")))
+                    .waitForElement(this, WAIT_FOR_JAVASCRIPT);
+        }
+
+        WebElement tabPanel = Locator.id("tab-panel").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement panelTab1 = Locator.id("tab-panel-tab-1").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement panelTab2 = Locator.id("tab-panel-tab-2").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+
+        BootstrapMenu addPrimaryMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Add New Primary Configuration").timeout(WAIT_FOR_JAVASCRIPT)
+                .findWhenNeeded(this);
 
         WebElement addAuthButton = Locator.linkWithSpan("Add...").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        WebElement tableElement = Locator.tagWithClass("table", "labkey-data-region-legacy")
-                .findElement(primaryConfigsPanel());
-
-        WebElement doneBtn()
+        WebElement saveAndFinishBtn()
         {
-            return Locator.lkButton("Done").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+            return Locator.tagWithClass("button", "labkey-button")
+                .withText("Save and Finish").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         }
     }
 }
