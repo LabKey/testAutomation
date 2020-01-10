@@ -36,6 +36,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
     public LoginConfigurePage clickDelete()
     {
         elementCache().deleteButton.click();
+        getWrapper().acceptAlert();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
         return new LoginConfigurePage(getDriver());
     }
@@ -82,7 +83,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
 
     public static class LoginConfigRowFinder extends WebDriverComponentFinder<LoginConfigRow, LoginConfigRowFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-field-row");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "auth-row");
         private String _description = null;
 
         public LoginConfigRowFinder(WebDriver driver)
@@ -106,7 +107,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
         protected Locator locator()
         {
             if (_description != null)
-                return _baseLocator.withDescendant(Locator.tagWithClass("div", "down").withText( _description));
+                return _baseLocator.withDescendant(Locator.tagWithClass("div", "description").withText( _description));
             else
                 return _baseLocator;
         }

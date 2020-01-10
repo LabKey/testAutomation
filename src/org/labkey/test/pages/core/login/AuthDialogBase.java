@@ -1,14 +1,17 @@
 package org.labkey.test.pages.core.login;
 
+import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.ToggleButton;
 import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 
-public abstract class AuthDialogBase extends ModalDialog
+public abstract class AuthDialogBase<T extends AuthDialogBase> extends ModalDialog
 {
     private final LoginConfigRow _row;
 
-    protected AuthDialogBase(AuthenticationProvider provider, WebDriver driver)
+    protected AuthDialogBase(AuthenticationProvider<org.labkey.test.pages.ldap.LdapConfigureDialog> provider, WebDriver driver)
     {
         super(getFinder("Configure New " + provider.getProviderName() + " Authentication", driver));
         _row = null;
@@ -30,18 +33,41 @@ public abstract class AuthDialogBase extends ModalDialog
         return _row;
     }
 
+    public T setDescription(String description)
+    {
+        elementCache().descriptionInput.set(description);
+        return getThis();
+    }
+
+    public String getDescription()
+    {
+        return elementCache().descriptionInput.get();
+    }
+
+    public T setEnabled(boolean enabled)
+    {
+        elementCache().enableSlider.set(enabled);
+        return getThis();
+    }
+
+    public boolean isEnabled()
+    {
+        return elementCache().enableSlider.get();
+    }
 
     public LoginConfigRow clickApply()
     {
+        String description= getDescription();
         dismiss("Apply");
-        return getRow();
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor();
     }
 
-    public LoginConfigRow clickCancel()
+    public void clickCancel()
     {
         dismiss("cancel");
-        return getRow();
     }
+
+    protected abstract T getThis();
 
     @Override
     protected ElementCache newElementCache()
@@ -49,9 +75,22 @@ public abstract class AuthDialogBase extends ModalDialog
         return new ElementCache();
     }
 
+    @Override
+    protected ElementCache elementCache()
+    {
+        return  (ElementCache) super.elementCache();
+    }
+
     protected class ElementCache extends ModalDialog.ElementCache
     {
+//        WebElement enableToggle = Locator.tagWithClass("div", "toggle")
+//                //.withChild(Locator.tagWithClass("div", "toggle-group"))
+//                .findWhenNeeded(this).withTimeout(2000);
+        ToggleButton enableSlider = new ToggleButton.ToggleButtonFinder(getDriver())
+            .withState("Enabled").timeout(2000).findWhenNeeded(this);
 
+        Input descriptionInput = new Input(Locator.input("description")
+                .findWhenNeeded(this).withTimeout(2000), getDriver());
     }
 
 

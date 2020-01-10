@@ -11,6 +11,8 @@ import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCache>
 {
     public LoginConfigurePage(WebDriver driver)
@@ -43,6 +45,12 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     public LoginConfigRow getPrimaryConfigurationRow(String description)
     {
         return new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor();
+    }
+
+    public List<LoginConfigRow> getConfigurations()
+    {
+        togglePrimaryConfiguration();
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll();
     }
 
     public LoginConfigurePage toggleSecondaryConfiguration()
@@ -110,7 +118,6 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         BootstrapMenu addPrimaryMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Add New Primary Configuration").timeout(WAIT_FOR_JAVASCRIPT)
                 .findWhenNeeded(this);
 
-        WebElement addAuthButton = Locator.linkWithSpan("Add...").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         WebElement saveAndFinishBtn()
         {
