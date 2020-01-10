@@ -11,7 +11,7 @@ public abstract class AuthDialogBase<T extends AuthDialogBase> extends ModalDial
 {
     private final LoginConfigRow _row;
 
-    protected AuthDialogBase(AuthenticationProvider<org.labkey.test.pages.ldap.LdapConfigureDialog> provider, WebDriver driver)
+    protected AuthDialogBase(AuthenticationProvider provider, WebDriver driver)
     {
         super(getFinder("Configure New " + provider.getProviderName() + " Authentication", driver));
         _row = null;
