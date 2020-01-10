@@ -12,7 +12,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
     final WebElement _el;
     final WebDriver _driver;
 
-    public LoginConfigRow(WebElement element, WebDriver driver)
+    protected LoginConfigRow(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
@@ -69,9 +69,9 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
     protected class ElementCache extends WebDriverComponent.ElementCache
     {
         final WebElement baseFieldsElement = Locator.tagWithClass("div", "domain-row-base-fields").findWhenNeeded(this);
-        final WebElement description = Locator.tagWithClass("div", "description").findElement(baseFieldsElement);
-        final WebElement details = Locator.tagWithClass("div", "details").findElement(baseFieldsElement);
-        final WebElement provider = Locator.tagWithClass("div", "provider").findElement(baseFieldsElement);
+        final WebElement description = Locator.tagWithClass("div", "description").findWhenNeeded(baseFieldsElement);
+        final WebElement details = Locator.tagWithClass("div", "details").findWhenNeeded(baseFieldsElement);
+        final WebElement provider = Locator.tagWithClass("div", "provider").findWhenNeeded(baseFieldsElement);
 
         WebElement statusElement = Locator.tagWithClass("div", "col-xs-7")
                 .withChild(Locator.tagWithClass("svg", "fa-circle")).findWhenNeeded(this);

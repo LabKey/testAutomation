@@ -1,6 +1,7 @@
 package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -10,7 +11,7 @@ public class ToggleButton extends WebDriverComponent<ToggleButton.ElementCache>
     final WebElement _el;
     final WebDriver _driver;
 
-    public ToggleButton(WebElement element, WebDriver driver)
+    protected ToggleButton(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
@@ -33,7 +34,7 @@ public class ToggleButton extends WebDriverComponent<ToggleButton.ElementCache>
         String desiredState = enabled ? "enabled" : "disabled";
         if (get() != enabled)
             getComponentElement().click();
-        getWrapper().waitFor(()-> get() == enabled,
+        WebDriverWrapper.waitFor(()-> get() == enabled,
                 "the toggle button did not become " + desiredState, 2000);
         return this;
     }

@@ -46,13 +46,13 @@ public abstract class AuthDialogBase<T extends AuthDialogBase> extends ModalDial
 
     public T setEnabled(boolean enabled)
     {
-        elementCache().enableSlider.set(enabled);
+        elementCache().enableToggle.set(enabled);
         return getThis();
     }
 
     public boolean isEnabled()
     {
-        return elementCache().enableSlider.get();
+        return elementCache().enableToggle.get();
     }
 
     public LoginConfigRow clickApply()
@@ -83,10 +83,7 @@ public abstract class AuthDialogBase<T extends AuthDialogBase> extends ModalDial
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-//        WebElement enableToggle = Locator.tagWithClass("div", "toggle")
-//                //.withChild(Locator.tagWithClass("div", "toggle-group"))
-//                .findWhenNeeded(this).withTimeout(2000);
-        ToggleButton enableSlider = new ToggleButton.ToggleButtonFinder(getDriver())
+        ToggleButton enableToggle = new ToggleButton.ToggleButtonFinder(getDriver())
             .withState("Enabled").timeout(2000).findWhenNeeded(this);
 
         Input descriptionInput = new Input(Locator.input("description")

@@ -65,9 +65,6 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     {
         new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor()
                 .clickDelete();
-
-        // pause, because that works?
-        sleep(1000);
         return this;
     }
 
