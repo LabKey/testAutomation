@@ -27,7 +27,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -114,7 +113,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assayDesigner.goToRunFields().addField("RunFileField").setLabel("Run File Field").setType(FieldDefinition.ColumnType.File);
 
         log("Add Results file field");
-        assayDesigner.goToResultFields().addField("DataFileField").setLabel("Data File Field").setType(FieldDefinition.ColumnType.File);
+        assayDesigner.goToResultsFields().addField("DataFileField").setLabel("Data File Field").setType(FieldDefinition.ColumnType.File);
 
         assayDesigner.clickFinish();
 
@@ -200,9 +199,9 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         log("Remove the 'File' (last) column from the batch and see that things still work.");
 
-        AssayDesignerPage gwtAassayDesigner = _assayHelper.clickEditAssayDesign();
-        gwtAassayDesigner.batchFields().selectField("BatchFileField").markForDeletion();
-        gwtAassayDesigner.saveAndClose();
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
+        assayDesignerPage.expandFieldsPanel("Batch").removeField("BatchFileField");
+        assayDesignerPage.clickFinish();
         waitAndClickAndWait(Locator.linkWithText("view results"));
 
         log("Verify that the file fields from the batch are no longer present.");

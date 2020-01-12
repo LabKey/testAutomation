@@ -118,6 +118,7 @@ import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.TestProperties.isViewCheckSkipped;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
+import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.components.PropertiesEditor.PhiSelectType;
 import static org.labkey.test.components.PropertiesEditor.PhiSelectType.NotPHI;
@@ -154,6 +155,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected static boolean _testFailed = false;
     protected static boolean _anyTestFailed = false;
     private final ArtifactCollector _artifactCollector;
+    private DeferredErrorCollector _errorCollector;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public final CustomizeView _customizeViewsHelper;
@@ -181,7 +183,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected static boolean _checkedLeaksAndErrors = false;
     private static final String ACTION_SUMMARY_TABLE_NAME = "actions";
 
-    protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation";
+    protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation.";
 
     static final Set<String> urlsSeen = new HashSet<>();
 
@@ -279,6 +281,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public ArtifactCollector getArtifactCollector()
     {
         return _artifactCollector;
+    }
+
+    public final DeferredErrorCollector checker()
+    {
+        if (_errorCollector == null)
+        {
+            throw new IllegalStateException("Default error collector only available within '@Test' methods.");
+        }
+        return _errorCollector;
     }
 
     /**
@@ -436,8 +447,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             Statement createFailOnTimeoutStatement(Statement statement, Class<?> testClass)
             {
-                // No class timeout when running through IntelliJ
-                if ("true".equals(System.getProperty("intellij.debug.agent")))
+                double timeoutMultiplier = TestProperties.getTimeoutMultiplier();
+
+                // No class timeout when running through IntelliJ or when multiplier is zero
+                if ("true".equals(System.getProperty("intellij.debug.agent")) || timeoutMultiplier == 0)
                     return statement;
 
                 long minutes;
@@ -447,10 +460,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 else
                     minutes = ClassTimeout.DEFAULT;
 
-                minutes *= TestProperties.getTimeoutMultiplier();
+                minutes *= timeoutMultiplier;
 
-                // Don't disable timeout unless multiplier is exactly zero
-                if (minutes == 0 && TestProperties.getTimeoutMultiplier() > 0)
+                if (minutes == 0)
                     minutes = 1;
 
                 if (isLinkCheckEnabled())
@@ -458,6 +470,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     // Increase timeout to account for crawler
                     minutes += TestProperties.getCrawlerTimeout().toMinutes();
                     minutes++;
+                }
+
+                if (!canConnectWithPrimaryUser())
+                {
+                    // Increase timeout to allow initial user creation and testing
+                    minutes += 3;
                 }
 
                 return FailOnTimeout.builder()
@@ -536,6 +554,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         return RuleChain.outerRule(lock).around(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
 //        return RuleChain.outerRule(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
+    }
+
+    private static boolean canConnectWithPrimaryUser()
+    {
+        try
+        {
+            String startPage = buildURL("project", "home", "start");
+            SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(startPage);
+            return httpResponse.getResponseCode() < 400;
+        }
+        catch (RuntimeException re)
+        {
+            return false; // Probably a connection timeout
+        }
     }
 
     private void doPreamble()
@@ -624,13 +656,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (_testFailed)
                     resetErrors(); // Clear errors from a previously failed test
                 _testFailed = false;
+                _errorCollector = new DeferredErrorCollector(getArtifactCollector());
             }
 
             @Override
             protected void succeeded(Description description)
             {
                 closeExtraWindows();
-                checkErrors();
+                checker().wrapAssertion(() -> checkErrors());
+                checker().recordResults();
             }
         };
 
@@ -1505,7 +1539,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void assertAtUserUserLacksPermissionPage()
     {
         assertTextPresent(PERMISSION_ERROR);
-        assertTitleEquals("403: Error Page -- User does not have permission to perform this operation");
+        assertTitleEquals("403: Error Page -- User does not have permission to perform this operation.");
     }
 
     public void assertNavTrail(String... links)
@@ -1568,13 +1602,21 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void setPipelineRoot(String rootPath, boolean inherit)
     {
-        _setPipelineRoot(rootPath, inherit);
+        if (TestProperties.isServerRemote())
+        {
+            WebDavUploadHelper uploadHelper = new WebDavUploadHelper(getProjectName());
+            uploadHelper.uploadDirectoryContents(new File(rootPath));
+        }
+        else
+        {
+            _setPipelineRoot(rootPath, inherit);
 
-        waitForElement(Locators.labkeyMessage.withText("The pipeline root was set to '" + Paths.get(rootPath).normalize().toString() + "'"));
+            waitForElement(Locators.labkeyMessage.withText("The pipeline root was set to '" + Paths.get(rootPath).normalize().toString() + "'"));
 
-        getArtifactCollector().addArtifactLocation(new File(rootPath));
+            getArtifactCollector().addArtifactLocation(new File(rootPath));
 
-        log("Finished setting pipeline to: " + rootPath);
+            log("Finished setting pipeline to: " + rootPath);
+        }
     }
 
     public String setPipelineRootExpectingError(String rootPath)

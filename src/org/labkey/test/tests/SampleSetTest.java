@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
@@ -35,18 +36,22 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
@@ -130,6 +135,17 @@ public class SampleSetTest extends BaseWebDriverTest
 
         projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
         portalHelper.addWebPart("Sample Sets");
+
+        Connection cn = createDefaultConnection(false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", true);
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+        Connection cn = createDefaultConnection(false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", false);
     }
 
     // Uncomment this function (after you run once) it will make iterating on tests much easier.
@@ -217,7 +233,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Try to create a sample set with the same name.");
         clickAndWait(Locator.linkWithText("Sample Sets"));
         sampleSetHelper = new SampleSetHelper(this);
-        sampleSetHelper.createSampleSet(sampleSetName, null);
+        sampleSetHelper.createSampleSet(sampleSetName, null, true);
         assertTextPresent("A sample set with that name already exists.");
 
         clickButton("Cancel");
@@ -230,7 +246,7 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         String sampleSetName = "SimpleCreateWithExp";
         List<String> fieldNames = Arrays.asList("StringValue", "FloatValue");
-        Map<String, FieldDefinition.ColumnType> fields = Map.of(fieldNames.get(0), FieldDefinition.ColumnType.String, fieldNames.get(1), FieldDefinition.ColumnType.Double);
+        Map<String, FieldDefinition.ColumnType> fields = Map.of(fieldNames.get(0), FieldDefinition.ColumnType.String, fieldNames.get(1), FieldDefinition.ColumnType.Decimal);
         SampleSetHelper sampleSetHelper = new SampleSetHelper(this);
         log("Create a new sample set with a name and name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
@@ -618,6 +634,85 @@ public class SampleSetTest extends BaseWebDriverTest
         dgen.deleteDomain(createDefaultConnection(true));
     }
 
+
+    @Test
+    public void testStringLookupFields() throws IOException, CommandException
+    {
+        String sampleSetName = "10000Samples"; // Testing with 10,000 samples because as per the product the lookup is converted into text field only when the samples exceed 10,000 samples
+        String listName = "MainList";
+
+        goToProjectHome();
+        new PortalHelper(this).addWebPart("Lists");
+
+        log("Creating the sample set of 10000 samples");
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
+        dgen.addDataSupplier("label", () -> dgen.randomString(10))
+                .withGeneratedRows(10000);
+        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        log("Successfully  inserted " + saveRowsResponse.getRowsAffected());
+
+        log("Waiting for the sample data to get generated");
+        goToProjectHome();
+        waitAndClickAndWait(Locator.linkWithText(sampleSetName));
+
+        log("Inserting 10,001 row in the sampleset");
+        DataRegionTable table = new DataRegionTable("Material", getDriver());
+        table.clickInsertNewRow();
+
+        setFormElement(Locator.name("quf_Name"), "Sample1");
+        setFormElement(Locator.name("quf_label"), "Sample1");
+        clickButton("Submit");
+
+        log("Creating the list");
+        goToProjectHome();
+        lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)));
+
+        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "VarList", Map.of("keyName", "id"));
+
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
+
+        log("Adding the lookUp field in the list");
+        DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
+                .setType(FieldDefinition.ColumnType.Lookup)
+                .expand()
+                .setFromFolder("Current Folder")
+                .setFromSchema("exp.materials")
+                .setFromTargetTable("10000Samples (Integer)")
+                .setDescription("LookUp in same container with 10000 samples");
+
+        domainDesignerPage.clickFinish();
+
+        log("Inserting the new row in the list with the newly created sample as lookup");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        table = new DataRegionTable("query", getDriver());
+        table.clickInsertNewRow();
+        setFormElement(Locator.name("quf_id"), "1");
+        setFormElement(Locator.name("quf_name"), "1");
+        setFormElement(Locator.name("quf_lookUpField"), "Sample2");
+        clickButton("Submit");
+
+        String errMsg = Locators.labkeyError.findElement(getDriver()).getText();
+        assertEquals("Expecpted error is different", "Could not convert value: Sample2", errMsg);
+
+        setFormElement(Locator.name("quf_lookUpField"), "Sample1");
+        clickButton("Submit");
+
+        log("Verifying row is inserted correctly");
+        table = new DataRegionTable("query", getDriver());
+        assertEquals("Lookup field value is incorrect", Arrays.asList("Sample1"), table.getColumnDataAsText("lookUpField"));
+
+    }
+
     @Test
     public void testInsertLargeLineageGraph() throws IOException, CommandException
     {
@@ -826,10 +921,13 @@ public class SampleSetTest extends BaseWebDriverTest
 //  Note that we currently will not find runs where the batch id references a sampleId.  See Issue 37918.
 //        log("Create an assay with sampleId in the batch fields");
 //        goToProjectHome();
-//        clickAndWait(Locator.linkWithText("Assay List"));
-//        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("General", BATCH_ID_ASSAY);
-//        designerPage.addLookupBatchField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
-//        designerPage.save();
+//        ReactAssayDesignerPage designerPage = _assayHelper.createAssayDesign("General", BATCH_ID_ASSAY);
+//        designerPage.goToBatchFields()
+//            .addField(SAMPLE_ID_FIELD_NAME)
+//            .setType(FieldDefinition.ColumnType.Lookup)
+//            .setFromSchema("samples")
+//            .setFromTargetTable(SAMPLE_SET_NAME + " (Integer)");
+//        designerPage.clickFinish();
 //
 //        log("Upload assay data for batch-level sampleId");
 //        goToProjectHome();
@@ -853,12 +951,15 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Create an assay with sampleId in the data field");
         goToProjectHome();
-        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("General", DATA_ID_ASSAY);
-        designerPage.addLookupDataField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
-        designerPage.save();
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", DATA_ID_ASSAY);
+        assayDesignerPage.goToResultsFields()
+            .addField(SAMPLE_ID_FIELD_NAME)
+            .setType(FieldDefinition.ColumnType.Lookup)
+            .setFromSchema("samples")
+            .setFromTargetTable(SAMPLE_SET_NAME + " (Integer)");
+        assayDesignerPage.clickFinish();
 
         log("Upload assay data referencing sampleId");
-        clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(DATA_ID_ASSAY));
         clickButton("Import Data");
         clickButton("Next");
@@ -883,13 +984,15 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Create an assay with sampleId in the run fields");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText("Assay List"));
-        designerPage = _assayHelper.createAssayAndEdit("General", RUN_ID_ASSAY);
-        designerPage.addLookupRunField(SAMPLE_ID_FIELD_NAME, null, "samples", SAMPLE_SET_NAME);
-        designerPage.save();
+        assayDesignerPage = _assayHelper.createAssayDesign("General", RUN_ID_ASSAY);
+        assayDesignerPage.goToRunFields()
+                .addField(SAMPLE_ID_FIELD_NAME)
+                .setType(FieldDefinition.ColumnType.Lookup)
+                .setFromSchema("samples")
+                .setFromTargetTable(SAMPLE_SET_NAME + " (Integer)");
+        assayDesignerPage.clickFinish();
 
         log("Upload assay data for run-level sampleId");
-        clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(RUN_ID_ASSAY));
         clickButton("Import Data");
         clickButton("Next");
@@ -1398,7 +1501,7 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleData.add(updateSample);
 
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null);
+        sampleHelper.createSampleSet(SAMPLE_SET_NAME);
         List<FieldDefinition> fields = new ArrayList<>();
         fields.add(new FieldDefinition(REQUIRED_FIELD_NAME)
                 .setType(FieldDefinition.ColumnType.String)
@@ -1408,7 +1511,6 @@ public class SampleSetTest extends BaseWebDriverTest
                 .setType(FieldDefinition.ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
-
         sampleHelper.addFields(fields);
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
@@ -1649,7 +1751,7 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         Map<String, FieldDefinition.ColumnType> sampleSetFields = Map.of("IntCol", FieldDefinition.ColumnType.Integer,
                 "StringCol", FieldDefinition.ColumnType.String,
-                "DateCol", FieldDefinition.ColumnType.DateTime,
+                "DateCol", FieldDefinition.ColumnType.DateAndTime,
                 "BoolCol", FieldDefinition.ColumnType.Boolean);
         File sampleSetFile = TestFileUtils.getSampleData("sampleSet.xlsx");
 
@@ -1797,7 +1899,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Create child sample set");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
         sampleHelper.createSampleSet(FOLDER_CHILDREN_SAMPLE_SET_NAME, null,
-                Map.of("OtherProp", FieldDefinition.ColumnType.Double),
+                Map.of("OtherProp", FieldDefinition.ColumnType.Decimal),
                 "Name\tMaterialInputs/" + PARENT_SAMPLE_SET_NAME + "\tOtherProp\n" +
                         "SampleSetBVTChildA\tSampleSetBVT11\t1.1\n" +
                         "SampleSetBVTChildB\tSampleSetBVT4\t2.2\n"
@@ -1824,7 +1926,7 @@ public class SampleSetTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Sample Sets"));
 
         sampleHelper.createSampleSet(FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME, null,
-                Map.of("OtherProp", FieldDefinition.ColumnType.Double),
+                Map.of("OtherProp", FieldDefinition.ColumnType.Decimal),
                 "Name\tMaterialInputs/" + FOLDER_CHILDREN_SAMPLE_SET_NAME + "\tOtherProp\n" +
                         "SampleSetBVTGrandchildA\tSampleSetBVTChildA,SampleSetBVTChildB\t11.11\n");
 
@@ -1916,7 +2018,7 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleHelper.createSampleSet(CASE_INSENSITIVE_SAMPLE_SET);
 
         clickProject(PROJECT_NAME);
-        sampleHelper.createSampleSet(LOWER_CASE_SAMPLE_SET);
+        sampleHelper.createSampleSet(LOWER_CASE_SAMPLE_SET, null, true);
         waitForElement(Locator.tagWithClass("div", "labkey-error").containing("A sample set with that name already exists."));
         clickProject(PROJECT_NAME);
         assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_SET));
@@ -1928,6 +2030,7 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         final String SAMPLE_SET= "Sample with lookup validator";
         final String listName = "Fruits from Excel";
+        final String lookupColumnLabel = "Label for lookup column";
 
         log("Infer from excel file, then import data");
         _listHelper.createListFromFile(getProjectName(), listName, TestFileUtils.getSampleData("dataLoading/excel/fruits.xls"));
@@ -1940,13 +2043,15 @@ public class SampleSetTest extends BaseWebDriverTest
         goToProjectHome();
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         sampleHelper.createSampleSet(SAMPLE_SET);
-        List<FieldDefinition> fields = new ArrayList<>();
-        final String lookupColumnLabel = "Label for lookup column";
-        fields.add(new FieldDefinition("Key")
+        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
+        domainDesignerPage.fieldsPanel()
+                .addField("Key")
                 .setLabel(lookupColumnLabel)
-                .setLookup(new FieldDefinition.LookupInfo(null, "lists", listName))
-                .setValidator(new ListHelper.LookUpValidator()));
-        sampleHelper.addFields(fields);
+                .setType(FieldDefinition.ColumnType.Lookup)
+                .setFromSchema("lists")
+                .setFromTargetTable(listName + " (Integer)")
+                .setLookupValidatorEnabled(true);
+        domainDesignerPage.clickFinish();
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(SAMPLE_SET));
@@ -2006,16 +2111,12 @@ public class SampleSetTest extends BaseWebDriverTest
         exportGridWithAttachment(3, expectedHeaders, attachIndex, "experiment-1.xar.xml", "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx");
 
         log("Remove the attachment columns and validate that everything still works.");
-        waitAndClickAndWait(Locator.lkButton("Edit Fields"));
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
-        fieldProperties.selectField("FileAttachment").markForDeletion();
-
-        // Can't use _listHelper.clickSave, it waits for a "Edit Design" button and a "Done" button.
-        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);
-        waitForElement(Locator.lkButton("Edit Fields"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        clickFolder(FOLDER_NAME);
+        DomainDesignerPage domainDesignerPage = sampleHelper.goToEditSampleSetFields(sampleSetName);
+        domainDesignerPage.fieldsPanel().removeField("FileAttachment");
+        domainDesignerPage.clickFinish();
 
         expectedHeaders.remove("File Attachment");
-
         exportGridVerifyRowCountAndHeader(3, expectedHeaders);
     }
 

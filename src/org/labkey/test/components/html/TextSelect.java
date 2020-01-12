@@ -28,14 +28,7 @@ public class TextSelect extends SelectWrapper implements FormItem<String>
 
     public static Component.SimpleComponentFinder<TextSelect> TextSelect(Locator loc)
     {
-        return new Component.SimpleComponentFinder<TextSelect>(loc)
-        {
-            @Override
-            protected TextSelect construct(WebElement el)
-            {
-                return new TextSelect(el);
-            }
-        };
+        return new Component.SimpleComponentFinder<>(loc, TextSelect::new);
     }
 
     @Override

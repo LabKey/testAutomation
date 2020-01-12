@@ -4,23 +4,28 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
-import org.openqa.selenium.WebDriver;
+import org.labkey.test.components.html.EnumSelect;
+import org.labkey.test.components.html.SelectWrapper;
+import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+
+import java.util.stream.Collectors;
 
 public class AdvancedSettingsDialog extends ModalDialog
 {
     private DomainFieldRow _row;
 
-    private AdvancedSettingsDialog(DomainFieldRow row, ModalDialogFinder finder, WebDriver driver)
+    private AdvancedSettingsDialog(DomainFieldRow row, ModalDialogFinder finder)
     {
-        super(finder.waitFor().getComponentElement(), driver);
+        super(finder);
         _row = row;
     }
 
-    public AdvancedSettingsDialog(DomainFieldRow row, WebDriver driver)
+    public AdvancedSettingsDialog(DomainFieldRow row)
     {
-        this(row, new ModalDialogFinder(driver).withTitle("Advanced Settings and Properties"), driver);
+        this(row, new ModalDialogFinder(row.getDriver()).withTitle("Advanced Settings and Properties"));
     }
 
     public boolean showInDefaultView()
@@ -67,15 +72,48 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
+    // default value options
+    public String getDefaultValueType()
+    {
+        return elementCache().defaultTypeSelect.getFirstSelectedOption().getText();
+    }
+    public AdvancedSettingsDialog setDefaultValueType(PropertiesEditor.DefaultType type)
+    {
+        getWrapper().waitFor(()->  elementCache().defaultTypeSelect.getOptions()
+                        .stream().map(WebElement::getText).collect(Collectors.toList()).contains(type.getText()),
+                "default value select did not contain expected option in time", 1500);
+        elementCache().defaultTypeSelect.set(type);
+        return this;
+    }
+
+    public LabKeyPage clickDefaultValuesLink()
+    {
+        getWrapper().clickAndWait(Locator.linkWithText("Set Default Values"));
+        return new LabKeyPage(getDriver());  // todo: return more strongly-typed page
+    }
+
     public String getPHILevel()
     {
-        return getWrapper().getFormElement(elementCache().phiSelect);
+        return elementCache().phiSelect.getFirstSelectedOption().getText();
     }
     public AdvancedSettingsDialog setPHILevel(PropertiesEditor.PhiSelectType phiLevel)
     {
-        getWrapper().waitFor(()->  elementCache().phiSelect.isEnabled(),
-                "phiSelect did not become enabled in time", 1500);
-        getWrapper().setFormElement(elementCache().phiSelect, phiLevel.getText());
+        getWrapper().waitFor(()->  elementCache().phiSelect.getOptions()
+                        .stream().map(WebElement::getText).collect(Collectors.toList()).contains(phiLevel.getText()),
+                "phiSelect did not contain phiLevel ["+phiLevel.getText()+"] in time", 1500);
+        elementCache().phiSelect.selectByVisibleText(phiLevel.getText());
+        return this;
+    }
+
+    public boolean enableExcludeDateShifting()
+    {
+        return elementCache().excludeDateShifting.get();
+    }
+    public AdvancedSettingsDialog enableExcludeDateShifting(boolean checked)
+    {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(
+                elementCache().excludeDateShifting.getComponentElement()));
+        elementCache().excludeDateShifting.set(checked);
         return this;
     }
 
@@ -165,10 +203,16 @@ public class AdvancedSettingsDialog extends ModalDialog
         public Checkbox showInDetailsView = new Checkbox(
                 Locator.input("domainpropertiesrow-showInDetailsView").findWhenNeeded(this));
 
-        // misc options
-        public WebElement phiSelect = Locator.tagWithAttribute("select", "name", "domainpropertiesrow-PHI")
-                .findWhenNeeded(this);
+        // default value options
+        private final EnumSelect<PropertiesEditor.DefaultType> defaultTypeSelect =
+                EnumSelect.EnumSelect(Locator.tagWithName("select", "domainpropertiesrow-defaultValueType"), PropertiesEditor.DefaultType.class)
+                        .findWhenNeeded(this);
 
+        // misc options
+        public Select phiSelect = SelectWrapper.Select(Locator.tagWithAttribute("select", "name", "domainpropertiesrow-PHI"))
+                .findWhenNeeded(this);
+        public Checkbox excludeDateShifting = new Checkbox(
+                Locator.input("domainpropertiesrow-excludeFromShifting").findWhenNeeded(this));
         public Checkbox enableMeasure = new Checkbox(
                 Locator.input("domainpropertiesrow-measure").findWhenNeeded(this));
         public Checkbox enableDimension = new Checkbox(
@@ -178,6 +222,5 @@ public class AdvancedSettingsDialog extends ModalDialog
         public Checkbox enableMissingValues = new Checkbox(
                 Locator.input("domainpropertiesrow-mvEnabled").findWhenNeeded(this));
     }
-
 
 }

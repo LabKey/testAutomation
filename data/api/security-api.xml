@@ -88,8 +88,7 @@
                                 "org.labkey.announcements.model.SecureMessageBoardRespondPermission",
                                 "org.labkey.api.security.permissions.ReadSomePermission",
                                 "org.labkey.api.security.permissions.UpdatePermission",
-                                "org.labkey.announcements.model.SecureMessageBoardReadPermission",
-                                "org.labkey.api.security.permissions.DesignSampleSetPermission"
+                                "org.labkey.announcements.model.SecureMessageBoardReadPermission"
                             ],
                             "groups": []
                         },

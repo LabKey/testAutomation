@@ -15,12 +15,16 @@
  */
 package org.labkey.test;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.assay.GetProtocolCommand;
 import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.remoteapi.assay.Protocol;
+import org.labkey.remoteapi.assay.ProtocolResponse;
+import org.labkey.remoteapi.assay.SaveProtocolCommand;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.ReactAssayDesignerPage;
@@ -40,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -106,6 +111,40 @@ public class AssayAPITest extends BaseWebDriverTest
         assertTextPresent(textToCheck);
     }
 
+    @Test
+    public void testGpatAssayOverAPI() throws Exception
+    {
+        String assayName = "testGpatAssay";
+        String assayDescription = "generated for test purposes over remoteAPI";
+
+        Connection connection = createDefaultConnection(true);
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand("General");                      // gets a template from the server
+        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, getCurrentContainerPath());
+
+        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
+        newAssayProtocol.setName(assayName)
+            .setDescription(assayDescription)
+            .setQCEnabled(true)
+            .setEditableResults(true)
+            .setEditableRuns(true);
+        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
+        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, getCurrentContainerPath());
+        Long protocolId = saveProtocolResponse.getProtocol().getProtocolId();
+
+        assertEquals(assayDescription, saveProtocolResponse.getProtocol().getDescription());
+        assertTrue(saveProtocolResponse.getProtocol().getQcEnabled());
+        assertTrue(saveProtocolResponse.getProtocol().getEditableResults());
+        assertTrue(saveProtocolResponse.getProtocol().getEditableRuns());
+
+        GetProtocolCommand protocolCommand = new GetProtocolCommand(protocolId);
+        ProtocolResponse doubleCheckProtocolResponse = protocolCommand.execute(connection, getCurrentContainerPath());
+
+        assertEquals(assayDescription, doubleCheckProtocolResponse.getProtocol().getDescription());
+        assertTrue(doubleCheckProtocolResponse.getProtocol().getQcEnabled());
+        assertTrue(doubleCheckProtocolResponse.getProtocol().getEditableResults());
+        assertTrue(doubleCheckProtocolResponse.getProtocol().getEditableRuns());
+    }
+
     // Issue 30003: support importing assay data relative to pipeline root
     @Test
     public void testImportRun_serverFilePath() throws Exception
@@ -116,10 +155,7 @@ public class AssayAPITest extends BaseWebDriverTest
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
         if (assayId == 0)
-        {
-            assayHelper.createAssayDesignWithDefaults("General", assayName);
-            assayId = assayHelper.getIdFromAssayName(assayName, getProjectName());
-        }
+            assayId = assayHelper.createAssayDesignUsingTemplate(getProjectName(), "General", assayName).getProtocolId().intValue();
 
         // First, simulate file already being uploaded to the server by copying to the pipeline root
         List<String> lines1 = Arrays.asList(
@@ -189,7 +225,7 @@ public class AssayAPITest extends BaseWebDriverTest
                 .setLabel("Run File Field");
 
         log("Create a 'File' column for the assay data.");
-        assayDesigner.goToResultFields()
+        assayDesigner.goToResultsFields()
                 .addField("DataFileField")
                 .setType(FieldDefinition.ColumnType.File)
                 .setLabel("Data File Field");
@@ -269,7 +305,7 @@ public class AssayAPITest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText(assayName));
         clickAndWait(Locator.linkContainingText(runName));
         DataRegionTable table = new DataRegionTable("Data", this);
-        Assert.assertEquals(Arrays.asList("K770K3VY-19", "A770K4W1-15"), table.getColumnDataAsText("SpecimenID"));
+        assertEquals(Arrays.asList("K770K3VY-19", "A770K4W1-15"), table.getColumnDataAsText("SpecimenID"));
 
         // verify images are resolved and rendered properly
         assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 1);

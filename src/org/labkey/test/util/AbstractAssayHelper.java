@@ -20,7 +20,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 
 import java.io.File;
@@ -43,52 +42,23 @@ public abstract class AbstractAssayHelper
 
     public abstract void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException;
 
-    protected abstract void goToUploadXarPage();
-
     /**
      * Upload a xar file as an assay configuration
      *
-     * There's no API version of this, so it can go in the absract helper for now.
-     * Preconditions:  on a page with an assay web part
      * @param file   file to upload
-     * @param pipelineCount  expected count of succesful pipeline jobs including thise one
+     * @param pipelineCount  expected count of successful pipeline jobs including this one
      */
-    @LogMethod
-    public void uploadXarFileAsAssayDesign(File file, int pipelineCount)
-    {
-        goToUploadXarPage();
-        _test.setFormElement(Locator.name("uploadFile"), file);
-        _test.clickAndWait(Locator.lkButton("Upload"));
-        _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
-    }
+    public abstract void uploadXarFileAsAssayDesign(File file, int pipelineCount);
+
+    /**
+     * Upload a xar file as an assay configuration. Does not wait for pipeline jobs to complete.
+     * @param file XAR file to upload
+     */
+    public abstract void uploadXarFileAsAssayDesign(File file);
 
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
-    /**
-     * @deprecated Use {@link #createAssayDesign(String, String)}
-     */
-    @Deprecated
-    public AssayDesignerPage createAssayAndEdit(String type, String name)
-    {
-        _test.clickButton("New Assay Design");
-        _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
-        _test.clickButton("Next");
-
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(_test.getDriver());
-        assayDesigner.setName(name);
-        assayDesigner.save();
-
-        return assayDesigner;
-    }
-
-    /**
-     * @deprecated Use {@link #createAssayDesignWithDefaults(String, String)}
-     */
-    @Deprecated
-    public void createAssayWithDefaults(String type, String name)
-    {
-        createAssayAndEdit(type, name).saveAndClose();
-    }
+    public abstract void importAssay(String assayName, File file, Map<String, Object> batchProperties, Map<String, Object> runProperties) throws CommandException, IOException;
 
     @LogMethod
     public void createAssayDesignWithDefaults(String type, String name)
@@ -102,23 +72,21 @@ public abstract class AbstractAssayHelper
     @LogMethod
     public ReactAssayDesignerPage createAssayDesign(String type, String name)
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
         _test.clickButton("New Assay Design");
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
         _test.clickButton("Next");
-        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
 
         ReactAssayDesignerPage assayDesigner = new ReactAssayDesignerPage(_test.getDriver());
         assayDesigner.setName(name);
         return assayDesigner;
     }
 
-    public AssayDesignerPage clickEditAssayDesign()
+    public ReactAssayDesignerPage clickEditAssayDesign()
     {
         return clickEditAssayDesign(false);
     }
 
-    public AssayDesignerPage clickEditAssayDesign(boolean confirmEditInOtherContainer)
+    public ReactAssayDesignerPage clickEditAssayDesign(boolean confirmEditInOtherContainer)
     {
         _test.doAndWaitForPageToLoad(() ->
         {
@@ -132,9 +100,8 @@ public abstract class AbstractAssayHelper
                         alertText.contains("Would you still like to edit it?"));
             }
         });
-        _test.waitForElement(Locator.id("AssayDesignerDescription"));
 
-        return new AssayDesignerPage(_test.getDriver());
+        return new ReactAssayDesignerPage(_test.getDriver());
     }
 
     public ReactAssayDesignerPage copyAssayDesign()
@@ -144,13 +111,11 @@ public abstract class AbstractAssayHelper
 
     public ReactAssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
         clickManageOption(true, "Copy assay design");
         if (destinationFolder == null)
             _test.clickButton("Copy to Current Folder");
         else
             _test.clickAndWait(Locator.tag("tr").append(Locator.linkWithText(destinationFolder)));
-        ExperimentalFeaturesHelper.disableExperimentalFeature(_test.createDefaultConnection(true), "experimental-uxdomaindesigner");
 
         return new ReactAssayDesignerPage(_test.getDriver());
     }

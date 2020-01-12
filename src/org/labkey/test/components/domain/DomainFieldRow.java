@@ -2,6 +2,7 @@ package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -10,10 +11,17 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.LabKeyExpectedConditions;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
+
+import java.time.Duration;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -69,26 +77,31 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow setType(FieldDefinition.ColumnType columnType)
     {
-        setType(columnType.toString());
+        elementCache().fieldTypeSelectInput.selectByVisibleText(columnType.getLabel());
         return this;
     }
 
     public WebElement typeInput()
     {
-        return elementCache().fieldTypeSelectInput;
+        return elementCache().fieldTypeSelectInput.getWrappedElement();
     }
 
     public FieldDefinition.ColumnType getType()
     {
-        String typeString = getWrapper().getFormElement(elementCache().fieldTypeSelectInput);
-        return Enum.valueOf(FieldDefinition.ColumnType.class, typeString);
-    }
+        // The previous code doesn't work:
+        //  String typeString = getWrapper().getFormElement(elementCache().fieldTypeSelectInput);
+        //  return Enum.valueOf(FieldDefinition.ColumnType.class, typeString);
+        // getFormElement get's the value attribute which is not the same as the text shown and not the
+        // same as the Enum.valueOf. To get a match get the text shown in the control and compare it
+        // to the enum's label attribute.
 
-    private DomainFieldRow setType(String columnType)
-    {
-        expand();
-        getWrapper().setFormElement(elementCache().fieldTypeSelectInput, columnType);
-        return this;
+        String typeString = getWrapper().getSelectedOptionText(elementCache().fieldTypeSelectInput.getWrappedElement());
+        for(FieldDefinition.ColumnType ct : FieldDefinition.ColumnType.values())
+        {
+            if(ct.getLabel().equalsIgnoreCase(typeString))
+                return ct;
+        }
+        return null;
     }
 
     public boolean getRequiredField()
@@ -104,7 +117,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public String detailsMessage()
     {
-        return elementCache().domainFieldDetailsSpan.getText();
+        return elementCache().fieldDetailsMessage.getText();
     }
 
     public int getIndex()
@@ -115,7 +128,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public boolean isExpanded()
     {
-        return getComponentElement().getAttribute("class").contains("domain-row-expanded");
+        return elementCache().collapseToggleLoc.existsIn(this);
     }
 
     /**
@@ -126,10 +139,23 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public ModalDialog clickRemoveField()
     {
         expand();
-        elementCache().removeFieldBtn.click();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().removeFieldBtn));
+        getWrapper().mouseOver(elementCache().removeFieldBtn);
 
-        ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Confirm Field Deletion")
-                .waitFor();
+        // re-try until the dialog appears or until attempts are exhausted
+        for (int i=0; i < 3; i++)
+        {
+            try
+            {
+                elementCache().removeFieldBtn.click();
+                new ModalDialog.ModalDialogFinder(getDriver())
+                        .withTitle("Confirm Field Deletion").timeout(1000).waitFor();
+                break;
+            }catch (NoSuchElementException notFound) {}
+        }
+
+        ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver())
+                .withTitle("Confirm Field Deletion").find();
         return confirmDeletionDlg;
     }
 
@@ -143,19 +169,27 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         {
             getWrapper().log("clicking advanced settings button try=["+trycount+"]");
             elementCache().advancedSettingsBtn.click();
-            getWrapper().sleep(250);
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement()));
             trycount++;
             assertTrue("advanced settings dialog did not appear in time",trycount < 4);
         }while (!Locator.tagWithClass("div", "modal-backdrop").existsIn(getDriver()));
 
-        return new AdvancedSettingsDialog(this, getDriver());
+        return new AdvancedSettingsDialog(this);
     }
 
     public DomainFieldRow expand()
     {
         if (!isExpanded())
         {
-            elementCache().expandToggle.click();
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().expandToggle));
+
+            for (int i=0; i < 3; i++)
+            {
+                elementCache().expandToggle.click();
+                getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
+                if (getWrapper().waitFor(() -> isExpanded(), 1000))
+                    break;
+            }
             getWrapper().waitFor(() -> isExpanded(),
                     "the field row did not become expanded", 1500);
         }
@@ -166,8 +200,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (isExpanded())
         {
-            elementCache().closeButton.click();
-            getWrapper().waitFor(() -> !isExpanded(),
+            elementCache().collapseToggle.click();
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
+            getWrapper().waitFor(() -> elementCache().expandToggleLoc.existsIn(this),
                     "the field row did not collapse", 1500);
         }
         return this;
@@ -271,7 +306,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setScaleType(PropertiesEditor.ScaleType scaleType)
     {
         expand();
-        elementCache().defaultScaleTypeSelect.selectByVisibleText(scaleType.toString());
+        elementCache().defaultScaleTypeSelect.selectByVisibleText(scaleType.getText());
         return this;
     }
 
@@ -279,7 +314,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
         String scaleTypeString = getWrapper().getFormElement(elementCache().defaultScaleTypeSelect.getWrappedElement());
-        return Enum.valueOf(PropertiesEditor.ScaleType.class, scaleTypeString);
+        return Enum.valueOf(PropertiesEditor.ScaleType.class, scaleTypeString.toUpperCase());
     }
 
     //
@@ -337,19 +372,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    public boolean getDateShift()
-    {
-        expand();
-        return elementCache().dateShiftBox.get();
-    }
-
-    public DomainFieldRow setDateShift(boolean shift)
-    {
-        expand();
-        elementCache().dateShiftBox.set(shift);
-        return this;
-    }
-
     public DomainFieldRow setLookup(FieldDefinition.LookupInfo lookupInfo)
     {
         setType(FieldDefinition.ColumnType.Lookup);
@@ -365,26 +387,23 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public String getFromFolder()
     {
         expand();
-        return elementCache().fromFolderInput.getFirstSelectedOption().getText();
+        return elementCache().lookupContainerSelect.getFirstSelectedOption().getText();
     }
 
     public DomainFieldRow setFromFolder(String containerPath)
     {
         expand();
-        if (StringUtils.isEmpty(containerPath) || containerPath.equals("Current Folder"))
+        if (StringUtils.isBlank(containerPath) || containerPath.equals("Current Folder") || containerPath.equals("Current Project"))
         {
-            containerPath = getWrapper().getCurrentContainerPath();
+            containerPath = "";
         }
-
-//        String previousValue = elementCache().getFromTargetTableInput().getFirstSelectedOption().getAttribute("value");
-//        if (!containerPath.equals(previousValue))
-//        {
-//            WebElement schemaSelect = elementCache().getFromSchemaInput().getWrappedElement();
-//            elementCache().fromFolderInput.selectByValue(containerPath);
-//            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(schemaSelect));
-//        }
-
-        elementCache().fromFolderInput.selectByValue(containerPath);
+        String initialValue = elementCache().lookupContainerSelect.getFirstSelectedOption().getAttribute("value");
+        if (!containerPath.equals(initialValue))
+        {
+            elementCache().lookupContainerSelect.selectByValue(containerPath);
+            getWrapper().shortWait().withMessage("Schema select didn't clear after selecting lookup container")
+                    .until(ExpectedConditions.attributeToBe(elementCache().getLookupSchemaSelect().getWrappedElement(), "value", ""));
+        }
 
         return this;
     }
@@ -392,27 +411,45 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public String getFromSchema()
     {
         expand();
-        return elementCache().getFromSchemaInput().getFirstSelectedOption().getText();
+        return elementCache().getLookupSchemaSelect().getFirstSelectedOption().getText();
     }
 
     public DomainFieldRow setFromSchema(String schemaName)
     {
         expand();
-        elementCache().getFromSchemaInput().selectByVisibleText(schemaName);
+        String initialValue = elementCache().getLookupSchemaSelect().getFirstSelectedOption().getText();
+        if (!schemaName.equals(initialValue))
+        {
+            elementCache().getLookupSchemaSelect().selectByVisibleText(schemaName);
+                getWrapper().shortWait().withMessage("Query select didn't update after selecting lookup schema")
+                        .until(ExpectedConditions.attributeToBe(elementCache().getLookupQuerySelect().getWrappedElement(), "value", ""));
+        }
         return this;
     }
 
     public String getFromTargetTable()
     {
         expand();
-        return elementCache().getFromTargetTableInput().getFirstSelectedOption().getText();
+        return elementCache().getLookupQuerySelect().getFirstSelectedOption().getText();
     }
 
     public DomainFieldRow setFromTargetTable(String targetTable)
     {
         expand();
-        elementCache().getFromTargetTableInput().selectByVisibleText(targetTable);
+        elementCache().getLookupQuerySelect().selectByVisibleText(targetTable);
         return this;
+    }
+
+    public DomainFieldRow setLookupValidatorEnabled(boolean checked)
+    {
+        expand();
+        elementCache().getLookupValidatorEnabledCheckbox().set(checked);
+        return this;
+    }
+    public boolean getLookupValidatorEnabled()
+    {
+        expand();
+        return elementCache().getLookupValidatorEnabledCheckbox().get();
     }
 
     // advanced settings
@@ -445,6 +482,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .setPHILevel(phiLevel)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow setDateShift(boolean shift)
+    {
+        clickAdvancedSettings()
+                .enableExcludeDateShifting(shift)
                 .apply();
         return this;
     }
@@ -488,9 +533,108 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getComponentElement().getAttribute("class").contains("domain-row-border-error");
     }
 
+    public DomainFieldRow waitForError()
+    {
+        getWrapper().waitFor(()-> this.hasFieldError(), WAIT_FOR_JAVASCRIPT);
+        return this;
+    }
+
     public boolean hasFieldWarning()
     {
         return getComponentElement().getAttribute("class").contains("domain-row-border-warning");
+    }
+
+    public DomainFieldRow waitForWarning()
+    {
+        getWrapper().waitFor(()-> this.hasFieldWarning(), WAIT_FOR_JAVASCRIPT);
+        return this;
+    }
+
+    // conditional formatting and validation options
+
+    /**
+     * appends the supplied validators to any existing ones (including any empty default ones that might exist)
+     * @param validators
+     * @return
+     */
+    public DomainFieldRow addRangeValidators(List<FieldDefinition.RangeValidator> validators)
+    {
+        RangeValidatorDialog dialog = clickRangeButton();
+        for (FieldDefinition.RangeValidator val : validators)
+        {
+            dialog.addValidator(val);
+        }
+        dialog.clickApply();
+        return this;
+    }
+
+    /**
+     * sets the supplied validators on the field, assumes none are already present
+     * @param validators
+     * @return
+     */
+    public DomainFieldRow setRangeValidators(List<FieldDefinition.RangeValidator> validators)
+    {
+        RangeValidatorDialog dialog = clickRangeButton();
+        for (int i =0; i< validators.size(); i++)
+        {
+            dialog.setValidator(i, validators.get(i));
+        }
+        dialog.clickApply();
+        return this;
+    }
+
+    public RangeValidatorDialog clickRangeButton()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().rangeButton()));
+        elementCache().rangeButton().click();
+        return new RangeValidatorDialog(this);
+    }
+
+    /**
+     * adds the specified regexValidators to the field.  Assumes that any range panels in the dialog
+     * are complete (by default, the first one is already shown but is empty)
+     * When adding the first/only regex validators to the field, use setRegularExpressions
+     * @param validators
+     * @return
+     */
+    public DomainFieldRow addRegularExpressions(List<FieldDefinition.RegExValidator> validators)
+    {
+        RegexValidatorDialog dialog = clickRegexButton();
+        for (FieldDefinition.RegExValidator val : validators)
+        {
+            dialog.addValidator(val);
+        }
+        dialog.clickApply();
+        return this;
+    }
+
+    public DomainFieldRow setRegularExpressions(List<FieldDefinition.RegExValidator> validators)
+    {
+        RegexValidatorDialog dialog = clickRegexButton();
+        for (int i =0; i< validators.size(); i++)
+        {
+            dialog.setValidator(i, validators.get(i));
+        }
+        dialog.clickApply();
+        return this;
+    }
+
+    public RegexValidatorDialog clickRegexButton()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().regexValidatorButton()));
+        elementCache().regexValidatorButton().click();
+        return new RegexValidatorDialog(this);
+    }
+
+    public ConditionalFormatDialog clickConditionalFormatButton()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().conditionalFormatButton()));
+        elementCache().conditionalFormatButton().click();
+        return new ConditionalFormatDialog(this);
     }
 
     @Override
@@ -538,25 +682,29 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // base row controls
         public Input fieldNameInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-name-")
                 .findWhenNeeded(this), getDriver());
-        public WebElement fieldTypeSelectInput = Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-type-")
+        public Select fieldTypeSelectInput = SelectWrapper.Select(Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-type-"))
                 .findWhenNeeded(this);
         public Checkbox fieldRequiredCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-required-")
                 .findWhenNeeded(this));
 
-        public WebElement domainFieldDetailsSpan = Locator.tagWithClass("div", "domain-field-details")
+        public WebElement fieldDetailsMessage = Locator.css(".domain-field-details, .domain-field-details-expanded")
                 .findWhenNeeded(this);
 
-        public WebElement expandToggle = Locator.tagWithClass("div", "domain-field-icon")
-                .child(Locator.tagWithAttribute("svg", "data-icon", "plus-square"))
-                .findWhenNeeded(this);
+
+        public Locator expandToggleLoc = Locator.tagWithClass("div", "field-icon")
+                .child(Locator.tagWithClassContaining("svg", "fa-plus-square"));
+        public Locator collapseToggleLoc = Locator.tagWithClass("div", "field-icon")
+                .child(Locator.tagWithClassContaining("svg",  "fa-minus-square"));
+
+        public WebElement expandToggle = expandToggleLoc.findWhenNeeded(this);
+
 
         // controls revealed when expanded
         public WebElement removeFieldBtn = Locator.tagWithAttributeContaining("button", "id", "domainpropertiesrow-delete-")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement advancedSettingsBtn = Locator.button("Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        public WebElement closeButton = Locator.tagWithAttribute("svg", "data-icon", "times")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        public WebElement collapseToggle = collapseToggleLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
 
         // common field options
@@ -586,29 +734,54 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // date field options
         public Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
                 .refindWhenNeeded(this), getDriver());
-        public Checkbox dateShiftBox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-excludeFromShifting")
-                .refindWhenNeeded(this));
 
         //lookup field options
-        public Select fromFolderInput = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
+        public Select lookupContainerSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
                 .findWhenNeeded(this);
 
-        public Select getFromSchemaInput()
+        public Select getLookupSchemaSelect()
         {
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupSchema")).find(this);
-            getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
-                    "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
-            return select;
+            return waitForSelectToLoad(select);
         }
 
-        public Select getFromTargetTableInput()
+        public Select getLookupQuerySelect()
         {
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
-            getWrapper().waitFor(()-> select.getOptions().size() > 0 && !select.getOptions().get(0).getText().equals("Loading..."),
-                    "select did not have options in the expected time", WAIT_FOR_JAVASCRIPT);
+            return waitForSelectToLoad(select);
+        }
+
+        private Select waitForSelectToLoad(Select select)
+        {
+            Locator.XPathLocator loadingOption = Locator.tagWithText("option", "Loading...");
+            if (!WebDriverWrapper.waitFor(() -> !loadingOption.existsIn(select.getWrappedElement()), WAIT_FOR_JAVASCRIPT))
+            {
+                throw new NoSuchElementException("Select got stuck loading: " + select.getWrappedElement().toString());
+            }
             return select;
         }
 
+        public Checkbox getLookupValidatorEnabledCheckbox()
+        {
+            return new Checkbox(Locator.checkboxByName("domainpropertiesrow-lookupValidator").findElement(this));
+        }
 
+        public WebElement rangeButton()
+        {
+            return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                    Locator.button("Add Range"), Locator.button("Edit Ranges"));
+        }
+
+        public WebElement regexValidatorButton()
+        {
+            return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                    Locator.button("Add Regex"), Locator.button("Edit Regex"));
+        }
+
+        public WebElement conditionalFormatButton()
+        {
+            return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                    Locator.button("Add Format"),  Locator.button("Edit Formats"));
+        }
     }
 }

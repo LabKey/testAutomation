@@ -15,13 +15,19 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.pages.security.AddUsersPage;
+import org.labkey.test.pages.user.ShowUsersPage;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
@@ -35,17 +41,7 @@ public class UIUserHelper extends AbstractUserHelper
     @LogMethod
     public CreateUserResponse cloneUser(@LoggedParam String userName, String cloneUserName, boolean sendEmail, boolean verifySuccess)
     {
-        getWrapper().goToSiteUsers();
-        getWrapper().clickButton("Add Users");
-
-        getWrapper().setFormElement(Locator.name("newUsers"), userName);
-        getWrapper().setCheckbox(Locator.checkboxByName("sendMail").findElement(getWrapper().getDriver()), sendEmail);
-        if (cloneUserName != null)
-        {
-            getWrapper().checkCheckbox(Locator.id("cloneUserCheck"));
-            getWrapper().setFormElement(Locator.name("cloneUser"), cloneUserName);
-        }
-        getWrapper().clickButton("Add Users");
+        createUsers(Arrays.asList(userName), cloneUserName, sendEmail, getWrapper().goToSiteUsers());
 
         if (verifySuccess)
             assertTrue("Failed to add user " + userName, getWrapper().isTextPresent(userName + " added as a new user to the system"));
@@ -68,7 +64,7 @@ public class UIUserHelper extends AbstractUserHelper
             userId = null;
         }
 
-        CreateUserResponse fakeResponse = new CreateUserResponse(null, 200, null, null, null){
+        return new CreateUserResponse(null, 200, null, null, null){
             @Override
             public Number getUserId()
             {
@@ -87,12 +83,36 @@ public class UIUserHelper extends AbstractUserHelper
                 return message;
             }
         };
-        return fakeResponse;
+    }
+
+    @LogMethod
+    private AddUsersPage createUsers(@LoggedParam List<String> userNames, @Nullable String cloneUserName, boolean sendEmail, ShowUsersPage showUsersPage)
+    {
+        return showUsersPage
+                .clickAddUsers()
+                .setNewUsers(userNames)
+                .setSendNotification(sendEmail)
+                .setClonedUser(cloneUserName)
+                .clickAddUsers();
     }
 
     public CreateUserResponse cloneUser(String userName, String cloneUserName)
     {
         return cloneUser(userName, cloneUserName, true, true);
+    }
+
+    @Override
+    public void ensureUsersExist(List<String> userEmails)
+    {
+        ShowUsersPage showUsersPage = ShowUsersPage.beginAt(getWrapper(), true);
+        DataRegionTable usersTable = showUsersPage.getUsersTable();
+
+        List<String> existingUsers = usersTable.getColumnDataAsText("Email");
+        List<String> usersToCreate = userEmails.stream().filter(o -> !existingUsers.contains(o)).collect(Collectors.toList());
+        createUsers(usersToCreate, null, false, showUsersPage);
+
+        getWrapper().assertTextPresent(usersToCreate);
+        getWrapper().assertElementNotPresent(Locators.labkeyError);
     }
 
     @Override
@@ -112,9 +132,7 @@ public class UIUserHelper extends AbstractUserHelper
     {
         int checked = 0;
         List<String> displayNames = new ArrayList<>();
-        getWrapper().beginAt("user/showUsers.view?inactive=true&Users.showRows=all");
-
-        DataRegionTable usersTable = new DataRegionTable("Users", getWrapper().getDriver());
+        DataRegionTable usersTable = ShowUsersPage.beginAt(getWrapper(), true).getUsersTable();
 
         for(String userEmail : userEmails)
         {
@@ -146,8 +164,7 @@ public class UIUserHelper extends AbstractUserHelper
 
     public void deactivateUser(String userEmail)
     {
-        getWrapper().goToSiteUsers();
-        DataRegionTable usersTable = new DataRegionTable("Users", getWrapper().getDriver());
+        DataRegionTable usersTable = getWrapper().goToSiteUsers().getUsersTable();
         usersTable.setFilter("Email", "Equals", userEmail);
         int row = usersTable.getRowIndex("Email", userEmail);
         usersTable.checkCheckbox(row);

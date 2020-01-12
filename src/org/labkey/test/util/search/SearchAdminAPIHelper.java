@@ -17,6 +17,7 @@ package org.labkey.test.util.search;
 
 import org.apache.http.HttpStatus;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
@@ -28,6 +29,17 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class SearchAdminAPIHelper
 {
+    /**
+     * Wait for search indexer to be idle via SearchController.WaitForIndexerAction
+     */
+    @LogMethod(quiet = true)
+    public static void waitForIndexer()
+    {
+        // Invoke a special server action that waits until all previous indexer tasks are complete
+        int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("search", "waitForIndexer")).getResponseCode();
+        assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
+    }
+
     public static void startCrawler(WebDriver driver)
     {
         SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin", Maps.of("start", "true")));

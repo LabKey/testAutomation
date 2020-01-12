@@ -57,14 +57,13 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
 
     public static Component.SimpleComponentFinder<Select> Select(Locator loc)
     {
-        return new Component.SimpleComponentFinder<Select>(loc)
-        {
-            @Override
-            protected SelectWrapper construct(WebElement el)
-            {
-                return new SelectWrapper(el);
-            }
-        };
+        return new Component.SimpleComponentFinder<>(loc, SelectWrapper::new);
+    }
+
+    @Override
+    public WebElement getWrappedElement()
+    {
+        return wrappedElement;
     }
 
     @Override

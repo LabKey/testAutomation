@@ -18,29 +18,36 @@ package org.labkey.test.pages.user;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.pages.security.AddUsersPage;
 import org.labkey.test.util.DataRegionTable;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 public class ShowUsersPage extends LabKeyPage<ShowUsersPage.ElementCache>
 {
+    private static final Locator hideInactiveUsersLoc = Locator.linkWithText("hide inactive users");
+    private static final Locator showInactiveUsersLoc = Locator.linkWithText("include inactive users");
+
     public ShowUsersPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static ShowUsersPage beginAt(WebDriverWrapper driver)
+    public static ShowUsersPage beginAt(WebDriverWrapper driver, boolean showAll)
     {
-        return beginAt(driver, driver.getCurrentContainerPath());
-    }
-
-    public static ShowUsersPage beginAt(WebDriverWrapper driver, String containerPath)
-    {
-        driver.beginAt(WebTestHelper.buildURL("user", containerPath, "showUsers"));
+        Map<String, String> params = new HashMap<>();
+        if (showAll)
+        {
+            params.put("inactive", "true");
+            params.put("Users.showRows", "all");
+        }
+        driver.beginAt(WebTestHelper.buildURL("user", "showUsers", params));
         return new ShowUsersPage(driver.getDriver());
     }
 
@@ -49,19 +56,54 @@ public class ShowUsersPage extends LabKeyPage<ShowUsersPage.ElementCache>
         return elementCache().usersTable;
     }
 
-    public PropertiesEditor clickChangeUserProperties()
+    public DomainDesignerPage clickChangeUserProperties()
     {
-        waitAndClickAndWait(Locator.linkWithSpan( "Change User Properties"));
-        return new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("Field Properties").waitFor();
+        getUsersTable().clickHeaderButtonAndWait( "Change User Properties");
+        return new DomainDesignerPage(getDriver());
     }
 
+    public AddUsersPage clickAddUsers()
+    {
+        getUsersTable().clickHeaderButtonAndWait( "Add Users");
+        return new AddUsersPage(getDriver());
+    }
+
+    public ShowUsersPage includeInactiveUsers()
+    {
+        Optional<WebElement> link = showInactiveUsersLoc.findOptionalElement(getDriver());
+        if (link.isPresent())
+        {
+            clickAndWait(link.get());
+            return new ShowUsersPage(getDriver());
+        }
+        else
+        {
+            return this;
+        }
+    }
+
+    public ShowUsersPage hideInctiveUsers()
+    {
+        Optional<WebElement> link = hideInactiveUsersLoc.findOptionalElement(getDriver());
+        if (link.isPresent())
+        {
+            clickAndWait(link.get());
+            return new ShowUsersPage(getDriver());
+        }
+        else
+        {
+            return this;
+        }
+    }
+
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        DataRegionTable usersTable = DataRegionTable.DataRegion(getDriver()).withName("Users").findWhenNeeded(getDriver());
+        final DataRegionTable usersTable = DataRegionTable.DataRegion(getDriver()).withName("Users").findWhenNeeded(getDriver());
     }
 }

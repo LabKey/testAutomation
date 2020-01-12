@@ -13,6 +13,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCache>
 {
     public DomainDesignerPage(WebDriver driver)
@@ -26,33 +29,27 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return new DomainDesignerPage(driver.getDriver());
     }
 
-    public DomainDesignerPage clickSave()
+    public void clickFinish()
     {
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
-        String currentURL = getDriver().getCurrentUrl();
-        elementCache().saveButton.click();
-        afterSaveOrFinishClick(currentURL);
-        return this;
+        scrollIntoView(elementCache().finishButton());
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton()));
+        clickAndWait(elementCache().finishButton());
     }
 
-    protected void afterSaveOrFinishClick(String currentURL)
+    public DomainDesignerPage clickFinishExpectingError()
     {
-        waitFor(()-> !getDriver().getCurrentUrl().equals(currentURL) || anyAlert() != null,
-                "expected either navigation or an alert with error or info to appear", WAIT_FOR_JAVASCRIPT);
-
-        if (isAlertVisible())
-        {
-            String msg = waitForAnyAlert();
-            log("Clicking save.  Waited until alert with message [" + msg + "] appeared");
-        }
+        scrollIntoView(elementCache().finishButton());
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton()));
+        elementCache().finishButton().click();
+        waitForError();
+        return this;
     }
 
     public UnsavedChangesModalDialog clickCancel()
     {
-        elementCache().cancelBtn.click();
+        elementCache().cancelBtn().click();
         UnsavedChangesModalDialog unsavedChangesModal = new UnsavedChangesModalDialog(
-                new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"),
-                getDriver());
+                new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"));
         return unsavedChangesModal;
     }
 
@@ -67,70 +64,94 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return Locators.alert.findOptionalElement(getDriver()).map(WebElement::isDisplayed).orElse(false);
     }
 
-    public DomainFormPanel fieldProperties()
+    public WebElement finishButton()
+    {
+        return elementCache().finishButton();
+    }
+
+    // this will return the first domain fields panel if there are multiple on the page
+    // if you are looking for a specific one, use the fieldsPanel(title) helper
+    public DomainFormPanel fieldsPanel()
     {
         return elementCache().firstDomainFormPanel;
     }
 
-    public DomainFormPanel fieldProperties(String title)
+    public DomainFormPanel fieldsPanel(String title)
     {
         return elementCache().domainFormPanel(title);
     }
 
-    public DomainFormPanel activeFieldProperties(String title)
+    /**
+     * Get a list of the Domain Panels on this page.
+     * @return List of DomainFormElement
+     */
+    public List<DomainFormPanel> getPanels()
     {
-        return elementCache().activeDomainFormPanel(title);
+        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).findAll();
     }
 
-    public int getFieldPropertiesPanelCount()
+    /**
+     * Get the titles of the panels on this page.
+     * @return List of strings with the panel titles.
+     */
+    public List<String> getPanelTitles()
     {
-        Locator panelLoc = new DomainFormPanel.DomainFormPanelFinder(getDriver()).getBaseLocator();
-        return panelLoc.findElements(getDriver()).size() - 1; // minus 1 because of top level Assay Properties panel
+        List<String> titles = new ArrayList<>();
+        for(DomainFormPanel formPanel : getPanels())
+        {
+            if (formPanel.hasPanelTitle())
+                titles.add(formPanel.getPanelTitle());
+        }
+        return titles;
     }
 
     public String waitForError()
     {
-        waitFor(()-> BootstrapLocators.dangerAlert.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.errorBanner.existsIn(getDriver()),
                 "the error alert did not appear as expected", 1000);
         return  errorAlert().getText();
     }
+
     public WebElement errorAlert()
     {
-        return BootstrapLocators.dangerAlert.existsIn(getDriver()) ? BootstrapLocators.dangerAlert.findElement(getDriver()) : null;
+        return BootstrapLocators.errorBanner.existsIn(getDriver()) ? BootstrapLocators.errorBanner.findElement(getDriver()) : null;
     }
 
     public String waitForWarning()
     {
-        waitFor(()-> BootstrapLocators.warningAlert.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.warningBanner.existsIn(getDriver()),
                 "the warning alert did not appear as expected", 1000);
         return  warningAlert().getText();
     }
+
     public WebElement warningAlert()
     {
-        return BootstrapLocators.warningAlert.existsIn(getDriver()) ? BootstrapLocators.warningAlert.findElement(getDriver()) : null;
+        return BootstrapLocators.warningBanner.existsIn(getDriver()) ? BootstrapLocators.warningBanner.findElement(getDriver()) : null;
     }
 
     public String waitForInfo()
     {
-        waitFor(()-> BootstrapLocators.infoAlert.existsIn(getDriver()),
+        waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
                 "the info alert did not appear as expected", 1000);
         return  infoAlert().getText();
     }
+
     public WebElement infoAlert()
     {
-        return BootstrapLocators.infoAlert.existsIn(getDriver()) ? BootstrapLocators.infoAlert.findElement(getDriver()) : null;
+        return BootstrapLocators.infoBanner.existsIn(getDriver()) ? BootstrapLocators.infoBanner.findElement(getDriver()) : null;
     }
 
     public String waitForAnyAlert()
     {
         WebElement alert = Locator.waitForAnyElement(shortWait(),
-                BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
+                BootstrapLocators.errorBanner, BootstrapLocators.infoBanner, BootstrapLocators.warningBanner, BootstrapLocators.successBanner);
         return alert.getText();
     }
+
     public String anyAlert()
     {
         WebElement alert = Locator.findAnyElementOrNull(getDriver(),
-                BootstrapLocators.dangerAlert, BootstrapLocators.infoAlert, BootstrapLocators.warningAlert, BootstrapLocators.successAlert);
+                BootstrapLocators.errorBanner, BootstrapLocators.infoBanner, BootstrapLocators.warningBanner, BootstrapLocators.successBanner);
         if (alert !=null)
             return alert.getText();
         else
@@ -146,6 +167,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         DomainFormPanel firstDomainFormPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())   // for situations where there's only one on the page
+                .timeout(WAIT_FOR_JAVASCRIPT)
                 .findWhenNeeded(this);                                                          // and the caller is too lazy to specify which one they want
 
         DomainFormPanel domainFormPanel(String title) // for situations with multiple domainformpanels on the same page
@@ -153,15 +175,17 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
             return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).findWhenNeeded(this);
         }                                                     // and the caller is too lazy to specify which one they want
 
-        DomainFormPanel activeDomainFormPanel(String title) // for situations with multiple domainformpanels on the same page and only one is active
+        WebElement finishButton()
         {
-            return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).active().findOrNull(this);
+            return Locator.button("Save")
+                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         }
 
-        WebElement saveButton = Locator.button("Save")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement cancelBtn = Locator.button("Cancel")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement cancelBtn()
+        {
+            return Locator.button("Cancel")
+                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     public static class Locators

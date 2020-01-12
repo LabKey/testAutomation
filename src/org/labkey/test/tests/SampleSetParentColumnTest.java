@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -9,13 +10,12 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.labkey.test.util.TestDataGenerator;
-import org.openqa.selenium.NoSuchElementException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -270,20 +270,19 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         final String PARENT_COLUMN = "P1";
         final String SAMPLE_SET_NAME = "SimpleSampleSet01";
 
-        // Add the Alias column as a regression test.
-        String sampleText = "Name\tAlias\t" + PARENT_COLUMN + "\n" +
+        String sampleText = "Name\t" + PARENT_COLUMN + "\n" +
                 "SA_01\t\n" +
-                "SA_02\t\tSA_03\n" +
+                "SA_02\tSA_03\n" +
                 "SA_03\t\n" +
-                "SA_04\t\tSA_01\n" +
-                "SA_05\t\tSA_02\n";
+                "SA_04\tSA_01\n" +
+                "SA_05\tSA_02\n";
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, CURRENT_SAMPLE_SET_OPTION));
 
-        log("Import samples that have an alias column.");
+        log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         sampleHelper.bulkImport(sampleText);
 
@@ -318,19 +317,19 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         final String PARENT_COLUMN_1 = "P2 Column";
         final String SAMPLE_SET_NAME = "SimpleSampleSet02";
 
-        String sampleText = "Name\tAlias\t" + PARENT_COLUMN_1 + "\n" +
+        String sampleText = "Name\t" + PARENT_COLUMN_1 + "\n" +
                 "SB_01\n" +
-                "SB_02\t\tSB_03\n" +
+                "SB_02\tSB_03\n" +
                 "SB_03\n" +
-                "SB_04\t\tSB_01\n" +
-                "SB_05\t\tSB_02\n";
+                "SB_04\tSB_01\n" +
+                "SB_05\tSB_02\n";
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN_1, CURRENT_SAMPLE_SET_OPTION));
 
-        log("Import samples that have an alias column.");
+        log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         sampleHelper.bulkImport(sampleText);
 
@@ -356,12 +355,12 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         sampleHelper = new SampleSetHelper(this);
 
         log("Insert samples where parent column is a different case.");
-        sampleText = "Name\tAlias\t" + PARENT_COLUMN_1.toLowerCase() + "\n" +
+        sampleText = "Name\t" + PARENT_COLUMN_1.toLowerCase() + "\n" +
                 "SB_06\n" +
-                "SB_07\t\tSB_08\n" +
+                "SB_07\tSB_08\n" +
                 "SB_08\n" +
-                "SB_09\t\tSB_06\n" +
-                "SB_10\t\tSB_07\n";
+                "SB_09\tSB_06\n" +
+                "SB_10\tSB_07\n";
 
         sampleHelper.goToSampleSet(SAMPLE_SET_NAME);
         sampleHelper.bulkImport(sampleText);
@@ -393,20 +392,19 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         final String PARENT_COLUMN = "P3";
         final String SAMPLE_SET_NAME = "SimpleSampleSet03";
 
-        // Add the Alias column as a regression test.
-        String sampleText = "Name\tAlias\t" + PARENT_COLUMN + "\n" +
-                "SC_01\t\n" +
-                "SC_02\t\tS_0\n" +
-                "SC_03\t\n" +
-                "SC_04\t\tS_1\n" +
-                "SC_05\t\tS_0\n";
+        String sampleText = "Name\t" + PARENT_COLUMN + "\n" +
+                "SC_01\n" +
+                "SC_02\tS_0\n" +
+                "SC_03\n" +
+                "SC_04\tS_1\n" +
+                "SC_05\tS_0\n";
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, PARENT_CONTAINER_SAMPLE_SET_NAME));
 
-        log("Import samples that have an alias column.");
+        log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         sampleHelper.bulkImport(sampleText);
 
@@ -425,20 +423,19 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         final String PARENT_COLUMN = "P4";
         final String SAMPLE_SET_NAME = "SimpleSampleSet04";
 
-        // Add the Alias column as a regression test.
-        String sampleText = "Name\tAlias\t" + PARENT_COLUMN + "\n" +
-                "SD_01\t\n" +
-                "SD_02\t\tSIB_0\n" +
-                "SD_03\t\n" +
-                "SD_04\t\tSIB_1\n" +
-                "SD_05\t\tSIB_0\n";
+        String sampleText = "Name\t" + PARENT_COLUMN + "\n" +
+                "SD_01\n" +
+                "SD_02\tSIB_0\n" +
+                "SD_03\n" +
+                "SD_04\tSIB_1\n" +
+                "SD_05\tSIB_0\n";
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, SIBLING_SAMPLE_SET_NAME));
 
-        log("Import samples that have an alias column.");
+        log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         sampleHelper.bulkImport(sampleText);
 
@@ -458,13 +455,12 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         final String PARENT_COLUMN_CONTAINER = "Parent Parent Folder";
         final String SAMPLE_SET_NAME = "SimpleSampleSet05";
 
-        // Add the Alias column as a regression test.
-        String sampleText = "Name\tAlias\t" + PARENT_COLUMN_SUB + "\t" + PARENT_COLUMN_CONTAINER + "\n" +
-                "SE_01\t\n" +
-                "SE_02\t\t\tS_10\n" +
-                "SE_03\t\tSE_01\n" +
+        String sampleText = "Name\t" + PARENT_COLUMN_SUB + "\t" + PARENT_COLUMN_CONTAINER + "\n" +
+                "SE_01\n" +
+                "SE_02\t\tS_10\n" +
+                "SE_03\tSE_01\n" +
                 "SE_04\n" +
-                "SE_05\t\tSE_04\tS_11\n";
+                "SE_05\tSE_04\tS_11\n";
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
@@ -474,7 +470,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 Map.of(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_SET_NAME,
                         PARENT_COLUMN_SUB, CURRENT_SAMPLE_SET_OPTION));
 
-        log("Import samples that have an alias column.");
+        log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         sampleHelper.bulkImport(sampleText);
 
@@ -515,13 +511,12 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         final String PARENT_COLUMN_CONTAINER = "Parent Parent Folder";
         final String SAMPLE_SET_NAME = "SimpleSampleSet06";
 
-        // Add the Alias column as a regression test.
-        String sampleText = "Name\tAlias\tmaterialInputs/" + SAMPLE_SET_NAME + "\tmaterialInputs/" + PARENT_CONTAINER_SAMPLE_SET_NAME + "\n" +
+        String sampleText = "Name\tmaterialInputs/" + SAMPLE_SET_NAME + "\tmaterialInputs/" + PARENT_CONTAINER_SAMPLE_SET_NAME + "\n" +
                 "SF_01\t\n" +
-                "SF_02\t\t\tS_20\n" +
-                "SF_03\t\tSF_01\n" +
+                "SF_02\t\tS_20\n" +
+                "SF_03\tSF_01\n" +
                 "SF_04\n" +
-                "SF_05\t\tSF_04\tS_21\n";
+                "SF_05\tSF_04\tS_21\n";
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
@@ -564,12 +559,12 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         // Not really sure how valuable the following checks are.
         log("Now import some more samples using the alias.");
         // Add the Alias column as a regression test.
-        sampleText = "Name\tAlias\t" + PARENT_COLUMN_SUB + "\t" + PARENT_COLUMN_CONTAINER + "\n" +
-                "SF_06\t\n" +
-                "SF_07\t\t\tS_22\n" +
-                "SF_08\t\tSF_01\n" +
+        sampleText = "Name\t" + PARENT_COLUMN_SUB + "\t" + PARENT_COLUMN_CONTAINER + "\n" +
+                "SF_06\n" +
+                "SF_07\t\tS_22\n" +
+                "SF_08\tSF_01\n" +
                 "SF_09\n" +
-                "SF_10\t\tSF_04\tS_23\n";
+                "SF_10\tSF_04\tS_23\n";
 
         sampleHelper.goToSampleSet(SAMPLE_SET_NAME);
         sampleHelper.bulkImport(sampleText);
@@ -605,17 +600,16 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         final String PARENT_COLUMN = "P7";
         final String SAMPLE_SET_NAME = "SimpleSampleSet07";
 
-        // Add the Alias column as a regression test.
-        String sampleText = "Name\tAlias\t" + PARENT_COLUMN + "\n" +
-                "SG_01\t\n" +
-                "SG_02\t\tSG_01\n";
+        String sampleText = "Name\t" + PARENT_COLUMN + "\n" +
+                "SG_01\n" +
+                "SG_02\tSG_01\n";
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, CURRENT_SAMPLE_SET_OPTION));
 
-        log("Import samples that have an alias column.");
+        log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         sampleHelper.bulkImport(sampleText);
 
@@ -629,8 +623,8 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         sampleHelper.removeParentColumnAlias(PARENT_COLUMN);
 
         log("Import some more samples using the alias column and make sure it doesn't work.");
-        sampleText = "Name\tAlias\t" + PARENT_COLUMN + "\n" +
-                "SG_03\t\tSG_01\n";
+        sampleText = "Name\t" + PARENT_COLUMN + "\n" +
+                "SG_03\tSG_01\n";
 
         sampleHelper.bulkImport(sampleText);
 
@@ -692,42 +686,32 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         log("Add a parent alias column to the sample set that conflicts with a given column name.");
         sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
-
         sampleHelper.addParentColumnAlias(Map.of(ALIAS_NAME_CONFLICT, CURRENT_SAMPLE_SET_OPTION));
-
         clickButton("Update");
 
         Locator errorMsgLocator = Locator.tagWithClass("div", "labkey-error");
-
         Assert.assertTrue("Error message is not present.", isElementPresent(errorMsgLocator));
         Assert.assertTrue("Error message is not visible.", isElementVisible(errorMsgLocator));
         Assert.assertEquals("Error message not as expected.", "A sample set property already exists with parent alias header: " + ALIAS_NAME_CONFLICT, errorMsgLocator.findElement(getDriver()).getText());
 
         log("Now add a valid parent column and check that you cannot now add a field in the sample set with the same name.");
-
         sampleHelper.addParentColumnAlias(Map.of(GOOD_PARENT_NAME, CURRENT_SAMPLE_SET_OPTION));
-
         clickButton("Update");
 
-        clickButton("Edit Fields");
+        clickFolder(SUB_FOLDER_NAME);
+        DomainDesignerPage domainDesignerPage = sampleHelper.goToEditSampleSetFields(SAMPLE_SET_NAME);
+        domainDesignerPage.fieldsPanel().addField(GOOD_PARENT_NAME);
+        domainDesignerPage.clickFinishExpectingError();
 
-        PropertiesEditor fieldProperties = new PropertiesEditor.PropertiesEditorFinder(getWrappedDriver()).withTitle("Field Properties").waitFor();
+        errorMsgLocator = Locator.tagWithClass("div", "alert-danger");
+        waitForElement(errorMsgLocator);
+        String errorMsgExpectedTxt = "'" + GOOD_PARENT_NAME + "' is a reserved field name in '" + SAMPLE_SET_NAME + "'.";
+        Assert.assertThat("Error message", errorMsgLocator.findElement(getDriver()).getText(), CoreMatchers.containsString(errorMsgExpectedTxt));
 
-        fieldProperties.addField();
-
-        // New field will be ff_name1 because there should already be a field there.
-        setFormElement(Locator.tagWithName("input", "ff_name1"), GOOD_PARENT_NAME);
-        try
-        {
-            waitForElementToBeVisible(Locator.xpath("//input[@title=\"'" + GOOD_PARENT_NAME + "' is reserved\"]"));
-        }
-        catch (NoSuchElementException nse)
-        {
-            Assert.fail(GOOD_PARENT_NAME + " is not marked as a reserved field name.");
-        }
+        domainDesignerPage.fieldsPanel().removeField(GOOD_PARENT_NAME);
+        domainDesignerPage.clickFinish();
 
         log("Validated name conflicts.");
-
     }
 
     @Test
@@ -737,13 +721,12 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         final String PARENT_COLUMN_CONTAINER = "DC Parent Parent Folder";
         final String SAMPLE_SET_NAME = "SimpleSampleSet09";
 
-        // Add the Alias column as a regression test.
-        String sampleText = "Name\tAlias\t" + PARENT_COLUMN_SUBFOLDER + "\t" + PARENT_COLUMN_CONTAINER + "\n" +
-                "SI_01\t\n" +
-                "SI_02\t\t\tDC_1\n" +
-                "SI_03\t\tDCSIB_1\n" +
+        String sampleText = "Name\t" + PARENT_COLUMN_SUBFOLDER + "\t" + PARENT_COLUMN_CONTAINER + "\n" +
+                "SI_01\n" +
+                "SI_02\t\tDC_1\n" +
+                "SI_03\tDCSIB_1\n" +
                 "SI_04\n" +
-                "SI_05\t\tDCSIB_2\tDC_2\n";
+                "SI_05\tDCSIB_2\tDC_2\n";
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
@@ -753,7 +736,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 Map.of(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_DATA_CLASS_NAME,
                         PARENT_COLUMN_SUBFOLDER, SIBLING_DATA_CLASS_NAME));
 
-        log("Import samples that have an alias column.");
+        log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         sampleHelper.bulkImport(sampleText);
 
@@ -774,7 +757,88 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         log("Check sample 'SI_05' which should have two parents, one from the Data Class in this folder and another in the Data Class in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SI_05"));
 
-        // TODO This will fail because of issue 38018: Sample Set: Multiple data inputs from different containers are not shown in the Parent Data grid.
+        checkAllRowsInDataRegion("parentData", "Name", List.of("DC_2", "DCSIB_2"));
+
+        regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:DC_2, DCSIB_2|DCSIB_2, DC_2)");
+
+    }
+
+    @Test
+    public void testMaterialInputsWithColumnNamedAlias()
+    {
+
+        final String PARENT_COLUMN = "P10";
+        final String SAMPLE_SET_NAME = "SimpleSampleSet10";
+
+        // Add the Alias column as a regression test.
+        String sampleText = "Name\tAlias\t" + PARENT_COLUMN + "\n" +
+                "SJ_01\n" +
+                "SJ_02\t\tS_0\n" +
+                "SJ_03\n" +
+                "SJ_04\t\tS_1\n" +
+                "SJ_05\t\tS_0\n";
+
+        goToProjectHome();
+        projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
+
+        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, PARENT_CONTAINER_SAMPLE_SET_NAME));
+
+        log("Import samples that have a parent alias column.");
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.bulkImport(sampleText);
+
+        log("Check sample 'SJ_05' and make sure the parent materials are correct.");
+        waitAndClickAndWait(Locator.linkWithText("SJ_05"));
+        checkAllRowsInDataRegion("parentMaterials", "Name", List.of("S_0"));
+        checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive 2 samples from S_0"));
+
+    }
+
+    @Test
+    public void testDataInputsWithColumnNamedAlias()
+    {
+        final String PARENT_COLUMN_SUBFOLDER = "DC_Parent-Sub-Folder";
+        final String PARENT_COLUMN_CONTAINER = "DC Parent Parent Folder";
+        final String SAMPLE_SET_NAME = "SimpleSampleSet11";
+
+        // Add the Alias column as a regression test.
+        String sampleText = "Name\tAlias\t" + PARENT_COLUMN_SUBFOLDER + "\t" + PARENT_COLUMN_CONTAINER + "\n" +
+                "SK_01\t\n" +
+                "SK_02\t\t\tDC_1\n" +
+                "SK_03\t\tDCSIB_1\n" +
+                "SK_04\n" +
+                "SK_05\t\tDCSIB_2\tDC_2\n";
+
+        goToProjectHome();
+        projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
+
+        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME,
+                PROJECT_NAME + "/" + SUB_FOLDER_NAME,
+                Map.of(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_DATA_CLASS_NAME,
+                        PARENT_COLUMN_SUBFOLDER, SIBLING_DATA_CLASS_NAME));
+
+        log("Import samples that have a parent alias column.");
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        sampleHelper.bulkImport(sampleText);
+
+        log("Check sample 'SK_02' and make sure the parent materials are correct. It's parent should be in from the Data Class in the parent container.");
+        waitAndClickAndWait(Locator.linkWithText("SK_02"));
+        checkAllRowsInDataRegion("parentData", "Name", List.of("DC_1"));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from DC_1"));
+
+        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+
+        log("Check sample 'SK_03' and make sure the parent materials are correct. It's parent should be from the Data Class in the same folder.");
+        waitAndClickAndWait(Locator.linkWithText("SK_03"));
+        checkAllRowsInDataRegion("parentData", "Name", List.of("DCSIB_1"));
+        checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from DCSIB_1"));
+
+        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+
+        log("Check sample 'SK_05' which should have two parents, one from the Data Class in this folder and another in the Data Class in the parent container.");
+        waitAndClickAndWait(Locator.linkWithText("SK_05"));
+
         checkAllRowsInDataRegion("parentData", "Name", List.of("DC_2", "DCSIB_2"));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:DC_2, DCSIB_2|DCSIB_2, DC_2)");

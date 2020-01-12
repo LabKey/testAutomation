@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -24,7 +23,6 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
@@ -44,7 +42,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     @Override
     public void waitForPage()
     {
-        waitForElement(Locator.button("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("assay-design-description"), WAIT_FOR_JAVASCRIPT);
         elementCache().descriptionInput.get();
     }
 
@@ -54,10 +52,27 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public String getName()
+    {
+        return elementCache().nameInput.get();
+    }
+
+    // I think the name field is the only field that can be enabled/disabled.
+    // For example once an assay is created you can't change it's name so the field will be disabled.
+    public boolean isNameEnabled()
+    {
+        return elementCache().nameInput.getComponentElement().isEnabled();
+    }
+
     public ReactAssayDesignerPage setDescription(String description)
     {
         elementCache().descriptionInput.set(description);
         return this;
+    }
+
+    public String getDescription()
+    {
+        return elementCache().descriptionInput.get();
     }
 
     public ReactAssayDesignerPage setAutoCopyTarget(String containerPath)
@@ -70,6 +85,12 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     {
         elementCache().plateTemplateSelect.selectByVisibleText(template);
         return this;
+    }
+
+    public void goToConfigureTemplates()
+    {
+        clickAndWait(elementCache().configureTemplatesLink);
+        // todo: return the class that wraps this page
     }
 
     public ReactAssayDesignerPage setDetectionMethod(String method)
@@ -96,10 +117,20 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public boolean getEditableRuns()
+    {
+        return elementCache().editableRunsCheckbox.get();
+    }
+
     public ReactAssayDesignerPage setEditableResults(boolean checked)
     {
         elementCache().editableResultCheckbox.set(checked);
         return this;
+    }
+
+    public boolean getEditableResults()
+    {
+        return elementCache().editableResultCheckbox.get();
     }
 
     public ReactAssayDesignerPage setBackgroundImport(boolean checked)
@@ -154,70 +185,24 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public DomainFormPanel goToBatchFields()
     {
-        return goToFieldProperties("Batch Properties");
+        return expandFieldsPanel("Batch");
     }
 
     public DomainFormPanel goToRunFields()
     {
-        return goToFieldProperties("Run Properties");
+        return expandFieldsPanel("Run");
     }
 
-    public DomainFormPanel goToResultFields()
+    public DomainFormPanel goToResultsFields()
     {
-        return goToFieldProperties("Results Properties");
+        return expandFieldsPanel("Results");
     }
 
-    public DomainFormPanel goToFieldProperties(String title)
+    public DomainFormPanel expandFieldsPanel(String title)
     {
-        DomainFormPanel panel = activeFieldProperties(title);
-
-        int attempts = 0; // don't try clicking next forever
-        while (panel == null && attempts < 10)
-        {
-            clickNext();
-            panel = activeFieldProperties(title);
-            attempts++;
-        }
-
-        return panel;
-    }
-
-    public DomainFormPanel expandFieldProperties(String title)
-    {
-        DomainFormPanel panel = fieldProperties(title);
+        DomainFormPanel panel = fieldsPanel(title);
         panel.expand();
         return panel;
-    }
-
-    public ReactAssayDesignerPage clickBack()
-    {
-        scrollIntoView(elementCache().backBtn);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().backBtn));
-        elementCache().backBtn.click();
-        return this;
-    }
-
-    public ReactAssayDesignerPage clickNext()
-    {
-        scrollIntoView(elementCache().nextBtn);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().nextBtn));
-        elementCache().nextBtn.click();
-        return this;
-    }
-
-    public void clickFinish()
-    {
-        // if we are in create mode, click next until we get to the end (but don't try forever)
-        int attempts = 0;
-        while (!isElementPresent(elementCache().finishBtnLoc) && isElementPresent(elementCache().nextBtnLoc) && attempts < 10)
-        {
-            clickNext();
-            attempts++;
-        }
-
-        scrollIntoView(elementCache().finishBtn);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishBtn));
-        clickAndWait(elementCache().finishBtn);
     }
 
     @Override
@@ -234,17 +219,11 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public class ElementCache extends DomainDesignerPage.ElementCache
     {
-        Locator.XPathLocator backBtnLoc = Locator.button("Back");
-        WebElement backBtn = backBtnLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        Locator.XPathLocator nextBtnLoc = Locator.button("Next");
-        WebElement nextBtn = nextBtnLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        Locator.XPathLocator finishBtnLoc = Locator.button("Finish");
-        WebElement finishBtn = finishBtnLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-
         final Input nameInput = Input(Locator.id("assay-design-name"), getDriver()).findWhenNeeded(this);
         final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(this);
         final Select autoCopyTargetSelect = Select(Locator.id("assay-design-autoCopyTargetContainerId")).findWhenNeeded(this);
         final Select plateTemplateSelect = Select(Locator.id("assay-design-selectedPlateTemplate")).findWhenNeeded(this);
+        final WebElement configureTemplatesLink = Locator.linkContainingText("Configure Templates").findWhenNeeded(this);
         final Select detectionMethodSelect = Select(Locator.id("assay-design-selectedDetectionMethod")).findWhenNeeded(this);
         final OptionSelect<MetadataInputFormat> metadataInputSelect = OptionSelect.finder(Locator.id("assay-design-selectedMetadataInputFormat"), MetadataInputFormat.class).findWhenNeeded(this);
         final Checkbox saveScriptFilesCheckbox = Checkbox(Locator.checkboxById("assay-design-saveScriptFiles")).findWhenNeeded(this);

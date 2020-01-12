@@ -25,6 +25,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PlateGrid;
@@ -193,9 +194,10 @@ public class NabAssayTest extends AbstractAssayTest
 
         // go back into assay design to configure templates
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        _assayHelper.clickEditAssayDesign();
-        clickAndWait(Locator.lkButton("configure templates"));
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
+        assayDesignerPage.goToConfigureTemplates();
 
+        // todo: implement in/refactor to use template page
         clickAndWait(Locator.linkWithText("new 96 well (8x12) NAb single-plate template"));
 
         setFormElement(Locator.inputById("templateName"), PLATE_TEMPLATE_NAME);
@@ -228,11 +230,12 @@ public class NabAssayTest extends AbstractAssayTest
 
         _assayHelper.clickEditAssayDesign()
                 .setPlateTemplate(PLATE_TEMPLATE_NAME)
-                .save();
+                .clickFinish();
 
-        clickAndWait(Locator.lkButton("configure templates"));
+        _assayHelper.clickEditAssayDesign()
+                .goToConfigureTemplates();
 
-        doAndWaitForPageToLoad(() ->
+        doAndWaitForPageToLoad(() ->                // todo: add page class method of removing first template
         {
             click(Locator.linkWithText("delete"));
 
@@ -348,7 +351,7 @@ public class NabAssayTest extends AbstractAssayTest
         assertEquals("No rows should be editable", 0, DataRegionTable.updateLinkLocator().findElements(table.getComponentElement()).size());
         _assayHelper.clickEditAssayDesign(true)
                 .setEditableRuns(true)
-                .saveAndClose();
+                .clickFinish();
 
         // Edit the first run
         doAndWaitForPageToLoad(() ->
@@ -493,7 +496,8 @@ public class NabAssayTest extends AbstractAssayTest
     {
         log("rename assay folder and verify source file still findable");
         _containerHelper.renameFolder(getProjectName(), TEST_ASSAY_FLDR_NAB, TEST_ASSAY_FLDR_NAB_RENAME, false);
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_NAB_RENAME).notHidden());
+        String portalUrl = WebTestHelper.buildURL("project", getProjectName() + "/" + TEST_ASSAY_FLDR_NAB_RENAME, "begin");
+        beginAt(portalUrl); // Navigate away from folder that was just renamed
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkContainingText("run details"));
 
@@ -693,7 +697,7 @@ public class NabAssayTest extends AbstractAssayTest
 
         _assayHelper.clickEditAssayDesign()
                 .addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"))
-                .saveAndClose();
+                .clickFinish();
 
         navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));

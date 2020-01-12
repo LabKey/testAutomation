@@ -174,7 +174,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         clickButton("Manage Assays");
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", "myassay");
-        DomainFormPanel dataFields = assayDesignerPage.goToResultFields()
+        DomainFormPanel dataFields = assayDesignerPage.goToResultsFields()
                 .removeField("Date")
                 .removeField("VisitID")
                 .removeField("ParticipantID")
@@ -316,6 +316,11 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
                 "INFO : hello Nashorn timeout world!",
+                // ${pipeline, protocol name} token replacement
+                "arg[2]=" + protocolName,
+                // ${httpSessionId} token replacement. Expect apikey prefix
+                "arg[3]=apikey|",
+                "sleeping for 8 seconds",
                 "Process killed after exceeding timeout of 3 seconds");
         assertTextNotPresent("goodbye Nashorn timeout world!");
     }

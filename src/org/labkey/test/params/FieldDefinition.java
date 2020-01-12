@@ -17,6 +17,7 @@ package org.labkey.test.params;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
+import org.labkey.remoteapi.query.Filter;
 
 import java.util.Map;
 
@@ -271,43 +272,58 @@ public class FieldDefinition
 
     public enum RangeType
     {
-        Equals("Equals"), NE("Does Not Equal"), GT("Greater than"), GTE("Greater than or Equals"), LT("Less than"), LTE("Less than or Equals");
+        Equals("Equals", Filter.Operator.EQUAL),
+        NE("Does Not Equal", Filter.Operator.NEQ),
+        GT("Greater than", Filter.Operator.GT),
+        GTE("Greater than or Equals", Filter.Operator.GTE),
+        LT("Less than", Filter.Operator.LT),
+        LTE("Less than or Equals", Filter.Operator.LTE);
         private final String _description;
+        private final Filter.Operator _operator;
 
-        RangeType(String description)
+        RangeType(String description, Filter.Operator operator)
         {
             _description = description;
+            _operator = operator;
         }
 
         public String toString()
         {
             return _description;
         }
+
+        public Filter.Operator getOperator()
+        {
+            return _operator;
+        }
     }
 
     public enum ColumnType
     {
-        MultiLine("Multi-Line Text", "string"),
-        Integer("Integer", "int"),
-        String("Text (String)", "string"),
-        Subject("Subject/Participant (String)", "string"),
-        DateTime("DateTime", "date"), // TODO remove this after GWT designer removed
-        DateAndTime("Date Time", "date"),
-        Boolean("Boolean", "boolean"),
-        Double("Number (Double)", "float"), // TODO remove this after GWT designer removed
-        Decimal("Decimal", "float"),
-        File("File", null),
-        AutoInteger("Auto-Increment Integer", "int"),
-        Flag("Flag (String)", null),
-        Attachment("Attachment", "attachment"),
-        User("User", "int"),
-        Lookup("Lookup", null);
+        MultiLine("Multi-Line Text", "Multi-Line Text", "string"),
+        Integer("Integer", "Integer", "int"),
+        String("Text", "Text (String)", "string"),
+        Subject("Subject/Participant", "Subject/Participant (String)", "string"),
+        DateTime("DateTime", "DateTime", "date"), // TODO remove this after GWT designer removed
+        DateAndTime("Date Time", "Date Time", "date"),
+        Boolean("Boolean", "Boolean", "boolean"),
+        Double("Number (Double)", "Number (Double)", "float"), // TODO remove this after GWT designer removed
+        Decimal("Decimal", "Decimal", "float"),
+        File("File", "File", null),
+        AutoInteger("Auto-Increment Integer", "Auto-Increment Integer", "int"),
+        Flag("Flag", "Flag (String)", null),
+        Attachment("Attachment", "Attachment", "attachment"),
+        User("User", "User", "int"),
+        Lookup("Lookup", "Lookup", null),
+        Sample("Sample", "Sample", null);
 
-        private final String _description;  // the display value in the UI for this kind of field
+        private final String _label; // the display value in the UI for this kind of field
+        private final String _description; // TODO remove this after GWT designer removed
         private final String _jsonType;     // the key used inside the API
 
-        ColumnType(String description, String jsonType)
+        ColumnType(String label, String description, String jsonType)
         {
+            _label = label;
             _description = description;
             _jsonType = jsonType;
         }
@@ -316,6 +332,12 @@ public class FieldDefinition
         {
             return _description;
         }
+
+        public String getLabel()
+        {
+            return _label;
+        }
+
         public String getJsonType() { return _jsonType; }
     }
 

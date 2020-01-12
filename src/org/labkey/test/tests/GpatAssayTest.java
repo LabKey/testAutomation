@@ -28,7 +28,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
@@ -196,19 +197,18 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
         assertEquals("DrawDt", getFormElement(Locator.name("Date")));
-        clickButton("Show Assay Designer");
 
-        AssayDesignerPage assayDesignerPage = new AssayDesignerPage(getDriver());
-        assayDesignerPage.dataFields().selectField(4)
+        clickButton("Show Assay Designer");     // todo: map this page
+        ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
+        DomainFormPanel results = assayDesignerPage.expandFieldsPanel("Results");
+        results.getField(4)
                 .setLabel("Blank");
-        assayDesignerPage.dataFields().selectField(7)
+        results.getField(7)
                 .setName("Result")
                 .setLabel("Result")
-                .properties()
-                .selectAdvancedTab()
                 .setImportAliases("Score");
+        assayDesignerPage.clickFinish();
 
-        assayDesignerPage.saveAndClose();
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_TSV));

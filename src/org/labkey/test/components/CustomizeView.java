@@ -534,7 +534,11 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     //enable customize view grid to show hidden fields
     public void showHiddenItems()
     {
-        _driver.click(Locator.tagWithText("Label", "Show Hidden Fields"));
+        Checkbox hiddenFields = Ext4Checkbox().withLabel("Show Hidden Fields").find(this);
+        getWrapper().scrollIntoView(hiddenFields.getComponentElement());
+        hiddenFields.check();
+        WebDriverWrapper.waitFor(hiddenFields::isChecked, "Hidden Fields not shown", 1000);
+
         BaseWebDriverTest.sleep(250); // wait for columns to display
     }
 
@@ -788,7 +792,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         public Window clickEdit()
         {
             WebElement gear = Locator.css("div.labkey-tool-gear").findElement(getComponentElement());
-            _driver.scrollIntoView(gear);
+            _driver.scrollIntoView(gear, true);
             gear.click();
             return Window(getDriver()).withTitleContaining("Edit title for").find();
         }

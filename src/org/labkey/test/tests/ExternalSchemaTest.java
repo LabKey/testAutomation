@@ -496,7 +496,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     public void updateViaFormNoPerms(String containerPath, int pk, String text, int intNotNull) throws IOException
     {
         _updateViaForm(containerPath, pk, text, intNotNull);
-        assertTitleEquals("401: Error Page -- User does not have permission to perform this operation");
+        assertTitleEquals("401: Error Page -- User does not have permission to perform this operation.");
     }
 
     public void updateViaForm(String containerPath, int pk, String text, int intNotNull)

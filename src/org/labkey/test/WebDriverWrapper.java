@@ -15,8 +15,8 @@
  */
 package org.labkey.test;
 
-import org.apache.commons.collections4.MultiMap;
-import org.apache.commons.collections4.map.MultiValueMap;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -32,6 +32,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.FolderManagementPage;
+import org.labkey.test.pages.assay.AssayBeginPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.query.ExecuteQueryPage;
@@ -103,11 +104,11 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -320,6 +321,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("pdfjs.enabledCache.state", false);
 
                     profile.setPreference("browser.ssl_override_behavior", 0);
+
+                    // TODO: Issue 38785: dom.disable_beforeunload FireFox preference is causing numerous test failures
+                    // profile.setPreference("dom.disable_beforeunload", false);
 
                     profile.setAcceptUntrustedCertificates(true);
                     profile.setAssumeUntrustedCertificateIssuer(false);
@@ -861,9 +865,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new ManageStudyPage(getDriver());
     }
 
-    public void goToManageAssays()
+    public AssayBeginPage goToManageAssays()
     {
         clickAdminMenuItem("Manage Assays");
+        return new AssayBeginPage(getDriver());
     }
 
     public BeginPage goToManageLists()
@@ -1816,9 +1821,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
             });
             if (getDriver().getTitle().isEmpty() && onLabKeyPage())
             {
-                Crawler.ControllerActionId action = new Crawler.ControllerActionId(getDriver().getCurrentUrl());
                 String warning = "Action doesn't define a page title";
-                addActionWarning(warning, action);
+                addActionWarning(warning, getDriver().getCurrentUrl());
             }
         }
 
@@ -1839,17 +1843,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return doAndAcceptUnloadAlert(func, "");
     }
 
-    private static final MultiMap<String, Set<String>> actionWarnings = MultiValueMap.multiValueMap(new HashMap<>(), HashSet::new);
+    private static final MultiValuedMap<String, String> actionWarnings = new HashSetValuedHashMap<>();
 
-    public static void addActionWarning(String warning, Crawler.ControllerActionId action)
+    public static void addActionWarning(String warning, String url)
     {
-        TestLogger.warn(warning + ": " + action);
-        actionWarnings.put(warning, action.toString());
+        Crawler.ControllerActionId action = new Crawler.ControllerActionId(url);
+        if (!action.getAction().equals("app")) // App actions generally define their title dynamically
+        {
+            TestLogger.warn(warning + ": " + url);
+            actionWarnings.put(warning, action.toString());
+        }
     }
 
-    public static Map<String, Set<String>> getActionWarnings()
+    public static Map<String, Collection<String>> getActionWarnings()
     {
-        return new HashMap(actionWarnings);
+        return actionWarnings.asMap();
     }
 
     private static final WeakHashMap<WebDriver, Set<PageLoadListener>> _pageLoadListeners = new WeakHashMap<>();
@@ -1990,7 +1998,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             sleep(100);
         } while ((System.currentTimeMillis() - startTime) < wait);
 
-        return false;
+        return checker.get();
     }
 
     public void waitForEquals(String message, Supplier expected, Supplier actual, int wait)
@@ -2284,10 +2292,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         do
         {
-            if(isTextPresent(text))
+            if (waitFor(() -> isTextPresent(text), 1000))
+            {
                 return;
-            else
-                sleep(1000);
+            }
             refresh();
         }while(System.currentTimeMillis() - startTime < wait);
         assertTextPresent(text);
@@ -3328,6 +3336,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         setInput(dropZone, files);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.FileBrowserHelper#dragAndDropFileInDropZone(File)} or
+     * {@link org.labkey.test.util.FileBrowserHelper#dragDropUpload(File)}
+     */
+    @Deprecated
     public void dragAndDropFileInDropZone(File fileName)
     {
         //Offsets for the drop zone
@@ -3347,6 +3360,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         //setting the input
         input.sendKeys(fileName.getAbsolutePath());
+
+        executeScript("LABKEY.internal.FileDrop.hideDropzones()");
     }
 
     public void setFormElement(Locator loc, File file)

@@ -22,7 +22,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.PropertiesEditor.DefaultType;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -32,7 +33,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 
 @Category({DailyB.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -91,27 +91,19 @@ public class ElisaAssayTest extends AbstractAssayTest
         //create a new ELISA template
         createTemplate();
 
-        //create a new ELISA assay
+        log("Setting up ELISA assay");
         clickProject(TEST_ASSAY_PRJ_ELISA);
         clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "ELISA"));
-        clickButton("Next");
-
-        log("Setting up ELISA assay");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("AssayDesignerName"), TEST_ASSAY_ELISA);
-
-        selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
-        setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_ELISA_DESC);
-
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("ELISA", TEST_ASSAY_ELISA)
+            .setDescription(TEST_ASSAY_ELISA_DESC)
+            .setPlateTemplate(PLATE_TEMPLATE_NAME);
         // set the specimenId field default value to be : last entered
-        PropertiesEditor sample_fields = PropertiesEditor(getDriver()).withTitleContaining("Sample Fields").find();
-        sample_fields.selectField("SpecimenId");
-        sample_fields.fieldProperties().selectAdvancedTab().setDefaultType(PropertiesEditor.DefaultType.LAST_ENTERED);
-
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
+        assayDesignerPage.expandFieldsPanel("Sample")
+            .getField("SpecimenId")
+            .clickAdvancedSettings()
+            .setDefaultValueType(DefaultType.LAST_ENTERED)
+            .apply();
+        assayDesignerPage.clickFinish();
 
         clickProject(TEST_ASSAY_PRJ_ELISA);
         clickAndWait(Locator.linkWithText("Assay List"));

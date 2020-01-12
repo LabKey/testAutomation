@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -116,11 +117,17 @@ public class RReportHelper
         _test._ext4Helper.clickTabContainingText("Report");
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 5);
 
-        Locator l = Locator.xpath("//div[@class='reportView']//pre");
-        _test.waitForElement(l);
-        String html = _test.getText(l).replaceAll(" +", " ");
+        String html = getReportText();
 
         return checkScriptOutput(html, expectedLines, failOnError);
+    }
+
+    @NotNull
+    public String getReportText()
+    {
+        Locator l = Locator.xpath("//div[@class='reportView']//pre");
+        _test.waitForElement(l);
+        return _test.getText(l).replaceAll(" +", " ");
     }
 
     public boolean executeScriptDirectly(String script, String expectedLines) throws IOException
@@ -424,7 +431,7 @@ public class RReportHelper
         String versionOutput = "";
         try
         {
-            versionOutput = TestFileUtils.getProcessOutput(r, "--version");
+            versionOutput = new ProcessHelper(r, "--version").getProcessOutput().trim();
 
             Pattern versionPattern = Pattern.compile("R version ([1-9]\\.\\d+\\.\\d)");
             Matcher matcher = versionPattern.matcher(versionOutput);
@@ -445,7 +452,7 @@ public class RReportHelper
 
     public String getRScriptOutput(String scriptContents) throws IOException
     {
-        return TestFileUtils.getProcessOutput(getRScriptExecutable(), "-e", scriptContents);
+        return new ProcessHelper(getRScriptExecutable(), "-e", scriptContents).getProcessOutput().trim();
     }
 
     public void saveReport(String name, boolean isSaveAs, int wait)

@@ -33,7 +33,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -157,29 +157,22 @@ public class ModuleAssayTest extends AbstractAssayTest
 
         portalHelper.addWebPart("Assay List");
         clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "Noblis Simple"));
-        clickButton("Next");
-
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         log("Setting up simple assay");
-        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), ASSAY_NAME);
-        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), "My Simple Assay Description");
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("Noblis Simple", ASSAY_NAME)
+            .setDescription("My Simple Assay Description");
+
         if (_useTransform)
         {
             log("setting transform script in assay design");
-            AssayDesignerPage designer = new AssayDesignerPage(getDriver());
-            designer.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
+            assayDesignerPage.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
         }
         else
         {
             log("not setting transform script");
         }
 
-        sleep(1000);
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
+        assayDesignerPage.clickFinish();
     }
 
     protected void createSampleSet()

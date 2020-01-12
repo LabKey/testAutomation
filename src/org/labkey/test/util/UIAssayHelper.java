@@ -43,12 +43,16 @@ public class UIAssayHelper extends AbstractAssayHelper
         importAssay(assayName, file, projectPath, batchProperties, null);
     }
 
+    @Override
+    public void importAssay(String assayName, File file, Map<String, Object> batchProperties, Map<String, Object> runProperties)
+    {
+        importAssay(assayName, file, null, batchProperties, runProperties);
+    }
+
     public void importAssay(String assayName, File file, String projectPath, @Nullable Map<String, Object> batchProperties, @Nullable Map<String, Object> runProperties)
     {
-        String[] folders = projectPath.split("/");
-        _test.clickProject(folders[0]);
-        if (folders.length > 1)
-            _test.clickFolder(folders[folders.length - 1]);
+        if (projectPath != null)
+            goToProjectPath(projectPath);
 
         _test.clickAndWait(Locator.linkWithText(assayName));
         _test.clickButton("Import Data");
@@ -78,17 +82,20 @@ public class UIAssayHelper extends AbstractAssayHelper
         _test.setFormElement(Locator.name("__primaryFile__"), file);
 
         _test.clickButton("Save and Finish");
-
     }
 
-
-    // TODO: Just a stop-gap measure for now (to work on a regression issue). Should revisit this function in trunk.
-    public void reImportAssay(String assayName, String currentRunName, File file, String projectPath, @Nullable Map<String, Object> batchProperties, @Nullable Map<String, Object> runProperties)
+    private void goToProjectPath(String projectPath)
     {
         String[] folders = projectPath.split("/");
         _test.clickProject(folders[0]);
         if (folders.length > 1)
             _test.clickFolder(folders[folders.length - 1]);
+    }
+
+    // TODO: Just a stop-gap measure for now (to work on a regression issue). Should revisit this function in trunk.
+    public void reImportAssay(String assayName, String currentRunName, File file, String projectPath, @Nullable Map<String, Object> batchProperties, @Nullable Map<String, Object> runProperties)
+    {
+        goToProjectPath(projectPath);
 
         _test.clickAndWait(Locator.linkWithText(assayName));
         _test.clickAndWait(Locator.linkContainingText(currentRunName));
@@ -122,11 +129,36 @@ public class UIAssayHelper extends AbstractAssayHelper
 
     }
 
-    @Override
     public void goToUploadXarPage()
     {
         _test.goToManageAssays();
         _test.clickButton("New Assay Design");
         _test.clickAndWait(Locator.linkWithText("upload"));
+    }
+
+    /**
+     * Upload a xar file as an assay configuration
+     *
+     * @param file   file to upload
+     * @param pipelineCount  expected count of successful pipeline jobs including this one
+     */
+    @Override
+    public void uploadXarFileAsAssayDesign(File file, int pipelineCount)
+    {
+        uploadXarFileAsAssayDesign(file);
+        _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
+    }
+
+    /**
+     * Upload a xar file as an assay configuration. Does not wait for pipeline jobs to complete.
+     * @param file XAR file to upload
+     */
+    @Override
+    @LogMethod
+    public void uploadXarFileAsAssayDesign(@LoggedParam File file)
+    {
+        goToUploadXarPage();
+        _test.setFormElement(Locator.name("uploadFile"), file);
+        _test.clickAndWait(Locator.lkButton("Upload"));
     }
 }
