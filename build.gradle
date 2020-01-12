@@ -32,7 +32,12 @@ project.dependencies {
     compile "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
 }
 
-BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle), depVersion: project.labkeyVersion)
+BuildUtils.addLabKeyDependency(
+        project: project,
+        config: 'uiTestImplementation',
+        depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle),
+        depProjectConfig: 'default',
+        depVersion: project.labkeyVersion)
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 {
@@ -42,10 +47,4 @@ if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 if (project.hasProperty("teamcity"))
 {
     apply plugin: 'org.labkey.teamCity'
-}
-
-// Add dependency on jar task so ant.iajc in the compileUiTestJava task can have the remote api jar.
-// Because of the move from (java to java-library plugin), Jar files are not recreated with the compileJava task.
-compileUiTestJava {
-    dependsOn ':remoteapi:java:jar'
 }
