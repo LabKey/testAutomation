@@ -406,7 +406,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         assertTextPresent(username,
                 "has been verified! Create an account password below.",
-                "Passwords must be six non-whitespace characters or more and must not match your email address."
+                "Your password must be at least six characters and cannot contain spaces or match your email address."
         );
 
         setFormElement(Locator.id("password"), newPassword);
