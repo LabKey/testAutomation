@@ -299,7 +299,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         beginAt(resetUrl);
 
-        attemptSetInvalidPassword("fooba", "fooba", "Your password must be six non-whitespace characters or more.");
+        attemptSetInvalidPassword("fooba", "fooba", "Your password must be at least six characters and cannot contain spaces.");
         attemptSetInvalidPassword("foobar", "foobar2", "Your password entries didn't match.");
 
         resetPassword(resetUrl, NORMAL_USER, NORMAL_USER_PASSWORD);
