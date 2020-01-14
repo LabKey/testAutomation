@@ -34,6 +34,43 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         return authenticationProvider.getNewDialog(getDriver());
     }
 
+    // global settings
+    public LoginConfigurePage setSelfSignup(boolean enable)
+    {
+        if (enable != getSelfSignupEnabed())
+        {
+            String desiredState =  enable ? "enabled" : "disabled";
+            elementCache().selfSignupCheckBox.click();
+            WebDriverWrapper.waitFor(()-> enable == getSelfSignupEnabed(),
+                    "the self-signup checkbox did not become " + desiredState, 2000);
+        }
+        return this;
+    }
+
+    public boolean getSelfSignupEnabed()
+    {
+        WebElement svg =  Locator.tag("svg").findWhenNeeded(elementCache().selfSignupCheckBox).withTimeout(2000);
+        return svg.getAttribute("class").contains("fa-check-square");
+    }
+
+    public LoginConfigurePage setAutoCreate(boolean enable)
+    {
+        if (enable != getAutoCreateEnabed())
+        {
+            String desiredState =  enable ? "enabled" : "disabled";
+            elementCache().autoCreateCheckBox.click();
+            WebDriverWrapper.waitFor(()-> enable == getAutoCreateEnabed(),
+                    "the auto-create checkbox did not become " + desiredState, 2000);
+        }
+        return this;
+    }
+
+    public boolean getAutoCreateEnabed()
+    {
+        WebElement svg =  Locator.tag("svg").findWhenNeeded(elementCache().autoCreateCheckBox).withTimeout(2000);
+        return svg.getAttribute("class").contains("fa-check-square");
+    }
+
     public LoginConfigurePage togglePrimaryConfiguration()
     {
         if (!elementCache().panelTab1.getAttribute("aria-selected").equals("true"))
@@ -91,15 +128,24 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         WebElement globalSettingsPanel()
         {
             return Locator.tagWithClass("div", "panel-default")
-                    .withDescendant(Locator.tagWithClass("div", "panel-heading").withChild(Locator.tag("span").withText("Global Settings")))
+                    .withChild(Locator.tagWithClass("div", "panel-heading")
+                            .withChild(Locator.tag("span").withText("Global Settings")))
                     .waitForElement(this, WAIT_FOR_JAVASCRIPT);
         }
 
         Locator checkBoxLoc(String label)
         {
-            return Locator.tagWithClass("div", "bottom-margin").withChild(Locator.tagWithText("span", label))
-                    .child(Locator.tagWithClassContaining("svg", "svg-inline--fa"));
+            return Locator.tagWithClass("div", "global-settings__text-row").containing(label)
+                    .child(Locator.tagWithClass("span", "clickable"));
         }
+
+        WebElement selfSignupCheckBox = checkBoxLoc("Allow self sign up").findWhenNeeded(globalSettingsPanel())
+                .withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement allowUserEmailEditCheckbox = checkBoxLoc("Allow users to edit their own email addresses")
+                .findWhenNeeded(globalSettingsPanel()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement autoCreateCheckBox = checkBoxLoc("Auto-create authenticated users")
+                .findWhenNeeded(globalSettingsPanel())
+                .withTimeout(WAIT_FOR_JAVASCRIPT);
 
         WebElement configurationsPanel()
         {

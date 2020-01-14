@@ -55,10 +55,23 @@ public abstract class AuthDialogBase<T extends AuthDialogBase> extends ModalDial
         return elementCache().enableToggle.get();
     }
 
+    public T clickButtonExpectingError(String buttonText)
+    {
+        Locators.dismissButton(buttonText).waitForElement(this, 2000).click();
+        return getThis();
+    }
+
+    /**
+     * for UX reasons, the wording in the button to submit an auth dialog differs when we're creating
+     * a new config vs. editing an existing one.
+     * @return
+     */
     public LoginConfigRow clickApply()
     {
         String description= getDescription();
-        dismiss("Apply");
+        Locator.findAnyElement("Finish or Apply button", this,
+                Locators.dismissButton("Finish"), Locators.dismissButton("Apply")).click();
+        waitForClose(4);
         return new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor();
     }
 
