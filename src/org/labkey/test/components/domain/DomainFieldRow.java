@@ -380,7 +380,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         String tableType = lookupInfo.getTableType();
         if (tableType == null)
             throw new IllegalArgumentException("No lookup type specified for " + lookupInfo.getTable());
-        setFromTargetTable(lookupInfo.getTable() + " (" + tableType + ")");
+        setFromTargetTable(lookupInfo.getTable() + " (" + tableType.toUpperCase() + ")");
         return this;
     }
 
