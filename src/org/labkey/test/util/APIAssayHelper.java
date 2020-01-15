@@ -198,7 +198,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         if (alr.getDefinition(assayName) == null)
         {
             if (failIfNotFound)
-                fail("Assay not found");
+                fail("Assay not found: " + assayName);
             return 0;
         }
         return ((Long) alr.getDefinition(assayName).get("id")).intValue();
@@ -228,10 +228,31 @@ public class APIAssayHelper extends AbstractAssayHelper
         cmd.execute(_test.createDefaultConnection(false), "/" + projectPath);
     }
 
-    public Protocol createAssayDesignUsingTemplate(String containerPath, String providerName, String assayName) throws Exception
+    public Protocol createAssayDesignWithDefaults(String containerPath, String providerName, String assayName) throws Exception
     {
         Connection connection = _test.createDefaultConnection(true);
         GetProtocolCommand getProtocolCommand = new GetProtocolCommand(providerName);
+        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
+
+        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
+        newAssayProtocol.setName(assayName);
+        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
+        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, containerPath);
+        return saveProtocolResponse.getProtocol();
+    }
+
+    /**
+     * Copy an assay design
+     * @param assayId rowId of the existing assay design
+     * @param containerPath container for the new assay design
+     * @param assayName name of the new assay design
+     * @return new assay protocol
+     * @throws Exception might be thrown by the LabKey Java remote API
+     */
+    public Protocol copyAssayDesign(Integer assayId, String containerPath, String assayName) throws Exception
+    {
+        Connection connection = _test.createDefaultConnection(true);
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand(assayId, true);
         ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
 
         Protocol newAssayProtocol = getProtocolResponse.getProtocol();
