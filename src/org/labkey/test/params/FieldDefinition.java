@@ -48,7 +48,7 @@ public class FieldDefinition
 
     public FieldDefinition(String name)
     {
-        this(name, ColumnType.string);
+        this(name, ColumnType.String);
     }
 
     public FieldDefinition(String name, LookupInfo lookup)
@@ -302,7 +302,7 @@ public class FieldDefinition
     {
         MultiLine("Multi-Line Text", "Multi-Line Text", "string"),
         Integer("Integer", "Integer", "int"),
-        string("Text", "Text (String)", "string"),
+        String("Text", "Text (String)", "string"),
         Subject("Subject/Participant", "Subject/Participant (String)", "string"),
         DateTime("DateTime", "DateTime", "date"), // TODO remove this after GWT designer removed
         DateAndTime("Date Time", "Date Time", "date"),
