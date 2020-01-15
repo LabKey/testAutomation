@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.RadioButton;
@@ -399,7 +400,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         Window(getDriver()).withTitle("Manage File Browser Configuration").waitFor();
     }
 
-    public PropertiesEditor goToEditProperties()
+    public DomainDesignerPage goToEditProperties()
     {
         goToAdminMenu();
         Window window = Window.Window(getDriver()).withTitle("Manage File Browser Configuration").waitFor();
@@ -408,7 +409,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         waitAndClick(Ext4Helper.Locators.ext4Tab("File Properties"));
         RadioButton().withLabel("Use Custom File Properties").find(window).check();
         window.clickButton("edit properties");
-        return new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitleContaining("File Properties").waitFor();
+        return new DomainDesignerPage(getDriver());
     }
 
     public Window clickImportData()

@@ -302,7 +302,8 @@ public class FieldDefinition
     {
         MultiLine("Multi-Line Text", "Multi-Line Text", "string"),
         Integer("Integer", "Integer", "int"),
-        String("Text", "Text (String)", "string"),
+        string("Text", "Text (String)", "string"),
+        String("Text", "Text (String)", "String"), // need upper case String for lookup tableType text
         Subject("Subject/Participant", "Subject/Participant (String)", "string"),
         DateTime("DateTime", "DateTime", "date"), // TODO remove this after GWT designer removed
         DateAndTime("Date Time", "Date Time", "date"),
