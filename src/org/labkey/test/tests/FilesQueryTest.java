@@ -26,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.FileBrowser;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserExtendedProperty;
@@ -81,10 +82,9 @@ public class FilesQueryTest extends BaseWebDriverTest
         _portalHelper.addWebPart("Files");
         _portalHelper.addQueryWebPart("FileRecords", EXP_SCHEMA, "Files", null);
 
-        _fileBrowserHelper.goToEditProperties();
-        waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.name("ff_name0"), CUSTOM_PROPERTY);
-        clickButton("Save & Close");
+        DomainDesignerPage designerPage = _fileBrowserHelper.goToEditProperties();
+        designerPage.fieldsPanel().addField(CUSTOM_PROPERTY);
+        designerPage.clickFinish();
 
         permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER);
         permissionsHelper.setPermissions(TEST_GROUP, "Project Administrator");
