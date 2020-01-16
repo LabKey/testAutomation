@@ -406,7 +406,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         assertTextPresent(username,
                 "has been verified! Create an account password below.",
-                "Passwords must be six non-whitespace characters or more and must not match your email address."
+                "Your password must be at least six characters and cannot contain spaces or match your email address."
         );
 
         setFormElement(Locator.id("password"), newPassword);
@@ -582,7 +582,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             verifyInitialUserError(email, null, null, "You must enter a password.");
             verifyInitialUserError(email, "LongEnough", null, "You must enter a password.");
             verifyInitialUserError(email, null, "LongEnough", "You must enter a password.");
-            verifyInitialUserError(email, "short", "short", "Your password must be six non-whitespace characters or more.");
+            verifyInitialUserError(email, "short", "short", "Your password must be at least six characters and cannot contain spaces.");
             verifyInitialUserError(email, email, email, "Your password must not match your email address.");
             verifyInitialUserError(email, "LongEnough", "ButDontMatch", "Your password entries didn't match.");
 

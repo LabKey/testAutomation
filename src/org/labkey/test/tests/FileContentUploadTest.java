@@ -28,7 +28,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
@@ -330,14 +332,16 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _listHelper.uploadData(COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
         clickProject(getProjectName());
         // Setup custom file properties
-        PropertiesEditor editor = _fileBrowserHelper.goToEditProperties();
+        DomainDesignerPage editor = _fileBrowserHelper.goToEditProperties();
 
-        PropertiesEditor.FieldRow row = editor.selectField(0);
+        DomainFieldRow row = editor.fieldsPanel().addField(CUSTOM_PROPERTY);
         row.setName(CUSTOM_PROPERTY);
-        row.properties().selectDisplayTab().setUrl("http://labkey.test/?a=${" + CUSTOM_PROPERTY + "}&b=${" + COLUMN_NAME + "}");
+        row.setUrl("http://labkey.test/?a=${" + CUSTOM_PROPERTY + "}&b=${" + COLUMN_NAME + "}");
 
-        editor.addField(new FieldDefinition(COLUMN_NAME).setLabel(COLUMN_NAME).setLookup(new FieldDefinition.LookupInfo(getProjectName(), "lists", LIST_NAME)));
-        clickButton("Save & Close");
+        row = editor.fieldsPanel().addField(COLUMN_NAME);
+        row.setLabel(COLUMN_NAME);
+        row.setLookup(new FieldDefinition.LookupInfo(getProjectName(), "lists", LIST_NAME).setTableType(FieldDefinition.ColumnType.String));
+        editor.clickFinish();
     }
 
 
