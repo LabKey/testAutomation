@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -109,9 +108,7 @@ public class TestDataGenerator
         int index = 0;
         for (FieldDefinition fieldDef : columns)
         {
-            JSONObject json = new JSONObject();
-            json.putAll(fieldDef.toMap());
-            PropertyDescriptor field = new PropertyDescriptor(json);
+            PropertyDescriptor field = fieldDef.toPropertyDescriptor();
             _columns.put(fieldDef.getName(), field);
             _indices.put(index, field);
             index++;
@@ -191,7 +188,7 @@ public class TestDataGenerator
         return _rows.size();
     }
 
-    private List<PropertyDescriptor> getColumns()
+    public List<PropertyDescriptor> getColumns()
     {
         List<PropertyDescriptor> cols = new ArrayList<>();
         for (PropertyDescriptor field : _columns.values())
