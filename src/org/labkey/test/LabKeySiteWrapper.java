@@ -145,11 +145,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             {
                 if (isElementPresent(SiteNavBar.Locators.userMenu))
                     return true;
-                bypassSecondaryAuthentication();
+                //bypassSecondaryAuthentication();
                 return false;
             }, defaultWaitForPage))
             {
-                bypassSecondaryAuthentication();
+                //bypassSecondaryAuthentication();
                 String errors = StringUtils.join(getTexts(Locator.css(".labkey-error").findElements(getDriver())), "\n");
 
                 // If we get redirected here the message is not indicated as an error

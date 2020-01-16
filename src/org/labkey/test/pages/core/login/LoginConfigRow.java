@@ -35,6 +35,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
 
     public LoginConfigurePage clickDelete()
     {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().deleteButton));
         elementCache().deleteButton.click();
         getWrapper().acceptAlert();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
@@ -43,6 +44,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
 
     public <P extends AuthDialogBase> P clickEdit(AuthenticationProvider<P> authenticationProvider)
     {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editButton));
         elementCache().editButton.click();
         return authenticationProvider.getEditDialog(this);
     }
@@ -76,14 +78,16 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
         WebElement statusElement = Locator.tagWithClass("div", "col-xs-7")
                 .withChild(Locator.tagWithClass("svg", "fa-circle")).findWhenNeeded(this);
 
-        final WebElement deleteButton = Locator.tagWithClass("svg", "fa-times-circle").findWhenNeeded(this);
-        final WebElement editButton = Locator.tagWithClass("svg", "fa-pencil-alt").findWhenNeeded(this);
+        final WebElement deleteButton = Locator.tagWithClass("svg", "fa-times-circle")
+                .findWhenNeeded(this).withTimeout(2000);
+        final WebElement editButton = Locator.tagWithClass("svg", "fa-pencil-alt")
+                .findWhenNeeded(this).withTimeout(2000);
     }
 
 
     public static class LoginConfigRowFinder extends WebDriverComponentFinder<LoginConfigRow, LoginConfigRowFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "auth-row");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "auth-row").notHidden();
         private String _description = null;
 
         public LoginConfigRowFinder(WebDriver driver)

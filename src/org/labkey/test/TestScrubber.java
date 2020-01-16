@@ -94,7 +94,7 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            disableSecondaryAuthentication();
+            //disableSecondaryAuthentication();
         }
         catch (RuntimeException e)
         {

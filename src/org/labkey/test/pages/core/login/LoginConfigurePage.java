@@ -28,10 +28,30 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     public <D extends AuthDialogBase> D addConfiguration(AuthenticationProvider<D> authenticationProvider)
     {
+        togglePrimaryConfiguration();
         elementCache().addPrimaryMenu.
                 clickSubMenu(false, authenticationProvider.getProviderName() + " : " + authenticationProvider.getProviderDescription());
 
         return authenticationProvider.getNewDialog(getDriver());
+    }
+
+    public <D extends AuthDialogBase> D addSecondaryConfiguration(AuthenticationProvider<D> authenticationProvider)
+    {
+        toggleSecondaryConfiguration();
+        WebDriverWrapper.waitFor(()-> elementCache().addSecondaryMenu.getComponentElement().isDisplayed(), 2000);
+        elementCache().addSecondaryMenu.
+                clickSubMenu(false, authenticationProvider.getProviderName() + " : " + authenticationProvider.getProviderDescription());
+
+        return authenticationProvider.getNewDialog(getDriver());
+    }
+
+    private boolean isPrimarySelected()
+    {
+        return elementCache().panelTab1.getAttribute("aria-selected").equals("true");
+    }
+    private boolean isSecondarySelected()
+    {
+        return elementCache().panelTab2.getAttribute("aria-selected").equals("true");
     }
 
     // global settings
@@ -73,29 +93,43 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     public LoginConfigurePage togglePrimaryConfiguration()
     {
-        if (!elementCache().panelTab1.getAttribute("aria-selected").equals("true"))
+        if (!isPrimarySelected())
             elementCache().panelTab1.click();
-        waitFor(()-> elementCache().panelTab1.getAttribute("aria-selected").equals("true"), 1000);
+        waitFor(()-> isPrimarySelected(), 1000);
         return this;
     }
 
     public LoginConfigRow getPrimaryConfigurationRow(String description)
     {
-        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor();
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description)
+                .waitFor(elementCache().tabPane1);
     }
 
-    public List<LoginConfigRow> getConfigurations()
+    public List<LoginConfigRow> getPrimaryConfigurations()
     {
         togglePrimaryConfiguration();
-        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll();
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll(elementCache().tabPane1);
     }
 
     public LoginConfigurePage toggleSecondaryConfiguration()
     {
-        if (!elementCache().panelTab2.getAttribute("aria-selected").equals("true"))
+        if (!isSecondarySelected())
             elementCache().panelTab2.click();
-        waitFor(()-> elementCache().panelTab2.getAttribute("aria-selected").equals("true"), 1000);
+        waitFor(()-> isSecondarySelected(), 1000);
         return this;
+    }
+
+    public List<LoginConfigRow> getSecondaryConfigurations()
+    {
+        toggleSecondaryConfiguration();
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll(elementCache().tabPane2);
+    }
+
+    public LoginConfigRow getSecondaryConfigurationRow(String description)
+    {
+        toggleSecondaryConfiguration();
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver())
+                .withDescription(description).waitFor(elementCache().tabPane2);
     }
 
     public LoginConfigurePage removeConfiguration(String description)      // assumes for now we're doing primary only
@@ -154,13 +188,17 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
                     .waitForElement(this, WAIT_FOR_JAVASCRIPT);
         }
 
-        WebElement tabPanel = Locator.id("tab-panel").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement panelTab1 = Locator.id("tab-panel-tab-1").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement panelTab2 = Locator.id("tab-panel-tab-2").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement tabPanel = Locator.id("tab-panel").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement panelTab1 = Locator.id("tab-panel-tab-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement tabPane1 = Locator.id("tab-panel-pane-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement panelTab2 = Locator.id("tab-panel-tab-2").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement tabPane2 = Locator.id("tab-panel-pane-2").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         BootstrapMenu addPrimaryMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Add New Primary Configuration").timeout(WAIT_FOR_JAVASCRIPT)
                 .findWhenNeeded(this);
 
+        BootstrapMenu addSecondaryMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Add New Secondary Configuration").timeout(WAIT_FOR_JAVASCRIPT)
+                .findWhenNeeded(this);
 
         WebElement saveAndFinishBtn()
         {
