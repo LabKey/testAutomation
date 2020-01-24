@@ -782,11 +782,8 @@ public class Runner extends TestSuite
 
     private static TestSet getSuite(String suiteName)
     {
-        try
-        {
-            return _suites.getTestSet(suiteName);
-        }
-        catch (Exception e)
+        TestSet testSet = _suites.getTestSet(suiteName);
+        if (testSet == null)
         {
             List<String> sortedSuites = new ArrayList<>(_suites.getSuites());
             Collections.sort(sortedSuites);
@@ -796,6 +793,7 @@ public class Runner extends TestSuite
                 System.err.println("   " + suite);
             throw new IllegalArgumentException("Couldn't find suite '" + suiteName + "'. Check log for details.");
         }
+        return testSet;
     }
 
     protected static List<String> getSpecifiedSuites()
