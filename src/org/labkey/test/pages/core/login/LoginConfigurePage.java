@@ -57,38 +57,35 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     // global settings
     public LoginConfigurePage setSelfSignup(boolean enable)
     {
-        if (enable != getSelfSignupEnabed())
-        {
-            String desiredState =  enable ? "enabled" : "disabled";
-            elementCache().selfSignupCheckBox.click();
-            WebDriverWrapper.waitFor(()-> enable == getSelfSignupEnabed(),
-                    "the self-signup checkbox did not become " + desiredState, 2000);
-        }
+        elementCache().selfSignupCheckBox.set(enable);
         return this;
     }
 
-    public boolean getSelfSignupEnabed()
+    public boolean getSelfSignupEnabled()
     {
-        WebElement svg =  Locator.tag("svg").findWhenNeeded(elementCache().selfSignupCheckBox).withTimeout(2000);
-        return svg.getAttribute("class").contains("fa-check-square");
+        return elementCache().selfSignupCheckBox.get();
+    }
+
+    public LoginConfigurePage setAllowEditEmail(boolean enable)
+    {
+        elementCache().allowUserEmailEditCheckbox.set(enable);
+        return this;
+    }
+
+    public boolean getAllowEditEmail()
+    {
+        return elementCache().allowUserEmailEditCheckbox.get();
     }
 
     public LoginConfigurePage setAutoCreate(boolean enable)
     {
-        if (enable != getAutoCreateEnabed())
-        {
-            String desiredState =  enable ? "enabled" : "disabled";
-            elementCache().autoCreateCheckBox.click();
-            WebDriverWrapper.waitFor(()-> enable == getAutoCreateEnabed(),
-                    "the auto-create checkbox did not become " + desiredState, 2000);
-        }
+        elementCache().autoCreateCheckBox.set(enable);
         return this;
     }
 
-    public boolean getAutoCreateEnabed()
+    public boolean getAutoCreateEnabled()
     {
-        WebElement svg =  Locator.tag("svg").findWhenNeeded(elementCache().autoCreateCheckBox).withTimeout(2000);
-        return svg.getAttribute("class").contains("fa-check-square");
+        return elementCache().autoCreateCheckBox.get();
     }
 
     public LoginConfigurePage togglePrimaryConfiguration()
@@ -173,13 +170,13 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
                     .child(Locator.tagWithClass("span", "clickable"));
         }
 
-        WebElement selfSignupCheckBox = checkBoxLoc("Allow self sign up").findWhenNeeded(globalSettingsPanel())
-                .withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement allowUserEmailEditCheckbox = checkBoxLoc("Allow users to edit their own email addresses")
-                .findWhenNeeded(globalSettingsPanel()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement autoCreateCheckBox = checkBoxLoc("Auto-create authenticated users")
+        SvgCheckbox selfSignupCheckBox = new SvgCheckbox(checkBoxLoc("Allow self sign up").findWhenNeeded(globalSettingsPanel())
+                .withTimeout(WAIT_FOR_JAVASCRIPT), getDriver());
+        SvgCheckbox allowUserEmailEditCheckbox = new SvgCheckbox(checkBoxLoc("Allow users to edit their own email addresses")
+                .findWhenNeeded(globalSettingsPanel()).withTimeout(WAIT_FOR_JAVASCRIPT), getDriver());
+        SvgCheckbox autoCreateCheckBox = new SvgCheckbox(checkBoxLoc("Auto-create authenticated users")
                 .findWhenNeeded(globalSettingsPanel())
-                .withTimeout(WAIT_FOR_JAVASCRIPT);
+                .withTimeout(WAIT_FOR_JAVASCRIPT), getDriver());
 
         WebElement configurationsPanel()
         {
