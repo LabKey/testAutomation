@@ -35,11 +35,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SuiteBuilder
 {
@@ -176,12 +179,52 @@ public class SuiteBuilder
             optional = true;
             suiteName = suiteName.substring(1);
         }
+        // Support syntax for splitting up test suites
+        // e.g. "Daily[1/3]" to select the first third of tests in the Daily suite
+        int subset = 1;
+        int subsetCount = 1;
+        Pattern pattern = Pattern.compile("(.+)\\[(\\d+)/(\\d+)]");
+        Matcher matcher = pattern.matcher(suiteName);
+        if (matcher.matches())
+        {
+            subset = Integer.parseInt(matcher.group(2));
+            subsetCount = Integer.parseInt(matcher.group(3));
+            if (subset < 1 || subsetCount < 1 || subset > subsetCount)
+            {
+                throw new IllegalArgumentException("Invalid subsuite specification: " + suiteName);
+            }
+
+            suiteName = matcher.group(1);
+        }
         Set<Class> tests = _suites.getOrDefault(suiteName, optional ? Collections.emptySet() : null);
 
+        tests = extractSubset(tests, subset, subsetCount);
+
         if (tests == null)
-            throw new IllegalArgumentException(suiteName + " is not a valid test suite");
+            return null;
 
         return new TestSet(tests, suiteName);
+    }
+
+    private Set<Class> extractSubset(Set<Class> tests, int subset, int subsetCount)
+    {
+        if (tests == null || tests.isEmpty() || subsetCount == 1)
+        {
+            return tests;
+        }
+
+        List<Class> sorted = new ArrayList<>(tests);
+        sorted.sort(Comparator.comparing(Class::getName));
+
+        int size = sorted.size();
+        int index = subset - 1;
+        int subsetSize = size / subsetCount;
+        int remainder = size % subsetCount;
+        int isLargeSubset = index < remainder ? 1 : 0;
+        int fromIndex = subsetSize * index + Math.min(index, remainder);
+        int toIndex = Math.min(fromIndex + subsetSize + isLargeSubset, size);
+
+        return new HashSet<>(sorted.subList(fromIndex, toIndex));
     }
 
     public TestSet getEmptyTestSet()
