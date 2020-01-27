@@ -21,8 +21,10 @@ import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.pages.ConfigureDbLoginPage;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
+import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
+import org.labkey.test.pages.core.login.LoginConfigRow;
+import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
 import org.labkey.test.util.TestLogger;
@@ -32,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
 
@@ -85,7 +88,7 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            ConfigureDbLoginPage.resetDbLoginConfig(this);
+            DatabaseAuthConfigureDialog.resetDbLoginConfig(this);
         }
         catch (RuntimeException e)
         {
@@ -93,8 +96,11 @@ public class TestScrubber extends ExtraSiteWrapper
         }
 
         try
-        {
-            //disableSecondaryAuthentication();
+        {   // disable any/all secondary auth configurations
+            LoginConfigurePage.beginAt(this).getSecondaryConfigurations()
+                .stream().filter(a -> a.getProvider().equals("TestSecondary"))
+                    .collect(Collectors.toList())
+                    .forEach(LoginConfigRow::clickDelete);
         }
         catch (RuntimeException e)
         {

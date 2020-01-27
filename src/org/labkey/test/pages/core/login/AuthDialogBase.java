@@ -23,6 +23,12 @@ public abstract class AuthDialogBase<T extends AuthDialogBase> extends ModalDial
         _row = row;
     }
 
+    protected AuthDialogBase(ModalDialogFinder finder)
+    {
+        super(finder);
+        _row = null;
+    }
+
     private static ModalDialogFinder getFinder(String title, WebDriver driver)
     {
         return new ModalDialogFinder(driver).withTitle(title);

@@ -31,7 +31,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
-import org.labkey.test.pages.ConfigureDbLoginPage;
+import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
+import org.labkey.test.pages.core.login.DatabaseAuthenticationProvider;
+import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
@@ -63,7 +65,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.buildURL;
-import static org.labkey.test.pages.ConfigureDbLoginPage.PasswordStrength;
 
 @Category(BVT.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
@@ -223,7 +224,10 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     public void passwordResetTest()
     {
-        ConfigureDbLoginPage.beginAt(this).setDbLoginConfig(PasswordStrength.Weak, null);
+        LoginConfigurePage.beginAt(this)
+                .getPrimaryConfigurationRow("Standard database authentication")
+                .clickEdit(new DatabaseAuthenticationProvider())
+                .setDbLoginConfig(DatabaseAuthConfigureDialog.PasswordStrength.Weak.Weak, null);
 
         //get user a password
         String username = NORMAL_USER;
@@ -742,7 +746,13 @@ public class SecurityTest extends BaseWebDriverTest
     {
         String simplePassword = "3asdfghi"; // Only two character types. 8 characters long.
         String shortPassword = "4asdfg!"; // Only 7 characters long. 3 character types.
-        ConfigureDbLoginPage.beginAt(this).setDbLoginConfig(PasswordStrength.Strong, null);
+        LoginConfigurePage configurePage = LoginConfigurePage.beginAt(this);
+        configurePage
+                .getPrimaryConfigurationRow("Standard database authentication")
+                .clickEdit(new DatabaseAuthenticationProvider())
+                .setDbLoginConfig(DatabaseAuthConfigureDialog.PasswordStrength.Strong,
+                                DatabaseAuthConfigureDialog.PasswordExpiration.Never);
+        configurePage.clickSaveAndFinish();
 
         setInitialPassword(NORMAL_USER, simplePassword);
         assertTextPresent("Your password must contain three of the following"); // fail, too simple
@@ -789,7 +799,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertTextNotPresent("Choose a new password.");
 
         stopImpersonating();
-        ConfigureDbLoginPage.resetDbLoginConfig(this);
+        DatabaseAuthConfigureDialog.resetDbLoginConfig(this);
     }
 
     @LogMethod
