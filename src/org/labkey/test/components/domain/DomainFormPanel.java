@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -99,8 +100,15 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFormPanel removeField(String name)
     {
+        return  removeField(name, true);
+    }
+
+    public DomainFormPanel removeField(String name, boolean confirmDialogExpected)
+    {
         getWrapper().log("attempting to remove field " + name);
-        getField(name).clickRemoveField().dismiss("Yes, Remove Field");
+        ModalDialog confirmRemoveDlg = getField(name).clickRemoveField(confirmDialogExpected);
+        if (confirmDialogExpected)
+            confirmRemoveDlg.dismiss("Yes, Remove Field");
         clearElementCache();
         return this;
     }
