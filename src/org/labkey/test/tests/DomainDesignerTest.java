@@ -451,6 +451,29 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
     }
 
+    @Test
+    public void testDeleteNewField() throws Exception
+    {
+        String list = "testDeleteNewFieldList";
+
+        // create the list with no fields to start
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo);
+        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+
+        // go to the new domain designer and do some work here
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
+
+        // add a new field and remove it, new fields should not have Confirm Remove Field dialog
+        domainFormPanel.addField("deleteMe")
+            .setLabel("field label test")
+            .setDescription("field description test")
+            .clickRemoveField(false);
+
+        domainDesignerPage.clickFinish();
+    }
+
     /**
      * confirms that the key field (called 'name') in a sampleset is not shown in the domain editor
      *
