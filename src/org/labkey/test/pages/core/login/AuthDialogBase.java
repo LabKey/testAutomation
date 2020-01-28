@@ -7,13 +7,13 @@ import org.labkey.test.components.html.ToggleButton;
 import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 
-public abstract class AuthDialogBase<T extends AuthDialogBase> extends ModalDialog
+public abstract class AuthDialogBase<T extends AuthDialogBase<T>> extends ModalDialog
 {
     private final LoginConfigRow _row;
 
-    protected AuthDialogBase(AuthenticationProvider provider, WebDriver driver)
+    protected AuthDialogBase(AuthenticationProvider<?> provider, WebDriver driver)
     {
-        super(getFinder("Configure New " + provider.getProviderName() + " Authentication", driver));
+        super(getFinder("Add New " + provider.getProviderName() + " Configuration", driver));
         _row = null;
     }
 
@@ -70,7 +70,6 @@ public abstract class AuthDialogBase<T extends AuthDialogBase> extends ModalDial
     /**
      * for UX reasons, the wording in the button to submit an auth dialog differs when we're creating
      * a new config vs. editing an existing one.
-     * @return
      */
     public LoginConfigRow clickApply()
     {
