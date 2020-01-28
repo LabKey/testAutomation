@@ -1,0 +1,33 @@
+<Schema name="OlapTest" description="testAutomation">
+
+    <Annotations>
+        <Annotation name="SchemaName">olaptest</Annotation>
+        <Annotation name="EnableMondrian">TRUE</Annotation>
+    </Annotations>
+
+    <Cube name="Facts" visible="true" defaultMeasure="RowCount" cache="true" enabled="true">
+
+        <Table schema="olaptest" name="Facts"/>
+
+        <Dimension name="Fact" visible="true" highCardinality="false">
+            <Hierarchy name="Name" visible="true" hasAll="true" uniqueKeyLevelName="Name">
+                <Level name="Name" visible="true" column="Name" type="String" uniqueMembers="true" />
+            </Hierarchy>
+            <Hierarchy name="Project" visible="true" hasAll="true">
+                <Level name="Project" visible="true" column="Project" type="String" uniqueMembers="false" />
+            </Hierarchy>
+            <Hierarchy name="Location" visible="true" hasAll="true">
+                <Level name="Location" visible="true" column="Location" type="String" uniqueMembers="false" />
+            </Hierarchy>
+            <Hierarchy name="Type" visible="true" hasAll="true">
+                <Level name="Type" visible="true" column="Type" type="String" uniqueMembers="false" />
+            </Hierarchy>
+        </Dimension>
+
+        <Measure name="RowCount" column="Name" aggregator="count" visible="true"/>
+        <Measure name="TotalVolume" column="Volume" aggregator="sum" visible="true"/>
+
+    </Cube>
+
+
+</Schema>
