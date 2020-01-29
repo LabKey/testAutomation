@@ -137,7 +137,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
                 "view all site errors since reset",
                 "view primary site log file"));
         if (_containerHelper.getAllModules().contains("dataintegration"))
-            expectedLinkTexts.addAll(Arrays.asList("etl- all job histories", "etl- run site scope etls"));
+            expectedLinkTexts.addAll(Arrays.asList("etl - all job histories", "etl - run site scope etls"));
 
         expectedLinkTexts.removeIf(linkText -> isElementPresent(Locator.linkWithText(linkText)));
         assertTrue("Missing expected admin console links: " + expectedLinkTexts, expectedLinkTexts.isEmpty());
