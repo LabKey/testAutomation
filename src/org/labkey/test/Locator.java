@@ -1230,7 +1230,7 @@ public abstract class Locator extends By
 
         public XPathLocator parent()
         {
-            return new XPathLocator("(" + getLoc() + ")/..");
+            return new XPathLocator(getLoc() + "/..");
         }
 
         /**
@@ -1240,7 +1240,7 @@ public abstract class Locator extends By
          */
         public XPathLocator parent(String tag)
         {
-            return new XPathLocator("(" + getLoc() + ")/parent::" + tag);
+            return new XPathLocator(getLoc() + "/parent::" + tag);
         }
 
         public XPathLocator child(String str)
