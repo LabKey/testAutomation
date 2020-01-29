@@ -10,6 +10,7 @@ import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
@@ -144,6 +145,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     public ShowAdminPage clickSaveAndFinish()
     {
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveAndFinishBtn()));
         clickAndWait(elementCache().saveAndFinishBtn());
         return new ShowAdminPage(getDriver());
     }

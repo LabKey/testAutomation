@@ -752,7 +752,7 @@ public class SecurityTest extends BaseWebDriverTest
                 .clickEdit(new DatabaseAuthenticationProvider())
                 .setDbLoginConfig(DatabaseAuthConfigureDialog.PasswordStrength.Strong,
                                 DatabaseAuthConfigureDialog.PasswordExpiration.Never);
-        configurePage.clickSaveAndFinish();
+        // don't click 'Save and Finish' here; setting to strong/never in dbAuth doesn't require a page-level submit
 
         setInitialPassword(NORMAL_USER, simplePassword);
         assertTextPresent("Your password must contain three of the following"); // fail, too simple
