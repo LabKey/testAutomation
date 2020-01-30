@@ -117,6 +117,7 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
         // Back to default.
         oldStrength = null;
         oldExpiration = null;
+        clickApply();
     }
 
     public enum PasswordStrength {Weak, Strong}
