@@ -16,12 +16,14 @@
 package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SelectWrapper extends org.openqa.selenium.support.ui.Select
 {
@@ -130,5 +132,19 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
     public void deselectByVisibleText(String text)
     {
         getWrappedSelect().deselectByVisibleText(text);
+    }
+
+    public static void waitForOptionWithVisibleText(Select select, String text)
+    {
+        WebDriverWrapper.waitFor(() ->
+                        select.getOptions().stream().anyMatch(option -> Objects.equals(text, option.getText())),
+                "Option [text = " + text + "] not found: " + select.getWrappedElement().toString(), 10000);
+    }
+
+    public static void waitForOptionWithValue(Select select, String value)
+    {
+        WebDriverWrapper.waitFor(() ->
+                select.getOptions().stream().anyMatch(option -> Objects.equals(value, option.getAttribute("value"))),
+                "Option [value = " + value + "] not found: " + select.getWrappedElement().toString(), 10000);
     }
 }

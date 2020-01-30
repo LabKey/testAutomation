@@ -16,7 +16,9 @@
 package org.labkey.test.params;
 
 import org.jetbrains.annotations.Nullable;
+import org.json.simple.JSONObject;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 
 import java.util.Map;
@@ -55,6 +57,13 @@ public class FieldDefinition
     {
         _name = name;
         _lookup = lookup;
+    }
+
+    public PropertyDescriptor toPropertyDescriptor()
+    {
+        JSONObject json = new JSONObject();
+        json.putAll(toMap());
+        return new PropertyDescriptor(json);
     }
 
     public String getName()
