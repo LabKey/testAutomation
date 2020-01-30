@@ -185,9 +185,19 @@ public class DeferredErrorCollector
      * @param actual Actual value.
      * @see Assert#assertEquals(String, Object, Object)
      */
-    public final void verifyEqual(String message, Object expected, Object actual)
+    public final void verifyEquals(String message, Object expected, Object actual)
     {
         wrapAssertion(() -> Assert.assertEquals(message, expected, actual));
+    }
+
+    /**
+     * Renamed to match JUnit Assert method
+     * @see #verifyEquals(String, Object, Object)
+     */
+    @Deprecated(forRemoval = true)
+    public final void verifyEqual(String message, Object expected, Object actual)
+    {
+        verifyEquals(message, expected, actual);
     }
 
     /**
@@ -198,9 +208,19 @@ public class DeferredErrorCollector
      * @param actual Actual value.
      * @see Assert#assertNotEquals(String, Object, Object)
      */
-    public final void verifyNotEqual(String message, Object unexpected, Object actual)
+    public final void verifyNotEquals(String message, Object unexpected, Object actual)
     {
         wrapAssertion(() -> Assert.assertNotEquals(message, unexpected, actual));
+    }
+
+    /**
+     * Renamed to match JUnit Assert method
+     * @see #verifyNotEquals(String, Object, Object)
+     */
+    @Deprecated(forRemoval = true)
+    public final void verifyNotEqual(String message, Object unexpected, Object actual)
+    {
+        verifyNotEquals(message, unexpected, actual);
     }
 
     /**

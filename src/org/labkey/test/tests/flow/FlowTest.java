@@ -20,8 +20,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
@@ -825,7 +825,7 @@ public class FlowTest extends BaseFlowTest
     {
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         DataRegionTable drt = new DataRegionTable("query", getDriver());
-        String error = Locators.alertWarning.findElement(drt.getComponentElement()).getText();
+        String error = BootstrapLocators.warningBanner.findElement(drt.getComponentElement()).getText();
         assertEquals("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.", error);
     }
 
