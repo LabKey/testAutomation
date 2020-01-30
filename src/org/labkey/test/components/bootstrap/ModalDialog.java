@@ -38,7 +38,6 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     {
         _el = element;
         _driver = driver;
-        waitForReady();
     }
 
     public ModalDialog(ModalDialogFinder finder)
@@ -55,10 +54,11 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         return new ModalDialogFinder(driver);
     }
 
-    public void waitForReady()
+    protected ElementCache waitForReady(ElementCache ec)
     {
-        elementCache().body.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
-        WebDriverWrapper.waitFor(() -> elementCache().body.getText().length() > 0, "Modal dialog not ready", 2000);
+        ec.body.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
+        WebDriverWrapper.waitFor(() -> ec.body.getText().length() > 0, "Modal dialog not ready", 2000);
+        return ec;
     }
 
     @Override
@@ -126,12 +126,13 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         }
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
-        return new ElementCache();
+        return waitForReady(new ElementCache());
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<ElementCache>.ElementCache
     {
         public final WebElement title = Locators.title.findWhenNeeded(getComponentElement());
         public final WebElement closeButton = Locator.tagWithClass("button", "close")

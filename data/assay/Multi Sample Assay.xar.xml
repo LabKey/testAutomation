@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns:ExperimentArchive xsi:schemaLocation="http://cpas.fhcrc.org/exp/xml http://www.labkey.org/download/XarSchema/V2.3/expTypes.xsd" xmlns:ns="http://cpas.fhcrc.org/exp/xml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <ns:DomainDefinitions>
+    <ns:Domain>
+      <ns:Name>Multi Sample Assay Batch Fields</ns:Name>
+      <ns:DomainURI>urn:lsid:${LSIDAuthority}:AssayDomain-Batch.Folder-${Container.RowId}:Multi+Sample+Assay</ns:DomainURI>
+      <ns:Description>Define the batch fields for this assay design. The user is prompted for these fields once for each set of runs they import to this assay.</ns:Description>
+      <ns:PropertyDescriptor>
+        <ns:PropertyURI>urn:lsid:${LSIDAuthority}:AssayDomain-Batch.Folder-${Container.RowId}:Multi+Sample+Assay#ParticipantVisitResolver</ns:PropertyURI>
+        <ns:Name>ParticipantVisitResolver</ns:Name>
+        <ns:Required>false</ns:Required>
+        <ns:Hidden>true</ns:Hidden>
+        <ns:ShownInInsertView>true</ns:ShownInInsertView>
+        <ns:ShownInUpdateView>true</ns:ShownInUpdateView>
+        <ns:ShownInDetailsView>true</ns:ShownInDetailsView>
+        <ns:RangeURI>http://www.w3.org/2001/XMLSchema#string</ns:RangeURI>
+        <ns:Label>Participant Visit Resolver</ns:Label>
+        <ns:MvEnabled>false</ns:MvEnabled>
+        <ns:DefaultType>LastEntered</ns:DefaultType>
+        <ns:Measure>false</ns:Measure>
+        <ns:Dimension>false</ns:Dimension>
+        <ns:RecommendedVariable>false</ns:RecommendedVariable>
+        <ns:Scale>4000</ns:Scale>
+      </ns:PropertyDescriptor>
+      <ns:PropertyDescriptor>
+        <ns:PropertyURI>urn:lsid:${LSIDAuthority}:AssayDomain-Batch.Folder-${Container.RowId}:Multi+Sample+Assay#TargetStudy</ns:PropertyURI>
+        <ns:Name>TargetStudy</ns:Name>
+        <ns:Required>false</ns:Required>
+        <ns:Hidden>false</ns:Hidden>
+        <ns:ShownInInsertView>true</ns:ShownInInsertView>
+        <ns:ShownInUpdateView>true</ns:ShownInUpdateView>
+        <ns:ShownInDetailsView>true</ns:ShownInDetailsView>
+        <ns:RangeURI>http://www.w3.org/2001/XMLSchema#string</ns:RangeURI>
+        <ns:Label>Target Study</ns:Label>
+        <ns:MvEnabled>false</ns:MvEnabled>
+        <ns:DefaultType>LastEntered</ns:DefaultType>
+        <ns:Measure>false</ns:Measure>
+        <ns:Dimension>false</ns:Dimension>
+        <ns:RecommendedVariable>false</ns:RecommendedVariable>
+        <ns:Scale>4000</ns:Scale>
+      </ns:PropertyDescriptor>
+    </ns:Domain>
+    <ns:Domain>
+      <ns:Name>Multi Sample Assay Run Fields</ns:Name>
+      <ns:DomainURI>urn:lsid:${LSIDAuthority}:AssayDomain-Run.Folder-${Container.RowId}:Multi+Sample+Assay</ns:DomainURI>
+      <ns:Description>Define the run fields for this assay design. The user is prompted for these fields once per run and they will be applied to all rows in the run.</ns:Description>
+    </ns:Domain>
+    <ns:Domain>
+      <ns:Name>Multi Sample Assay Data Fields</ns:Name>
+      <ns:DomainURI>urn:lsid:${LSIDAuthority}:AssayDomain-Data.Folder-${Container.RowId}:Multi+Sample+Assay</ns:DomainURI>
+      <ns:Description>Define the results fields for this assay design. The user is prompted for these fields for individual rows within the imported run, typically done as a file upload.</ns:Description>
+      <ns:PropertyDescriptor>
+        <ns:PropertyURI>urn:lsid:${LSIDAuthority}:AssayDomain-Data.Folder-${Container.RowId}:Multi+Sample+Assay#textField</ns:PropertyURI>
+        <ns:Name>textField</ns:Name>
+        <ns:Required>false</ns:Required>
+        <ns:Hidden>false</ns:Hidden>
+        <ns:ShownInInsertView>true</ns:ShownInInsertView>
+        <ns:ShownInUpdateView>true</ns:ShownInUpdateView>
+        <ns:ShownInDetailsView>true</ns:ShownInDetailsView>
+        <ns:RangeURI>http://www.w3.org/2001/XMLSchema#string</ns:RangeURI>
+        <ns:MvEnabled>false</ns:MvEnabled>
+        <ns:DefaultType>LastEntered</ns:DefaultType>
+        <ns:Measure>false</ns:Measure>
+        <ns:Dimension>false</ns:Dimension>
+        <ns:RecommendedVariable>false</ns:RecommendedVariable>
+        <ns:Scale>4000</ns:Scale>
+      </ns:PropertyDescriptor>
+      <ns:PropertyDescriptor>
+        <ns:PropertyURI>urn:lsid:${LSIDAuthority}:AssayDomain-Data.Folder-${Container.RowId}:Multi+Sample+Assay#intField</ns:PropertyURI>
+        <ns:Name>intField</ns:Name>
+        <ns:Required>false</ns:Required>
+        <ns:Hidden>false</ns:Hidden>
+        <ns:ShownInInsertView>true</ns:ShownInInsertView>
+        <ns:ShownInUpdateView>true</ns:ShownInUpdateView>
+        <ns:ShownInDetailsView>true</ns:ShownInDetailsView>
+        <ns:RangeURI>http://www.w3.org/2001/XMLSchema#int</ns:RangeURI>
+        <ns:MvEnabled>false</ns:MvEnabled>
+        <ns:DefaultType>LastEntered</ns:DefaultType>
+        <ns:Measure>true</ns:Measure>
+        <ns:Dimension>false</ns:Dimension>
+        <ns:RecommendedVariable>false</ns:RecommendedVariable>
+      </ns:PropertyDescriptor>
+      <ns:PropertyDescriptor>
+        <ns:PropertyURI>urn:lsid:${LSIDAuthority}:AssayDomain-Data.Folder-${Container.RowId}:Multi+Sample+Assay#doubleField</ns:PropertyURI>
+        <ns:Name>doubleField</ns:Name>
+        <ns:Required>false</ns:Required>
+        <ns:Hidden>false</ns:Hidden>
+        <ns:ShownInInsertView>true</ns:ShownInInsertView>
+        <ns:ShownInUpdateView>true</ns:ShownInUpdateView>
+        <ns:ShownInDetailsView>true</ns:ShownInDetailsView>
+        <ns:RangeURI>http://www.w3.org/2001/XMLSchema#double</ns:RangeURI>
+        <ns:MvEnabled>false</ns:MvEnabled>
+        <ns:DefaultType>LastEntered</ns:DefaultType>
+        <ns:Measure>true</ns:Measure>
+        <ns:Dimension>false</ns:Dimension>
+        <ns:RecommendedVariable>false</ns:RecommendedVariable>
+      </ns:PropertyDescriptor>
+      <ns:PropertyDescriptor>
+        <ns:PropertyURI>urn:lsid:${LSIDAuthority}:AssayDomain-Data.Folder-${Container.RowId}:Multi+Sample+Assay#sample</ns:PropertyURI>
+        <ns:Name>sample1</ns:Name>
+        <ns:Required>false</ns:Required>
+        <ns:Hidden>false</ns:Hidden>
+        <ns:ShownInInsertView>true</ns:ShownInInsertView>
+        <ns:ShownInUpdateView>true</ns:ShownInUpdateView>
+        <ns:ShownInDetailsView>true</ns:ShownInDetailsView>
+        <ns:RangeURI>http://www.w3.org/2001/XMLSchema#int</ns:RangeURI>
+        <ns:ConceptURI>http://www.labkey.org/exp/xml#sample</ns:ConceptURI>
+        <ns:FK>
+          <ns:Query>Materials</ns:Query>
+          <ns:Schema>exp</ns:Schema>
+        </ns:FK>
+        <ns:MvEnabled>false</ns:MvEnabled>
+        <ns:DefaultType>LastEntered</ns:DefaultType>
+        <ns:Measure>false</ns:Measure>
+        <ns:Dimension>true</ns:Dimension>
+        <ns:RecommendedVariable>false</ns:RecommendedVariable>
+      </ns:PropertyDescriptor>
+      <ns:PropertyDescriptor>
+        <ns:PropertyURI>urn:lsid:${LSIDAuthority}:AssayDomain-Data.Folder-${Container.RowId}:Multi+Sample+Assay#sample2</ns:PropertyURI>
+        <ns:Name>sample2</ns:Name>
+        <ns:Required>false</ns:Required>
+        <ns:Hidden>false</ns:Hidden>
+        <ns:ShownInInsertView>true</ns:ShownInInsertView>
+        <ns:ShownInUpdateView>true</ns:ShownInUpdateView>
+        <ns:ShownInDetailsView>true</ns:ShownInDetailsView>
+        <ns:RangeURI>http://www.w3.org/2001/XMLSchema#int</ns:RangeURI>
+        <ns:ConceptURI>http://www.labkey.org/exp/xml#sample</ns:ConceptURI>
+        <ns:FK>
+          <ns:Query>Materials</ns:Query>
+          <ns:Schema>exp</ns:Schema>
+        </ns:FK>
+        <ns:MvEnabled>false</ns:MvEnabled>
+        <ns:DefaultType>LastEntered</ns:DefaultType>
+        <ns:Measure>false</ns:Measure>
+        <ns:Dimension>true</ns:Dimension>
+        <ns:RecommendedVariable>false</ns:RecommendedVariable>
+      </ns:PropertyDescriptor>
+    </ns:Domain>
+  </ns:DomainDefinitions>
+  <ns:ProtocolDefinitions>
+    <ns:Protocol rdf:about="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay">
+      <ns:Name>Multi Sample Assay</ns:Name>
+      <ns:ApplicationType>ExperimentRun</ns:ApplicationType>
+      <ns:MaxInputMaterialPerInstance>1</ns:MaxInputMaterialPerInstance>
+      <ns:MaxInputDataPerInstance>1</ns:MaxInputDataPerInstance>
+      <ns:OutputMaterialType>Material</ns:OutputMaterialType>
+      <ns:OutputDataType>Data</ns:OutputDataType>
+      <ns:ParameterDeclarations>
+        <ns:SimpleVal Name="XarTemplate.ApplicationLSID" OntologyEntryURI="terms.fhcrc.org#XarTemplate.ApplicationLSID" ValueType="String">${RunLSIDBase}:SimpleProtocol.InputStep</ns:SimpleVal>
+        <ns:SimpleVal Name="XarTemplate.ApplicationName" OntologyEntryURI="terms.fhcrc.org#XarTemplate.ApplicationName" ValueType="String">Multi Sample Assay Protocol</ns:SimpleVal>
+      </ns:ParameterDeclarations>
+      <ns:Properties>
+        <ns:SimpleVal Name="QCEnabled" OntologyEntryURI="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay#QCEnabled" ValueType="Boolean">false</ns:SimpleVal>
+        <ns:SimpleVal Name="BackgroundUpload" OntologyEntryURI="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay#BackgroundUpload" ValueType="Boolean">false</ns:SimpleVal>
+        <ns:SimpleVal Name="EditableResults" OntologyEntryURI="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay#EditableResults" ValueType="Boolean">false</ns:SimpleVal>
+        <ns:SimpleVal Name="Multi Sample Assay" OntologyEntryURI="urn:lsid:${LSIDAuthority}:AssayDomain-Run.Folder-${Container.RowId}:Multi+Sample+Assay" ValueType="String">urn:lsid:${LSIDAuthority}:AssayDomain-Run.Folder-${Container.RowId}:Multi+Sample+Assay</ns:SimpleVal>
+        <ns:SimpleVal Name="Multi Sample Assay" OntologyEntryURI="urn:lsid:${LSIDAuthority}:AssayDomain-Data.Folder-${Container.RowId}:Multi+Sample+Assay" ValueType="String">urn:lsid:${LSIDAuthority}:AssayDomain-Data.Folder-${Container.RowId}:Multi+Sample+Assay</ns:SimpleVal>
+        <ns:SimpleVal Name="SaveScriptFiles" OntologyEntryURI="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay#SaveScriptFiles" ValueType="Boolean">false</ns:SimpleVal>
+        <ns:SimpleVal Name="EditableRuns" OntologyEntryURI="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay#EditableRuns" ValueType="Boolean">false</ns:SimpleVal>
+        <ns:SimpleVal Name="Multi Sample Assay" OntologyEntryURI="urn:lsid:${LSIDAuthority}:AssayDomain-Batch.Folder-${Container.RowId}:Multi+Sample+Assay" ValueType="String">urn:lsid:${LSIDAuthority}:AssayDomain-Batch.Folder-${Container.RowId}:Multi+Sample+Assay</ns:SimpleVal>
+      </ns:Properties>
+    </ns:Protocol>
+    <ns:Protocol rdf:about="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay.Core">
+      <ns:Name>Multi Sample Assay - Core</ns:Name>
+      <ns:ApplicationType>ProtocolApplication</ns:ApplicationType>
+      <ns:OutputMaterialType>Material</ns:OutputMaterialType>
+      <ns:OutputDataType>Data</ns:OutputDataType>
+      <ns:ParameterDeclarations>
+        <ns:SimpleVal Name="ApplicationLSIDTemplate" OntologyEntryURI="terms.fhcrc.org#XarTemplate.ApplicationLSID" ValueType="String">${RunLSIDBase}:SimpleProtocol.CoreStep</ns:SimpleVal>
+        <ns:SimpleVal Name="ApplicationName" OntologyEntryURI="terms.fhcrc.org#XarTemplate.ApplicationName" ValueType="String">Multi Sample Assay</ns:SimpleVal>
+      </ns:ParameterDeclarations>
+    </ns:Protocol>
+    <ns:Protocol rdf:about="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay.Output">
+      <ns:Name>Multi Sample Assay - Output</ns:Name>
+      <ns:ApplicationType>ExperimentRunOutput</ns:ApplicationType>
+      <ns:OutputMaterialType>Material</ns:OutputMaterialType>
+      <ns:OutputDataType>Data</ns:OutputDataType>
+      <ns:ParameterDeclarations>
+        <ns:SimpleVal Name="ApplicationLSIDTemplate" OntologyEntryURI="terms.fhcrc.org#XarTemplate.ApplicationLSID" ValueType="String">${RunLSIDBase}:SimpleProtocol.OutputStep</ns:SimpleVal>
+        <ns:SimpleVal Name="ApplicationName" OntologyEntryURI="terms.fhcrc.org#XarTemplate.ApplicationName" ValueType="String">Multi Sample Assay output</ns:SimpleVal>
+      </ns:ParameterDeclarations>
+    </ns:Protocol>
+  </ns:ProtocolDefinitions>
+  <ns:ProtocolActionDefinitions>
+    <ns:ProtocolActionSet ParentProtocolLSID="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay">
+      <ns:ProtocolAction ActionSequence="1" ChildProtocolLSID="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay">
+        <ns:PredecessorAction ActionSequenceRef="1"/>
+      </ns:ProtocolAction>
+      <ns:ProtocolAction ActionSequence="10" ChildProtocolLSID="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay.Core">
+        <ns:PredecessorAction ActionSequenceRef="1"/>
+      </ns:ProtocolAction>
+      <ns:ProtocolAction ActionSequence="20" ChildProtocolLSID="urn:lsid:${LSIDAuthority}:GeneralAssayProtocol.Folder-${Container.RowId}:Multi+Sample+Assay.Output">
+        <ns:PredecessorAction ActionSequenceRef="10"/>
+      </ns:ProtocolAction>
+    </ns:ProtocolActionSet>
+  </ns:ProtocolActionDefinitions>
+</ns:ExperimentArchive>
