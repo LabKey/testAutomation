@@ -211,8 +211,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.getField("deleteMe")
-                .clickRemoveField()
-                .dismiss("Yes, Remove Field");
+                .clickRemoveField(true);
         domainDesignerPage.clickFinish();
 
         GetDomainCommand domainCommand = new GetDomainCommand("exp.materials", sampleSet);
@@ -401,14 +400,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
+        // first, delete 'name' column and 'color'
         DomainFieldRow nameRow = domainFormPanel.getField("name");
-        // first, delete 'name' column
-        nameRow.clickRemoveField()
-                .dismiss("Yes, Remove Field");
-
+        nameRow.clickRemoveField(true);
         DomainFieldRow colorRow = domainFormPanel.getField("color");
-        colorRow.clickRemoveField()
-                .dismiss("Yes, Remove Field");
+        colorRow.clickRemoveField(true);
         domainDesignerPage.clickFinish();
 
         // there should just be the key field (id) now:
@@ -446,8 +442,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // confirm the UI shows its expected 'required' status
         assertEquals(true, nameRow.getRequiredField());
 
-        nameRow.clickRemoveField()
-                .dismiss("Yes, Remove Field");
+        nameRow.clickRemoveField(true);
         domainDesignerPage.clickFinish();
     }
 

@@ -106,9 +106,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFormPanel removeField(String name, boolean confirmDialogExpected)
     {
         getWrapper().log("attempting to remove field " + name);
-        ModalDialog confirmRemoveDlg = getField(name).clickRemoveField(confirmDialogExpected);
-        if (confirmDialogExpected)
-            confirmRemoveDlg.dismiss("Yes, Remove Field");
+        getField(name).clickRemoveField(confirmDialogExpected);
         clearElementCache();
         return this;
     }

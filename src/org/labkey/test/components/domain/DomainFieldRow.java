@@ -132,44 +132,20 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     }
 
     /**
-     * begins the process of removing the field
-     *
-     * @return a modal dialog prompting the user to confirm or cancel deletion
-     */
-    public ModalDialog clickRemoveField()
-    {
-        return clickRemoveField(true);
-    }
-
-    /**
-     * begins the process of removing the field
+     * Remove the field from the domain designer.
      * @param confirmDialogExpected boolean indicating if this field removal expects a confirm dialog
-     * @return a modal dialog prompting the user to confirm or cancel deletion
      */
-    public ModalDialog clickRemoveField(boolean confirmDialogExpected)
+    public void clickRemoveField(boolean confirmDialogExpected)
     {
         getWrapper().mouseOver(elementCache().removeField);
+        elementCache().removeField.click();
 
-        // re-try until the dialog appears or until attempts are exhausted
-        for (int i=0; i < 3; i++)
+        if (confirmDialogExpected)
         {
-            try
-            {
-                elementCache().removeField.click();
-
-                if (!confirmDialogExpected)
-                    return null;
-
-                new ModalDialog.ModalDialogFinder(getDriver())
-                        .withTitle("Confirm Remove Field").timeout(1000).waitFor();
-                break;
-            }
-            catch (NoSuchElementException notFound) {}
+            ModalDialog confirmDialog = new ModalDialog.ModalDialogFinder(getDriver())
+                    .withTitle("Confirm Remove Field").timeout(1000).waitFor();
+            confirmDialog.dismiss("Yes, Remove Field");
         }
-
-        ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver())
-                .withTitle("Confirm Remove Field").find();
-        return confirmDeletionDlg;
     }
 
     public AdvancedSettingsDialog clickAdvancedSettings()
