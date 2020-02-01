@@ -8,7 +8,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.pages.samplemanagement.search.SearchResultsPage;
+import org.labkey.test.util.search.HasSearchResults;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -41,11 +41,11 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         return elementCache().headerLogo.getAttribute("src");
     }
 
-    public SearchResultsPage searchFor(String searchString)
+    public HasSearchResults searchFor(String searchString)
     {
         elementCache().searchBox.set(searchString);
         elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
-        return new SearchResultsPage(getDriver());
+        return null;
     }
 
     public String getDisplayedProjectName()
