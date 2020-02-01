@@ -61,6 +61,7 @@ public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements> im
         return elementCache().getFolderSearchResultsPanel();
     }
 
+    @Override
     public List<WebElement> getResults()
     {
         return elementCache().searchResultCards();
@@ -106,6 +107,7 @@ public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements> im
         return this;
     }
 
+    @Override
     public boolean hasResultLocatedBy(Locator resultLoc)
     {
         boolean inResultsPanel = getResultsPanel().map(resultLoc::existsIn).orElse(false);
