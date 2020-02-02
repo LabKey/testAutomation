@@ -133,12 +133,12 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         }
     }
 
-    public DomainFormPanel removeAllFields()
+    public DomainFormPanel removeAllFields(boolean confirmDialogExpected)
     {
         List<String> fieldNames = fieldNames();
         for (String name : fieldNames)
         {
-            removeField(name);
+            removeField(name, confirmDialogExpected);
         }
         return this;
     }

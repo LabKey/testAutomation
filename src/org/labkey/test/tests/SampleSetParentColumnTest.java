@@ -708,7 +708,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         String errorMsgExpectedTxt = "'" + GOOD_PARENT_NAME + "' is a reserved field name in '" + SAMPLE_SET_NAME + "'.";
         Assert.assertThat("Error message", errorMsgLocator.findElement(getDriver()).getText(), CoreMatchers.containsString(errorMsgExpectedTxt));
 
-        domainDesignerPage.fieldsPanel().removeField(GOOD_PARENT_NAME);
+        domainDesignerPage.fieldsPanel().removeField(GOOD_PARENT_NAME, false);
         domainDesignerPage.clickFinish();
 
         log("Validated name conflicts.");
