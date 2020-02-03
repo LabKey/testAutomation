@@ -132,31 +132,20 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     }
 
     /**
-     * begins the process of removing the field
-     *
-     * @return a modal dialog prompting the user to confirm or cancel deletion
+     * Remove the field from the domain designer.
+     * @param confirmDialogExpected boolean indicating if this field removal expects a confirm dialog
      */
-    public ModalDialog clickRemoveField()
+    public void clickRemoveField(boolean confirmDialogExpected)
     {
-        expand();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().removeFieldBtn));
-        getWrapper().mouseOver(elementCache().removeFieldBtn);
+        getWrapper().mouseOver(elementCache().removeField);
+        elementCache().removeField.click();
 
-        // re-try until the dialog appears or until attempts are exhausted
-        for (int i=0; i < 3; i++)
+        if (confirmDialogExpected)
         {
-            try
-            {
-                elementCache().removeFieldBtn.click();
-                new ModalDialog.ModalDialogFinder(getDriver())
-                        .withTitle("Confirm Field Deletion").timeout(1000).waitFor();
-                break;
-            }catch (NoSuchElementException notFound) {}
+            ModalDialog confirmDialog = new ModalDialog.ModalDialogFinder(getDriver())
+                    .withTitle("Confirm Remove Field").timeout(1000).waitFor();
+            confirmDialog.dismiss("Yes, Remove Field");
         }
-
-        ModalDialog confirmDeletionDlg = new ModalDialog.ModalDialogFinder(getDriver())
-                .withTitle("Confirm Field Deletion").find();
-        return confirmDeletionDlg;
     }
 
     public AdvancedSettingsDialog clickAdvancedSettings()
@@ -695,13 +684,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .child(Locator.tagWithClassContaining("svg", "fa-plus-square"));
         public Locator collapseToggleLoc = Locator.tagWithClass("div", "field-icon")
                 .child(Locator.tagWithClassContaining("svg",  "fa-minus-square"));
-
         public WebElement expandToggle = expandToggleLoc.findWhenNeeded(this);
 
+        public Locator removeFieldLoc = Locator.tagWithClass("span", "field-icon")
+                .child(Locator.tagWithClassContaining("svg", "domain-field-delete-icon"));
+        public WebElement removeField = removeFieldLoc.findWhenNeeded(this);
 
         // controls revealed when expanded
-        public WebElement removeFieldBtn = Locator.tagWithAttributeContaining("button", "id", "domainpropertiesrow-delete-")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement advancedSettingsBtn = Locator.button("Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement collapseToggle = collapseToggleLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
