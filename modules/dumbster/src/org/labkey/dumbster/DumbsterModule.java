@@ -28,35 +28,39 @@ import org.labkey.api.view.WebPartView;
 import org.labkey.dumbster.model.DumbsterManager;
 import org.labkey.dumbster.view.MailWebPart;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 public class DumbsterModule extends CodeOnlyModule
 {
+    @Override
     public String getName()
     {
         return "Dumbster";
     }
 
+    @Override
     protected void init()
     {
         addController("dumbster", DumbsterController.class);
         DumbsterManager.setInstance(new DumbsterManager());
     }
 
+    @Override
     @NotNull
     protected Collection<WebPartFactory> createWebPartFactories()
     {
-        return new ArrayList<>(Arrays.asList(new BaseWebPartFactory("Mail Record")
+        return List.of(new BaseWebPartFactory("Mail Record")
         {
+            @Override
             public WebPartView getWebPartView(@NotNull ViewContext portalCtx, @NotNull Portal.WebPart webPart)
             {
                 return new MailWebPart();
             }
-        }));
+        });
     }
 
+    @Override
     public void doStartup(ModuleContext moduleContext)
     {
         if (AppProps.getInstance().isMailRecorderEnabled())
