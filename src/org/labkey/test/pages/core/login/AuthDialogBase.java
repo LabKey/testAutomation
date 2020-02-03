@@ -61,8 +61,9 @@ public abstract class AuthDialogBase<T extends AuthDialogBase<T>> extends ModalD
         return elementCache().enableToggle.get();
     }
 
-    public T clickButtonExpectingError(String buttonText)
+    public T clickApplyExpectingError()
     {
+        String buttonText = _row == null ? "Finish" : "Apply";
         Locators.dismissButton(buttonText).waitForElement(this, 2000).click();
         return getThis();
     }
@@ -73,10 +74,8 @@ public abstract class AuthDialogBase<T extends AuthDialogBase<T>> extends ModalD
      */
     public LoginConfigRow clickApply()
     {
-        String description= getDescription();
-        Locator.findAnyElement("Finish or Apply button", this,
-                Locators.dismissButton("Finish"), Locators.dismissButton("Apply")).click();
-        waitForClose(4);
+        String description = getDescription();
+        dismiss(_row == null ? "Finish" : "Apply");
         return new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor();
     }
 

@@ -4,6 +4,7 @@ import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.params.login.DatabaseAuthenticationProvider;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebDriver;
@@ -30,23 +31,26 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
         else return PasswordStrength.Strong;
     }
 
-    public DatabaseAuthConfigureDialog setPasswordStrength(PasswordStrength desiredStrength)
+    public DatabaseAuthConfigureDialog setPasswordStrength(PasswordStrength newStrength)
     {
-        if (getPasswordStrength().equals(desiredStrength))
+        currentStrength = newStrength;
+        if (getPasswordStrength().equals(newStrength))
             return this;
+
+        if (newStrength.equals(PasswordStrength.Strong))
+            elementCache().strongButton.click();
         else
-            if (desiredStrength.equals(PasswordStrength.Strong))
-                elementCache().strongButton.click();
-            else
-                elementCache().weakButton.click();
-        WebDriverWrapper.waitFor(()-> getPasswordStrength().equals(desiredStrength),
-                "the password strength was not set to desired state ["+desiredStrength.toString()+"] in time", 1000);
+            elementCache().weakButton.click();
+
+        WebDriverWrapper.waitFor(()-> getPasswordStrength().equals(newStrength),
+                "the password strength was not set to desired state ["+newStrength.toString()+"] in time", 1000);
         return this;
     }
 
     public DatabaseAuthConfigureDialog setPasswordExpiration(PasswordExpiration expiration)
     {
         elementCache().passwordExpirationSelect.selectOption(expiration);
+        currentExpiration = expiration;
         return this;
     }
 
@@ -58,6 +62,11 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     @Override
     public LoginConfigRow clickApply()
     {
+        if (oldExpiration == null)
+            oldExpiration = currentExpiration;
+        if (oldStrength == null)
+            oldStrength = currentStrength;
+
         Locator.findAnyElement("Finish or Apply button", this,
                 Locators.dismissButton("Finish"), Locators.dismissButton("Apply")).click();
         waitForClose(4);
@@ -68,29 +77,8 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     @LogMethod
     public void setDbLoginConfig(@LoggedParam PasswordStrength newStrength, PasswordExpiration newExpiration)
     {
-        PasswordStrength curStrength = null;
-        PasswordExpiration curExpiration = null;
-
-        if (oldStrength == null || oldExpiration == null)
-        {
-            curStrength = getPasswordStrength();
-            curExpiration = getPasswordExpiration();
-        }
-
-        if ( newStrength != null && curStrength != newStrength)
-        {
-            if (oldStrength == null)
-                oldStrength = curStrength;
-            setPasswordStrength(newStrength);
-        }
-
-        if ( newExpiration != null && curExpiration != newExpiration)
-        {
-            if (oldExpiration == null)
-                oldExpiration = curExpiration;
-            setPasswordExpiration(newExpiration);
-        }
-
+        setPasswordStrength(newStrength);
+        setPasswordExpiration(newExpiration);
         clickApply();
     }
 
@@ -133,7 +121,9 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     }
 
     private static PasswordStrength oldStrength = null;
+    private PasswordStrength currentStrength = null;
     private static PasswordExpiration oldExpiration = null;
+    private PasswordExpiration currentExpiration = null;
 
     @Override
     protected DatabaseAuthConfigureDialog getThis()

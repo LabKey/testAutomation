@@ -32,8 +32,8 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
-import org.labkey.test.pages.core.login.DatabaseAuthenticationProvider;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
+import org.labkey.test.params.login.DatabaseAuthenticationProvider;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
@@ -227,7 +227,8 @@ public class SecurityTest extends BaseWebDriverTest
         LoginConfigurePage.beginAt(this)
                 .getPrimaryConfigurationRow("Standard database authentication")
                 .clickEdit(new DatabaseAuthenticationProvider())
-                .setDbLoginConfig(DatabaseAuthConfigureDialog.PasswordStrength.Weak.Weak, null);
+                .setDbLoginConfig(DatabaseAuthConfigureDialog.PasswordStrength.Weak,
+                        DatabaseAuthConfigureDialog.PasswordExpiration.Never);
 
         //get user a password
         String username = NORMAL_USER;

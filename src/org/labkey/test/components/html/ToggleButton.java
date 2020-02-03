@@ -43,19 +43,7 @@ public class ToggleButton extends WebDriverComponent<ToggleButton.ElementCache>
     {
         return !getComponentElement().getAttribute("class").contains("off");
     }
-
-
-    @Override
-    protected ElementCache newElementCache()
-    {
-        return new ElementCache();
-    }
-
-
-    protected class ElementCache extends WebDriverComponent.ElementCache
-    {
-
-    }
+    
 
     public static class ToggleButtonFinder extends WebDriverComponentFinder<ToggleButton, ToggleButtonFinder>
     {

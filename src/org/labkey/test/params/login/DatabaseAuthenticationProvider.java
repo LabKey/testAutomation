@@ -1,6 +1,7 @@
-package org.labkey.test.pages.core.login;
+package org.labkey.test.params.login;
 
-import org.labkey.test.params.login.AuthenticationProvider;
+import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
+import org.labkey.test.pages.core.login.LoginConfigRow;
 import org.openqa.selenium.WebDriver;
 
 public class DatabaseAuthenticationProvider extends AuthenticationProvider<DatabaseAuthConfigureDialog>

@@ -197,7 +197,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement analyticsSettingsLink = Locator.linkWithText("analytics settings").findWhenNeeded(this);
         protected WebElement externalRedirectHostLink = Locator.linkWithText("External Redirect Hosts").findElement(this);
         protected WebElement auditLogLink = Locator.linkWithText("audit log").findWhenNeeded(this);
-        protected WebElement authenticationLink = Locator.linkWithText("authentication (deprecated)").findWhenNeeded(this);
+        protected WebElement authenticationLink = Locator.linkWithText("authentication").findWhenNeeded(this);
         protected WebElement configurePageElements = Locator.linkWithText("configure page elements").findWhenNeeded(this);
         protected WebElement emailCustomizationLink = Locator.linkWithText("email customization").findWhenNeeded(this);
         protected WebElement notificationServiceAdminLink = Locator.linkWithText("notification service admin").findWhenNeeded(this);
