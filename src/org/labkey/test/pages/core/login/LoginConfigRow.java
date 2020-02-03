@@ -2,6 +2,7 @@ package org.labkey.test.pages.core.login;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -37,7 +38,8 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
     {
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().deleteButton));
         elementCache().deleteButton.click();
-        getWrapper().acceptAlert();
+        new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Warning")
+                .waitFor().dismiss("Yes");
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
         return new LoginConfigurePage(getDriver());
     }
