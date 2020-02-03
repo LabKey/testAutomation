@@ -2113,7 +2113,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Remove the attachment columns and validate that everything still works.");
         clickFolder(FOLDER_NAME);
         DomainDesignerPage domainDesignerPage = sampleHelper.goToEditSampleSetFields(sampleSetName);
-        domainDesignerPage.fieldsPanel().removeField("FileAttachment");
+        domainDesignerPage.fieldsPanel().removeField("FileAttachment", true);
         domainDesignerPage.clickFinish();
 
         expectedHeaders.remove("File Attachment");

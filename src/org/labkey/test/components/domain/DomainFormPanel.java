@@ -100,7 +100,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFormPanel removeField(String name)
     {
-        return  removeField(name, true);
+        return  removeField(name, false);
     }
 
     public DomainFormPanel removeField(String name, boolean confirmDialogExpected)

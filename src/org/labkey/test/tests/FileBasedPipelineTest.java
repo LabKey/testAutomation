@@ -175,10 +175,10 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", "myassay");
         DomainFormPanel dataFields = assayDesignerPage.goToResultsFields()
-                .removeField("Date", false)
-                .removeField("VisitID", false)
-                .removeField("ParticipantID", false)
-                .removeField("SpecimenID", false);
+                .removeField("Date")
+                .removeField("VisitID")
+                .removeField("ParticipantID")
+                .removeField("SpecimenID");
         dataFields.startNewDesign("Name"); // field defaults to type String
         dataFields.addField("Age").setType(FieldDefinition.ColumnType.Integer);
         assayDesignerPage.clickFinish();

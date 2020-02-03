@@ -299,7 +299,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinishExpectingError();
 
         assertTrue("field should report error if saved without a name", noNameRow.hasFieldError());
-        assertEquals("New field. Error: Please provide a name for each field.", noNameRow.detailsMessage());
+        assertTrue(noNameRow.detailsMessage().contains("New field. Error: Please provide a name for each field."));
         WebElement errorDiv = domainDesignerPage.errorAlert();
         assertNotNull(errorDiv);
         String hasNoNameError = domainDesignerPage.waitForError();
@@ -309,7 +309,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String warningFieldMessage = noNameRow.setName("&has weird characters that make scripts hard to write")
                 .waitForWarning()
                 .detailsMessage();
-        String expectedWarning = "New field. Warning: SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore";
+        String expectedWarning = "New field. Warning: Field name contains special characters.";
         assertThat("expected error", warningFieldMessage, containsString(expectedWarning));
 
         domainDesignerPage.clickCancelAndDiscardChanges();
@@ -517,7 +517,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow clientFieldWarning = domainFormPanel.addField("select * from table");
 
         domainDesignerPage.clickFinishExpectingError();
-        String expectedWarnMsg = "New field. Warning: SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore.";
+        String expectedWarnMsg = "New field. Warning: Field name contains special characters.";
         String blargErrMsg = "New field. Error: The field name 'blarg' is already taken. Please provide a unique name for each field.";
         String reservedErrMsg = "New field. Error: 'modified' is a reserved field name in 'fieldsWithReservedNamesSampleSet'.";
         String modRowDetailsMsg = modifiedRow.waitForError()
