@@ -301,7 +301,7 @@ public class ViabilityTest extends AbstractViabilityTest
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign(true);
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
-        assayDesignerPage.expandFieldsPanel("Batch").removeField("TargetStudy");
+        assayDesignerPage.expandFieldsPanel("Batch").removeField("TargetStudy", true);
         assayDesignerPage.expandFieldsPanel("Result").addField(new FieldDefinition("TargetStudy").setLabel("Target Study").setType(FieldDefinition.ColumnType.String));
         assayDesignerPage.clickFinish();
 

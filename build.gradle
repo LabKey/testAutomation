@@ -32,7 +32,12 @@ project.dependencies {
     compile "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
 }
 
-BuildUtils.addLabKeyDependency(project: project, config: 'uiTestImplementation', depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle), depVersion: project.labkeyVersion)
+BuildUtils.addLabKeyDependency(
+        project: project,
+        config: 'uiTestImplementation',
+        depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle),
+        depProjectConfig: 'default',
+        depVersion: project.labkeyVersion)
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 {

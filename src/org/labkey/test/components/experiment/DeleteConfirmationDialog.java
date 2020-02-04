@@ -45,6 +45,12 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
         return _confirmPageSupplier.get();
     }
 
+    public ConfirmPage confirmPermanentlyDelete()
+    {
+        this.dismiss("Yes, Permanently Delete");
+        return _confirmPageSupplier.get();
+    }
+
     public SourcePage clickDismiss()
     {
         this.dismiss("Dismiss");

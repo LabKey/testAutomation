@@ -25,6 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.ManageDatasetsPage;
@@ -433,30 +434,31 @@ public class StudyHelper
         return new ManageVisitPage(_test.getDriver());
     }
 
-    public PropertiesEditor goToEditSpecimenProperties()
+    public DomainDesignerPage goToEditSpecimenProperties()
     {
         return goToEditSpecimenProperties(SpecimenPropertyEditors.SPECIMEN_EVENT);
     }
 
-    public PropertiesEditor goToEditSpecimenProperties(SpecimenPropertyEditors editor)
+    public DomainDesignerPage goToEditSpecimenProperties(SpecimenPropertyEditors editor)
     {
-        String editorTitle;
+        _test.goToManageStudy();
+
         switch(editor)
         {
             case VIAL:
-                editorTitle = "Vial";
+                _test.waitAndClickAndWait(Locator.linkWithText("Edit Vial fields"));
                 break;
             case SPECIMEN:
-                editorTitle = "Specimen";
+                _test.waitAndClickAndWait(Locator.linkWithText("Edit Specimen fields"));
                 break;
             case SPECIMEN_EVENT:
             default:
-                editorTitle = "SpecimenEvent";
+                _test.waitAndClickAndWait(Locator.linkWithText("Edit Specimen Event fields"));
         }
 
-        _test.goToManageStudy();
-        _test.waitAndClickAndWait(Locator.linkWithText("Edit specimen properties"));
-        return PropertiesEditor.PropertiesEditor(_test.getDriver()).withTitleContaining(editorTitle).waitFor();
+        DomainDesignerPage designerPage = new DomainDesignerPage(_test.getDriver());
+
+        return designerPage;
     }
 
     public static String getStudySampleDataPath()

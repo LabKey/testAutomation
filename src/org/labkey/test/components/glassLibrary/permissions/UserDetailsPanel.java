@@ -42,7 +42,7 @@ public class UserDetailsPanel extends WebDriverComponent<Component<?>.ElementCac
 
     public String getSelectedUser()
     {
-        return Locator.byClass("permissions-title-primary")
+        return Locator.byClass("principal-title-primary")
                 .findOptionalElement(this)
                 .map(WebElement::getText).orElse(null);
     }

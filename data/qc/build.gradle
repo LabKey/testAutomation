@@ -23,7 +23,7 @@ project.task('validatorJar',
             from sourceSets.main.output
             from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
             duplicatesStrategy = 'exclude'
-            archiveBaseName.set( "validator.jar")
+            archiveFileName.set("validator.jar")
             destinationDirectory = project.projectDir
             manifest {
                 attributes 'Implementation-Title': 'Assay Validator Jar',
@@ -43,7 +43,7 @@ project.task('transformJar',
             from sourceSets.main.output
             from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
             duplicatesStrategy = 'exclude'
-            archiveBaseName.set("transform.jar")
+            archiveFileName.set("transform.jar")
             destinationDirectory = project.projectDir
             manifest {
             attributes 'Implementation-Title': 'Assay Validator Jar',
@@ -62,7 +62,7 @@ project.task('transformWarningJar',
             from sourceSets.main.output
             from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
             duplicatesStrategy = 'exclude'
-            archiveBaseName.set("transformWarning.jar")
+            archiveFileName.set("transformWarning.jar")
             destinationDirectory = project.projectDir
             manifest {
             attributes 'Implementation-Title': 'Assay Validator Jar',

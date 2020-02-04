@@ -211,8 +211,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.getField("deleteMe")
-                .clickRemoveField()
-                .dismiss("Yes, Remove Field");
+                .clickRemoveField(true);
         domainDesignerPage.clickFinish();
 
         GetDomainCommand domainCommand = new GetDomainCommand("exp.materials", sampleSet);
@@ -300,7 +299,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinishExpectingError();
 
         assertTrue("field should report error if saved without a name", noNameRow.hasFieldError());
-        assertEquals("New field. Error: Please provide a name for each field.", noNameRow.detailsMessage());
+        assertTrue(noNameRow.detailsMessage().contains("New field. Error: Please provide a name for each field."));
         WebElement errorDiv = domainDesignerPage.errorAlert();
         assertNotNull(errorDiv);
         String hasNoNameError = domainDesignerPage.waitForError();
@@ -310,7 +309,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String warningFieldMessage = noNameRow.setName("&has weird characters that make scripts hard to write")
                 .waitForWarning()
                 .detailsMessage();
-        String expectedWarning = "New field. Warning: SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore";
+        String expectedWarning = "New field. Warning: Field name contains special characters.";
         assertThat("expected error", warningFieldMessage, containsString(expectedWarning));
 
         domainDesignerPage.clickCancelAndDiscardChanges();
@@ -401,14 +400,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
+        // first, delete 'name' column and 'color'
         DomainFieldRow nameRow = domainFormPanel.getField("name");
-        // first, delete 'name' column
-        nameRow.clickRemoveField()
-                .dismiss("Yes, Remove Field");
-
+        nameRow.clickRemoveField(true);
         DomainFieldRow colorRow = domainFormPanel.getField("color");
-        colorRow.clickRemoveField()
-                .dismiss("Yes, Remove Field");
+        colorRow.clickRemoveField(true);
         domainDesignerPage.clickFinish();
 
         // there should just be the key field (id) now:
@@ -446,8 +442,30 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // confirm the UI shows its expected 'required' status
         assertEquals(true, nameRow.getRequiredField());
 
-        nameRow.clickRemoveField()
-                .dismiss("Yes, Remove Field");
+        nameRow.clickRemoveField(true);
+        domainDesignerPage.clickFinish();
+    }
+
+    @Test
+    public void testDeleteNewField() throws Exception
+    {
+        String list = "testDeleteNewFieldList";
+
+        // create the list with no fields to start
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo);
+        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+
+        // go to the new domain designer and do some work here
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
+
+        // add a new field and remove it, new fields should not have Confirm Remove Field dialog
+        domainFormPanel.addField("deleteMe")
+            .setLabel("field label test")
+            .setDescription("field description test")
+            .clickRemoveField(false);
+
         domainDesignerPage.clickFinish();
     }
 
@@ -499,7 +517,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow clientFieldWarning = domainFormPanel.addField("select * from table");
 
         domainDesignerPage.clickFinishExpectingError();
-        String expectedWarnMsg = "New field. Warning: SQL queries, R scripts, and other code are easiest to write when field names only contain combination of letters, numbers, and underscores, and start with a letter or underscore.";
+        String expectedWarnMsg = "New field. Warning: Field name contains special characters.";
         String blargErrMsg = "New field. Error: The field name 'blarg' is already taken. Please provide a unique name for each field.";
         String reservedErrMsg = "New field. Error: 'modified' is a reserved field name in 'fieldsWithReservedNamesSampleSet'.";
         String modRowDetailsMsg = modifiedRow.waitForError()
