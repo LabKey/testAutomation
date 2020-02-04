@@ -23,6 +23,10 @@ public class CompactFileUploadField extends WebDriverComponent<CompactFileUpload
 
     public CompactFileUploadField setFile(File file)
     {
+        if (hasAttachedFile())
+        {
+            removeFile();
+        }
         elementCache().logoFileInput.sendKeys(file.getAbsolutePath());
         WebDriverWrapper.waitFor(()-> hasAttachedFile() && getAttachedFileName().equals(file.getName()),
                 "the file did not become attached", 2000);

@@ -81,7 +81,7 @@ public abstract class AuthDialogBase<T extends AuthDialogBase<T>> extends ModalD
 
     public void clickCancel()
     {
-        dismiss("cancel");
+        dismiss("Cancel");
     }
 
     protected abstract T getThis();
