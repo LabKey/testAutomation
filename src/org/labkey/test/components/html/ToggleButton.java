@@ -6,7 +6,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class ToggleButton extends WebDriverComponent<ToggleButton.ElementCache>
+public class ToggleButton extends WebDriverComponent
 {
     final WebElement _el;
     final WebDriver _driver;
