@@ -86,6 +86,7 @@ public class AuthenticationAPIUtils
             List<Map<String, Object>> parsedConfigurations = new ArrayList<>();
             parsedConfigurations.addAll(response.getProperty("ssoConfigurations"));
             parsedConfigurations.addAll(response.getProperty("secondaryConfigurations"));
+            parsedConfigurations.addAll(response.getProperty("formConfigurations"));
 
             List<Configuration> configurations = new ArrayList<>();
             for (Map<String, Object> configMap : parsedConfigurations)
