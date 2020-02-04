@@ -125,7 +125,7 @@ public class UserTest extends BaseWebDriverTest
             DomainFieldRow domainFieldRow = domainFormPanel.getField(field);
             if (domainFieldRow != null)
             {
-                domainFormPanel.removeField(field);
+                domainFormPanel.removeField(field, true);
             }
         }
         domainDesignerPage.clickFinish();
