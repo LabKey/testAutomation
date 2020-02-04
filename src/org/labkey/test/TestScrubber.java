@@ -23,18 +23,16 @@ import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
-import org.labkey.test.pages.core.login.LoginConfigRow;
-import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.login.AuthenticationAPIUtils;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
 
@@ -96,11 +94,9 @@ public class TestScrubber extends ExtraSiteWrapper
         }
 
         try
-        {   // disable any/all secondary auth configurations
-            LoginConfigurePage.beginAt(this).getSecondaryConfigurations()
-                .stream().filter(a -> a.getProvider().equals("TestSecondary"))
-                    .collect(Collectors.toList())
-                    .forEach(LoginConfigRow::clickDelete);
+        {
+            // disable any/all secondary auth configurations
+            AuthenticationAPIUtils.deleteConfigurations("TestSecondary", createDefaultConnection(true));
         }
         catch (RuntimeException e)
         {
