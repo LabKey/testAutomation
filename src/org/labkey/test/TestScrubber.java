@@ -88,7 +88,7 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            DatabaseAuthConfigureDialog.resetDbLoginConfig(this);
+            DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection(true));
         }
         catch (RuntimeException e)
         {

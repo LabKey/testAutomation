@@ -1,14 +1,18 @@
 package org.labkey.test.pages.core.login;
 
-import org.labkey.test.LabKeySiteWrapper;
+import org.json.simple.JSONObject;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.OptionSelect;
-import org.labkey.test.params.login.DatabaseAuthenticationProvider;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.io.IOException;
 
 public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConfigureDialog>
 {
@@ -83,29 +87,24 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     }
 
     @LogMethod
-    public static void resetDbLoginConfig(LabKeySiteWrapper siteWrapper)
+    public static void resetDbLoginConfig(Connection connection)
     {
         if ( oldStrength != null || oldExpiration != null )
         {
-            siteWrapper.ensureSignedInAsPrimaryTestUser();
-            LoginConfigurePage.beginAt(siteWrapper)
-                    .getPrimaryConfigurationRow("Standard database authentication")
-                    .clickEdit(new DatabaseAuthenticationProvider())
-                    .resetDbLoginConfig();
+            JSONObject params = new JSONObject();
+            params.put("expiration", oldExpiration != null ? oldExpiration.name() : PasswordExpiration.Never.name());
+            params.put("strength", oldStrength != null ? oldStrength.name() : PasswordStrength.Strong.name());
+            PostCommand<?> postCommand = new PostCommand<>("login", "SaveDbLoginProperties");
+            postCommand.setJsonObject(params);
+            try
+            {
+                postCommand.execute(connection, "/");
+            }
+            catch (IOException | CommandException e)
+            {
+                throw new RuntimeException(e);
+            }
         }
-    }
-
-    private void resetDbLoginConfig()
-    {
-        if (oldStrength != null)
-            setPasswordStrength(oldStrength);
-        if (oldExpiration != null)
-            setPasswordExpiration(oldExpiration);
-
-        // Back to default.
-        oldStrength = null;
-        oldExpiration = null;
-        clickApply();
     }
 
     public enum PasswordStrength {Weak, Strong}

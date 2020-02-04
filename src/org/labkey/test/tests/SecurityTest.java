@@ -800,7 +800,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertTextNotPresent("Choose a new password.");
 
         stopImpersonating();
-        DatabaseAuthConfigureDialog.resetDbLoginConfig(this);
+        DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection(true));
     }
 
     @LogMethod
