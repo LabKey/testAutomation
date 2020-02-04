@@ -6,7 +6,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class ToggleButton extends WebDriverComponent
+public class ToggleButton extends WebDriverComponent<ToggleButton.ElementCache>
 {
     final WebElement _el;
     final WebDriver _driver;
@@ -43,7 +43,17 @@ public class ToggleButton extends WebDriverComponent
     {
         return !getComponentElement().getAttribute("class").contains("off");
     }
-    
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends WebDriverComponent.ElementCache
+    {
+    }
+
 
     public static class ToggleButtonFinder extends WebDriverComponentFinder<ToggleButton, ToggleButtonFinder>
     {
