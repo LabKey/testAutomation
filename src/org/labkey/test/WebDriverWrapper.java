@@ -1256,6 +1256,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         Alert alert = waitForAlert();
         String text = alert.getText();
         alert.accept();
+        TestLogger.log("Accepted alert: " + text);
         return text;
     }
 
@@ -1264,6 +1265,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         Alert alert = waitForAlert();
         String text = alert.getText();
         alert.dismiss();
+        TestLogger.log("Dismissed alert: " + text);
         return text;
     }
 

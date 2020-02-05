@@ -21,11 +21,12 @@ import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.pages.ConfigureDbLoginPage;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
+import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.login.AuthenticationAPIUtils;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
@@ -85,7 +86,7 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            ConfigureDbLoginPage.resetDbLoginConfig(this);
+            DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection(true));
         }
         catch (RuntimeException e)
         {
@@ -94,7 +95,8 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            disableSecondaryAuthentication();
+            // disable any/all secondary auth configurations
+            AuthenticationAPIUtils.deleteConfigurations("TestSecondary", createDefaultConnection(true));
         }
         catch (RuntimeException e)
         {
