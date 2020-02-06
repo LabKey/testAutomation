@@ -53,6 +53,7 @@ import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -83,6 +84,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -1007,6 +1009,42 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         WebElement menu = Locator.menuBarItem(menuText).findElement(getDriver());
         menu.click();
         return menu;
+    }
+
+    // get the current set of flags and enable those specified by the test properties
+    @LogMethod()
+    public Map<String, Boolean> setExperimentalFlags()
+    {
+        Map<String, Boolean> flagsToSet = TestProperties.getExperimentalFeatures();
+
+        // don't do anything if no flags need be changed
+        if (flagsToSet.isEmpty())
+            return emptyMap();
+
+        Connection cn = createDefaultConnection(false);
+        Map<String, Boolean> previousFlags = ExperimentalFeaturesHelper.getExperimentalFeatures(cn);
+
+        log("Current experimental flags: " + previousFlags);
+        if (previousFlags.isEmpty())
+            return emptyMap();
+
+        log("Enabling experimental flags: " + flagsToSet);
+        var newFlags = ExperimentalFeaturesHelper.setExperimentalFeatures(cn, flagsToSet);
+
+        log("Testing with experimental flags: " + newFlags);
+        return previousFlags;
+    }
+
+    @LogMethod()
+    public void resetExperimentalFlags(Map<String, Boolean> flags)
+    {
+        if (flags == null || flags.isEmpty())
+            return;
+
+        log("Resettings experimental flags: " + flags);
+        Connection cn = createDefaultConnection(false);
+        flags = ExperimentalFeaturesHelper.getExperimentalFeatures(cn);
+        log("Current experimental flags: " + flags);
     }
 
     @LogMethod(quiet = true)

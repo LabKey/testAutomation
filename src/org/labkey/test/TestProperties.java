@@ -15,6 +15,7 @@
  */
 package org.labkey.test;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.TestLogger;
@@ -23,7 +24,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY;
 import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY;
@@ -257,6 +263,28 @@ public abstract class TestProperties
     public static String getAdditionalPipelineTools()
     {
         return System.getProperty("additional.pipeline.tools");
+    }
+
+    public static Map<String, Boolean> getExperimentalFeatures()
+    {
+        Map<String, Boolean> features = new HashMap<>();
+
+        Properties props = System.getProperties();
+        for (Map.Entry<Object, Object> entry : props.entrySet())
+        {
+            String key = String.valueOf(entry.getKey());
+            Boolean value = (entry.getValue() instanceof Boolean)
+                    ? (Boolean)entry.getValue()
+                    : Boolean.valueOf(String.valueOf(entry.getValue()));
+
+            if (key.startsWith("experimental.") && value != null)
+            {
+                String feature = key.substring("experimental.".length());
+                features.put(feature, value);
+            }
+        }
+
+        return features;
     }
 
     private static File dumpDir = null;

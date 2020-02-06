@@ -356,6 +356,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static long testCount;
     private static int currentTestNumber;
 
+    private static Map<String, Boolean> previousExperimentalFlags = Collections.emptyMap();
+
     @ClassRule
     public static RuleChain testClassWatcher()
     {
@@ -574,6 +576,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         signIn();
         Log4jUtils.resetAllLogLevels();
+        previousExperimentalFlags = setExperimentalFlags();
 
         // Start logging JS errors.
         resumeJsErrorChecker();
@@ -1011,6 +1014,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (reenableMiniProfiler)
             setMiniProfilerEnabled(true);
+
+        resetExperimentalFlags(previousExperimentalFlags);
     }
 
     private void waitForPendingRequests(int msWait)

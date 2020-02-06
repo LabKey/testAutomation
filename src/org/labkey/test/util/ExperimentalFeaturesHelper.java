@@ -15,15 +15,19 @@
  */
 package org.labkey.test.util;
 
+import org.json.simple.JSONObject;
+import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
-import org.labkey.test.BaseWebDriverTest;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static java.util.Collections.emptyMap;
 
 public class ExperimentalFeaturesHelper
 {
@@ -60,4 +64,65 @@ public class ExperimentalFeaturesHelper
             throw new RuntimeException("Error setting experimental feature '" + feature + "': " + e.getStatusCode(), e);
         }
     }
+
+    // Get the current experimental flags
+    public static Map<String, Boolean> getExperimentalFeatures(Connection cn)
+    {
+        Command command = new Command("admin", "getExperimentalFeatures.api");
+        try
+        {
+            CommandResponse r = command.execute(cn, null);
+            Map<String, Object> response = r.getParsedData();
+            if (response.containsKey("success") && (Boolean)response.get("success"))
+            {
+                Map<String, Boolean> data = (Map<String, Boolean>)response.get("data");
+                return data;
+            }
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to get experimental features", e);
+        }
+        catch (CommandException e)
+        {
+            TestLogger.log("Unable to get experimental features. Ignoring: " + e.getStatusCode());
+        }
+
+        return emptyMap();
+    }
+
+    // Set the current experimental flags
+    public static Map<String, Boolean> setExperimentalFeatures(Connection cn, Map<String, Boolean> flags)
+    {
+        PostCommand command = new PostCommand("admin", "setExperimentalFeatures.api");
+
+        // don't send apiVersion
+        command.setRequiredVersion(-1);
+
+        JSONObject json = new JSONObject();
+        json.put("flags", flags);
+        command.setJsonObject(json);
+
+        try
+        {
+            CommandResponse r = command.execute(cn, null);
+            Map<String, Object> response = r.getParsedData();
+            if (response.containsKey("success") && (Boolean)response.get("success"))
+            {
+                Map<String, Boolean> data = (Map<String, Boolean>)response.get("data");
+                return data;
+            }
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Error setting experimental features", e);
+        }
+        catch (CommandException e)
+        {
+            throw new RuntimeException("Error setting experimental features" + e.getStatusCode(), e);
+        }
+
+        return emptyMap();
+    }
+
 }
