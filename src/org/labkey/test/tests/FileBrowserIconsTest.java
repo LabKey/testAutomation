@@ -26,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 4 )
 public class FileBrowserIconsTest extends BaseWebDriverTest
 {
-    protected final static String SAMPLE_DATA_LOC =  "/sampledata/fileTypes/";
+    protected final static File SAMPLE_DATA_LOC =  TestFileUtils.getSampleData("fileTypes");
 
     @Override
     public List<String> getAssociatedModules()
@@ -82,7 +83,7 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
 
         log("Use the pipeline to poulate the file browser.");  // It's quicker than uploading each file individually.
         portalHelper.addWebPart("Pipeline Files");
-        setPipelineRoot(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOC);
+        setPipelineRoot(SAMPLE_DATA_LOC.getAbsolutePath());
 
     }
 

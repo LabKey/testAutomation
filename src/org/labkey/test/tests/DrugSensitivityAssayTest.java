@@ -44,13 +44,13 @@ public class DrugSensitivityAssayTest extends AbstractAssayTest
     protected static final String TEST_ASSAY_NAME = "TestAssayDrugSensitivity";
     protected static final String TEST_ASSAY_DESC = "Description for Drug Sensitivity assay";
 
-    protected final String TEST_ASSAY_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/1.txt";
-    protected final String TEST_ASSAY_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/2.txt";
-    protected final String TEST_ASSAY_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/3.txt";
+    protected static final File TEST_ASSAY_FILE1 = TestFileUtils.getSampleData("DrugSensitivity/1.txt");
+    protected static final File TEST_ASSAY_FILE2 = TestFileUtils.getSampleData("DrugSensitivity/2.txt");
+    protected static final File TEST_ASSAY_FILE3 = TestFileUtils.getSampleData("DrugSensitivity/3.txt");
 
-    protected final String TEST_ASSAY_DATA_ACQUISITION_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition1.xlsx";
-    protected final String TEST_ASSAY_DATA_ACQUISITION_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition2.xlsx";
-    protected final String TEST_ASSAY_DATA_ACQUISITION_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition3.xlsx";
+    protected static final File TEST_ASSAY_DATA_ACQUISITION_FILE1 = TestFileUtils.getSampleData("DrugSensitivity/acquisition1.xlsx");
+    protected static final File TEST_ASSAY_DATA_ACQUISITION_FILE2 = TestFileUtils.getSampleData("DrugSensitivity/acquisition2.xlsx");
+    protected static final File TEST_ASSAY_DATA_ACQUISITION_FILE3 = TestFileUtils.getSampleData("DrugSensitivity/acquisition3.xlsx");
 
     @Test
     public void runUITests() throws Exception
@@ -122,7 +122,7 @@ public class DrugSensitivityAssayTest extends AbstractAssayTest
         testCopyToStudy();
     }
 
-    protected void uploadFile(String filePath, String acquisitionFilePath, String ptid, boolean checkRequired)
+    protected void uploadFile(File file, File acquisitionFile, String ptid, boolean checkRequired)
     {
         // cutoff values
         setFormElement(Locator.name("cutoff1"), "50");
@@ -157,13 +157,11 @@ public class DrugSensitivityAssayTest extends AbstractAssayTest
             selectOptionByText(methodLocator, method[i]);
         }
 
-        if (acquisitionFilePath != null)
+        if (acquisitionFile != null)
         {
-            File acquisitionFile = new File(acquisitionFilePath);
             setFormElement(Locator.name("dataAcquisitionFile"), acquisitionFile);
         }
-        File file1 = new File(filePath);
-        setFormElement(Locator.name("__primaryFile__"), file1);
+        setFormElement(Locator.name("__primaryFile__"), file);
 
         clickButton("Save and Finish");
 
