@@ -423,7 +423,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         public ElementCache()
         {

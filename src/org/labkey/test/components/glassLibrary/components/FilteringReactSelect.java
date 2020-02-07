@@ -176,12 +176,13 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         return elementCache().getOptions();
     }
 
+    @Override
     protected ElementCache elementCache()
     {
         return new ElementCache();
     }
 
-    protected class ElementCache extends BaseReactSelect.ElementCache
+    protected class ElementCache extends BaseReactSelect<?>.ElementCache
     {
 
     }
