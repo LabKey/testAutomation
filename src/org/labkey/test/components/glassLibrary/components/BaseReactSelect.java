@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
 
 public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriverComponent<BaseReactSelect.ElementCache>
@@ -42,6 +44,11 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         try
         {
             WebElement selectMenuElement = Locators.selectMenu.findElementOrNull(getComponentElement());
+
+            if((selectMenuElement != null && selectMenuElement.isDisplayed()) && selectMenuElement.getText().toLowerCase().contains("loading"))
+                waitFor(()-> !selectMenuElement.getText().toLowerCase().contains("loading"),
+                        "React Select is stuck loading.", WAIT_FOR_JAVASCRIPT);
+
             return (selectMenuElement != null && selectMenuElement.isDisplayed()) || hasClass("is-open");
         }
         catch (NoSuchElementException | StaleElementReferenceException see)
@@ -129,7 +136,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     {
         // wait for the down-caret to be clickable/interactive
         long start = System.currentTimeMillis();
-        _wrapper.waitFor(this::isInteractive, "The select-box did not become interactive in time", 2000);
+        _wrapper.waitFor(this::isInteractive, "The select-box did not become interactive in time", 2_000);
         long elapsed = System.currentTimeMillis() - start;
         getWrapper().log("waited ["+ elapsed + "] msec for select to become interactive");
 
@@ -166,7 +173,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             _wrapper.fireEvent(elementCache().arrow, WebDriverWrapper.SeleniumEvent.click);
         }
 
-        WebDriverWrapper.waitFor(this::isExpanded, 4000);
+        WebDriverWrapper.waitFor(this::isExpanded, 4_000);
         _wrapper.fireEvent(_componentElement, WebDriverWrapper.SeleniumEvent.blur);
         return (T) this;
     }
@@ -180,9 +187,14 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
         elementCache().arrow.click(); // collapse the options
 
-        WebDriverWrapper.waitFor(()->!isExpanded(), 1000);
+        waitForClosed();
 
         return (T) this;
+    }
+
+    protected void waitForClosed()
+    {
+        WebDriverWrapper.waitFor(()->!isExpanded(), "Select didn't close", 1_000);
     }
 
     public T clearSelection()
@@ -219,11 +231,26 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
     public List<String> getSelections()
     {
-        List<WebElement> selectedItems = Locators.selectedItems.findElements(getComponentElement());
-        List<String> rawItems = _wrapper.getTexts(selectedItems);
 
-        // trim whitespace characters
-        return rawItems.stream().map(String::trim).collect(Collectors.toList());
+        try
+        {
+            // Wait for at least one of the elements to be visible.
+            waitFor(()-> Locators.selectedItems.findElement(getComponentElement()).isDisplayed(), 1_000);
+
+            List<WebElement> selectedItems = Locators.selectedItems.findElements(getComponentElement());
+            List<String> rawItems = _wrapper.getTexts(selectedItems);
+
+            // trim whitespace characters
+            return rawItems.stream().map(String::trim).collect(Collectors.toList());
+        }
+        catch(NoSuchElementException nse)
+        {
+            // If there has been an error and the selection couldn't be loaded the html structure is different.
+            // There should be the placeholder text so get it.
+            WebElement placeHolder = Locators.placeholder.findElement(getComponentElement());
+            return List.of(placeHolder.getText());
+        }
+
     }
 
     /**

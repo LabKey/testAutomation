@@ -53,8 +53,8 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
                 .open()
                 .clickOption(option)
                 .getSelections();
+        waitForClosed();
 
-        assertTrue("Expected '" + option + "' to be selected.  Current selections: " + selections, selections.contains(option));
         return this;
     }
 
