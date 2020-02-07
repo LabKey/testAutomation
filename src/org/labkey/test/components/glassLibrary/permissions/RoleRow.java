@@ -93,7 +93,7 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
     {
         final WebElement rowToggle = Locator.byClass("container-expandable-detail").findWhenNeeded(this);
         final WebElement assignmentsRow = Locator.byClass("permissions-assignments-row").findWhenNeeded(this);
-        final ReactSelect memberSelect = new ReactSelect.ReactSelectFinder(getDriver()).findWhenNeeded(this)
+        final ReactSelect memberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this)
                 .setOptionLocator(ReactSelect.Locators.option::startsWith);
 
         List<PermissionsMember> findMembers()
