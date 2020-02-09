@@ -7,6 +7,9 @@ package org.labkey.test.components.glassLibrary.navigation;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.Input;
+import org.labkey.test.util.search.HasSearchResults;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -38,10 +41,11 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         return elementCache().headerLogo.getAttribute("src");
     }
 
-    public NavBar setSearchTerm(String searchString)
+    public HasSearchResults searchFor(String searchString)
     {
-        getWrapper().setFormElement(elementCache().searchBox, searchString);
-        return this;
+        elementCache().searchBox.set(searchString);
+        elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+        return null;
     }
 
     public String getDisplayedProjectName()
@@ -80,6 +84,6 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         public WebElement userMenuButton = Locator.tagWithId("a", "user-menu-dropdown").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         public WebElement userIcon = Locator.tagWithAttribute("img", "alt", "User Avatar").findWhenNeeded(this);
         public WebElement projectNameDisplay = Locator.tagWithClass("span", "project-name").findWhenNeeded(this);
-        public WebElement searchBox = Locator.tagWithAttribute("input", "placeholder","Enter search terms").findWhenNeeded(this);
+        public Input searchBox = Input.Input(Locator.tagWithClass("input", "navbar__search-input"), getDriver()).findWhenNeeded(this);
     }
 }

@@ -18,6 +18,7 @@ package org.labkey.test.pages.search;
 import org.labkey.test.Locator;
 import org.labkey.test.components.search.SearchForm;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.search.HasSearchResults;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -28,7 +29,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
 
-public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements>
+public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements> implements HasSearchResults
 {
     public SearchResultsPage(WebDriver test)
     {
@@ -60,6 +61,7 @@ public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements>
         return elementCache().getFolderSearchResultsPanel();
     }
 
+    @Override
     public List<WebElement> getResults()
     {
         return elementCache().searchResultCards();
@@ -105,6 +107,7 @@ public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements>
         return this;
     }
 
+    @Override
     public boolean hasResultLocatedBy(Locator resultLoc)
     {
         boolean inResultsPanel = getResultsPanel().map(resultLoc::existsIn).orElse(false);
