@@ -15,33 +15,70 @@
  */
 package org.labkey.test.util;
 
-import org.json.simple.JSONObject;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
+import org.labkey.test.WebDriverWrapper;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import static java.util.Collections.emptyMap;
+import java.util.Objects;
 
 public class ExperimentalFeaturesHelper
 {
+    private static Map<String, Boolean> _originalFeatureFlags = new HashMap<>();
+
     public static void enableExperimentalFeature(Connection cn, String feature)
     {
-        setExperimentalFeature(cn, feature, true);
+        setExperimentalFeature(cn, feature, true, true);
     }
 
     public static void disableExperimentalFeature(Connection cn, String feature)
     {
-        setExperimentalFeature(cn, feature, false);
+        setExperimentalFeature(cn, feature, false, true);
     }
 
     public static void setExperimentalFeature(Connection cn, String feature, boolean enable)
+    {
+        setExperimentalFeature(cn, feature, enable, true);
+    }
+
+    public static void setFeatures(LabKeySiteWrapper test, Map<String, Boolean> flags)
+    {
+        if (flags == null || flags.isEmpty())
+            return;
+
+        TestLogger.log("Setting experimental flags for duration of the test:");
+
+        Connection cn = test.createDefaultConnection(false);
+        for (Map.Entry<String, Boolean> flag : flags.entrySet())
+        {
+            setExperimentalFeature(cn, flag.getKey(), flag.getValue(), true);
+        }
+    }
+
+    public static void resetFeatures(LabKeySiteWrapper test)
+    {
+        if (_originalFeatureFlags.isEmpty())
+            return;
+
+        TestLogger.log("Resetting experimental flags to their original value:");
+
+        Map<String, Boolean> flags = new HashMap<>(_originalFeatureFlags);
+        _originalFeatureFlags = new HashMap<>();
+
+        Connection cn = test.createDefaultConnection(false);
+        for (Map.Entry<String, Boolean> features : flags.entrySet())
+        {
+            setExperimentalFeature(cn, features.getKey(), features.getValue(), false);
+        }
+    }
+
+    private static void setExperimentalFeature(Connection cn, String feature, boolean enable, boolean savePrevious)
     {
         TestLogger.log((enable ? "Enabling" : "Disabling") + " experimental feature " + feature);
 
@@ -53,7 +90,18 @@ public class ExperimentalFeaturesHelper
         command.setParameters(parameters);
         try
         {
-            CommandResponse rt = command.execute(cn, null);
+            CommandResponse r = command.execute(cn, null);
+            Map<String, Object> response = r.getParsedData();
+            if (savePrevious && response.containsKey("previouslyEnabled"))
+            {
+                // Remember the previous setting for the feature flag if was different
+                Boolean previouslyEnabled = (Boolean)response.get("previouslyEnabled");
+                if (!Objects.equals(enable, previouslyEnabled.booleanValue()))
+                {
+                    TestLogger.log("Experimental feature will be reset back to " + (previouslyEnabled ? "enabled" : "disabled") + " after test is completed");
+                    _originalFeatureFlags.put(feature, previouslyEnabled.booleanValue());
+                }
+            }
         }
         catch (IOException e)
         {
@@ -65,64 +113,5 @@ public class ExperimentalFeaturesHelper
         }
     }
 
-    // Get the current experimental flags
-    public static Map<String, Boolean> getExperimentalFeatures(Connection cn)
-    {
-        Command command = new Command("admin", "getExperimentalFeatures.api");
-        try
-        {
-            CommandResponse r = command.execute(cn, null);
-            Map<String, Object> response = r.getParsedData();
-            if (response.containsKey("success") && (Boolean)response.get("success"))
-            {
-                Map<String, Boolean> data = (Map<String, Boolean>)response.get("data");
-                return data;
-            }
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failed to get experimental features", e);
-        }
-        catch (CommandException e)
-        {
-            TestLogger.log("Unable to get experimental features. Ignoring: " + e.getStatusCode());
-        }
-
-        return emptyMap();
-    }
-
-    // Set the current experimental flags
-    public static Map<String, Boolean> setExperimentalFeatures(Connection cn, Map<String, Boolean> flags)
-    {
-        PostCommand command = new PostCommand("admin", "setExperimentalFeatures.api");
-
-        // don't send apiVersion
-        command.setRequiredVersion(-1);
-
-        JSONObject json = new JSONObject();
-        json.put("flags", flags);
-        command.setJsonObject(json);
-
-        try
-        {
-            CommandResponse r = command.execute(cn, null);
-            Map<String, Object> response = r.getParsedData();
-            if (response.containsKey("success") && (Boolean)response.get("success"))
-            {
-                Map<String, Boolean> data = (Map<String, Boolean>)response.get("data");
-                return data;
-            }
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Error setting experimental features", e);
-        }
-        catch (CommandException e)
-        {
-            throw new RuntimeException("Error setting experimental features" + e.getStatusCode(), e);
-        }
-
-        return emptyMap();
-    }
 
 }

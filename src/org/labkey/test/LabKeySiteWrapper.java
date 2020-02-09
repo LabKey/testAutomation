@@ -1011,40 +1011,18 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return menu;
     }
 
-    // get the current set of flags and enable those specified by the test properties
+    // enable/disable the flags specified by the test properties
     @LogMethod()
-    public Map<String, Boolean> setExperimentalFlags()
+    public void setExperimentalFlags()
     {
         Map<String, Boolean> flagsToSet = TestProperties.getExperimentalFeatures();
-
-        // don't do anything if no flags need be changed
-        if (flagsToSet.isEmpty())
-            return emptyMap();
-
-        Connection cn = createDefaultConnection(false);
-        Map<String, Boolean> previousFlags = ExperimentalFeaturesHelper.getExperimentalFeatures(cn);
-
-        log("Current experimental flags: " + previousFlags);
-        if (previousFlags.isEmpty())
-            return emptyMap();
-
-        log("Enabling experimental flags: " + flagsToSet);
-        var newFlags = ExperimentalFeaturesHelper.setExperimentalFeatures(cn, flagsToSet);
-
-        log("Testing with experimental flags: " + newFlags);
-        return previousFlags;
+        ExperimentalFeaturesHelper.setFeatures(this, flagsToSet);
     }
 
     @LogMethod()
-    public void resetExperimentalFlags(Map<String, Boolean> flags)
+    public void resetExperimentalFlags()
     {
-        if (flags == null || flags.isEmpty())
-            return;
-
-        log("Resettings experimental flags: " + flags);
-        Connection cn = createDefaultConnection(false);
-        flags = ExperimentalFeaturesHelper.getExperimentalFeatures(cn);
-        log("Current experimental flags: " + flags);
+        ExperimentalFeaturesHelper.resetFeatures(this);
     }
 
     @LogMethod(quiet = true)
