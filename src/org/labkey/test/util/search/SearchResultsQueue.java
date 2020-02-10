@@ -3,7 +3,10 @@ package org.labkey.test.util.search;
 import org.labkey.test.Locator;
 import org.labkey.test.util.SearchHelper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SearchResultsQueue
@@ -33,6 +36,11 @@ public class SearchResultsQueue
         _searchQueue.put(searchTerm, new SearchItem(isFile, expectedResults));
     }
 
+    public void addUnwantedResult(String searchTerm, Locator unexpectedResults)
+    {
+        _searchQueue.get(searchTerm).addUnwantedResult(unexpectedResults);
+    }
+
     public Map<String, SearchItem> getQueuedItems()
     {
         HashMap<String, SearchItem> searchQueuePlus = new HashMap<>(_searchQueue);
@@ -47,12 +55,13 @@ public class SearchResultsQueue
 
     public static class SearchItem
     {
-        private final Locator[] _searchResults;
+        private final List<Locator> _searchResults;
+        private final List<Locator> _unwantedResults = new ArrayList<>();
         private final boolean _file; // is this search expecting a file?
 
         private SearchItem(boolean file, Locator... results)
         {
-            _searchResults = results;
+            _searchResults = Arrays.asList(results);
             _file = file;
         }
 
@@ -61,7 +70,7 @@ public class SearchResultsQueue
             this(false);
         }
 
-        public Locator[] getExpectedResults()
+        public List<Locator> getExpectedResults()
         {
             return _searchResults;
         }
@@ -69,6 +78,16 @@ public class SearchResultsQueue
         public boolean expectFileInResults()
         {
             return _file;
+        }
+
+        public List<Locator> getUnwantedResults()
+        {
+            return _unwantedResults;
+        }
+
+        public void addUnwantedResult(Locator unwantedResult)
+        {
+            _unwantedResults.add(unwantedResult);
         }
     }
 }
