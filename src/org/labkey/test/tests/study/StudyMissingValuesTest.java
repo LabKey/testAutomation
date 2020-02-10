@@ -15,6 +15,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
     public void testDatasetMV()
     {
         final String datasetName = "MV Dataset";
-        final String DATASET_SCHEMA_FILE = "/sampledata/mvIndicators/dataset_schema.tsv";
+        final File DATASET_SCHEMA_FILE = TestFileUtils.getSampleData("mvIndicators/dataset_schema.tsv");
         final String TEST_DATA_SINGLE_COLUMN_DATASET =
                 "participantid\tSequenceNum\tAge with space\tSex\n" +
                         "Ted\t1\tN\tmale\n" +

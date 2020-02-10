@@ -132,8 +132,8 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
     private static final String DATEFORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final String ATTACHMENT_REPORT_NAME = "Attachment Report1";
     private static final String ATTACHMENT_REPORT_DESCRIPTION = "This attachment report uploads a file";
-    private static final File ATTACHMENT_REPORT_FILE = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Microarray/", "test1.jpg"); // arbitrary image file
-    private static final File ATTACHMENT_REPORT2_FILE = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Microarray/", "test2.jpg"); // arbitrary image file
+    private static final File ATTACHMENT_REPORT_FILE = TestFileUtils.getSampleData("Microarray/test1.jpg"); // arbitrary image file
+    private static final File ATTACHMENT_REPORT2_FILE = TestFileUtils.getSampleData("Microarray/test2.jpg"); // arbitrary image file
 
     private static final String[] datasetsContentChanging = {
         TIMECHART_NAME, R_NAME, PLOT_NAME, PARTICIPANTREPORT_NAME, LINKREPORT_NAME, ATTACHMENT_REPORT_NAME

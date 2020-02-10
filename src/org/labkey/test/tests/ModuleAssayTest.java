@@ -323,7 +323,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     {
         APIAssayHelper ah = new APIAssayHelper(this);
 
-        File dataRoot = new File(TestFileUtils.getLabKeyRoot(), "/sampledata/miniassay/data");
+        File dataRoot = TestFileUtils.getSampleData("miniassay/data");
         File file = new File(dataRoot, "run01.tsv");
         assertTrue(file.exists());
 
@@ -424,7 +424,7 @@ public class ModuleAssayTest extends AbstractAssayTest
 
     protected void uploadBatch(String batchName, String... uploadedFiles)
     {
-        File dataRoot = new File(TestFileUtils.getLabKeyRoot(), "/sampledata/miniassay/data");
+        File dataRoot = TestFileUtils.getSampleData("miniassay/data");
         assertTrue(dataRoot.isDirectory());
 
         log("Uploading batch: " + batchName);
