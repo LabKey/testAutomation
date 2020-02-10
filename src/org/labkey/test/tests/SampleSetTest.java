@@ -98,7 +98,7 @@ public class SampleSetTest extends BaseWebDriverTest
     private static final String CASE_INSENSITIVE_SAMPLE_SET = "CaseInsensitiveSampleSet";
     private static final String LOWER_CASE_SAMPLE_SET = "caseinsensitivesampleset";
 
-    protected static final String PIPELINE_PATH = "/sampledata/xarfiles/expVerify";
+    protected static final File PIPELINE_PATH = TestFileUtils.getSampleData("xarfiles/expVerify");
 
     public List<String> getAssociatedModules()
     {
@@ -1783,7 +1783,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         if (isElementPresent(Locator.linkWithText("configure a valid pipeline root for this folder")))
         {
-            setPipelineRoot(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH);
+            setPipelineRoot(PIPELINE_PATH.getAbsolutePath());
         }
 
         clickFolder(FOLDER_NAME);
@@ -2077,7 +2077,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void fileAttachmentTest()
     {
-        File experimentFilePath = new File(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");
+        File experimentFilePath = new File(PIPELINE_PATH, "experiment.xar.xml");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
 
         String sampleSetName = "FileAttachmentSampleSet";
@@ -2096,7 +2096,7 @@ public class SampleSetTest extends BaseWebDriverTest
         expectedHeaders.add("File Attachment");
 
         setFileAttachment(0, experimentFilePath);
-        setFileAttachment(1, new File(TestFileUtils.getLabKeyRoot() +  "/sampledata/sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
+        setFileAttachment(1, TestFileUtils.getSampleData( "sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
 
         DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
         drt.clickInsertNewRow();

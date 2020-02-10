@@ -59,22 +59,22 @@ public class ElispotAssayTest extends AbstractAssayTest
     protected static final String TEST_ASSAY_ELISPOT = "TestAssayElispot";
     protected static final String TEST_ASSAY_ELISPOT_DESC = "Description for Elispot assay";
 
-    protected final String TEST_ASSAY_ELISPOT_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/CTL_040A20042503-0001p.xls";
-    protected final String TEST_ASSAY_ELISPOT_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W4.txt";
-    protected final String TEST_ASSAY_ELISPOT_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/Zeiss_datafile.txt";
-    protected final String TEST_ASSAY_ELISPOT_FILE4 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W5.txt";
-    protected final String TEST_ASSAY_ELISPOT_FILE5 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W8.txt";
-    protected final String TEST_ASSAY_ELISPOT_FILE6 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/AID_TNTC.txt";
+    protected static final File TEST_ASSAY_ELISPOT_FILE1 = TestFileUtils.getSampleData("Elispot/CTL_040A20042503-0001p.xls");
+    protected static final File TEST_ASSAY_ELISPOT_FILE2 = TestFileUtils.getSampleData("Elispot/AID_0161456 W4.txt");
+    protected static final File TEST_ASSAY_ELISPOT_FILE3 = TestFileUtils.getSampleData("Elispot/Zeiss_datafile.txt");
+    protected static final File TEST_ASSAY_ELISPOT_FILE4 = TestFileUtils.getSampleData("Elispot/AID_0161456 W5.txt");
+    protected static final File TEST_ASSAY_ELISPOT_FILE5 = TestFileUtils.getSampleData("Elispot/AID_0161456 W8.txt");
+    protected static final File TEST_ASSAY_ELISPOT_FILE6 = TestFileUtils.getSampleData("Elispot/AID_TNTC.txt");
 
     private static final String PLATE_TEMPLATE_NAME = "ElispotAssayTest Template";
 
     protected static final String TEST_ASSAY_FLUOROSPOT = "TestAssayFluorospot";
     protected static final String TEST_ASSAY_FLUOROSPOT_DESC = "Description for Fluorospot assay";
 
-    protected final String TEST_ASSAY_FLUOROSPOT_FILENAME1 = "AID_fluoro2.xlsx";
-    protected final String TEST_ASSAY_FLUOROSPOT_FILENAME2 = "AID_fluoro5.xlsx";
-    protected final String TEST_ASSAY_FLUOROSPOT_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME1;
-    protected final String TEST_ASSAY_FLUOROSPOT_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME2;
+    protected static final String TEST_ASSAY_FLUOROSPOT_FILENAME1 = "AID_fluoro2.xlsx";
+    protected static final String TEST_ASSAY_FLUOROSPOT_FILENAME2 = "AID_fluoro5.xlsx";
+    protected static final File TEST_ASSAY_FLUOROSPOT_FILE1 = TestFileUtils.getSampleData("Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME1);
+    protected static final File TEST_ASSAY_FLUOROSPOT_FILE2 = TestFileUtils.getSampleData("Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME2);
     private static final String FLUOROSPOT_DETECTION_METHOD = "fluorescent";
 
     public static final String FLUOROSPOT_FOLDER = "Fluorospot";
@@ -270,22 +270,22 @@ public class ElispotAssayTest extends AbstractAssayTest
         createTemplate();
     }
 
-    protected void uploadFluorospotFile(String filePath, String uniqueifier, String finalButton)
+    protected void uploadFluorospotFile(File file, String uniqueifier, String finalButton)
     {
-        uploadFile(filePath, uniqueifier, finalButton, false, false, true);
+        uploadFile(file, uniqueifier, finalButton, false, false, true);
     }
 
-    protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation)
+    protected void uploadFile(File file, String uniqueifier, String finalButton, boolean testPrepopulation)
     {
-        uploadFile(filePath, uniqueifier, finalButton, testPrepopulation, false);
+        uploadFile(file, uniqueifier, finalButton, testPrepopulation, false);
     }
 
-    protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground)
+    protected void uploadFile(File file, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground)
     {
-        uploadFile(filePath, uniqueifier, finalButton, testPrepopulation, subtractBackground, false);
+        uploadFile(file, uniqueifier, finalButton, testPrepopulation, subtractBackground, false);
     }
 
-    protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground, boolean fluorospot)
+    protected void uploadFile(File file, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground, boolean fluorospot)
     {
         if (subtractBackground)
             checkCheckbox(Locator.checkboxByName("subtractBackground"));
@@ -302,8 +302,7 @@ public class ElispotAssayTest extends AbstractAssayTest
             setFormElement(Locator.name("specimen" + (i + 1) + "_SampleDescription"), "blood");
         }
 
-        File file1 = new File(filePath);
-        setFormElement(Locator.name("__primaryFile__"), file1);
+        setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Next");
 
         for (int i = 0; i < 6; i++)

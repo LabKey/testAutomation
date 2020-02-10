@@ -45,7 +45,7 @@ public class NonStudyReportsTest extends ReportTest
 
     private static final String ATTACHMENT_REPORT_NAME = "Attachment Report1";
     private static final String ATTACHMENT_REPORT_DESCRIPTION = "This attachment report uploads a file";
-    private static final File ATTACHMENT_REPORT_FILE = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Microarray/", "test1.jpg"); // arbitrary image file
+    private static final File ATTACHMENT_REPORT_FILE = TestFileUtils.getSampleData("Microarray/test1.jpg"); // arbitrary image file
 
 
     private static final String ATTACHMENT_REPORT2_NAME = "Attachment Report2";
@@ -53,7 +53,7 @@ public class NonStudyReportsTest extends ReportTest
     private static final String UPDATE_ATTACHMENT_REPORT = "Update Attachment Report";
 
     private static final String ATTACHMENT_REPORT2_DESCRIPTION= "This attachment report points at a file on the server.";
-    private static final File ATTACHMENT_REPORT2_FILE = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Microarray/", "test2.jpg"); // arbitrary image file
+    private static final File ATTACHMENT_REPORT2_FILE = TestFileUtils.getSampleData("Microarray/test2.jpg"); // arbitrary image file
 
 
     private static final String DISCUSSED_REPORT = "Blank R Report";

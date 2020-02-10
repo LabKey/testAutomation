@@ -79,7 +79,7 @@ public class ExpTest extends BaseWebDriverTest
         portalHelper.addWebPart("Data Pipeline");
         portalHelper.addWebPart("Run Groups");
         clickButton("Setup");
-        setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/xarfiles/expVerify");
+        setPipelineRoot(TestFileUtils.getSampleData("xarfiles/expVerify").getAbsolutePath());
         clickFolder(FOLDER_NAME);
         clickButton("Process and Import Data");
 

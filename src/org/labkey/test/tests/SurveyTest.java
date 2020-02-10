@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
 public class SurveyTest extends BaseWebDriverTest
 {
     private final String folderName = "subfolder";
-    protected final String pipelineLoc =  "/sampledata/survey";
+    protected static final File pipelineLoc = TestFileUtils.getSampleData("survey");
     private final String projectSurveyDesign = "My Project Survey Design";
     private final String subfolderSurveyDesign = "My Subfolder Survey Design";
     private final String AUTO_SAVE_SURVEY_DESIGN = "Auto Save Survey Design";
@@ -102,7 +102,7 @@ public class SurveyTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
 
         log("Create survey design at the project level");
-        _listHelper.importListArchive(getProjectName(), new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
+        _listHelper.importListArchive(getProjectName(), new File(pipelineLoc, "ListA.zip"));
         _containerHelper.enableModule(getProjectName(), "Survey");
         portalHelper.addWebPart("Survey Designs");
         createSurveyDesign(getProjectName(), null, null, projectSurveyDesign, null, "lists", "listA", null);
@@ -114,7 +114,7 @@ public class SurveyTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), folderName);
 
         log("Create survey design at the subfolder level");
-        _listHelper.importListArchive(folderName, new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
+        _listHelper.importListArchive(folderName, new File(pipelineLoc, "ListA.zip"));
         clickFolder(folderName);
         portalHelper.addWebPart("Survey Designs");
         createSurveyDesign(folderName, null, null, subfolderSurveyDesign, null, "lists", "listA", null);
@@ -165,7 +165,7 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("intfield"), "999");
         setFormElement(Locator.name("dblfield"), "999.1");
         setFormElement(Locator.name("dtfield"), "2013-01-04");
-        addSurveyFileAttachment("attfield", pipelineLoc + "/TestAttachment.txt");
+        addSurveyFileAttachment("attfield", new File(pipelineLoc, "TestAttachment.txt"));
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), Ext4Helper.TextMatchTechnique.CONTAINS, "Test1");
         log("Wait for the survey autosave (save attempts every minute)");
         waitForText(65000, "Responses automatically saved at");
@@ -180,10 +180,10 @@ public class SurveyTest extends BaseWebDriverTest
         waitForText("No data to show.");
     }
 
-    private void addSurveyFileAttachment(String inputName, String fileName)
+    private void addSurveyFileAttachment(String inputName, File file)
     {
         // TODO: implement file attachment for the survey form
-        //setFormElement(Locator.name(inputName), new File(getLabKeyRoot() + fileName));
+        //setFormElement(Locator.name(inputName), file);
     }
 
     @LogMethod
@@ -276,7 +276,7 @@ public class SurveyTest extends BaseWebDriverTest
         log("Customize the survey design metadata (card layout, multiple sections, show question counts, etc.)");
         clickFolder(folderName);
         clickEditForLabel("Survey Designs", subfolderSurveyDesign);
-        String json = TestFileUtils.getFileContents(pipelineLoc + "/CustomSurveyMetadata.json");
+        String json = TestFileUtils.getFileContents(new File(pipelineLoc, "CustomSurveyMetadata.json"));
         _extHelper.setCodeMirrorValue("metadata", json);
         clickButton("Save Survey");
 
@@ -318,7 +318,7 @@ public class SurveyTest extends BaseWebDriverTest
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), Ext4Helper.TextMatchTechnique.CONTAINS, "Test2");
         assertElementPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), Ext4Helper.TextMatchTechnique.CONTAINS, "Test1");
-        addSurveyFileAttachment("attField", pipelineLoc + "/TestAttachment.txt");
+        addSurveyFileAttachment("attField", new File(pipelineLoc, "TestAttachment.txt"));
         clickButton("Next", 0);
         // check submit button text about invalid fields
         waitForText("Note: The following fields must be valid before you can submit the form");
@@ -450,7 +450,7 @@ public class SurveyTest extends BaseWebDriverTest
 
         // add survey metadata which disables autosave.
         clickEditForLabel("Survey Designs", AUTO_SAVE_SURVEY_DESIGN);
-        String json = TestFileUtils.getFileContents(pipelineLoc + "/AutoSaveDisabledMetadata.json");
+        String json = TestFileUtils.getFileContents(new File(pipelineLoc, "AutoSaveDisabledMetadata.json"));
         _extHelper.setCodeMirrorValue("metadata", json);
         clickButton("Save Survey");
 

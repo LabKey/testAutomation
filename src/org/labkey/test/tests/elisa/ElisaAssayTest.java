@@ -47,10 +47,10 @@ public class ElisaAssayTest extends AbstractAssayTest
     protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
     private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";   //name of Nab Dataset Readers group
 
-    protected final String TEST_ASSAY_ELISA_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elisa/biotek_01.xlsx";
-    protected final String TEST_ASSAY_ELISA_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elisa/biotek_02.xls";
-    protected final String TEST_ASSAY_ELISA_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elisa/biotek_03.xls";
-    protected final String TEST_ASSAY_ELISA_FILE4 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elisa/biotek_04.xls";
+    protected static final File TEST_ASSAY_ELISA_FILE1 = TestFileUtils.getSampleData("Elisa/biotek_01.xlsx");
+    protected static final File TEST_ASSAY_ELISA_FILE2 = TestFileUtils.getSampleData("Elisa/biotek_02.xls");
+    protected static final File TEST_ASSAY_ELISA_FILE3 = TestFileUtils.getSampleData("Elisa/biotek_03.xls");
+    protected static final File TEST_ASSAY_ELISA_FILE4 = TestFileUtils.getSampleData("Elisa/biotek_04.xls");
 
     private static final String PLATE_TEMPLATE_NAME = "ELISAAssayTest Template";
 
@@ -137,7 +137,7 @@ public class ElisaAssayTest extends AbstractAssayTest
         waitForText(PLATE_TEMPLATE_NAME);
     }
 
-    protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation, int startSpecimen, int lastSpecimen)
+    protected void uploadFile(File file, String uniqueifier, String finalButton, boolean testPrepopulation, int startSpecimen, int lastSpecimen)
     {
         for (int i = startSpecimen; i <= lastSpecimen; i++)
         {
@@ -153,8 +153,7 @@ public class ElisaAssayTest extends AbstractAssayTest
             setFormElement(Locator.name("specimen" + (i) + "_VisitID"), "" + (i));
         }
 
-        File file1 = new File(filePath);
-        setFormElement(Locator.name("__primaryFile__"), file1);
+        setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Next");
 
         String allErrors = "";
