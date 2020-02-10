@@ -25,6 +25,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Disabled;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.Ext4Helper;
 
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({DailyB.class, Reports.class, Charting.class})
+@Category({DailyB.class, Reports.class, Charting.class, Disabled.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class RaphaelRendererTest extends BaseWebDriverTest
 {
