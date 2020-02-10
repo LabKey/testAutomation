@@ -19,14 +19,11 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
-import org.labkey.test.WebDriverWrapper;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class ExperimentalFeaturesHelper
 {
@@ -34,17 +31,17 @@ public class ExperimentalFeaturesHelper
 
     public static void enableExperimentalFeature(Connection cn, String feature)
     {
-        setExperimentalFeature(cn, feature, true, true);
+        setFeature(cn, feature, true);
     }
 
     public static void disableExperimentalFeature(Connection cn, String feature)
     {
-        setExperimentalFeature(cn, feature, false, true);
+        setFeature(cn, feature, false);
     }
 
     public static void setExperimentalFeature(Connection cn, String feature, boolean enable)
     {
-        setExperimentalFeature(cn, feature, enable, true);
+        setFeature(cn, feature, enable);
     }
 
     public static void setFeatures(LabKeySiteWrapper test, Map<String, Boolean> flags)
@@ -57,7 +54,7 @@ public class ExperimentalFeaturesHelper
         Connection cn = test.createDefaultConnection(false);
         for (Map.Entry<String, Boolean> flag : flags.entrySet())
         {
-            setExperimentalFeature(cn, flag.getKey(), flag.getValue(), true);
+            setFeature(cn, flag.getKey(), flag.getValue());
         }
     }
 
@@ -68,17 +65,16 @@ public class ExperimentalFeaturesHelper
 
         TestLogger.log("Resetting experimental flags to their original value:");
 
-        Map<String, Boolean> flags = new HashMap<>(_originalFeatureFlags);
-        _originalFeatureFlags = new HashMap<>();
-
         Connection cn = test.createDefaultConnection(false);
-        for (Map.Entry<String, Boolean> features : flags.entrySet())
+        for (Map.Entry<String, Boolean> features : _originalFeatureFlags.entrySet())
         {
-            setExperimentalFeature(cn, features.getKey(), features.getValue(), false);
+            setExperimentalFeature(cn, features.getKey(), features.getValue());
         }
+
+        _originalFeatureFlags = new HashMap<>();
     }
 
-    private static void setExperimentalFeature(Connection cn, String feature, boolean enable, boolean savePrevious)
+    private static void setFeature(Connection cn, String feature, boolean enable)
     {
         TestLogger.log((enable ? "Enabling" : "Disabling") + " experimental feature " + feature);
 
@@ -92,15 +88,12 @@ public class ExperimentalFeaturesHelper
         {
             CommandResponse r = command.execute(cn, null);
             Map<String, Object> response = r.getParsedData();
-            if (savePrevious && response.containsKey("previouslyEnabled"))
+
+            // When setting a feature flag the first time, remember the previous setting
+            if (!_originalFeatureFlags.containsKey(feature) && response.containsKey("previouslyEnabled"))
             {
-                // Remember the previous setting for the feature flag if was different
                 Boolean previouslyEnabled = (Boolean)response.get("previouslyEnabled");
-                if (!Objects.equals(enable, previouslyEnabled.booleanValue()))
-                {
-                    TestLogger.log("Experimental feature will be reset back to " + (previouslyEnabled ? "enabled" : "disabled") + " after test is completed");
-                    _originalFeatureFlags.put(feature, previouslyEnabled.booleanValue());
-                }
+                _originalFeatureFlags.put(feature, previouslyEnabled.booleanValue());
             }
         }
         catch (IOException e)
