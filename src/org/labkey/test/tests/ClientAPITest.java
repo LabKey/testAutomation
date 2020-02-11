@@ -97,7 +97,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String VISIT_STUDY_NAME = "visitStudyName";
     public final static String LIST_NAME = "People";
     private final static String QUERY_LIST_NAME = "NewPeople";
-    private final static String TEST_XLS_DATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/dataLoading/excel/ClientAPITestList.xls";
+    private final static File TEST_XLS_DATA_FILE = TestFileUtils.getSampleData("dataLoading/excel/ClientAPITestList.xls");
     private final static String SUBFOLDER_LIST = "subfolderList"; // for cross-folder query test
     private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
     public final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
@@ -288,8 +288,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private void createLargePeopleList()
     {
         // Create Larger list for query test.
-        File listFile = new File(TEST_XLS_DATA_FILE);
-        _listHelper.createListFromFile(getProjectName() + "/" + FOLDER_NAME, QUERY_LIST_NAME, listFile);
+        _listHelper.createListFromFile(getProjectName() + "/" + FOLDER_NAME, QUERY_LIST_NAME, TEST_XLS_DATA_FILE);
         waitForElement(Locator.linkWithText("Norbert"));
     }
 

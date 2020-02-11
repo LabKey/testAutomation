@@ -837,7 +837,7 @@ public class NabAssayTest extends AbstractAssayTest
         assertEquals("DilutionData row did not match.", expectedDilRow40, row40.subList(0, expectedDilRow40.size()));
 
         log("Delete assay data file and test that run details still works");
-        File assayFile = new File(TestFileUtils.getLabKeyRoot(), "/build/testTemp/assaydata/" + NAB_FILENAME2);
+        File assayFile = new File(TestFileUtils.getTestTempDir(), "assaydata/" + NAB_FILENAME2);
         boolean deleteSuccess = assayFile.delete();
         assertTrue("Failed to delete file: " + NAB_FILENAME2, deleteSuccess);
         navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);

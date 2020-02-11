@@ -53,6 +53,7 @@ import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -83,6 +84,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -1007,6 +1009,20 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         WebElement menu = Locator.menuBarItem(menuText).findElement(getDriver());
         menu.click();
         return menu;
+    }
+
+    // enable/disable the flags specified by the test properties
+    @LogMethod()
+    public void setExperimentalFlags()
+    {
+        Map<String, Boolean> flagsToSet = TestProperties.getExperimentalFeatures();
+        ExperimentalFeaturesHelper.setFeatures(this, flagsToSet);
+    }
+
+    @LogMethod()
+    public void resetExperimentalFlags()
+    {
+        ExperimentalFeaturesHelper.resetFeatures(this);
     }
 
     @LogMethod(quiet = true)

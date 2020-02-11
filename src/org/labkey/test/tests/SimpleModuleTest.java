@@ -111,8 +111,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
     public static final String RESTRICTED_FOLDER_NAME = "Restricted Folder";
     public static final String RESTRICTED_FOLDER_TYPE = "Folder With Restricted Module";
     public static final String NEW_FOLDER_NAME = "New Folder";
-    public static final String RESTRICTED_FOLDER_IMPORT_NAME =
-            "/sampledata/SimpleAndRestrictedModule/FolderWithRestricted.folder.zip";
+    public static final File RESTRICTED_FOLDER_IMPORT_NAME =
+            TestFileUtils.getSampleData("SimpleAndRestrictedModule/FolderWithRestricted.folder.zip");
 
     private static final String THUMBNAIL_FOLDER = "thumbnails/";
     private static final String THUMBNAIL_FILENAME = "/Thumbnail.png";
@@ -1885,7 +1885,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), NEW_FOLDER_NAME, "Collaboration", null);
         createPeopleListInFolder(NEW_FOLDER_NAME);
         navigateToFolder(getProjectName(), NEW_FOLDER_NAME);
-        importFolderFromZip(new File(getLabKeyRoot(), RESTRICTED_FOLDER_IMPORT_NAME), false, 1, true);
+        importFolderFromZip(RESTRICTED_FOLDER_IMPORT_NAME, false, 1, true);
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
                 "Folder type 'Folder With Restricted Module' not set because it requires a restricted module for which you do not have permission.",
