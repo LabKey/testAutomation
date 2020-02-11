@@ -26,7 +26,6 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.ManageDatasetsPage;
 import org.labkey.test.pages.study.CreateStudyPage;
@@ -46,6 +45,9 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class StudyHelper
 {
+    public static final File SPECIMEN_ARCHIVE_A = TestFileUtils.getSampleData("study/specimens/sample_a.specimens");
+    public static final File SPECIMEN_ARCHIVE_B = TestFileUtils.getSampleData("study/specimens/sample_b.specimens");
+
     protected BaseWebDriverTest _test;
 
     public StudyHelper(BaseWebDriverTest test)
@@ -461,14 +463,19 @@ public class StudyHelper
         return designerPage;
     }
 
-    public static String getStudySampleDataPath()
+    public static File getStudyTempDir()
     {
-        return "/sampledata/study/";
+        return new File(getPipelinePath(), "drt_temp");
     }
 
     public static String getPipelinePath()
     {
-        return TestFileUtils.getLabKeyRoot() + getStudySampleDataPath();
+        return TestFileUtils.getLabKeyRoot() + "/sampledata/study/";
+    }
+
+    public static File getStudySampleData(String relativePath)
+    {
+        return TestFileUtils.getSampleData("study/" + relativePath);
     }
 
     public enum TimepointType

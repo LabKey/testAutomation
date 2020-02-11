@@ -21,6 +21,8 @@ import org.labkey.test.Locators;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
+
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 
 public class PipelineFolder
@@ -30,12 +32,12 @@ public class PipelineFolder
     protected String _folderType = "None";
     protected String[] _tabs = new String[0];
     protected String[] _webParts = new String[0];
-    protected String _pipelinePath;
+    protected File _pipelinePath;
     protected MailSettings _mailSettings;
 
     public PipelineFolder(PipelineWebTestBase test,
                           String folderName,
-                          String pipelinePath)
+                          File pipelinePath)
     {
         _test = test;
         _folderName = folderName;
@@ -47,7 +49,7 @@ public class PipelineFolder
         return _folderName;
     }
 
-    public String getPipelinePath()
+    public File getPipelinePath()
     {
         return _pipelinePath;
     }
@@ -100,7 +102,7 @@ public class PipelineFolder
     protected void setupPipeline()
     {
         _test.log("Set pipeline root.");
-        _test.setPipelineRoot(_pipelinePath);
+        _test.setPipelineRoot(_pipelinePath.getAbsolutePath());
 
         _test.log("Set file permissions."); // totally guessing the prior 'submit' was hitting the permissionsForm- there are 3 on the page
         _test.submit(Locators.bodyPanel().append("//form[@id='permissionsForm']"));

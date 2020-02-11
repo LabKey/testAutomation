@@ -38,7 +38,7 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class RaphaelRendererTest extends BaseWebDriverTest
 {
-    private static final String MULTI_FOLDER_ZIP = "/sampledata/vis/RaphaelRendererTest.folder.zip";
+    private static final File MULTI_FOLDER_ZIP = TestFileUtils.getSampleData("vis/RaphaelRendererTest.folder.zip");
     private static final String DATE_STUDY_FOLDER_NAME = "Date Based Study";
     private static final String VISIT_STUDY_FOLDER_NAME = "Visit Based Study";
     private static final String GENERIC_CHARTS_FOLDER_NAME = "Generic Charts";
@@ -56,7 +56,7 @@ public class RaphaelRendererTest extends BaseWebDriverTest
     {
         RaphaelRendererTest initTest = (RaphaelRendererTest)getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
-        initTest.importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), MULTI_FOLDER_ZIP));
+        initTest.importFolderFromZip(MULTI_FOLDER_ZIP);
         initTest.populateTimeChartConfigs();
     }
     private void populateTimeChartConfigs()
