@@ -54,8 +54,7 @@ import static org.junit.Assert.assertEquals;
 @Deprecated
 public abstract class StudyBaseTest extends BaseWebDriverTest
 {
-    protected static final String ARCHIVE_TEMP_DIR = StudyHelper.getStudySampleDataPath() + "drt_temp";
-    protected static final String SPECIMEN_ARCHIVE_A = StudyHelper.getStudySampleDataPath() + "specimens/sample_a.specimens";
+    protected static final File ARCHIVE_TEMP_DIR = StudyHelper.getStudyTempDir();
     protected int datasetCount = getDatasetCount();
     protected int visitCount = 65;
 
@@ -108,11 +107,11 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     // verification steps to speed up the test.  Call waitForSpecimenImport() before verifying specimens.
     protected void startSpecimenImport(int completeJobsExpected)
     {
-        startSpecimenImport(completeJobsExpected, SPECIMEN_ARCHIVE_A);
+        startSpecimenImport(completeJobsExpected, StudyHelper.SPECIMEN_ARCHIVE_A);
     }
-    protected void startSpecimenImport(int completeJobsExpected, String specimenArchivePath)
+    protected void startSpecimenImport(int completeJobsExpected, File specimenArchive)
     {
-        _specimenImporter = new SpecimenImporter(new File(StudyHelper.getPipelinePath()), new File(TestFileUtils.getLabKeyRoot(), specimenArchivePath), new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), completeJobsExpected);
+        _specimenImporter = new SpecimenImporter(new File(StudyHelper.getPipelinePath()), specimenArchive, ARCHIVE_TEMP_DIR, getFolderName(), completeJobsExpected);
         _specimenImporter.startImport();
     }
 
@@ -145,7 +144,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         deleteLogFiles("datasets");
         TestFileUtils.deleteDir(new File(StudyHelper.getPipelinePath(), "assaydata"));
         TestFileUtils.deleteDir(new File(StudyHelper.getPipelinePath(), "reports_temp"));
-        TestFileUtils.deleteDir(new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR));
+        TestFileUtils.deleteDir(ARCHIVE_TEMP_DIR);
     }
 
     private void deleteLogFiles(String directoryName)

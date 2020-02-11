@@ -119,7 +119,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
     protected File getPipelineWorkDirectory()
     {
-        return new File(TestFileUtils.getLabKeyRoot() + "/sampledata/flow/work");
+        return new File(TestFileUtils.getSampleData("flow"), "work");
     }
 
     protected void deletePipelineWorkDirectory()
@@ -232,7 +232,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         goToSchemaBrowser();
     }
 
-    protected void uploadSampleDescriptions(String sampleFilePath, Map<String, FieldDefinition.ColumnType> fields, String[] idCols, String[] keywordCols)
+    protected void uploadSampleDescriptions(File sampleFile, Map<String, FieldDefinition.ColumnType> fields, String[] idCols, String[] keywordCols)
     {
         log("** Uploading sample set");
         goToFlowDashboard();
@@ -249,7 +249,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         helper.addFields(fields);
 
         clickAndWait(Locator.linkWithText("Upload More Samples"));
-        helper.setTsvData(TestFileUtils.getFileContents(sampleFilePath));
+        helper.setTsvData(TestFileUtils.getFileContents(sampleFile));
         clickButton("Submit");
 
         log("** Join sample set with FCSFile keywords");

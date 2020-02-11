@@ -49,19 +49,18 @@ public class NabAssayThawListTest extends AbstractAssayTest
     protected static final String TEST_ASSAY_NAB_DESC = "Description for NAb assay";
     public static final String THAW_LIST_ASSAY_ID = "thaw list ptid + visit";
 
-    private final String SAMPLE_DATA_ROOT = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/";
     protected final File TEST_ASSAY_NAB_FILE1 = TestFileUtils.getSampleData("Nab/m0902051;3997.xls");
-    private final String THAW_LIST_NAME = "NabThawList";
-    private final String THAW_LIST_ARCHIVE = SAMPLE_DATA_ROOT + THAW_LIST_NAME + ".zip";
+    private static final String THAW_LIST_NAME = "NabThawList";
+    private static final File THAW_LIST_ARCHIVE = TestFileUtils.getSampleData("Nab/" + THAW_LIST_NAME + ".zip");
 
     private final String THAW_LIST_MISSING_COLUMNS = THAW_LIST_NAME + "MissingColumns";
-    private final String THAW_LIST_ARCHIVE_MISSING_COLUMNS = SAMPLE_DATA_ROOT + THAW_LIST_NAME + "_MISSING_COLUMNS.zip";
+    private static final File THAW_LIST_ARCHIVE_MISSING_COLUMNS = TestFileUtils.getSampleData("Nab/" + THAW_LIST_NAME + "_MISSING_COLUMNS.zip");
 
     private final String THAW_LIST_MISSING_ROWS = THAW_LIST_NAME + "MissingRows";
-    private final String THAW_LIST_ARCHIVE_MISSING_ROWS = SAMPLE_DATA_ROOT + THAW_LIST_NAME + "_MISSING_ROWS.zip";
+    private static final File THAW_LIST_ARCHIVE_MISSING_ROWS = TestFileUtils.getSampleData("Nab/" + THAW_LIST_NAME + "_MISSING_ROWS.zip");
 
     private final String THAW_LIST_BAD_DATATYPES = THAW_LIST_NAME + "BadDataTypes";
-    private final String THAW_LIST_ARCHIVE_BAD_DATATYPES = SAMPLE_DATA_ROOT + THAW_LIST_NAME + "_BAD_DATATYPES.zip";
+    private static final File THAW_LIST_ARCHIVE_BAD_DATATYPES = TestFileUtils.getSampleData("Nab/" + THAW_LIST_NAME + "_BAD_DATATYPES.zip");
 
     public List<String> getAssociatedModules()
     {

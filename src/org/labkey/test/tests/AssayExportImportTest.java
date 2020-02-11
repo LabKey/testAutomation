@@ -56,7 +56,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
     private final String SIMPLE_ASSAY_FOR_EXPORT = "AssayForExport";
 
-    private final String SAMPLE_DATA_LOCATION = "/sampledata/AssayImportExport";
+    private static final File SAMPLE_DATA_LOCATION = TestFileUtils.getSampleData("AssayImportExport");
 
     private final String RUN01_FILE = "GenericAssay_Run1.xls";
     private final String RUN02_FILE = "GenericAssay_Run2.xls";
