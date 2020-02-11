@@ -4,12 +4,15 @@
  */
 package org.labkey.test.components.glassLibrary.grids;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
 import java.util.Optional;
 
 public class QueryGrid extends WebDriverComponent
@@ -95,6 +98,39 @@ public class QueryGrid extends WebDriverComponent
     public GridBar getGridBar()
     {
         return _gridBar.orElseThrow();
+    }
+
+    public List<WebElement> getTabs()
+    {
+        return navTab(null).findElements(this);
+    }
+
+    private boolean hasTab(String partialTabText)
+    {
+        return navTab(partialTabText).existsIn(this);
+    }
+
+    /* tabs usually have a name plus a parenthetical number (denoting record count).
+     * startsWith is the text before the open-parenthesis [(] */
+    public QueryGrid selectTab(String startsWith)
+    {
+        getWrapper().waitFor(()-> getGrid().isLoaded() && hasTab(startsWith), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        WebElement navTab = navTab(startsWith).findElement(this);
+
+        if (navTab.getAttribute("class").equals("active"))
+        {
+            return this;
+        }
+
+        Locator.tag("a").startsWith(startsWith).findElement(navTab).click();
+        getWrapper().waitFor(()-> navTab.getAttribute("class").equals("active"), 2000);
+        return  new QueryGrid(_queryGridPanel, getDriver());
+    }
+
+    private Locator navTab(@Nullable String partialTabText)
+    {
+        return Locator.tagWithClass("ul", "nav nav-tabs").child(Locator.tag("li")
+                .withChild(Locator.tag("a").startsWith(partialTabText != null ? partialTabText + " (" : "")));
     }
 
     public int getRecordCount()
