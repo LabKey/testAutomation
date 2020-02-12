@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class UserDetailsPanel extends WebDriverComponent<Component<?>.ElementCache>
 {
-    private static final Locator LOC = BootstrapLocators.panel("User Details");
+    protected static final Locator LOC = BootstrapLocators.panel("User Details");
 
     private final WebElement _el;
     private final WebDriver _driver;
@@ -35,11 +35,6 @@ public class UserDetailsPanel extends WebDriverComponent<Component<?>.ElementCac
         return _driver;
     }
 
-    public static SimpleWebDriverComponentFinder<UserDetailsPanel> finder(WebDriver driver)
-    {
-        return new SimpleWebDriverComponentFinder<>(driver, LOC, UserDetailsPanel::new);
-    }
-
     public String getSelectedUser()
     {
         return Locator.byClass("principal-title-primary")
@@ -47,10 +42,4 @@ public class UserDetailsPanel extends WebDriverComponent<Component<?>.ElementCac
                 .map(WebElement::getText).orElse(null);
     }
 
-    public List<String> getEffectiveRoles()
-    {
-        return Locator.css(".permissions-ul > li")
-                .findElements(this)
-                .stream().map(WebElement::getText).collect(Collectors.toList());
-    }
 }
