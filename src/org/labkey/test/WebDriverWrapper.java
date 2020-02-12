@@ -147,6 +147,8 @@ import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBO
 
 public abstract class WebDriverWrapper implements WrapsDriver
 {
+    private static final Map<WebDriver, File> _downloadDirs = new WeakHashMap<>();
+
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public final static int WAIT_FOR_PAGE = 60000;
 
@@ -187,14 +189,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     protected Pair<WebDriver, DriverService> createNewWebDriver(BrowserType browserType, File downloadDir)
     {
-        return createNewWebDriver(new ImmutablePair<>(null, null), browserType, downloadDir);
-    }
-
-    protected Pair<WebDriver, DriverService> createNewWebDriver(@NotNull Pair<WebDriver, DriverService> oldDriverAndService, BrowserType browserType, File downloadDir)
-    {
-        WebDriver oldWebDriver = oldDriverAndService.getLeft();
         WebDriver newWebDriver = null;
-        DriverService oldDriverService = oldDriverAndService.getRight();
         DriverService newDriverService = null;
 
         switch (browserType)
@@ -213,29 +208,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             case IE: //experimental
             {
-                if (oldWebDriver != null && !(oldWebDriver instanceof InternetExplorerDriver))
-                {
-                    oldWebDriver.quit();
-                    oldWebDriver = null;
-                    if (oldDriverService != null && oldDriverService.isRunning())
-                        oldDriverService.stop();
-                }
-                if (oldWebDriver == null)
-                {
-                    newWebDriver = new InternetExplorerDriver();
-                }
+                newWebDriver = new InternetExplorerDriver();
                 break;
             }
             case CHROME:
             {
-                if (oldWebDriver != null && !(oldWebDriver instanceof ChromeDriver))
-                {
-                    oldWebDriver.quit();
-                    oldWebDriver = null;
-                    if (oldDriverService != null && oldDriverService.isRunning())
-                        oldDriverService.stop();
-                }
-                if (oldWebDriver == null)
                 {
                     log("Using chromedriver: " + TestProperties.ensureChromedriverExeProperty());
                     configureChromeDriverLogging(downloadDir);
@@ -268,14 +245,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             case FIREFOX:
             {
-                if (oldWebDriver != null && !(oldWebDriver instanceof FirefoxDriver))
-                {
-                    oldWebDriver.quit();
-                    oldWebDriver = null;
-                    if (oldDriverService != null && oldDriverService.isRunning())
-                        oldDriverService.stop();
-                }
-                if (oldWebDriver == null)
                 {
                     log("Using geckodriver: " + TestProperties.ensureGeckodriverExeProperty());
                     configureGeckoDriverLogging(downloadDir);
@@ -365,17 +334,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 throw new IllegalArgumentException("Browser not yet implemented: " + browserType);
         }
 
-        if (newWebDriver != null)
         {
             Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getVersion();
             log("Browser: " + browserName + " " + browserVersion);
+            _downloadDirs.put(newWebDriver, downloadDir);
             return new ImmutablePair<>(newWebDriver, newDriverService);
-        }
-        else
-        {
-            return oldDriverAndService;
         }
     }
 
@@ -1028,7 +993,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
 
             long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
-            logMessage += " [" + elapsedTime + " ms]";
+            logMessage += " (" + elapsedTime + " ms)";
 
 
             return elapsedTime;
@@ -1804,7 +1769,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
-                    listener.beforePageLoad();
+                    listener.beforePageLoad(this);
             });
             getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
             toBeStale = Locators.documentRoot.findElement(getDriver()); // Document should become stale
@@ -1818,7 +1783,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
             _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
-                    listener.afterPageLoad();
+                    listener.afterPageLoad(this);
             });
             if (getDriver().getTitle().isEmpty() && onLabKeyPage())
             {
@@ -1877,6 +1842,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         default void beforePageLoad(){}
         default void afterPageLoad(){}
+        default void beforePageLoad(WebDriverWrapper driver) {beforePageLoad();}
+        default void afterPageLoad(WebDriverWrapper driver) {afterPageLoad();}
     }
 
     /**
@@ -2020,7 +1987,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (!waitFor(checker, wait))
         {
-            throw new TimeoutException(failMessage + " [" + wait + "ms]");
+            throw new TimeoutException(failMessage + " (" + wait + "ms)");
         }
     }
 
@@ -2060,9 +2027,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     // https://stackoverflow.com/questions/136505/searching-for-uuids-in-text-with-regex
     private static final Pattern TEMP_FILE_PATTERN = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.tmp");
 
+    protected File getDownloadDir()
+    {
+        return _downloadDirs.get(getDriver());
+    }
+
     public File[] doAndWaitForDownload(Runnable func, final int expectedFileCount)
     {
-        final File downloadDir = BaseWebDriverTest.getDownloadDir();
+        final File downloadDir = getDownloadDir();
         File[] existingFilesArray = downloadDir.listFiles();
         final List<File> existingFiles;
 
@@ -2283,7 +2255,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void waitForTextToDisappear(final String text, int wait)
     {
-        String failMessage = "Text: " + text + " was still present after [" + wait + "ms]";
+        String failMessage = "Text: " + text + " was still present after (" + wait + "ms)";
         waitFor(() -> !isTextPresent(text), failMessage, wait);
     }
 

@@ -1083,7 +1083,7 @@ public class Crawler
             if (origin != null)
             {
                 TestLogger.log("Crawl failure: collecting origin page info.");
-                try (ExtraSiteWrapper originBrowser = new ExtraSiteWrapper(WebDriverWrapper.BrowserType.FIREFOX, BaseWebDriverTest.getDownloadDir()))
+                try (ExtraSiteWrapper originBrowser = new ExtraSiteWrapper(WebDriverWrapper.BrowserType.FIREFOX, _test.getDownloadDir()))
                 {
                     originBrowser.simpleSignIn();
                     originBrowser.beginAt(origin.toString());

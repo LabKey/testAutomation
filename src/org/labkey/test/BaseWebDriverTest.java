@@ -21,7 +21,6 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -83,6 +82,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -148,12 +148,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 {
     private static BaseWebDriverTest currentTest;
     private final BrowserType BROWSER_TYPE;
+    private ManagedWebDriver _managedWebDriver;
 
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
     private String _lastPageText = null;
     protected static boolean _testFailed = false;
-    protected static boolean _anyTestFailed = false;
+    protected static final Map<Class<?>, Boolean> _anyTestFailed = new HashMap<>();
     private final ArtifactCollector _artifactCollector;
     private DeferredErrorCollector _errorCollector;
 
@@ -223,6 +224,18 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             BROWSER_TYPE = bestBrowser();
             log("Unknown browser [" + seleniumBrowser + "]; Using best compatible browser [" + BROWSER_TYPE + "]");
         }
+
+        if (TestProperties.isInjectionCheckEnabled())
+        {
+            addPageLoadListener(new PageLoadListener()
+            {
+                @Override
+                public void afterPageLoad(WebDriverWrapper wrapper)
+                {
+                    urlsSeen.add(wrapper.getCurrentRelativeURL());
+                }
+            });
+        }
     }
 
     public Set<String> getUrlsSeen()
@@ -240,9 +253,25 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return getCurrentTest() != null ? getCurrentTest().getClass() : null;
     }
 
+    private void setManagedWebDriver(ManagedWebDriver mwd)
+    {
+        if (mwd.isTornDown())
+        {
+            throw new IllegalStateException("Specified WebDriver has already been closed");
+        }
+        _managedWebDriver = mwd;
+    }
+
+    @Override
     public WebDriver getWrappedDriver()
     {
-        return SingletonWebDriver.getInstance().getWebDriver();
+        return _managedWebDriver.getWebDriver();
+    }
+
+    @Override
+    public File getDownloadDir()
+    {
+        return _managedWebDriver.getDownloadDir();
     }
 
     protected abstract @Nullable String getProjectName();
@@ -255,13 +284,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     public void setUp()
     {
-        if (_testFailed)
-        {
-            // In case the previous test failed so catastrophically that it couldn't clean up after itself
-            doTearDown();
-        }
-
-        SingletonWebDriver.getInstance().setUp(this);
+        WebDriverManager.getInstance().setUp(this);
 
         getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
         getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
@@ -306,10 +329,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return BROWSER_TYPE;
     }
 
-    private static void doTearDown()
+    private void doTearDown()
     {
         boolean closeWindow = !_testFailed || isRunWebDriverHeadless() || Boolean.parseBoolean(System.getProperty("close.on.fail", "true"));
-        SingletonWebDriver.getInstance().tearDown(closeWindow || isTestRunningOnTeamCity());
+        _managedWebDriver.tearDown(closeWindow || isTestRunningOnTeamCity());
     }
 
     private void populateLastPageInfo()
@@ -348,6 +371,22 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    private static BaseWebDriverTest getInstanceForDescription(Description description)
+    {
+        try
+        {
+            return (BaseWebDriverTest) description.getTestClass().getDeclaredConstructor().newInstance();
+        }
+        catch (InstantiationException | IllegalAccessException | NoSuchMethodException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (InvocationTargetException e)
+        {
+            throw new RuntimeException(e.getTargetException());
+        }
+    }
+
     private static final String BEFORE_CLASS = "BeforeClass";
     private static final String AFTER_CLASS = "AfterClass";
     private static boolean beforeClassSucceeded = false;
@@ -365,30 +404,22 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             public void starting(Description description)
             {
                 testClassStartTime = System.currentTimeMillis();
-                SingletonWebDriver.getInstance().clear();
                 testCount = description.getChildren().stream().filter(child -> child.getAnnotation(Ignore.class) == null).count();
                 currentTestNumber = 0;
                 beforeClassSucceeded = false;
-                _anyTestFailed = false;
+                _anyTestFailed.put(description.getTestClass(), false);
 
                 ArtifactCollector.init();
 
-                try
-                {
-                    currentTest = (BaseWebDriverTest) description.getTestClass().newInstance();
-                }
-                catch (InstantiationException | IllegalAccessException e)
-                {
-                    currentTest = null; // Make sure previous instance is cleared
-                    throw new RuntimeException(e);
-                }
+                currentTest = null; // Make sure previous instance is cleared
+                currentTest = getInstanceForDescription(description);
 
                 currentTest.setUp();
 
-                if (getDownloadDir().exists())
+                if (currentTest.getDownloadDir().exists())
                 {
                     try{
-                        FileUtils.deleteDirectory(getDownloadDir());
+                        FileUtils.deleteDirectory(currentTest.getDownloadDir());
                     }
                     catch (IOException ignore) { }
                 }
@@ -400,10 +431,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void succeeded(Description description)
             {
-                if (!_anyTestFailed)
+                if (!_anyTestFailed.get(description.getTestClass()))
+                {
                     getCurrentTest().doPostamble();
+                }
                 else
+                {
                     TestLogger.log("Skipping post-test checks because a test case failed.");
+                }
             }
         };
 
@@ -423,13 +458,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void finished(Description description)
             {
+                BaseWebDriverTest currentTest = getCurrentTest();
                 // Skip teardown if another test has already started
-                if (description.getTestClass().equals(getCurrentTestClass()))
+                if (currentTest != null && description.getTestClass().equals(currentTest.getClass()))
                 {
-                    doTearDown();
+                    currentTest.doTearDown();
                     if (!isTestCleanupSkipped())
                     {
-                        try (TestScrubber scrubber = new TestScrubber(TestProperties.isTestRunningOnTeamCity() ? BrowserType.FIREFOX : getCurrentTest().getBrowserType(), getDownloadDir()))
+                        try (TestScrubber scrubber = new TestScrubber(TestProperties.isTestRunningOnTeamCity() ? BrowserType.FIREFOX : getCurrentTest().getBrowserType(), getCurrentTest().getDownloadDir()))
                         {
                             scrubber.cleanSiteSettings();
                         }
@@ -507,7 +543,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 if (e instanceof TestTimedOutException || e instanceof InterruptedException)
                 {
-                    SingletonWebDriver.getInstance().clear();
                     currentTest = null;
                 }
             }
@@ -531,29 +566,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         };
 
-        TestWatcher lock = new TestWatcher()
-        {
-            @Override
-            public Statement apply(Statement base, Description description)
-            {
-                final Statement statement = super.apply(base, description);
-                return new Statement()
-                {
-                    @Override
-                    public void evaluate() throws Throwable
-                    {
-                        synchronized (BaseWebDriverTest.class)
-                        {
-                            statement.evaluate();
-                        }
-                        synchronized (description.getTestClass()) { /* Make sure test methods have finished */ }
-                    }
-                };
-            }
-        };
-
-        return RuleChain.outerRule(lock).around(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
-//        return RuleChain.outerRule(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
+        return RuleChain.outerRule(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
     }
 
     private static boolean canConnectWithPrimaryUser()
@@ -758,29 +771,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         };
 
-        TestWatcher _lock = new TestWatcher()
-        {
-            @Override
-            public Statement apply(Statement base, Description description)
-            {
-                final Statement statement = super.apply(base, description);
-                return new Statement()
-                {
-                    @Override
-                    public void evaluate() throws Throwable
-                    {
-                        synchronized (description.getTestClass())
-                        {
-                            statement.evaluate();
-                        }
-                    }
-                };
-            }
-        };
-
         Timeout timeoutRule = "true".equals(System.getProperty("intellij.debug.agent")) ? Timeout.millis(0) : testTimeout();
-        return RuleChain.outerRule(_lock).around(_logger).around(timeoutRule).around(_failWatcher).around(_watcher);
-//        return RuleChain.outerRule(_logger).around(timeoutRule).around(_failWatcher).around(_watcher);
+        return RuleChain.outerRule(_logger).around(timeoutRule).around(_failWatcher).around(_watcher);
     }
 
     /**
@@ -790,7 +782,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void handleFailure(Throwable error, @LoggedParam String testName)
     {
         _testFailed = true;
-        _anyTestFailed = true;
+        _anyTestFailed.put(getClass(), true);
 
         error.printStackTrace();
 
@@ -1084,13 +1076,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         finally
         {
-            doTearDown();
+            _managedWebDriver.tearDown(true);
         }
-    }
-
-    public static File getDownloadDir()
-    {
-        return SingletonWebDriver.getInstance().getDownloadDir();
     }
 
     @LogMethod
@@ -2476,26 +2463,23 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         int minutes() default DEFAULT;
     }
 
-    private static final class SingletonWebDriver
+    private static final class ManagedWebDriver
     {
-        private static final SingletonWebDriver INSTANCE = new SingletonWebDriver();
-
         @NotNull
-        private Pair<WebDriver, DriverService> _driverAndService = new ImmutablePair<>(null, null);
-        private File _downloadDir;
+        private final Pair<WebDriver, DriverService> _driverAndService;
+        private final File _downloadDir;
 
-        private SingletonWebDriver()
+        boolean _tornDown = false;
+
+        public ManagedWebDriver(@NotNull Pair<WebDriver, DriverService> driverAndService, File downloadDir)
         {
-            // Just for me
-            if (INSTANCE != null)
-                throw new IllegalStateException("Don't create multiple instances");
+            _driverAndService = driverAndService;
+            _downloadDir = downloadDir;
         }
 
-        private static SingletonWebDriver getInstance()
+        public boolean isTornDown()
         {
-            if (Thread.interrupted())
-                return null; // Not for you
-            return INSTANCE;
+            return _tornDown;
         }
 
         private WebDriver getWebDriver()
@@ -2508,30 +2492,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             return _driverAndService.getRight();
         }
 
-        private File getDownloadDir()
+        public File getDownloadDir()
         {
             return _downloadDir;
-        }
-
-        private void setUp(BaseWebDriverTest test)
-        {
-            WebDriver oldWebDriver = getWebDriver();
-            File newDownloadDir = new File(test.getArtifactCollector().ensureDumpDir(test.getClass().getSimpleName()), "downloads");
-            _driverAndService = test.createNewWebDriver(_driverAndService, test.BROWSER_TYPE, newDownloadDir);
-            if (getWebDriver() != oldWebDriver) // downloadDir only changes when a new WebDriver is started.
-                _downloadDir = newDownloadDir;
-
-            if (TestProperties.isInjectionCheckEnabled())
-            {
-                test.addPageLoadListener(new PageLoadListener(){
-                    @Override
-                    public void afterPageLoad()
-                    {
-                        urlsSeen.add(test.getCurrentRelativeURL());
-                    }
-                });
-            }
-
         }
 
         private void tearDown(boolean closeOldBrowser)
@@ -2549,16 +2512,61 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             finally
             {
-                clear();
+                if (getDriverService() != null && getDriverService().isRunning())
+                    getDriverService().stop();
+                _tornDown = true;
+            }
+        }
+    }
+
+    private static final class WebDriverManager
+    {
+        private static Map<Class<? extends BaseWebDriverTest>, ManagedWebDriver> _webDrivers = new HashMap<>();
+
+        private static final WebDriverManager INSTANCE = new WebDriverManager();
+
+        private WebDriverManager()
+        {
+            // Just for me
+            if (INSTANCE != null)
+                throw new IllegalStateException("Don't create multiple instances");
+        }
+
+        private static WebDriverManager getInstance()
+        {
+            return INSTANCE;
+        }
+
+        private ManagedWebDriver setUp(BaseWebDriverTest test)
+        {
+            synchronized (INSTANCE)
+            {
+                ManagedWebDriver driver = getDriver(test);
+                if (driver != null && !driver.isTornDown())
+                {
+                    if (TestProperties.isNewWebDriverForEachTest())
+                    {
+                        TestLogger.error("Forcing new WebDriver.");
+                        driver.tearDown(true);
+                    }
+                    else
+                    {
+                        test.setManagedWebDriver(driver);
+                        return driver;
+                    }
+                }
+                File newDownloadDir = new File(test.getArtifactCollector().ensureDumpDir(test.getClass().getSimpleName()), "downloads");
+                Pair<WebDriver, DriverService> newDriverAndService = test.createNewWebDriver(test.BROWSER_TYPE, newDownloadDir);
+                driver = new ManagedWebDriver(newDriverAndService, newDownloadDir);
+                _webDrivers.put(test.getClass(), driver);
+                test.setManagedWebDriver(driver);
+                return driver;
             }
         }
 
-        private void clear()
+        private ManagedWebDriver getDriver(BaseWebDriverTest test)
         {
-            if (getDriverService() != null && getDriverService().isRunning())
-                getDriverService().stop();
-            // Don't clear _downloadDir. Cleanup steps might still need it after tearDown
-            _driverAndService = new ImmutablePair<>(null, null);
+            return _webDrivers.get(test.getClass());
         }
     }
 }
