@@ -90,7 +90,7 @@ public class SubNavBar extends WebDriverComponent<SubNavBar.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         WebElement parentNav = Locator.css("div.parent-nav > ul.navbar-nav > li > a").findWhenNeeded(this);
         WebElement tabScrollContainer = Locator.tagWithClass("div", "tab-scroll-ct").findWhenNeeded(this);
