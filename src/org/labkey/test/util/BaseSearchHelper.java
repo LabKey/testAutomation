@@ -211,27 +211,21 @@ public abstract class BaseSearchHelper<H extends BaseSearchHelper<H, SearchResul
 
     protected void addExpectedContainerLink(String expectedResultsContainer, SearchResultsQueue.SearchItem item, List<Locator> expectedResults)
     {
-        if (expectedResultsContainer != null)
+        if (item.expectFileInResults())
         {
-            if ( Locator.linkContainingText("@files").findOptionalElement(getDriver()).isPresent() )
+            if (expectedResultsContainer == null)
             {
-                if(expectedResultsContainer.contains("@files"))
-                {
-                    expectedResults.add(Locator.linkWithText(expectedResultsContainer));
-                }
-                else
-                {
-                    expectedResults.add(Locator.linkWithText(expectedResultsContainer + (item.expectFileInResults() ? "/@files" : "")));
-                }
+                expectedResults.add(Locator.linkContainingText("/@files"));
             }
             else
             {
-                expectedResults.add(Locator.linkWithText(expectedResultsContainer));
+                // Use 'startsWith', "@files" link might be appended by subfolder name
+                expectedResults.add(Locator.tag("a").startsWith(expectedResultsContainer + "/@files"));
             }
         }
-        else if (item.expectFileInResults())
+        else
         {
-            expectedResults.add(Locator.linkContainingText("/@files"));
+            expectedResults.add(Locator.linkWithText(expectedResultsContainer));
         }
     }
 
