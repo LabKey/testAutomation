@@ -187,7 +187,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return driver;
     }
 
-    protected Pair<WebDriver, DriverService> createNewWebDriver(BrowserType browserType, File downloadDir)
+    public static Pair<WebDriver, DriverService> createNewWebDriver(BrowserType browserType, File downloadDir)
     {
         WebDriver newWebDriver = null;
         DriverService newDriverService = null;
@@ -214,7 +214,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             case CHROME:
             {
                 {
-                    log("Using chromedriver: " + TestProperties.ensureChromedriverExeProperty());
+                    TestLogger.log("Using chromedriver: " + TestProperties.ensureChromedriverExeProperty());
                     configureChromeDriverLogging(downloadDir);
                     ChromeOptions options = new ChromeOptions();
                     Map<String, Object> prefs = new HashMap<>();
@@ -246,7 +246,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             case FIREFOX:
             {
                 {
-                    log("Using geckodriver: " + TestProperties.ensureGeckodriverExeProperty());
+                    TestLogger.log("Using geckodriver: " + TestProperties.ensureGeckodriverExeProperty());
                     configureGeckoDriverLogging(downloadDir);
                     final FirefoxProfile profile = new FirefoxProfile();
                     profile.setPreference("app.update.auto", false);
@@ -338,13 +338,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
             Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getVersion();
-            log("Browser: " + browserName + " " + browserVersion);
+            TestLogger.log("Browser: " + browserName + " " + browserVersion);
             _downloadDirs.put(newWebDriver, downloadDir);
             return new ImmutablePair<>(newWebDriver, newDriverService);
         }
     }
 
-    private void configureChromeDriverLogging(File downloadDir)
+    private static void configureChromeDriverLogging(File downloadDir)
     {
         if (isWebDriverLoggingEnabled())
         {
@@ -352,18 +352,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
             {
                 String logFileName = new SimpleDateFormat("'chromedriver_'HHmmss'.log'").format(new Date());
                 final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
-                log("Saving chromedriver log to: " + logPath);
+                TestLogger.log("Saving chromedriver log to: " + logPath);
                 System.setProperty(CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
                 System.setProperty(CHROME_DRIVER_LOG_PROPERTY, logPath);
             }
             else
             {
-                log("Failed to create directory for chromedriver log: " + downloadDir.getParentFile().getAbsolutePath());
+                TestLogger.log("Failed to create directory for chromedriver log: " + downloadDir.getParentFile().getAbsolutePath());
             }
         }
     }
 
-    private void configureGeckoDriverLogging(File downloadDir)
+    private static void configureGeckoDriverLogging(File downloadDir)
     {
         if (isWebDriverLoggingEnabled())
         {
@@ -371,13 +371,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
             {
                 String logFileName = new SimpleDateFormat("'geckodriver_'HHmmss'.log'").format(new Date());
                 final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
-                log("Saving geckodriver log to: " + logPath);
+                TestLogger.log("Saving geckodriver log to: " + logPath);
                 System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, logPath);
                 return;
             }
             else
             {
-                log("Failed to create directory for geckodriver log: " + downloadDir.getParentFile().getAbsolutePath());
+                TestLogger.log("Failed to create directory for geckodriver log: " + downloadDir.getParentFile().getAbsolutePath());
             }
         }
         System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");

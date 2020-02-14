@@ -248,30 +248,21 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return currentTest;
     }
 
-    public static Class getCurrentTestClass()
+    public static Class<? extends BaseWebDriverTest> getCurrentTestClass()
     {
         return getCurrentTest() != null ? getCurrentTest().getClass() : null;
-    }
-
-    private void setManagedWebDriver(ManagedWebDriver mwd)
-    {
-        if (mwd.isTornDown())
-        {
-            throw new IllegalStateException("Specified WebDriver has already been closed");
-        }
-        _managedWebDriver = mwd;
     }
 
     @Override
     public WebDriver getWrappedDriver()
     {
-        return _managedWebDriver.getWebDriver();
+        return _managedWebDriver == null ? null : _managedWebDriver.getWebDriver();
     }
 
     @Override
     public File getDownloadDir()
     {
-        return _managedWebDriver.getDownloadDir();
+        return _managedWebDriver == null ? null : _managedWebDriver.getDownloadDir();
     }
 
     protected abstract @Nullable String getProjectName();
@@ -284,7 +275,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     public void setUp()
     {
-        WebDriverManager.getInstance().setUp(this);
+        _managedWebDriver = WebDriverManager.getInstance().setUp(this);
 
         getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
         getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
@@ -2463,7 +2454,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         int minutes() default DEFAULT;
     }
 
-    private static final class ManagedWebDriver
+    public static final class ManagedWebDriver
     {
         @NotNull
         private final Pair<WebDriver, DriverService> _driverAndService;
@@ -2471,7 +2462,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         boolean _tornDown = false;
 
-        public ManagedWebDriver(@NotNull Pair<WebDriver, DriverService> driverAndService, File downloadDir)
+        private ManagedWebDriver(@NotNull Pair<WebDriver, DriverService> driverAndService, File downloadDir)
         {
             _driverAndService = driverAndService;
             _downloadDir = downloadDir;
@@ -2508,7 +2499,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             catch (UnreachableBrowserException log)
             {
-                log.printStackTrace(System.out);
+                log.printStackTrace(System.err);
             }
             finally
             {
@@ -2521,9 +2512,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private static final class WebDriverManager
     {
-        private static Map<Class<? extends BaseWebDriverTest>, ManagedWebDriver> _webDrivers = new HashMap<>();
-
         private static final WebDriverManager INSTANCE = new WebDriverManager();
+
+        private final Map<Class<? extends BaseWebDriverTest>, ManagedWebDriver> _webDrivers = new HashMap<>();
 
         private WebDriverManager()
         {
@@ -2551,15 +2542,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     }
                     else
                     {
-                        test.setManagedWebDriver(driver);
                         return driver;
                     }
                 }
                 File newDownloadDir = new File(test.getArtifactCollector().ensureDumpDir(test.getClass().getSimpleName()), "downloads");
-                Pair<WebDriver, DriverService> newDriverAndService = test.createNewWebDriver(test.BROWSER_TYPE, newDownloadDir);
+                Pair<WebDriver, DriverService> newDriverAndService = createNewWebDriver(test.BROWSER_TYPE, newDownloadDir);
                 driver = new ManagedWebDriver(newDriverAndService, newDownloadDir);
                 _webDrivers.put(test.getClass(), driver);
-                test.setManagedWebDriver(driver);
                 return driver;
             }
         }
