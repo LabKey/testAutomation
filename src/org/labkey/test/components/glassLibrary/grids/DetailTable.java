@@ -37,6 +37,13 @@ public class DetailTable extends WebDriverComponent
         return _tableElement;
     }
 
+    public Boolean isLoaded()
+    {
+        return !Locators.loadingGrid.existsIn(this) &&
+                !Locators.spinner.existsIn(this) &&
+                Locator.tag("td").existsIn(this);
+    }
+
     // TODO Not sure if the get & click methods are correct (or appropriate?), for a @glass component.
     //  It may be appropriate to have these interfaces but maybe the way the cell is identified should be different.
 
@@ -94,6 +101,10 @@ public class DetailTable extends WebDriverComponent
         {
             return Locator.tagWithAttribute("td", "data-caption", caption);
         }
+
+        static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
+        static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
+        static final Locator spinner = Locator.css("span i.fa-spinner");
 
     }
 

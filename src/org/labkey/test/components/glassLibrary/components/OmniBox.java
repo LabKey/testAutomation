@@ -186,7 +186,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         public WebElement control = new LazyWebElement(Locators.omniBoxControl, this);
         public WebElement input = new RefindingWebElement(Locators.omniBoxInput, this);

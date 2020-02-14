@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class AuthenticationAPIUtils
 {
@@ -91,10 +92,10 @@ public class AuthenticationAPIUtils
             List<Configuration> configurations = new ArrayList<>();
             for (Map<String, Object> configMap : parsedConfigurations)
             {
-                Configuration config = new Configuration();
-                config._configuration = (long) configMap.get("configuration");
-                config._description = (String) configMap.get("description");
-                config._provider = (String) configMap.get("provider");
+                long configuration = (long) configMap.get("configuration");
+                String description = (String) configMap.get("description");
+                String provider = (String) configMap.get("provider");
+                Configuration config = new Configuration(description, configuration, provider);
                 configurations.add(config);
             }
 
@@ -116,16 +117,20 @@ public class AuthenticationAPIUtils
     @LogMethod
     public static void deleteConfigurations(@LoggedParam String providerName, Connection connection)
     {
-        List<Configuration> configurations = getAllConfigurations(connection);
-        configurations.stream().filter(configuration -> providerName.equals(configuration._provider))
-                .forEach(configuration -> deleteConfiguration(configuration, connection));
+        deleteConfigurations(configuration -> providerName.equals(configuration._provider), connection);
     }
 
     @LogMethod
     public static void deleteConfiguration(@LoggedParam String configurationDescription, Connection connection)
     {
+        deleteConfigurations(configuration -> configurationDescription.equals(configuration._description), connection);
+    }
+
+    @LogMethod
+    public static void deleteConfigurations(Predicate<Configuration> configurationFilter, Connection connection)
+    {
         List<Configuration> configurations = getAllConfigurations(connection);
-        configurations.stream().filter(configuration -> configurationDescription.equals(configuration._description))
+        configurations.stream().filter(configurationFilter)
                 .forEach(configuration -> deleteConfiguration(configuration, connection));
     }
 
@@ -147,10 +152,32 @@ public class AuthenticationAPIUtils
         }
     }
 
-    private static class Configuration
+    public static class Configuration
     {
-        private String _description;
-        private long _configuration;
-        private String _provider;
+        private final String _description;
+        private final long _configuration;
+        private final String _provider;
+
+        public Configuration(String description, long configuration, String provider)
+        {
+            _description = description;
+            _configuration = configuration;
+            _provider = provider;
+        }
+
+        public String getDescription()
+        {
+            return _description;
+        }
+
+        public long getConfiguration()
+        {
+            return _configuration;
+        }
+
+        public String getProvider()
+        {
+            return _provider;
+        }
     }
 }
