@@ -207,7 +207,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
             {
                 click(Locator.radioButtonById("Fileupload"));
                 waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
-                setFormElement(Locator.tagWithAttribute("input", "type", "file"), new File(TestFileUtils.getLabKeyRoot() + runFiles.get(fileIndex++)));
+                setFormElement(Locator.tagWithAttribute("input", "type", "file"), runFiles.get(fileIndex++));
 
                 if (isElementPresent(Locator.lkButton("Save and Import Another Run")))
                 {

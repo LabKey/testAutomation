@@ -29,7 +29,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.Window;
@@ -163,14 +162,13 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _fileBrowserHelper.moveFile(filename, folderName);
 
         log("rename file");
-        final Locator fileLocationLink = Locator.linkWithText("/" + getProjectName() + "/@files/" + folderName);
         final String newFileName = "changedFilename.html";
         _fileBrowserHelper.renameFile(folderName + "/" + filename, newFileName);
 
         _searchHelper.enqueueSearchItem(filename); // No results for old file name
-        _searchHelper.enqueueSearchItem(newFileName, true, Locator.linkContainingText(newFileName), fileLocationLink);
-        _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(newFileName), fileLocationLink);
-        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true, Locator.linkContainingText(newFileName), fileLocationLink);
+        _searchHelper.enqueueSearchItem(newFileName, folderName, Locator.linkContainingText(newFileName));
+        _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, folderName, Locator.linkContainingText(newFileName));
+        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, folderName, Locator.linkContainingText(newFileName));
 
         _searchHelper.verifySearchResults(getProjectName(), "searchAfterRename");
 

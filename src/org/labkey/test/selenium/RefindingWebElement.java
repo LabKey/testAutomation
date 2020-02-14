@@ -47,7 +47,7 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
         }
         else
         {
-            _wrappedElement = element;
+            setWrappedElement(element);
         }
     }
 
@@ -58,7 +58,7 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
     public RefindingWebElement(WebElement element, Locator locator, SearchContext searchContext)
     {
         this(locator, searchContext);
-        _wrappedElement = element;
+        setWrappedElement(element);
     }
 
     private void assertUniqueId(WebElement el)
@@ -75,24 +75,28 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
         {
             super.getWrappedElement().isEnabled(); // Check for staleness
         }
-        catch (NoSuchElementException | StaleElementReferenceException refind)
+        catch (WebDriverException e)
         {
-
-            // Geckodriver sometimes thros NoSuchElementException for stale elements. Check for those.
-            if (refind instanceof NoSuchElementException && !refind.getMessage().startsWith("Web element reference not seen before:"))
+            boolean staleElement =
+                    // Actual stale element
+                    e instanceof StaleElementReferenceException ||
+                    // Geckodriver sometimes throws NoSuchElementException for stale elements. Check for those.
+                    e instanceof NoSuchElementException && e.getMessage().startsWith("Web element reference not seen before:") ||
+                    // Intermittent `WebDriverException`
+                    e.getMessage().startsWith("TypeError: el is undefined");
+            if (!staleElement)
             {
-                throw refind;
+                throw e;
             }
-            boolean refound = false;
             try
             {
-                _wrappedElement = findWrappedElement();
-                refound = true;
-            }
-            catch (NoSuchElementException ignore) {}
-
-            if (refound)
+                setWrappedElement(null); // Trigger refind
                 callListeners(super.getWrappedElement());
+            }
+            catch (NoSuchElementException ignore)
+            {
+                throw e;
+            }
         }
         return super.getWrappedElement();
     }

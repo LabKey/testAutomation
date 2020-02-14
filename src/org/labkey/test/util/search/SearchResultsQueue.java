@@ -28,12 +28,12 @@ public class SearchResultsQueue
      */
     public void enqueueSearchItem(String searchTerm, Locator... expectedResults)
     {
-        enqueueSearchItem(searchTerm, false, expectedResults);
+        enqueueSearchItem(searchTerm, null, expectedResults);
     }
 
-    public void enqueueSearchItem(String searchTerm, boolean isFile, Locator... expectedResults)
+    public void enqueueSearchItem(String searchTerm, String filePath, Locator... expectedResults)
     {
-        _searchQueue.put(searchTerm, new SearchItem(isFile, expectedResults));
+        _searchQueue.put(searchTerm, new SearchItem(filePath, expectedResults));
     }
 
     public void addUnwantedResult(String searchTerm, Locator unexpectedResults)
@@ -44,7 +44,7 @@ public class SearchResultsQueue
     public Map<String, SearchItem> getQueuedItems()
     {
         HashMap<String, SearchItem> searchQueuePlus = new HashMap<>(_searchQueue);
-        searchQueuePlus.put(SearchHelper.getUnsearchableValue(), new SearchItem());
+        searchQueuePlus.put(SearchHelper.getUnsearchableValue(), new SearchItem(null));
         return searchQueuePlus;
     }
 
@@ -57,17 +57,12 @@ public class SearchResultsQueue
     {
         private final List<Locator> _searchResults;
         private final List<Locator> _unwantedResults = new ArrayList<>();
-        private final boolean _file; // is this search expecting a file?
+        private final String _filePath;
 
-        private SearchItem(boolean file, Locator... results)
+        private SearchItem(String filePath, Locator... results)
         {
             _searchResults = Arrays.asList(results);
-            _file = file;
-        }
-
-        private SearchItem()
-        {
-            this(false);
+            _filePath = filePath;
         }
 
         public List<Locator> getExpectedResults()
@@ -77,7 +72,12 @@ public class SearchResultsQueue
 
         public boolean expectFileInResults()
         {
-            return _file;
+            return _filePath != null;
+        }
+
+        public String getFilePath()
+        {
+            return _filePath;
         }
 
         public List<Locator> getUnwantedResults()
