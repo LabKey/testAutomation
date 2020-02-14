@@ -289,7 +289,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         public Optional<WebElement> selectColumn = Locator.xpath("//th/input[@type='checkbox']").findOptionalElement(getComponentElement());
         public WebElement inputCell()

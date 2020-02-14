@@ -31,11 +31,16 @@ import org.labkey.remoteapi.assay.ProtocolResponse;
 import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.remoteapi.assay.SaveProtocolCommand;
+import org.labkey.remoteapi.query.Row;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebTestHelper;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -202,6 +207,35 @@ public class APIAssayHelper extends AbstractAssayHelper
             return 0;
         }
         return ((Long) alr.getDefinition(assayName).get("id")).intValue();
+    }
+
+    /**
+     * For a given container get a list of the assays present.
+     *
+     * @param containerPath Container path.
+     * @return A list of the names of assays that were found.
+     * @throws IOException Can be thrown by the SelectRowsCommand.
+     * @throws CommandException Can be thrown by the SelectRowsCommand.
+     */
+    public static List<String> getListOfAssayNames(String containerPath) throws IOException, CommandException
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        SelectRowsCommand cmd = new SelectRowsCommand("assay", "AssayList");
+        cmd.setColumns(Arrays.asList("Name", "Description", "Type"));
+
+        String formattedContainerPath = containerPath;
+        if(!formattedContainerPath.startsWith("/"))
+            formattedContainerPath = "/" + formattedContainerPath;
+
+        List<String> resultData = new ArrayList<>();
+
+        SelectRowsResponse response = cmd.execute(connection, formattedContainerPath);
+        for(Row row : response.getRowset())
+        {
+            resultData.add(row.getValue("Name").toString());
+        }
+
+        return resultData;
     }
 
     public void saveBatch(String assayName, String runName, Map<String, Object> runProperties, List<Map<String, Object>> resultRows, String projectName) throws IOException, CommandException

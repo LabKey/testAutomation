@@ -286,7 +286,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         public OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver).findWhenNeeded(this);
         private final Map<String, MultiMenu> menus = new HashMap<>();
