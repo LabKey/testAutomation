@@ -193,7 +193,7 @@ public class RReportHelper
         {
             if (local)
             {
-                File rPackage = new File(TestFileUtils.getLabKeyRoot(), "/sampledata/rlabkey/Rlabkey.zip");
+                File rPackage = new File(getRLibraryPath(), "Rlabkey.zip");
 
                 if (!rPackage.exists())
                     fail("Unable to locate the local Rlabkey package: " + rPackage.getName());

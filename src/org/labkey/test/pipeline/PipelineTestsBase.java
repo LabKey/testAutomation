@@ -100,7 +100,7 @@ public class PipelineTestsBase
 
         _folder.clean();
 
-        File rootDir = new File(_folder.getPipelinePath());
+        File rootDir = _folder.getPipelinePath();
         _test.log("Cleaning pipeline files in " + rootDir);
 
         for (PipelineTestParams tp : getParams())
@@ -114,7 +114,7 @@ public class PipelineTestsBase
         if (_folder == null)
             return;
 
-        File rootDir = new File(_folder.getPipelinePath());
+        File rootDir = _folder.getPipelinePath();
         _test.log("Verifying that pipeline files were cleaned up properly in " + rootDir);
 
         for (PipelineTestParams tp : getParams())

@@ -574,6 +574,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         signIn();
         Log4jUtils.resetAllLogLevels();
+        setExperimentalFlags();
 
         // Start logging JS errors.
         resumeJsErrorChecker();
@@ -1011,6 +1012,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (reenableMiniProfiler)
             setMiniProfilerEnabled(true);
+
+        resetExperimentalFlags();
     }
 
     private void waitForPendingRequests(int msWait)

@@ -29,7 +29,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.Window;
@@ -167,11 +166,11 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _fileBrowserHelper.renameFile(folderName + "/" + filename, newFileName);
 
         _searchHelper.enqueueSearchItem(filename); // No results for old file name
-        _searchHelper.enqueueSearchItem(newFileName, true, Locator.linkContainingText(newFileName));
-        _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(newFileName));
-        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true, Locator.linkContainingText(newFileName));
+        _searchHelper.enqueueSearchItem(newFileName, folderName, Locator.linkContainingText(newFileName));
+        _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, folderName, Locator.linkContainingText(newFileName));
+        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, folderName, Locator.linkContainingText(newFileName));
 
-        _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName, "searchAfterRename");
+        _searchHelper.verifySearchResults(getProjectName(), "searchAfterRename");
 
         // Delete file.
         clickProject(getProjectName());
@@ -181,7 +180,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _searchHelper.enqueueSearchItem(FILE_DESCRIPTION);
         _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE);
 
-        _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName, "searchAfterDelete");
+        _searchHelper.verifySearchResults(getProjectName(), "searchAfterDelete");
 
         clickProject(getProjectName());
         _fileBrowserHelper.clickFileBrowserButton(BrowserAction.AUDIT_HISTORY);

@@ -210,7 +210,7 @@ public class DetailTableEdit extends WebDriverComponent
      **/
     public List<String> getSelectValue(String fieldCaption)
     {
-        return new ReactSelect.ReactSelectFinder(_driver).followingLabelWithSpan(fieldCaption).find().getSelections();
+        return ReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find().getSelections();
     }
 
     /**
@@ -235,7 +235,7 @@ public class DetailTableEdit extends WebDriverComponent
      **/
     public DetailTableEdit setSelectValue(String fieldCaption, List<String> selectValues)
     {
-        ReactSelect reactSelect = new ReactSelect.ReactSelectFinder(_driver).followingLabelWithSpan(fieldCaption).find();
+        ReactSelect reactSelect =  ReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find();
         selectValues.forEach(s -> {reactSelect.select(s);});
         return this;
     }
@@ -248,7 +248,7 @@ public class DetailTableEdit extends WebDriverComponent
      **/
     public DetailTableEdit clearSelectValue(String fieldCaption)
     {
-        new ReactSelect.ReactSelectFinder(_driver).followingLabelWithSpan(fieldCaption).find().clearSelection();
+        ReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find().clearSelection();
         return this;
     }
 

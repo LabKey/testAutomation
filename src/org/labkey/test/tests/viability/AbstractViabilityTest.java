@@ -77,10 +77,10 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
 
     protected void importSpecimens()
     {
-        importSpecimens(getFolderName(), "/sampledata/viability/specimens.txt");
+        importSpecimens(getFolderName(), TestFileUtils.getSampleData("viability/specimens.txt"));
     }
 
-    protected void importSpecimens(String studyFolder, String specimensPath)
+    protected void importSpecimens(String studyFolder, File specimensPath)
     {
         log("** Import specimens");
         clickFolder(studyFolder);
@@ -116,12 +116,12 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
         setupPipeline(getProjectName());
     }
 
-    protected void uploadViabilityRun(String path, boolean setBatchTargetStudy)
+    protected void uploadViabilityRun(File file, boolean setBatchTargetStudy)
     {
-        uploadViabilityRun(path, null, setBatchTargetStudy);
+        uploadViabilityRun(file, null, setBatchTargetStudy);
     }
 
-    protected void uploadViabilityRun(String path, String runName, boolean setBatchTargetStudy)
+    protected void uploadViabilityRun(File file, String runName, boolean setBatchTargetStudy)
     {
         log("** Upload viability run " + (runName != null ? runName : "<unnamed>"));
         clickFolder(getFolderName());
@@ -134,10 +134,10 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
         if (runName != null)
             setFormElement(Locator.name("name"), runName);
 
-        uploadAssayFile(path);
+        uploadAssayFile(file);
     }
 
-    protected void reuploadViabilityRun(String path, String runName)
+    protected void reuploadViabilityRun(File file, String runName)
     {
         // we should be already viewing the assay results page
         assertTitleContains(getAssayName() + " Results");
@@ -149,12 +149,11 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
         if (runName != null)
             setFormElement(Locator.name("name"), runName);
 
-        uploadAssayFile(path);
+        uploadAssayFile(file);
     }
 
-    private void uploadAssayFile(String path)
+    private void uploadAssayFile(File guavaFile)
     {
-        File guavaFile = new File(TestFileUtils.getLabKeyRoot() + path);
         assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
         setFormElement(Locator.name("__primaryFile__"), guavaFile);
         clickButton("Next", 8000);

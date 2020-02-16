@@ -53,6 +53,7 @@ import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -83,6 +84,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -263,13 +265,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         try
         {
+            String configId = getUrlParameters().get("configuration");
+
             //Select radio Yes
             checkRadioButton(Locator.radioButtonByNameAndValue("valid", "1"));
 
             //Click on button 'TestSecondary'
             clickAndWait(Locator.input("TestSecondary"));
 
-            disableSecondaryAuthentication();
+            // delete the current secondaryAuth configuration
+            deleteAuthenticationConfiguration(configId, createDefaultConnection(true));
         }
         catch (NoSuchElementException ignored)
         {
@@ -1006,6 +1011,20 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return menu;
     }
 
+    // enable/disable the flags specified by the test properties
+    @LogMethod()
+    public void setExperimentalFlags()
+    {
+        Map<String, Boolean> flagsToSet = TestProperties.getExperimentalFeatures();
+        ExperimentalFeaturesHelper.setFeatures(this, flagsToSet);
+    }
+
+    @LogMethod()
+    public void resetExperimentalFlags()
+    {
+        ExperimentalFeaturesHelper.resetFeatures(this);
+    }
+
     @LogMethod(quiet = true)
     public boolean disableMiniProfiler()
     {
@@ -1087,21 +1106,27 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return new EmailRecordTable(getDriver());
     }
 
-    @LogMethod(quiet = true)
-    public void enableSecondaryAuthentication()
-    {
-        setAuthenticationProvider("Test Secondary Authentication", true);
-    }
-
-    @LogMethod(quiet = true)
-    public void disableSecondaryAuthentication()
-    {
-        setAuthenticationProvider("Test Secondary Authentication", false);
-    }
-
     public void setAuthenticationProvider(String provider, boolean enabled)
     {
         setAuthenticationProvider(provider, enabled, createDefaultConnection(true));
+    }
+
+    @LogMethod(quiet = true)
+    public void deleteAuthenticationConfiguration(@LoggedParam String id, Connection cn)
+    {
+        String url = WebTestHelper.buildURL("login", "deleteConfiguration", Maps.of("configuration", id));
+        SimpleHttpRequest deleteRequest = new SimpleHttpRequest(url, "POST");
+        deleteRequest.copySession(getDriver());
+
+        try
+        {
+            SimpleHttpResponse response = deleteRequest.getResponse();
+            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @LogMethod(quiet = true)

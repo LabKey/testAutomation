@@ -3,7 +3,10 @@ package org.labkey.test.util.search;
 import org.labkey.test.Locator;
 import org.labkey.test.util.SearchHelper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SearchResultsQueue
@@ -25,18 +28,23 @@ public class SearchResultsQueue
      */
     public void enqueueSearchItem(String searchTerm, Locator... expectedResults)
     {
-        enqueueSearchItem(searchTerm, false, expectedResults);
+        enqueueSearchItem(searchTerm, null, expectedResults);
     }
 
-    public void enqueueSearchItem(String searchTerm, boolean isFile, Locator... expectedResults)
+    public void enqueueSearchItem(String searchTerm, String filePath, Locator... expectedResults)
     {
-        _searchQueue.put(searchTerm, new SearchItem(isFile, expectedResults));
+        _searchQueue.put(searchTerm, new SearchItem(filePath, expectedResults));
+    }
+
+    public void addUnwantedResult(String searchTerm, Locator unexpectedResults)
+    {
+        _searchQueue.get(searchTerm).addUnwantedResult(unexpectedResults);
     }
 
     public Map<String, SearchItem> getQueuedItems()
     {
         HashMap<String, SearchItem> searchQueuePlus = new HashMap<>(_searchQueue);
-        searchQueuePlus.put(SearchHelper.getUnsearchableValue(), new SearchItem());
+        searchQueuePlus.put(SearchHelper.getUnsearchableValue(), new SearchItem(null));
         return searchQueuePlus;
     }
 
@@ -47,28 +55,39 @@ public class SearchResultsQueue
 
     public static class SearchItem
     {
-        private final Locator[] _searchResults;
-        private final boolean _file; // is this search expecting a file?
+        private final List<Locator> _searchResults;
+        private final List<Locator> _unwantedResults = new ArrayList<>();
+        private final String _filePath;
 
-        private SearchItem(boolean file, Locator... results)
+        private SearchItem(String filePath, Locator... results)
         {
-            _searchResults = results;
-            _file = file;
+            _searchResults = Arrays.asList(results);
+            _filePath = filePath;
         }
 
-        private SearchItem()
-        {
-            this(false);
-        }
-
-        public Locator[] getExpectedResults()
+        public List<Locator> getExpectedResults()
         {
             return _searchResults;
         }
 
         public boolean expectFileInResults()
         {
-            return _file;
+            return _filePath != null;
+        }
+
+        public String getFilePath()
+        {
+            return _filePath;
+        }
+
+        public List<Locator> getUnwantedResults()
+        {
+            return _unwantedResults;
+        }
+
+        public void addUnwantedResult(Locator unwantedResult)
+        {
+            _unwantedResults.add(unwantedResult);
         }
     }
 }
