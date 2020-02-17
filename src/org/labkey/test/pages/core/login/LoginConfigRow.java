@@ -51,6 +51,11 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
         return authenticationProvider.getEditDialog(this);
     }
 
+    public boolean canEdit()
+    {
+        return Locator.tagWithClass("svg", "fa-pencil-alt").existsIn(this);
+    }
+
     @Override
     public WebElement getComponentElement()
     {

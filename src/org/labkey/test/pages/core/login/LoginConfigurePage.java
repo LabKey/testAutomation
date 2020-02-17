@@ -36,6 +36,12 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         return authenticationProvider.getNewDialog(getDriver());
     }
 
+    public boolean canAddConfiguration()
+    {
+        togglePrimaryConfiguration();
+        return new MultiMenu.MultiMenuFinder(getDriver()).withText("Add New Primary Configuration").findOptional(getDriver()).isPresent();
+    }
+
     public <D extends AuthDialogBase> D addSecondaryConfiguration(AuthenticationProvider<D> authenticationProvider)
     {
         toggleSecondaryConfiguration();
@@ -44,6 +50,12 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
                 clickSubMenu(false, authenticationProvider.getProviderName() + " : " + authenticationProvider.getProviderDescription());
 
         return authenticationProvider.getNewDialog(getDriver());
+    }
+
+    public boolean canAddSecondaryConfiguration()
+    {
+        toggleSecondaryConfiguration();
+        return new MultiMenu.MultiMenuFinder(getDriver()).withText("Add New Secondary Configuration").findOptional(getDriver()).isPresent();
     }
 
     private boolean isPrimarySelected()
