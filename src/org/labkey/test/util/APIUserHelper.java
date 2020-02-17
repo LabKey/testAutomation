@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -42,6 +43,22 @@ public class APIUserHelper extends AbstractUserHelper
     public APIUserHelper(WebDriverWrapper driver)
     {
         super(driver);
+    }
+
+    @Override
+    public String getDisplayNameForEmail(@NotNull String email)
+    {
+        GetUsersResponse users = getUsers(true);
+        Optional<GetUsersResponse.UserInfo> user = users.getUsersInfo().stream()
+                .filter(userInfo -> email.equals(userInfo.getEmail())).findFirst();
+        if (user.isPresent())
+        {
+            return user.get().getDisplayName();
+        }
+        else
+        {
+            return super.getDisplayNameForEmail(email);
+        }
     }
 
     @Override

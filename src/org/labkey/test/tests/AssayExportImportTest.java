@@ -121,7 +121,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
 
-        assayDesignerPage.addTransformScript(new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + PERL_SCRIPT));
+        assayDesignerPage.addTransformScript(new File(SAMPLE_DATA_LOCATION, PERL_SCRIPT));
         assayDesignerPage.setSaveScriptData(true);
 
         assayDesignerPage.setEditableResults(true);
@@ -138,7 +138,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         assayDesignerPage.goToResultsFields()
                 .removeAllFields(false)
-                .setInferFieldFile(new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE))
+                .setInferFieldFile(new File(SAMPLE_DATA_LOCATION, RUN01_FILE))
                 .addField(new FieldDefinition("adjustedM1").setType(FieldDefinition.ColumnType.Integer));
 
         assayDesignerPage.fieldsPanel("Results")
@@ -162,7 +162,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         assayDesignerPage.clickFinish();
     }
 
-    public void populateAssay(String projectName, String assayName, boolean useFilesWebPart, List<String> runFiles, @Nullable Map<String, String> batchProperties, @Nullable List<Map<String, String>> runProperties)
+    public void populateAssay(String projectName, String assayName, boolean useFilesWebPart, List<File> runFiles, @Nullable Map<String, String> batchProperties, @Nullable List<Map<String, String>> runProperties)
     {
 
         goToProjectHome(projectName);
@@ -173,12 +173,9 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
             portalHelper.addWebPart("Files");
 
-            runFiles.forEach((filePath)->_fileBrowserHelper.uploadFile(new File(TestFileUtils.getLabKeyRoot() + filePath)));
+            runFiles.forEach(file -> _fileBrowserHelper.uploadFile(file));
 
-            runFiles.forEach((filePath)->{
-                String fileName = filePath.substring(filePath.lastIndexOf("/"));
-                _fileBrowserHelper.selectFileBrowserItem(fileName);
-            });
+            runFiles.forEach(file -> _fileBrowserHelper.selectFileBrowserItem(file.getName()));
 
             _fileBrowserHelper.selectImportDataAction(assayName);
 
@@ -210,7 +207,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
             {
                 click(Locator.radioButtonById("Fileupload"));
                 waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
-                setFormElement(Locator.tagWithAttribute("input", "type", "file"), new File(TestFileUtils.getLabKeyRoot() + runFiles.get(fileIndex++)));
+                setFormElement(Locator.tagWithAttribute("input", "type", "file"), runFiles.get(fileIndex++));
 
                 if (isElementPresent(Locator.lkButton("Save and Import Another Run")))
                 {
@@ -334,11 +331,11 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         createSimpleProjectAndAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT);
 
-        List<String> runFiles = Arrays.asList(
-                SAMPLE_DATA_LOCATION + "/" + RUN01_FILE,
-                SAMPLE_DATA_LOCATION + "/" + RUN02_FILE,
-                SAMPLE_DATA_LOCATION + "/" + RUN03_FILE,
-                SAMPLE_DATA_LOCATION + "/" + RUN04_FILE);
+        List<File> runFiles = Arrays.asList(
+                new File(SAMPLE_DATA_LOCATION, RUN01_FILE),
+                new File(SAMPLE_DATA_LOCATION, RUN02_FILE),
+                new File(SAMPLE_DATA_LOCATION, RUN03_FILE),
+                new File(SAMPLE_DATA_LOCATION, RUN04_FILE));
 
         Map<String, String> batchProperties = new HashMap<>();
         batchProperties.put("operatorEmail", OPERATOR_EMAIL_01);
@@ -429,11 +426,11 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         createSimpleProjectAndAssay(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT);
 
-        List<String> runFiles = Arrays.asList(
-                SAMPLE_DATA_LOCATION + "/" + RUN01_FILE,
-                SAMPLE_DATA_LOCATION + "/" + RUN02_FILE,
-                SAMPLE_DATA_LOCATION + "/" + RUN03_FILE,
-                SAMPLE_DATA_LOCATION + "/" + RUN04_FILE);
+        List<File> runFiles = Arrays.asList(
+                new File(SAMPLE_DATA_LOCATION, RUN01_FILE),
+                new File(SAMPLE_DATA_LOCATION, RUN02_FILE),
+                new File(SAMPLE_DATA_LOCATION, RUN03_FILE),
+                new File(SAMPLE_DATA_LOCATION, RUN04_FILE));
 
         Map<String, String> batchProperties = new HashMap<>();
         batchProperties.put("operatorEmail", OPERATOR_EMAIL_02);
@@ -533,7 +530,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         assayDesignerPage.goToResultsFields()
                 .removeAllFields(false)
-                .setInferFieldFile(new File(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOCATION + "/" + RUN01_FILE));
+                .setInferFieldFile(new File(SAMPLE_DATA_LOCATION, RUN01_FILE));
         assayDesignerPage.clickFinish();
     }
 

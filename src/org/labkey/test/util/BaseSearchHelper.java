@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.search.HasSearchResults;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.labkey.test.util.search.SearchResultsQueue;
@@ -14,7 +13,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -211,27 +209,24 @@ public abstract class BaseSearchHelper<H extends BaseSearchHelper<H, SearchResul
 
     protected void addExpectedContainerLink(String expectedResultsContainer, SearchResultsQueue.SearchItem item, List<Locator> expectedResults)
     {
-        if (expectedResultsContainer != null)
+        expectedResults.add(Locator.linkWithText(expectedResultsContainer));
+        if (item.expectFileInResults())
         {
-            if ( Locator.linkContainingText("@files").findOptionalElement(getDriver()).isPresent() )
+            StringBuilder atFilesPath = new StringBuilder();
+            atFilesPath.append("/@files");
+            if (!item.getFilePath().isBlank())
             {
-                if(expectedResultsContainer.contains("@files"))
-                {
-                    expectedResults.add(Locator.linkWithText(expectedResultsContainer));
-                }
-                else
-                {
-                    expectedResults.add(Locator.linkWithText(expectedResultsContainer + (item.expectFileInResults() ? "/@files" : "")));
-                }
+                atFilesPath.append("/");
+                atFilesPath.append(item.getFilePath());
+            }
+            if (expectedResultsContainer == null)
+            {
+                expectedResults.add(Locator.tag("a").endsWith(atFilesPath.toString()));
             }
             else
             {
-                expectedResults.add(Locator.linkWithText(expectedResultsContainer));
+                expectedResults.add(Locator.linkWithText(expectedResultsContainer + atFilesPath));
             }
-        }
-        else if (item.expectFileInResults())
-        {
-            expectedResults.add(Locator.linkContainingText("/@files"));
         }
     }
 
@@ -273,12 +268,17 @@ public abstract class BaseSearchHelper<H extends BaseSearchHelper<H, SearchResul
      */
     public void enqueueSearchItem(String searchTerm, Locator... expectedResults)
     {
-        enqueueSearchItem(searchTerm, false, expectedResults);
+        enqueueSearchItem(searchTerm, null, expectedResults);
     }
 
     public void enqueueSearchItem(String searchTerm, boolean isFile, Locator... expectedResults)
     {
-        _searchResultsQueue.enqueueSearchItem(searchTerm, isFile, expectedResults);
+        enqueueSearchItem(searchTerm, isFile ? "" : null, expectedResults);
+    }
+
+    public void enqueueSearchItem(String searchTerm, String filePath, Locator... expectedResults)
+    {
+        _searchResultsQueue.enqueueSearchItem(searchTerm, filePath, expectedResults);
     }
 
     public void addUnwantedResult(String searchTerm, Locator unexpectedResults)
