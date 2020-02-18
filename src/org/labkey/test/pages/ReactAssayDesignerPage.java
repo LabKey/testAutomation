@@ -145,6 +145,12 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public ReactAssayDesignerPage setPlateMetadata(boolean checked)
+    {
+        elementCache().plateTemplateCheckbox.set(checked);
+        return this;
+    }
+
     public ReactAssayDesignerPage addTransformScript(File transformScript)
     {
         int index = Locator.xpath("//input[starts-with(@id, 'assay-design-protocolTransformScripts')]").findElements(getDriver()).size();
@@ -231,5 +237,6 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         final Checkbox editableResultCheckbox = Checkbox(Locator.checkboxById("assay-design-editableResults")).findWhenNeeded(this);
         final Checkbox backgroundUploadCheckbox = Checkbox(Locator.checkboxById("assay-design-backgroundUpload")).findWhenNeeded(this);
         final Checkbox qcEnabledCheckbox = Checkbox(Locator.checkboxById("assay-design-qcEnabled")).findWhenNeeded(this);
+        final Checkbox plateTemplateCheckbox = Checkbox(Locator.checkboxById("assay-design-plateMetadata")).findWhenNeeded(this);
     }
 }
