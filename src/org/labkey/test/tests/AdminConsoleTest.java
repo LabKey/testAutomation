@@ -164,7 +164,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         List<LoginConfigRow> configRows = configurePage.getPrimaryConfigurations();
         assertFalse("expect 'edit' links not to be available for auth configs", configRows.stream().anyMatch(a-> a.canEdit()));
         assertFalse("expect 'add configuration' menu to be absent for AppAdmin", configurePage.canAddConfiguration());
-        configurePage.clickSaveAndFinish();
+        clickButton("Done");
         assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
 
         //email customization

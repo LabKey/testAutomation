@@ -53,7 +53,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
 
     public boolean canEdit()
     {
-        return Locator.tagWithClass("svg", "fa-pencil-alt").existsIn(this);
+        return elementCache().editButtonLoc.existsIn(this);
     }
 
     @Override
@@ -87,8 +87,8 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
 
         final WebElement deleteButton = Locator.tagWithClass("svg", "fa-times-circle")
                 .findWhenNeeded(this).withTimeout(2000);
-        final WebElement editButton = Locator.tagWithClass("svg", "fa-pencil-alt")
-                .findWhenNeeded(this).withTimeout(2000);
+        Locator editButtonLoc = Locator.tagWithClass("svg", "fa-pencil-alt");
+        final WebElement editButton = editButtonLoc.findWhenNeeded(this).withTimeout(2000);
     }
 
 

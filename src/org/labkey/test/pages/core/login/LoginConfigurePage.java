@@ -39,7 +39,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     public boolean canAddConfiguration()
     {
         togglePrimaryConfiguration();
-        return new MultiMenu.MultiMenuFinder(getDriver()).withText("Add New Primary Configuration").findOptional(getDriver()).isPresent();
+        return elementCache().primaryMenuFinder.findOptional(getDriver()).isPresent();
     }
 
     public <D extends AuthDialogBase> D addSecondaryConfiguration(AuthenticationProvider<D> authenticationProvider)
@@ -55,7 +55,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     public boolean canAddSecondaryConfiguration()
     {
         toggleSecondaryConfiguration();
-        return new MultiMenu.MultiMenuFinder(getDriver()).withText("Add New Secondary Configuration").findOptional(getDriver()).isPresent();
+        return elementCache().secondaryMenuFinder.findOptional(getDriver()).isPresent();
     }
 
     private boolean isPrimarySelected()
@@ -205,11 +205,13 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         WebElement panelTab2 = Locator.id("tab-panel-tab-2").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement tabPane2 = Locator.id("tab-panel-pane-2").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        BootstrapMenu addPrimaryMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Add New Primary Configuration").timeout(WAIT_FOR_JAVASCRIPT)
-                .findWhenNeeded(this);
+        MultiMenu.MultiMenuFinder primaryMenuFinder = new MultiMenu.MultiMenuFinder(getDriver())
+                .withText("Add New Primary Configuration").timeout(WAIT_FOR_JAVASCRIPT);
+        BootstrapMenu addPrimaryMenu = primaryMenuFinder.findWhenNeeded(this);
 
-        BootstrapMenu addSecondaryMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Add New Secondary Configuration").timeout(WAIT_FOR_JAVASCRIPT)
-                .findWhenNeeded(this);
+        MultiMenu.MultiMenuFinder secondaryMenuFinder = new MultiMenu.MultiMenuFinder(getDriver())
+                .withText("Add New Secondary Configuration").timeout(WAIT_FOR_JAVASCRIPT);
+        BootstrapMenu addSecondaryMenu = secondaryMenuFinder.findWhenNeeded(this);
 
         WebElement saveAndFinishBtn()
         {
