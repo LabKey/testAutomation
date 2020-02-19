@@ -21,7 +21,7 @@ project.task('validatorJar',
         description: "Builds jar for assay validation",
         {
             from sourceSets.main.output
-            from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+            from { configurations.default.collect { it.isDirectory() ? it : zipTree(it) } }
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             archiveFileName.set("validator.jar")
             destinationDirectory = project.projectDir
@@ -41,8 +41,8 @@ project.task('transformJar',
 
         {
             from sourceSets.main.output
-            from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-            duplicatesStrategy = 'exclude'
+            from { configurations.default.collect { it.isDirectory() ? it : zipTree(it) } }
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             archiveFileName.set("transform.jar")
             destinationDirectory = project.projectDir
             manifest {
@@ -60,8 +60,8 @@ project.task('transformWarningJar',
         description: "Builds jar for doing assay transform warnings",
         {
             from sourceSets.main.output
-            from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-            duplicatesStrategy = 'exclude'
+            from { configurations.default.collect { it.isDirectory() ? it : zipTree(it) } }
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             archiveFileName.set("transformWarning.jar")
             destinationDirectory = project.projectDir
             manifest {
