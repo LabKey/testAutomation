@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyC.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class TroubleshooterRoleTest extends BaseWebDriverTest
 {
     private static final String TROUBLESHOOTER = "user@troubleshooter.test";
@@ -71,10 +72,10 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         checker().verifyFalse("Save should not be present for troubleshooter under External Redirect Hosts",
                 isElementPresent(Locator.button("Save")));
 
-//        log("Verify authentication changes cannot be saved");
-//        goToAdminConsole().goToSettingsSection().clickAuthentication();
-//        checker().verifyFalse("Save should not be present for troubleshooter under authentication",
-//                isElementPresent(Locator.button("Save and Finish")));
+        log("Verify authentication changes cannot be saved");
+        goToAdminConsole().goToSettingsSection().clickAuthentication();
+        checker().verifyFalse("Save should not be present for troubleshooter under authentication",
+                isElementPresent(Locator.button("Save and Finish")));
 
         stopImpersonating();
 
