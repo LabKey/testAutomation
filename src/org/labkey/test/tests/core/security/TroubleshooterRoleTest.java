@@ -57,28 +57,37 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         File exportedFile = auditLogPage.exportExcelxlsx();
         checker().verifyTrue("Empty downloaded [" + exportedFile.getName() + "]", exportedFile.length() > 0);
 
-        log("Verify look and feel setting changes cannot be saved");
-        goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
-        checker().verifyFalse("Save should not be present for troubleshooter under look and feel",
-                isElementPresent(Locator.button("Save")));
-
-        log("Verify configure page elements changes cannot be saved");
-        goToAdminConsole().goToSettingsSection().clickConfigurePageElements();
-        checker().verifyFalse("Save should not be present for troubleshooter under configure page element",
-                isElementPresent(Locator.button("Save")));
-
-        log("Verify External Redirect Hosts changes cannot be saved");
-        goToAdminConsole().goToSettingsSection().clickExternalRedirectHosts();
-        checker().verifyFalse("Save should not be present for troubleshooter under External Redirect Hosts",
-                isElementPresent(Locator.button("Save")));
-
-        log("Verify authentication changes cannot be saved");
-        goToAdminConsole().goToSettingsSection().clickAuthentication();
-        checker().verifyFalse("Save should not be present for troubleshooter under authentication",
-                isElementPresent(Locator.button("Save and Finish")));
-
+        log("Verify permissions from troubleshooter");
+        verifySitePermissionSetting(false);
         stopImpersonating();
 
+        log("Verify the permissions for admin ");
+        goToHome();
+        verifySitePermissionSetting(true);
+
+    }
+
+    private void verifySitePermissionSetting(boolean canSave)
+    {
+        log("Verify permissions for look and feel setting");
+        goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
+        checker().verifyEquals("Incorrect access for look and feel setting", canSave,
+                isElementPresent(Locator.tagWithText("span","Save")));
+
+        log("Verify permissions for configure page elements");
+        goToAdminConsole().goToSettingsSection().clickConfigurePageElements();
+        checker().verifyEquals("Incorrect access for configure page element", canSave,
+                isElementPresent(Locator.tagWithText("span","Save")));
+
+        log("Verify permissions for External Redirect Hosts");
+        goToAdminConsole().goToSettingsSection().clickExternalRedirectHosts();
+        checker().verifyEquals("Incorrect access for External Redirect Hosts", canSave,
+                isElementPresent(Locator.tagWithText("span","Save")));
+
+        log("Verify permissions for authentication changes");
+        goToAdminConsole().goToSettingsSection().clickAuthentication();
+        checker().verifyEquals("Incorrect access for authentication", canSave,
+                isElementPresent(Locator.button("Save and Finish")));
     }
 
     @Override

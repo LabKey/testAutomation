@@ -19,12 +19,19 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     public LoginConfigurePage(WebDriver driver)
     {
         super(driver);
+        waitForPage();
     }
 
     public static LoginConfigurePage beginAt(WebDriverWrapper webDriverWrapper)
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("login", "configure"));
         return new LoginConfigurePage(webDriverWrapper.getDriver());
+    }
+
+    @Override
+    protected void waitForPage()
+    {
+        Locator.waitForAnyElement(shortWait(), Locator.button("Done"), Locator.button("Cancel"));
     }
 
     public <D extends AuthDialogBase> D addConfiguration(AuthenticationProvider<D> authenticationProvider)
