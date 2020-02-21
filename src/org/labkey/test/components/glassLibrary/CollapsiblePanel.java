@@ -9,12 +9,12 @@ import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
-public class CollapsableFormPanel extends WebDriverComponent<CollapsableFormPanel.ElementCache>
+public class CollapsiblePanel extends WebDriverComponent<CollapsiblePanel.ElementCache>
 {
     final WebElement _el;
     final WebDriver _driver;
 
-    public CollapsableFormPanel(WebElement element, WebDriver driver)
+    public CollapsiblePanel(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
@@ -32,7 +32,7 @@ public class CollapsableFormPanel extends WebDriverComponent<CollapsableFormPane
         return _driver;
     }
 
-    public CollapsableFormPanel expand()
+    public CollapsiblePanel expand()
     {
         if (!isExpanded())
             elementCache().expandCollapseToggle.click();
@@ -41,7 +41,7 @@ public class CollapsableFormPanel extends WebDriverComponent<CollapsableFormPane
         return this;
     }
 
-    public CollapsableFormPanel collapse()
+    public CollapsiblePanel collapse()
     {
         if (isExpanded())
             elementCache().expandCollapseToggle.click();
@@ -83,7 +83,7 @@ public class CollapsableFormPanel extends WebDriverComponent<CollapsableFormPane
     }
 
 
-    public static class CollapsableFormPanelFinder extends WebDriverComponentFinder<CollapsableFormPanel, CollapsableFormPanelFinder>
+    public static class CollapsableFormPanelFinder extends WebDriverComponentFinder<CollapsiblePanel, CollapsableFormPanelFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "panel-default")
                 .withChild(Locator.tagWithClass("div", "collapsible-panel-header"));
@@ -101,9 +101,9 @@ public class CollapsableFormPanel extends WebDriverComponent<CollapsableFormPane
         }
 
         @Override
-        protected CollapsableFormPanel construct(WebElement el, WebDriver driver)
+        protected CollapsiblePanel construct(WebElement el, WebDriver driver)
         {
-            return new CollapsableFormPanel(el, driver);
+            return new CollapsiblePanel(el, driver);
         }
 
         @Override
