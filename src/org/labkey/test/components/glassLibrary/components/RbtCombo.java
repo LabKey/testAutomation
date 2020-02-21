@@ -97,26 +97,21 @@ public class RbtCombo extends WebDriverComponent<RbtCombo.ElementCache>
         }
     }
 
-    /**
-     * TODO:
-     * For components that are, essentially, singletons on a page, you may want to omit this Finder class
-     * Note that even in that case, a Finder class can be useful for lazily finding components
-     * Usage: 'new Component.ComponentFinder(getDriver()).withTitle("title").findWhenNeeded();'
-     */
+
     public static class RbtSelectFinder extends WebDriverComponentFinder<RbtCombo, RbtSelectFinder>
     {
-        // TODO: This locator should find all instances of this component
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "my-component");
-        private String _title = null;
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "rbt")
+                .withDescendant(Locator.tagWithClass("input", "rbt-input")).parent();
+        private String _label = null;
 
         public RbtSelectFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public RbtSelectFinder withTitle(String title)
+        public RbtSelectFinder withLabel(String label)
         {
-            _title = title;
+            _label = label;
             return this;
         }
 
@@ -126,16 +121,11 @@ public class RbtCombo extends WebDriverComponent<RbtCombo.ElementCache>
             return new RbtCombo(el, driver);
         }
 
-        /**
-         * TODO:
-         * Add methods and fields, as appropriate, to build a Locator that will find the element(s)
-         * that this component represents
-         */
         @Override
         protected Locator locator()
         {
-            if (_title != null)
-                return _baseLocator.withAttribute("title", _title);
+            if (_label != null)
+                return _baseLocator.withChild(Locator.tagWithText("div", _label));
             else
                 return _baseLocator;
         }
