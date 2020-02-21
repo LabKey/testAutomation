@@ -15,7 +15,6 @@
  */
 package org.labkey.test;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.TestLogger;
@@ -25,11 +24,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY;
 import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY;
@@ -285,6 +284,13 @@ public abstract class TestProperties
         }
 
         return features;
+    }
+
+    public static List<String> getDebugLoggingPackages()
+    {
+        String prop = System.getProperty("webtest.debug.logging.packages", "");
+        String[] packages = prop.split("\\s*,\\s*");
+        return Arrays.stream(packages).map(String::trim).filter(String::isEmpty).collect(Collectors.toList());
     }
 
     private static File dumpDir = null;
