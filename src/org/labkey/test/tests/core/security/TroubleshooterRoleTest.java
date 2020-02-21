@@ -9,6 +9,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.PermissionsHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -18,7 +19,7 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class TroubleshooterRoleTest extends BaseWebDriverTest
 {
-    private static final String TROUBLESHOOTER = "user@troubleshooter.test";
+    private static final String TROUBLESHOOTER = "troubleshooter@troubleshooter.test";
 
     @BeforeClass
     public static void setupProject()
@@ -37,8 +38,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
     {
         _userHelper.createUser(TROUBLESHOOTER);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-        goToSitePermissions();
-        apiPermissionsHelper.setUserPermissions(TROUBLESHOOTER, "Troubleshooter");
+        apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER,"Troubleshooter", PermissionsHelper.MemberType.user,"/");
     }
 
     @Test
