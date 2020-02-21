@@ -1276,7 +1276,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      * Stop impersonating user
      * @param goHome go to Server Home or return to page where impersonation started
      */
-    public void stopImpersonating(Boolean goHome)
+    public void stopImpersonating(boolean goHome)
     {
         navBar().stopImpersonating();
         if (goHome)
