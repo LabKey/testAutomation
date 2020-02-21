@@ -288,7 +288,7 @@ public abstract class TestProperties
 
     public static List<String> getDebugLoggingPackages()
     {
-        String prop = System.getProperty("webtest.debug.logging.packages", "");
+        String prop = System.getProperty("webtest.debug.server.packages", "");
         String[] packages = prop.split("\\s*,\\s*");
         return Arrays.stream(packages).map(String::trim).filter(String::isEmpty).collect(Collectors.toList());
     }
