@@ -268,11 +268,13 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         public void impersonate(String fakeUser)
         {
             ImpersonateUserWindow window;
-            try {
+            try
+            {
                 clickSubMenu(false, "Impersonate", "User");
                 window = new ImpersonateUserWindow(getDriver());
                 window.getComponentElement().isDisplayed(); // force it to resolve
-            }catch (NoSuchElementException notfound)
+            }
+            catch (NoSuchElementException notfound)
             {
                 clickSubMenu(false, "Impersonate", "User");
                 window = new ImpersonateUserWindow(getDriver());
@@ -291,11 +293,13 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         public void impersonateRoles(String oneRole, String... roles)
         {
             ImpersonateRoleWindow window;
-            try {
+            try
+            {
                 clickSubMenu(false, "Impersonate", "Roles");
                 window = new ImpersonateRoleWindow(getDriver());
                 window.getComponentElement().isDisplayed(); // force it to find/resolve
-            } catch (NoSuchElementException notFound)
+            }
+            catch (NoSuchElementException notFound)
             {
                 clickSubMenu(false, "Impersonate", "Roles");
                 window = new ImpersonateRoleWindow(getDriver());
@@ -310,11 +314,13 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         {
             ImpersonateGroupWindow window;
 
-            try{
+            try
+            {
                 clickSubMenu(false, "Impersonate", "Group");
                 window = new ImpersonateGroupWindow(getDriver());
                 window.getComponentElement().isDisplayed(); // force it to resolve
-            }catch (NoSuchElementException retry)
+            }
+            catch (NoSuchElementException retry)
             {
                 clickSubMenu(false, "Impersonate", "Group");
                 window = new ImpersonateGroupWindow(getDriver());
