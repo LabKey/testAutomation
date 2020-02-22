@@ -299,7 +299,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinishExpectingError();
 
         assertTrue("field should report error if saved without a name", noNameRow.hasFieldError());
-        assertTrue(noNameRow.detailsMessage().contains("New field. Error: Please provide a name for each field."));
+        assertTrue(noNameRow.detailsMessage().contains("New Field. Error: Please provide a name for each field."));
         WebElement errorDiv = domainDesignerPage.errorAlert();
         assertNotNull(errorDiv);
         String hasNoNameError = domainDesignerPage.waitForError();
@@ -309,7 +309,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String warningFieldMessage = noNameRow.setName("&has weird characters that make scripts hard to write")
                 .waitForWarning()
                 .detailsMessage();
-        String expectedWarning = "New field. Warning: Field name contains special characters.";
+        String expectedWarning = "New Field. Warning: Field name contains special characters.";
         assertThat("expected error", warningFieldMessage, containsString(expectedWarning));
 
         domainDesignerPage.clickCancelAndDiscardChanges();
@@ -517,9 +517,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow clientFieldWarning = domainFormPanel.addField("select * from table");
 
         domainDesignerPage.clickFinishExpectingError();
-        String expectedWarnMsg = "New field. Warning: Field name contains special characters.";
-        String blargErrMsg = "New field. Error: The field name 'blarg' is already taken. Please provide a unique name for each field.";
-        String reservedErrMsg = "New field. Error: 'modified' is a reserved field name in 'fieldsWithReservedNamesSampleSet'.";
+        String expectedWarnMsg = "New Field. Warning: Field name contains special characters.";
+        String blargErrMsg = "New Field. Error: The field name 'blarg' is already taken. Please provide a unique name for each field.";
+        String reservedErrMsg = "New Field. Error: 'modified' is a reserved field name in 'fieldsWithReservedNamesSampleSet'.";
         String modRowDetailsMsg = modifiedRow.waitForError()
                 .detailsMessage();
         String blarg1DetailsMsg = blarg1.waitForError().detailsMessage();
