@@ -41,7 +41,7 @@ public class DetailTable extends WebDriverComponent
     public Boolean isLoaded()
     {
         // Need to wrap the checks in a try / catch for a stale element exception. This can happen because the "this"
-        // reference can go stale after editing a sample and reloading the grid happening.
+        // reference can go stale after editing a sample and reloading the grid with the updated data is happening.
         try
         {
             return !Locators.loadingGrid.existsIn(this) &&
