@@ -6,7 +6,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Git;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({DailyC.class})
+@Category({Git.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class TroubleshooterRoleTest extends BaseWebDriverTest
 {
