@@ -6,14 +6,15 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Stub page class. Limited plate designer functionality is implemented in
- * {@link org.labkey.test.tests.elispotassay.ElispotAssayTest#highlightWells(String, String, String, String)}
- * TODO: Pull that functionality into this class and expand it
+ * Utility page class to create plate templates
  */
 public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache>
 {
@@ -31,6 +32,72 @@ public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("plate", containerPath, "designer", params.toUrlParams()));
         return new PlateDesignerPage(webDriverWrapper.getDriver());
+    }
+
+    public void createWellGroup(String type, String name)
+    {
+        selectTypeTab(type);
+
+        List<WebElement> elements = Locator.tagWithClass("input", "gwt-TextBox").findElements(getDriver());
+        WebElement wellGroup = elements.get(elements.size()-1);
+        setFormElement(wellGroup, name);
+        fireEvent(wellGroup, SeleniumEvent.change);
+        clickButton("Create", 0);
+        waitForElement(Locator.tagContainingText("label", name));
+    }
+
+    public void selectTypeTab(String name)
+    {
+        Locator.tagWithClass("*", "gwt-Label").withText(name).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
+    }
+
+    public void selectWellsForWellgroup(String type, String wellGroup, String startLocation, String endLocation)
+    {
+        selectTypeTab(type);
+        waitForElement(Locator.tagWithText("label", wellGroup));
+
+        Locator start = Locator.css(".Cell-"+startLocation);
+        Locator end = Locator.css(".Cell-"+endLocation);
+        if (wellGroup != null & !"".equals(wellGroup))
+        {
+            if (!getText(Locator.css(".gwt-TabBarItem-selected")).equals(type))
+            {
+                Locator.css(".gwt-Label").withText(type).findElement(getDriver()).click();
+                //want for switch
+            }
+            if (!isChecked(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+wellGroup+"']]")))
+                click(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+wellGroup+"']]"));
+            if (!getAttribute(start, "style").contains("rgb(255, 255, 255)"))
+                click(start);
+        }
+        else
+        {
+            Locator.tagWithClass("*", "gwt-Label").withText(type).findElement(getDriver()).click();
+            //select no group in order to clear area
+        }
+        WebElement fromEl = start.findElement(getDriver());
+        WebElement toEl = end.findElement(getDriver());
+
+        Actions builder = new Actions(getDriver());
+        builder.clickAndHold(fromEl).moveToElement(toEl).release().build().perform();
+    }
+
+    public void setName(String name)
+    {
+        Locator nameField = Locator.id("templateName");
+        waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
+        setFormElement(nameField, name);
+        fireEvent(nameField, SeleniumEvent.change);
+    }
+
+    public void saveAndClose()
+    {
+        clickButton("Save & Close");
+    }
+
+    public void save()
+    {
+        clickButton("Save", 0);
     }
 
     @Override
