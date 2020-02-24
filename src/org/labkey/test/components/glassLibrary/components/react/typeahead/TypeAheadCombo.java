@@ -1,4 +1,4 @@
-package org.labkey.test.components.glassLibrary.components;
+package org.labkey.test.components.glassLibrary.components.react.typeahead;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -10,12 +10,15 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class RbtCombo extends WebDriverComponent<RbtCombo.ElementCache>
+/**
+ *  Wraps the rbtCombo from react-bootstrap-typeahead; the client component is implemented in PropertyLookup.tsx
+ */
+public class TypeAheadCombo extends WebDriverComponent<TypeAheadCombo.ElementCache>
 {
     final WebElement _el;
     final WebDriver _driver;
 
-    public RbtCombo(WebElement element, WebDriver driver)
+    public TypeAheadCombo(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
@@ -33,7 +36,7 @@ public class RbtCombo extends WebDriverComponent<RbtCombo.ElementCache>
         return _driver;
     }
 
-    public RbtCombo setValue(String value)
+    public TypeAheadCombo setValue(String value)
     {
         if (hasValue())
             clear();
@@ -56,12 +59,12 @@ public class RbtCombo extends WebDriverComponent<RbtCombo.ElementCache>
     }
 
     // open
-    public boolean isOpened()
+    protected boolean isOpened()
     {
         return elementCache().input.getAttribute("aria-expanded").equals("true");
     }
 
-    public RbtCombo clear()
+    public TypeAheadCombo clear()
     {
         if (hasValue())
             elementCache().clearBtn.click();
@@ -98,7 +101,7 @@ public class RbtCombo extends WebDriverComponent<RbtCombo.ElementCache>
     }
 
 
-    public static class RbtSelectFinder extends WebDriverComponentFinder<RbtCombo, RbtSelectFinder>
+    public static class RbtSelectFinder extends WebDriverComponentFinder<TypeAheadCombo, RbtSelectFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "rbt")
                 .withDescendant(Locator.tagWithClass("input", "rbt-input")).parent();
@@ -116,9 +119,9 @@ public class RbtCombo extends WebDriverComponent<RbtCombo.ElementCache>
         }
 
         @Override
-        protected RbtCombo construct(WebElement el, WebDriver driver)
+        protected TypeAheadCombo construct(WebElement el, WebDriver driver)
         {
-            return new RbtCombo(el, driver);
+            return new TypeAheadCombo(el, driver);
         }
 
         @Override

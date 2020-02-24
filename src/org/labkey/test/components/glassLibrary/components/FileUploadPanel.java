@@ -8,6 +8,8 @@ import org.labkey.test.components.html.Input;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.util.List;
@@ -45,6 +47,8 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
             elementCache().input().set(file.getAbsolutePath());
         }catch(ElementNotInteractableException nie)
         {
+            new WebDriverWait(getDriver(), 2)
+                    .until(ExpectedConditions.elementToBeClickable(elementCache().input().getComponentElement()));
             elementCache().input().set(file.getAbsolutePath());   // retry
         }
         WebDriverWrapper.waitFor(()-> hasFile(file.getName()),
