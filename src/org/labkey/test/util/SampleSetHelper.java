@@ -165,7 +165,7 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public CreateSampleSetPage goToCreateNewSampleSet()
     {
-        getSampleSetsList().clickHeaderButtonAndWait("Create New Sample Set");
+        getSampleSetsList().clickHeaderButtonAndWait("New Sample Set");
         return new CreateSampleSetPage(getDriver());
     }
 
