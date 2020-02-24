@@ -3,6 +3,7 @@ package org.labkey.test.components.glassLibrary.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -39,9 +40,19 @@ public class DetailTable extends WebDriverComponent
 
     public Boolean isLoaded()
     {
-        return !Locators.loadingGrid.existsIn(this) &&
-                !Locators.spinner.existsIn(this) &&
-                Locator.tag("td").existsIn(this);
+        // Need to wrap the checks in a try / catch for a stale element exception. This can happen because the "this"
+        // reference can go stale after editing a sample and reloading the grid with the updated data is happening.
+        try
+        {
+            return !Locators.loadingGrid.existsIn(this) &&
+                    !Locators.spinner.existsIn(this) &&
+                    Locator.tag("td").existsIn(this);
+        }
+        catch(StaleElementReferenceException stale)
+        {
+            return false;
+        }
+
     }
 
     // TODO Not sure if the get & click methods are correct (or appropriate?), for a @glass component.
