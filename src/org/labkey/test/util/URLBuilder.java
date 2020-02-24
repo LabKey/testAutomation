@@ -107,6 +107,7 @@ public class URLBuilder
             if (!_containerPath.startsWith("/"))
                 url.append("/");
             url.append(URIUtil.encodePath(_containerPath)
+                    .replace("+", "%2B")
                     .replace("[", "%5B")
                     .replace("]", "%5D"));
         }
