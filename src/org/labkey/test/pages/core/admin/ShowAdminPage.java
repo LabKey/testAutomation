@@ -80,6 +80,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
     {
         goToSettingsSection();
         clickAndWait(elementCache().externalRedirectHostLink);
+        Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span","Done"), Locator.tagWithText("span","Save"));
     }
 
     public ShowAuditLogPage clickAuditLog()
@@ -100,6 +101,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
     {
         goToSettingsSection();
         clickAndWait(elementCache().configurePageElements);
+        Locator.waitForAnyElement(shortWait(),Locator.tagWithText("span","Done"), Locator.tagWithText("span","Save"));
     }
 
     public void clickEmailCustomization()
@@ -126,10 +128,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().fullTextSearchLink);
     }
 
-    public void clickLookAndFeelSettings()
+    public LookAndFeelSettingsPage clickLookAndFeelSettings()
     {
         goToSettingsSection();
         clickAndWait(elementCache().lookAndFeelSettingsLink);
+        return new LookAndFeelSettingsPage(getDriver());
     }
 
     public void clickMasterPatientIndex()
