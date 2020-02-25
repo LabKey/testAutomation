@@ -147,6 +147,8 @@ import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBO
 
 public abstract class WebDriverWrapper implements WrapsDriver
 {
+    private static final Map<WebDriver, File> _downloadDirs = new WeakHashMap<>();
+
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public final static int WAIT_FOR_PAGE = 60000;
 
@@ -185,16 +187,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return driver;
     }
 
-    protected Pair<WebDriver, DriverService> createNewWebDriver(BrowserType browserType, File downloadDir)
+    public static Pair<WebDriver, DriverService> createNewWebDriver(BrowserType browserType, File downloadDir)
     {
-        return createNewWebDriver(new ImmutablePair<>(null, null), browserType, downloadDir);
-    }
-
-    protected Pair<WebDriver, DriverService> createNewWebDriver(@NotNull Pair<WebDriver, DriverService> oldDriverAndService, BrowserType browserType, File downloadDir)
-    {
-        WebDriver oldWebDriver = oldDriverAndService.getLeft();
         WebDriver newWebDriver = null;
-        DriverService oldDriverService = oldDriverAndService.getRight();
         DriverService newDriverService = null;
 
         switch (browserType)
@@ -213,31 +208,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             case IE: //experimental
             {
-                if (oldWebDriver != null && !(oldWebDriver instanceof InternetExplorerDriver))
-                {
-                    oldWebDriver.quit();
-                    oldWebDriver = null;
-                    if (oldDriverService != null && oldDriverService.isRunning())
-                        oldDriverService.stop();
-                }
-                if (oldWebDriver == null)
-                {
-                    newWebDriver = new InternetExplorerDriver();
-                }
+                newWebDriver = new InternetExplorerDriver();
                 break;
             }
             case CHROME:
             {
-                if (oldWebDriver != null && !(oldWebDriver instanceof ChromeDriver))
                 {
-                    oldWebDriver.quit();
-                    oldWebDriver = null;
-                    if (oldDriverService != null && oldDriverService.isRunning())
-                        oldDriverService.stop();
-                }
-                if (oldWebDriver == null)
-                {
-                    log("Using chromedriver: " + TestProperties.ensureChromedriverExeProperty());
+                    TestLogger.log("Using chromedriver: " + TestProperties.ensureChromedriverExeProperty());
                     configureChromeDriverLogging(downloadDir);
                     ChromeOptions options = new ChromeOptions();
                     Map<String, Object> prefs = new HashMap<>();
@@ -268,16 +245,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             case FIREFOX:
             {
-                if (oldWebDriver != null && !(oldWebDriver instanceof FirefoxDriver))
                 {
-                    oldWebDriver.quit();
-                    oldWebDriver = null;
-                    if (oldDriverService != null && oldDriverService.isRunning())
-                        oldDriverService.stop();
-                }
-                if (oldWebDriver == null)
-                {
-                    log("Using geckodriver: " + TestProperties.ensureGeckodriverExeProperty());
+                    TestLogger.log("Using geckodriver: " + TestProperties.ensureGeckodriverExeProperty());
                     configureGeckoDriverLogging(downloadDir);
                     final FirefoxProfile profile = new FirefoxProfile();
                     profile.setPreference("app.update.auto", false);
@@ -365,21 +334,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 throw new IllegalArgumentException("Browser not yet implemented: " + browserType);
         }
 
-        if (newWebDriver != null)
         {
             Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getVersion();
-            log("Browser: " + browserName + " " + browserVersion);
+            TestLogger.log("Browser: " + browserName + " " + browserVersion);
+            _downloadDirs.put(newWebDriver, downloadDir);
             return new ImmutablePair<>(newWebDriver, newDriverService);
-        }
-        else
-        {
-            return oldDriverAndService;
         }
     }
 
-    private void configureChromeDriverLogging(File downloadDir)
+    private static void configureChromeDriverLogging(File downloadDir)
     {
         if (isWebDriverLoggingEnabled())
         {
@@ -387,18 +352,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
             {
                 String logFileName = new SimpleDateFormat("'chromedriver_'HHmmss'.log'").format(new Date());
                 final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
-                log("Saving chromedriver log to: " + logPath);
+                TestLogger.log("Saving chromedriver log to: " + logPath);
                 System.setProperty(CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
                 System.setProperty(CHROME_DRIVER_LOG_PROPERTY, logPath);
             }
             else
             {
-                log("Failed to create directory for chromedriver log: " + downloadDir.getParentFile().getAbsolutePath());
+                TestLogger.log("Failed to create directory for chromedriver log: " + downloadDir.getParentFile().getAbsolutePath());
             }
         }
     }
 
-    private void configureGeckoDriverLogging(File downloadDir)
+    private static void configureGeckoDriverLogging(File downloadDir)
     {
         if (isWebDriverLoggingEnabled())
         {
@@ -406,13 +371,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
             {
                 String logFileName = new SimpleDateFormat("'geckodriver_'HHmmss'.log'").format(new Date());
                 final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
-                log("Saving geckodriver log to: " + logPath);
+                TestLogger.log("Saving geckodriver log to: " + logPath);
                 System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, logPath);
                 return;
             }
             else
             {
-                log("Failed to create directory for geckodriver log: " + downloadDir.getParentFile().getAbsolutePath());
+                TestLogger.log("Failed to create directory for geckodriver log: " + downloadDir.getParentFile().getAbsolutePath());
             }
         }
         System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
@@ -1028,7 +993,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
 
             long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
-            logMessage += " [" + elapsedTime + " ms]";
+            logMessage += " (" + elapsedTime + " ms)";
 
 
             return elapsedTime;
@@ -1804,7 +1769,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
-                    listener.beforePageLoad();
+                    listener.beforePageLoad(this);
             });
             getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
             toBeStale = Locators.documentRoot.findElement(getDriver()); // Document should become stale
@@ -1818,7 +1783,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
             _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
-                    listener.afterPageLoad();
+                    listener.afterPageLoad(this);
             });
             if (getDriver().getTitle().isEmpty() && onLabKeyPage())
             {
@@ -1877,6 +1842,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         default void beforePageLoad(){}
         default void afterPageLoad(){}
+        default void beforePageLoad(WebDriverWrapper driver) {beforePageLoad();}
+        default void afterPageLoad(WebDriverWrapper driver) {afterPageLoad();}
     }
 
     /**
@@ -2020,7 +1987,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (!waitFor(checker, wait))
         {
-            throw new TimeoutException(failMessage + " [" + wait + "ms]");
+            throw new TimeoutException(failMessage + " (" + wait + "ms)");
         }
     }
 
@@ -2060,9 +2027,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     // https://stackoverflow.com/questions/136505/searching-for-uuids-in-text-with-regex
     private static final Pattern TEMP_FILE_PATTERN = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.tmp");
 
+    protected File getDownloadDir()
+    {
+        return _downloadDirs.get(getDriver());
+    }
+
     public File[] doAndWaitForDownload(Runnable func, final int expectedFileCount)
     {
-        final File downloadDir = BaseWebDriverTest.getDownloadDir();
+        final File downloadDir = getDownloadDir();
         File[] existingFilesArray = downloadDir.listFiles();
         final List<File> existingFiles;
 
@@ -2283,7 +2255,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void waitForTextToDisappear(final String text, int wait)
     {
-        String failMessage = "Text: " + text + " was still present after [" + wait + "ms]";
+        String failMessage = "Text: " + text + " was still present after (" + wait + "ms)";
         waitFor(() -> !isTextPresent(text), failMessage, wait);
     }
 

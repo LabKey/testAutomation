@@ -31,7 +31,7 @@ public class StudyImporter
 
     public void zipAndImportStudy(File studyFolder)
     {
-        ZipUtil zipper = new ZipUtil(studyFolder, BaseWebDriverTest.getDownloadDir());
+        ZipUtil zipper = new ZipUtil(studyFolder, _test.getDownloadDir());
         File studyZip;
         try
         {
