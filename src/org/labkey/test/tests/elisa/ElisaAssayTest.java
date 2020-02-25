@@ -24,6 +24,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.PropertiesEditor.DefaultType;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -120,21 +121,17 @@ public class ElisaAssayTest extends AbstractAssayTest
         uploadFile(TEST_ASSAY_ELISA_FILE3, "C", "Save and Import Another Run", true, 1, 5);
         assertTextPresent("Upload successful.");
         uploadFile(TEST_ASSAY_ELISA_FILE4, "D", "Save and Finish", true, 1, 5);
-
-//        assertELISAData();
     }
 
     protected void createTemplate()
     {
-        clickButton("Manage Assays");
-        clickButton("Configure Plate Templates");
-        clickAndWait(Locator.linkWithText("new 96 well (8x12) ELISA default template"));
-        Locator nameField = Locator.id("templateName");
-        waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
-        setFormElement(nameField, PLATE_TEMPLATE_NAME);
+        PlateDesignerPage.PlateDesignerParams params = new PlateDesignerPage.PlateDesignerParams(8, 12);
+        params.setTemplateType("default");
+        params.setAssayType("ELISA");
+        PlateDesignerPage plateDesigner = PlateDesignerPage.beginAt(this, params);
 
-        clickButton("Save & Close");
-        waitForText(PLATE_TEMPLATE_NAME);
+        plateDesigner.setName(PLATE_TEMPLATE_NAME);
+        plateDesigner.saveAndClose();
     }
 
     protected void uploadFile(File file, String uniqueifier, String finalButton, boolean testPrepopulation, int startSpecimen, int lastSpecimen)

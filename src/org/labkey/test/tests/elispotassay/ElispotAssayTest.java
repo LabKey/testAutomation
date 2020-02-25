@@ -31,6 +31,7 @@ import org.labkey.test.components.CrosstabDataRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -450,26 +451,23 @@ public class ElispotAssayTest extends AbstractAssayTest
     @LogMethod
     protected void createTemplate()
     {
-        clickButton("Manage Assays");
-        clickButton("Configure Plate Templates");
-        clickAndWait(Locator.linkWithText("new 96 well (8x12) ELISpot default template"));
-        Locator nameField = Locator.id("templateName");
-        waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
+        PlateDesignerPage.PlateDesignerParams params = new PlateDesignerPage.PlateDesignerParams(8, 12);
+        params.setTemplateType("default");
+        params.setAssayType("ELISpot");
+        PlateDesignerPage plateDesigner = PlateDesignerPage.beginAt(this, params);
 
-        Locator.tagWithClass("*", "gwt-Label").withText("CONTROL").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
-
-        setFormElement(nameField, PLATE_TEMPLATE_NAME);
-        fireEvent(nameField, SeleniumEvent.change);
+        plateDesigner.setName(PLATE_TEMPLATE_NAME);
+        plateDesigner.selectTypeTab("CONTROL");
 
         clickButton("Create", 0);
         waitForElement(Locator.tagWithText("label", "Background Wells"));
 
-        highlightWells("CONTROL", "Background Wells", "A1", "B3");
-        highlightWells("CONTROL", "Background Wells", "C4", "D6");
-        highlightWells("CONTROL", "Background Wells", "E7", "F9");
-        highlightWells("CONTROL", "Background Wells", "G10", "H12");
-        clickButton("Save & Close");
-        waitForText(PLATE_TEMPLATE_NAME);
+        plateDesigner.selectWellsForWellgroup("CONTROL", "Background Wells", "A1", "B3");
+        plateDesigner.selectWellsForWellgroup("CONTROL", "Background Wells", "C4", "D6");
+        plateDesigner.selectWellsForWellgroup("CONTROL", "Background Wells", "E7", "F9");
+        plateDesigner.selectWellsForWellgroup("CONTROL", "Background Wells", "G10", "H12");
+
+        plateDesigner.saveAndClose();
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -615,29 +613,6 @@ public class ElispotAssayTest extends AbstractAssayTest
         assertEquals(Arrays.asList("10.0","9.0","6.0","10.0","18.0","7.0","11.0","244.0","0.0","0.0","0.0","0.0"), plateSummary.getRowValues(E));
     }
 
-    protected void highlightWells(String type, String group, String startCell, String endCell)
-    {
-        Locator start = Locator.css(".Cell-"+startCell);
-        Locator end = Locator.css(".Cell-"+endCell);
-        if (group != null & !"".equals(group))
-        {
-            if (!getText(Locator.css(".gwt-TabBarItem-selected")).equals(type))
-            {
-                Locator.css(".gwt-Label").withText(type).findElement(getDriver()).click();
-                //want for switch
-            }
-            if (!isChecked(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+group+"']]")))
-                click(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+group+"']]"));
-            if (!getAttribute(start, "style").contains("rgb(255, 255, 255)"))
-                click(start);
-        }
-        else
-        {
-            Locator.tagWithClass("*", "gwt-Label").withText(type).findElement(getDriver()).click();
-            //select no group in order to clear area
-        }
-        dragAndDrop(start, end);
-    }
     private void testTNTCdata()
     {
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
