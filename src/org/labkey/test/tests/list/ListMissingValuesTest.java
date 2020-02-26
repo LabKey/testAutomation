@@ -77,6 +77,7 @@ public class ListMissingValuesTest extends MissingValueIndicatorsTest
         _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         log("Test upload list data with a combined data and MVI column");
+        _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData();
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_LIST_BAD);
         _listHelper.submitImportTsv_error(null);

@@ -324,8 +324,10 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod
     public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
+        toggleNewListDesigner(true);
         beginCreateListFromTab(tabName, listName);
         createListHelper(listName, listKeyType, listKeyName, cols);
+        toggleNewListDesigner(false);
     }
 
     @LogMethod
@@ -345,45 +347,12 @@ public class ListHelper extends LabKeySiteWrapper
             return;
         }
 
-        // TODO move the relevant parts below to a ListPropertiesPanel test helper component
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
-
-        log("Set list key field");
-        if (listKeyType == ListColumnType.AutoInteger)
-        {
-            fieldsPanel.startNewDesign("REMOVE_ME");
-            selectOptionByText(Locator.name("keyField"), "Auto integer key");
-            sleep(500); // wait just a bit for the auto integer key field to be added
-            fieldsPanel.getField(0).setName(listKeyName);
-            fieldsPanel.removeField("REMOVE_ME");
-        }
-        else
-        {
-            fieldsPanel.startNewDesign(listKeyName);
-            selectOptionByText(Locator.name("keyField"), listKeyName);
-        }
-
-        log("Add additional fields");
+        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver(), NEW_LIST_DESIGNER_ENABLED);
+        DomainFormPanel fieldsPanel = listDefinitionPage.setKeyField(listKeyType, listKeyName);
         for (ListColumn col : cols)
-        {
             fieldsPanel.addField(col);
-        }
 
         clickSave();
-    }
-
-    // TODO move this to a ListDesignerPage test helper
-    private DomainFormPanel getFieldsPanel()
-    {
-        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Fields").find();
-    }
-
-    // TODO move this to a ListDesignerPage test helper
-    private DomainFormPanel expandFieldsPanel()
-    {
-        DomainFormPanel panel = getFieldsPanel();
-        panel.expand();
-        return panel;
     }
 
     private void createListHelper_OLD(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
@@ -562,9 +531,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public EditListDefinitionPage goToEditDesign(String listName)
     {
-        // if we are on the Manage List page, click the list name first
-        if (isElementPresent(Locators.bodyTitle("Available Lists")))
-            clickAndWait(Locator.linkWithText(listName));
+        goToList(listName);
 
         toggleNewListDesigner(true);
         if (!NEW_LIST_DESIGNER_ENABLED)
@@ -576,6 +543,13 @@ public class ListHelper extends LabKeySiteWrapper
         toggleNewListDesigner(false);
 
         return listDefinitionPage;
+    }
+
+    public void goToList(String listName)
+    {
+        // if we are on the Manage List page, click the list name first
+        if (isElementPresent(Locators.bodyTitle("Available Lists")))
+            clickAndWait(Locator.linkWithText(listName));
     }
 
     private void clickSave_OLD()
@@ -660,8 +634,14 @@ public class ListHelper extends LabKeySiteWrapper
 
     public enum ListColumnType
     {
-        MultiLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"), DateTime("DateTime"), Boolean("Boolean"),
-        Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer"), Flag("Flag (String)"), Attachment("Attachment"), User("User");
+        MultiLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"),
+        DateTime("DateTime"), // TODO remove this after GWT designer removed
+        DateAndTime("Date Time"),
+        Boolean("Boolean"),
+        Double("Number (Double)"), // TODO remove this after GWT designer removed
+        Decimal("Decimal"),
+        File("File"), AutoInteger("Auto-Increment Integer"),
+        Flag("Flag (String)"), Attachment("Attachment"), User("User");
 
         private final String _description;
 

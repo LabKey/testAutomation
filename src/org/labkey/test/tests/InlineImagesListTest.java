@@ -141,7 +141,9 @@ public class InlineImagesListTest extends BaseWebDriverTest
 
         log("Create a list named: " + LIST_NAME);
         _listHelper.createList(getProjectName(), LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listColDescription, _listColAttachment01);
-        clickAndWait(Locator.lkButton("Done"));
+
+        goToManageLists();
+        clickAndWait(Locator.linkWithText(LIST_NAME));
 
         Map<String, String> newValues = new HashMap<>();
 

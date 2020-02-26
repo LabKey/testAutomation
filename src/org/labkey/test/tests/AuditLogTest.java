@@ -445,6 +445,7 @@ public class AuditLogTest extends BaseWebDriverTest
         _listHelper.createList(containerPath, listName, ListHelper.ListColumnType.AutoInteger, "Key", listColumns);
         if(null != tsvData)
         {
+            _listHelper.goToList(listName);
             _listHelper.clickImportData();
             _listHelper.submitTsvData(tsvData);
         }

@@ -20,8 +20,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
@@ -74,6 +76,27 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         DomainFormPanel panel = getFieldsPanel();
         panel.expand();
         return panel;
+    }
+
+    public DomainFormPanel setKeyField(ListHelper.ListColumnType listKeyType, String listKeyName)
+    {
+        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        if (listKeyType == ListHelper.ListColumnType.AutoInteger)
+        {
+            fieldsPanel.startNewDesign("REMOVE_ME");
+            selectOptionByText(Locator.name("keyField"), "Auto integer key");
+            sleep(500); // wait just a bit for the auto integer key field to be added
+            fieldsPanel.getField(0).setName(listKeyName);
+            fieldsPanel.removeField("REMOVE_ME");
+        }
+        else
+        {
+            DomainFieldRow keyField = fieldsPanel.startNewDesign(listKeyName);
+            keyField.setType(FieldDefinition.ColumnType.valueOf(listKeyType.name()));
+            selectOptionByText(Locator.name("keyField"), listKeyName);
+        }
+
+        return fieldsPanel;
     }
 
     public void setColumnName(int index, String name)

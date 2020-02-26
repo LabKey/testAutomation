@@ -174,6 +174,7 @@ public class DataRegionTest extends AbstractQWPTest
         _listHelper.createList(getProjectName(), LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, NAME_COLUMN, HEX_COLUMN);
 
         log("Upload data");
+        _listHelper.goToList(LIST_NAME);
         _listHelper.uploadData(LIST_DATA);
     }
 
