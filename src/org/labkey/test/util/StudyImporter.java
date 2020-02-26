@@ -31,11 +31,11 @@ public class StudyImporter
 
     public void zipAndImportStudy(File studyFolder)
     {
-        ZipUtil zipper = new ZipUtil(studyFolder, BaseWebDriverTest.getDownloadDir());
+        ZipUtil zipper = new ZipUtil(studyFolder);
         File studyZip;
         try
         {
-            studyZip = zipper.zipIt();
+            studyZip = zipper.zipInto(BaseWebDriverTest.getDownloadDir());
         }
         catch (IOException fail)
         {
