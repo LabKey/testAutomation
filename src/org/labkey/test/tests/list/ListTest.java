@@ -32,6 +32,7 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.Format;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
@@ -953,19 +954,21 @@ public class ListTest extends BaseWebDriverTest
     public void doRenameFieldsTest()
     {
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
-        _listHelper.createList(PROJECT_VERIFY, "new", ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListColumnType.String, "Some new column"));
+        String listName = "new";
+        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListColumnType.String, "Some new column"));
+
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
         assertTextPresent("BarBar");
-        _listHelper.clickEditDesign();
-        setColumnName(1, "FooFoo");
-        setColumnLabel(1, "");
-        _listHelper.clickSave();
+        listDefinitionPage.setColumnName(1, "FooFoo");
+        listDefinitionPage.setColumnLabel(1, "FooFoo");
+        listDefinitionPage.clickSave();
         assertTextPresent("FooFoo");
         assertTextNotPresent("BarBar");
-        _listHelper.clickEditDesign();
-        ListHelper listHelper = new ListHelper(this);
+
+        listDefinitionPage = _listHelper.goToEditDesign(listName);
         ListColumn newCol = new ListColumn("BarBar", "BarBar", ListColumnType.String, "None");
-        listHelper.addField(newCol);
-        _listHelper.clickSave();
+        listDefinitionPage.addField(newCol);
+        listDefinitionPage.clickSave();
         assertTextBefore("FooFoo", "BarBar");
     }
 
@@ -985,20 +988,16 @@ public class ListTest extends BaseWebDriverTest
                 new ListColumn(limitedPhiColumn, "LimitedPhiFile", ListColumnType.Attachment, "the file itself"),
                 new ListColumn(phiColumn, "PhiFile", ListColumnType.Attachment, "the file itself"),
                 new ListColumn(restrictedPhiColumn, "RestrictedFile", ListColumnType.Attachment, "the file itself"));
-        _listHelper.clickEditDesign();
+
 
         // set phi levels
-        PropertiesEditor listFieldEditor = _listHelper.getListFieldEditor();
-        listFieldEditor.selectField("NotPhiColumn");
-        listFieldEditor.fieldProperties().selectAdvancedTab().setPhiLevel(PropertiesEditor.PhiSelectType.NotPHI);
-        listFieldEditor.selectField("LimitedPhiColumn");
-        listFieldEditor.fieldProperties().selectAdvancedTab().setPhiLevel(PropertiesEditor.PhiSelectType.Limited);
-        listFieldEditor.selectField("PhiColumn");
-        listFieldEditor.fieldProperties().selectAdvancedTab().setPhiLevel(PropertiesEditor.PhiSelectType.PHI);
-        listFieldEditor.selectField("RestrictedPhiColumn");
-        listFieldEditor.fieldProperties().selectAdvancedTab().setPhiLevel(PropertiesEditor.PhiSelectType.Restricted);
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.setColumnPhiLevel("NotPhiColumn", PropertiesEditor.PhiSelectType.NotPHI);
+        listDefinitionPage.setColumnPhiLevel("LimitedPhiColumn", PropertiesEditor.PhiSelectType.Limited);
+        listDefinitionPage.setColumnPhiLevel("PhiColumn", PropertiesEditor.PhiSelectType.PHI);
+        listDefinitionPage.setColumnPhiLevel("RestrictedPhiColumn", PropertiesEditor.PhiSelectType.Restricted);
+        listDefinitionPage.clickSave();
 
-        _listHelper.clickSave();
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));
 
@@ -1303,6 +1302,7 @@ public class ListTest extends BaseWebDriverTest
         popLocation();
     }
 
+    // TODO replace usages with _listHelper.goToEditDesign(listName)
     void dataregionToEditDesign()
     {
         clickButton("Design");

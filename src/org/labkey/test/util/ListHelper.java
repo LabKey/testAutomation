@@ -23,6 +23,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
@@ -55,6 +57,18 @@ public class ListHelper extends LabKeySiteWrapper
     public ListHelper(WebDriver driver)
     {
         this(() -> driver);
+    }
+
+    private boolean NEW_LIST_DESIGNER_ENABLED = false;
+    private void toggleNewListDesigner(boolean enabled)
+    {
+        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
+//        if (enabled)
+//            ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
+//        else
+//            ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
+//
+//        NEW_LIST_DESIGNER_ENABLED = enabled;
     }
 
     @Override
@@ -317,11 +331,62 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod
     public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
+        toggleNewListDesigner(true);
         beginCreateList(containerPath, listName);
         createListHelper(listName, listKeyType, listKeyName, cols);
+        toggleNewListDesigner(false);
     }
 
     private void createListHelper(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    {
+        if (!NEW_LIST_DESIGNER_ENABLED)
+        {
+            createListHelper_OLD(listName, listKeyType, listKeyName, cols);
+            return;
+        }
+
+        // TODO move the relevant parts below to a ListPropertiesPanel test helper component
+        DomainFormPanel fieldsPanel = expandFieldsPanel();
+
+        log("Set list key field");
+        if (listKeyType == ListColumnType.AutoInteger)
+        {
+            fieldsPanel.startNewDesign("REMOVE_ME");
+            selectOptionByText(Locator.name("keyField"), "Auto integer key");
+            sleep(500); // wait just a bit for the auto integer key field to be added
+            fieldsPanel.getField(0).setName(listKeyName);
+            fieldsPanel.removeField("REMOVE_ME");
+        }
+        else
+        {
+            fieldsPanel.startNewDesign(listKeyName);
+            selectOptionByText(Locator.name("keyField"), listKeyName);
+        }
+
+        log("Add additional fields");
+        for (ListColumn col : cols)
+        {
+            fieldsPanel.addField(col);
+        }
+
+        clickSave();
+    }
+
+    // TODO move this to a ListDesignerPage test helper
+    private DomainFormPanel getFieldsPanel()
+    {
+        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Fields").find();
+    }
+
+    // TODO move this to a ListDesignerPage test helper
+    private DomainFormPanel expandFieldsPanel()
+    {
+        DomainFormPanel panel = getFieldsPanel();
+        panel.expand();
+        return panel;
+    }
+
+    private void createListHelper_OLD(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
         selectOptionByText(Locator.id("ff_keyType"), listKeyType.toString());
         setFormElement(Locator.id("ff_keyName"), listKeyName);
@@ -391,11 +456,29 @@ public class ListHelper extends LabKeySiteWrapper
 
         log("Add List");
         clickButton("Create New List");
+        setListName(listName);
+    }
+
+    private void setListName_OLD(String listName)
+    {
         waitForElement(Locator.id("ff_name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("ff_name"), listName);
         fireEvent(Locator.id("ff_name"), BaseWebDriverTest.SeleniumEvent.blur);
     }
 
+    private void setListName(String listName)
+    {
+        if (!NEW_LIST_DESIGNER_ENABLED)
+        {
+            setListName_OLD(listName);
+            return;
+        }
+
+        // TODO move this to a ListPropertiesPanel test helper component
+        waitForElement(Locator.id("name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.id("name"), listName);
+        fireEvent(Locator.id("name"), BaseWebDriverTest.SeleniumEvent.blur);
+    }
 
     public void createListFromFile(String containerPath, String listName, File inputFile)
     {
@@ -477,13 +560,43 @@ public class ListHelper extends LabKeySiteWrapper
         return new EditListDefinitionPage(getDriver());
     }
 
-    public void clickSave()
+    public EditListDefinitionPage goToEditDesign(String listName)
+    {
+        // if we are on the Manage List page, click the list name first
+        if (isElementPresent(Locators.bodyTitle("Available Lists")))
+            clickAndWait(Locator.linkWithText(listName));
+
+        toggleNewListDesigner(true);
+        if (!NEW_LIST_DESIGNER_ENABLED)
+            waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
+        else
+            clickAndWait(Locator.lkButton("Design"));
+
+        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver(), NEW_LIST_DESIGNER_ENABLED);
+        toggleNewListDesigner(false);
+
+        return listDefinitionPage;
+    }
+
+    private void clickSave_OLD()
     {
         WebElement saveButton = Locator.lkButton("Save").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         scrollToTop(); // After clicking save, sometimes the page scrolls so that the project menu is under the mouse
         saveButton.click();
         waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void clickSave()
+    {
+        if (!NEW_LIST_DESIGNER_ENABLED)
+        {
+            clickSave_OLD();
+            return;
+        }
+
+        // TODO move this to a ListDesignerPage test helper
+        clickAndWait(Locator.button("Save").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
     }
 
     public void clickDeleteList()
