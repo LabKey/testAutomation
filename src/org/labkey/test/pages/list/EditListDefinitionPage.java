@@ -29,6 +29,9 @@ import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.ElementCache>
 {
     private boolean useNewDesigner = false;
@@ -157,6 +160,32 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         fieldsPanel.addField(newCol);
     }
 
+    public void removeField(int index)
+    {
+        if (!this.useNewDesigner)
+        {
+            ListHelper listHelper = new ListHelper(this);
+            listHelper.getListFieldEditor().selectField(index).markForDeletion();
+            return;
+        }
+
+        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        fieldsPanel.removeField(fieldsPanel.getField(index).getName(), true);
+    }
+
+    public List<String> getFieldNames()
+    {
+        if (!this.useNewDesigner)
+        {
+            ListHelper listHelper = new ListHelper(this);
+            return listHelper.getListFieldEditor().getFieldNames().stream()
+                    .map(String::toLowerCase).collect(Collectors.toList());
+        }
+
+        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        return fieldsPanel.fieldNames();
+    }
+
     public void clickSave()
     {
         if (!this.useNewDesigner)
@@ -173,7 +202,7 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         clickAndWait(Locator.button("Save").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
     }
 
-    public PropertiesEditor listFields()
+    public PropertiesEditor getPropertyEditor()
     {
         return elementCache()._propertiesEditor;
     }
