@@ -36,6 +36,8 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 
 import java.io.File;
 import java.io.IOException;
@@ -294,5 +296,50 @@ public class APIAssayHelper extends AbstractAssayHelper
         SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
         ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, containerPath);
         return saveProtocolResponse.getProtocol();
+    }
+
+    public void createAssayWithPlateSupport(String name)
+    {
+        ReactAssayDesignerPage assayDesigner = createAssayDesign("General", name);
+
+        assayDesigner.setPlateMetadata(true);
+        assayDesigner.clickFinish();
+    }
+
+    public String getPlateTemplateLsid(String folderPath) throws Exception
+    {
+        SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General", "PlateTemplate");
+        selectRowsCmd.setColumns(List.of("Lsid"));
+
+        SelectRowsResponse resp = selectRowsCmd.execute(_test.createDefaultConnection(false), folderPath);
+
+        return String.valueOf(resp.getRows().get(0).get("Lsid"));
+    }
+
+    public void createPlateTemplate(String templateName, String templateType, String assayType)
+    {
+        PlateDesignerPage.PlateDesignerParams params = new PlateDesignerPage.PlateDesignerParams(8, 12);
+        params.setTemplateType(templateType);
+        params.setAssayType(assayType);
+        PlateDesignerPage plateDesigner = PlateDesignerPage.beginAt(_test, params);
+
+       if (assayType.contains("GPAT"))
+       {
+           plateDesigner.createWellGroup("SAMPLE", "SA01");
+           plateDesigner.createWellGroup("SAMPLE", "SA02");
+           plateDesigner.createWellGroup("SAMPLE", "SA03");
+           plateDesigner.createWellGroup("SAMPLE", "SA04");
+
+           // mark the regions on the plate to use the well groups
+           plateDesigner.selectWellsForWellgroup("CONTROL", "Positive", "A11", "H11");
+           plateDesigner.selectWellsForWellgroup("CONTROL", "Negative", "A12", "H12");
+
+           plateDesigner.selectWellsForWellgroup("SAMPLE", "SA01", "A1", "H3");
+           plateDesigner.selectWellsForWellgroup("SAMPLE", "SA02", "A4", "H6");
+           plateDesigner.selectWellsForWellgroup("SAMPLE", "SA03", "A7", "H8");
+           plateDesigner.selectWellsForWellgroup("SAMPLE", "SA04", "A9", "H10");
+       }
+        plateDesigner.setName(templateName);
+        plateDesigner.saveAndClose();
     }
 }
