@@ -51,9 +51,8 @@ public class CollapsiblePanel extends WebDriverComponent<CollapsiblePanel.Elemen
     }
 
     public boolean isExpanded()
-    {
-        return elementCache().waitForBody()
-                .getAttribute("class").equals("panel-collapse collapse in");
+    {   // use the toggle button's svg class to evaluate
+        return elementCache().expandedLoc.existsIn(elementCache().expandCollapseToggle);
     }
 
     public WebElement body()
@@ -75,6 +74,8 @@ public class CollapsiblePanel extends WebDriverComponent<CollapsiblePanel.Elemen
         WebElement expandCollapseToggle = Locator.tagWithClass("span", "pull-right")
                 .findWhenNeeded(header).withTimeout(2000);
         private Locator.XPathLocator body = Locator.tagWithClass("div", "panel-collapse");
+        Locator expandedLoc = Locator.tagWithAttributeContaining("svg", "class", "fa-minus-square");
+        Locator collapsedLoc = Locator.tagWithAttributeContaining("svg", "class", "fa-plus-square");
 
         WebElement waitForBody()
         {
