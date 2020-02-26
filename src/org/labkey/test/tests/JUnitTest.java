@@ -102,11 +102,6 @@ public class JUnitTest extends TestSuite
 
     public static class JUnitSeleniumHelper extends BaseWebDriverTest
     {
-        public void unfail()
-        {
-            _testFailed = false;
-        }
-
         protected String getProjectName() {return null;}
         protected void doCleanup(boolean afterTest) throws TestTimeoutException
         { }
@@ -121,10 +116,20 @@ public class JUnitTest extends TestSuite
     {
         // TODO: remove upgrade helper from JUnitTest and run before suite starts.
         JUnitSeleniumHelper helper = new JUnitSeleniumHelper();
-        helper.setUp();
-        // sign in performs upgrade if necessary
-        helper.signIn();
-        helper.unfail();
+        try
+        {
+            helper.setUp();
+            // sign in performs upgrade if necessary
+            helper.signIn();
+        }
+        catch (Throwable t)
+        {
+            if (helper.getWrappedDriver() != null)
+            {
+                helper.getArtifactCollector().dumpPageSnapshot("ServerBootstrap", null);
+            }
+            throw t;
+        }
     }
 
     public static TestSuite dynamicSuite(Collection<String> categories, Collection<String> excludedCategories)

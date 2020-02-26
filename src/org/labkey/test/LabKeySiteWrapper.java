@@ -54,6 +54,7 @@ import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -84,7 +85,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -568,7 +568,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     private void checkForUpgrade()
     {
+        final String upgradeText = "Please wait, this page will automatically update with progress information.";
         boolean bootstrapped = false;
+        boolean performingUpgrade = false;
 
         // check to see if we're the first user:
         if (isTextPresent("Welcome! We see that this is your first time logging in."))
@@ -604,111 +606,108 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             // Make sure we got redirected to the module status page, since we already have a user
             assertTextNotPresent("Confirm Password");
             assertTextPresent("Please wait, this page will automatically update with progress information");
-            goToHome();
 
             WebTestHelper.saveSession(email, getDriver());
         }
-
-        if (bootstrapped || getDriver().getTitle().startsWith("Sign In"))
+        else if (getDriver().getTitle().startsWith("Sign In"))
         {
             // if the logout page takes us to the sign-in page, then we may have a schema update to do:
             if (getDriver().getTitle().startsWith("Sign In"))
                 simpleSignIn();
 
-            String upgradeText = "Please wait, this page will automatically update with progress information.";
-            boolean performingUpgrade = isTextPresent(upgradeText);
+            performingUpgrade = isTextPresent(upgradeText);
+        }
 
+        if (bootstrapped || performingUpgrade)
+        {
             RuntimeException redirectCheckError = null;
 
-            if (performingUpgrade)
+            try
+            {
+                verifyRedirectBehavior(upgradeText);
+            }
+            catch (IOException | AssertionError fail)
+            {
+                // Delay throwing failure so that upgrade can finish
+                redirectCheckError = new RuntimeException(fail);
+            }
+
+            int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
+            long startTime = System.currentTimeMillis();
+            long elapsed = 0;
+
+            while (elapsed < waitMs && (!isElementPresent(Locator.lkButton("Next"))))
             {
                 try
                 {
-                    verifyRedirectBehavior(upgradeText);
+                    // Pound the server aggressively with requests for the home page to test synchronization
+                    // in the sql script runner.
+                    for (int i = 0; i < 5; i++)
+                    {
+                        int responseCode = WebTestHelper.getHttpResponse(buildURL("project", "Home", "begin")).getResponseCode();
+                        TestLogger.log("Home: " + responseCode);
+                        sleep(200);
+                    }
+                    sleep(2000);
+                    if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
+                        throw new RuntimeException("A startup failure occurred.");
+                    Optional<WebElement> progressBar = Locator.id("status-progress-bar").findOptionalElement(getDriver());
+                    log(bootstrapped ? "Bootstrapping" : "Upgrading" + (progressBar.map(webElement -> (": \"" + webElement.getText() + "\"")).orElse("")));
                 }
-                catch (IOException fail)
+                catch (WebDriverException ignore)
                 {
-                    // Delay throwing failure so that upgrade can finish
-                    redirectCheckError = new RuntimeException(fail);
+                    // Do nothing -- this page will sometimes auto-navigate out from under selenium
                 }
-
-                int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
-                long startTime = System.currentTimeMillis();
-                long elapsed = 0;
-
-                while (elapsed < waitMs && (!isElementPresent(Locator.lkButton("Next"))))
+                finally
                 {
-                    try
-                    {
-                        // Pound the server aggressively with requests for the home page to test synchronization
-                        // in the sql script runner.
-                        for (int i = 0; i < 5; i++)
-                        {
-                            int responseCode = WebTestHelper.getHttpResponse(buildURL("project", "Home", "begin")).getResponseCode();
-                            TestLogger.log("Home: " + responseCode);
-                            sleep(200);
-                        }
-                        sleep(2000);
-                        if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
-                            throw new RuntimeException("A startup failure occurred.");
-                        Optional<WebElement> progressBar = Locator.id("status-progress-bar").findOptionalElement(getDriver());
-                        log(bootstrapped ? "Bootstrapping" : "Upgrading" + (progressBar.map(webElement -> (": \"" + webElement.getText() + "\"")).orElse("")));
-                    }
-                    catch (WebDriverException ignore)
-                    {
-                        // Do nothing -- this page will sometimes auto-navigate out from under selenium
-                    }
-                    finally
-                    {
-                        elapsed = System.currentTimeMillis() - startTime;
-                    }
-                }
-
-                if (elapsed > waitMs)
-                    throw new TestTimeoutException("Script runner took more than 10 minutes to complete.");
-
-                if (bootstrapped)
-                {
-                    // admin-moduleStatus
-                    assertEquals("Progress bar text", "Module startup complete", getText(Locator.id("status-progress-bar")));
-                    clickAndWait(Locator.lkButton("Next"));
-                    // admin-newInstallSiteSettings
-                    assertElementPresent(Locator.id("rootPath"));
-                    clickAndWait(Locator.lkButton("Next"));
-                    // admin-installComplete
-                    clickAndWait(Locator.linkContainingText("Go to the server's Home page"));
-                    assertEquals("Landed on wrong project after bootstrapping", "home", getCurrentProject().toLowerCase());
-                }
-                else
-                {
-                    Optional<WebElement> header = Locator.css(".labkey-nav-page-header").findOptionalElement(getDriver());
-                    if (header.isPresent() && Arrays.asList("Start Modules", "Upgrade Modules").contains(header.get().getText().trim()))
-                    {
-                        waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
-                        clickAndWait(Locator.lkButton("Next"));
-                        Locator.lkButton("Next")
-                                .findOptionalElement(getDriver())
-                                .ifPresent(this::clickAndWait);
-                    }
-                    else
-                    {
-                        goToHome();
-                    }
+                    elapsed = System.currentTimeMillis() - startTime;
                 }
             }
 
+            if (elapsed > waitMs)
+                throw new TestTimeoutException("Script runner took more than 10 minutes to complete.");
+
             if (bootstrapped)
             {
+                // admin-moduleStatus
+                assertEquals("Progress bar text", "Module startup complete", getText(Locator.id("status-progress-bar")));
+                clickAndWait(Locator.lkButton("Next"));
+                // admin-newInstallSiteSettings
+                assertElementPresent(Locator.id("rootPath"));
+                uncheckCheckbox(Locator.name("allowReporting"));
+                clickAndWait(Locator.lkButton("Next"));
+                // admin-installComplete
+                clickAndWait(Locator.linkContainingText("Go to the server's Home page"));
+                assertEquals("Landed on wrong project after bootstrapping", "home", getCurrentProject().toLowerCase());
+
                 // Tests hit Home portal a lot. Make it load as fast as possible
                 new PortalHelper(this).removeAllWebParts();
                 String displayName = AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername())
                         + (WebTestHelper.RANDOM.nextBoolean() ? BaseWebDriverTest.INJECT_CHARS_1 : BaseWebDriverTest.INJECT_CHARS_2);
                 _userHelper.setDisplayName(PasswordUtil.getUsername(), displayName);
-
-                PipelineStatusTable.goToAllJobsPage(this);
-                log("Wait for any upgrade/bootstrap pipeline jobs");
-                waitForRunningPipelineJobs(false, 120000);
             }
+            else // Just upgrading
+            {
+                Optional<WebElement> header = Locator.css(".labkey-nav-page-header").findOptionalElement(getDriver());
+                if (header.isPresent() && Arrays.asList("Start Modules", "Upgrade Modules").contains(header.get().getText().trim()))
+                {
+                    waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
+                    clickAndWait(Locator.lkButton("Next"));
+                    Locator.lkButton("Next")
+                            .findOptionalElement(getDriver())
+                            .ifPresent(button ->
+                                    doAndWaitForPageToLoad(() ->
+                                            shortWait().until(LabKeyExpectedConditions.clickUntilStale(button))));
+                }
+                else
+                {
+                    goToHome();
+                }
+            }
+
+            PipelineStatusTable.goToAllJobsPage(this);
+            log("Wait for any upgrade/bootstrap pipeline jobs");
+            waitForRunningPipelineJobs(false, 120000);
 
             checkErrors(); // Check for errors from bootstrap/upgrade
 
@@ -1277,7 +1276,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      * Stop impersonating user
      * @param goHome go to Server Home or return to page where impersonation started
      */
-    public void stopImpersonating(Boolean goHome)
+    public void stopImpersonating(boolean goHome)
     {
         navBar().stopImpersonating();
         if (goHome)

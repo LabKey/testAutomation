@@ -4,32 +4,32 @@ apply plugin: 'org.labkey.testRunner'
 import org.labkey.gradle.util.BuildUtils
 
 project.dependencies {
-    compile "org.slf4j:slf4j-log4j12:${slf4jLog4j12Version}" // Suppresses unwanted logging from remoteapi and webdriver
-    compile "com.github.lookfirst:sardine:${project.lookfirstSardineVersion}"
-    compile "com.googlecode.json-simple:json-simple:${jsonSimpleVersion}"
-    compile "javax.xml.bind:jaxb-api:${jaxbVersion}"
-    compile "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
-    compile "com.sun.xml.bind:jaxb-core:${jaxbVersion}"
-    compile "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
-    compile "org.apache.tika:tika-core:${tikaVersion}"
-    compile "org.apache.commons:commons-compress:${commonsCompressVersion}"
-    compile "org.apache.commons:commons-lang3:${commonsLang3Version}"
-    compile "org.apache.commons:commons-math3:${commonsMath3Version}"
-    compile "org.apache.pdfbox:pdfbox:${pdfboxVersion}"
-    compile "org.apache.poi:poi:${poiVersion}"
-    compile "org.apache.poi:poi-ooxml:${poiVersion}"
-    compile "org.apache.xmlbeans:xmlbeans:${xmlbeansVersion}"
-    compile "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
-    compile "org.jetbrains:annotations:${annotationsVersion}"
-    compile "org.mock-server:mockserver-netty:${mockserverVersion}"
+    implementation "org.slf4j:slf4j-log4j12:${slf4jLog4j12Version}" // Suppresses unwanted logging from remoteapi and webdriver
+    implementation "com.github.lookfirst:sardine:${project.lookfirstSardineVersion}"
+    implementation "com.googlecode.json-simple:json-simple:${jsonSimpleVersion}"
+    implementation "javax.xml.bind:jaxb-api:${jaxbVersion}"
+    implementation "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
+    implementation "com.sun.xml.bind:jaxb-core:${jaxbVersion}"
+    implementation "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
+    implementation "org.apache.tika:tika-core:${tikaVersion}"
+    implementation "org.apache.commons:commons-compress:${commonsCompressVersion}"
+    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
+    implementation "org.apache.commons:commons-math3:${commonsMath3Version}"
+    implementation "org.apache.pdfbox:pdfbox:${pdfboxVersion}"
+    implementation "org.apache.poi:poi:${poiVersion}"
+    implementation "org.apache.poi:poi-ooxml:${poiVersion}"
+    implementation "org.apache.xmlbeans:xmlbeans:${xmlbeansVersion}"
+    implementation "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
+    implementation "org.jetbrains:annotations:${annotationsVersion}"
+    implementation "org.mock-server:mockserver-netty:${mockserverVersion}"
     
     // LabKey XML schemas are used to decode exported folder XMLs and test case XMLs
     // Don't include local version so that running tests doesn't require building :server:api
-    compile ("org.labkey:api:${labkeySchemasTestVersion}:schemas") { transitive = false }
+    implementation ("org.labkey:api:${labkeySchemasTestVersion}:schemas") { transitive = false }
 
     // 36184: Tests can't find selenium-ie-driver library when running on Windows on TeamCity
     // Workaround to ensure that the class-loader finds InternetExplorerDriver
-    compile "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
+    implementation "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
 }
 
 BuildUtils.addLabKeyDependency(
@@ -41,7 +41,7 @@ BuildUtils.addLabKeyDependency(
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 {
-    BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":remoteapi:labkey-api-jdbc")
+    BuildUtils.addLabKeyDependency(project: project, config: "implementation", depProjectPath: ":remoteapi:labkey-api-jdbc")
 }
 
 if (project.hasProperty("teamcity"))
