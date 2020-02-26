@@ -8,6 +8,7 @@ import org.labkey.test.components.html.Checkbox;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.By;
 
 import java.util.List;
 
@@ -48,8 +49,17 @@ public class FileSelectTree extends WebDriverComponent<FileSelectTree.ElementCac
             elementCache().collapsedCaret.findElement(nodeRow).click();    // expand it
             WebDriverWrapper.waitFor(()-> elementCache().expandedCaret.existsIn(nodeRow),
                 "the node did not expand", 2000);
+            this.waitForLoadingFileTree();
         }
         return Locator.tag("ul").waitForElement(nodeContainer, 2000);   // contains the new child list, which is a //div/ul with list items
+    }
+
+    public FileSelectTree waitForLoadingFileTree()
+    {
+        WebDriverWrapper.waitFor(()-> (this.findElements(By.xpath("//span[contains(text(), 'Loading...')]")).size() < 1),
+                "File tree loading too long", 4000);
+
+        return this;
     }
 
     private FileSelectTree collapseNode(SearchContext parent, String nodeName)
