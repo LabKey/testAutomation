@@ -62,13 +62,20 @@ public class ListHelper extends LabKeySiteWrapper
     private boolean NEW_LIST_DESIGNER_ENABLED = false;
     private void toggleNewListDesigner(boolean enabled)
     {
+        if (enabled)
+            enabledNewListDesigner();
+        else
+            disableNewListDesigner();
+    }
+    private void enabledNewListDesigner()
+    {
         ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
-//        if (enabled)
-//            ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
-//        else
-//            ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
-//
-//        NEW_LIST_DESIGNER_ENABLED = enabled;
+        NEW_LIST_DESIGNER_ENABLED = true;
+    }
+    private void disableNewListDesigner()
+    {
+        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
+        NEW_LIST_DESIGNER_ENABLED = false;
     }
 
     @Override
@@ -394,7 +401,7 @@ public class ListHelper extends LabKeySiteWrapper
         getListFieldEditor().addField(col);
     }
 
-    public void beginCreateListFromTab(String tabName, String listName)
+    private void beginCreateListFromTab(String tabName, String listName)
     {
         clickTab(tabName.replace(" ", ""));
         beginCreateListHelper(listName);
@@ -451,6 +458,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void createListFromFile(String containerPath, String listName, File inputFile)
     {
+        disableNewListDesigner();
         beginCreateList(containerPath, listName);
 
         click(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
@@ -522,6 +530,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public EditListDefinitionPage clickEditDesign()
     {
+        disableNewListDesigner();
         waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
         waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.id("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
