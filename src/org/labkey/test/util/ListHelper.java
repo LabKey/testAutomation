@@ -62,9 +62,9 @@ public class ListHelper extends LabKeySiteWrapper
     private boolean NEW_LIST_DESIGNER_ENABLED = false;
     private void toggleNewListDesigner(boolean enabled)
     {
-        if (enabled)
-            enabledNewListDesigner();
-        else
+        //if (enabled)
+        //    enabledNewListDesigner();
+        //else
             disableNewListDesigner();
     }
     private void enabledNewListDesigner()
