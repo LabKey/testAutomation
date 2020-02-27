@@ -155,6 +155,7 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         goToModule("List");
         _listHelper.createList(getProjectName(), "Ages", ListHelper.ListColumnType.Integer, "Age");
+        _listHelper.goToList("Ages");
         _listHelper.uploadData(TEST_DATA_AGE_LIST);
     }
 
