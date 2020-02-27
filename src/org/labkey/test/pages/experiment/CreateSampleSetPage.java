@@ -114,11 +114,11 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        Input nameInput = Input.Input(Locator.name("name"), getDriver())
+        Input nameInput = Input.Input(Locator.id("entity-name"), getDriver())
                 .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
-        Input nameExpressionInput = Input.Input(Locator.name("nameExpression"), getDriver())
+        Input nameExpressionInput = Input.Input(Locator.id("entity-nameExpression"), getDriver())
                 .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
-        Input descriptionInput = Input.Input(Locator.name("description"), getDriver())
+        Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver())
                 .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
 
         WebElement createButton = Locator.lkButton("Create").findWhenNeeded(this);
@@ -126,7 +126,7 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
 
         protected Input parentAlias(int index)
         {
-            return Input.Input(Locator.name("importAliasKeys"), getDriver()).findAll(this).get(index);
+            return Input.Input(Locator.name("alias"), getDriver()).findAll(this).get(index);
         }
 
         protected WebElement parentAliasSelect(int index)
