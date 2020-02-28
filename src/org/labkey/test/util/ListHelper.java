@@ -65,7 +65,7 @@ public class ListHelper extends LabKeySiteWrapper
         //if (enabled)
         //    enabledNewListDesigner();
         //else
-            disableNewListDesigner();
+        //    disableNewListDesigner();
     }
     private void enabledNewListDesigner()
     {
@@ -74,7 +74,7 @@ public class ListHelper extends LabKeySiteWrapper
     }
     private void disableNewListDesigner()
     {
-        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
+        //ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
         NEW_LIST_DESIGNER_ENABLED = false;
     }
 
