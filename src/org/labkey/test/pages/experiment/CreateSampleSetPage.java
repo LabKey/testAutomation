@@ -3,15 +3,16 @@ package org.labkey.test.pages.experiment;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.html.Input;
+import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
+
+import java.util.List;
 
 
-public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementCache>
+public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementCache> implements SampleTypeDesigner.SavesSampleType<CreateSampleSetPage, LabKeyPage<?>>
 {
     public final static String CURRENT_SAMPLE_TYPE_OPTION_TEXT = "(Current Sample Type)";
     public final static String CURRENT_SAMPLE_SET_OPTION_TEXT = "(Current Sample Set)";
@@ -31,107 +32,98 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return new CreateSampleSetPage(driver.getDriver());
     }
 
+    @Override
+    public Locator getBodyLocator()
+    {
+        return Locator.id("app");
+    }
+
+    @Override
+    public LabKeyPage<?> getSaveDestination()
+    {
+        return null;
+    }
+
     public CreateSampleSetPage setName(String name)
     {
-        elementCache().nameInput.set(name);
+        elementCache()._designer.setName(name);
         return this;
     }
 
     public String getName()
     {
-        return elementCache().nameInput.get();
+        return elementCache()._designer.getName();
     }
 
     public CreateSampleSetPage setDescription(String desc)
     {
-        elementCache().descriptionInput.set(desc);
+        elementCache()._designer.setDescription(desc);
         return this;
     }
 
     public String getDescrption()
     {
-        return elementCache().descriptionInput.get();
+        return elementCache()._designer.getDescription();
     }
 
     public CreateSampleSetPage setNameExpression(String nameExp)
     {
-        elementCache().nameExpressionInput.set(nameExp);
+        elementCache()._designer.setNameExpression(nameExp);
         return this;
     }
 
     public String getNameExpression()
     {
-        return elementCache().nameExpressionInput.get();
+        return elementCache()._designer.getNameExpression();
     }
 
     public CreateSampleSetPage addParentColumnAlias(int index, String importHeader, String materialInputName)
     {
-        int countOfInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size();
-
-        click(Locator.linkWithText("add parent column import alias"));
-        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() > countOfInputs, 1000);
-
-        Input aliasInput = elementCache().parentAlias(index);
-        WebElement aliasSelect = elementCache().parentAliasSelect(index);
-
-        aliasInput.setValue(importHeader);
-        selectOptionByTextContaining(aliasSelect, materialInputName);
+        elementCache()._designer.addParentAlias();
+        elementCache()._designer.setParentAlias(index, importHeader, materialInputName);
 
         return this;
     }
 
     public String getParentAlias(int index)
     {
-        return elementCache().parentAlias(index).getValue();
+        return elementCache()._designer.getParentAlias(index);
     }
 
     public String getParentAliasSelectText(int index)
     {
-        return new Select(elementCache().parentAliasSelect(index)).getFirstSelectedOption().getText();
+        return elementCache()._designer.getParentAliasSelectText(index);
     }
 
-    public DomainDesignerPage clickCreate()
+    public DomainFormPanel fieldsPanel()
     {
-        clickAndWait(elementCache().createButton);
-        return new DomainDesignerPage(getDriver());
+        return elementCache()._designer.getDomainEditor();
     }
 
-    public CreateSampleSetPage clickCreateExpectingError()
+    public LabKeyPage clickSave()
     {
-        clickAndWait(elementCache().createButton);
-        return this;
+        elementCache()._designer.clickSave(false);
+        return new LabKeyPage(getDriver());
+    }
+
+    public List<WebElement> clickSaveExpectingError()
+    {
+        return elementCache()._designer.clickSaveExpectingError();
     }
 
     public void clickCancel()
     {
-        clickAndWait(elementCache().cancelButton);
+        elementCache()._designer.clickCancel();
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        Input nameInput = Input.Input(Locator.id("entity-name"), getDriver())
-                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
-        Input nameExpressionInput = Input.Input(Locator.id("entity-nameExpression"), getDriver())
-                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
-        Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver())
-                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
-
-        WebElement createButton = Locator.lkButton("Create").findWhenNeeded(this);
-        WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
-
-        protected Input parentAlias(int index)
-        {
-            return Input.Input(Locator.name("alias"), getDriver()).findAll(this).get(index);
-        }
-
-        protected WebElement parentAliasSelect(int index)
-        {
-            return Locator.tagWithName("select", "importAliasValues").findElements(getDriver()).get(index);
-        }
+        SampleTypeDesigner _designer = new SampleTypeDesigner(getDriver());
     }
 }

@@ -88,41 +88,37 @@ public class SampleSetHelper extends WebDriverWrapper
             i++;
         }
 
-        DomainDesignerPage domainDesignerPage = createPage.clickCreate();
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
+        DomainFormPanel domainFormPanel = createPage.fieldsPanel();
         for (FieldDefinition fieldDefinition : props.getFields())
         {
             domainFormPanel.addField(fieldDefinition);
         }
-        domainDesignerPage.clickFinish();
+        createPage.clickSave();
 
         return this;
     }
 
     public SampleSetHelper createSampleSet(String name)
     {
-        return createSampleSet(name, null);
+        goToCreateNewSampleSet()
+                .setName(name)
+                .clickSave();
+        return this;
     }
 
     public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression)
     {
-        return createSampleSet(name, nameExpression, false);
+        goToCreateNewSampleSet()
+                .setName(name)
+                .setNameExpression(nameExpression)
+                .clickSave();
+        return this;
     }
 
     public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression, boolean createFailureExpected)
     {
-        CreateSampleSetPage createSampleSetPage = goToCreateNewSampleSet();
-
-        createSampleSetPage.setName(name);
-        if (nameExpression != null)
-        {
-            createSampleSetPage.setNameExpression(nameExpression);
-        }
-
-        if (createFailureExpected)
-            createSampleSetPage.clickCreateExpectingError();
-        else
-            createSampleSetPage.clickCreate();
+        goToCreateNewSampleSet().setName(name).setNameExpression(nameExpression)
+                .clickSaveExpectingError();
 
         return this;
     }
