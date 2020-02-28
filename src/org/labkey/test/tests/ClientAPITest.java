@@ -259,6 +259,7 @@ public class ClientAPITest extends BaseWebDriverTest
         String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
 
         _listHelper.createList(PROJECT_NAME + "/" + FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();
@@ -298,6 +299,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         // Create lists for cross-folder query test.
         _listHelper.createList(PROJECT_NAME + "/" + FOLDER_NAME + "/" + SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.goToList(SUBFOLDER_LIST);
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();
@@ -305,6 +307,7 @@ public class ClientAPITest extends BaseWebDriverTest
         // Create lists for cross-folder query test.
         clickProject(OTHER_PROJECT);
         _listHelper.createList(OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.goToList(OTHER_PROJECT_LIST);
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();

@@ -28,6 +28,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -141,10 +142,9 @@ public class InlineImagesListTest extends BaseWebDriverTest
 
         log("Create a list named: " + LIST_NAME);
         _listHelper.createList(getProjectName(), LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listColDescription, _listColAttachment01);
-        clickAndWait(Locator.lkButton("Done"));
 
         Map<String, String> newValues = new HashMap<>();
-
+        goToManageLists();
         list=new DataRegionTable("query", getDriver());
         clickAndWait(Locator.linkWithText(LIST_NAME).waitForElement(list.getComponentElement(), WAIT_FOR_JAVASCRIPT));
 
@@ -176,12 +176,13 @@ public class InlineImagesListTest extends BaseWebDriverTest
 
         log("Add another attachment field.");
         clickAndWait(Locator.linkWithText("Design"));
-        _listHelper.clickEditDesign();
-        _listHelper.addField(_listColAttachment02);
-        _listHelper.clickSave();
-        clickAndWait(Locator.lkButton("Done"));
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
+        listDefinitionPage.addField(_listColAttachment02);
+        listDefinitionPage.clickSave();
 
         log("Insert images and files into the new attachment rows.");
+        goToManageLists();
+        clickAndWait(Locator.linkWithText(LIST_NAME));
         newValues = new HashMap<>();
         newValues.put(LIST_ATTACHMENT02_NAME, PDF_FILE.getAbsolutePath());
         _listHelper.updateRow(1, newValues, false);
@@ -271,13 +272,13 @@ public class InlineImagesListTest extends BaseWebDriverTest
 
         log("Remove one of the attachment columns and validate that everything still works.");
         clickAndWait(Locator.linkWithText("Design"));
-        _listHelper.clickEditDesign();
-        _listHelper.getListFieldEditor().selectField(3)
-                .markForDeletion();
-        _listHelper.clickSave();
-        clickAndWait(Locator.lkButton("Done"));
+        listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
+        listDefinitionPage.removeField(3);
+        listDefinitionPage.clickSave();
 
         log("Validate that the correct number of images are present.");
+        goToManageLists();
+        clickAndWait(Locator.linkWithText(LIST_NAME));
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName(), Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
         assertElementPresent("Did not find the expected number of icons for images for " + JPG01_FILE.getName(), Locator.xpath("//img[contains(@title, '" + JPG01_FILE.getName() + "')]"), 1);
         assertElementPresent("Did not find the expected number of icons for images for " + PDF_FILE.getName(), Locator.xpath("//img[contains(@src, 'pdf.gif')]"), 1);

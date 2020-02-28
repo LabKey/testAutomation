@@ -49,7 +49,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         DomainFieldRow fieldRow = addField(fieldDefinition.getName());
 
         if (fieldDefinition.getLookup() != null)
-            throw new IllegalArgumentException("Lookups are not yet supported");
+            fieldRow.setLookup(fieldDefinition.getLookup());
         else if (fieldDefinition.getType() != null)
             fieldRow.setType(fieldDefinition.getType());
 
@@ -63,12 +63,21 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             fieldRow.setCharCount(fieldDefinition.getScale());
         if (fieldDefinition.getURL() != null)
             fieldRow.setUrl(fieldDefinition.getURL());
-        if (fieldDefinition.getValidator() != null)
-            throw new IllegalArgumentException("Validators are not yet supported");
         if (fieldDefinition.isMvEnabled())
             fieldRow.setMissingValue(fieldDefinition.isMvEnabled());
         if (fieldDefinition.isRequired())
             fieldRow.setRequiredField(fieldDefinition.isRequired());
+
+        if (fieldDefinition.getValidator() != null)
+        {
+            FieldDefinition.FieldValidator validator = fieldDefinition.getValidator();
+            if (validator instanceof FieldDefinition.RegExValidator)
+                fieldRow.setRegularExpressions(List.of((FieldDefinition.RegExValidator)validator));
+            else if (validator instanceof FieldDefinition.RangeValidator)
+                fieldRow.setRangeValidators(List.of((FieldDefinition.RangeValidator)validator));
+            else
+                throw new IllegalArgumentException("Validators are not yet supported");
+        }
 
         fieldRow.collapse();
 

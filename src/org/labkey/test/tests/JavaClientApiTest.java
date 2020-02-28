@@ -172,7 +172,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
                 new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "First Name"),
                 new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "Last Name"),
                 new ListHelper.ListColumn("Birthdate", "Birthdate", ListHelper.ListColumnType.DateTime, "Birthdate"),
+//                new ListHelper.ListColumn("Birthdate", "Birthdate", ListHelper.ListColumnType.DateAndTime, "Birthdate"),// TODO change to this for new list designer
                 new ListHelper.ListColumn("GooAmount", "Goo Amount", ListHelper.ListColumnType.Double, "Amount of Goo"),
+//                new ListHelper.ListColumn("GooAmount", "Goo Amount", ListHelper.ListColumnType.Decimal, "Amount of Goo"),// TODO change to this for new list designer
                 new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"),
                 new ListHelper.ListColumn("Notes", "Notes", ListHelper.ListColumnType.String, "Notes"));
 

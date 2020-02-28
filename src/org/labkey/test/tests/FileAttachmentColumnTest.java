@@ -101,12 +101,12 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     {
         beginAt("/project/" + getProjectName() +"/"+ FOLDER_NAME + "/begin.view?");
         clickTab("Portal");
-        ListHelper listHelper = new ListHelper(getDriver());
 
+        ListHelper listHelper = new ListHelper(getDriver());
         listHelper.createList(getProjectName() + "/" + FOLDER_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, LIST_KEY,
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String),
                 new ListHelper.ListColumn("File", "File", ListHelper.ListColumnType.Attachment));
-        clickButton("Done");
+        goToManageLists();
         listHelper.click(Locator.linkContainingText(LIST_NAME));
         // todo: import actual data here
         Map<String, String> csvRow = new HashMap<>();
