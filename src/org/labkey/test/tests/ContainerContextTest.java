@@ -158,7 +158,6 @@ public class ContainerContextTest extends BaseWebDriverTest
         };
         String lookupSourceListName = "Project-LookupSource-List";
         _listHelper.createList(getProjectName(), lookupSourceListName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
-        clickButton("Done");
 
         log("** Insert row into list");
         goToProjectHome();
@@ -221,7 +220,6 @@ public class ContainerContextTest extends BaseWebDriverTest
             new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "Study Lookup", new ListHelper.LookupInfo(null, "viscstudies", "studies")),
         };
         _listHelper.createList(getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
-        clickButton("Done");
 
         log("** Inserting row into list");
         goToProjectHome();
@@ -280,7 +278,6 @@ public class ContainerContextTest extends BaseWebDriverTest
         };
         String listName = folder + "-Issue15751-List";
         _listHelper.createList(getProjectName() + "/" + folder, listName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
-        clickButton("Done");
 
         log("** Creating background R script");
         goToProjectHome();

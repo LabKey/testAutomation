@@ -479,8 +479,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _listHelper.createList(getProjectName() + "/" + STUDY_FOLDER, STUDY_LIST_NAME,
                 ListHelper.ListColumnType.String, "GlobalPid",
                 new ListHelper.ListColumn("Study", "Study", ListHelper.ListColumnType.String, "Study"));
-
-        clickButton("Import Data");
+        _listHelper.goToList(STUDY_LIST_NAME);
+        _listHelper.clickImportData();
         _listHelper.submitTsvData(STUDY_LIST_DATA);
 
         log("Create the linked schema to the study.");
@@ -620,7 +620,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 new ListHelper.ListColumn("Z", LIST_DEF_TITLE + " Z", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL));
 
         log("** Importing some data...");
-        clickButton("Import Data");
+        _listHelper.goToList(LIST_NAME);
+        _listHelper.clickImportData();
         _listHelper.submitTsvData(LIST_DATA);
 
         log("** Applying metadata xml override to list...");

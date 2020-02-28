@@ -174,7 +174,8 @@ public class TimelineTest extends BaseWebDriverTest
             }
         }
 
-        clickButton("Import Data");
+        _listHelper.goToList(LIST_NAME);
+        _listHelper.clickImportData();
         _listHelper.submitTsvData(data.toString());
         for (String[] rowData : TEST_DATA)
         {

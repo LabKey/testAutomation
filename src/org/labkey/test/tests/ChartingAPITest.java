@@ -122,6 +122,7 @@ public class ChartingAPITest extends BaseWebDriverTest
         String data = ClientAPITest.getListData(ClientAPITest.LIST_KEY_NAME, ClientAPITest.LIST_COLUMNS, ClientAPITest.TEST_DATA);
 
         _listHelper.createList(getProjectName(), ClientAPITest.LIST_NAME, ClientAPITest.LIST_KEY_TYPE, ClientAPITest.LIST_KEY_NAME, ClientAPITest.LIST_COLUMNS);
+        _listHelper.goToList(ClientAPITest.LIST_NAME);
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();
