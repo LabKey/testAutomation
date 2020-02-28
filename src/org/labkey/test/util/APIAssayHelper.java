@@ -37,7 +37,6 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ReactAssayDesignerPage;
-import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 
 import java.io.File;
 import java.io.IOException;
@@ -146,7 +145,7 @@ public class APIAssayHelper extends AbstractAssayHelper
 
     @LogMethod(quiet = true)
     public void importAssay(String assayName, String runName, File file, String projectPath,
-                                         @Nullable Map<String, Object> runProperties, @Nullable Map<String, Object> batchProperties)  throws CommandException, IOException
+                            @Nullable Map<String, Object> runProperties, @Nullable Map<String, Object> batchProperties)  throws CommandException, IOException
     {
         importAssay(getIdFromAssayName(assayName, projectPath), runName, file, projectPath, runProperties, batchProperties);
     }
@@ -316,30 +315,4 @@ public class APIAssayHelper extends AbstractAssayHelper
         return String.valueOf(resp.getRows().get(0).get("Lsid"));
     }
 
-    public void createPlateTemplate(String templateName, String templateType, String assayType)
-    {
-        PlateDesignerPage.PlateDesignerParams params = new PlateDesignerPage.PlateDesignerParams(8, 12);
-        params.setTemplateType(templateType);
-        params.setAssayType(assayType);
-        PlateDesignerPage plateDesigner = PlateDesignerPage.beginAt(_test, params);
-
-       if (assayType.contains("GPAT"))
-       {
-           plateDesigner.createWellGroup("SAMPLE", "SA01");
-           plateDesigner.createWellGroup("SAMPLE", "SA02");
-           plateDesigner.createWellGroup("SAMPLE", "SA03");
-           plateDesigner.createWellGroup("SAMPLE", "SA04");
-
-           // mark the regions on the plate to use the well groups
-           plateDesigner.selectWellsForWellgroup("CONTROL", "Positive", "A11", "H11");
-           plateDesigner.selectWellsForWellgroup("CONTROL", "Negative", "A12", "H12");
-
-           plateDesigner.selectWellsForWellgroup("SAMPLE", "SA01", "A1", "H3");
-           plateDesigner.selectWellsForWellgroup("SAMPLE", "SA02", "A4", "H6");
-           plateDesigner.selectWellsForWellgroup("SAMPLE", "SA03", "A7", "H8");
-           plateDesigner.selectWellsForWellgroup("SAMPLE", "SA04", "A9", "H10");
-       }
-        plateDesigner.setName(templateName);
-        plateDesigner.saveAndClose();
-    }
 }

@@ -10,6 +10,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 
@@ -21,8 +22,8 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class GpatPlateTemplateTest extends BaseWebDriverTest
 {
-    public static final File TEST_PLATE_DATA = TestFileUtils.getSampleData("GPAT/plateData.xlsx");
-    public static final File TEST_PLATE_METADATA = TestFileUtils.getSampleData("GPAT/plate-metadata-1.json");
+    private static final File TEST_PLATE_DATA = TestFileUtils.getSampleData("GPAT/plateData.xlsx");
+    private static final File TEST_PLATE_METADATA = TestFileUtils.getSampleData("GPAT/plate-metadata-1.json");
     private static final String ASSAY_NAME = "Assay with plate template";
     private static final String templateName = "GPAT";
 
@@ -41,8 +42,7 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
         goToProjectHome();
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         assayHelper.createAssayWithPlateSupport(ASSAY_NAME);
-        assayHelper.createPlateTemplate(templateName, "blank", "GPAT (General)");
-
+        createPlateTemplate(templateName, "blank", "GPAT (General)");
     }
 
     @Override
@@ -104,7 +104,6 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
         checker().verifyEquals("Dilution is incorrect", Arrays.asList("1.0", "1.0", "1.0", "2.0", "2.0", "2.0", "3.0", "3.0", "4.0", "4.0"),
                 table.getColumnDataAsText(" PlateData/dilution"));
         table.clearAllFilters();
-
     }
 
     @Test
@@ -123,16 +122,14 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
         importPlateData(assayId, TEST_PLATE_DATA, null, TEST_PLATE_METADATA);
         checker().verifyEquals("Invalid error message for missing plate template", "PlateTemplate is required and must be of type Text (String).",
                 Locator.byClass("labkey-error").findElement(getDriver()).getText());
-
     }
 
     @Test
     public void verifyTemplateOptions()
     {
         goToProjectHome();
-        APIAssayHelper assayHelper = new APIAssayHelper(this);
-        assayHelper.createPlateTemplate("Elisa template", "blank", "ELISA");
-        assayHelper.createPlateTemplate("ELISpot template", "blank", "ELISpot");
+        createPlateTemplate("Elisa template", "blank", "ELISA");
+        createPlateTemplate("ELISpot template", "blank", "ELISpot");
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
@@ -163,5 +160,32 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
 
         clickAndWait(Locator.tagWithText("span", "Save and Finish"));
 
+    }
+
+    private void createPlateTemplate(String templateName, String templateType, String assayType)
+    {
+        PlateDesignerPage.PlateDesignerParams params = new PlateDesignerPage.PlateDesignerParams(8, 12);
+        params.setTemplateType(templateType);
+        params.setAssayType(assayType);
+        PlateDesignerPage plateDesigner = PlateDesignerPage.beginAt(this, params);
+
+        if (assayType.contains("GPAT"))
+        {
+            plateDesigner.createWellGroup("SAMPLE", "SA01");
+            plateDesigner.createWellGroup("SAMPLE", "SA02");
+            plateDesigner.createWellGroup("SAMPLE", "SA03");
+            plateDesigner.createWellGroup("SAMPLE", "SA04");
+
+            // mark the regions on the plate to use the well groups
+            plateDesigner.selectWellsForWellgroup("CONTROL", "Positive", "A11", "H11");
+            plateDesigner.selectWellsForWellgroup("CONTROL", "Negative", "A12", "H12");
+
+            plateDesigner.selectWellsForWellgroup("SAMPLE", "SA01", "A1", "H3");
+            plateDesigner.selectWellsForWellgroup("SAMPLE", "SA02", "A4", "H6");
+            plateDesigner.selectWellsForWellgroup("SAMPLE", "SA03", "A7", "H8");
+            plateDesigner.selectWellsForWellgroup("SAMPLE", "SA04", "A9", "H10");
+        }
+        plateDesigner.setName(templateName);
+        plateDesigner.saveAndClose();
     }
 }
