@@ -59,6 +59,7 @@ public class FacetedFilterCutoffTest extends BaseWebDriverTest
         ListHelper.ListColumn col1 = new ListHelper.ListColumn(OVER_CUTOFF, OVER_CUTOFF, ListHelper.ListColumnType.Integer, "");
         ListHelper.ListColumn col2 = new ListHelper.ListColumn(AT_CUTOFF, AT_CUTOFF, ListHelper.ListColumnType.Integer, "");
         _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", col1, col2);
+        _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData();
         _listHelper.submitTsvData(getListData());
     }
