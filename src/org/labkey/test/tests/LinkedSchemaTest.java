@@ -407,6 +407,15 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         createLinkedSchema();
         verifyLinkedSchema();
+        deleteLinkedSchema();
+    }
+
+    @LogMethod
+    void deleteLinkedSchema()
+    {
+        log("Verify linked schema deletion");
+        String containerPath = getProjectName() + "/" + TARGET_FOLDER;
+        _schemaHelper.deleteSchema(containerPath, A_PEOPLE_SCHEMA_NAME);
     }
 
     @Test
