@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -65,10 +64,10 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             fieldRow.setUrl(fieldDefinition.getURL());
         if (fieldDefinition.getValidator() != null)
             throw new IllegalArgumentException("Validators are not yet supported");
-        if (fieldDefinition.isMvEnabled())
-            fieldRow.setMissingValue(fieldDefinition.isMvEnabled());
-        if (fieldDefinition.isRequired())
-            fieldRow.setRequiredField(fieldDefinition.isRequired());
+        if (fieldDefinition.getMvEnabled())
+            fieldRow.setMissingValue(fieldDefinition.getMvEnabled());
+        if (fieldDefinition.getRequired())
+            fieldRow.setRequiredField(fieldDefinition.getRequired());
 
         fieldRow.collapse();
 

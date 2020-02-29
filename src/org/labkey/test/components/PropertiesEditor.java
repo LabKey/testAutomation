@@ -132,7 +132,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         if (col.getFormat() != null)
             fieldProperties().selectFormatTab().setPropertyFormat(col.getFormat());
 
-        if (col.isRequired())
+        if (col.getRequired())
             fieldProperties().selectValidatorsTab().setRequired(true);
 
         FieldDefinition.FieldValidator validator = col.getValidator();
@@ -167,7 +167,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         }
 
-        if (col.isMvEnabled())
+        if (col.getMvEnabled())
         {
             fieldProperties().selectAdvancedTab().setMvEnabled(true);
         }

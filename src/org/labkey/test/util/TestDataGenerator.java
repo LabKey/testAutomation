@@ -87,30 +87,13 @@ public class TestDataGenerator
      * @param columns   The fieldSet for the domain/sampleset/list.
      * @return
      */
-    public TestDataGenerator withColumns(List<PropertyDescriptor> columns)
+    public TestDataGenerator withColumns(List<? extends PropertyDescriptor> columns)
     {
         int index = 0;
         for (PropertyDescriptor fieldDef : columns)
         {
             _columns.put(fieldDef.getName(), fieldDef);
             _indices.put(index, fieldDef);
-            index++;
-        }
-        return this;
-    }
-
-    @Deprecated
-    /**
-     * use withColumns (list<PropertyDescriptor> columns) instead
-     */
-    public TestDataGenerator withColumnSet(List<FieldDefinition> columns)
-    {
-        int index = 0;
-        for (FieldDefinition fieldDef : columns)
-        {
-            PropertyDescriptor field = fieldDef.toPropertyDescriptor();
-            _columns.put(fieldDef.getName(), field);
-            _indices.put(index, field);
             index++;
         }
         return this;

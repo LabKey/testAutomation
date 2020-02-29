@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -34,14 +35,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 
 public class SampleSetHelper extends WebDriverWrapper
 {
     private final WebDriver _driver;
-    private Map<String, FieldDefinition.ColumnType> _fields;
     public static final String IMPORT_DATA_LABEL = "Insert";
     public static final String MERGE_DATA_LABEL = "Insert and Replace";
 
@@ -67,7 +68,7 @@ public class SampleSetHelper extends WebDriverWrapper
         return _driver;
     }
 
-    private SampleSetHelper createSampleSet(SampleSetDefinition props)
+    public void createSampleSet(SampleSetDefinition props)
     {
         CreateSampleSetPage createPage = goToCreateNewSampleSet();
 
@@ -88,39 +89,18 @@ public class SampleSetHelper extends WebDriverWrapper
             i++;
         }
 
-        DomainFormPanel domainFormPanel = createPage.fieldsPanel();
-        for (FieldDefinition fieldDefinition : props.getFields())
-        {
-            domainFormPanel.addField(fieldDefinition);
-        }
+        createPage.addFields(props.getFields());
         createPage.clickSave();
-
-        return this;
     }
 
     public SampleSetHelper createSampleSet(String name)
     {
-        goToCreateNewSampleSet()
-                .setName(name)
-                .clickSave();
-        return this;
+        return createSampleSet(name, null);
     }
 
     public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression)
     {
-        goToCreateNewSampleSet()
-                .setName(name)
-                .setNameExpression(nameExpression)
-                .clickSave();
-        return this;
-    }
-
-    public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression, boolean createFailureExpected)
-    {
-        goToCreateNewSampleSet().setName(name).setNameExpression(nameExpression)
-                .clickSaveExpectingError();
-
-        return this;
+        return createSampleSet(name, nameExpression, null);
     }
 
     public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields)
@@ -128,7 +108,6 @@ public class SampleSetHelper extends WebDriverWrapper
         SampleSetDefinition props = new SampleSetDefinition();
         props.setName(name);
         props.setNameExpression(nameExpression);
-        _fields = fields;
         if (fields != null)
         {
             for (String fieldName : fields.keySet())
@@ -250,9 +229,11 @@ public class SampleSetHelper extends WebDriverWrapper
         return new DomainDesignerPage(getDriver());
     }
 
-    public void setFields(Map<String, FieldDefinition.ColumnType> fields)
+    public static List<FieldDefinition> convertFieldMap(Map<String, FieldDefinition.ColumnType> fields)
     {
-        _fields = fields;
+        return fields.entrySet().stream()
+                .map(entry -> new FieldDefinition(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     @LogMethod
@@ -260,7 +241,6 @@ public class SampleSetHelper extends WebDriverWrapper
     {
         DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
 
-        _fields = fields;
         if (fields != null && !fields.isEmpty())
         {
             DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -280,7 +260,7 @@ public class SampleSetHelper extends WebDriverWrapper
         if (null != fields && !fields.isEmpty())
         {
             DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-            fields.forEach(fieldDefinition -> domainFormPanel.addField(fieldDefinition));
+            fields.forEach(domainFormPanel::addField);
             domainDesignerPage.clickFinish();
         }
         else
@@ -289,13 +269,12 @@ public class SampleSetHelper extends WebDriverWrapper
         return this;
     }
 
-    public SampleSetHelper verifyFields()
+    public void verifyFields(List<FieldDefinition> _fields)
     {
         TestLogger.log("Verify that the fields for the sample set are as expected");
         List<String> actualNames = getSampleSetFields();
-        for (String name : _fields.keySet())
-            assertTrue("'" + name + "' should be one of the fields", actualNames.contains(name));
-        return this;
+        String[] expectedNames = (String[]) _fields.stream().map(FieldDefinition::getName).toArray();
+        assertThat("Fields in sample set.", actualNames, CoreMatchers.hasItems(expectedNames));
     }
 
     public DataRegionTable getSampleSetsList()

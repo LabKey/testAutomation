@@ -48,6 +48,7 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -79,7 +80,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
@@ -197,22 +197,18 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testCreateSampleSetNoExpression()
     {
-        String sampleSetName = "SimpleCreateNoExp";
-        Map<String, FieldDefinition.ColumnType> fields = Map.of("StringValue", FieldDefinition.ColumnType.String, "IntValue", FieldDefinition.ColumnType.Integer);
+        final String sampleSetName = "SimpleCreateNoExp";
+        final List<FieldDefinition> fields = List.of(
+                new FieldDefinition("StringValue", FieldDefinition.ColumnType.String),
+                new FieldDefinition("IntValue", FieldDefinition.ColumnType.Integer));
+
+        SampleSetDefinition sampleSetDefinition = new SampleSetDefinition(sampleSetName).setFields(fields);
+
         log("Create a new sample set with a name and no name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-
         SampleSetHelper sampleSetHelper = new SampleSetHelper(this);
-        sampleSetHelper.goToCreateNewSampleSet();
-        log("Verify the name field is required");
-        clickButton("Create");
-        assertTextPresent("You must supply a name for the sample set.");
-        clickButton("Cancel");
-
-        sampleSetHelper.createSampleSet(sampleSetName)
-                .addFields(fields)
-                .goToSampleSet(sampleSetName)
-                .verifyFields();
+        sampleSetHelper.createSampleSet(sampleSetDefinition);
+        sampleSetHelper.verifyFields(fields);
 
         log("Add a single row to the sample set");
         Map<String, String> fieldMap = Map.of("Name", "S-1", "StringValue", "Ess", "IntValue", "1");
@@ -229,16 +225,6 @@ public class SampleSetTest extends BaseWebDriverTest
         assertEquals("Number of samples not as expected", 3, sampleSetHelper.getSampleCount());
 
         sampleSetHelper.verifyDataValues(data);
-
-        log("Try to create a sample set with the same name.");
-        clickAndWait(Locator.linkWithText("Sample Sets"));
-        sampleSetHelper = new SampleSetHelper(this);
-        sampleSetHelper.createSampleSet(sampleSetName, null, true);
-        assertTextPresent("A sample set with that name already exists.");
-
-        clickButton("Cancel");
-        DataRegionTable drt = DataRegion(this.getDriver()).find();
-        assertEquals("Data region should be sample sets listing", "SampleSet", drt.getDataRegionName());
     }
 
     @Test
@@ -246,14 +232,13 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         String sampleSetName = "SimpleCreateWithExp";
         List<String> fieldNames = Arrays.asList("StringValue", "FloatValue");
-        Map<String, FieldDefinition.ColumnType> fields = Map.of(fieldNames.get(0), FieldDefinition.ColumnType.String, fieldNames.get(1), FieldDefinition.ColumnType.Decimal);
+        List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(fieldNames.get(0)), new FieldDefinition(fieldNames.get(1), FieldDefinition.ColumnType.Decimal));
         SampleSetHelper sampleSetHelper = new SampleSetHelper(this);
         log("Create a new sample set with a name and name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        sampleSetHelper.createSampleSet(sampleSetName, "${" + fieldNames.get(0) + "}-${batchRandomId}-${randomId}")
-                .addFields(fields)
-                .goToSampleSet(sampleSetName)
-                .verifyFields();
+        SampleSetDefinition definition = new SampleSetDefinition(sampleSetName).setNameExpression("${" + fields.get(0).getName() + "}-${batchRandomId}-${randomId}").setFields(fields);
+        sampleSetHelper.createSampleSet(definition);
+        sampleSetHelper.verifyFields(fields);
 
         log("Add data without supplying the name");
         Map<String, String> fieldMap = Map.of(fieldNames.get(0), "Vee", fieldNames.get(1), "1.6");
@@ -2018,8 +2003,11 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleHelper.createSampleSet(CASE_INSENSITIVE_SAMPLE_SET);
 
         clickProject(PROJECT_NAME);
-        sampleHelper.createSampleSet(LOWER_CASE_SAMPLE_SET, null, true);
-        waitForElement(Locator.tagWithClass("div", "labkey-error").containing("A sample set with that name already exists."));
+        List<WebElement> errors = sampleHelper
+                .goToCreateNewSampleSet()
+                .setName(LOWER_CASE_SAMPLE_SET)
+                .clickSaveExpectingError();
+        assertEquals("Sample Type creation error", Arrays.asList("A sample set with that name already exists."), getTexts(errors));
         clickProject(PROJECT_NAME);
         assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_SET));
         assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLE_SET));

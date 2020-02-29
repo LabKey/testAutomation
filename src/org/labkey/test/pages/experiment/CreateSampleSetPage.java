@@ -6,6 +6,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -93,6 +94,16 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
     public String getParentAliasSelectText(int index)
     {
         return elementCache()._designer.getParentAliasSelectText(index);
+    }
+
+    public CreateSampleSetPage addFields(List<FieldDefinition> fields)
+    {
+        fieldsPanel().expand();
+        for (FieldDefinition fieldDefinition : fields)
+        {
+            fieldsPanel().addField(fieldDefinition);
+        }
+        return this;
     }
 
     public DomainFormPanel fieldsPanel()

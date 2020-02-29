@@ -30,7 +30,6 @@ public class SampleSetAPIHelper
 {
     /**
      * Create a sample set in the specified container with the fields provided.
-     * TODO: Add support for name expression, description, and import aliases
      *
      * @param containerPath Container in which to create the sample set
      * @param def domain properties for the new sample set
@@ -55,7 +54,7 @@ public class SampleSetAPIHelper
             Domain domain = getDomainCommand.execute(connection, containerPath).getDomain();
             List<PropertyDescriptor> fields = new ArrayList<>(domain.getFields());
             // Include to default field ("name")
-            def.getFields().forEach(field -> fields.add(field.toPropertyDescriptor()));
+            fields.addAll(def.getFields());
             domain.setFields(fields);
 
             SaveDomainCommand saveDomainCommand = new SaveDomainCommand(domainId);
@@ -67,8 +66,7 @@ public class SampleSetAPIHelper
             throw new RuntimeException("Failed to create sample set", e);
         }
 
-        return new TestDataGenerator("exp.materials", def.getName(), containerPath)
-                .withColumnSet(def.getFields());
+        return new TestDataGenerator("exp.materials", def.getName(), containerPath).withColumns(def.getFields());
     }
 
     /**

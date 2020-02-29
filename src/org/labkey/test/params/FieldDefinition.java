@@ -17,26 +17,21 @@ package org.labkey.test.params;
 
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
-import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 
-import java.util.Map;
-
-public class FieldDefinition
+public class FieldDefinition extends PropertyDescriptor
 {
-    private final String _name;
-    private String _label;
+    // for UI helpers
     private ColumnType _type;
-    private String _description;
-    private String _format;
-    private boolean _mvEnabled;
-    private boolean _required;
     private LookupInfo _lookup;
+
+    // UI Only field properties
     private FieldValidator _validator;
     private String _url;
+
+    // Field properties not supported by PropertyDescriptor
     private Integer _scale;
-    private Boolean _hidden;
     private Boolean _shownInDetailsView;
     private Boolean _shownInInsertView;
     private Boolean _shownInUpdateView;
@@ -44,7 +39,7 @@ public class FieldDefinition
 
     public FieldDefinition(String name, ColumnType type)
     {
-        _name = name;
+        super(name, type.getJsonType());
         _type = type;
     }
 
@@ -55,30 +50,36 @@ public class FieldDefinition
 
     public FieldDefinition(String name, LookupInfo lookup)
     {
-        _name = name;
-        _lookup = lookup;
+        setName(name);
+        setLookup(lookup);
     }
 
-    public PropertyDescriptor toPropertyDescriptor()
+    @Override
+    public JSONObject toJSONObject()
     {
-        JSONObject json = new JSONObject();
-        json.putAll(toMap());
-        return new PropertyDescriptor(json);
-    }
+        if (getType() != null && getType().getJsonType() == null)
+        {
+            throw new IllegalArgumentException("`FieldDefinition` cannot be used to create column over API: " + getType().name());
+        }
 
-    public String getName()
-    {
-        return _name;
-    }
+        JSONObject json = super.toJSONObject();
+        if (getScale() != null)
+            json.put("scale", getScale());
+        if (isPrimaryKey() != null)
+            json.put("isPrimaryKey", isPrimaryKey());
+        if (getShownInDetailsView() != null)
+            json.put("shownInDetailsView", getShownInDetailsView());
+        if (getShownInInsertView() != null)
+            json.put("shownInInsertView", getShownInInsertView());
+        if (getShownInUpdateView() != null)
+            json.put("shownInUpdateView", getShownInUpdateView());
 
-    public String getLabel()
-    {
-        return _label;
+        return json;
     }
 
     public FieldDefinition setLabel(String label)
     {
-        _label = label;
+        super.setLabel(label);
         return this;
     }
 
@@ -90,50 +91,35 @@ public class FieldDefinition
     public FieldDefinition setType(ColumnType type)
     {
         _type = type;
+        super.setRangeURI(type.getJsonType());
         return this;
     }
 
-    public String getDescription()
-    {
-        return _description;
-    }
-
+    @Override
     public FieldDefinition setDescription(String description)
     {
-        _description = description;
+        super.setDescription(description);
         return this;
     }
 
-    public String getFormat()
-    {
-        return _format;
-    }
-
+    @Override
     public FieldDefinition setFormat(String format)
     {
-        _format = format;
+        super.setFormat(format);
         return this;
     }
 
-    public boolean isMvEnabled()
+    @Override
+    public FieldDefinition setMvEnabled(Boolean mvEnabled)
     {
-        return _mvEnabled;
-    }
-
-    public FieldDefinition setMvEnabled(boolean mvEnabled)
-    {
-        _mvEnabled = mvEnabled;
+        super.setMvEnabled(mvEnabled);
         return this;
     }
 
-    public boolean isRequired()
+    @Override
+    public FieldDefinition setRequired(Boolean required)
     {
-        return _required;
-    }
-
-    public FieldDefinition setRequired(boolean required)
-    {
-        _required = required;
+        super.setRequired(required);
         return this;
     }
 
@@ -144,8 +130,22 @@ public class FieldDefinition
 
     public FieldDefinition setLookup(LookupInfo lookup)
     {
+        if (lookup == null)
+        {
+            super.setLookup(null, null, null);
+        }
+        else
+        {
+            super.setLookup(lookup.getSchema(), lookup.getTable(), lookup.getFolder());
+        }
         _lookup = lookup;
         return this;
+    }
+
+    @Override
+    public PropertyDescriptor setLookup(String schema, String query, String container)
+    {
+        return setLookup(new LookupInfo(container, schema, query));
     }
 
     public FieldValidator getValidator()
@@ -175,14 +175,10 @@ public class FieldDefinition
         return _scale;
     }
 
-    public Boolean isHidden()
-    {
-        return _hidden;
-    }
-
+    @Override
     public FieldDefinition setHidden(Boolean hidden)
     {
-        _hidden = hidden;
+        super.setHidden(hidden);
         return this;
     }
 
@@ -236,49 +232,6 @@ public class FieldDefinition
         return this;
     }
 
-    public Map<String, Object> toMap()
-    {
-        CaseInsensitiveHashMap<Object> map = new CaseInsensitiveHashMap<>();
-
-        map.put("name", getName());
-        if (getLabel() != null)
-            map.put("label", getLabel());
-
-        if (getLookup() != null)
-        {
-            map.put("lookupSchema", getLookup().getSchema());
-            map.put("lookupQuery", getLookup().getTable());
-            map.put("lookupContainer", getLookup().getFolder());
-            map.put("rangeURI", getLookup().getTableType());
-        }
-        else if (getType() != null)
-        {
-            if (getType().getJsonType() == null)
-                throw new IllegalArgumentException("`FieldDefinition.toMap()` does not currently support column type: " + getType().name());
-            map.put("rangeURI", getType().getJsonType());
-        }
-        if (getDescription() != null)
-            map.put("description", getDescription());
-        if (getFormat() != null)
-            map.put("format", getFormat());
-        map.put("mvEnabled", isMvEnabled());
-        map.put("required", isRequired());
-        if (getScale() != null)
-            map.put("scale", getScale());
-        if (isHidden() != null)
-            map.put("hidden", isHidden());
-        if (isPrimaryKey() != null)
-            map.put("isPrimaryKey", isPrimaryKey());
-        if (getShownInDetailsView() != null)
-            map.put("shownInDetailsView", getShownInDetailsView());
-        if (getShownInInsertView() != null)
-            map.put("shownInInsertView", getShownInInsertView());
-        if (getShownInUpdateView() != null)
-            map.put("shownInUpdateView", getShownInUpdateView());
-
-        return map;
-    }
-
     public enum RangeType
     {
         Equals("Equals", Filter.Operator.EQUAL),
@@ -328,7 +281,7 @@ public class FieldDefinition
 
         private final String _label; // the display value in the UI for this kind of field
         private final String _description; // TODO remove this after GWT designer removed
-        private final String _jsonType;     // the key used inside the API
+        private final String _jsonType;     // the key used inside the API (aka rangeURI)
 
         ColumnType(String label, String description, String jsonType)
         {
