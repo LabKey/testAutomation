@@ -18,6 +18,7 @@ public class QueryGrid extends WebDriverComponent
     final private WebDriver _driver;
     final private WebElement _queryGridPanel;
     private Optional<GridBar> _gridBar;
+    private Optional<GridTabBar> _gridTabBar;
     private Optional<ResponsiveGrid> _responsiveGrid;
 
     protected QueryGrid(WebElement element, WebDriver driver)
@@ -30,12 +31,13 @@ public class QueryGrid extends WebDriverComponent
         if (_responsiveGrid.isPresent())
         {
             _gridBar = new GridBar.GridBarFinder(_driver, _responsiveGrid.get()).withQueryGrid().findOptional(_queryGridPanel);
+            _gridTabBar = new GridTabBar.GridTabBarFinder(_driver, _responsiveGrid.get()).findOptional(_queryGridPanel);
         }
         else
         {
             _gridBar = Optional.empty();
+            _gridTabBar = Optional.empty();
         }
-
     }
 
     @Override
@@ -60,6 +62,8 @@ public class QueryGrid extends WebDriverComponent
     {
         return _gridBar.isPresent();
     }
+
+    public boolean hasTabs() { return _gridTabBar.isPresent(); }
 
     public boolean hasGrid()
     {
@@ -95,6 +99,11 @@ public class QueryGrid extends WebDriverComponent
     public GridBar getGridBar()
     {
         return _gridBar.orElseThrow();
+    }
+
+    public GridTabBar getGridTabBar()
+    {
+        return _gridTabBar.orElseThrow();
     }
 
     public int getRecordCount()
