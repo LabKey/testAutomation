@@ -368,13 +368,13 @@ public class AssayAPITest extends BaseWebDriverTest
         goToProjectHome();
 
         String assayName = "GPAT-SaveBatch-Plate";
-        createAssayWithPlateSupport(assayName);
+        ((APIAssayHelper) _assayHelper).createAssayWithPlateSupport(assayName);
 
         String runName = "created-via-saveBatch";
         String folderPath = "/" + getProjectName();
 
         // get the plate lsid
-        String lsid = getPlateTemplateLsid(folderPath);
+        String lsid = ((APIAssayHelper) _assayHelper).getPlateTemplateLsid(folderPath);
 
         log("create run via saveBatch");
         Run run = new Run();
@@ -442,52 +442,6 @@ public class AssayAPITest extends BaseWebDriverTest
         verifyPlateMetadata(resp, expectedRows);
     }
 
-    private void createPlateTemplate()
-    {
-        PlateDesignerPage.PlateDesignerParams params = new PlateDesignerPage.PlateDesignerParams(8, 12);
-        params.setTemplateType("blank");
-        params.setAssayType("GPAT (General)");
-        PlateDesignerPage plateDesigner = PlateDesignerPage.beginAt(this, params);
-
-        // create the sample well groups
-        plateDesigner.createWellGroup("SAMPLE", "SA01");
-        plateDesigner.createWellGroup("SAMPLE", "SA02");
-        plateDesigner.createWellGroup("SAMPLE", "SA03");
-        plateDesigner.createWellGroup("SAMPLE", "SA04");
-
-        // mark the regions on the plate to use the well groups
-        plateDesigner.selectWellsForWellgroup("CONTROL", "Positive", "A11", "H11");
-        plateDesigner.selectWellsForWellgroup("CONTROL", "Negative", "A12", "H12");
-
-        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA01", "A1", "H3");
-        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA02", "A4", "H6");
-        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA03", "A7", "H8");
-        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA04", "A9", "H10");
-
-        plateDesigner.setName("GPAT");
-        plateDesigner.save();
-    }
-
-    private void createAssayWithPlateSupport(String name)
-    {
-        log("create GPAT assay");
-        ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", name);
-
-        assayDesigner.setPlateMetadata(true);
-        assayDesigner.clickFinish();
-    }
-
-    private String getPlateTemplateLsid(String folderPath) throws Exception
-    {
-        SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General", "PlateTemplate");
-        selectRowsCmd.setColumns(List.of("Lsid"));
-
-        SelectRowsResponse resp = selectRowsCmd.execute(createDefaultConnection(false), folderPath);
-
-        assertEquals("There should only be a single plate template for this folder", resp.getRowCount().longValue(), 1L);
-        return String.valueOf(resp.getRows().get(0).get("Lsid"));
-    }
-
     private void verifyPlateMetadata(SelectRowsResponse resp, List<Map<String, Object>> expectedRows)
     {
         assertTrue("Wrong number of data rows returned", resp.getRowCount().intValue() == expectedRows.size());
@@ -511,13 +465,13 @@ public class AssayAPITest extends BaseWebDriverTest
         goToProjectHome();
 
         String assayName = "GPAT-ImportRun-Plate";
-        createAssayWithPlateSupport(assayName);
+        ((APIAssayHelper) _assayHelper).createAssayWithPlateSupport(assayName);
 
         String runName = "created-via-importRun";
         String folderPath = "/" + getProjectName();
 
         // get the plate lsid
-        String lsid = getPlateTemplateLsid(folderPath);
+        String lsid =  ((APIAssayHelper) _assayHelper).getPlateTemplateLsid(folderPath);
         int assayId = ((APIAssayHelper)_assayHelper).getIdFromAssayName(assayName, getProjectName());
 
         log("create run via importRun");
@@ -549,5 +503,31 @@ public class AssayAPITest extends BaseWebDriverTest
         expectedRows.add(Maps.of("wellLocation", "G9", "plateData/dilution", 4.05, "plateData/barcode", "BC_444"));
 
         verifyPlateMetadata(resp, expectedRows);
+    }
+
+    public void createPlateTemplate()
+    {
+        PlateDesignerPage.PlateDesignerParams params = new PlateDesignerPage.PlateDesignerParams(8, 12);
+        params.setTemplateType("blank");
+        params.setAssayType("GPAT (General)");
+        PlateDesignerPage plateDesigner = PlateDesignerPage.beginAt(this,params);
+
+        // create the sample well groups
+        plateDesigner.createWellGroup("SAMPLE", "SA01");
+        plateDesigner.createWellGroup("SAMPLE", "SA02");
+        plateDesigner.createWellGroup("SAMPLE", "SA03");
+        plateDesigner.createWellGroup("SAMPLE", "SA04");
+
+        // mark the regions on the plate to use the well groups
+        plateDesigner.selectWellsForWellgroup("CONTROL", "Positive", "A11", "H11");
+        plateDesigner.selectWellsForWellgroup("CONTROL", "Negative", "A12", "H12");
+
+        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA01", "A1", "H3");
+        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA02", "A4", "H6");
+        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA03", "A7", "H8");
+        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA04", "A9", "H10");
+
+        plateDesigner.setName("GPAT");
+        plateDesigner.save();
     }
 }

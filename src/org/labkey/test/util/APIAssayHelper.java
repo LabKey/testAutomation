@@ -36,6 +36,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 
 import java.io.File;
 import java.io.IOException;
@@ -144,7 +145,7 @@ public class APIAssayHelper extends AbstractAssayHelper
 
     @LogMethod(quiet = true)
     public void importAssay(String assayName, String runName, File file, String projectPath,
-                                         @Nullable Map<String, Object> runProperties, @Nullable Map<String, Object> batchProperties)  throws CommandException, IOException
+                            @Nullable Map<String, Object> runProperties, @Nullable Map<String, Object> batchProperties)  throws CommandException, IOException
     {
         importAssay(getIdFromAssayName(assayName, projectPath), runName, file, projectPath, runProperties, batchProperties);
     }
@@ -295,4 +296,23 @@ public class APIAssayHelper extends AbstractAssayHelper
         ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, containerPath);
         return saveProtocolResponse.getProtocol();
     }
+
+    public void createAssayWithPlateSupport(String name)
+    {
+        ReactAssayDesignerPage assayDesigner = createAssayDesign("General", name);
+
+        assayDesigner.setPlateMetadata(true);
+        assayDesigner.clickFinish();
+    }
+
+    public String getPlateTemplateLsid(String folderPath) throws Exception
+    {
+        SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General", "PlateTemplate");
+        selectRowsCmd.setColumns(List.of("Lsid"));
+
+        SelectRowsResponse resp = selectRowsCmd.execute(_test.createDefaultConnection(false), folderPath);
+
+        return String.valueOf(resp.getRows().get(0).get("Lsid"));
+    }
+
 }

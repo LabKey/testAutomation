@@ -122,7 +122,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
     {
         setUpList(LIST_NAME);
 
-        PropertiesEditor propertiesEditor = _listHelper.clickEditDesign().listFields();
+        PropertiesEditor propertiesEditor = _listHelper.clickEditDesign().getPropertyEditor();
 
         log("Validate Scale: Existing fields");
         assertWidgetNotVisible(propertiesEditor, KEY_ROW);    //Check scale widget is not available for key
@@ -154,7 +154,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         _listHelper.clickSave();
         goToManageLists();
         clickAndWait(Locator.linkWithText("view design"));
-        propertiesEditor = _listHelper.clickEditDesign().listFields();  //Open designer so row locator works
+        propertiesEditor = _listHelper.clickEditDesign().getPropertyEditor();  //Open designer so row locator works
 
         //Verify Changes are retained
         log("Validate Scale: Verify new Scale retained");
@@ -194,7 +194,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         log("Change column with existing larger data");
         //Check changing size with larger existing data
         _extHelper.clickMenuButton("Design");
-        PropertiesEditor propertiesEditor = _listHelper.clickEditDesign().listFields();
+        PropertiesEditor propertiesEditor = _listHelper.clickEditDesign().getPropertyEditor();
         changeScale(propertiesEditor, MAX_ROW, LT_SCALE, false);
         clickButton("Save", 0);
         assertAlert("The property \"" + MAX_COLUMN_NAME + "\" cannot be scaled down. It contains existing values exceeding [" + LT_SCALE + "] characters.\n");
@@ -206,7 +206,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
 
         log("Change column with existing smaller data");
         //Check changing size with smaller existing data
-        propertiesEditor = _listHelper.clickEditDesign().listFields();
+        propertiesEditor = _listHelper.clickEditDesign().getPropertyEditor();
         changeScale(propertiesEditor, GT_ROW, DEFAULT_SCALE, false);
         _listHelper.clickSave();
         assertNoLabKeyErrors();
