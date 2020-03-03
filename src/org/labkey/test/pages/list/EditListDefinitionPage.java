@@ -71,6 +71,12 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         return new EditListDefinitionPage(driver.getDriver());
     }
 
+    public void waitForPage()
+    {
+        waitFor(()-> elementCache().listPropertiesHeaderLoc.existsIn(getDriver()),
+            "The page did not render in time", WAIT_FOR_PAGE);
+    }
+
     public EditListDefinitionPage setListName(String listName)
     {
         expandPropertiesPane();
@@ -270,7 +276,8 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement listPropertiesHeader = Locator.id("list-properties-hdr")
+        Locator listPropertiesHeaderLoc = Locator.id("list-properties-hdr");
+        WebElement listPropertiesHeader = listPropertiesHeaderLoc
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement propertiesPaneToggle = Locator.tagWithClass("span", "pull-right")
                 .waitForElement(listPropertiesHeader, WAIT_FOR_JAVASCRIPT);

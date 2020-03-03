@@ -628,10 +628,10 @@ public class ListHelper extends LabKeySiteWrapper
     public enum ListColumnType
     {
         MultiLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"),
-        DateTime("DateTime"), // TODO remove this after GWT designer removed
+        //DateTime("DateTime"), // TODO remove this after GWT designer removed
         DateAndTime("Date Time"),
         Boolean("Boolean"),
-        Double("Number (Double)"), // TODO remove this after GWT designer removed
+        //Double("Number (Double)"), // TODO remove this after GWT designer removed
         Decimal("Decimal"),
         File("File"), AutoInteger("Auto-Increment Integer"),
         Flag("Flag (String)"), Attachment("Attachment"), User("User");

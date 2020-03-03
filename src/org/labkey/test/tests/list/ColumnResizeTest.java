@@ -193,7 +193,9 @@ public class ColumnResizeTest extends BaseWebDriverTest
 
         log("Change column with existing larger data");
         //Check changing size with larger existing data
-        _extHelper.clickMenuButton("Design");
+        _listHelper.goToEditDesign(listName)
+            .expandFieldsPanel()
+            .getField("MAX_ROW");
         PropertiesEditor propertiesEditor = _listHelper.clickEditDesign().getPropertyEditor();
         changeScale(propertiesEditor, MAX_ROW, LT_SCALE, false);
         clickButton("Save", 0);

@@ -49,8 +49,8 @@ public class TimelineTest extends BaseWebDriverTest
     {
         new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "The first name"),
         new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
-        new ListHelper.ListColumn("DOB", "DOB", ListHelper.ListColumnType.DateTime, "Date of Birth"),
-        new ListHelper.ListColumn("DOD", "DOD", ListHelper.ListColumnType.DateTime, "Date of Death"),
+        new ListHelper.ListColumn("DOB", "DOB", ListHelper.ListColumnType.DateAndTime, "Date of Birth"),
+        new ListHelper.ListColumn("DOD", "DOD", ListHelper.ListColumnType.DateAndTime, "Date of Death"),
     };
 
     private final static String[][] TEST_DATA =

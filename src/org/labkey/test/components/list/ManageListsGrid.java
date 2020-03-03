@@ -53,6 +53,7 @@ public class ManageListsGrid extends DataRegionTable
 
     public LabKeyPage viewListDesign(String listName)
     {
+
         getWrapper().clickAndWait(link(getRowIndex("Name", listName), 0));
         return null;
     }
