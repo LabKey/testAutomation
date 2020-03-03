@@ -31,8 +31,10 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.Format;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
@@ -85,7 +87,7 @@ public class ListTest extends BaseWebDriverTest
 
     protected final ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListColumnType.String, "What the color is like");
     protected final ListColumn _listCol1 = new ListColumn("Desc", "Description", ListColumnType.String, "What the color is like");
-    protected final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListColumnType.DateTime, "When to wear the color", "M");
+    protected final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListColumnType.DateAndTime, "When to wear the color", "M");
     protected final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListColumnType.Boolean, "Am I a jewel tone?");
     protected final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListColumnType.Integer, "How nice the color is");
     protected final ListColumn _listCol5 = new ListColumn("HiddenColumn", HIDDEN_TEXT, ListColumnType.String, "I should be hidden!");
@@ -229,12 +231,12 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1Fake, _listCol2, _listCol3);
 
         log("Add description and test edit");
-        _listHelper.clickEditDesign();
-        setFormElement(Locator.id("ff_description"), LIST_DESCRIPTION);
-        _listHelper.clickSave();
+        _listHelper.goToEditDesign(LIST_NAME_COLORS)
+            .setDescription(LIST_DESCRIPTION)
+            .clickSave();
 
-        log("Check that edit list definition worked");
-        assertTextPresent(LIST_KEY_NAME2, LIST_DESCRIPTION);
+//        log("Check that edit list definition worked");
+//        assertTextPresent(LIST_KEY_NAME2, LIST_DESCRIPTION);
 
         log("Test upload data");
 
@@ -286,7 +288,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test edit and adding new field with imported data present");
         clickTab("List");
         clickAndWait(Locator.linkWithText("view design"));
-        _listHelper.clickEditDesign();
+        _listHelper.goToEditDesign(LIST_NAME_COLORS);
         setColumnName(1, _listCol1.getName());
         setColumnLabel(1, _listCol1.getLabel());
         ListHelper listHelper = new ListHelper(this);
@@ -382,7 +384,7 @@ public class ListTest extends BaseWebDriverTest
         assertEquals(TEST_DATA[2][3], table.getDataAsText(3, _listCol3.getLabel()));
 
         log("Check hidden field is hidden only where specified.");
-        dataregionToEditDesign();
+        _listHelper.goToEditDesign(LIST_NAME_COLORS);
 
         click(Locator.id("partdown_2"));
         click(Locator.id("name5")); // Select Hidden field.
@@ -405,7 +407,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
 
-        dataregionToEditDesign();
+        _listHelper.goToEditDesign(LIST_NAME_COLORS);
 
         click(Locator.id("name5")); // Select Hidden field.
         uncheckCheckbox(Locator.css("#propertyShownInGrid > input"));
@@ -721,12 +723,17 @@ public class ListTest extends BaseWebDriverTest
         log("Issue 6883: test list self join");
 
         ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
-                new ListHelper.ListColumn(dummyCol, dummyCol, ListColumnType.String, ""),
-                new ListHelper.ListColumn(lookupField, lookupField, ListColumnType.String, "", new ListHelper.LookupInfo(null, lookupSchema, lookupTable))
+                new ListHelper.ListColumn(dummyCol, dummyCol, ListColumnType.String, "")
         };
+        ListHelper.ListColumn lookupCol = new ListHelper.ListColumn(lookupField, lookupField, ListColumnType.String, "",
+                new ListHelper.LookupInfo(null, lookupSchema, lookupTable).setTableType("Integer"));
+        // create the list
         _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, keyCol, columns);
-        clickButton("Done");
-        clickAndWait(Locator.linkWithText(listName));
+        // now add the lookup column (which references the new table)
+        _listHelper.goToEditDesign(listName)
+                .addField(lookupCol)
+                .clickSave();
+
         waitForElement(Locator.xpath("//table[@lk-region-name='query']"));
         assertTextPresent(dummyBase);
         assertTextNotPresent("An unexpected error");
@@ -830,7 +837,7 @@ public class ListTest extends BaseWebDriverTest
     public void uploadAndCustomFormat()  // customFormattingTest assumes it picks up where doUploadTest leaves off
     {
         doUploadTest();
-        customFormattingTest();
+        //customFormattingTest();   // todo: evaluate whether or not the custom-formatting test here is redundant to the format testing in domainDesignerTest
     }
 
     @LogMethod
@@ -838,6 +845,7 @@ public class ListTest extends BaseWebDriverTest
     {
         log("Infer from excel file, then import data");
         _listHelper.createListFromFile(PROJECT_VERIFY, "Fruits from Excel", EXCEL_DATA_FILE);
+        clickAndWait(Locator.linkWithText("Fruits from Excel"));
         waitForElement(Locator.linkWithText("pomegranate"));
         assertNoLabKeyErrors();
 
@@ -860,19 +868,24 @@ public class ListTest extends BaseWebDriverTest
 
         log("Infer from a tsv file, then import data");
         _listHelper.createListFromFile(PROJECT_VERIFY, TSV_LIST_NAME, TSV_DATA_FILE);
+        clickAndWait(Locator.linkWithText(TSV_LIST_NAME));
         waitForElement(Locator.linkWithText("pomegranate"));
         assertNoLabKeyErrors();
         log("Verify correct types are inferred from file");
         clickButton("Design");
-        waitForElement(Locator.xpath("//tr[./td/div[text()='BoolCol'] and ./td/div[text()='Boolean']]"), WAIT_FOR_JAVASCRIPT);
-        assertElementPresent(Locator.xpath("//tr[./td/div[text()='IntCol'] and ./td/div[text()='Integer']]"));
-        assertElementPresent(Locator.xpath("//tr[./td/div[text()='NumCol'] and ./td/div[text()='Number (Double)']]"));
-        assertElementPresent(Locator.xpath("//tr[./td/div[text()='DateCol'] and ./td/div[text()='DateTime']]"));
+        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
+        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        assertEquals(FieldDefinition.ColumnType.Boolean, fieldsPanel.getField("BoolCol").getType());
+        assertEquals(FieldDefinition.ColumnType.Integer, fieldsPanel.getField("IntCol").getType());
+        assertEquals(FieldDefinition.ColumnType.Decimal, fieldsPanel.getField("NumCol").getType());
+        assertEquals(FieldDefinition.ColumnType.DateAndTime, fieldsPanel.getField("DateCol").getType());
+        listDefinitionPage.clickSave();
     }
 
     @LogMethod
     private void customFormattingTest()
     {
+        // todo: uncomment and convert if this is redundant to conditional format testing in domainDesignerTest
         // Assumes we are at the list designer after doUploadTest()
 
         clickButton("Edit Design", 0);
@@ -1059,9 +1072,11 @@ public class ListTest extends BaseWebDriverTest
                 col(descriptionCol, ListColumnType.String),
                 col(attachmentCol, ListColumnType.Attachment));
         // index on attachment column
-        _listHelper.clickEditDesign();
-        _listHelper.checkIndexFileAttachements(true);
-        _listHelper.clickSave();
+        _listHelper.goToEditDesign(listName)
+                .getAdvancedListSettings()
+                .setIndexFileAttachments(true)
+                .clickApply()
+        .clickSave();
 
         // Insert data, upload attachment
         goToProjectHome();
@@ -1095,9 +1110,9 @@ public class ListTest extends BaseWebDriverTest
                                col(descriptionCol, ListColumnType.String),
                                col(attachmentCol, ListColumnType.Attachment));
         // index on attachment column
-        _listHelper.clickEditDesign();
-        _listHelper.checkIndexFileAttachements(true);
-        _listHelper.clickSave();
+        _listHelper.goToEditDesign(listName)
+            .checkIndexFileAttachements(true)
+            .clickSave();
 
         // Insert data, upload attachment
         goToProjectHome();
@@ -1105,8 +1120,11 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.insertNewRow(row);
 
         // Now remove attachment column and check audit log
-        dataregionToEditDesign();
-        _listHelper.getListFieldEditor().selectField(2).markForDeletion();
+        _listHelper.goToEditDesign(listName)
+            .expandFieldsPanel()
+            .getField("Attachment")
+            .clickRemoveField(true);
+
         _listHelper.clickSave();
         AuditLogTest.verifyAuditEvent(this, "Attachment events", AuditLogTest.COMMENT_COLUMN, "The attachment searchData.tsv was deleted", 1);
     }
@@ -1229,9 +1247,7 @@ public class ListTest extends BaseWebDriverTest
         log("Add List -- " + name);
         _listHelper.createList(PROJECT_VERIFY, name, ListColumnType.fromNew(cols.get(0).getType()), cols.get(0).getName(),
                 cols.subList(1, cols.size()).toArray(new ListHelper.ListColumn[cols.size() - 1]));
-        _listHelper.clickEditDesign();
-        selectOptionByText(Locator.id("ff_titleColumn"), cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
-        _listHelper.clickSave();
+        clickAndWait(Locator.linkWithText(name));
         _listHelper.clickImportData();
         setListImportAsTestDataField(toTSV(cols,data));
     }
@@ -1306,7 +1322,6 @@ public class ListTest extends BaseWebDriverTest
     void dataregionToEditDesign()
     {
         clickButton("Design");
-        _listHelper.clickEditDesign();
     }
 
     void clickDone()

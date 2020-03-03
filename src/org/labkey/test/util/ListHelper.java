@@ -23,7 +23,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
-import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
@@ -62,10 +61,10 @@ public class ListHelper extends LabKeySiteWrapper
     private boolean NEW_LIST_DESIGNER_ENABLED = false;
     private void toggleNewListDesigner(boolean enabled)
     {
-        //if (enabled)
-        //    enabledNewListDesigner();
-        //else
-        //    disableNewListDesigner();
+        if (enabled)
+            enabledNewListDesigner();
+        else
+            disableNewListDesigner();
     }
     private void enabledNewListDesigner()
     {
@@ -74,7 +73,7 @@ public class ListHelper extends LabKeySiteWrapper
     }
     private void disableNewListDesigner()
     {
-        //ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
+        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
         NEW_LIST_DESIGNER_ENABLED = false;
     }
 
@@ -368,7 +367,12 @@ public class ListHelper extends LabKeySiteWrapper
         setFormElement(Locator.id("ff_keyName"), listKeyName);
         fireEvent(Locator.id("ff_keyName"), BaseWebDriverTest.SeleniumEvent.blur);
 
+        ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner", true);
         clickButton("Create List", 0);
+
+        EditListDefinitionPage listEditPage = new EditListDefinitionPage(getDriver());
+
+
         waitForElement(Locator.name("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.name("ff_name0"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
@@ -414,13 +418,13 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
     // initial "create list" steps common to both manual and import from file scenarios
-    public void beginCreateList(String containerPath, String listName)
+    public EditListDefinitionPage beginCreateList(String containerPath, String listName)
     {
         beginAt(WebTestHelper.buildURL("project", containerPath, "begin"));
-        beginCreateListHelper(listName);
+        return beginCreateListHelper(listName);
     }
 
-    private void beginCreateListHelper(String listName)
+    private EditListDefinitionPage beginCreateListHelper(String listName)
     {
         if (!isElementPresent(Locator.linkWithText("Lists")))
         {
@@ -432,7 +436,9 @@ public class ListHelper extends LabKeySiteWrapper
 
         log("Add List");
         clickButton("Create New List");
-        setListName(listName);
+        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
+        listDefinitionPage.setListName(listName);
+        return listDefinitionPage;
     }
 
     private void setListName_OLD(String listName)
@@ -442,37 +448,16 @@ public class ListHelper extends LabKeySiteWrapper
         fireEvent(Locator.id("ff_name"), BaseWebDriverTest.SeleniumEvent.blur);
     }
 
-    private void setListName(String listName)
-    {
-        if (!NEW_LIST_DESIGNER_ENABLED)
-        {
-            setListName_OLD(listName);
-            return;
-        }
-
-        // TODO move this to a ListPropertiesPanel test helper component
-        waitForElement(Locator.id("name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("name"), listName);
-        fireEvent(Locator.id("name"), BaseWebDriverTest.SeleniumEvent.blur);
-    }
-
     public void createListFromFile(String containerPath, String listName, File inputFile)
     {
-        disableNewListDesigner();
-        beginCreateList(containerPath, listName);
-
-        click(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
-        //test.clickCheckbox("fileImport");
-
-        clickButton("Create List", 0);
-
-        waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.name("uploadFormElement"), inputFile);
-
-        waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        clickButton("Import");
+        toggleNewListDesigner(true);
+        EditListDefinitionPage listEditPage = beginCreateList(containerPath, listName);
+        listEditPage.getFieldsPanel()
+            .setInferFieldFile(inputFile);
+        // assumes we intend to key on auto-integer
+        listEditPage.selectAutoIntegerKeyField();
+        // assumes we intend to import from file
+        listEditPage.clickSave();
     }
 
     /**
@@ -549,7 +534,6 @@ public class ListHelper extends LabKeySiteWrapper
             clickAndWait(Locator.lkButton("Design"));
 
         EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver(), NEW_LIST_DESIGNER_ENABLED);
-        toggleNewListDesigner(false);
 
         return listDefinitionPage;
     }
