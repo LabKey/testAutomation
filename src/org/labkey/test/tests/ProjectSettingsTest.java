@@ -135,6 +135,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         clickButtonContainingText("Save");
         _listHelper.createList(getProjectName(), "IceCream", ListHelper.ListColumnType.AutoInteger, "IceCreamID",
                 new ListHelper.ListColumn("IceCreamDate", "", ListHelper.ListColumnType.DateTime, ""));
+//                new ListHelper.ListColumn("IceCreamDate", "", ListHelper.ListColumnType.DateAndTime, ""));
         goToProjectHome();
         clickAndWait(Locator.linkWithText("IceCream"));
         Map<String, String> testRow = new HashMap<>();

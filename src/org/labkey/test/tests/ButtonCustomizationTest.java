@@ -98,8 +98,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         };
 
         _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
-
-        clickButton("Done");
+        goToManageLists();
         clickAndWait(Locator.linkWithText(LIST_NAME));
         assertButtonNotPresent(METADATA_OVERRIDE_BUTTON);
         DataRegionTable.findDataRegion(this).clickInsertNewRow();

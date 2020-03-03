@@ -135,6 +135,7 @@ public class FilterTest extends BaseWebDriverTest
         log("Add list -- " + LIST_NAME_COLORS);
         _listHelper.createList(getProjectName(), LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
         log("Set title field of 'Colors' to 'Desc'");
+        _listHelper.goToList(LIST_NAME_COLORS);
         _listHelper.clickEditDesign();
         selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
         _listHelper.clickSave();
@@ -151,7 +152,8 @@ public class FilterTest extends BaseWebDriverTest
     {
         ListHelper.ListColumn yearColumn = new ListHelper.ListColumn("year", "year", ListHelper.ListColumnType.Integer, "");
         _listHelper.createList(getProjectName(), FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
-        clickButton("Import Data");
+        _listHelper.goToList(FACET_TEST_LIST);
+        _listHelper.clickImportData();
         setFormElement(Locator.name("text"), "Car\tColor\tyear\n" +
                 "1\tBlue\t1980\n" +
                 "2\tRed\t1970\n" +

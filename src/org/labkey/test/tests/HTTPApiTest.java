@@ -38,6 +38,7 @@ public class HTTPApiTest extends BaseWebDriverTest
 
     private static final ListHelper.ListColumn COL1 = new ListHelper.ListColumn("Like", "Like", ListHelper.ListColumnType.String, "What the color is like");
     private static final ListHelper.ListColumn COL2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
+//    private static final ListHelper.ListColumn COL2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateAndTime, "When to wear the color", "M");// TODO change to this for new list designer
     private static final ListHelper.ListColumn COL3 = new ListHelper.ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
     private final static String[][] TEST_DATA = { { "Blue", "Green", "Red", "Yellow" },
             { "Zany", "Robust", "Mellow", "Light"},
