@@ -6,6 +6,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
@@ -39,27 +40,10 @@ public class SampleSetAPIHelper
     {
         Connection connection = WebTestHelper.getRemoteApiConnection();
 
-        PostCommand<CommandResponse> createSampleSetCommand = new PostCommand<>("experiment", "createSampleSetApi");
-        JSONObject props = new JSONObject();
-        props.put("name", def.getName());
-        props.put("nameExpression", def.getNameExpression());
-        props.put("description", def.getDescription());
-        createSampleSetCommand.setJsonObject(props);
+        CreateDomainCommand createSampleSetCommand = def.getCreateCommand();
         try
         {
             CommandResponse response = createSampleSetCommand.execute(connection, containerPath);
-            long domainId = response.getProperty("sampleSet.domainId");
-
-            GetDomainCommand getDomainCommand = new GetDomainCommand(domainId);
-            Domain domain = getDomainCommand.execute(connection, containerPath).getDomain();
-            List<PropertyDescriptor> fields = new ArrayList<>(domain.getFields());
-            // Include to default field ("name")
-            fields.addAll(def.getFields());
-            domain.setFields(fields);
-
-            SaveDomainCommand saveDomainCommand = new SaveDomainCommand(domainId);
-            saveDomainCommand.setDomainDesign(domain);
-            saveDomainCommand.execute(connection, containerPath);
         }
         catch (CommandException | IOException e)
         {

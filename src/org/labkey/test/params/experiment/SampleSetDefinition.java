@@ -1,14 +1,17 @@
 package org.labkey.test.params.experiment;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.property.DomainProps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SampleSetDefinition
+public class SampleSetDefinition extends DomainProps
 {
     private String _name;
     private String _nameExpression;
@@ -90,5 +93,44 @@ public class SampleSetDefinition
     {
         _importAliases.put(columnName, sampleSetName);
         return this;
+    }
+
+    @NotNull
+    @Override
+    protected Domain getDomainDesign()
+    {
+        Domain domain = new Domain(getName());
+        ArrayList<PropertyDescriptor> fields = new ArrayList<>(getFields());
+        fields.add(new PropertyDescriptor("Name", null));
+        domain.setFields(fields);
+        domain.setDescription(getDescription());
+        return domain;
+    }
+
+    @NotNull
+    @Override
+    protected String getKind()
+    {
+        return "SampleSet";
+    }
+
+    @NotNull
+    @Override
+    protected Map<String, Object> getOptions()
+    {
+        Map<String, Object> json = new HashMap<>();
+        json.put("name", getName());
+        json.put("nameExpression", getNameExpression());
+        if (!getImportAliases().isEmpty())
+        {
+            Map<String, String> importAliases = new HashMap<>();
+            for (String columnName : getImportAliases().keySet())
+            {
+                String sampleType = "materialInputs/" + getImportAliases().get(columnName);
+                importAliases.put(columnName, sampleType);
+            }
+            json.put("importAliases", importAliases);
+        }
+        return json;
     }
 }

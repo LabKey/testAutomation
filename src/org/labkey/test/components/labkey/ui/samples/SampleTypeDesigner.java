@@ -126,15 +126,23 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         return elementCache().descriptionInput.get();
     }
 
-    public SampleTypeDesigner addParentAlias()
+    public SampleTypeDesigner addParentAlias(String alias, String optionDisplayText)
     {
-        elementCache().addAliasButton.click();
+        int initialCount = elementCache().parentAliases().size();
+        addParentAlias();
+        setParentAlias(initialCount, alias, optionDisplayText);
         return this;
     }
 
     public SampleTypeDesigner removeParentAlias(int index)
     {
         elementCache().removeParentAliasIcon(index).click();
+        return this;
+    }
+
+    public SampleTypeDesigner addParentAlias()
+    {
+        elementCache().addAliasButton.click();
         return this;
     }
 
@@ -169,9 +177,14 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         protected final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
         protected final WebElement saveButton = Locator.button("Save").findWhenNeeded(this);
 
+        protected List<Input> parentAliases()
+        {
+            return Input.Input(Locator.name("alias"), getDriver()).findAll(this);
+        }
+
         protected Input parentAlias(int index)
         {
-            return Input.Input(Locator.name("alias"), getDriver()).findAll(this).get(index);
+            return parentAliases().get(index);
         }
 
         protected WebElement parentAliasSelect(int index)
