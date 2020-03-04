@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -33,12 +32,13 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 public class SampleSetHelper extends WebDriverWrapper
 {
@@ -272,9 +272,11 @@ public class SampleSetHelper extends WebDriverWrapper
     public void verifyFields(List<FieldDefinition> _fields)
     {
         TestLogger.log("Verify that the fields for the sample set are as expected");
-        List<String> actualNames = getSampleSetFields();
-        String[] expectedNames = (String[]) _fields.stream().map(FieldDefinition::getName).toArray();
-        assertThat("Fields in sample set.", actualNames, CoreMatchers.hasItems(expectedNames));
+        Set<String> actualNames = new HashSet<>(getSampleSetFields());
+        Set<String> expectedNames = _fields.stream().map(FieldDefinition::getName).collect(Collectors.toSet());
+        expectedNames.add("Name");
+        expectedNames.add("Flag");
+        assertEquals("Fields in sample set.", expectedNames, actualNames);
     }
 
     public DataRegionTable getSampleSetsList()

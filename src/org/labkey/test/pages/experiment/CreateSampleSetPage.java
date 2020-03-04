@@ -111,10 +111,9 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return elementCache()._designer.getDomainEditor();
     }
 
-    public LabKeyPage clickSave()
+    public void clickSave()
     {
-        elementCache()._designer.clickSave(false);
-        return new LabKeyPage(getDriver());
+        doAndWaitForPageToLoad(() -> elementCache()._designer.clickSave());
     }
 
     public List<WebElement> clickSaveExpectingError()

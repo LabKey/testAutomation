@@ -208,6 +208,7 @@ public class SampleSetTest extends BaseWebDriverTest
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
         SampleSetHelper sampleSetHelper = new SampleSetHelper(this);
         sampleSetHelper.createSampleSet(sampleSetDefinition);
+        sampleSetHelper.goToSampleSet(sampleSetName);
         sampleSetHelper.verifyFields(fields);
 
         log("Add a single row to the sample set");
@@ -238,6 +239,7 @@ public class SampleSetTest extends BaseWebDriverTest
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
         SampleSetDefinition definition = new SampleSetDefinition(sampleSetName).setNameExpression("${" + fields.get(0).getName() + "}-${batchRandomId}-${randomId}").setFields(fields);
         sampleSetHelper.createSampleSet(definition);
+        sampleSetHelper.goToSampleSet(sampleSetName);
         sampleSetHelper.verifyFields(fields);
 
         log("Add data without supplying the name");

@@ -86,11 +86,9 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         return elementCache().saveButton.isEnabled();
     }
 
-    public void clickSave(boolean isUpdate)
+    public void clickSave()
     {
         elementCache().saveButton.click();
-        String expectedText = isUpdate ? "Successfully updated sample type details." : "Successfully created a new sample type.";
-        BootstrapLocators.successBanner.withText(expectedText).waitForElement(getDriver(), 10000);
     }
 
     public List<WebElement> clickSaveExpectingError()
