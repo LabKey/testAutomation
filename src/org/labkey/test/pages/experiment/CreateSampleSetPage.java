@@ -1,6 +1,5 @@
 package org.labkey.test.pages.experiment;
 
-import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -13,7 +12,7 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 
 
-public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementCache> implements SampleTypeDesigner.SavesSampleType<CreateSampleSetPage, LabKeyPage<?>>
+public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementCache>
 {
     public final static String CURRENT_SAMPLE_TYPE_OPTION_TEXT = "(Current Sample Type)";
     public final static String CURRENT_SAMPLE_SET_OPTION_TEXT = "(Current Sample Set)";
@@ -31,18 +30,6 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
     {
         driver.beginAt(WebTestHelper.buildURL("experiment", containerPath, "createSampleSet"));
         return new CreateSampleSetPage(driver.getDriver());
-    }
-
-    @Override
-    public Locator getBodyLocator()
-    {
-        return Locator.id("app");
-    }
-
-    @Override
-    public LabKeyPage<?> getSaveDestination()
-    {
-        return null;
     }
 
     public CreateSampleSetPage setName(String name)
@@ -98,15 +85,14 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
 
     public CreateSampleSetPage addFields(List<FieldDefinition> fields)
     {
-        fieldsPanel().expand();
         for (FieldDefinition fieldDefinition : fields)
         {
-            fieldsPanel().addField(fieldDefinition);
+            getDomainEditor().addField(fieldDefinition);
         }
         return this;
     }
 
-    public DomainFormPanel fieldsPanel()
+    public DomainFormPanel getDomainEditor()
     {
         return elementCache()._designer.getDomainEditor();
     }

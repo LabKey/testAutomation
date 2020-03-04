@@ -9,7 +9,6 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WrapsDriver;
 
 import java.util.List;
 
@@ -49,16 +48,13 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
 
     public DomainFormPanel getDomainEditor()
     {
-        return elementCache()._domainFormPanel;
+        return elementCache()._domainFormPanel.expand();
     }
 
-    public SampleTypeDesigner removeFields(boolean confirmDialogExpected, String... fieldNames)
+    public SampleTypeDesigner removeField(boolean confirmDialogExpected, String fieldName)
     {
-        for (String fieldName : fieldNames)
-        {
-            getDomainEditor().removeField(fieldName, confirmDialogExpected);
-            sleep(250); // wait for collapse animation
-        }
+        getDomainEditor().removeField(fieldName, confirmDialogExpected);
+        sleep(250); // wait for collapse animation
         return this;
     }
 
@@ -192,11 +188,5 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         {
             return Locator.tagWithClass("i","container--removal-icon").findElements(getDriver()).get(index);
         }
-    }
-
-    public interface SavesSampleType<W, S> extends WrapsDriver
-    {
-        Locator getBodyLocator();
-        S getSaveDestination();
     }
 }
