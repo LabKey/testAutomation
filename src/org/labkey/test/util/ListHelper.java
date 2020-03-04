@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
@@ -391,10 +392,15 @@ public class ListHelper extends LabKeySiteWrapper
     {
         enabledNewListDesigner();
         EditListDefinitionPage listEditPage = beginCreateList(containerPath, listName);
-        listEditPage.getFieldsPanel()
+        listEditPage.expandFieldsPanel()
             .setInferFieldFile(inputFile);
+
         // assumes we intend to key on auto-integer
+        DomainFieldRow keyRow = listEditPage.getFieldsPanel().getField("Key");
+        if (keyRow != null)
+            keyRow.clickRemoveField(false);
         listEditPage.selectAutoIntegerKeyField();
+
         // assumes we intend to import from file
         listEditPage.clickSave();
     }
@@ -559,14 +565,18 @@ public class ListHelper extends LabKeySiteWrapper
 
     public enum ListColumnType
     {
-        MultiLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"),
-        //DateTime("DateTime"), // TODO remove this after GWT designer removed
+        MultiLine("Multi-Line Text"),
+        Integer("Integer"),
+        String("Text (String)"),
+        Subject("Subject/Participant (String)"),
         DateAndTime("Date Time"),
         Boolean("Boolean"),
-        //Double("Number (Double)"), // TODO remove this after GWT designer removed
         Decimal("Decimal"),
-        File("File"), AutoInteger("Auto-Increment Integer"),
-        Flag("Flag (String)"), Attachment("Attachment"), User("User");
+        File("File"),
+        AutoInteger("Auto-Increment Integer"),
+        Flag("Flag (String)"),
+        Attachment("Attachment"),
+        User("User");
 
         private final String _description;
 
