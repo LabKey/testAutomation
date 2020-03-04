@@ -59,13 +59,6 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
     private boolean NEW_LIST_DESIGNER_ENABLED = false;
-    private void toggleNewListDesigner(boolean enabled)
-    {
-        if (enabled)
-            enabledNewListDesigner();
-        else
-            disableNewListDesigner();
-    }
     private void enabledNewListDesigner()
     {
         ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
@@ -330,74 +323,27 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod
     public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        toggleNewListDesigner(true);
+        enabledNewListDesigner();
         beginCreateListFromTab(tabName, listName);
-        createListHelper(listName, listKeyType, listKeyName, cols);
-        toggleNewListDesigner(false);
+        createListHelper(listKeyType, listKeyName, cols);
     }
 
     @LogMethod
     public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        toggleNewListDesigner(true);
+        enabledNewListDesigner();
         beginCreateList(containerPath, listName);
-        createListHelper(listName, listKeyType, listKeyName, cols);
-        toggleNewListDesigner(false);
+        createListHelper(listKeyType, listKeyName, cols);
     }
 
-    private void createListHelper(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    private void createListHelper(ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        if (!NEW_LIST_DESIGNER_ENABLED)
-        {
-            createListHelper_OLD(listName, listKeyType, listKeyName, cols);
-            return;
-        }
-
-        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver(), NEW_LIST_DESIGNER_ENABLED);
+        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
         DomainFormPanel fieldsPanel = listDefinitionPage.setKeyField(listKeyType, listKeyName);
         for (ListColumn col : cols)
             fieldsPanel.addField(col);
 
         clickSave();
-    }
-
-    private void createListHelper_OLD(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
-    {
-        selectOptionByText(Locator.id("ff_keyType"), listKeyType.toString());
-        setFormElement(Locator.id("ff_keyName"), listKeyName);
-        fireEvent(Locator.id("ff_keyName"), BaseWebDriverTest.SeleniumEvent.blur);
-
-        ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner", true);
-        clickButton("Create List", 0);
-
-        EditListDefinitionPage listEditPage = new EditListDefinitionPage(getDriver());
-
-
-        waitForElement(Locator.name("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.name("ff_name0"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        log("Check that list was created correctly");
-        waitForFormElementToEqual(Locator.name("ff_name"), listName);
-        waitForFormElementToEqual(Locator.name("ff_name0"), listKeyName);
-
-        log("Add columns");
-
-        for (ListColumn col : cols)
-        {
-            addField(col);
-        }
-
-        clickSave();
-
-        Set<String> expectedTexts = new HashSet<>();
-        for (ListColumn col : cols)
-        {
-            expectedTexts.add(col.getName());
-            expectedTexts.add(col.getLabel());
-        }
-        expectedTexts.remove("");
-        expectedTexts.remove(null);
-        assertTextPresent(new ArrayList<>(expectedTexts));
     }
 
     public void addField(ListColumn col)
@@ -441,16 +387,9 @@ public class ListHelper extends LabKeySiteWrapper
         return listDefinitionPage;
     }
 
-    private void setListName_OLD(String listName)
-    {
-        waitForElement(Locator.id("ff_name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("ff_name"), listName);
-        fireEvent(Locator.id("ff_name"), BaseWebDriverTest.SeleniumEvent.blur);
-    }
-
     public void createListFromFile(String containerPath, String listName, File inputFile)
     {
-        toggleNewListDesigner(true);
+        enabledNewListDesigner();
         EditListDefinitionPage listEditPage = beginCreateList(containerPath, listName);
         listEditPage.getFieldsPanel()
             .setInferFieldFile(inputFile);
@@ -525,17 +464,10 @@ public class ListHelper extends LabKeySiteWrapper
 
     public EditListDefinitionPage goToEditDesign(String listName)
     {
+        enabledNewListDesigner();
         goToList(listName);
-
-        toggleNewListDesigner(true);
-        if (!NEW_LIST_DESIGNER_ENABLED)
-            waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
-        else
-            clickAndWait(Locator.lkButton("Design"));
-
-        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver(), NEW_LIST_DESIGNER_ENABLED);
-
-        return listDefinitionPage;
+        clickAndWait(Locator.lkButton("Design"));
+        return new EditListDefinitionPage(getDriver());
     }
 
     public void goToList(String listName)
