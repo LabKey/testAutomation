@@ -40,6 +40,18 @@ public class SchemaHelper
         _editLinkedSchema(false, projectName, targetFolder, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
     }
 
+    //delete external or linked schema
+    @LogMethod
+    public void deleteSchema(String containerPath, String schemaToDelete)
+    {
+        _test.beginAt("/query/" + containerPath + "/admin.view");
+        Locator link = Locator.xpath("//td[text()='" + schemaToDelete + "']/..//a[text()='delete']");
+        _test.waitAndClickAndWait(link);
+        _test.assertTextPresent("Are you sure you want to delete the schema '" + schemaToDelete + "'? The tables and queries defined in this schema will no longer be accessible.");
+        _test.clickButton("Delete");
+        _test.assertTextNotPresent(schemaToDelete);
+    }
+
     public void setQueryLoadTimeout(int timeout)
     {
         _queryLoadTimeOut = timeout;
