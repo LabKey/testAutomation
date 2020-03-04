@@ -32,21 +32,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.ElementCache>
 {
-    private boolean useNewDesigner = false;
-
     public EditListDefinitionPage(WebDriver driver)
     {
         super(driver);
-    }
-
-    public EditListDefinitionPage(WebDriver driver, boolean useNewDesigner)
-    {
-        super(driver);
-        this.useNewDesigner = useNewDesigner;
     }
 
     public static EditListDefinitionPage beginAt(WebDriverWrapper driver, int listId)
@@ -167,87 +158,42 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
 
     // todo; get autoimport slider, set autoimport
 
-    public void setColumnName(int index, String name)
+    public EditListDefinitionPage setColumnName(int index, String name)
     {
-        if (!this.useNewDesigner)
-        {
-            Locator nameLoc = Locator.name("ff_name" + index);
-            click(nameLoc);
-            setFormElement(nameLoc, name);
-            pressTab(nameLoc);
-            return;
-        }
-
         DomainFormPanel fieldsPanel = expandFieldsPanel();
         fieldsPanel.getField(index).setName(name);
+        return this;
     }
 
-    public void setColumnLabel(int index, String label)
+    public EditListDefinitionPage setColumnLabel(int index, String label)
     {
-        if (!this.useNewDesigner)
-        {
-            Locator labelLoc = Locator.name("ff_label" + index);
-            click(labelLoc);
-            setFormElement(labelLoc, label);
-            pressTab(labelLoc);
-            return;
-        }
-
         DomainFormPanel fieldsPanel = expandFieldsPanel();
         fieldsPanel.getField(index).setLabel(label);
+        return this;
     }
 
     public void setColumnPhiLevel(String name, PropertiesEditor.PhiSelectType phiLevel)
     {
-        if (!this.useNewDesigner)
-        {
-            ListHelper listHelper = new ListHelper(this);
-            PropertiesEditor listFieldEditor = listHelper.getListFieldEditor();
-            listFieldEditor.selectField(name);
-            listFieldEditor.fieldProperties().selectAdvancedTab().setPhiLevel(phiLevel);
-            return;
-        }
-
         DomainFormPanel fieldsPanel = expandFieldsPanel();
         fieldsPanel.getField(name).setPHILevel(phiLevel);
     }
 
     public EditListDefinitionPage addField(ListHelper.ListColumn newCol)
     {
-        if (!this.useNewDesigner)
-        {
-            ListHelper listHelper = new ListHelper(this);
-            listHelper.addField(newCol);
-            return this;
-        }
-
         DomainFormPanel fieldsPanel = expandFieldsPanel();
         fieldsPanel.addField(newCol);
         return this;
     }
 
-    public void removeField(int index)
+    public EditListDefinitionPage removeField(int index)
     {
-        if (!this.useNewDesigner)
-        {
-            ListHelper listHelper = new ListHelper(this);
-            listHelper.getListFieldEditor().selectField(index).markForDeletion();
-            return;
-        }
-
         DomainFormPanel fieldsPanel = expandFieldsPanel();
         fieldsPanel.removeField(fieldsPanel.getField(index).getName(), true);
+        return this;
     }
 
     public List<String> getFieldNames()
     {
-        if (!this.useNewDesigner)
-        {
-            ListHelper listHelper = new ListHelper(this);
-            return listHelper.getListFieldEditor().getFieldNames().stream()
-                    .map(String::toLowerCase).collect(Collectors.toList());
-        }
-
         DomainFormPanel fieldsPanel = expandFieldsPanel();
         return fieldsPanel.fieldNames();
     }
