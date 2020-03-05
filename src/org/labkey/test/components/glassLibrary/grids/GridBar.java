@@ -32,7 +32,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     protected GridBar(WebDriver driver, WebElement container, ResponsiveGrid responsiveGrid)
     {
-        _gridBarElement = Locator.tagWithClass("div", "query-grid-bar").findElement(container);
+        _gridBarElement = Locators.gridBar().findWhenNeeded(container);
         _responsiveGrid = responsiveGrid;  // The responsive grid that is associated with this bar.
         _driver = driver;
     }

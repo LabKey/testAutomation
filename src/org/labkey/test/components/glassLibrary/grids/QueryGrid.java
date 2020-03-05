@@ -7,6 +7,7 @@ package org.labkey.test.components.glassLibrary.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -52,7 +53,20 @@ public class QueryGrid extends WebDriverComponent
 
     public ResponsiveGrid getGrid()
     {
-        _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).find(_queryGridPanel);
+
+        // Find the grid if needed. If it has been update the reference created in the constructor should go stale.
+        // Calling isEnable should be a benign operation.
+        // Didn't want to call satelnessOf because it requires a wait. If the grid has been update stalenessOf should
+        // return right away. If the grid hasn't been updated the wait time would have to expire.
+        try
+        {
+            _responsiveGrid.getComponentElement().isEnabled();
+        }
+        catch(StaleElementReferenceException se)
+        {
+            _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).find(_queryGridPanel);
+        }
+
         return _responsiveGrid;
     }
 

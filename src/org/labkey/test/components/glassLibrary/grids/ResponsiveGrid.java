@@ -187,21 +187,6 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
     }
 
     // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
-    public ResponsiveGrid selectAllRows(boolean checked)
-    {
-        selectAllOnPage(checked);
-
-        // If selecting all of the elements (checked == true) on a page and there is more than one page a button
-        // should show up asking if you want to select all of the rows.
-        if((checked) && getWrapper().isElementPresent(Locator.buttonContainingText("Select all")))
-        {
-            Locator.buttonContainingText("Select all").findElement(getComponentElement()).click();
-        }
-
-        return this;
-    }
-
-    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public boolean areElementsSelected()
     {
         Checkbox box = elementCache().selectAllCheckbox;
