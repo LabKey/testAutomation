@@ -203,6 +203,11 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         clickAndWait(Locator.button("Save").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
     }
 
+    public void clickCancel()
+    {
+        clickAndWait(Locator.button("Cancel").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
+    }
+
     // domain properties
     public DomainFormPanel listFieldsPane()
     {
