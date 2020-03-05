@@ -155,7 +155,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         goToProjectHome();
         ListHelper.ListColumn[] cols = {
             new ListHelper.ListColumn("MyName", "MyName", ListHelper.ListColumnType.String, "My Name"),
-            new ListHelper.ListColumn("ListLookup", "ListLookup", ListHelper.ListColumnType.String, "List Lookup", new ListHelper.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName).setTableType(FieldDefinition.ColumnType.LookupToString)),
+            new ListHelper.ListColumn("ListLookup", "ListLookup", ListHelper.ListColumnType.Integer, "List Lookup", new ListHelper.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName).setTableType(FieldDefinition.ColumnType.LookupToInteger)),
         };
         String lookupSourceListName = "Project-LookupSource-List";
         _listHelper.createList(getProjectName(), lookupSourceListName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
