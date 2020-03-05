@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -31,6 +32,8 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.ConditionalFormatDialog;
+import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.list.EditListDefinitionPage;
@@ -122,7 +125,7 @@ public class ListTest extends BaseWebDriverTest
     protected final static ListColumnType LIST2_KEY_TYPE = ListColumnType.String;
     protected final static String LIST2_KEY_NAME = "Car";
 
-    protected final ListColumn _list2Col1 = new ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new LookupInfo(null, "lists", LIST_NAME_COLORS));
+    protected final ListColumn _list2Col1 = new ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new LookupInfo(null, "lists", LIST_NAME_COLORS).setTableType(FieldDefinition.ColumnType.LookupToString));
     private final static String LIST2_KEY = "Car1";
     private final static String LIST2_FOREIGN_KEY = "Blue";
     private final static String LIST2_KEY2 = "Car2";
@@ -136,7 +139,7 @@ public class ListTest extends BaseWebDriverTest
     private final static ListColumnType LIST3_KEY_TYPE = ListColumnType.String;
     private final static String LIST3_KEY_NAME = "Owner";
     private final ListColumn _list3Col2 = new ListColumn("Wealth", "Wealth", ListColumnType.String, "");
-    protected final ListColumn _list3Col1 = new ListColumn(LIST3_KEY_NAME, LIST3_KEY_NAME, LIST3_KEY_TYPE, "Who owns the car", new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS));
+    protected final ListColumn _list3Col1 = new ListColumn(LIST3_KEY_NAME, LIST3_KEY_NAME, LIST3_KEY_TYPE, "Who owns the car", new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS).setTableType(FieldDefinition.ColumnType.LookupToString));
     private final static String LIST3_COL2 = "Rich";
     private final String LIST2_DATA =
             LIST2_KEY_NAME + "\t" + _list2Col1.getName()  + "\t" + LIST3_KEY_NAME + "\n" +
@@ -235,11 +238,7 @@ public class ListTest extends BaseWebDriverTest
             .setDescription(LIST_DESCRIPTION)
             .clickSave();
 
-//        log("Check that edit list definition worked");
-//        assertTextPresent(LIST_KEY_NAME2, LIST_DESCRIPTION);
-
         log("Test upload data");
-
         _listHelper.clickImportData();
         submitImportTsv("Form contains no data");
 
@@ -287,46 +286,42 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test edit and adding new field with imported data present");
         clickTab("List");
-        clickAndWait(Locator.linkWithText("view design"));
-        _listHelper.goToEditDesign(LIST_NAME_COLORS);
-        setColumnName(1, _listCol1.getName());
-        setColumnLabel(1, _listCol1.getLabel());
-        ListHelper listHelper = new ListHelper(this);
-        listHelper.addField(_listCol4);
+        _listHelper.goToList(LIST_NAME_COLORS);
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
+        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel.getField(1)
+            .setName(_listCol1.getName())
+            .setLabel(_listCol1.getLabel());
+        fieldsPanel.addField(_listCol4);
 
         // Create "Hidden Field" and remove from all views.
-        listHelper.addField(_listCol5);
-        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInGrid']/input"));
-        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInInsert']/input"));
-        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInUpdate']/input"));
-        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInDetail']/input"));
+        fieldsPanel.addField(_listCol5);
+        fieldsPanel.getField(_listCol5.getName())
+            .showFieldOnDefaultView(false)
+            .showFieldOnInsertView(false)
+            .showFieldOnUpdateView(false)
+            .showFieldOnDetailsView(false);
 
-        listHelper.addField(_listCol6);
-        PropertiesEditor editor = _listHelper.getListFieldEditor();
-        PropertiesEditor.FieldRow row = editor.selectField(_listCol6.getName());
-        PropertiesEditor.FieldPropertyDock.AdvancedTabPane tabPane = row.properties().selectAdvancedTab();
+        fieldsPanel.addField(_listCol6);
+        fieldsPanel.getField(_listCol6.getName())
+            .setImportAliases(ALIASED_KEY_NAME);
 
-        tabPane.setImportAliases(ALIASED_KEY_NAME);
-        click(Locator.id("partdown_2"));
-
-        _listHelper.clickSave();
+        listDefinitionPage.clickSave();
 
         log("Check new field was added correctly");
         assertTextPresent(_listCol4.getName());
 
         log("Set title field of 'Colors' to 'Desc'");
-        _listHelper.clickEditDesign();
-        selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
-        clickDone();
+        listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
+        listDefinitionPage.getAdvancedListSettings().setFieldUsedForDisplayTitle("Desc").clickApply();
+        listDefinitionPage.clickSave();
 
-        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         assertTextPresent(
                 TEST_DATA[0][0],
                 TEST_DATA[1][1],
                 TEST_DATA[3][2]);
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from Grid view.
-        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
 
         setUpListFinish();
 
@@ -346,17 +341,14 @@ public class ListTest extends BaseWebDriverTest
         DataRegionTable regionTable = new DataRegionTable("query", getDriver());
         clickAndWait(regionTable.detailsLink(0));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
-        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
-        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         clickButton("Cancel");
 
         log("Test inserting new row");
         regionTable = new DataRegionTable("query", getDriver());
         regionTable.clickInsertNewRow();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
-        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         String html = getHtmlSource();
         assertTrue("Description \"" + _listCol1.getDescription() + "\" not present.", html.contains(_listCol1.getDescription()));
         assertTrue("Description \"" + _listCol3.getDescription() + "\" not present.", html.contains(_listCol3.getDescription()));
@@ -384,13 +376,11 @@ public class ListTest extends BaseWebDriverTest
         assertEquals(TEST_DATA[2][3], table.getDataAsText(3, _listCol3.getLabel()));
 
         log("Check hidden field is hidden only where specified.");
-        _listHelper.goToEditDesign(LIST_NAME_COLORS);
-
-        click(Locator.id("partdown_2"));
-        click(Locator.id("name5")); // Select Hidden field.
-        checkCheckbox(Locator.css("#propertyShownInGrid >input"));
-        waitForElement(Locator.css("#partstatus_5 > span.fa-wrench"));
-        clickDone();
+        listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
+        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel.getField(5) // Select Hidden field.
+            .showFieldOnDefaultView(true);
+        listDefinitionPage.clickSave();
 
         log("Check that hidden column is hidden.");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from grid view.
@@ -407,13 +397,12 @@ public class ListTest extends BaseWebDriverTest
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
 
-        _listHelper.goToEditDesign(LIST_NAME_COLORS);
-
-        click(Locator.id("name5")); // Select Hidden field.
-        uncheckCheckbox(Locator.css("#propertyShownInGrid > input"));
-        checkCheckbox(Locator.css("#propertyShownInInsert > input"));
-        waitForElement(Locator.css("#partstatus_5 > span.fa-wrench"));
-        clickDone();
+        listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
+        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel.getField(5) // Select Hidden field.
+            .showFieldOnDefaultView(false)
+            .showFieldOnInsertView(true);
+        listDefinitionPage.clickSave();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         table = new DataRegionTable("query", getDriver());
@@ -426,13 +415,12 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
         clickButton("Cancel");
 
-        dataregionToEditDesign();
-
-        click(Locator.id("name5")); // Select Hidden field.
-        uncheckCheckbox(Locator.css("#propertyShownInInsert > input"));
-        checkCheckbox(Locator.css("#propertyShownInUpdate > input"));
-        waitForElement(Locator.css("#partstatus_5 > span.fa-wrench"));
-        clickDone();
+        listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
+        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel.getField(5) // Select Hidden field.
+            .showFieldOnInsertView(false)
+            .showFieldOnUpdateView(true);
+        listDefinitionPage.clickSave();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         table = new DataRegionTable("query", getDriver());
@@ -445,13 +433,12 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
 
-        dataregionToEditDesign();
-
-        click(Locator.id("name5")); // Select Hidden field.
-        uncheckCheckbox(Locator.css("#propertyShownInUpdate > input"));
-        checkCheckbox(Locator.css("#propertyShownInDetail > input"));
-        waitForElement(Locator.css("#partstatus_5 > span.fa-wrench"));
-        clickDone();
+        listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
+        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel.getField(5) // Select Hidden field.
+            .showFieldOnUpdateView(false)
+            .showFieldOnDetailsView(true);
+        listDefinitionPage.clickSave();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         table = new DataRegionTable("query", getDriver());
@@ -537,14 +524,14 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view history"));
         assertTextPresent(":History");
         assertTextPresent("record was modified", 2);    // An existing list record was modified
-        assertTextPresent("were modified", 7);          // The column(s) of domain ></% 1äöüColors were modified
+        assertTextPresent("were modified", 8);          // The column(s) of domain ></% 1äöüColors were modified
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("was created", 2);                // Once for the list, once for the domain
         // List insert/update events should each have a link to the list item that was modified, but the other events won't have a link
         assertEquals("details Links", 6, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size());
-        assertEquals("Project Links", 19, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size());
-        assertEquals("List Links", 19, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size());
+        assertEquals("Project Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size());
+        assertEquals("List Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size());
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
         dataRegionTable.clickRowDetails(0);
         assertTextPresent("List Item Details");
@@ -568,16 +555,16 @@ public class ListTest extends BaseWebDriverTest
 
         log("Add List -- " + LIST3_NAME_OWNERS);
         _listHelper.createList(PROJECT_OTHER, LIST3_NAME_OWNERS, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
-        assertTextPresent("<AUTO> (Owner)");
 
         log("Upload data to second list");
+        _listHelper.goToList(LIST3_NAME_OWNERS);
         _listHelper.uploadData(LIST3_DATA);
 
-        log("Navigate back to first project");
         log("Add list -- " + LIST2_NAME_CARS);
         _listHelper.createList(PROJECT_VERIFY, LIST2_NAME_CARS, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, _list3Col1);
 
         log("Upload data to second list");
+        _listHelper.goToList(LIST2_NAME_CARS);
         _listHelper.uploadData(LIST2_DATA);
 
         log("Check that upload worked");
@@ -647,10 +634,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test deleting data (should any list custom views)");
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
-        dt.clickHeaderButtonAndWait("Design");
-        _listHelper.clickDeleteList();
-        assertTextPresent("The following depend upon this list:", "Custom view '" + TEST_VIEW + "'");
-        clickButton("OK");
+        _listHelper.deleteList("Custom view '" + TEST_VIEW + "'");
 
         log("Test that deletion happened");
         assertTextNotPresent(LIST_NAME_COLORS);
@@ -725,8 +709,8 @@ public class ListTest extends BaseWebDriverTest
         ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
                 new ListHelper.ListColumn(dummyCol, dummyCol, ListColumnType.String, "")
         };
-        ListHelper.ListColumn lookupCol = new ListHelper.ListColumn(lookupField, lookupField, ListColumnType.String, "",
-                new ListHelper.LookupInfo(null, lookupSchema, lookupTable).setTableType("Integer"));
+        ListHelper.ListColumn lookupCol = new ListHelper.ListColumn(lookupField, lookupField, ListColumnType.Integer, "",
+                new ListHelper.LookupInfo(null, lookupSchema, lookupTable).setTableType(FieldDefinition.ColumnType.LookupToInteger));
         // create the list
         _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, keyCol, columns);
         // now add the lookup column (which references the new table)
@@ -734,7 +718,7 @@ public class ListTest extends BaseWebDriverTest
                 .addField(lookupCol)
                 .clickSave();
 
-        waitForElement(Locator.xpath("//table[@lk-region-name='query']"));
+        _listHelper.goToList(listName);
         assertTextPresent(dummyBase);
         assertTextNotPresent("An unexpected error");
         Map<String, String> row = new HashMap<>();
@@ -760,6 +744,7 @@ public class ListTest extends BaseWebDriverTest
         //create list with look up A
         String lookupColumn = "lookup";
         _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, ListColumnType.Integer, "A" ));
+        _listHelper.goToList(crossContainerLookupList);
         _listHelper.clickImportData();
         setListImportAsTestDataField(lookupColumn + "\n1");
 
@@ -837,7 +822,7 @@ public class ListTest extends BaseWebDriverTest
     public void uploadAndCustomFormat()  // customFormattingTest assumes it picks up where doUploadTest leaves off
     {
         doUploadTest();
-        //customFormattingTest();   // todo: evaluate whether or not the custom-formatting test here is redundant to the format testing in domainDesignerTest
+        customFormattingTest();   // todo: evaluate whether or not the custom-formatting test here is redundant to the format testing in domainDesignerTest
     }
 
     @LogMethod
@@ -845,7 +830,7 @@ public class ListTest extends BaseWebDriverTest
     {
         log("Infer from excel file, then import data");
         _listHelper.createListFromFile(PROJECT_VERIFY, "Fruits from Excel", EXCEL_DATA_FILE);
-        clickAndWait(Locator.linkWithText("Fruits from Excel"));
+        _listHelper.goToList("Fruits from Excel");
         waitForElement(Locator.linkWithText("pomegranate"));
         assertNoLabKeyErrors();
 
@@ -868,12 +853,11 @@ public class ListTest extends BaseWebDriverTest
 
         log("Infer from a tsv file, then import data");
         _listHelper.createListFromFile(PROJECT_VERIFY, TSV_LIST_NAME, TSV_DATA_FILE);
-        clickAndWait(Locator.linkWithText(TSV_LIST_NAME));
+        _listHelper.goToList(TSV_LIST_NAME);
         waitForElement(Locator.linkWithText("pomegranate"));
         assertNoLabKeyErrors();
         log("Verify correct types are inferred from file");
-        clickButton("Design");
-        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(TSV_LIST_NAME);
         DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
         assertEquals(FieldDefinition.ColumnType.Boolean, fieldsPanel.getField("BoolCol").getType());
         assertEquals(FieldDefinition.ColumnType.Integer, fieldsPanel.getField("IntCol").getType());
@@ -885,47 +869,41 @@ public class ListTest extends BaseWebDriverTest
     @LogMethod
     private void customFormattingTest()
     {
-        // todo: uncomment and convert if this is redundant to conditional format testing in domainDesignerTest
-        // Assumes we are at the list designer after doUploadTest()
+        String red = "#D33115";
+        String cyan = "#68CCCA";
 
-        clickButton("Edit Design", 0);
+        // Assumes we are at the list designer after doUploadTest()
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(TSV_LIST_NAME);
+        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
 
         // Set conditional format on boolean column. Bold, italic, strikethrough, cyan text, red background
-        PropertiesEditor editor = _listHelper.getListFieldEditor();
-
-        PropertiesEditor.FieldRow row = editor.selectField("BoolCol");
-        PropertiesEditor.FieldPropertyDock.FormatTabPane tabPane = row.properties().selectFormatTab();
-        tabPane.addConditionalFormat("true", new Format.Builder().setBold(true).setItalics(true).setStrikethrough(true).build());
-        click(Locator.xpath("//div[@title='Color']"));
-        waitForElement(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//fieldset[./legend/span[text()='Background']]//input"), "FF0000"); // Red background
-        // don't know why this is necessary TODO: investigate
-        click(Locator.id("button_OK"));
-        click(Locator.id("button_OK"));
-        waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
-        // Regression test for Issue 11435: reopen color dialog to set text color
-        click(Locator.xpath("//div[@title='Color']"));
-        waitForElement(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//fieldset[./legend/span[text()='Foreground']]//input"), "00FFFF"); // Cyan text
-        // don't know why this is necessary TODO: investigate
-        click(Locator.id("button_OK"));
-        click(Locator.id("button_OK"));
-        waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
+        DomainFieldRow boolField = fieldsPanel.getField("BoolCol");
+        ConditionalFormatDialog formatDlg = boolField.clickConditionalFormatButton();
+        formatDlg.getOpenFormatPanel()
+            .setFirstValue("true")
+            .setBoldCheckbox(true)
+            .setItalicsCheckbox(true)
+            .setStrikethroughCheckbox(true)
+            .setFillColor(red) //red background
+            .setTextColor(cyan); //cyan text (Issue 11435: set text color)
+        formatDlg.clickApply();
 
         // Set multiple conditional formats on int column.
-        row = editor.selectField("IntCol");
-        tabPane = row.properties().selectFormatTab();
-        // If greater than 5, Bold
-        tabPane.addConditionalFormat("Is Greater Than", "5", Format.BOLD);
+        DomainFieldRow intField = fieldsPanel.getField("IntCol");
+        formatDlg = intField.clickConditionalFormatButton();
         // If greater than 7, strikethrough
-        tabPane.addConditionalFormat("Is Greater Than", "7", Format.STRIKETHROUGH);
+        formatDlg.getOpenFormatPanel()
+            .setFirstCondition(Filter.Operator.GT)
+            .setFirstValue("7")
+            .setStrikethroughCheckbox(true);
+        // If greater than 5, Bold
+        formatDlg.addFormatPanel()
+            .setFirstCondition(Filter.Operator.GT)
+            .setFirstValue("5")
+            .setBoldCheckbox(true);
+        formatDlg.clickApply();
 
-        // Switch the order of filters so that >7 takes precedence over >5
-        dragAndDrop(Locator.xpath("//div[text()='Is Greater Than 5']"), Locator.xpath("//div[text()='Is Greater Than 7']"));
-        assertTextBefore("Is Greater Than 7", "Is Greater Than 5");
-
-        _listHelper.clickSave();
-        clickButton("Done", defaultWaitForPage);
+        listDefinitionPage.clickSave();
 
         // Verify conditional format of boolean column
         // look for cells that do not match the
@@ -933,8 +911,8 @@ public class ListTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'line-through'))]"));
         assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'bold'))]"));
         assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'italic'))]"));
-        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'color: rgb(0, 255, 255)') or contains(@style, 'color: #00FFFF'))]")); // Cyan text
-        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'background-color: rgb(255, 0, 0)') or contains(@style, 'color: #FF0000'))]")); // Red background
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'color: rgb(0, 255, 255)') or contains(@style, 'color: " + cyan.toLowerCase() + "'))]")); // Cyan text
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'background-color: rgb(255, 0, 0)') or contains(@style, 'color: " + red.toLowerCase() + "'))]")); // Red background
         assertElementNotPresent(Locator.xpath("//td[text() = 'false' and @style]")); // No style on false items
         assertElementPresent(Locator.xpath("//td[text()='5' and not(contains(@style, 'bold')) and not(contains(@style, 'line-through'))]"));
         assertElementPresent(Locator.xpath("//td[text()='6' and contains(@style, 'bold') and not(contains(@style, 'line-through'))]"));
@@ -1120,12 +1098,11 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.insertNewRow(row);
 
         // Now remove attachment column and check audit log
-        _listHelper.goToEditDesign(listName)
-            .expandFieldsPanel()
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.expandFieldsPanel()
             .getField("Attachment")
             .clickRemoveField(true);
-
-        _listHelper.clickSave();
+        listDefinitionPage.clickSave();
         AuditLogTest.verifyAuditEvent(this, "Attachment events", AuditLogTest.COMMENT_COLUMN, "The attachment searchData.tsv was deleted", 1);
     }
 
@@ -1247,7 +1224,7 @@ public class ListTest extends BaseWebDriverTest
         log("Add List -- " + name);
         _listHelper.createList(PROJECT_VERIFY, name, ListColumnType.fromNew(cols.get(0).getType()), cols.get(0).getName(),
                 cols.subList(1, cols.size()).toArray(new ListHelper.ListColumn[cols.size() - 1]));
-        clickAndWait(Locator.linkWithText(name));
+        _listHelper.goToList(name);
         _listHelper.clickImportData();
         setListImportAsTestDataField(toTSV(cols,data));
     }
@@ -1316,46 +1293,6 @@ public class ListTest extends BaseWebDriverTest
             assertTrue(getCurrentRelativeURL().contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
         }
         popLocation();
-    }
-
-    // TODO replace usages with _listHelper.goToEditDesign(listName)
-    void dataregionToEditDesign()
-    {
-        clickButton("Design");
-    }
-
-    void clickDone()
-    {
-        if (isElementPresent(Locator.lkButton("Save")))
-            _listHelper.clickSave();
-        clickButton("Done");
-    }
-
-    void selectPropertyTab(String name)
-    {
-        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='" + name + "']"));
-    }
-
-    void setColumnName(int index, String name)
-    {
-        Locator nameLoc = Locator.name("ff_name"+index);
-        click(nameLoc);
-        setFormElement(nameLoc, name);
-        pressTab(nameLoc);
-    }
-    void setColumnLabel(int index, String label)
-    {
-        Locator labelLoc = Locator.name("ff_label"+index);
-        click(labelLoc);
-        setFormElement(labelLoc, label);
-        pressTab(labelLoc);
-    }
-    void setColumnType(int index, ListColumnType type)
-    {
-        Locator typeLoc = Locator.name("ff_type"+index);
-        click(typeLoc);
-        setFormElement(typeLoc, type.toString());
-        pressTab(typeLoc);
     }
 
     @Override

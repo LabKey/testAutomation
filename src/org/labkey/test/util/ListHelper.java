@@ -59,16 +59,13 @@ public class ListHelper extends LabKeySiteWrapper
         this(() -> driver);
     }
 
-    private boolean NEW_LIST_DESIGNER_ENABLED = false;
     private void enabledNewListDesigner()
     {
         ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
-        NEW_LIST_DESIGNER_ENABLED = true;
     }
     private void disableNewListDesigner()
     {
         ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
-        NEW_LIST_DESIGNER_ENABLED = false;
     }
 
     @Override
@@ -321,6 +318,17 @@ public class ListHelper extends LabKeySiteWrapper
         clickButton("OK");
     }
 
+    /**
+     * Starting at the grid view of a list, confirm dependencies, and delete it
+     */
+    public void deleteList(String confirmText)
+    {
+        String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
+        beginAt(url);
+        assertTextPresent(confirmText);
+        clickButton("OK");
+    }
+
     @LogMethod
     public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
@@ -457,16 +465,6 @@ public class ListHelper extends LabKeySiteWrapper
         clickImportData();
         setFormElement(Locator.name("text"), listData);
         submitImportTsv_success();
-    }
-
-    public EditListDefinitionPage clickEditDesign()
-    {
-        disableNewListDesigner();
-        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
-        waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.id("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        return new EditListDefinitionPage(getDriver());
     }
 
     public EditListDefinitionPage goToEditDesign(String listName)
