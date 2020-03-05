@@ -25,6 +25,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Data;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.issues.IssuesTest;
 import org.labkey.test.util.DataRegionTable;
@@ -136,9 +137,12 @@ public class FilterTest extends BaseWebDriverTest
         _listHelper.createList(getProjectName(), LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
         log("Set title field of 'Colors' to 'Desc'");
         _listHelper.goToList(LIST_NAME_COLORS);
-        _listHelper.clickEditDesign();
-        selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
-        _listHelper.clickSave();
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
+        listDefinitionPage.getAdvancedListSettings().setFieldUsedForDisplayTitle("Desc");
+        listDefinitionPage.clickSave();
+
+        log("Import data to the list");
+        _listHelper.goToList(LIST_NAME_COLORS);
         _listHelper.clickImportData();
         _listHelper.submitTsvData(testDataFull.toString());
 
