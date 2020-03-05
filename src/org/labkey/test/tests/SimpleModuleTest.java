@@ -47,13 +47,14 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
@@ -1053,7 +1054,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void createList()
+    protected void createList() throws Exception
     {
         //create a list for our query
         clickProject(getProjectName());
@@ -1069,29 +1070,44 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Create list in subfolder to prevent query validation failure");
         createPeopleListInFolder(FOLDER_NAME);
-
+        projectMenu().navigateToFolder(getProjectName(), "subfolder");
         log("Create list in container tab containers to prevent query validation failure");
-        createPeopleListInTab(STUDY_FOLDER_TAB_LABEL);
-        createPeopleListInTab(ASSAY_FOLDER_TAB_LABEL);
+        createPeopleListInTab(STUDY_FOLDER_TAB_LABEL, getProjectName() + "/subfolder/Study Container Tab");
+        createPeopleListInTab(ASSAY_FOLDER_TAB_LABEL, getProjectName() + "/subfolder/Assay Container Tab 2");
     }
 
-    private void createPeopleListInFolder(String folderName)
+    private void createPeopleListInFolder(String folderName) throws Exception
     {
         String containerPath = folderName.equals(getProjectName()) ? getProjectName() : getProjectName() + "/" + folderName;
-        _listHelper.createList(containerPath, LIST_NAME,
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
+        TestDataGenerator dgen = new TestDataGenerator(new FieldDefinition.LookupInfo(containerPath, "lists", LIST_NAME))
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("Name", FieldDefinition.ColumnType.String).setDescription("Name"),
+                        TestDataGenerator.simpleFieldDef("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
+                        TestDataGenerator.simpleFieldDef("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
+                ));
+        dgen.createList(createDefaultConnection(true), "Key");
+        goToManageLists();
+        _listHelper.goToList(LIST_NAME);
     }
 
-    private void createPeopleListInTab(String tabLabel)
+    private void createPeopleListInTab(String tabLabel, String containerPath) throws Exception
     {
-        _listHelper.createListFromTab(tabLabel, LIST_NAME,
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
+        clickTab(tabLabel.replace(" ", ""));
+        if (!isElementPresent(Locator.linkWithText("Lists")))
+        {
+            PortalHelper portalHelper = new PortalHelper(getDriver());
+            portalHelper.addWebPart("Lists");
+        }
+
+        waitAndClickAndWait(Locator.linkWithText("manage lists"));
+        TestDataGenerator dgen = new TestDataGenerator(new FieldDefinition.LookupInfo(containerPath, "lists", LIST_NAME))
+                .withColumns(List.of(
+                        TestDataGenerator.simpleFieldDef("Name", FieldDefinition.ColumnType.String).setDescription("Name"),
+                        TestDataGenerator.simpleFieldDef("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
+                        TestDataGenerator.simpleFieldDef("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
+                ));
+        dgen.createList(createDefaultConnection(true), "Key");
+        refresh();
     }
 
     @LogMethod
@@ -1857,7 +1873,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
 
     @LogMethod
-    private void doTestRestrictedModule()
+    private void doTestRestrictedModule() throws Exception
     {
         log("Create folder with restricted");
         clickProject(getProjectName());
