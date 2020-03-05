@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -89,11 +90,11 @@ public class HTTPApiTest extends BaseWebDriverTest
 
         log("Create List");
         _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
-//        _listHelper.goToEditDesign(LIST_NAME);
-//        selectOptionByText(Locator.id("ff_titleColumn"), "Like");    // Explicitly set to the PK (auto title will pick wealth column)
-//        clickButton("Save", 0);
-//        waitForElement(Locator.id("button_Import Data"), WAIT_FOR_JAVASCRIPT);
-        clickAndWait(Locator.linkWithText(LIST_NAME));
+        _listHelper.goToList(LIST_NAME);
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
+        listDefinitionPage.getAdvancedListSettings().setFieldUsedForDisplayTitle("Like").clickApply();
+        listDefinitionPage.clickSave();
+        _listHelper.goToList(LIST_NAME);
         waitForText("Like");
 
         log("Upload data");
