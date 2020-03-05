@@ -86,6 +86,9 @@ public class DetailTable extends WebDriverComponent
      **/
     public List<List<String>> getTableData()
     {
+        // Explicitly check that the table has been loaded before trying to get the data.
+        getWrapper().waitFor(this::isLoaded, "Cannot get the table data because the table is not loaded.", 500);
+
         List<List<String>> tableData = new ArrayList<>();
 
         for(WebElement tableRow : getComponentElement().findElements(By.cssSelector("tr")))
