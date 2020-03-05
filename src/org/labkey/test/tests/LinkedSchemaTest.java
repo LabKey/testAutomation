@@ -26,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -878,11 +879,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         goToManageLists();
 
-        _listHelper.goToEditDesign(tableName)
-                .expandFieldsPanel()
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(tableName);
+        listDefinitionPage.expandFieldsPanel()
                 .getField(fieldName).setLookup(info);
-        _listHelper.clickSave();
-
+        listDefinitionPage.clickSave();
     }
 
     protected void createLinkedSchemaQuery(String sourceFolder, String schemaName, String queryName, String tableName)

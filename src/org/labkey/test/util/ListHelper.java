@@ -342,9 +342,10 @@ public class ListHelper extends LabKeySiteWrapper
         EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
         DomainFormPanel fieldsPanel = listDefinitionPage.setKeyField(listKeyType, listKeyName);
         for (ListColumn col : cols)
+        {
             fieldsPanel.addField(col);
-
-        clickSave();
+        }
+        listDefinitionPage.clickSave();
     }
 
     public void addField(ListColumn col)
