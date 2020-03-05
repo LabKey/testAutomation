@@ -484,32 +484,6 @@ public class ListHelper extends LabKeySiteWrapper
             clickAndWait(Locator.linkWithText(listName));
     }
 
-    private void clickSave_OLD()
-    {
-        WebElement saveButton = Locator.lkButton("Save").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        scrollToTop(); // After clicking save, sometimes the page scrolls so that the project menu is under the mouse
-        saveButton.click();
-        waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void clickSave()
-    {
-        if (!NEW_LIST_DESIGNER_ENABLED)
-        {
-            clickSave_OLD();
-            return;
-        }
-
-        // TODO move this to a ListDesignerPage test helper
-        clickAndWait(Locator.button("Save").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
-    }
-
-    public void clickDeleteList()
-    {
-        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Delete List"), BaseWebDriverTest.WAIT_FOR_PAGE);
-    }
-
     /**
      * @deprecated Use {@link PropertiesEditor#addField(FieldDefinition)}
      */

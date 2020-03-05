@@ -69,6 +69,24 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         return this;
     }
 
+    public ConditionalFormatPanel setTextColor(String colorHex)
+    {
+        expand();
+        elementCache().textColor.click();
+        getWrapper().click(Locator.tagWithAttribute("div", "title", colorHex));
+        getWrapper().click(Locator.tagWithClass("div", "domain-validator-color-cover")); // click elsewhere on the dialog to close the color picker
+        return this;
+    }
+
+    public ConditionalFormatPanel setFillColor(String colorHex)
+    {
+        expand();
+        elementCache().fillColor.click();
+        getWrapper().click(Locator.tagWithAttribute("div", "title", colorHex));
+        getWrapper().click(Locator.tagWithClass("div", "domain-validator-color-cover")); // click elsewhere on the dialog to close the color picker
+        return this;
+    }
+
     public ConditionalFormatDialog clickRemove()
     {
         expand();
@@ -151,6 +169,8 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         }
 
         final Locator collapseIconLocator = Locator.tagWithClass("div", "domain-validator-collapse-icon");
+        final WebElement textColor = Locator.tagWithName("button", "domainpropertiesrow-textColor").findWhenNeeded(this);
+        final WebElement fillColor = Locator.tagWithName("button", "domainpropertiesrow-backgroundColor").findWhenNeeded(this);
         final WebElement removeButton = Locator.button("Remove Validator").findWhenNeeded(this);
     }
 

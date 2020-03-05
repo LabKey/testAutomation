@@ -477,6 +477,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public DomainFieldRow showFieldOnDetailsView(boolean checked)
+    {
+        clickAdvancedSettings()
+                .showOnDetailsView(checked)
+                .apply();
+        return this;
+    }
+
     public DomainFieldRow setPHILevel(PropertiesEditor.PhiSelectType phiLevel)
     {
         clickAdvancedSettings()
