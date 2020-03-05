@@ -25,7 +25,9 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
@@ -34,6 +36,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
@@ -121,50 +127,52 @@ public class ColumnResizeTest extends BaseWebDriverTest
     public void testColumnResizing()
     {
         setUpList(LIST_NAME);
-
-        PropertiesEditor propertiesEditor = _listHelper.clickEditDesign().getPropertyEditor();
+        _listHelper.goToList(LIST_NAME);
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
+        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
 
         log("Validate Scale: Existing fields");
-        assertWidgetNotVisible(propertiesEditor, KEY_ROW);    //Check scale widget is not available for key
+        // Issue 39877: max text length options should not be visible for text key field of list
+        //assertWidgetNotVisible(fieldsPanel, KEY_ROW);    //Check scale widget is not available for key
 
         //Check unhidden
-        assertMaxChecked(propertiesEditor, MAX_ROW);  //Check max checked for field set to max
-        assertMaxChecked(propertiesEditor, GT_ROW);   //Check max checked for field set to > 4k
-        assertMaxNotChecked(propertiesEditor, LT_ROW);    //Check max isn't checked for LT_ROW
-        assertMaxNotChecked(propertiesEditor, FOUR_ROW);  //Check max isn't checked for field set to 4k
-        assertMaxNotChecked(propertiesEditor, MULTI_ROW);
+        assertMaxChecked(fieldsPanel, MAX_ROW);  //Check max checked for field set to max
+        assertMaxChecked(fieldsPanel, GT_ROW);   //Check max checked for field set to > 4k
+        assertMaxNotChecked(fieldsPanel, LT_ROW);    //Check max isn't checked for LT_ROW
+        assertMaxNotChecked(fieldsPanel, FOUR_ROW);  //Check max isn't checked for field set to 4k
+        assertMaxNotChecked(fieldsPanel, MULTI_ROW);
 
         //Check hiding
-        assertWidgetNotVisible(propertiesEditor, NUMBER_ROW); //Check widget is not available for number
+        assertWidgetNotVisible(fieldsPanel, NUMBER_ROW); //Check widget is not available for number
 
         //Check value is as expected for field
-        assertScaleEquals(propertiesEditor, LT_ROW, LT_SCALE);    //Check arbitrary scale can be set
-        assertScaleEquals(propertiesEditor, FOUR_ROW, DEFAULT_SCALE); //Validate 4K is stored
-        assertScaleEquals(propertiesEditor, MULTI_ROW, DEFAULT_SCALE);    //Validate that scale not set defaults to 4K
+        assertScaleEquals(fieldsPanel, LT_ROW, LT_SCALE);    //Check arbitrary scale can be set
+        assertScaleEquals(fieldsPanel, FOUR_ROW, DEFAULT_SCALE); //Validate 4K is stored
+        assertScaleEquals(fieldsPanel, MULTI_ROW, DEFAULT_SCALE);    //Validate that scale not set defaults to 4K
 
         //Make changes
         log("Validate Scale: Change Scale");
-        changeScale(propertiesEditor, LT_ROW, DEFAULT_SCALE, false);  // LT--> LT
-        changeScale(propertiesEditor, GT_ROW, LT_SCALE, false);   //Max --> LT
-        changeScale(propertiesEditor, FOUR_ROW, GT_SCALE, true); //max checked
-        changeScale(propertiesEditor, MULTI_ROW, GT_SCALE, false); //LT --> GT --> Max
-        propertiesEditor.selectField(MAX_ROW).setType(FieldDefinition.ColumnType.MultiLine);
-        assertMaxChecked(propertiesEditor, MAX_ROW);
+        changeScale(fieldsPanel, LT_ROW, DEFAULT_SCALE, false);  // LT--> LT
+        changeScale(fieldsPanel, GT_ROW, LT_SCALE, false);   //Max --> LT
+        changeScale(fieldsPanel, FOUR_ROW, GT_SCALE, true); //max checked
+        changeScale(fieldsPanel, MULTI_ROW, GT_SCALE, false); //LT --> GT --> Max
+        fieldsPanel.getField(MAX_ROW).setType(FieldDefinition.ColumnType.MultiLine);
+        assertMaxChecked(fieldsPanel, MAX_ROW);
+        listDefinitionPage.clickSave();
 
-        _listHelper.clickSave();
-        goToManageLists();
-        clickAndWait(Locator.linkWithText("view design"));
-        propertiesEditor = _listHelper.clickEditDesign().getPropertyEditor();  //Open designer so row locator works
+        _listHelper.goToList(LIST_NAME);
+        listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
+        fieldsPanel = listDefinitionPage.expandFieldsPanel();
 
         //Verify Changes are retained
         log("Validate Scale: Verify new Scale retained");
-        assertMaxChecked(propertiesEditor, MAX_ROW);  //Check max check unchanged for type change
-        assertMaxNotChecked(propertiesEditor, GT_ROW);    //Check max unchecked change retained
-        assertScaleEquals(propertiesEditor, GT_ROW, LT_SCALE);    //Check arbitrary scale change retained
-        assertMaxNotChecked(propertiesEditor, LT_ROW);    //Check scale change retained
-        assertScaleEquals(propertiesEditor, LT_ROW, DEFAULT_SCALE);
-        assertMaxChecked(propertiesEditor, FOUR_ROW);     //Check max retained
-        assertMaxChecked(propertiesEditor, MULTI_ROW);    //Check GT change sets max
+        assertMaxChecked(fieldsPanel, MAX_ROW);  //Check max check unchanged for type change
+        assertMaxNotChecked(fieldsPanel, GT_ROW);    //Check max unchecked change retained
+        assertScaleEquals(fieldsPanel, GT_ROW, LT_SCALE);    //Check arbitrary scale change retained
+        assertMaxNotChecked(fieldsPanel, LT_ROW);    //Check scale change retained
+        assertScaleEquals(fieldsPanel, LT_ROW, DEFAULT_SCALE);
+        assertMaxChecked(fieldsPanel, FOUR_ROW);     //Check max retained
+        assertMaxChecked(fieldsPanel, MULTI_ROW);    //Check GT change sets max
     }
 
     /**
@@ -193,24 +201,23 @@ public class ColumnResizeTest extends BaseWebDriverTest
 
         log("Change column with existing larger data");
         //Check changing size with larger existing data
-        _listHelper.goToEditDesign(listName)
-            .expandFieldsPanel()
-            .getField("MAX_ROW");
-        PropertiesEditor propertiesEditor = _listHelper.clickEditDesign().getPropertyEditor();
-        changeScale(propertiesEditor, MAX_ROW, LT_SCALE, false);
-        clickButton("Save", 0);
-        assertAlert("The property \"" + MAX_COLUMN_NAME + "\" cannot be scaled down. It contains existing values exceeding [" + LT_SCALE + "] characters.\n");
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
+        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        changeScale(fieldsPanel, MAX_ROW, LT_SCALE, false);
+        listDefinitionPage.clickSaveExpectingError();
+        String expectedErrorTxt ="The property \"" + MAX_COLUMN_NAME + "\" cannot be scaled down. It contains existing values exceeding [" + LT_SCALE + "] characters.";
+        assertEquals(expectedErrorTxt, fieldsPanel.getPanelAlertText());
         checkExpectedErrors(0);  // Shouldn't log any SQLExceptions - product should detect inability to scale and not issue an alter query
 
         //Cancel changes
-        clickButton("Cancel",0);
-        assertAlertContains("discarded");
+        listDefinitionPage.clickCancel();
 
         log("Change column with existing smaller data");
         //Check changing size with smaller existing data
-        propertiesEditor = _listHelper.clickEditDesign().getPropertyEditor();
-        changeScale(propertiesEditor, GT_ROW, DEFAULT_SCALE, false);
-        _listHelper.clickSave();
+        listDefinitionPage = _listHelper.goToEditDesign(listName);
+        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        changeScale(fieldsPanel, GT_ROW, DEFAULT_SCALE, false);
+        listDefinitionPage.clickSave();
         assertNoLabKeyErrors();
     }
 
@@ -220,51 +227,43 @@ public class ColumnResizeTest extends BaseWebDriverTest
      * @param newScale new scale value
      * @param checkMax Override flag to set Max (will not unset Max if newScale >4K)
      */
-    private void changeScale(PropertiesEditor propertiesEditor, int rowIndex, int newScale, boolean checkMax)
+    private void changeScale(DomainFormPanel fieldsPanel, int rowIndex, int newScale, boolean checkMax)
     {
-        PropertiesEditor.FieldPropertyDock.AdvancedTabPane advancedProperties = propertiesEditor
-                .selectField(rowIndex).properties()
-                .selectAdvancedTab();
-
-        //Uncheck Max if necessary
-        advancedProperties.enableMaxText(false);
-        advancedProperties.setMaxTextLength(String.valueOf(newScale));
+        DomainFieldRow fieldRow = fieldsPanel.getField(rowIndex);
         if (checkMax)
-            advancedProperties.enableMaxText(true);
+            fieldRow.allowMaxChar();
+        else
+            fieldRow.setCharCount(newScale);
     }
 
-    private void assertScaleEquals(PropertiesEditor propertiesEditor, int rowIndex, Integer expected)
+    private void assertScaleEquals(DomainFormPanel fieldsPanel, int rowIndex, Integer expected)
     {
-        String scaleStr = propertiesEditor
-                .selectField(rowIndex).properties()
-                .selectAdvancedTab()
-                .getMaxTextLength();
-        Integer scale = Integer.valueOf(scaleStr.replace(",",""));
-
-        Assert.assertEquals(String.format("Scale for row [%d] is actually [%d] vs expected [%d]", rowIndex, scale, expected), expected, scale);
+        Integer scale = fieldsPanel.getField(rowIndex).getCustomCharCount();
+        assertEquals(String.format("Scale for row [%d] is actually [%d] vs expected [%d]", rowIndex, scale, expected), expected, scale);
     }
 
-    private void assertWidgetNotVisible(PropertiesEditor propertiesEditor, int rowIndex)
+    private void assertWidgetNotVisible(DomainFormPanel fieldsPanel, int rowIndex)
     {
-        propertiesEditor.selectField(rowIndex).properties().selectAdvancedTab();
-        assertElementNotVisible(ListHelper.DesignerLocators.maxCheckbox);
-        assertElementNotVisible(ListHelper.DesignerLocators.scaleTextbox);
+        DomainFieldRow fieldRow = fieldsPanel.getField(rowIndex).expand();
+        assertFalse("Max text length options should not be visible for field " + rowIndex, fieldRow.isMaxTextLengthPresent(rowIndex));
     }
 
-    private void assertMaxChecked(PropertiesEditor propertiesEditor, int rowIndex)
+    private void assertMaxChecked(DomainFormPanel fieldsPanel, int rowIndex)
     {
-        propertiesEditor.selectField(rowIndex).properties().selectAdvancedTab();
-        assertElementVisible(ListHelper.DesignerLocators.maxCheckbox);
-        assertChecked(ListHelper.DesignerLocators.maxCheckbox);
-        Assert.assertFalse("Scale textbox is enabled for row [" + rowIndex + "]", ListHelper.DesignerLocators.scaleTextbox.findElement(getDriver()).isEnabled());
+        DomainFieldRow fieldRow = fieldsPanel.getField(rowIndex).expand();
+        assertTrue("Expected max text length options to be visible for field " + rowIndex, fieldRow.isMaxTextLengthPresent(rowIndex));
+        assertTrue("Expected max text length 'unlimited' option selected for field " + rowIndex, fieldRow.isMaxCharDefault());
+        assertFalse("Expected max text length 'custom' option unselected for field " + rowIndex, fieldRow.isCustomCharSelected());
+        assertTrue("Scale textbox is enabled for row [" + rowIndex + "]", fieldRow.isCharCountDisabled());
     }
 
-    private void assertMaxNotChecked(PropertiesEditor propertiesEditor, int rowIndex)
+    private void assertMaxNotChecked(DomainFormPanel fieldsPanel, int rowIndex)
     {
-        propertiesEditor.selectField(rowIndex).properties().selectAdvancedTab();
-        assertElementVisible(ListHelper.DesignerLocators.maxCheckbox);
-        assertNotChecked(ListHelper.DesignerLocators.maxCheckbox);
-        Assert.assertTrue("Scale textbox is not enabled for row [" + rowIndex + "]", ListHelper.DesignerLocators.scaleTextbox.findElement(getDriver()).isEnabled());
+        DomainFieldRow fieldRow = fieldsPanel.getField(rowIndex).expand();
+        assertTrue("Expected max text length options to be visible for field " + rowIndex, fieldRow.isMaxTextLengthPresent(rowIndex));
+        assertFalse("Expected max text length 'unlimited' option unselected for field " + rowIndex, fieldRow.isMaxCharDefault());
+        assertTrue("Expected max text length 'custom' option selected for field " + rowIndex, fieldRow.isCustomCharSelected());
+        assertFalse("Scale textbox is disabled for row [" + rowIndex + "]", fieldRow.isCharCountDisabled());
     }
 
     @Override

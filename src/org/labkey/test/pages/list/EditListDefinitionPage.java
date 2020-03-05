@@ -198,6 +198,11 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         return fieldsPanel.fieldNames();
     }
 
+    public void clickSaveExpectingError()
+    {
+        clickAndWait(Locator.button("Save").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), 0);
+    }
+
     public void clickSave()
     {
         clickAndWait(Locator.button("Save").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
