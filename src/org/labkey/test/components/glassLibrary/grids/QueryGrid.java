@@ -53,20 +53,7 @@ public class QueryGrid extends WebDriverComponent
 
     public ResponsiveGrid getGrid()
     {
-
-        // Find the grid if needed. If it has been update the reference created in the constructor should go stale.
-        // Calling isEnable should be a benign operation.
-        // Didn't want to call satelnessOf because it requires a wait. If the grid has been update stalenessOf should
-        // return right away. If the grid hasn't been updated the wait time would have to expire.
-        try
-        {
-            _responsiveGrid.getComponentElement().isEnabled();
-        }
-        catch(StaleElementReferenceException se)
-        {
-            _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).find(_queryGridPanel);
-        }
-
+        _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).find(_queryGridPanel);
         return _responsiveGrid;
     }
 
