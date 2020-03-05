@@ -1122,7 +1122,7 @@ public class ListTest extends BaseWebDriverTest
 
     ListHelper.ListColumn col(String folder, String name, ListColumnType type, String table)
     {
-        return new ListHelper.ListColumn(name, "", type, "", new ListHelper.LookupInfo(folder, "lists", table));
+        return new ListHelper.ListColumn(name, "", type, "", new ListHelper.LookupInfo(folder, "lists", table).setTableType(type.name()));
     }
 
     ListHelper.ListColumn colURL(String name, ListColumnType type, String url)
