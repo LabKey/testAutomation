@@ -646,11 +646,11 @@ public class AuditLogTest extends BaseWebDriverTest
         // Add the list of the event ids to an ignore list so future tests don't look at them again.
         ignoreIds.addAll(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
 
-        if(domainPropertyEventRows.size() != 2)
+        if(domainPropertyEventRows.size() != 3)
         {
             // We are going to fail, so navigate to the Domain Property Events Audit Log.
             goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 2, domainPropertyEventRows.size());
+            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 3, domainPropertyEventRows.size());
         }
 
         log("Validate that the expected rows after the update are in the log.");
@@ -677,7 +677,9 @@ public class AuditLogTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LIST_CHECK_LOG));
         listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
         listDefinitionPage.expandFieldsPanel()
-                .addField(new FieldDefinition(FIELD03_NAME).setLabel(FIELD03_LABEL).setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)));
+                .addField(new FieldDefinition(FIELD03_NAME).setLabel(FIELD03_LABEL)
+                        .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)
+                                .setTableType(FieldDefinition.ColumnType.LookupToInteger)));
         listDefinitionPage.clickSave();
 
         log("Validate that a 'Create' event was logged for the new filed.");
@@ -686,11 +688,11 @@ public class AuditLogTest extends BaseWebDriverTest
         // Add the list of the event ids to an ignore list so future tests don't look at them again.
         ignoreIds.addAll(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
 
-        if(domainPropertyEventRows.size() != 1)
+        if(domainPropertyEventRows.size() != 4)
         {
             // We are going to fail, so navigate to the Domain Property Events Audit Log.
             goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 1, domainPropertyEventRows.size());
+            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 4, domainPropertyEventRows.size());
         }
 
         log("Validate that the expected row is there for the newly created field.");
@@ -715,7 +717,7 @@ public class AuditLogTest extends BaseWebDriverTest
         log("Change properties on field '" + FIELD03_NAME + "'.");
         listDefinitionPage.expandFieldsPanel()
                 .getField(FIELD03_NAME)
-                .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02));
+                .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02).setTableType(FieldDefinition.ColumnType.LookupToInteger));
         listDefinitionPage.clickSave();
 
         log("Validate that the expected row is there for the after modifying the Lookup field.");
