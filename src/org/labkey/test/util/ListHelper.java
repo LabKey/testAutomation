@@ -520,23 +520,6 @@ public class ListHelper extends LabKeySiteWrapper
                 .addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
     }
 
-    public List<String> getColumnNames()
-    {
-        List<String> columns = new ArrayList<>();
-
-        List<WebElement> nameFields = Locator.xpath("//input[contains(@name, 'ff_name')]").findElements(getDriver());
-        for(WebElement webElement : nameFields)
-        {
-            // If it is not the list name element then add it to the list.
-            if (!webElement.getAttribute("name").trim().toLowerCase().equals("ff_name"))
-            {
-                columns.add(webElement.getAttribute("value"));
-            }
-        }
-
-        return columns;
-    }
-
     public enum RangeType
     {
         Equals("Equals"), NE("Does Not Equal"), GT("Greater than"), GTE("Greater than or Equals"), LT("Less than"), LTE("Less than or Equals");
