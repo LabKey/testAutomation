@@ -59,13 +59,13 @@ public class ListHelper extends LabKeySiteWrapper
         this(() -> driver);
     }
 
-    private void enabledNewListDesigner()
+    private void enabledGwtListDesigner()
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
+        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-gwtlistdesigner");
     }
-    private void disableNewListDesigner()
+    private void disableGwtListDesigner()
     {
-        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
+        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-gwtlistdesigner");
     }
 
     @Override
@@ -332,7 +332,7 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod
     public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        enabledNewListDesigner();
+        disableGwtListDesigner();
         beginCreateListFromTab(tabName, listName);
         createListHelper(listKeyType, listKeyName, cols);
     }
@@ -340,7 +340,7 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod
     public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        enabledNewListDesigner();
+        disableGwtListDesigner();
         beginCreateList(containerPath, listName);
         createListHelper(listKeyType, listKeyName, cols);
     }
@@ -399,7 +399,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void createListFromFile(String containerPath, String listName, File inputFile)
     {
-        enabledNewListDesigner();
+        disableGwtListDesigner();
         EditListDefinitionPage listEditPage = beginCreateList(containerPath, listName);
         listEditPage.expandFieldsPanel()
             .setInferFieldFile(inputFile);
@@ -469,7 +469,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public EditListDefinitionPage goToEditDesign(String listName)
     {
-        enabledNewListDesigner();
+        disableGwtListDesigner();
         goToList(listName);
         clickAndWait(Locator.lkButton("Design"));
         return new EditListDefinitionPage(getDriver());
