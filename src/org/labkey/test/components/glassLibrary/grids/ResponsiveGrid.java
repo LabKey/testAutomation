@@ -92,24 +92,28 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return elementCache().getRows();
     }
 
+    // TODO Responsive grids cannot be sorted, this should be moved to QueryGrid (or what ever it will be called).
     public ResponsiveGrid sortColumnAscending(String columnName)
     {
         sortColumn(columnName, false);
         return this;
     }
 
+    // TODO Responsive grids cannot be sorted, this should be moved to QueryGrid (or what ever it will be called).
     public ResponsiveGrid sortColumnDescending(String columnName)
     {
         sortColumn(columnName, true);
         return this;
     }
 
+    // TODO Responsive grids cannot be sorted, this should be moved to QueryGrid (or what ever it will be called).
     public ResponsiveGrid sortOn(String column, boolean descending)
     {
         sortColumn(column, descending);
         return this;
     }
 
+    // TODO Responsive grids cannot be sorted, this should be moved to QueryGrid (or what ever it will be called).
     private void sortColumn(String columnName, boolean descending)
     {
         String sortCls = "fa-sort-amount-" + (descending ? "desc" : "asc");
@@ -124,6 +128,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         getWrapper().waitFor(()-> !menuItem.isDisplayed(), 1000);
     }
 
+    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public ResponsiveGrid selectRow(int index, boolean checked)
     {
         WebElement checkBox = Locator.css("td > input[type=checkbox]").findElement(getRow(index));
@@ -131,11 +136,13 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return this;
     }
 
+    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public ResponsiveGrid selectRow(String columnName, String columnValue, boolean checked)
     {
         return selectRow(columnName, List.of(columnValue), checked);
     }
 
+    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public ResponsiveGrid selectRow(String columnName, List<String> columnValues, boolean checked)
     {
         List<Map<String, String>> gridData = getRowMaps();
@@ -152,12 +159,14 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return this;
     }
 
+    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public boolean isRowSelected(int index)
     {
         WebElement checkBox = elementCache().getRowCheckbox(index);
         return checkBox.isSelected();
     }
 
+    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public ResponsiveGrid selectAllOnPage(boolean checked)
     {
         Checkbox box = elementCache().selectAllCheckbox;
@@ -177,20 +186,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return this;
     }
 
-    public ResponsiveGrid selectAllRows(boolean checked)
-    {
-        selectAllOnPage(checked);
-
-        // If selecting all of the elements (checked == true) on a page and there is more than one page a button
-        // should show up asking if you want to select all of the rows.
-        if((checked) && getWrapper().isElementPresent(Locator.buttonContainingText("Select all")))
-        {
-            Locator.buttonContainingText("Select all").findElement(getComponentElement()).click();
-        }
-
-        return this;
-    }
-
+    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public boolean areElementsSelected()
     {
         Checkbox box = elementCache().selectAllCheckbox;
@@ -286,6 +282,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return -1;
     }
 
+    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     // This feels like a bug waiting to happen. The entry in the column name collections are removed if it is the
     // select column. However a similar removal does not happen when getting the text from a row. This causes the
     // getRowMap(WebElement row) function to be off by 1 if the table has a select column.
@@ -433,6 +430,8 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         protected Optional<WebElement> emptyGrid = Locators.emptyGrid.findOptionalElement(this);
 
         public WebElement button = Locator.xpath("//button[contains(@class,'dropdown-toggle')]").findWhenNeeded(this);
+
+        // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
         public Optional<WebElement> selectColumn = Locator.xpath("//th/input[@type='checkbox']").findOptionalElement(getComponentElement());
         Checkbox selectAllCheckbox = Checkbox.Checkbox(Locator.xpath("//th/input[@type='checkbox']")).findWhenNeeded(this);
 
@@ -476,6 +475,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
             return rows;
         }
 
+        // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
         private final Map<Integer, WebElement> rowCheckboxes = new HashMap<>();
         protected final WebElement getRowCheckbox(Integer rowIndex)
         {
@@ -521,18 +521,6 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         {
             super(driver);
             _locator= Locators.responsiveGrid();
-        }
-
-        public ResponsiveGridFinder withGridId(String gridId)
-        {
-            _locator= Locators.responsiveGrid(gridId);
-            return this;
-        }
-
-        public ResponsiveGridFinder withBaseGridId(String gridId)
-        {
-            _locator= Locators.responsiveGridByBaseId(gridId);
-            return this;
         }
 
         @Override

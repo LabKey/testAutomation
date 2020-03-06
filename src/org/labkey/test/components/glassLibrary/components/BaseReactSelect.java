@@ -258,7 +258,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
      *
      * @return List of strings for the values in the list.
      */
-    public List<String> getListItems()
+    public List<String> getOptions()
     {
         // Can only get the list of items once the list has been opened.
         open();
@@ -347,7 +347,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         public static Locator selectMenu = Locator.tagWithClass("div", "Select-menu");
         public static Locator.XPathLocator selectedItems = Locator.tagWithClass("span", "Select-value-label");
         public static Locator loadingSpinner = Locator.tagWithClass("span", "Select-loading");
-        final public static Locator listItems = Locator.tagWithClass("div", "Select-menu-outer");
+        final public static Locator listItems = Locator.tagWithClass("div", "Select-option");
 
         public static Locator.XPathLocator selectContainer()
         {
