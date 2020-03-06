@@ -1049,12 +1049,13 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.createList(getProjectName(), listName, ListColumnType.AutoInteger, "id",
                 col(descriptionCol, ListColumnType.String),
                 col(attachmentCol, ListColumnType.Attachment));
-        // index on attachment column
+        // index for entire list as single document and index on attachment column
         _listHelper.goToEditDesign(listName)
                 .getAdvancedListSettings()
+                .indexEntireListAsASingleDocument(true, "", "Include both metadata and data", "Index all non-PHI text fields")
                 .setIndexFileAttachments(true)
                 .clickApply()
-        .clickSave();
+                .clickSave();
 
         // Insert data, upload attachment
         goToProjectHome();

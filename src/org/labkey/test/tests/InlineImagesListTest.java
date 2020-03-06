@@ -175,7 +175,6 @@ public class InlineImagesListTest extends BaseWebDriverTest
         assertElementPresent("Did not find the expected text for " + PDF_FILE.getName(), Locator.xpath("//a[contains(text(), '" + PDF_FILE.getName() + "')]"), 1);
 
         log("Add another attachment field.");
-        //clickAndWait(Locator.linkWithText("Design"));
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
         listDefinitionPage.addField(_listColAttachment02);
         listDefinitionPage.clickSave();
