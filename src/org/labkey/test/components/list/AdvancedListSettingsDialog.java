@@ -47,38 +47,50 @@ public class AdvancedListSettingsDialog extends ModalDialog
         return this;
     }
 
-    public AdvancedListSettingsDialog indexEntireListAsASingleDocument(boolean checked, String docTitle, String includeRadioLabel, String indexRadioLabel)
+    public AdvancedListSettingsDialog indexEntireListAsASingleDocument(boolean checked, String docTitle,
+                                                                       SearchIncludeOptions includeOptions,
+                                                                       SearchIndexOptions indexOptions)
     {
         String labelText = "Index entire list as a single document";
         elementCache().checkbox(labelText).set(checked);
         if (checked)
         {
-            WebElement expandContainer = elementCache().collapseibleFieldContainer(labelText)
+            WebElement expandContainer = elementCache().collapsibleFieldContainer(labelText)
                     .waitForElement(this, 2000);
             WebElement expandCollapsePane = elementCache().collapsibleField(labelText);
             expandPane(expandCollapsePane);
             Input.Input(Locator.id("entireListTitleTemplate"), getDriver()).find().set(docTitle);
-            elementCache().radio(expandContainer, includeRadioLabel).check();
-            elementCache().radio(expandContainer, indexRadioLabel).check();
+            elementCache().radio(expandContainer, includeOptions.toString()).check();
+            elementCache().radio(expandContainer, indexOptions.toString()).check();
         }
         return this;
     }
 
-    public AdvancedListSettingsDialog indexEachItemAsASeparateDocument(boolean checked, String docTitle, String radioLabel)
+    public AdvancedListSettingsDialog disableEntireListIndex()
+    {
+        return indexEntireListAsASingleDocument(false, null, null, null);
+    }
+
+    public AdvancedListSettingsDialog indexEachItemAsASeparateDocument(boolean checked, String docTitle, SearchIndexOptions indexOptions)
     {
         String labelText = "Index each item as a separate document";
         elementCache().checkbox(labelText).set(checked);
         if (checked)
         {
-            WebElement expandContainer = elementCache().collapseibleFieldContainer(labelText)
+            WebElement expandContainer = elementCache().collapsibleFieldContainer(labelText)
                     .waitForElement(this, 2000);
             WebElement expandCollapsePane = elementCache().collapsibleField(labelText);
             expandPane(expandCollapsePane);
 
             Input.Input(Locator.id("eachItemTitleTemplate"), getDriver()).find().set(docTitle);
-            elementCache().radio(expandContainer, radioLabel).check();
+            elementCache().radio(expandContainer, indexOptions.toString()).check();
         }
         return this;
+    }
+
+    public AdvancedListSettingsDialog disableEachItemIndexing()
+    {
+        return indexEachItemAsASeparateDocument(false, null, null);
     }
 
     private void expandPane(WebElement expandCollapsePane)
@@ -143,7 +155,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
             return Locator.tag("div").withChild(checkBoxLoc(checkboxLabelText))
                     .child(Locator.tagWithClass("span", "list__advanced-settings-model__collapsible-field"));
         }
-        Locator.XPathLocator collapseibleFieldContainer(String checkboxLabelText)
+        Locator.XPathLocator collapsibleFieldContainer(String checkboxLabelText)
         {
             return Locator.tag("div").withChild(checkBoxLoc(checkboxLabelText));
         }
@@ -164,6 +176,44 @@ public class AdvancedListSettingsDialog extends ModalDialog
         WebElement collapsibleField(String checkboxLabelText)
         {
             return collapsibleFieldLoc(checkboxLabelText).waitForElement(this, 2000);
+        }
+    }
+
+    public enum SearchIncludeOptions
+    {
+        MetadataAndData("Include both metadata and data" ),
+        DataOnly("Include data only"),
+        MetadataOnly("Include metadata only (name and description of list and fields)");
+
+        private String _labelText;
+
+        SearchIncludeOptions(String labelText)
+        {
+            _labelText = labelText;
+        }
+
+        public String toString()
+        {
+            return _labelText;
+        }
+    }
+
+    public enum SearchIndexOptions
+    {
+        NonPhiText("Index all non-PHI text fields"),
+        NonPhiFields("Index all non-PHI fields (text, number, date, and boolean)"),
+        CustomTemplate("Index using custom template");
+
+        private String _labelText;
+
+        SearchIndexOptions(String labelText)
+        {
+            _labelText = labelText;
+        }
+
+        public String toString()
+        {
+            return _labelText;
         }
     }
 }

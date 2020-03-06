@@ -17,7 +17,6 @@ package org.labkey.test.tests.list;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -129,7 +128,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         setUpList(LIST_NAME);
         _listHelper.goToList(LIST_NAME);
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
-        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
 
         log("Validate Scale: Existing fields");
         // Issue 39877: max text length options should not be visible for text key field of list
@@ -162,7 +161,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
 
         _listHelper.goToList(LIST_NAME);
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
-        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel = listDefinitionPage.getFieldsPanel();
 
         //Verify Changes are retained
         log("Validate Scale: Verify new Scale retained");
@@ -202,7 +201,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         log("Change column with existing larger data");
         //Check changing size with larger existing data
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
-        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
         changeScale(fieldsPanel, MAX_ROW, LT_SCALE, false);
         listDefinitionPage.clickSaveExpectingError();
         String expectedErrorTxt ="The property \"" + MAX_COLUMN_NAME + "\" cannot be scaled down. It contains existing values exceeding [" + LT_SCALE + "] characters.";
@@ -215,7 +214,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         log("Change column with existing smaller data");
         //Check changing size with smaller existing data
         listDefinitionPage = _listHelper.goToEditDesign(listName);
-        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel = listDefinitionPage.getFieldsPanel();
         changeScale(fieldsPanel, GT_ROW, DEFAULT_SCALE, false);
         listDefinitionPage.clickSave();
         assertNoLabKeyErrors();

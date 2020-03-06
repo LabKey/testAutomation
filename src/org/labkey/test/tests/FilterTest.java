@@ -138,7 +138,7 @@ public class FilterTest extends BaseWebDriverTest
         log("Set title field of 'Colors' to 'Desc'");
         _listHelper.goToList(LIST_NAME_COLORS);
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
-        listDefinitionPage.getAdvancedListSettings()
+        listDefinitionPage.openAdvancedListSettings()
                 .setFieldUsedForDisplayTitle("Desc")
                 .clickApply();
         listDefinitionPage.clickSave();

@@ -880,7 +880,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         goToManageLists();
 
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(tableName);
-        listDefinitionPage.expandFieldsPanel()
+        listDefinitionPage.getFieldsPanel()
                 .getField(fieldName).setLookup(info);
         listDefinitionPage.clickSave();
     }

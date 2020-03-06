@@ -19,7 +19,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.list.EditListDefinitionPage;
@@ -92,7 +91,7 @@ public class HTTPApiTest extends BaseWebDriverTest
         _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
         _listHelper.goToList(LIST_NAME);
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
-        listDefinitionPage.getAdvancedListSettings().setFieldUsedForDisplayTitle("Like").clickApply();
+        listDefinitionPage.openAdvancedListSettings().setFieldUsedForDisplayTitle("Like").clickApply();
         listDefinitionPage.clickSave();
         _listHelper.goToList(LIST_NAME);
         waitForText("Like");

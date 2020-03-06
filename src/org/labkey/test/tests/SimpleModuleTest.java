@@ -1090,7 +1090,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _listHelper.goToList(LIST_NAME);
     }
 
-    private void createPeopleListInTab(String tabLabel, String containerPath) throws Exception
+    private void createPeopleListInTab(String tabLabel, String containerPath) throws Exception  // todo: post-20.3, change this to go through the UI
     {
         clickTab(tabLabel.replace(" ", ""));
         if (!isElementPresent(Locator.linkWithText("Lists")))

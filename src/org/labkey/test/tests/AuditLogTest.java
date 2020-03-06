@@ -621,7 +621,7 @@ public class AuditLogTest extends BaseWebDriverTest
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
         clickAndWait(Locator.linkWithText(LIST_CHECK_LOG));
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
-        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
 
         log("Change properties on field '" + FIELD01_NAME + "'.");
         fieldsPanel.getField(FIELD01_NAME)
@@ -676,7 +676,7 @@ public class AuditLogTest extends BaseWebDriverTest
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
         clickAndWait(Locator.linkWithText(LIST_CHECK_LOG));
         listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
-        listDefinitionPage.expandFieldsPanel()
+        listDefinitionPage.getFieldsPanel()
                 .addField(new FieldDefinition(FIELD03_NAME).setLabel(FIELD03_LABEL)
                         .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)
                                 .setTableType(FieldDefinition.ColumnType.LookupToInteger)));
@@ -715,7 +715,7 @@ public class AuditLogTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
 
         log("Change properties on field '" + FIELD03_NAME + "'.");
-        listDefinitionPage.expandFieldsPanel()
+        listDefinitionPage.getFieldsPanel()
                 .getField(FIELD03_NAME)
                 .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02).setTableType(FieldDefinition.ColumnType.LookupToInteger));
         listDefinitionPage.clickSave();
@@ -742,7 +742,7 @@ public class AuditLogTest extends BaseWebDriverTest
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
         clickAndWait(Locator.linkWithText(LIST_CHECK_LOG));
         listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
-        listDefinitionPage.expandFieldsPanel().getField(3).clickRemoveField(true);
+        listDefinitionPage.getFieldsPanel().getField(3).clickRemoveField(true);
         listDefinitionPage.clickSave();
 
         log("Validate that the expected row is there after deleting the Lookup field.");

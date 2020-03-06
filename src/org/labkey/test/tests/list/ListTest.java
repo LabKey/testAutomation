@@ -36,9 +36,9 @@ import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.Format;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -288,7 +288,7 @@ public class ListTest extends BaseWebDriverTest
         clickTab("List");
         _listHelper.goToList(LIST_NAME_COLORS);
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
-        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
         fieldsPanel.getField(1)
             .setName(_listCol1.getName())
             .setLabel(_listCol1.getLabel());
@@ -313,7 +313,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Set title field of 'Colors' to 'Desc'");
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
-        listDefinitionPage.getAdvancedListSettings().setFieldUsedForDisplayTitle("Desc").clickApply();
+        listDefinitionPage.openAdvancedListSettings().setFieldUsedForDisplayTitle("Desc").clickApply();
         listDefinitionPage.clickSave();
 
         assertTextPresent(
@@ -377,7 +377,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check hidden field is hidden only where specified.");
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
-        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel = listDefinitionPage.getFieldsPanel();
         fieldsPanel.getField(5) // Select Hidden field.
             .showFieldOnDefaultView(true);
         listDefinitionPage.clickSave();
@@ -398,7 +398,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
-        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel = listDefinitionPage.getFieldsPanel();
         fieldsPanel.getField(5) // Select Hidden field.
             .showFieldOnDefaultView(false)
             .showFieldOnInsertView(true);
@@ -416,7 +416,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
-        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel = listDefinitionPage.getFieldsPanel();
         fieldsPanel.getField(5) // Select Hidden field.
             .showFieldOnInsertView(false)
             .showFieldOnUpdateView(true);
@@ -434,7 +434,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
-        fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        fieldsPanel = listDefinitionPage.getFieldsPanel();
         fieldsPanel.getField(5) // Select Hidden field.
             .showFieldOnUpdateView(false)
             .showFieldOnDetailsView(true);
@@ -858,7 +858,7 @@ public class ListTest extends BaseWebDriverTest
         assertNoLabKeyErrors();
         log("Verify correct types are inferred from file");
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(TSV_LIST_NAME);
-        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
         assertEquals(FieldDefinition.ColumnType.Boolean, fieldsPanel.getField("BoolCol").getType());
         assertEquals(FieldDefinition.ColumnType.Integer, fieldsPanel.getField("IntCol").getType());
         assertEquals(FieldDefinition.ColumnType.Decimal, fieldsPanel.getField("NumCol").getType());
@@ -874,7 +874,7 @@ public class ListTest extends BaseWebDriverTest
 
         // Assumes we are at the list designer after doUploadTest()
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(TSV_LIST_NAME);
-        DomainFormPanel fieldsPanel = listDefinitionPage.expandFieldsPanel();
+        DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
 
         // Set conditional format on boolean column. Bold, italic, strikethrough, cyan text, red background
         DomainFieldRow boolField = fieldsPanel.getField("BoolCol");
@@ -1051,8 +1051,10 @@ public class ListTest extends BaseWebDriverTest
                 col(attachmentCol, ListColumnType.Attachment));
         // index for entire list as single document and index on attachment column
         _listHelper.goToEditDesign(listName)
-                .getAdvancedListSettings()
-                .indexEntireListAsASingleDocument(true, "", "Include both metadata and data", "Index all non-PHI text fields")
+                .openAdvancedListSettings()
+                .indexEntireListAsASingleDocument(true, "",
+                        AdvancedListSettingsDialog.SearchIncludeOptions.MetadataAndData,
+                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText)
                 .setIndexFileAttachments(true)
                 .clickApply()
                 .clickSave();
@@ -1100,7 +1102,7 @@ public class ListTest extends BaseWebDriverTest
 
         // Now remove attachment column and check audit log
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
-        listDefinitionPage.expandFieldsPanel()
+        listDefinitionPage.getFieldsPanel()
             .getField("Attachment")
             .clickRemoveField(true);
         listDefinitionPage.clickSave();

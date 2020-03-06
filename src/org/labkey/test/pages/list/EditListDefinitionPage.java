@@ -82,7 +82,7 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         return this;
     }
 
-    public AdvancedListSettingsDialog getAdvancedListSettings()
+    public AdvancedListSettingsDialog openAdvancedListSettings()
     {
         expandPropertiesPane();
         elementCache().advancedSettingsBtn().click();
@@ -104,20 +104,16 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
 
     public EditListDefinitionPage checkIndexFileAttachements(boolean checked)
     {
-        getAdvancedListSettings()
+        openAdvancedListSettings()
                 .setIndexFileAttachments(checked)
                 .clickApply();
         return this;
     }
 
+
     public DomainFormPanel getFieldsPanel()
     {
-        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Fields").find();
-    }
-
-    public DomainFormPanel expandFieldsPanel()
-    {
-        DomainFormPanel panel = getFieldsPanel();
+        DomainFormPanel panel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Fields").find();
         panel.expand();
         return panel;
     }
@@ -125,7 +121,7 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
 
     public DomainFormPanel setKeyField(ListHelper.ListColumnType listKeyType, String listKeyName)
     {
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         if (listKeyType == ListHelper.ListColumnType.AutoInteger)
         {
             fieldsPanel.startNewDesign("REMOVE_ME");
@@ -151,7 +147,7 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
 
     public DomainFormPanel selectKeyField(String keyField)
     {
-        DomainFormPanel fieldsPanel =expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         selectOptionByText(Locator.name("keyField"), keyField);
         return fieldsPanel;
     }
@@ -160,41 +156,41 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
 
     public EditListDefinitionPage setColumnName(int index, String name)
     {
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         fieldsPanel.getField(index).setName(name);
         return this;
     }
 
     public EditListDefinitionPage setColumnLabel(int index, String label)
     {
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         fieldsPanel.getField(index).setLabel(label);
         return this;
     }
 
     public void setColumnPhiLevel(String name, PropertiesEditor.PhiSelectType phiLevel)
     {
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         fieldsPanel.getField(name).setPHILevel(phiLevel);
     }
 
     public EditListDefinitionPage addField(ListHelper.ListColumn newCol)
     {
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         fieldsPanel.addField(newCol);
         return this;
     }
 
     public EditListDefinitionPage removeField(int index)
     {
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         fieldsPanel.removeField(fieldsPanel.getField(index).getName(), true);
         return this;
     }
 
     public List<String> getFieldNames()
     {
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         return fieldsPanel.fieldNames();
     }
 
@@ -211,18 +207,6 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
     public void clickCancel()
     {
         clickAndWait(Locator.button("Cancel").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
-    }
-
-    // domain properties
-    public DomainFormPanel listFieldsPane()
-    {
-        return elementCache().fieldsPanel;
-    }
-
-
-    public PropertiesEditor getPropertyEditor()
-    {
-        return elementCache()._propertiesEditor;
     }
 
     protected ElementCache newElementCache()
@@ -260,12 +244,5 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
             return Locator.tagWithClass("button", "domain-field-float-right").withText("Advanced Settings")
                     .waitForElement(this, 2000);
         }
-
-        DomainFormPanel fieldsPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())
-                .timeout(4000).findWhenNeeded(this);
-
-
-       private final PropertiesEditor _propertiesEditor = new PropertiesEditor.PropertiesEditorFinder(getDriver())
-               .withTitle("List Fields").findWhenNeeded();
     }
 }

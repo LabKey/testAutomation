@@ -36,11 +36,8 @@ import org.openqa.selenium.WrapsDriver;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -401,7 +398,7 @@ public class ListHelper extends LabKeySiteWrapper
     {
         disableGwtListDesigner();
         EditListDefinitionPage listEditPage = beginCreateList(containerPath, listName);
-        listEditPage.expandFieldsPanel()
+        listEditPage.getFieldsPanel()
             .setInferFieldFile(inputFile);
 
         // assumes we intend to key on auto-integer
