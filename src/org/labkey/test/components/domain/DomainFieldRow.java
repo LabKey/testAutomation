@@ -327,10 +327,15 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         String strCharCount = Integer.toString(maxCharCount);
         elementCache().setCharCountRadio.set(true);
-        getWrapper().waitFor(() -> elementCache().charScaleInput.getComponentElement().getAttribute("disabled") == null,
+        getWrapper().waitFor(() -> !isCharCountDisabled(),
                 "character count input did not become enabled in time", 1000);
         elementCache().charScaleInput.setValue(strCharCount);
         return this;
+    }
+
+    public boolean isCharCountDisabled()
+    {
+        return elementCache().charScaleInput.getComponentElement().getAttribute("disabled") != null;
     }
 
     public boolean isCustomCharSelected()
@@ -339,10 +344,15 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().setCharCountRadio.isChecked();
     }
 
-    public Integer customCharCount()
+    public Integer getCustomCharCount()
     {
         expand();
         return Integer.parseInt(elementCache().charScaleInput.getValue());
+    }
+
+    public boolean isMaxTextLengthPresent(int rowIndex)
+    {
+        return getWrapper().isElementPresent(elementCache().getCharScaleInputLocForRow(rowIndex));
     }
 
     //
@@ -463,6 +473,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .showOnUpdateView(checked)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow showFieldOnDetailsView(boolean checked)
+    {
+        clickAdvancedSettings()
+                .showOnDetailsView(checked)
                 .apply();
         return this;
     }
@@ -719,6 +737,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this));
         public Input charScaleInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-scale")
                 .refindWhenNeeded(this), getDriver());
+
+        public Locator.XPathLocator getCharScaleInputLocForRow(int rowIndex)
+        {
+            return Locator.tagWithId("input", "domainpropertiesrow-scale-0-" + rowIndex);
+        }
 
         // date field options
         public Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")

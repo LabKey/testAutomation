@@ -36,11 +36,8 @@ import org.openqa.selenium.WrapsDriver;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -59,23 +56,13 @@ public class ListHelper extends LabKeySiteWrapper
         this(() -> driver);
     }
 
-    private boolean NEW_LIST_DESIGNER_ENABLED = false;
-    private void toggleNewListDesigner(boolean enabled)
+    private void enabledGwtListDesigner()
     {
-        //if (enabled)
-        //    enabledNewListDesigner();
-        //else
-        //    disableNewListDesigner();
+        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-gwtlistdesigner");
     }
-    private void enabledNewListDesigner()
+    private void disableGwtListDesigner()
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
-        NEW_LIST_DESIGNER_ENABLED = true;
-    }
-    private void disableNewListDesigner()
-    {
-        //ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-reactlistdesigner");
-        NEW_LIST_DESIGNER_ENABLED = false;
+        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-gwtlistdesigner");
     }
 
     @Override
@@ -328,72 +315,42 @@ public class ListHelper extends LabKeySiteWrapper
         clickButton("OK");
     }
 
+    /**
+     * Starting at the grid view of a list, confirm dependencies, and delete it
+     */
+    public void deleteList(String confirmText)
+    {
+        String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
+        beginAt(url);
+        assertTextPresent(confirmText);
+        clickButton("OK");
+    }
+
     @LogMethod
     public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        toggleNewListDesigner(true);
+        disableGwtListDesigner();
         beginCreateListFromTab(tabName, listName);
-        createListHelper(listName, listKeyType, listKeyName, cols);
-        toggleNewListDesigner(false);
+        createListHelper(listKeyType, listKeyName, cols);
     }
 
     @LogMethod
     public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        toggleNewListDesigner(true);
+        disableGwtListDesigner();
         beginCreateList(containerPath, listName);
-        createListHelper(listName, listKeyType, listKeyName, cols);
-        toggleNewListDesigner(false);
+        createListHelper(listKeyType, listKeyName, cols);
     }
 
-    private void createListHelper(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    private void createListHelper(ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        if (!NEW_LIST_DESIGNER_ENABLED)
-        {
-            createListHelper_OLD(listName, listKeyType, listKeyName, cols);
-            return;
-        }
-
-        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver(), NEW_LIST_DESIGNER_ENABLED);
+        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
         DomainFormPanel fieldsPanel = listDefinitionPage.setKeyField(listKeyType, listKeyName);
         for (ListColumn col : cols)
+        {
             fieldsPanel.addField(col);
-
-        clickSave();
-    }
-
-    private void createListHelper_OLD(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
-    {
-        selectOptionByText(Locator.id("ff_keyType"), listKeyType.toString());
-        setFormElement(Locator.id("ff_keyName"), listKeyName);
-        fireEvent(Locator.id("ff_keyName"), BaseWebDriverTest.SeleniumEvent.blur);
-
-        clickButton("Create List", 0);
-        waitForElement(Locator.name("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.name("ff_name0"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        log("Check that list was created correctly");
-        waitForFormElementToEqual(Locator.name("ff_name"), listName);
-        waitForFormElementToEqual(Locator.name("ff_name0"), listKeyName);
-
-        log("Add columns");
-
-        for (ListColumn col : cols)
-        {
-            addField(col);
         }
-
-        clickSave();
-
-        Set<String> expectedTexts = new HashSet<>();
-        for (ListColumn col : cols)
-        {
-            expectedTexts.add(col.getName());
-            expectedTexts.add(col.getLabel());
-        }
-        expectedTexts.remove("");
-        expectedTexts.remove(null);
-        assertTextPresent(new ArrayList<>(expectedTexts));
+        listDefinitionPage.clickSave();
     }
 
     public void addField(ListColumn col)
@@ -414,13 +371,13 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
     // initial "create list" steps common to both manual and import from file scenarios
-    public void beginCreateList(String containerPath, String listName)
+    public EditListDefinitionPage beginCreateList(String containerPath, String listName)
     {
         beginAt(WebTestHelper.buildURL("project", containerPath, "begin"));
-        beginCreateListHelper(listName);
+        return beginCreateListHelper(listName);
     }
 
-    private void beginCreateListHelper(String listName)
+    private EditListDefinitionPage beginCreateListHelper(String listName)
     {
         if (!isElementPresent(Locator.linkWithText("Lists")))
         {
@@ -432,47 +389,26 @@ public class ListHelper extends LabKeySiteWrapper
 
         log("Add List");
         clickButton("Create New List");
-        setListName(listName);
-    }
-
-    private void setListName_OLD(String listName)
-    {
-        waitForElement(Locator.id("ff_name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("ff_name"), listName);
-        fireEvent(Locator.id("ff_name"), BaseWebDriverTest.SeleniumEvent.blur);
-    }
-
-    private void setListName(String listName)
-    {
-        if (!NEW_LIST_DESIGNER_ENABLED)
-        {
-            setListName_OLD(listName);
-            return;
-        }
-
-        // TODO move this to a ListPropertiesPanel test helper component
-        waitForElement(Locator.id("name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("name"), listName);
-        fireEvent(Locator.id("name"), BaseWebDriverTest.SeleniumEvent.blur);
+        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
+        listDefinitionPage.setListName(listName);
+        return listDefinitionPage;
     }
 
     public void createListFromFile(String containerPath, String listName, File inputFile)
     {
-        disableNewListDesigner();
-        beginCreateList(containerPath, listName);
+        disableGwtListDesigner();
+        EditListDefinitionPage listEditPage = beginCreateList(containerPath, listName);
+        listEditPage.getFieldsPanel()
+            .setInferFieldFile(inputFile);
 
-        click(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
-        //test.clickCheckbox("fileImport");
+        // assumes we intend to key on auto-integer
+        DomainFieldRow keyRow = listEditPage.getFieldsPanel().getField("Key");
+        if (keyRow != null)
+            keyRow.clickRemoveField(false);
+        listEditPage.selectAutoIntegerKeyField();
 
-        clickButton("Create List", 0);
-
-        waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.name("uploadFormElement"), inputFile);
-
-        waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        clickButton("Import");
+        // assumes we intend to import from file
+        listEditPage.clickSave();
     }
 
     /**
@@ -528,30 +464,12 @@ public class ListHelper extends LabKeySiteWrapper
         submitImportTsv_success();
     }
 
-    public EditListDefinitionPage clickEditDesign()
-    {
-        disableNewListDesigner();
-        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
-        waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.id("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        return new EditListDefinitionPage(getDriver());
-    }
-
     public EditListDefinitionPage goToEditDesign(String listName)
     {
+        disableGwtListDesigner();
         goToList(listName);
-
-        toggleNewListDesigner(true);
-        if (!NEW_LIST_DESIGNER_ENABLED)
-            waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
-        else
-            clickAndWait(Locator.lkButton("Design"));
-
-        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver(), NEW_LIST_DESIGNER_ENABLED);
-        toggleNewListDesigner(false);
-
-        return listDefinitionPage;
+        clickAndWait(Locator.lkButton("Design"));
+        return new EditListDefinitionPage(getDriver());
     }
 
     public void goToList(String listName)
@@ -559,32 +477,6 @@ public class ListHelper extends LabKeySiteWrapper
         // if we are on the Manage List page, click the list name first
         if (isElementPresent(Locators.bodyTitle("Available Lists")))
             clickAndWait(Locator.linkWithText(listName));
-    }
-
-    private void clickSave_OLD()
-    {
-        WebElement saveButton = Locator.lkButton("Save").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        scrollToTop(); // After clicking save, sometimes the page scrolls so that the project menu is under the mouse
-        saveButton.click();
-        waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void clickSave()
-    {
-        if (!NEW_LIST_DESIGNER_ENABLED)
-        {
-            clickSave_OLD();
-            return;
-        }
-
-        // TODO move this to a ListDesignerPage test helper
-        clickAndWait(Locator.button("Save").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
-    }
-
-    public void clickDeleteList()
-    {
-        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Delete List"), BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     /**
@@ -596,23 +488,6 @@ public class ListHelper extends LabKeySiteWrapper
     {
         PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(areaTitle).find()
                 .addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
-    }
-
-    public List<String> getColumnNames()
-    {
-        List<String> columns = new ArrayList<>();
-
-        List<WebElement> nameFields = Locator.xpath("//input[contains(@name, 'ff_name')]").findElements(getDriver());
-        for(WebElement webElement : nameFields)
-        {
-            // If it is not the list name element then add it to the list.
-            if (!webElement.getAttribute("name").trim().toLowerCase().equals("ff_name"))
-            {
-                columns.add(webElement.getAttribute("value"));
-            }
-        }
-
-        return columns;
     }
 
     public enum RangeType
@@ -643,14 +518,18 @@ public class ListHelper extends LabKeySiteWrapper
 
     public enum ListColumnType
     {
-        MultiLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"),
-        DateTime("DateTime"), // TODO remove this after GWT designer removed
+        MultiLine("Multi-Line Text"),
+        Integer("Integer"),
+        String("Text (String)"),
+        Subject("Subject/Participant (String)"),
         DateAndTime("Date Time"),
         Boolean("Boolean"),
-        Double("Number (Double)"), // TODO remove this after GWT designer removed
         Decimal("Decimal"),
-        File("File"), AutoInteger("Auto-Increment Integer"),
-        Flag("Flag (String)"), Attachment("Attachment"), User("User");
+        File("File"),
+        AutoInteger("Auto-Increment Integer"),
+        Flag("Flag (String)"),
+        Attachment("Attachment"),
+        User("User");
 
         private final String _description;
 

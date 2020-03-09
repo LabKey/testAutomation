@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -47,7 +46,17 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFormPanel addField(FieldDefinition fieldDefinition)
     {
         DomainFieldRow fieldRow = addField(fieldDefinition.getName());
+        return editField(fieldRow, fieldDefinition);
+    }
 
+    public DomainFormPanel setField(FieldDefinition fieldDefinition)
+    {
+        DomainFieldRow fieldRow = getField(fieldDefinition.getName());
+        return editField(fieldRow, fieldDefinition);
+    }
+
+    private DomainFormPanel editField(DomainFieldRow fieldRow, FieldDefinition fieldDefinition)
+    {
         if (fieldDefinition.getLookup() != null)
             fieldRow.setLookup(fieldDefinition.getLookup());
         else if (fieldDefinition.getType() != null)
