@@ -359,20 +359,32 @@ public class WebTestHelper
 
     public static Map<String, String> parseUrlQuery(URL url)
     {
-        String query = url.getQuery();
-        if (query.startsWith("?"))
-            query = query.substring(1);
-        String[] queryArgs = query.split("&");
+        if (url != null)
+            return parseUrlQueryString(url.getQuery());
 
-        Map<String, String> parsedQuery = new HashMap<>(queryArgs.length);
+        return Collections.emptyMap();
+    }
 
-        for (String arg : queryArgs)
+    public static Map<String, String> parseUrlQueryString(String query)
+    {
+        if (query != null)
         {
-            String[] split = arg.split("=", 2);
-            parsedQuery.put(split[0], split.length > 1 ? split[1] : null);
+            if (query.startsWith("?"))
+                query = query.substring(1);
+            String[] queryArgs = query.split("&");
+
+            Map<String, String> parsedQuery = new HashMap<>(queryArgs.length);
+
+            for (String arg : queryArgs)
+            {
+                String[] split = arg.split("=", 2);
+                parsedQuery.put(split[0], split.length > 1 ? split[1] : null);
+            }
+
+            return parsedQuery;
         }
 
-        return parsedQuery;
+        return Collections.emptyMap();
     }
 
     public static Connection getRemoteApiConnection()
