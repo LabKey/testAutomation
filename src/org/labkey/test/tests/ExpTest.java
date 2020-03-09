@@ -24,7 +24,10 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 
@@ -132,15 +135,15 @@ public class ExpTest extends BaseWebDriverTest
         clickButton("Save", 0);
         waitForElement(Locator.css(".labkey-status-info").withText("Saved"));
         clickButton("Edit Metadata");
+        DomainDesignerPage designerPage = new DomainDesignerPage(getDriver());
         int created_RowIndex = 5;
         waitForElement(Locator.name("ff_label" + created_RowIndex), WAIT_FOR_JAVASCRIPT);
 
         PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitle("Metadata Properties").find();
-        PropertiesEditor.FieldRow row = editor.selectField("Created");
-        row.setLabel("editedCreated");
-        PropertiesEditor.FieldPropertyDock.FormatTabPane tabPane = row.properties().selectFormatTab();
-        tabPane.setPropertyFormat("ddd MMM dd yyyy");
-        clickButton("Save", 0);
+        DomainFieldRow domainRow = designerPage.fieldsPanel().getField("Created");
+        domainRow.setLabel("editedCreated");
+        domainRow.setDateFormat("ddd MMM dd yyyy");
+        designerPage.clickFinish();
         waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
 
         // Verify that it ended up in the XML version of the metadata
@@ -163,17 +166,17 @@ public class ExpTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]")) - 1;
         Locator lastField = Locator.xpath("//input[@name='ff_label" + lastFieldIndex + "']");
-        click(lastField);
-        click(Locator.xpath("//span").append(Locator.lkButton("Alias Field")));
-        selectOptionByText(Locator.name("sourceColumn"), "RowId");
-        click(Locator.xpath("//span").append(Locator.lkButton("OK")));
+        domainRow = designerPage.fieldsPanel().getField(lastFieldIndex);
+        clickButton("Alias Field");
+        SelectWrapper.Select(Locator.tagWithAttribute("select", "name", "aliasField")).findWhenNeeded(getDriver()).selectByVisibleText("RowId");
+        clickButton("OK");
 
         // Make it a lookup into our custom query
         editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Metadata Properties").find();
         int fieldCount = getElementCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
         assertTrue(fieldCount > 0);
-        row = editor.selectField(fieldCount-1);
-        row.setType(new FieldDefinition.LookupInfo(null, "exp", "dataCustomQuery"));
+        domainRow = designerPage.fieldsPanel().getField(fieldCount-1);
+        domainRow.setType(FieldDefinition.ColumnType.Lookup).setFromSchema("exp").setFromTargetTable("dataCustomQuery");
 
         // Save it
         clickButton("Save", 0);
