@@ -137,6 +137,7 @@ public class FieldDefinition extends PropertyDescriptor
         else
         {
             super.setLookup(lookup.getSchema(), lookup.getTable(), lookup.getFolder());
+            setRangeURI(lookup.getTableType());
         }
         _lookup = lookup;
         return this;
