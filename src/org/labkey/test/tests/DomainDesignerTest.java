@@ -587,7 +587,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
      * @throws Exception
      */
     @Test
-    @Ignore("ignore this test until issue 38341 is resolved")
     public void showHideFieldOnDefaultGridView() throws Exception
     {
         String sampleSet = "showFieldOnDefaultGridViewSampleSet";
