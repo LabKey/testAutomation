@@ -14,8 +14,6 @@ import java.util.List;
 
 public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementCache>
 {
-    public final static String CURRENT_SAMPLE_TYPE_OPTION_TEXT = "(Current Sample Type)";
-    public final static String CURRENT_SAMPLE_SET_OPTION_TEXT = "(Current Sample Set)";
     public CreateSampleSetPage(WebDriver driver)
     {
         super(driver);
@@ -65,10 +63,9 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return elementCache()._designer.getNameExpression();
     }
 
-    public CreateSampleSetPage addParentColumnAlias(int index, String importHeader, String materialInputName)
+    public CreateSampleSetPage addParentColumnAlias(String importHeader, String materialInputName)
     {
-        elementCache()._designer.addParentAlias();
-        elementCache()._designer.setParentAlias(index, importHeader, materialInputName);
+        elementCache()._designer.addParentAlias(importHeader, materialInputName);
 
         return this;
     }

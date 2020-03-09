@@ -1,10 +1,12 @@
 package org.labkey.test.components.labkey.ui.samples;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
@@ -19,6 +21,8 @@ import static org.labkey.test.WebDriverWrapper.sleep;
  */
 public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.ElementCache>
 {
+    public final static String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
+
     private final WebElement _el;
     private final WebDriver _driver;
 
@@ -126,10 +130,10 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         return elementCache().descriptionInput.get();
     }
 
-    public SampleTypeDesigner addParentAlias(String alias, String optionDisplayText)
+    public SampleTypeDesigner addParentAlias(String alias, @Nullable String optionDisplayText)
     {
         int initialCount = elementCache().parentAliases().size();
-        addParentAlias();
+        elementCache().addAliasButton.click();
         setParentAlias(initialCount, alias, optionDisplayText);
         return this;
     }
@@ -140,18 +144,13 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         return this;
     }
 
-    public SampleTypeDesigner addParentAlias()
-    {
-        elementCache().addAliasButton.click();
-        return this;
-    }
-
-    public SampleTypeDesigner setParentAlias(int index, String alias, String optionDisplayText)
+    public SampleTypeDesigner setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
     {
         elementCache().parentAlias(index).setValue(alias);
-        elementCache().parentAliasSelect(index).click();
-        elementCache().selectParentOption(index, optionDisplayText).click();
-
+        if (optionDisplayText != null)
+        {
+            elementCache().parentAliasSelect(index).select(optionDisplayText);
+        }
         return this;
     }
 
@@ -162,7 +161,7 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
 
     public String getParentAliasSelectText(int index)
     {
-        return elementCache().parentAliasSelect(index).getText();
+        return elementCache().parentAliasSelect(index).getSelections().get(0);
     }
 
     protected class ElementCache extends Component<?>.ElementCache
@@ -187,19 +186,15 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
             return parentAliases().get(index);
         }
 
-        protected WebElement parentAliasSelect(int index)
+        protected ReactSelect parentAliasSelect(int index)
         {
-            return Locator.tagWithClass("div", "Select-control").findElements(getDriver()).get(index);
-        }
-
-        protected WebElement selectParentOption(int index, String optionDisplayText)
-        {
-            return Locator.tagWithText("div", optionDisplayText).findElements(getDriver()).get(index);
+            return ReactSelect.finder(getDriver()).locatedBy(Locator.byClass("sampleset-insert--parent-select"))
+                    .index(index).find(this);
         }
 
         protected WebElement removeParentAliasIcon(int index)
         {
-            return Locator.tagWithClass("i","container--removal-icon").findElements(getDriver()).get(index);
+            return Locator.tagWithClass("i","container--removal-icon").findElements(this).get(index);
         }
     }
 }
