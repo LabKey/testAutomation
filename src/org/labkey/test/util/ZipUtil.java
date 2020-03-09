@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -25,27 +26,30 @@ import java.util.zip.ZipOutputStream;
 
 public class ZipUtil
 {
-    private List<File> fileList;
-    private final File _dest;
     private final File _source;
 
-    public ZipUtil(File source, File destDir)
+    public ZipUtil(File source)
     {
-        fileList = new ArrayList<>();
         _source = source;
-        _dest = new File(destDir, source.getName() + ".zip");
-
     }
 
-    public File zipIt() throws IOException
+    public File zipInto(File destDir) throws IOException
     {
-        generateFileList(_source);
+        return zipIt(new File(destDir, _source.getName() + ".zip"));
+    }
 
-        System.out.println("Output to Zip : " + _dest.toString());
-        _dest.getParentFile().mkdirs();
-        _dest.createNewFile();
+    public File zipIt(File _dest) throws IOException
+    {
+        List<File> fileList = generateFileList(_source, new ArrayList<>());
 
-        int fileCount = 0;
+        TestLogger.log("Output to Zip : " + _dest.toString());
+        Files.createDirectories(_dest.getParentFile().toPath());
+        if (_dest.exists())
+        {
+            Files.delete(_dest.toPath());
+        }
+        Files.createFile(_dest.toPath());
+
         byte[] buffer = new byte[1024];
 
         try(
@@ -53,7 +57,7 @@ public class ZipUtil
                 ZipOutputStream zos = new ZipOutputStream(fos)
         )
         {
-            for (File file : this.fileList)
+            for (File file : fileList)
             {
                 ZipEntry ze = generateZipEntry(file);
                 zos.putNextEntry(ze);
@@ -66,18 +70,17 @@ public class ZipUtil
                         zos.write(buffer, 0, len);
                     }
                 }
-                fileCount++;
             }
 
             zos.closeEntry();
 
-            System.out.println(String.format("Zipped %d files", fileCount));
+            TestLogger.log(String.format("Zipped %d files", fileList.size()));
         }
 
         return _dest;
     }
 
-    private void generateFileList(File node)
+    private List<File> generateFileList(File node, List<File> fileList)
     {
         // add file only
         if (node.isFile())
@@ -87,12 +90,14 @@ public class ZipUtil
 
         if (node.isDirectory())
         {
-            String[] subNote = node.list();
-            for (String filename : subNote)
+            String[] subNodes = node.list();
+            for (String filename : subNodes)
             {
-                generateFileList(new File(node, filename));
+                generateFileList(new File(node, filename), fileList);
             }
         }
+
+        return fileList;
     }
 
     private ZipEntry generateZipEntry(File file)
