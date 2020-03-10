@@ -22,6 +22,7 @@ import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.ToggleButton;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.core.login.SvgCheckbox;
@@ -152,7 +153,17 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         return fieldsPanel;
     }
 
-    // todo; get autoimport slider, set autoimport
+    // note: auto-import slider is only shown when you've inferred fields from file
+    public EditListDefinitionPage setAutoImport(boolean autoImport)
+    {
+        elementCache().autoImportSlider().set(autoImport);
+        return this;
+    }
+
+    public boolean getAutoImport()
+    {
+        return elementCache().autoImportSlider().get();
+    }
 
     public EditListDefinitionPage setColumnName(int index, String name)
     {
@@ -243,6 +254,11 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         {
             return Locator.tagWithClass("button", "domain-field-float-right").withText("Advanced Settings")
                     .waitForElement(this, 2000);
+        }
+
+        ToggleButton autoImportSlider()
+        {
+            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Import Data").find();
         }
     }
 }
