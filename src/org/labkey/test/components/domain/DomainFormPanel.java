@@ -320,7 +320,16 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
     {
-        final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-form-panel");
+        private final String HEADER_ID = "domain-header"; // Default header
+        private final String HEADER_ID_PREFIX = "domainpropertiesrow"; // Prefix for header ID on multi-domain editors (Assays)
+        private final String PROPERTIES_HEADER_SUFFIX = "properties-hdr"; // By convention, headers for general properties end with this
+
+        private final Locator.XPathLocator _domainHeaderLocator =
+                Locator.tagWithClass("div", "domain-panel-header")
+                        .withoutAttributeContaining("id", PROPERTIES_HEADER_SUFFIX);
+
+        private final Locator.XPathLocator _panelLocator = Locator.tagWithClass("div", "domain-form-panel");
+
         private String _title = null;
 
         public DomainFormPanelFinder(WebDriver driver)
@@ -345,16 +354,13 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         {
             if (_title != null)
             {
-                Locator.XPathLocator titleLoc = Locator.tagWithClass("div", "domain-panel-header").child(Locator.tag("span")).startsWith(_title);
-                return getBaseLocator().withDescendant(titleLoc);
+                Locator.XPathLocator titleLoc = Locator.byClass("domain-panel-title").startsWith(_title);
+                return _panelLocator.withDescendant(titleLoc);
             }
             else
-                return getBaseLocator();
-        }
-
-        public Locator.XPathLocator getBaseLocator()
-        {
-            return _baseLocator;
+            {
+                return _panelLocator.withChild(_domainHeaderLocator);
+            }
         }
     }
 }
