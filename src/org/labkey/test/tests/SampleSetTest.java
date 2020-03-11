@@ -47,6 +47,7 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -2009,7 +2010,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 .goToCreateNewSampleSet()
                 .setName(LOWER_CASE_SAMPLE_SET)
                 .clickSaveExpectingError();
-        assertEquals("Sample Type creation error", Arrays.asList("A sample set with that name already exists."), getTexts(errors));
+        assertEquals("Sample Type creation error", Arrays.asList("A Sample Type with that name already exists."), getTexts(errors));
         clickProject(PROJECT_NAME);
         assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_SET));
         assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLE_SET));
@@ -2102,9 +2103,9 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Remove the attachment columns and validate that everything still works.");
         clickFolder(FOLDER_NAME);
-        DomainDesignerPage domainDesignerPage = sampleHelper.goToEditSampleSetFields(sampleSetName);
-        domainDesignerPage.fieldsPanel().removeField("FileAttachment", true);
-        domainDesignerPage.clickFinish();
+        UpdateSampleSetPage domainDesignerPage = sampleHelper.goToEditSampleSet(sampleSetName);
+        domainDesignerPage.getDomainEditor().removeField("FileAttachment", true);
+        domainDesignerPage.clickSave();
 
         expectedHeaders.remove("File Attachment");
         exportGridVerifyRowCountAndHeader(3, expectedHeaders);

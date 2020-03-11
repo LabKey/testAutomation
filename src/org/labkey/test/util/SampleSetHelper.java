@@ -220,13 +220,6 @@ public class SampleSetHelper extends WebDriverWrapper
         return new UpdateSampleSetPage(getDriver());
     }
 
-    public DomainDesignerPage goToEditSampleSetFields(String name)
-    {
-        goToSampleSet(name);
-        waitAndClickAndWait(Locator.lkButton("Edit Fields"));
-        return new DomainDesignerPage(getDriver());
-    }
-
     public static List<FieldDefinition> convertFieldMap(Map<String, FieldDefinition.ColumnType> fields)
     {
         return fields.entrySet().stream()

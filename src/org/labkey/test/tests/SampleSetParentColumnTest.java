@@ -10,7 +10,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
-import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -698,17 +698,14 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         clickButton("Update");
 
         clickFolder(SUB_FOLDER_NAME);
-        DomainDesignerPage domainDesignerPage = sampleHelper.goToEditSampleSetFields(SAMPLE_SET_NAME);
-        domainDesignerPage.fieldsPanel().addField(GOOD_PARENT_NAME);
-        domainDesignerPage.clickFinishExpectingError();
+        UpdateSampleSetPage updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
+        updatePage.getDomainEditor().addField(GOOD_PARENT_NAME);
+        List<String> errors = getTexts(updatePage.clickSaveExpectingError());
 
-        errorMsgLocator = Locator.tagWithClass("div", "alert-danger");
-        waitForElement(errorMsgLocator);
         String errorMsgExpectedTxt = "'" + GOOD_PARENT_NAME + "' is a reserved field name in '" + SAMPLE_SET_NAME + "'.";
-        Assert.assertThat("Error message", errorMsgLocator.findElement(getDriver()).getText(), CoreMatchers.containsString(errorMsgExpectedTxt));
+        Assert.assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
 
-        domainDesignerPage.fieldsPanel().removeField(GOOD_PARENT_NAME);
-        domainDesignerPage.clickFinish();
+        updatePage.clickCancel();
 
         log("Validated name conflicts.");
     }

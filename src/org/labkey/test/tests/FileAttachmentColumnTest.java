@@ -24,7 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
-import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -143,9 +143,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         // add a 'file' column
         log("editing fields for sample set");
         clickFolder(FOLDER_NAME);
-        DomainDesignerPage domainDesignerPage = sampleHelper.goToEditSampleSetFields(SAMPLESET_NAME);
-        domainDesignerPage.fieldsPanel().addField(new FieldDefinition("File", FieldDefinition.ColumnType.File));
-        domainDesignerPage.clickFinish();
+        UpdateSampleSetPage updatePage = sampleHelper.goToEditSampleSet(SAMPLESET_NAME);
+        updatePage.addFields(List.of(new FieldDefinition("File", FieldDefinition.ColumnType.File)));
+        updatePage.clickSave();
 
         StringBuilder sb = new StringBuilder("Name\tcolor\tfile\n");
         for (File file : DATAFILE_DIRECTORY.listFiles())
