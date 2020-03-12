@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
@@ -43,13 +42,12 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.domain.DomainFieldRow;
-import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -656,28 +654,16 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_label"), "Sample1");
         clickButton("Submit");
 
-        log("Creating the list");
-        goToProjectHome();
-        lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)));
+        log("Creating the list via API");
+        ListDefinition listDef = new ListDefinition(listName);
+        listDef.setKeyName("id");
+        listDef.addField(new FieldDefinition("name", FieldDefinition.ColumnType.String));
+        listDef.addField(new FieldDefinition("lookUpField",
+                new FieldDefinition.LookupInfo(null, "exp.materials", "10000Samples")
+                        .setTableType(FieldDefinition.ColumnType.Integer))
+                .setDescription("LookUp in same container with 10000 samples"));
 
-        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "VarList", Map.of("keyName", "id"));
-
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-
-        log("Adding the lookUp field in the list");
-        DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
-                .setType(FieldDefinition.ColumnType.Lookup)
-                .expand()
-                .setFromFolder("Current Folder")
-                .setFromSchema("exp.materials")
-                .setFromTargetTable("10000Samples (Integer)")
-                .setDescription("LookUp in same container with 10000 samples");
-
-        domainDesignerPage.clickFinish();
+        listDef.getCreateCommand().execute(createDefaultConnection(true), getProjectName());
 
         log("Inserting the new row in the list with the newly created sample as lookup");
         goToProjectHome();

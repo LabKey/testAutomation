@@ -385,9 +385,12 @@ public class TestDataGenerator
         return new TestDataValidator(_lookupInfo, _columns, _rows);
     }
 
-    // helper to generate a column or field definition
+    /**
+     * @deprecated Inline this.
+     */
+    @Deprecated
     static public PropertyDescriptor simpleFieldDef(String name, FieldDefinition.ColumnType type)
     {
-        return new PropertyDescriptor(name, type.getJsonType());
+        return new FieldDefinition(name, type);
     }
 }

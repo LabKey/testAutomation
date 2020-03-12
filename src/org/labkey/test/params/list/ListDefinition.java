@@ -16,17 +16,24 @@ import java.util.Map;
  */
 public class ListDefinition extends DomainProps
 {
-    private static final String AUTO_INCREMENT_KIND = "IntList";
+    private static final String AUTO_INCREMENT_DOMAIN_KIND = "IntList";
     private static final String DOMAIN_KIND = "VarList";
 
     private String _name;
     private String _description;
     private List<FieldDefinition> _fields = new ArrayList<>();
-    private boolean _autoIncrementKey = true;
+    private String _autoIncrementKey = null;
+    private String _keyName;
 
     public ListDefinition(String name)
     {
         _name = name;
+    }
+
+    public ListDefinition setAutoIncrementKeyName(String keyName)
+    {
+        _autoIncrementKey = keyName;
+        return this;
     }
 
     public String getName()
@@ -48,6 +55,17 @@ public class ListDefinition extends DomainProps
     public ListDefinition setDescription(String description)
     {
         _description = description;
+        return this;
+    }
+
+    public String getKeyName()
+    {
+        return _keyName;
+    }
+
+    public ListDefinition setKeyName(String keyName)
+    {
+        _keyName = keyName;
         return this;
     }
 
@@ -74,9 +92,9 @@ public class ListDefinition extends DomainProps
     {
         Domain domain = new Domain(getName());
         ArrayList<PropertyDescriptor> fields = new ArrayList<>(getFields());
-        if (_autoIncrementKey)
+        if (_autoIncrementKey != null)
         {
-            fields.add(new FieldDefinition("Key", FieldDefinition.ColumnType.Integer).setPrimaryKey(true));
+            fields.add(new FieldDefinition(_autoIncrementKey, FieldDefinition.ColumnType.Integer).setPrimaryKey(true));
         }
         domain.setFields(fields);
         domain.setDescription(getDescription());
@@ -87,7 +105,7 @@ public class ListDefinition extends DomainProps
     @Override
     protected String getKind()
     {
-        return _autoIncrementKey ? AUTO_INCREMENT_KIND : DOMAIN_KIND;
+        return _autoIncrementKey != null ? AUTO_INCREMENT_DOMAIN_KIND : DOMAIN_KIND;
     }
 
     @NotNull
@@ -97,6 +115,7 @@ public class ListDefinition extends DomainProps
         Map<String, Object> json = new HashMap<>();
         json.put("name", getName());
         json.put("description", getDescription());
+        json.put("keyName", getKeyName());
         return json;
     }
 }
