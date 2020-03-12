@@ -10,8 +10,10 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
+import org.labkey.test.components.react.ReactInput;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -329,7 +331,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         elementCache().setCharCountRadio.set(true);
         getWrapper().waitFor(() -> !isCharCountDisabled(),
                 "character count input did not become enabled in time", 1000);
-        elementCache().charScaleInput.setValue(strCharCount);
+        elementCache().charScaleInput.setWithJs(strCharCount);
+        elementCache().charScaleInput.getComponentElement().sendKeys(Keys.ENTER);
+        WebDriverWrapper.sleep(1000); // ugh;
         return this;
     }
 
@@ -735,7 +739,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this));
         public RadioButton setCharCountRadio = new RadioButton(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-customLength-")
                 .refindWhenNeeded(this));
-        public Input charScaleInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-scale")
+        public ReactInput charScaleInput = new ReactInput(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-scale")
                 .refindWhenNeeded(this), getDriver());
 
         public Locator.XPathLocator getCharScaleInputLocForRow(int rowIndex)

@@ -18,10 +18,10 @@ package org.labkey.test.tests.list;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.domain.DomainFieldRow;
@@ -123,6 +123,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
      * Uses: Lists and the List Designer
      */
     @Test
+    @Ignore // remove when resolved: https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=39938
     public void testColumnResizing()
     {
         setUpList(LIST_NAME);
@@ -179,6 +180,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
      * Uses: Lists and the List Designer
      */
     @Test
+    @Ignore // remove when resolved: https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=39938
     public void testResizeColumnWithData()
     {
         //Create List
@@ -194,8 +196,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         row.put(FOUR_K_COLUMN_NAME, EXACTLY_4K);
 
         //Insert row into List
-        goToManageLists();
-        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.goToList(listName);
         _listHelper.insertNewRow(row);
 
         log("Change column with existing larger data");

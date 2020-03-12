@@ -69,7 +69,10 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         if (fieldDefinition.getFormat() != null)
             fieldRow.setNumberFormat(fieldDefinition.getFormat());
         if (fieldDefinition.getScale() != null)
-            fieldRow.setCharCount(fieldDefinition.getScale());
+            if (fieldDefinition.getScale() <= 4000)
+                fieldRow.setCharCount(fieldDefinition.getScale());
+            else
+                fieldRow.allowMaxChar();
         if (fieldDefinition.getURL() != null)
             fieldRow.setUrl(fieldDefinition.getURL());
         if (fieldDefinition.isMvEnabled())
