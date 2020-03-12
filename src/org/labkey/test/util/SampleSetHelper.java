@@ -19,8 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
@@ -218,30 +216,6 @@ public class SampleSetHelper extends WebDriverWrapper
         goToSampleSet(name);
         waitAndClickAndWait(Locator.lkButton("Edit Set"));
         return new UpdateSampleSetPage(getDriver());
-    }
-
-    public static List<FieldDefinition> convertFieldMap(Map<String, FieldDefinition.ColumnType> fields)
-    {
-        return fields.entrySet().stream()
-                .map(entry -> new FieldDefinition(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-    }
-
-    @LogMethod
-    public SampleSetHelper addFields(Map<String, FieldDefinition.ColumnType> fields)
-    {
-        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
-
-        if (fields != null && !fields.isEmpty())
-        {
-            DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-            fields.forEach((name, type) -> domainFormPanel.addField(new FieldDefinition(name, type)));
-            domainDesignerPage.clickFinish();
-        }
-        else
-            clickButton("Cancel");
-
-        return this;
     }
 
     public void verifyFields(List<FieldDefinition> _fields)
