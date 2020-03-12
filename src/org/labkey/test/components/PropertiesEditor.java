@@ -774,7 +774,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             else
                 Locator.tagWithClass("div", "test-marker-" + lookup.getSchema()).descendant("input").withAttribute("name", "schema").waitForElement(this, WAIT_FOR_JAVASCRIPT);
 
-            selectLookupTableComboItem(lookup.getTable(), lookup.getTableType());
+            selectLookupTableComboItem(lookup.getTable(), lookup.getTableType().getJsonType());
             return this;
         }
 

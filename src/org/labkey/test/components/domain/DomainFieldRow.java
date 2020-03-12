@@ -366,10 +366,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         setType(FieldDefinition.ColumnType.Lookup);
         setFromFolder(lookupInfo.getFolder());
         setFromSchema(lookupInfo.getSchema());
-        String tableType = lookupInfo.getTableType();
-        if (tableType == null)
+        if (lookupInfo.getTableType() == null)
             throw new IllegalArgumentException("No lookup type specified for " + lookupInfo.getTable());
-        setFromTargetTable(lookupInfo.getTable() + " (" + tableType.substring(0,1).toUpperCase() + tableType.substring(1) + ")");
+        String tableType = lookupInfo.getTableType().name();
+        setFromTargetTable(lookupInfo.getTable() + " (" + tableType + ")");
         return this;
     }
 

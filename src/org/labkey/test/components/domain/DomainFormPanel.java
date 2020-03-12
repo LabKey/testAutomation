@@ -66,6 +66,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             fieldRow.setMissingValue(fieldDefinition.getMvEnabled());
         if (fieldDefinition.getRequired())
             fieldRow.setRequiredField(fieldDefinition.getRequired());
+        if (fieldDefinition.getLookupValidatorEnabled() != null)
+            fieldRow.setLookupValidatorEnabled(fieldDefinition.getLookupValidatorEnabled());
 
         if (fieldDefinition.getValidator() != null)
         {
@@ -308,8 +310,6 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
         WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
 
-        // TODO since the Assay Properties panel also has the notion of expand/collapse,
-        //  we should split that part out into an Abstract test class that both can use
         WebElement expandToggle = Locator.tagWithClass("svg", "domain-form-expand-btn").findWhenNeeded(DomainFormPanel.this);
         Locator.XPathLocator panelTitleLoc = Locator.tagWithClass("span", "domain-panel-title");
         WebElement panelTitle = panelTitleLoc.findWhenNeeded(DomainFormPanel.this);
@@ -320,14 +320,6 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
     {
-        private final String HEADER_ID = "domain-header"; // Default header
-        private final String HEADER_ID_PREFIX = "domainpropertiesrow"; // Prefix for header ID on multi-domain editors (Assays)
-        private final String PROPERTIES_HEADER_SUFFIX = "properties-hdr"; // By convention, headers for general properties end with this
-
-        private final Locator.XPathLocator _domainHeaderLocator =
-                Locator.tagWithClass("div", "domain-panel-header")
-                        .withoutAttributeContaining("id", PROPERTIES_HEADER_SUFFIX);
-
         private final Locator.XPathLocator _panelLocator = Locator.tagWithClass("div", "domain-form-panel");
 
         private String _title = null;
@@ -359,7 +351,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             }
             else
             {
-                return _panelLocator.withChild(_domainHeaderLocator);
+                return _panelLocator;
             }
         }
     }

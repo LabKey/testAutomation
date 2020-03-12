@@ -52,7 +52,7 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
 
     public DomainFormPanel getDomainEditor()
     {
-        return elementCache()._domainFormPanel.expand();
+        return elementCache()._fieldEditorPanel.expand();
     }
 
     public SampleTypeDesigner removeField(boolean confirmDialogExpected, String fieldName)
@@ -171,7 +171,7 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         protected final Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver()).findWhenNeeded(this);
         protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
 
-        protected final DomainFormPanel _domainFormPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).timeout(1000).findWhenNeeded(this);
+        protected final DomainFormPanel _fieldEditorPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).index(1).timeout(1000).findWhenNeeded(this);
 
         protected final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
         protected final WebElement saveButton = Locator.button("Save").findWhenNeeded(this);

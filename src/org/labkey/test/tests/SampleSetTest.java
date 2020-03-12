@@ -41,7 +41,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
-import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
@@ -1486,7 +1485,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 .setRequired(false));
         SampleSetDefinition def = new SampleSetDefinition(SAMPLE_SET_NAME).setFields(fields);
         sampleHelper.createSampleSet(def);
-
+        sampleHelper.goToSampleSet(SAMPLE_SET_NAME);
         sampleHelper.bulkImport(sampleData);
 
         // Change the view so the missing value indicator is there and for the screen shot is useful on failure.
@@ -2016,16 +2015,11 @@ public class SampleSetTest extends BaseWebDriverTest
 
         goToProjectHome();
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(SAMPLE_SET);
-        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
-        domainDesignerPage.fieldsPanel()
-                .addField("Key")
-                .setLabel(lookupColumnLabel)
-                .setType(FieldDefinition.ColumnType.Lookup)
-                .setFromSchema("lists")
-                .setFromTargetTable(listName + " (Integer)")
-                .setLookupValidatorEnabled(true);
-        domainDesignerPage.clickFinish();
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET);
+        definition.addField(new FieldDefinition("Key",
+                new FieldDefinition.LookupInfo(null, "lists", listName)
+                        .setTableType(FieldDefinition.ColumnType.Integer)).setLabel(lookupColumnLabel).setLookupValidatorEnabled(true));
+        sampleHelper.createSampleSet(definition);
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(SAMPLE_SET));

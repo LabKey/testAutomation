@@ -36,6 +36,7 @@ public class FieldDefinition extends PropertyDescriptor
     private Boolean _shownInInsertView;
     private Boolean _shownInUpdateView;
     private Boolean _isPrimaryKey;
+    private Boolean _lookupValidatorEnabled;
 
     public FieldDefinition(String name, ColumnType type)
     {
@@ -73,6 +74,8 @@ public class FieldDefinition extends PropertyDescriptor
             json.put("shownInInsertView", getShownInInsertView());
         if (getShownInUpdateView() != null)
             json.put("shownInUpdateView", getShownInUpdateView());
+        if (getLookupValidatorEnabled() != null)
+            json.put("lookupValidatorEnabled", getLookupValidatorEnabled());
 
         return json;
     }
@@ -137,7 +140,7 @@ public class FieldDefinition extends PropertyDescriptor
         else
         {
             super.setLookup(lookup.getSchema(), lookup.getTable(), lookup.getFolder());
-            setRangeURI(lookup.getTableType());
+            setRangeURI(lookup.getTableType().getJsonType());
         }
         _lookup = lookup;
         return this;
@@ -191,6 +194,17 @@ public class FieldDefinition extends PropertyDescriptor
     public FieldDefinition setPrimaryKey(Boolean isPrimaryKey)
     {
         _isPrimaryKey = isPrimaryKey;
+        return this;
+    }
+
+    public Boolean getLookupValidatorEnabled()
+    {
+        return _lookupValidatorEnabled;
+    }
+
+    public FieldDefinition setLookupValidatorEnabled(Boolean lookupValidatorEnabled)
+    {
+        _lookupValidatorEnabled = lookupValidatorEnabled;
         return this;
     }
 
@@ -309,7 +323,7 @@ public class FieldDefinition extends PropertyDescriptor
         private String _folder;
         private String _schema;
         private String _table;
-        private String _tableType;
+        private ColumnType _tableType;
 
         public LookupInfo(@Nullable String folder, String schema, String table)
         {
@@ -320,6 +334,7 @@ public class FieldDefinition extends PropertyDescriptor
 
             _schema = ("".equals(schema) ? null : schema);
             _table = ("".equals(table) ? null : table);
+            setTableType(ColumnType.String);
         }
 
         public String getFolder()
@@ -337,20 +352,20 @@ public class FieldDefinition extends PropertyDescriptor
             return _table;
         }
 
-        public String getTableType()
+        public ColumnType getTableType()
         {
             return _tableType;
         }
 
-        @Deprecated
+        @Deprecated (forRemoval = true)
         public LookupInfo setTableType(String tableType)
         {
-            _tableType = tableType;
+            _tableType = "int".equals(tableType) ? ColumnType.Integer : ColumnType.String;
             return this;
         }
         public LookupInfo setTableType(ColumnType tableType)
         {
-            _tableType = tableType._jsonType;
+            _tableType = tableType;
             return this;
         }
 
