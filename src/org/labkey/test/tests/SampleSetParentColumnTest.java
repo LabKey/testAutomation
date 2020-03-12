@@ -218,14 +218,15 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         // in order to see the sample set in the dataregion
         refresh();
 
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-
         log("Add a parent alias column to the sample set.");
-        sampleHelper.goToEditSampleSet(sampleSetName);
+        UpdateSampleSetPage updatePage = new SampleSetHelper(this).goToEditSampleSet(sampleSetName);
 
-        sampleHelper.addParentColumnAlias(parentColumnAliases);
+        for(String importHeader : parentColumnAliases.keySet())
+        {
+            updatePage.addParentColumnAlias(importHeader, parentColumnAliases.get(importHeader));
+        }
 
-        clickButton("Update");
+        updatePage.clickSave();
 
     }
 
@@ -617,9 +618,10 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         log("Remove the parent alias column");
         clickButton("Edit Set");
 
-        sampleHelper = new SampleSetHelper(this);
+        UpdateSampleSetPage updatePage = new UpdateSampleSetPage(getDriver());
 
-        sampleHelper.removeParentColumnAlias(PARENT_COLUMN);
+        updatePage.removeParentAlias(PARENT_COLUMN);
+        updatePage.clickSave();
 
         log("Import some more samples using the alias column and make sure it doesn't work.");
         sampleText = "Name\t" + PARENT_COLUMN + "\n" +
@@ -684,23 +686,22 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
 
         log("Add a parent alias column to the sample set that conflicts with a given column name.");
-        sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
-        sampleHelper.addParentColumnAlias(Map.of(ALIAS_NAME_CONFLICT, CURRENT_SAMPLE_SET_OPTION));
-        clickButton("Update");
+        UpdateSampleSetPage updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
+        updatePage.addParentColumnAlias(ALIAS_NAME_CONFLICT, CURRENT_SAMPLE_SET_OPTION);
+        List<String> errors = getTexts(updatePage.clickSaveExpectingError());
 
-        Locator errorMsgLocator = Locator.tagWithClass("div", "labkey-error");
-        Assert.assertTrue("Error message is not present.", isElementPresent(errorMsgLocator));
-        Assert.assertTrue("Error message is not visible.", isElementVisible(errorMsgLocator));
-        Assert.assertEquals("Error message not as expected.", "A sample set property already exists with parent alias header: " + ALIAS_NAME_CONFLICT, errorMsgLocator.findElement(getDriver()).getText());
+        Assert.assertEquals("Error message not as expected.",
+                "A sample set property already exists with parent alias header: " + ALIAS_NAME_CONFLICT,
+                String.join("\n", errors));
 
         log("Now add a valid parent column and check that you cannot now add a field in the sample set with the same name.");
-        sampleHelper.addParentColumnAlias(Map.of(GOOD_PARENT_NAME, CURRENT_SAMPLE_SET_OPTION));
-        clickButton("Update");
+        updatePage.setParentAlias(1, GOOD_PARENT_NAME, CURRENT_SAMPLE_SET_OPTION);
+        updatePage.clickSave();
 
         clickFolder(SUB_FOLDER_NAME);
-        UpdateSampleSetPage updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
+        updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
         updatePage.getDomainEditor().addField(GOOD_PARENT_NAME);
-        List<String> errors = getTexts(updatePage.clickSaveExpectingError());
+        errors = getTexts(updatePage.clickSaveExpectingError());
 
         String errorMsgExpectedTxt = "'" + GOOD_PARENT_NAME + "' is a reserved field name in '" + SAMPLE_SET_NAME + "'.";
         Assert.assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));

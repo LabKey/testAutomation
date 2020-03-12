@@ -45,6 +45,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -164,9 +165,9 @@ public class SampleSetTest extends BaseWebDriverTest
                 "Sampledefg\t1046\tzeta";
         projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(LINEAGE_SAMPLE_SET_NAME, null,
-                Map.of("IntCol", FieldDefinition.ColumnType.Integer,
-                        "StringCol", FieldDefinition.ColumnType.String),
+        sampleHelper.createSampleSet(new SampleSetDefinition(LINEAGE_SAMPLE_SET_NAME).setFields(
+                List.of(new FieldDefinition("IntCol", ColumnType.Integer),
+                        new FieldDefinition("StringCol", ColumnType.String))),
                 sampleText);
 
         // at this point, we're in the LINEAGE_FOLDER, on the Experiment tab, looking at the sample sets properties and Sample Set contents webparts.
@@ -197,8 +198,8 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         final String sampleSetName = "SimpleCreateNoExp";
         final List<FieldDefinition> fields = List.of(
-                new FieldDefinition("StringValue", FieldDefinition.ColumnType.String),
-                new FieldDefinition("IntValue", FieldDefinition.ColumnType.Integer));
+                new FieldDefinition("StringValue", ColumnType.String),
+                new FieldDefinition("IntValue", ColumnType.Integer));
 
         SampleSetDefinition sampleSetDefinition = new SampleSetDefinition(sampleSetName).setFields(fields);
 
@@ -231,7 +232,7 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         String sampleSetName = "SimpleCreateWithExp";
         List<String> fieldNames = Arrays.asList("StringValue", "FloatValue");
-        List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(fieldNames.get(0)), new FieldDefinition(fieldNames.get(1), FieldDefinition.ColumnType.Decimal));
+        List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(fieldNames.get(0)), new FieldDefinition(fieldNames.get(1), ColumnType.Decimal));
         SampleSetHelper sampleSetHelper = new SampleSetHelper(this);
         log("Create a new sample set with a name and name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
@@ -282,7 +283,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Create a new sample set with a name");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(sampleSetName, null, Map.of("StringValue", FieldDefinition.ColumnType.String));
+        sampleHelper.createSampleSet(sampleSetName, null, List.of(new FieldDefinition("StringValue", ColumnType.String)));
 
         log("Go to the sample set and add some data");
         clickAndWait(Locator.linkWithText(sampleSetName));
@@ -363,9 +364,9 @@ public class SampleSetTest extends BaseWebDriverTest
         // create a sampleset with the following explicit domain columns
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "implicitParentage", getCurrentContainerPath())
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer),
-                        TestDataGenerator.simpleFieldDef("stringData", FieldDefinition.ColumnType.String)
+                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("data", ColumnType.Integer),
+                        TestDataGenerator.simpleFieldDef("stringData", ColumnType.String)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addRow(List.of("A", 12, dgen.randomString(15)));
@@ -443,8 +444,8 @@ public class SampleSetTest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "badLookupTest", getCurrentContainerPath())
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer)
+                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("data", ColumnType.Integer)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
@@ -470,10 +471,10 @@ public class SampleSetTest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "sampleData", getCurrentContainerPath())
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("strData", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("intData", FieldDefinition.ColumnType.Integer),
-                        TestDataGenerator.simpleFieldDef("floatData", FieldDefinition.ColumnType.Double)
+                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("strData", ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("intData", ColumnType.Integer),
+                        TestDataGenerator.simpleFieldDef("floatData", ColumnType.Double)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "A", "strData", "argy", "intData", 6, "floatData", 2.5));
@@ -487,12 +488,12 @@ public class SampleSetTest extends BaseWebDriverTest
         // create another with a lookup to it
         TestDataGenerator lookupDgen = new TestDataGenerator("exp.materials", "sampleLookups", getCurrentContainerPath())
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("strLookup", FieldDefinition.ColumnType.String)
+                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("strLookup", ColumnType.String)
                                 .setLookup("exp.materials", "sampleData", lookupContainer),
-                        TestDataGenerator.simpleFieldDef("intLookup", FieldDefinition.ColumnType.Integer)
+                        TestDataGenerator.simpleFieldDef("intLookup", ColumnType.Integer)
                                 .setLookup("exp.materials", "sampleData", lookupContainer),
-                        TestDataGenerator.simpleFieldDef("floatLooky", FieldDefinition.ColumnType.Double)
+                        TestDataGenerator.simpleFieldDef("floatLooky", ColumnType.Double)
                                 .setLookup("exp.materials", "sampleData", lookupContainer)
                 ));
         lookupDgen.createDomain(createDefaultConnection(true), "SampleSet");
@@ -523,8 +524,8 @@ public class SampleSetTest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "badParentLookup", getCurrentContainerPath())
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer)
+                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("data", ColumnType.Integer)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
@@ -562,9 +563,9 @@ public class SampleSetTest extends BaseWebDriverTest
         // create a sampleset with the following explicit domain columns
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "Family", getCurrentContainerPath())
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("age", FieldDefinition.ColumnType.Integer),
-                        TestDataGenerator.simpleFieldDef("height", FieldDefinition.ColumnType.Integer)
+                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("age", ColumnType.Integer),
+                        TestDataGenerator.simpleFieldDef("height", ColumnType.Integer)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addRow(List.of("A", 56, 60));
@@ -633,8 +634,8 @@ public class SampleSetTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
+                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("label", ColumnType.String)));
         dgen.addDataSupplier("label", () -> dgen.randomString(10))
                 .withGeneratedRows(10000);
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
@@ -656,10 +657,10 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Creating the list via API");
         ListDefinition listDef = new ListDefinition(listName);
         listDef.setKeyName("id");
-        listDef.addField(new FieldDefinition("name", FieldDefinition.ColumnType.String));
+        listDef.addField(new FieldDefinition("name", ColumnType.String));
         listDef.addField(new FieldDefinition("lookUpField",
                 new FieldDefinition.LookupInfo(null, "exp.materials", "10000Samples")
-                        .setTableType(FieldDefinition.ColumnType.Integer))
+                        .setTableType(ColumnType.Integer))
                 .setDescription("LookUp in same container with 10000 samples"));
 
         listDef.getCreateCommand().execute(createDefaultConnection(true), getProjectName());
@@ -693,9 +694,9 @@ public class SampleSetTest extends BaseWebDriverTest
         // create a sampleset with the following explicit domain columns
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "bigLineage", getCurrentContainerPath())
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer),
-                        TestDataGenerator.simpleFieldDef("testIndex", FieldDefinition.ColumnType.Integer)
+                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
+                        TestDataGenerator.simpleFieldDef("data", ColumnType.Integer),
+                        TestDataGenerator.simpleFieldDef("testIndex", ColumnType.Integer)
                 ));
 
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
@@ -758,8 +759,8 @@ public class SampleSetTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null,
-                Map.of("Field01",  FieldDefinition.ColumnType.String),
+        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME)
+                        .setFields(List.of(new FieldDefinition("Field01",  ColumnType.String))),
                 sampleData);
 
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
@@ -784,9 +785,7 @@ public class SampleSetTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         log("Create a sample set with some potential parents");
-        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null,
-                null,
-                sampleData);
+        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME), sampleData);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         log("Derive one sample from another");
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
@@ -887,9 +886,7 @@ public class SampleSetTest extends BaseWebDriverTest
         portalHelper.addWebPart("Assay List");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         log("Create a sample set");
-        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null,
-                null,
-                sampleData);
+        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME), sampleData);
 
 //  Note that we currently will not find runs where the batch id references a sampleId.  See Issue 37918.
 //        log("Create an assay with sampleId in the batch fields");
@@ -927,7 +924,7 @@ public class SampleSetTest extends BaseWebDriverTest
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", DATA_ID_ASSAY);
         assayDesignerPage.goToResultsFields()
             .addField(SAMPLE_ID_FIELD_NAME)
-            .setType(FieldDefinition.ColumnType.Lookup)
+            .setType(ColumnType.Lookup)
             .setFromSchema("samples")
             .setFromTargetTable(SAMPLE_SET_NAME + " (Integer)");
         assayDesignerPage.clickFinish();
@@ -960,7 +957,7 @@ public class SampleSetTest extends BaseWebDriverTest
         assayDesignerPage = _assayHelper.createAssayDesign("General", RUN_ID_ASSAY);
         assayDesignerPage.goToRunFields()
                 .addField(SAMPLE_ID_FIELD_NAME)
-                .setType(FieldDefinition.ColumnType.Lookup)
+                .setType(ColumnType.Lookup)
                 .setFromSchema("samples")
                 .setFromTargetTable(SAMPLE_SET_NAME + " (Integer)");
         assayDesignerPage.clickFinish();
@@ -1094,8 +1091,8 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleData.add(Map.of("Name", "ud06", "Field01", "ff", "Description", "This is description for sample 6.", "Flag", "Flag Value 6"));
 
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null,
-                Map.of("Field01",  FieldDefinition.ColumnType.String),
+        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME)
+                        .setFields(List.of(new FieldDefinition("Field01",  ColumnType.String))),
                 sampleData);
 
         List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/SampleSetTestProject","UpdateAndDeleteFields", Arrays.asList("Name", "Flag/Comment", "Field01", "Description"));
@@ -1476,11 +1473,11 @@ public class SampleSetTest extends BaseWebDriverTest
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         List<FieldDefinition> fields = new ArrayList<>();
         fields.add(new FieldDefinition(REQUIRED_FIELD_NAME)
-                .setType(FieldDefinition.ColumnType.String)
+                .setType(ColumnType.String)
                 .setMvEnabled(false)
                 .setRequired(true));
         fields.add(new FieldDefinition(MISSING_FIELD_NAME)
-                .setType(FieldDefinition.ColumnType.String)
+                .setType(ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
         SampleSetDefinition def = new SampleSetDefinition(SAMPLE_SET_NAME).setFields(fields);
@@ -1719,20 +1716,21 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testCreateAndDeriveSamples()
     {
-        Map<String, FieldDefinition.ColumnType> sampleSetFields = Map.of("IntCol", FieldDefinition.ColumnType.Integer,
-                "StringCol", FieldDefinition.ColumnType.String,
-                "DateCol", FieldDefinition.ColumnType.DateAndTime,
-                "BoolCol", FieldDefinition.ColumnType.Boolean);
+        List<FieldDefinition> sampleSetFields = List.of(
+                new FieldDefinition("IntCol", ColumnType.Integer),
+                new FieldDefinition("StringCol", ColumnType.String),
+                new FieldDefinition("DateCol", ColumnType.DateAndTime),
+                new FieldDefinition("BoolCol", ColumnType.Boolean));
         File sampleSetFile = TestFileUtils.getSampleData("sampleSet.xlsx");
 
         clickProject(PROJECT_NAME);
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(PROJECT_SAMPLE_SET_NAME, null, sampleSetFields, sampleSetFile);
+        sampleHelper.createSampleSet(new SampleSetDefinition(PROJECT_SAMPLE_SET_NAME).setFields(sampleSetFields), sampleSetFile);
 
         clickFolder(FOLDER_NAME);
-        sampleHelper.createSampleSet(FOLDER_SAMPLE_SET_NAME, null,
-                Map.of("IntCol-Folder",  FieldDefinition.ColumnType.Integer,
-                       "StringCol-Folder", FieldDefinition.ColumnType.String),
+        sampleHelper.createSampleSet(new SampleSetDefinition(FOLDER_SAMPLE_SET_NAME).setFields(
+                List.of(new FieldDefinition("IntCol-Folder",  ColumnType.Integer),
+                        new FieldDefinition("StringCol-Folder", ColumnType.String))),
                 "Name\tIntCol-Folder\tStringCol-Folder\n" +
                         "SampleSetBVT11\t101\taa\n" +
                         "SampleSetBVT4\t102\tbb\n" +
@@ -1836,9 +1834,10 @@ public class SampleSetTest extends BaseWebDriverTest
         String sampleSetName = "TestAuditLogSampleSet";
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
         SampleSetHelper helper = new SampleSetHelper(this);
-        helper.createSampleSet(sampleSetName, null, Map.of(
-                "First", FieldDefinition.ColumnType.String,
-                "Second", FieldDefinition.ColumnType.Integer),
+        helper.createSampleSet(new SampleSetDefinition(sampleSetName).setFields(
+                List.of(
+                        new FieldDefinition("First", ColumnType.String),
+                        new FieldDefinition("Second", ColumnType.Integer))),
                 "Name\tFirst\tSecond\n" +
                         "Audit-1\tsome\t100");
 
@@ -1857,8 +1856,8 @@ public class SampleSetTest extends BaseWebDriverTest
 
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         log("Create parent sample set");
-        sampleHelper.createSampleSet(PARENT_SAMPLE_SET_NAME, null,
-                Map.of("IntCol",  FieldDefinition.ColumnType.Integer),
+        sampleHelper.createSampleSet(new SampleSetDefinition(PARENT_SAMPLE_SET_NAME).setFields(
+                List.of(new FieldDefinition("IntCol",  ColumnType.Integer))),
                 "Name\tIntCol\n" +
                         "SampleSetBVT11\t101\n" +
                         "SampleSetBVT4\t102\n" +
@@ -1868,8 +1867,8 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Create child sample set");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        sampleHelper.createSampleSet(FOLDER_CHILDREN_SAMPLE_SET_NAME, null,
-                Map.of("OtherProp", FieldDefinition.ColumnType.Decimal),
+        sampleHelper.createSampleSet(new SampleSetDefinition(FOLDER_CHILDREN_SAMPLE_SET_NAME).setFields(
+                List.of(new FieldDefinition("OtherProp", ColumnType.Decimal))),
                 "Name\tMaterialInputs/" + PARENT_SAMPLE_SET_NAME + "\tOtherProp\n" +
                         "SampleSetBVTChildA\tSampleSetBVT11\t1.1\n" +
                         "SampleSetBVTChildB\tSampleSetBVT4\t2.2\n"
@@ -1895,8 +1894,8 @@ public class SampleSetTest extends BaseWebDriverTest
         clickTab("Experiment");
         clickAndWait(Locator.linkWithText("Sample Sets"));
 
-        sampleHelper.createSampleSet(FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME, null,
-                Map.of("OtherProp", FieldDefinition.ColumnType.Decimal),
+        sampleHelper.createSampleSet(new SampleSetDefinition(FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME).setFields(
+                List.of(new FieldDefinition("OtherProp", ColumnType.Decimal))),
                 "Name\tMaterialInputs/" + FOLDER_CHILDREN_SAMPLE_SET_NAME + "\tOtherProp\n" +
                         "SampleSetBVTGrandchildA\tSampleSetBVTChildA,SampleSetBVTChildB\t11.11\n");
 
@@ -1962,14 +1961,14 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
         clickProject(PROJECT_NAME);
-        sampleHelper.createSampleSet(PROJECT_PARENT_SAMPLE_SET_NAME, null,
-                Map.of("Field1", FieldDefinition.ColumnType.String),
+        sampleHelper.createSampleSet(new SampleSetDefinition(PROJECT_PARENT_SAMPLE_SET_NAME).setFields(
+                List.of(new FieldDefinition("Field1", ColumnType.String))),
                 "Name\tField1\n" +
                         "ProjectS1\tsome value\n");
 
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        sampleHelper.createSampleSet("ChildOfProject", null,
-                Map.of("IntCol",  FieldDefinition.ColumnType.Integer),
+        sampleHelper.createSampleSet(new SampleSetDefinition("ChildOfProject").setFields(
+                List.of(new FieldDefinition("IntCol",  ColumnType.Integer))),
                 "Name\tMaterialInputs/" + PROJECT_PARENT_SAMPLE_SET_NAME + "\n" +
                         "COP1\tProjectS1\n");
 
@@ -1985,7 +1984,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         // make sure we are case-sensitive when creating samplesets -- regression coverage for issue 33743
         clickProject(PROJECT_NAME);
-        sampleHelper.createSampleSet(CASE_INSENSITIVE_SAMPLE_SET);
+        sampleHelper.createSampleSet(new SampleSetDefinition(CASE_INSENSITIVE_SAMPLE_SET));
 
         clickProject(PROJECT_NAME);
         List<WebElement> errors = sampleHelper
@@ -2018,7 +2017,7 @@ public class SampleSetTest extends BaseWebDriverTest
         SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET);
         definition.addField(new FieldDefinition("Key",
                 new FieldDefinition.LookupInfo(null, "lists", listName)
-                        .setTableType(FieldDefinition.ColumnType.Integer)).setLabel(lookupColumnLabel).setLookupValidatorEnabled(true));
+                        .setTableType(ColumnType.Integer)).setLabel(lookupColumnLabel).setLookupValidatorEnabled(true));
         sampleHelper.createSampleSet(definition);
 
         goToProjectHome();
@@ -2050,9 +2049,9 @@ public class SampleSetTest extends BaseWebDriverTest
 
         String sampleSetName = "FileAttachmentSampleSet";
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(sampleSetName, null,
-                Map.of("OtherProp", FieldDefinition.ColumnType.String,
-                        "FileAttachment", FieldDefinition.ColumnType.File),
+        sampleHelper.createSampleSet(new SampleSetDefinition(sampleSetName).setFields(
+                List.of(new FieldDefinition("OtherProp", ColumnType.String),
+                        new FieldDefinition("FileAttachment", ColumnType.File))),
                 "Name\tOtherProp\n" +
                         "FA-1\tOne\n" +
                         "FA-2\tTwo\n");

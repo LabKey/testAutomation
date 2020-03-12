@@ -24,9 +24,7 @@ import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -89,62 +87,41 @@ public class SampleSetHelper extends WebDriverWrapper
         createPage.clickSave();
     }
 
-    public SampleSetHelper createSampleSet(String name)
+    public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression, List<FieldDefinition> fields)
     {
-        return createSampleSet(name, null);
-    }
-
-    public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression)
-    {
-        return createSampleSet(name, nameExpression, null);
-    }
-
-    public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields)
-    {
-        SampleSetDefinition props = new SampleSetDefinition();
-        props.setName(name);
+        SampleSetDefinition props = new SampleSetDefinition(name);
         props.setNameExpression(nameExpression);
         if (fields != null)
         {
-            for (String fieldName : fields.keySet())
-            {
-                props.addField(new FieldDefinition(fieldName).setType(fields.get(fieldName)));
-            }
+            props.setFields(fields);
         }
 
         createSampleSet(props);
         return this;
     }
 
-    public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields, File dataFile)
+    public void createSampleSet(SampleSetDefinition definition, File dataFile)
     {
-        createSampleSet(name, nameExpression, fields);
-        goToSampleSet(name).bulkImport(dataFile);
+        createSampleSet(definition);
+        goToSampleSet(definition.getName()).bulkImport(dataFile);
     }
 
-    public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields, String data)
+    public void createSampleSet(SampleSetDefinition definition, String data)
     {
-        createSampleSet(name, nameExpression, fields);
-        goToSampleSet(name).bulkImport(data);
+        createSampleSet(definition);
+        goToSampleSet(definition.getName()).bulkImport(data);
     }
 
-    public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields, List<Map<String, String>> data)
+    public void createSampleSet(SampleSetDefinition definition, List<Map<String, String>> data)
     {
-        createSampleSet(name, nameExpression, fields);
-        goToSampleSet(name).bulkImport(data);
+        createSampleSet(definition);
+        goToSampleSet(definition.getName()).bulkImport(data);
     }
 
     public CreateSampleSetPage goToCreateNewSampleSet()
     {
         getSampleSetsList().clickHeaderButtonAndWait("New Sample Set");
         return new CreateSampleSetPage(getDriver());
-    }
-
-
-    public SampleSetHelper setNameExpression(String nameExpression)
-    {
-        new CreateSampleSetPage(getDriver()).setNameExpression(nameExpression);
-        return this;
     }
 
     public SampleSetHelper selectImportOption(String label, int index)
@@ -154,53 +131,6 @@ public class SampleSetHelper extends WebDriverWrapper
         String componentId = "insertOption" + index;
         String script = "Ext4.ComponentManager.get('" + componentId + "').setValue(" + (merge?"1":"0") + ")";
         executeScript(script);
-        return this;
-    }
-
-    public SampleSetHelper addParentColumnAlias(Map<String, String> aliases)
-    {
-        CreateSampleSetPage createSampleSetPage = new CreateSampleSetPage(getDriver());
-
-        int i = 0;
-        for(String importHeader : aliases.keySet())
-        {
-            createSampleSetPage.addParentColumnAlias(importHeader, aliases.get(importHeader));
-            i++;
-        }
-
-        return this;
-    }
-
-    public SampleSetHelper removeParentColumnAlias(String parentAlias)
-    {
-
-        List<WebElement> importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
-
-        int countOfInputs = importAliasInputs.size();
-
-        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() > countOfInputs, 1000);
-
-        importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
-
-        int index = 0;
-        for(WebElement input : importAliasInputs)
-        {
-            if(getFormElement(input).trim().equalsIgnoreCase(parentAlias.trim()))
-            {
-                break;
-            }
-            index++;
-        }
-
-        if(index == importAliasInputs.size())
-            throw new NoSuchElementException("No 'Parent Alias' with the value of '" + parentAlias + "' was found.");
-
-        importAliasInputs = Locator.tagWithClass("a", "removeAliasTrigger").findElements(getDriver());
-
-        importAliasInputs.get(index).click();
-
-        clickButton("Update");
-
         return this;
     }
 
@@ -266,16 +196,13 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void bulkImport(File dataFile, String importOption)
     {
-        if (dataFile != null)
-        {
-            DataRegionTable drt = getSamplesDataRegionTable();
-            TestLogger.log("Adding data from file");
-            drt.clickImportBulkData();
-            click(Locators.fileUpload);
-            selectImportOption(importOption, 0);
-            setFormElement(Locator.tagWithName("input", "file"), dataFile);
-            clickButton("Submit");
-        }
+        DataRegionTable drt = getSamplesDataRegionTable();
+        TestLogger.log("Adding data from file");
+        drt.clickImportBulkData();
+        click(Locators.fileUpload);
+        selectImportOption(importOption, 0);
+        setFormElement(Locator.tagWithName("input", "file"), dataFile);
+        clickButton("Submit");
     }
 
     public void setTsvData(String tsvData)

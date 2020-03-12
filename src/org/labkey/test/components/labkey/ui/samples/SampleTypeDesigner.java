@@ -9,6 +9,7 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.params.FieldDefinition;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -135,6 +136,26 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         int initialCount = elementCache().parentAliases().size();
         elementCache().addAliasButton.click();
         setParentAlias(initialCount, alias, optionDisplayText);
+        return this;
+    }
+
+    public SampleTypeDesigner removeParentAlias(String parentAlias)
+    {
+        int aliasIndex = -1;
+        List<Input> inputs = elementCache().parentAliases();
+        for (int i = 0; i < inputs.size(); i++)
+        {
+            if (inputs.get(i).get().equals(parentAlias))
+            {
+                aliasIndex = i;
+                break;
+            }
+        }
+        if (aliasIndex < 0)
+        {
+            throw new NotFoundException("No such parent alias: " + parentAlias);
+        }
+        elementCache().removeParentAliasIcon(aliasIndex).click();
         return this;
     }
 

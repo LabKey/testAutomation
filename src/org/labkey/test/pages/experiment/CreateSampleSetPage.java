@@ -70,6 +70,12 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return this;
     }
 
+    public CreateSampleSetPage setParentAlias(int index, String alias, String optionDisplayText)
+    {
+        elementCache()._designer.setParentAlias(index, alias, optionDisplayText);
+        return this;
+    }
+
     public String getParentAlias(int index)
     {
         return elementCache()._designer.getParentAlias(index);
@@ -78,6 +84,18 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
     public String getParentAliasSelectText(int index)
     {
         return elementCache()._designer.getParentAliasSelectText(index);
+    }
+
+    public CreateSampleSetPage removeParentAlias(int index)
+    {
+        elementCache()._designer.removeParentAlias(index);
+        return this;
+    }
+
+    public CreateSampleSetPage removeParentAlias(String parentAlias)
+    {
+        elementCache()._designer.removeParentAlias(parentAlias);
+        return this;
     }
 
     public CreateSampleSetPage addFields(List<FieldDefinition> fields)
