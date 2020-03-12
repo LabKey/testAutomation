@@ -466,7 +466,6 @@ public class ListHelper extends LabKeySiteWrapper
 
     public EditListDefinitionPage goToEditDesign(String listName)
     {
-        disableGwtListDesigner();
         goToList(listName);
         clickAndWait(Locator.lkButton("Design"));
         return new EditListDefinitionPage(getDriver());
