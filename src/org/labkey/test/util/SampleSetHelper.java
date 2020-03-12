@@ -244,22 +244,6 @@ public class SampleSetHelper extends WebDriverWrapper
         return this;
     }
 
-    public SampleSetHelper addFields(List<FieldDefinition> fields)
-    {
-        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
-
-        if (null != fields && !fields.isEmpty())
-        {
-            DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-            fields.forEach(domainFormPanel::addField);
-            domainDesignerPage.clickFinish();
-        }
-        else
-            clickButton("Cancel");
-
-        return this;
-    }
-
     public void verifyFields(List<FieldDefinition> _fields)
     {
         TestLogger.log("Verify that the fields for the sample set are as expected");

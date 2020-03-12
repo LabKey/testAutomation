@@ -1475,7 +1475,6 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleData.add(updateSample);
 
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(SAMPLE_SET_NAME);
         List<FieldDefinition> fields = new ArrayList<>();
         fields.add(new FieldDefinition(REQUIRED_FIELD_NAME)
                 .setType(FieldDefinition.ColumnType.String)
@@ -1485,10 +1484,8 @@ public class SampleSetTest extends BaseWebDriverTest
                 .setType(FieldDefinition.ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
-        sampleHelper.addFields(fields);
-
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
-        sampleHelper = new SampleSetHelper(this);
+        SampleSetDefinition def = new SampleSetDefinition(SAMPLE_SET_NAME).setFields(fields);
+        sampleHelper.createSampleSet(def);
 
         sampleHelper.bulkImport(sampleData);
 

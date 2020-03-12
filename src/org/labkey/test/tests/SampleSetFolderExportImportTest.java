@@ -277,7 +277,6 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
                 .setType(FieldDefinition.ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
-        sampleHelper.addFields(fields);
         SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME).setFields(fields);
         sampleHelper.createSampleSet(definition);
 
