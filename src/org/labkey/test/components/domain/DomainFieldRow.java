@@ -332,7 +332,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         getWrapper().waitFor(() -> !isCharCountDisabled(),
                 "character count input did not become enabled in time", 1000);
         elementCache().charScaleInput.setWithJs(strCharCount);
-        elementCache().charScaleInput.getComponentElement().sendKeys(Keys.ENTER);
+        elementCache().charScaleInput.getComponentElement().sendKeys(Keys.TAB);
         WebDriverWrapper.sleep(1000); // ugh;
         return this;
     }
