@@ -731,7 +731,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         assertElementPresent(Locator.linkWithText(issueIdC));
         assertElementPresent(Locator.linkWithText(issueIdB));
-        assertTextPresent(String.format("%s,%s", issueIdB, issueIdC));
+        assertTextPresent(String.format("%s,%s", issueIdC, issueIdB));
 
         // show related comments
         final Locator.XPathLocator related = Locator.tagWithClass("div", "relatedIssue");
