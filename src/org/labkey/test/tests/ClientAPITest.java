@@ -290,6 +290,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         // Create Larger list for query test.
         _listHelper.createListFromFile(getProjectName() + "/" + FOLDER_NAME, QUERY_LIST_NAME, TEST_XLS_DATA_FILE);
+        _listHelper.goToList(QUERY_LIST_NAME);
         waitForElement(Locator.linkWithText("Norbert"));
     }
 

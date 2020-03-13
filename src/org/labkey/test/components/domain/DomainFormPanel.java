@@ -46,7 +46,17 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFormPanel addField(FieldDefinition fieldDefinition)
     {
         DomainFieldRow fieldRow = addField(fieldDefinition.getName());
+        return editField(fieldRow, fieldDefinition);
+    }
 
+    public DomainFormPanel setField(FieldDefinition fieldDefinition)
+    {
+        DomainFieldRow fieldRow = getField(fieldDefinition.getName());
+        return editField(fieldRow, fieldDefinition);
+    }
+
+    private DomainFormPanel editField(DomainFieldRow fieldRow, FieldDefinition fieldDefinition)
+    {
         if (fieldDefinition.getLookup() != null)
             fieldRow.setLookup(fieldDefinition.getLookup());
         else if (fieldDefinition.getType() != null)
@@ -59,7 +69,10 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         if (fieldDefinition.getFormat() != null)
             fieldRow.setNumberFormat(fieldDefinition.getFormat());
         if (fieldDefinition.getScale() != null)
-            fieldRow.setCharCount(fieldDefinition.getScale());
+            if (fieldDefinition.getScale() <= 4000)
+                fieldRow.setCharCount(fieldDefinition.getScale());
+            else
+                fieldRow.allowMaxChar();
         if (fieldDefinition.getURL() != null)
             fieldRow.setUrl(fieldDefinition.getURL());
         if (fieldDefinition.getMvEnabled())

@@ -2006,6 +2006,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Infer from excel file, then import data");
         _listHelper.createListFromFile(getProjectName(), listName, TestFileUtils.getSampleData("dataLoading/excel/fruits.xls"));
+        _listHelper.goToList(listName);
         waitForElement(Locator.linkWithText("pomegranate"));
         assertNoLabKeyErrors();
         int listRowCount = new DataRegionTable.DataRegionFinder(getDriver()).withName("query")

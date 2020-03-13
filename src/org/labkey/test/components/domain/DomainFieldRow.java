@@ -12,6 +12,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -233,7 +234,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().descriptionTextArea));
-        getWrapper().setFormElement(elementCache().descriptionTextArea, description);
+        getWrapper().setFormElementJS(elementCache().descriptionTextArea, description);
         return this;
     }
 
@@ -327,10 +328,17 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         String strCharCount = Integer.toString(maxCharCount);
         elementCache().setCharCountRadio.set(true);
-        getWrapper().waitFor(() -> elementCache().charScaleInput.getComponentElement().getAttribute("disabled") == null,
+        getWrapper().waitFor(() -> !isCharCountDisabled(),
                 "character count input did not become enabled in time", 1000);
-        elementCache().charScaleInput.setValue(strCharCount);
+        getWrapper().setFormElementJS(elementCache().charScaleInput, strCharCount);
+        elementCache().charScaleInput.sendKeys(Keys.TAB);
+        WebDriverWrapper.sleep(1000); // ugh;
         return this;
+    }
+
+    public boolean isCharCountDisabled()
+    {
+        return elementCache().charScaleInput.getAttribute("disabled") != null;
     }
 
     public boolean isCustomCharSelected()
@@ -339,10 +347,15 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().setCharCountRadio.isChecked();
     }
 
-    public Integer customCharCount()
+    public Integer getCustomCharCount()
     {
         expand();
-        return Integer.parseInt(elementCache().charScaleInput.getValue());
+        return Integer.parseInt(getWrapper().getFormElement(elementCache().charScaleInput));
+    }
+
+    public boolean isMaxTextLengthPresent(int rowIndex)
+    {
+        return getWrapper().isElementPresent(elementCache().getCharScaleInputLocForRow(rowIndex));
     }
 
     //
@@ -463,6 +476,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         clickAdvancedSettings()
                 .showOnUpdateView(checked)
+                .apply();
+        return this;
+    }
+
+    public DomainFieldRow showFieldOnDetailsView(boolean checked)
+    {
+        clickAdvancedSettings()
+                .showOnDetailsView(checked)
                 .apply();
         return this;
     }
@@ -717,8 +738,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this));
         public RadioButton setCharCountRadio = new RadioButton(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-customLength-")
                 .refindWhenNeeded(this));
-        public Input charScaleInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-scale")
-                .refindWhenNeeded(this), getDriver());
+        public WebElement charScaleInput = Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-scale")
+                .refindWhenNeeded(this);
+
+        public Locator.XPathLocator getCharScaleInputLocForRow(int rowIndex)
+        {
+            return Locator.tagWithId("input", "domainpropertiesrow-scale-0-" + rowIndex);
+        }
 
         // date field options
         public Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
