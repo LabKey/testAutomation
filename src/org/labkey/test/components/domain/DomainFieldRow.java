@@ -239,7 +239,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             getWrapper().setFormElement(elementCache().descriptionTextArea, description);
         }catch (ElementNotInteractableException retry)
         {
-            getWrapper().setFormElementJS(elementCache().descriptionTextArea, description);
+            WebDriverWrapper.sleep(500);
+            getWrapper().setFormElement(elementCache().descriptionTextArea, description);
         }
         return this;
     }
