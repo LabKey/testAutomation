@@ -128,8 +128,8 @@ public class SchemaBrowserTest extends BaseWebDriverTest
                 ListHelper.ListColumnType.AutoInteger, "TitleId",
                 new ListHelper.ListColumn("Title", "Title", ListHelper.ListColumnType.String, TEST_DESC_BOOKS),
                 new ListHelper.ListColumn("Subtitle", "Subtitle", ListHelper.ListColumnType.String, ""),
-                new ListHelper.ListColumn("AuthorId", "AuthorId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", AUTHORS_LIST).setTableType(FieldDefinition.ColumnType.LookupToInteger)),
-                new ListHelper.ListColumn("PublisherId", "PublisherId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", PUBLISHERS_LIST).setTableType(FieldDefinition.ColumnType.LookupToInteger))
+                new ListHelper.ListColumn("AuthorId", "AuthorId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", AUTHORS_LIST).setTableType(FieldDefinition.ColumnType.Integer)),
+                new ListHelper.ListColumn("PublisherId", "PublisherId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", PUBLISHERS_LIST).setTableType(FieldDefinition.ColumnType.Integer))
         );
     }
 }

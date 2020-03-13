@@ -125,7 +125,7 @@ public class ListTest extends BaseWebDriverTest
     protected final static ListColumnType LIST2_KEY_TYPE = ListColumnType.String;
     protected final static String LIST2_KEY_NAME = "Car";
 
-    protected final ListColumn _list2Col1 = new ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new LookupInfo(null, "lists", LIST_NAME_COLORS).setTableType(FieldDefinition.ColumnType.LookupToString));
+    protected final ListColumn _list2Col1 = new ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new LookupInfo(null, "lists", LIST_NAME_COLORS).setTableType(FieldDefinition.ColumnType.String));
     private final static String LIST2_KEY = "Car1";
     private final static String LIST2_FOREIGN_KEY = "Blue";
     private final static String LIST2_KEY2 = "Car2";
@@ -139,7 +139,7 @@ public class ListTest extends BaseWebDriverTest
     private final static ListColumnType LIST3_KEY_TYPE = ListColumnType.String;
     private final static String LIST3_KEY_NAME = "Owner";
     private final ListColumn _list3Col2 = new ListColumn("Wealth", "Wealth", ListColumnType.String, "");
-    protected final ListColumn _list3Col1 = new ListColumn(LIST3_KEY_NAME, LIST3_KEY_NAME, LIST3_KEY_TYPE, "Who owns the car", new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS).setTableType(FieldDefinition.ColumnType.LookupToString));
+    protected final ListColumn _list3Col1 = new ListColumn(LIST3_KEY_NAME, LIST3_KEY_NAME, LIST3_KEY_TYPE, "Who owns the car", new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS).setTableType(FieldDefinition.ColumnType.String));
     private final static String LIST3_COL2 = "Rich";
     private final String LIST2_DATA =
             LIST2_KEY_NAME + "\t" + _list2Col1.getName()  + "\t" + LIST3_KEY_NAME + "\n" +
@@ -710,7 +710,7 @@ public class ListTest extends BaseWebDriverTest
                 new ListHelper.ListColumn(dummyCol, dummyCol, ListColumnType.String, "")
         };
         ListHelper.ListColumn lookupCol = new ListHelper.ListColumn(lookupField, lookupField, ListColumnType.Integer, "",
-                new ListHelper.LookupInfo(null, lookupSchema, lookupTable).setTableType(FieldDefinition.ColumnType.LookupToInteger));
+                new ListHelper.LookupInfo(null, lookupSchema, lookupTable).setTableType(FieldDefinition.ColumnType.Integer));
         // create the list
         _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, keyCol, columns);
         // now add the lookup column (which references the new table)

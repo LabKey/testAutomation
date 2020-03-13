@@ -291,9 +291,7 @@ public class FieldDefinition extends PropertyDescriptor
         Flag("Flag", "Flag (String)", null),
         Attachment("Attachment", "Attachment", "attachment"),
         User("User", "User", "int"),
-        Lookup("Lookup", "Lookup", null),   // Todo: convert usage to lookupTo<type>
-        LookupToInteger("Lookup", "Lookup", "Integer"),
-        LookupToString("Lookup", "Lookup", "String"),
+        Lookup("Lookup", "Lookup", null),
         Sample("Sample", "Sample", null);
 
         private final String _label; // the display value in the UI for this kind of field
@@ -370,7 +368,6 @@ public class FieldDefinition extends PropertyDescriptor
             _tableType = tableType;
             return this;
         }
-
     }
 
     public static abstract class FieldValidator
