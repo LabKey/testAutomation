@@ -1458,7 +1458,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (!missingTexts.isEmpty())
         {
-            String failMsg = (missingTexts.size() == 1 ? "Text '" : "Texts ['") + String.join("','", missingTexts) + "'";
+            String failMsg = (missingTexts.size() == 1 ? "Text '" : "Texts ['") + String.join("', '", missingTexts) + "'";
             failMsg += missingTexts.size() == 1 ? " was not present" : "] were not present";
             fail(failMsg);
         }
