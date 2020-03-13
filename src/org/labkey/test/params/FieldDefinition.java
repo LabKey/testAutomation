@@ -323,7 +323,9 @@ public class FieldDefinition
         Flag("Flag", "Flag (String)", null),
         Attachment("Attachment", "Attachment", "attachment"),
         User("User", "User", "int"),
-        Lookup("Lookup", "Lookup", null),
+        Lookup("Lookup", "Lookup", null),   // Todo: convert usage to lookupTo<type>
+        LookupToInteger("Lookup", "Lookup", "Integer"),
+        LookupToString("Lookup", "Lookup", "String"),
         Sample("Sample", "Sample", null);
 
         private final String _label; // the display value in the UI for this kind of field

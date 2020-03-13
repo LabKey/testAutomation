@@ -25,6 +25,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Data;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.issues.IssuesTest;
 import org.labkey.test.util.DataRegionTable;
@@ -58,7 +59,7 @@ public class FilterTest extends BaseWebDriverTest
     protected final static String HIDDEN_TEXT = "CantSeeMe";
 
     protected final ListHelper.ListColumn _listCol1 = new ListHelper.ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
-    protected final ListHelper.ListColumn _listCol2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
+    protected final ListHelper.ListColumn _listCol2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateAndTime, "When to wear the color", "M");
     protected final ListHelper.ListColumn _listCol3 = new ListHelper.ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
     protected final ListHelper.ListColumn _listCol4 = new ListHelper.ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
     protected final ListHelper.ListColumn _listCol5 = new ListHelper.ListColumn("HiddenColumn", HIDDEN_TEXT, ListHelper.ListColumnType.String, "I should be hidden!");
@@ -74,7 +75,7 @@ public class FilterTest extends BaseWebDriverTest
     protected final static ListHelper.ListColumnType LIST2_KEY_TYPE = ListHelper.ListColumnType.String;
     protected final static String LIST2_KEY_NAME = "Car";
 
-    protected final ListHelper.ListColumn _list2Col1 = new ListHelper.ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new ListHelper.LookupInfo(null, "lists", LIST_NAME_COLORS));
+    protected final ListHelper.ListColumn _list2Col1 = new ListHelper.ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new ListHelper.LookupInfo(null, "lists", LIST_NAME_COLORS).setTableType(FieldDefinition.ColumnType.LookupToString));
 
     @Override
     protected BrowserType bestBrowser()
@@ -136,9 +137,14 @@ public class FilterTest extends BaseWebDriverTest
         _listHelper.createList(getProjectName(), LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
         log("Set title field of 'Colors' to 'Desc'");
         _listHelper.goToList(LIST_NAME_COLORS);
-        _listHelper.clickEditDesign();
-        selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
-        _listHelper.clickSave();
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
+        listDefinitionPage.openAdvancedListSettings()
+                .setFieldUsedForDisplayTitle("Desc")
+                .clickApply();
+        listDefinitionPage.clickSave();
+
+        log("Import data to the list");
+        _listHelper.goToList(LIST_NAME_COLORS);
         _listHelper.clickImportData();
         _listHelper.submitTsvData(testDataFull.toString());
 
