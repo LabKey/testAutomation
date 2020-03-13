@@ -40,8 +40,8 @@ public class FieldDefinition extends PropertyDescriptor
 
     public FieldDefinition(String name, ColumnType type)
     {
-        super(name, type.getJsonType());
-        _type = type;
+        super(name, type.getRangeURI());
+        setType(type);
     }
 
     public FieldDefinition(String name)
@@ -58,7 +58,7 @@ public class FieldDefinition extends PropertyDescriptor
     @Override
     public JSONObject toJSONObject()
     {
-        if (getType() != null && getType().getJsonType() == null)
+        if (getType() != null && getType().getRangeURI() == null)
         {
             throw new IllegalArgumentException("`FieldDefinition` cannot be used to create column over API: " + getType().name());
         }
@@ -76,6 +76,8 @@ public class FieldDefinition extends PropertyDescriptor
             json.put("shownInUpdateView", getShownInUpdateView());
         if (getLookupValidatorEnabled() != null)
             json.put("lookupValidatorEnabled", getLookupValidatorEnabled());
+        if (getType().getConceptURI() != null)
+            json.put("conceptURI", getType().getConceptURI());
 
         return json;
     }
@@ -94,7 +96,14 @@ public class FieldDefinition extends PropertyDescriptor
     public FieldDefinition setType(ColumnType type)
     {
         _type = type;
-        super.setRangeURI(type.getJsonType());
+        if (type.getLookupInfo() != null)
+        {
+            // Special 'User' and 'Sample' lookups
+            super.setLookup(type.getLookupInfo().getSchema(),
+                    type.getLookupInfo().getTable(),
+                    type.getLookupInfo().getFolder());
+        }
+        super.setRangeURI(type.getRangeURI());
         return this;
     }
 
@@ -140,7 +149,7 @@ public class FieldDefinition extends PropertyDescriptor
         else
         {
             super.setLookup(lookup.getSchema(), lookup.getTable(), lookup.getFolder());
-            setRangeURI(lookup.getTableType().getJsonType());
+            setRangeURI(lookup.getTableType().getRangeURI());
         }
         _lookup = lookup;
         return this;
@@ -286,23 +295,36 @@ public class FieldDefinition extends PropertyDescriptor
         Boolean("Boolean", "Boolean", "boolean"),
         Double("Number (Double)", "Number (Double)", "float"), // TODO remove this after GWT designer removed
         Decimal("Decimal", "Decimal", "float"),
-        File("File", "File", null),
+        File("File", "File", "fileLink"),
         AutoInteger("Auto-Increment Integer", "Auto-Increment Integer", "int"),
-        Flag("Flag", "Flag (String)", null),
+        Flag("Flag", "Flag (String)", "string",
+                "http://www.labkey.org/exp/xml#flag", null),
         Attachment("Attachment", "Attachment", "attachment"),
-        User("User", "User", "int"),
+        User("User", "User", "int", null,
+                new LookupInfo(null, "core", "users")),
         Lookup("Lookup", "Lookup", null),
-        Sample("Sample", "Sample", null);
+        Sample("Sample", "Sample", "int",
+                "http://www.labkey.org/exp/xml#sample",
+                new LookupInfo(null, "exp", "Materials"));
 
         private final String _label; // the display value in the UI for this kind of field
         private final String _description; // TODO remove this after GWT designer removed
-        private final String _jsonType;     // the key used inside the API (aka rangeURI)
+        private final String _rangeURI;     // the key used inside the API
+        private final String _conceptURI;
+        private final LookupInfo _lookupInfo;
 
-        ColumnType(String label, String description, String jsonType)
+        ColumnType(String label, String description, String rangeURI, String conceptURI, LookupInfo lookupInfo)
         {
             _label = label;
             _description = description;
-            _jsonType = jsonType;
+            _rangeURI = rangeURI;
+            _conceptURI = conceptURI;
+            _lookupInfo = lookupInfo;
+        }
+
+        ColumnType(String label, String description, String rangeURI)
+        {
+            this(label, description, rangeURI, null, null);
         }
 
         public String toString()
@@ -315,7 +337,17 @@ public class FieldDefinition extends PropertyDescriptor
             return _label;
         }
 
-        public String getJsonType() { return _jsonType; }
+        public String getRangeURI() { return _rangeURI; }
+
+        protected String getConceptURI()
+        {
+            return _conceptURI;
+        }
+
+        protected LookupInfo getLookupInfo()
+        {
+            return _lookupInfo;
+        }
     }
 
     public static class LookupInfo
