@@ -12,6 +12,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -234,7 +235,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().descriptionTextArea));
-        getWrapper().setFormElementJS(elementCache().descriptionTextArea, description);
+        try{
+            getWrapper().setFormElement(elementCache().descriptionTextArea, description);
+        }catch (ElementNotInteractableException retry)
+        {
+            WebDriverWrapper.sleep(500);
+            getWrapper().setFormElement(elementCache().descriptionTextArea, description);
+        }
         return this;
     }
 
