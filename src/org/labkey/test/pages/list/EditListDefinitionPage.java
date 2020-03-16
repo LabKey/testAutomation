@@ -15,14 +15,17 @@
  */
 package org.labkey.test.pages.list;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.ToggleButton;
+import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.core.login.SvgCheckbox;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
@@ -30,21 +33,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.ElementCache>
 {
-    private boolean useNewDesigner = false;
-
     public EditListDefinitionPage(WebDriver driver)
     {
         super(driver);
-    }
-
-    public EditListDefinitionPage(WebDriver driver, boolean useNewDesigner)
-    {
-        super(driver);
-        this.useNewDesigner = useNewDesigner;
     }
 
     public static EditListDefinitionPage beginAt(WebDriverWrapper driver, int listId)
@@ -69,25 +63,70 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         return new EditListDefinitionPage(driver.getDriver());
     }
 
-    public DomainFormPanel getFieldsPanel()
+    public void waitForPage()
     {
-        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Fields").find();
+        waitFor(()-> elementCache().listPropertiesHeaderLoc.existsIn(getDriver()),
+            "The page did not render in time", WAIT_FOR_PAGE);
     }
 
-    public DomainFormPanel expandFieldsPanel()
+    public EditListDefinitionPage setListName(String listName)
     {
-        DomainFormPanel panel = getFieldsPanel();
+        expandPropertiesPane();
+        elementCache().nameInput().set(listName);
+        return this;
+    }
+
+    public EditListDefinitionPage setDescription(String description)
+    {
+        expandPropertiesPane();
+        elementCache().descriptionInput().set(description);
+        return this;
+    }
+
+    public AdvancedListSettingsDialog openAdvancedListSettings()
+    {
+        expandPropertiesPane();
+        elementCache().advancedSettingsBtn().click();
+        return new AdvancedListSettingsDialog(this);
+    }
+
+    public void expandPropertiesPane()
+    {
+        if (!isListPropertiesPaneExpanded())
+            elementCache().propertiesPaneToggle.click();
+        waitFor(()-> isListPropertiesPaneExpanded(), "the properties pane did not expand in time", 2000);
+    }
+
+    private boolean isListPropertiesPaneExpanded()
+    {
+        String panelHeaderClass = elementCache().listPropertiesHeader.getAttribute("class");
+        return panelHeaderClass.contains("expanded") && !panelHeaderClass.contains("collapsed");
+    }
+
+    public EditListDefinitionPage checkIndexFileAttachements(boolean checked)
+    {
+        openAdvancedListSettings()
+                .setIndexFileAttachments(checked)
+                .clickApply();
+        return this;
+    }
+
+
+    public DomainFormPanel getFieldsPanel()
+    {
+        DomainFormPanel panel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Fields").find();
         panel.expand();
         return panel;
     }
+    // list properties
 
     public DomainFormPanel setKeyField(ListHelper.ListColumnType listKeyType, String listKeyName)
     {
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         if (listKeyType == ListHelper.ListColumnType.AutoInteger)
         {
             fieldsPanel.startNewDesign("REMOVE_ME");
-            selectOptionByText(Locator.name("keyField"), "Auto integer key");
+            selectAutoIntegerKeyField();
             sleep(500); // wait just a bit for the auto integer key field to be added
             fieldsPanel.getField(0).setName(listKeyName);
             fieldsPanel.removeField("REMOVE_ME");
@@ -96,115 +135,89 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
         {
             DomainFieldRow keyField = fieldsPanel.startNewDesign(listKeyName);
             keyField.setType(FieldDefinition.ColumnType.valueOf(listKeyType.name()));
-            selectOptionByText(Locator.name("keyField"), listKeyName);
+            selectKeyField(listKeyName);
         }
 
         return fieldsPanel;
     }
 
-    public void setColumnName(int index, String name)
+    public DomainFormPanel selectAutoIntegerKeyField()
     {
-        if (!this.useNewDesigner)
-        {
-            Locator nameLoc = Locator.name("ff_name" + index);
-            click(nameLoc);
-            setFormElement(nameLoc, name);
-            pressTab(nameLoc);
-            return;
-        }
-
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
-        fieldsPanel.getField(index).setName(name);
+        return selectKeyField("Auto integer key");
     }
 
-    public void setColumnLabel(int index, String label)
+    public DomainFormPanel selectKeyField(String keyField)
     {
-        if (!this.useNewDesigner)
-        {
-            Locator labelLoc = Locator.name("ff_label" + index);
-            click(labelLoc);
-            setFormElement(labelLoc, label);
-            pressTab(labelLoc);
-            return;
-        }
+        DomainFormPanel fieldsPanel = getFieldsPanel();
+        selectOptionByText(Locator.name("keyField"), keyField);
+        return fieldsPanel;
+    }
 
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+    // note: auto-import slider is only shown when you've inferred fields from file
+    public EditListDefinitionPage setAutoImport(boolean autoImport)
+    {
+        elementCache().autoImportSlider().set(autoImport);
+        return this;
+    }
+
+    public boolean getAutoImport()
+    {
+        return elementCache().autoImportSlider().get();
+    }
+
+    public EditListDefinitionPage setColumnName(int index, String name)
+    {
+        DomainFormPanel fieldsPanel = getFieldsPanel();
+        fieldsPanel.getField(index).setName(name);
+        return this;
+    }
+
+    public EditListDefinitionPage setColumnLabel(int index, String label)
+    {
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         fieldsPanel.getField(index).setLabel(label);
+        return this;
     }
 
     public void setColumnPhiLevel(String name, PropertiesEditor.PhiSelectType phiLevel)
     {
-        if (!this.useNewDesigner)
-        {
-            ListHelper listHelper = new ListHelper(this);
-            PropertiesEditor listFieldEditor = listHelper.getListFieldEditor();
-            listFieldEditor.selectField(name);
-            listFieldEditor.fieldProperties().selectAdvancedTab().setPhiLevel(phiLevel);
-            return;
-        }
-
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         fieldsPanel.getField(name).setPHILevel(phiLevel);
     }
 
-    public void addField(ListHelper.ListColumn newCol)
+    public EditListDefinitionPage addField(ListHelper.ListColumn newCol)
     {
-        if (!this.useNewDesigner)
-        {
-            ListHelper listHelper = new ListHelper(this);
-            listHelper.addField(newCol);
-            return;
-        }
-
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         fieldsPanel.addField(newCol);
+        return this;
     }
 
-    public void removeField(int index)
+    public EditListDefinitionPage removeField(int index)
     {
-        if (!this.useNewDesigner)
-        {
-            ListHelper listHelper = new ListHelper(this);
-            listHelper.getListFieldEditor().selectField(index).markForDeletion();
-            return;
-        }
-
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         fieldsPanel.removeField(fieldsPanel.getField(index).getName(), true);
+        return this;
     }
 
     public List<String> getFieldNames()
     {
-        if (!this.useNewDesigner)
-        {
-            ListHelper listHelper = new ListHelper(this);
-            return listHelper.getListFieldEditor().getFieldNames().stream()
-                    .map(String::toLowerCase).collect(Collectors.toList());
-        }
-
-        DomainFormPanel fieldsPanel = expandFieldsPanel();
+        DomainFormPanel fieldsPanel = getFieldsPanel();
         return fieldsPanel.fieldNames();
+    }
+
+    public void clickSaveExpectingError()
+    {
+        clickAndWait(Locator.button("Save").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), 0);
     }
 
     public void clickSave()
     {
-        if (!this.useNewDesigner)
-        {
-            WebElement saveButton = Locator.lkButton("Save").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            scrollToTop(); // After clicking save, sometimes the page scrolls so that the project menu is under the mouse
-            saveButton.click();
-            waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            return;
-        }
-
-        // TODO move this ElementCache
         clickAndWait(Locator.button("Save").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
     }
 
-    public PropertiesEditor getPropertyEditor()
+    public void clickCancel()
     {
-        return elementCache()._propertiesEditor;
+        clickAndWait(Locator.button("Cancel").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
     }
 
     protected ElementCache newElementCache()
@@ -214,6 +227,38 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        private final PropertiesEditor _propertiesEditor = new PropertiesEditor.PropertiesEditorFinder(getDriver()).withTitle("List Fields").findWhenNeeded();
+        Locator listPropertiesHeaderLoc = Locator.id("list-properties-hdr");
+        WebElement listPropertiesHeader = listPropertiesHeaderLoc
+                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement propertiesPaneToggle = Locator.tagWithClass("span", "pull-right")
+                .waitForElement(listPropertiesHeader, WAIT_FOR_JAVASCRIPT);
+
+        Input nameInput()
+        {
+            return Input.Input(Locator.id("name"), getDriver()).waitFor();
+        }
+        Input descriptionInput()
+        {
+            return Input.Input(Locator.id("description"), getDriver()).waitFor();
+        }
+
+        SvgCheckbox checkbox(String labelText)
+        {
+            Locator loc = Locator.tagWithClass("div", "list__properties__checkbox-row")
+                    .withChild(Locator.tagWithText("span", labelText))
+                    .child(Locator.tagWithClass("span", "list__properties__checkbox--no-highlight"));
+            return new SvgCheckbox(loc.waitForElement(getDriver(), 2000), getDriver());
+        }
+
+        WebElement advancedSettingsBtn()
+        {
+            return Locator.tagWithClass("button", "domain-field-float-right").withText("Advanced Settings")
+                    .waitForElement(this, 2000);
+        }
+
+        ToggleButton autoImportSlider()
+        {
+            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Import Data").find();
+        }
     }
 }

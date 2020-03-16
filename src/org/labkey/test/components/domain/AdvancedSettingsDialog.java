@@ -201,7 +201,7 @@ public class AdvancedSettingsDialog extends ModalDialog
         public Checkbox showInInsertView = new Checkbox(
                 Locator.input("domainpropertiesrow-shownInInsertView").findWhenNeeded(this));
         public Checkbox showInDetailsView = new Checkbox(
-                Locator.input("domainpropertiesrow-showInDetailsView").findWhenNeeded(this));
+                Locator.input("domainpropertiesrow-shownInDetailsView").findWhenNeeded(this));
 
         // default value options
         private final EnumSelect<PropertiesEditor.DefaultType> defaultTypeSelect =
