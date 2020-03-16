@@ -15,11 +15,13 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
@@ -191,87 +193,87 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void bulkImport(File dataFile)
     {
-        bulkImport(dataFile, IMPORT_DATA_LABEL);
+        fileImport(dataFile, IMPORT_DATA_LABEL);
     }
 
-    public void bulkImport(File dataFile, String importOption)
+    public void mergeImport(File dataFile)
+    {
+        fileImport(dataFile, MERGE_DATA_LABEL);
+    }
+
+    private void fileImport(File dataFile, String importOption)
     {
         DataRegionTable drt = getSamplesDataRegionTable();
         TestLogger.log("Adding data from file");
-        drt.clickImportBulkData();
-        click(Locators.fileUpload);
+        ImportDataPage importDataPage = drt.clickImportBulkData();
+        importDataPage.setFile(dataFile);
         selectImportOption(importOption, 0);
-        setFormElement(Locator.tagWithName("input", "file"), dataFile);
-        clickButton("Submit");
-    }
-
-    public void setTsvData(String tsvData)
-    {
-        setFormElement(Locator.name("text"), tsvData);
+        importDataPage.submit();
     }
 
     public void bulkImport(String tsvData)
     {
-        bulkImport(tsvData, IMPORT_DATA_LABEL);
+        startTsvImport(tsvData, IMPORT_DATA_LABEL)
+                .submit();
     }
 
-    public void bulkImport(String tsvData, String importOption)
+    public void mergeImport(String tsvData)
     {
-        if (tsvData.length() > 0)
-        {
-            DataRegionTable drt = getSamplesDataRegionTable();
-            TestLogger.log("Adding tsv data via bulk import");
-            drt.clickImportBulkData();
-            selectImportOption(importOption, 1);
-            setTsvData(tsvData);
-            clickButton("Submit");
-        }
+        startTsvImport(tsvData, SampleSetHelper.MERGE_DATA_LABEL)
+                .submit();
     }
 
     public void bulkImport(List<Map<String, String>> data)
     {
-        bulkImport(data, IMPORT_DATA_LABEL, null);
+        startTsvImport(data, IMPORT_DATA_LABEL)
+                .submit();
     }
 
-    public void bulkImport(List<Map<String, String>> data, int waitTime)
+    public void mergeImport(List<Map<String, String>> data)
     {
-        bulkImport(data, IMPORT_DATA_LABEL, waitTime);
+        startTsvImport(data, SampleSetHelper.MERGE_DATA_LABEL)
+                .submit();
     }
 
-    public void bulkImport(List<Map<String, String>> data, String importOption)
+    public void bulkImportExpectingError(List<Map<String, String>> data, String importOption)
     {
-        bulkImport(data, importOption, null);
+        startTsvImport(data, importOption)
+                .submitExpectingError();
     }
 
-    public void bulkImport(List<Map<String, String>> data, String importOption, @Nullable Integer waitTime)
+    private ImportDataPage startTsvImport(String tsv, String importOption)
     {
-        if (data.size() > 0)
+        DataRegionTable drt = getSamplesDataRegionTable();
+        ImportDataPage importDataPage = drt.clickImportBulkData();
+        selectImportOption(importOption, 1);
+        importDataPage.setText(tsv);
+        return importDataPage;
+    }
+
+    private ImportDataPage startTsvImport(List<Map<String, String>> data, String importOption)
+    {
+        if (data == null || data.isEmpty())
         {
-            TestLogger.log ("Adding " + data.size() + " rows via bulk import");
-            DataRegionTable drt = getSamplesDataRegionTable();
-            drt.clickImportBulkData();
-            // first the header
-            List<String> rows = new ArrayList<>();
-            rows.add(String.join("\t", data.get(0).keySet()));
-            data.forEach(dataMap -> {
-                StringBuilder row = new StringBuilder();
-                data.get(0).keySet().forEach(key -> {
-                    row.append(dataMap.get(key));
-                    row.append("\t");
-                });
-                rows.add(row.substring(0, row.lastIndexOf("\t")));
-            });
-
-            selectImportOption(importOption, 1);
-            setTsvData(String.join("\n", rows));
-
-            // If an error is expected after clicking submit the page won't navigate. A 0 waitTime will avoid the "Page didn't navigate" error.
-            if(null != waitTime)
-                clickButton("Submit", waitTime);
-            else
-                clickButton("Submit");
-
+            throw new IllegalArgumentException("No data provided");
         }
+        return startTsvImport(convertMapToTsv(data), importOption);
+    }
+
+    @NotNull
+    private static String convertMapToTsv(@NotNull List<Map<String, String>> data)
+    {
+        // first the header
+        List<String> rows = new ArrayList<>();
+        rows.add(String.join("\t", data.get(0).keySet()));
+        data.forEach(dataMap -> {
+            StringBuilder row = new StringBuilder();
+            data.get(0).keySet().forEach(key -> {
+                row.append(dataMap.get(key));
+                row.append("\t");
+            });
+            rows.add(row.substring(0, row.lastIndexOf("\t")));
+        });
+        return String.join("\n", rows);
     }
 
     public SampleSetHelper deleteSamples(DataRegionTable samplesTable, String expectedTitle)

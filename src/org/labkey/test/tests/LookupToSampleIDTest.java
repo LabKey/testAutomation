@@ -85,8 +85,8 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         portalHelper.addWebPart("Assay List");
 
         //import more to sample set while in subfolder
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
-        sampleHelper.bulkImport(SAMPLE_SET_SUB_FOLDER, SampleSetHelper.MERGE_DATA_LABEL);
+        sampleHelper.goToSampleSet(SAMPLE_SET_NAME);
+        sampleHelper.mergeImport(SAMPLE_SET_SUB_FOLDER);
     }
 
     @Before

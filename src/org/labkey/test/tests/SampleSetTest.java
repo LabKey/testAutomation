@@ -1240,7 +1240,7 @@ public class SampleSetTest extends BaseWebDriverTest
         updateSampleData.add(updatedFields);
 
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
+        sampleHelper.mergeImport(updateSampleData);
 
     }
 
@@ -1532,7 +1532,7 @@ public class SampleSetTest extends BaseWebDriverTest
         // TODO: Need to pass in all of the columns so as not to lose any data. See TODO comment below.
         List<Map<String, String>> updateSampleData = new ArrayList<>();
         updateSampleData.add(sampleData.get(testDataIndex));
-        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
+        sampleHelper.mergeImport(updateSampleData);
         expectedMissingCount--;
 
         // TODO: Need to revisit. When doing a bulk update if a field is missing the update views it as a request to
@@ -1626,7 +1626,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Validate that the required field check works as expected.");
         updateSampleData = new ArrayList<>();
         updateSampleData.add(Map.of("Name", "mv10", REQUIRED_FIELD_NAME, "", MISSING_FIELD_NAME, "There should be no value in the required field.", INDICATOR_FIELD_NAME, ""));
-        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.IMPORT_DATA_LABEL, 0);
+        sampleHelper.bulkImportExpectingError(updateSampleData, SampleSetHelper.IMPORT_DATA_LABEL);
 
         boolean errorMsgShown;
         try
@@ -1940,7 +1940,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 "SampleSetBVTChildA\tSampleSetBVT13\t1.111\n" +
                 "SampleSetBVTChildB\tSampleSetBVT14\t2.222\n";
 
-        sampleHelper.bulkImport(REPARENTED_CHILD_SAMPLE_SET_TSV, SampleSetHelper.MERGE_DATA_LABEL);
+        sampleHelper.mergeImport(REPARENTED_CHILD_SAMPLE_SET_TSV);
 
         clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
         assertTextPresent("2.222");
