@@ -10,12 +10,15 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.SampleSetAPIHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +34,6 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
     private static final String PROJECT_NAME = "SampleSetParentAliasProject";
     private static final String SUB_FOLDER_NAME = "ParentAliasSubFolder";
-    private static final String CURRENT_SAMPLE_SET_OPTION = "(Current Sample Set)";
 
     protected static final String PARENT_CONTAINER_SAMPLE_SET_NAME = "PrePopulatedSampleSet";
     protected static final String PARENT_CONTAINER_SAMPLE_SET_CAPTION = "Pre Populated Sample Set";
@@ -204,32 +206,6 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
     }
 
-    private void createEmptySampleSetAndSetParentColumn(String sampleSetName, String path, Map<String, String> parentColumnAliases)
-    {
-        createEmptySampleSetAndSetParentColumn(sampleSetName, path, parentColumnAliases, null);
-    }
-
-    private void createEmptySampleSetAndSetParentColumn(String sampleSetName, String path, Map<String, String> parentColumnAliases, @Nullable List<FieldDefinition> customFields)
-    {
-
-        log("Create a sample set named '" + sampleSetName + "' in '" + path + "'.");
-        createEmptySampleSet(sampleSetName, path, customFields);
-        // Because the sample set was create with the API the test will need to refresh the page
-        // in order to see the sample set in the dataregion
-        refresh();
-
-        log("Add a parent alias column to the sample set.");
-        UpdateSampleSetPage updatePage = new SampleSetHelper(this).goToEditSampleSet(sampleSetName);
-
-        for(String importHeader : parentColumnAliases.keySet())
-        {
-            updatePage.addParentColumnAlias(importHeader, parentColumnAliases.get(importHeader));
-        }
-
-        updatePage.clickSave();
-
-    }
-
     private void checkAllRowsInDataRegion(String dataRegionName, String columnName, List<String> expectedValues)
     {
         DataRegionTable dataRegionTable = new DataRegionTable(dataRegionName, this);
@@ -280,7 +256,9 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, CURRENT_SAMPLE_SET_OPTION));
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN);
+        SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
 
         log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -327,7 +305,9 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN_1, CURRENT_SAMPLE_SET_OPTION));
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN_1);
+        SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
 
         log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -402,7 +382,9 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, PARENT_CONTAINER_SAMPLE_SET_NAME));
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN, PARENT_CONTAINER_SAMPLE_SET_NAME);
+        SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
 
         log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -433,7 +415,9 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, SIBLING_SAMPLE_SET_NAME));
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN, SIBLING_SAMPLE_SET_NAME);
+        SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
 
         log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -465,10 +449,10 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME,
-                PROJECT_NAME + "/" + SUB_FOLDER_NAME,
-                Map.of(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_SET_NAME,
-                        PARENT_COLUMN_SUB, CURRENT_SAMPLE_SET_OPTION));
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN_SUB);
+        SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
 
         log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -522,10 +506,10 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Add the parent columns just like before.");
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME,
-                PROJECT_NAME + "/" + SUB_FOLDER_NAME,
-                Map.of(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_SET_NAME,
-                        PARENT_COLUMN_SUB, CURRENT_SAMPLE_SET_OPTION));
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN_SUB);
+        SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
 
         log("Import samples that use the 'materialInputs column header.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -607,7 +591,9 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, CURRENT_SAMPLE_SET_OPTION));
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN);
+        SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
 
         log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -687,7 +673,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         log("Add a parent alias column to the sample set that conflicts with a given column name.");
         UpdateSampleSetPage updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
-        updatePage.addParentColumnAlias(ALIAS_NAME_CONFLICT, CURRENT_SAMPLE_SET_OPTION);
+        updatePage.addParentAlias(ALIAS_NAME_CONFLICT);
         List<String> errors = getTexts(updatePage.clickSaveExpectingError());
 
         Assert.assertEquals("Error message not as expected.",
@@ -695,7 +681,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 String.join("\n", errors));
 
         log("Now add a valid parent column and check that you cannot now add a field in the sample set with the same name.");
-        updatePage.setParentAlias(1, GOOD_PARENT_NAME, CURRENT_SAMPLE_SET_OPTION);
+        updatePage.setParentAlias(1, GOOD_PARENT_NAME, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
         updatePage.clickSave();
 
         clickFolder(SUB_FOLDER_NAME);
@@ -728,10 +714,10 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME,
-                PROJECT_NAME + "/" + SUB_FOLDER_NAME,
-                Map.of(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_DATA_CLASS_NAME,
-                        PARENT_COLUMN_SUBFOLDER, SIBLING_DATA_CLASS_NAME));
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN_SUBFOLDER, PARENT_CONTAINER_SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN_CONTAINER, SIBLING_DATA_CLASS_NAME);
+        SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
 
         log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -778,7 +764,9 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, Map.of(PARENT_COLUMN, PARENT_CONTAINER_SAMPLE_SET_NAME));
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN, PARENT_CONTAINER_SAMPLE_SET_NAME);
+        SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
 
         log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
@@ -810,10 +798,10 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        createEmptySampleSetAndSetParentColumn(SAMPLE_SET_NAME,
-                PROJECT_NAME + "/" + SUB_FOLDER_NAME,
-                Map.of(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_DATA_CLASS_NAME,
-                        PARENT_COLUMN_SUBFOLDER, SIBLING_DATA_CLASS_NAME));
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        definition.addParentAlias(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_DATA_CLASS_NAME);
+        definition.addParentAlias(PARENT_COLUMN_SUBFOLDER, SIBLING_DATA_CLASS_NAME);
+        SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
 
         log("Import samples that have a parent alias column.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);

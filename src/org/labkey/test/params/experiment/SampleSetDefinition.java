@@ -3,6 +3,7 @@ package org.labkey.test.params.experiment;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
+import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.property.DomainProps;
 
@@ -17,7 +18,7 @@ public class SampleSetDefinition extends DomainProps
     private String _nameExpression;
     private String _description;
     private List<FieldDefinition> _fields = new ArrayList<>();
-    private Map<String, String> _importAliases = new HashMap<>();
+    private Map<String, String> _parentAliases = new HashMap<>();
 
     public SampleSetDefinition() { }
 
@@ -78,20 +79,26 @@ public class SampleSetDefinition extends DomainProps
     }
 
     @NotNull
-    public Map<String, String> getImportAliases()
+    public Map<String, String> getParentAliases()
     {
-        return _importAliases;
+        return _parentAliases;
     }
 
-    public SampleSetDefinition setImportAliases(@NotNull Map<String, String> importAliases)
+    public SampleSetDefinition setParentAliases(@NotNull Map<String, String> parentAliases)
     {
-        _importAliases = new HashMap<>(importAliases);
+        _parentAliases = new HashMap<>(parentAliases);
         return this;
     }
 
-    public SampleSetDefinition addImportAlias(@NotNull String columnName, @NotNull String sampleSetName)
+    public SampleSetDefinition addParentAlias(@NotNull String columnName, String sampleSetName)
     {
-        _importAliases.put(columnName, sampleSetName);
+        _parentAliases.put(columnName, sampleSetName);
+        return this;
+    }
+
+    public SampleSetDefinition addParentAlias(@NotNull String columnName)
+    {
+        _parentAliases.put(columnName, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
         return this;
     }
 
@@ -121,13 +128,18 @@ public class SampleSetDefinition extends DomainProps
         Map<String, Object> json = new HashMap<>();
         json.put("name", getName());
         json.put("nameExpression", getNameExpression());
-        if (!getImportAliases().isEmpty())
+        if (!getParentAliases().isEmpty())
         {
             Map<String, String> importAliases = new HashMap<>();
-            for (String columnName : getImportAliases().keySet())
+            for (String columnName : getParentAliases().keySet())
             {
-                String sampleType = "materialInputs/" + getImportAliases().get(columnName);
-                importAliases.put(columnName, sampleType);
+                String sampleType = getParentAliases().get(columnName);
+                if (sampleType == null || sampleType.equals(SampleTypeDesigner.CURRENT_SAMPLE_TYPE))
+                {
+                    sampleType = getName();
+                }
+                String aliasTable = "materialInputs/" + sampleType;
+                importAliases.put(columnName, aliasTable);
             }
             json.put("importAliases", importAliases);
         }

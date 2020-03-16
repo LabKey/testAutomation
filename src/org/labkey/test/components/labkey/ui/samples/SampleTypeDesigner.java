@@ -135,6 +135,10 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
     {
         int initialCount = elementCache().parentAliases().size();
         elementCache().addAliasButton.click();
+        if (optionDisplayText == null)
+        {
+            optionDisplayText = CURRENT_SAMPLE_TYPE;
+        }
         setParentAlias(initialCount, alias, optionDisplayText);
         return this;
     }

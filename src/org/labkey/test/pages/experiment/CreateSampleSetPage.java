@@ -63,11 +63,16 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return elementCache()._designer.getNameExpression();
     }
 
-    public CreateSampleSetPage addParentColumnAlias(String importHeader, String materialInputName)
+    public CreateSampleSetPage addParentAlias(String importHeader, String materialInputName)
     {
         elementCache()._designer.addParentAlias(importHeader, materialInputName);
 
         return this;
+    }
+
+    public CreateSampleSetPage addParentAlias(String importHeader)
+    {
+        return addParentAlias(importHeader, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
     }
 
     public CreateSampleSetPage setParentAlias(int index, String alias, String optionDisplayText)

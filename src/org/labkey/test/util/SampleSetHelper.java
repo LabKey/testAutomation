@@ -78,9 +78,9 @@ public class SampleSetHelper extends WebDriverWrapper
             createPage.setDescription(props.getDescription());
         }
 
-        for (String importHeader : props.getImportAliases().keySet())
+        for (String importHeader : props.getParentAliases().keySet())
         {
-            createPage.addParentColumnAlias(importHeader, props.getImportAliases().get(importHeader));
+            createPage.addParentAlias(importHeader, props.getParentAliases().get(importHeader));
         }
 
         createPage.addFields(props.getFields());
