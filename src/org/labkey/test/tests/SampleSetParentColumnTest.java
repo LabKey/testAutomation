@@ -599,7 +599,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         sampleText = "Name\t" + PARENT_COLUMN + "\n" +
                 "SG_03\tSG_01\n";
 
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        sampleHelper.bulkImport(sampleText);
 
         log("Check sample 'SG_03' and make sure there are no parents.");
         waitAndClickAndWait(Locator.linkWithText("SG_03"));
