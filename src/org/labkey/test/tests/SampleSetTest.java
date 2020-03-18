@@ -283,7 +283,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Create a new sample set with a name");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(sampleSetName, null, List.of(new FieldDefinition("StringValue", ColumnType.String)));
+        sampleHelper.createSampleSet(new SampleSetDefinition(sampleSetName).addField(new FieldDefinition("StringValue", ColumnType.String)));
 
         log("Go to the sample set and add some data");
         clickAndWait(Locator.linkWithText(sampleSetName));

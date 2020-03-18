@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Defines a Sample Type. Suitable for use with UI and API helpers.
+ */
 public class SampleSetDefinition extends DomainProps
 {
     private String _name;
@@ -119,6 +122,10 @@ public class SampleSetDefinition extends DomainProps
         return addParentAlias(columnName, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
     }
 
+    /*
+    DomainProps
+     */
+
     @NotNull
     @Override
     protected Domain getDomainDesign()
@@ -142,9 +149,9 @@ public class SampleSetDefinition extends DomainProps
     @Override
     protected Map<String, Object> getOptions()
     {
-        Map<String, Object> json = new HashMap<>();
-        json.put("name", getName());
-        json.put("nameExpression", getNameExpression());
+        Map<String, Object> options = new HashMap<>();
+        options.put("name", getName());
+        options.put("nameExpression", getNameExpression());
         if (!getParentAliases().isEmpty())
         {
             Map<String, String> importAliases = new HashMap<>();
@@ -159,8 +166,8 @@ public class SampleSetDefinition extends DomainProps
                 String aliasTable = inputPrefix + aliasTarget;
                 importAliases.put(columnName, aliasTable);
             }
-            json.put("importAliases", importAliases);
+            options.put("importAliases", importAliases);
         }
-        return json;
+        return options;
     }
 }

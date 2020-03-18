@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -38,6 +37,9 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Helper methods for create Sample Types and import data into them through standard LabKey Server UI
+ */
 public class SampleSetHelper extends WebDriverWrapper
 {
     private final WebDriver _driver;
@@ -89,19 +91,6 @@ public class SampleSetHelper extends WebDriverWrapper
         createPage.clickSave();
     }
 
-    public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression, List<FieldDefinition> fields)
-    {
-        SampleSetDefinition props = new SampleSetDefinition(name);
-        props.setNameExpression(nameExpression);
-        if (fields != null)
-        {
-            props.setFields(fields);
-        }
-
-        createSampleSet(props);
-        return this;
-    }
-
     public void createSampleSet(SampleSetDefinition definition, File dataFile)
     {
         createSampleSet(definition);
@@ -126,20 +115,19 @@ public class SampleSetHelper extends WebDriverWrapper
         return new CreateSampleSetPage(getDriver());
     }
 
-    public SampleSetHelper selectImportOption(String label, int index)
+    public void selectImportOption(String label, int index)
     {
         waitForText("Import Lookups by Alternate Key");
         boolean merge = MERGE_DATA_LABEL.equals(label);
         String componentId = "insertOption" + index;
         String script = "Ext4.ComponentManager.get('" + componentId + "').setValue(" + (merge?"1":"0") + ")";
         executeScript(script);
-        return this;
     }
 
     public SampleSetHelper goToSampleSet(String name)
     {
         TestLogger.log("Go to the sample set '" + name + "'");
-        click(Locator.linkWithText(name));
+        clickAndWait(Locator.linkWithText(name));
         return this;
     }
 
@@ -276,7 +264,7 @@ public class SampleSetHelper extends WebDriverWrapper
         return String.join("\n", rows);
     }
 
-    public SampleSetHelper deleteSamples(DataRegionTable samplesTable, String expectedTitle)
+    public void deleteSamples(DataRegionTable samplesTable, String expectedTitle)
     {
         samplesTable.doAndWaitForUpdate(() -> {
             samplesTable.clickHeaderButton("Delete");
@@ -285,15 +273,9 @@ public class SampleSetHelper extends WebDriverWrapper
             Window.Window(getDriver()).withTitleContaining("Delete sample").waitFor();
             _ext4Helper.waitForMaskToDisappear();
         });
-        return this;
     }
 
-    public SampleSetHelper verifyDataRow(Map<String, String> data, int index)
-    {
-        return verifyDataRow(data, index, DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents"));
-    }
-
-    private SampleSetHelper verifyDataRow(Map<String, String> expectedData, int index, DataRegionTable drt)
+    private void verifyDataRow(Map<String, String> expectedData, int index, DataRegionTable drt)
     {
         Map<String, String> actualData = drt.getRowDataAsMap(index);
 
@@ -301,28 +283,15 @@ public class SampleSetHelper extends WebDriverWrapper
         {
             assertEquals(field.getKey() + " not as expected at index " + index, field.getValue(), actualData.get(field.getKey()));
         }
-        return this;
     }
 
-    public SampleSetHelper verifyDataValues(List<Map<String, String>> data)
-    {
-        return verifyDataValues(data, "Name");
-    }
-
-    public SampleSetHelper verifyDataValues(List<Map<String, String>> data, String keyField)
+    public void verifyDataValues(List<Map<String, String>> data)
     {
         DataRegionTable drt = getSamplesDataRegionTable();
         for (Map<String, String> expectedRow : data)
         {
-            int index = drt.getRowIndex(keyField, expectedRow.get(keyField));
+            int index = drt.getRowIndex("Name", expectedRow.get("Name"));
             verifyDataRow(expectedRow, index, drt);
         }
-        return this;
     }
-
-    public static class Locators
-    {
-        public static final Locator.XPathLocator fileUpload = Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)");
-    }
-
 }

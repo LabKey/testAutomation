@@ -19,6 +19,7 @@ import static org.labkey.test.WebDriverWrapper.sleep;
 
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/samples/SampleTypeDesigner.tsx
+ * This is a full-page component and should be wrapped by a context-specific page class
  */
 public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.ElementCache>
 {
@@ -143,24 +144,23 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         return this;
     }
 
-    public SampleTypeDesigner removeParentAlias(String parentAlias)
+    private int getParentAliasIndex(String parentAlias)
     {
-        int aliasIndex = -1;
         List<Input> inputs = elementCache().parentAliases();
         for (int i = 0; i < inputs.size(); i++)
         {
             if (inputs.get(i).get().equals(parentAlias))
             {
-                aliasIndex = i;
-                break;
+                return i;
             }
         }
-        if (aliasIndex < 0)
-        {
-            throw new NotFoundException("No such parent alias: " + parentAlias);
-        }
-        elementCache().removeParentAliasIcon(aliasIndex).click();
-        return this;
+        throw new NotFoundException("No such parent alias: " + parentAlias);
+    }
+
+    public SampleTypeDesigner removeParentAlias(String parentAlias)
+    {
+        int aliasIndex = getParentAliasIndex(parentAlias);
+        return removeParentAlias(aliasIndex);
     }
 
     public SampleTypeDesigner removeParentAlias(int index)
@@ -176,6 +176,13 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         {
             elementCache().parentAliasSelect(index).select(optionDisplayText);
         }
+        return this;
+    }
+
+    public SampleTypeDesigner setParentAlias(String alias, String optionDisplayText)
+    {
+        int index = getParentAliasIndex(alias);
+        elementCache().parentAliasSelect(index).select(optionDisplayText);
         return this;
     }
 

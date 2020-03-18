@@ -25,9 +25,6 @@ public abstract class Locators
     public static final Locator.XPathLocator folderTab = Locator.tagWithClass("div", "lk-nav-tabs-ct").append(Locator.tagWithClass("ul", "lk-nav-tabs")).childTag("li");
     public static final Locator.XPathLocator panelWebpartTitle = Locator.byClass("labkey-wp-title-text");
 
-    // Body of Biologics or Sample Manager (below the nav bar)
-    private final Locator.XPathLocator appBody = Locator.byClass("app-content-wrapper");
-
     public static Locator.XPathLocator headerContainer()
     {
         return Locator.byClass("lk-header-ct");

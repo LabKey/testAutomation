@@ -76,7 +76,7 @@ public class ListDefinition extends DomainProps
 
     public ListDefinition setFields(List<FieldDefinition> fields)
     {
-        _fields = fields;
+        _fields = new ArrayList<>(fields); // Make sure it isn't immutable
         return this;
     }
 
@@ -85,6 +85,10 @@ public class ListDefinition extends DomainProps
         _fields.add(field);
         return this;
     }
+
+    /*
+    DomainProps
+     */
 
     @NotNull
     @Override
@@ -112,10 +116,10 @@ public class ListDefinition extends DomainProps
     @Override
     protected Map<String, Object> getOptions()
     {
-        Map<String, Object> json = new HashMap<>();
-        json.put("name", getName());
-        json.put("description", getDescription());
-        json.put("keyName", getKeyName());
-        return json;
+        Map<String, Object> options = new HashMap<>();
+        options.put("name", getName());
+        options.put("description", getDescription());
+        options.put("keyName", getKeyName());
+        return options;
     }
 }

@@ -7,6 +7,9 @@ import org.labkey.remoteapi.domain.Domain;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Base class for domain properties that might be created via the 'createDomain' API
+ */
 public abstract class DomainProps
 {
     protected abstract @NotNull Domain getDomainDesign();
