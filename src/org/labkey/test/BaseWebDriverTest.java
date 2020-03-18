@@ -57,6 +57,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.admin.ExportFolderPage;
+import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
@@ -573,7 +574,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
-        Log4jUtils.resetAllLogLevels();
+        setServerDebugLogging();
         setExperimentalFlags();
 
         // Start logging JS errors.
@@ -603,6 +604,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         cleanup(false);
+    }
+
+    private void setServerDebugLogging()
+    {
+        Log4jUtils.resetAllLogLevels();
+        for (String pkg : TestProperties.getDebugLoggingPackages())
+        {
+            Log4jUtils.setLogLevel(pkg, ManagerPage.LoggingLevel.DEBUG);
+        }
     }
 
     private void assertModulesAvailable(List<String> modules)
