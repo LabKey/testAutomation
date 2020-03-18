@@ -698,8 +698,8 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SI_05\tDCSIB_2\tDC_2\n";
 
         SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
-        definition.addParentAlias(PARENT_COLUMN_SUBFOLDER, PARENT_CONTAINER_SAMPLE_SET_NAME);
-        definition.addDataParentAlias(PARENT_COLUMN_CONTAINER, SIBLING_DATA_CLASS_NAME);
+        definition.addDataParentAlias(PARENT_COLUMN_SUBFOLDER, SIBLING_DATA_CLASS_NAME);
+        definition.addDataParentAlias(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_DATA_CLASS_NAME);
         SampleSetAPIHelper.createEmptySampleSet(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
