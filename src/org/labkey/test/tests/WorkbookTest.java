@@ -99,14 +99,15 @@ public class WorkbookTest extends BaseWebDriverTest
         // Make sure that the edit stuck
         assertTextPresent("Renamed" + DEFAULT_WORKBOOK_NAME);
 
+        Locator emptyDescription = Locator.id("wb-description").withText("No description provided. Click to add one.");
         // Clear description
         setFormElement(Locator.css("#wb-description + textarea"), "");
-        waitForText("No description provided. Click to add one.");
+        waitForElement(emptyDescription);
 
         // Check that title and description are saved
         refresh();
         assertTextPresent("Renamed" + DEFAULT_WORKBOOK_NAME);
-        waitForText("No description provided. Click to add one.");
+        waitForElement(emptyDescription);
 
         //Verify folder menu links
         SiteNavBar.AdminMenu menu = new SiteNavBar(getDriver()).adminMenu();

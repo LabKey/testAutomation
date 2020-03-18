@@ -23,18 +23,21 @@ import org.labkey.test.pages.core.admin.logger.ManagerPage;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class Log4jUtils
 {
     // Only log the first failed attempt at setting log level. It isn't fatal and will tend add noise to logs.
-    private static boolean loggedError = false;
+    private static boolean loggedResetError = false;
+    private static final Set<String> erroredPackages = new HashSet<>();
 
     @LogMethod(quiet = true)
     public static void setLogLevel(@LoggedParam String name, @LoggedParam ManagerPage.LoggingLevel level)
     {
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        PostCommand command = new PostCommand("logger", "update");
+        PostCommand<?> command = new PostCommand<>("logger", "update");
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("level", level.name());
@@ -49,9 +52,9 @@ public abstract class Log4jUtils
         }
         catch (CommandException e)
         {
-            if (!loggedError)
+            if (!erroredPackages.contains(name))
             {
-                loggedError = true;
+                erroredPackages.add(name);
                 TestLogger.warn("Failed to set log level for '" + name + "'. We will not log any subsequent failures.");
                 e.printStackTrace();
             }
@@ -62,7 +65,7 @@ public abstract class Log4jUtils
     public static void resetAllLogLevels()
     {
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        PostCommand command = new PostCommand("logger", "reset");
+        PostCommand<?> command = new PostCommand<>("logger", "reset");
         try
         {
             command.execute(connection, "/");
@@ -73,9 +76,9 @@ public abstract class Log4jUtils
         }
         catch (CommandException e)
         {
-            if (!loggedError)
+            if (!loggedResetError)
             {
-                loggedError = true;
+                loggedResetError = true;
                 TestLogger.warn("Failed to reset server logging levels. We will not log any subsequent failures.");
                 e.printStackTrace();
             }
