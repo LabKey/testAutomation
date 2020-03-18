@@ -290,7 +290,7 @@ public abstract class TestProperties
     {
         String prop = System.getProperty("webtest.debug.server.packages", "");
         String[] packages = prop.split("\\s*,\\s*");
-        return Arrays.stream(packages).map(String::trim).filter(String::isEmpty).collect(Collectors.toList());
+        return Arrays.stream(packages).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
     }
 
     private static File dumpDir = null;
