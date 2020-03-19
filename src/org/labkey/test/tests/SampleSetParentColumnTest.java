@@ -663,11 +663,12 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         List<String> errors = getTexts(updatePage.clickSaveExpectingError());
 
         Assert.assertEquals("Error message not as expected.",
-                "A sample set property already exists with parent alias header: " + ALIAS_NAME_CONFLICT,
+                "An existing sample type property conflicts with parent alias header: " + ALIAS_NAME_CONFLICT,
                 String.join("\n", errors));
+        updatePage.removeParentAlias(0);
 
         log("Now add a valid parent column and check that you cannot now add a field in the sample set with the same name.");
-        updatePage.setParentAlias(1, GOOD_PARENT_NAME, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
+        updatePage.addParentAlias(GOOD_PARENT_NAME, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
         updatePage.clickSave();
 
         clickFolder(SUB_FOLDER_NAME);
