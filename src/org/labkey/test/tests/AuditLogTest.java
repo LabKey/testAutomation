@@ -679,7 +679,7 @@ public class AuditLogTest extends BaseWebDriverTest
         listDefinitionPage.getFieldsPanel()
                 .addField(new FieldDefinition(FIELD03_NAME).setLabel(FIELD03_LABEL)
                         .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)
-                                .setTableType(FieldDefinition.ColumnType.LookupToInteger)));
+                                .setTableType(FieldDefinition.ColumnType.Integer)));
         listDefinitionPage.clickSave();
 
         log("Validate that a 'Create' event was logged for the new filed.");
@@ -717,7 +717,7 @@ public class AuditLogTest extends BaseWebDriverTest
         log("Change properties on field '" + FIELD03_NAME + "'.");
         listDefinitionPage.getFieldsPanel()
                 .getField(FIELD03_NAME)
-                .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02).setTableType(FieldDefinition.ColumnType.LookupToInteger));
+                .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02).setTableType(FieldDefinition.ColumnType.Integer));
         listDefinitionPage.clickSave();
 
         log("Validate that the expected row is there for the after modifying the Lookup field.");

@@ -23,13 +23,13 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
@@ -83,10 +83,11 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
                 "a\tb\tc\n" +
                 "a\tb\tc\n";
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet("SimpleNameExprTest", nameExpression,
-                Map.of("A", FieldDefinition.ColumnType.String,
-                        "B", FieldDefinition.ColumnType.String,
-                        "C", FieldDefinition.ColumnType.String),
+        sampleHelper.createSampleSet(new SampleSetDefinition("SimpleNameExprTest")
+                        .setNameExpression(nameExpression)
+                        .setFields(List.of(new FieldDefinition("A", FieldDefinition.ColumnType.String),
+                                new FieldDefinition("B", FieldDefinition.ColumnType.String),
+                                new FieldDefinition("C", FieldDefinition.ColumnType.String))),
                 data
                 );
 
@@ -124,7 +125,10 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
                 "\tb\t\n";
 
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet("InputsExpressionTest", nameExpression, Map.of("B", FieldDefinition.ColumnType.String), data);
+        sampleHelper.createSampleSet(new SampleSetDefinition("InputsExpressionTest")
+                .setNameExpression(nameExpression)
+                .setFields(List.of(new FieldDefinition("B", FieldDefinition.ColumnType.String))),
+                data);
 
         assertTextPresent(nameExpression);
 

@@ -439,7 +439,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propagating
         changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
                 new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics")
-                        .setTableType(FieldDefinition.ColumnType.LookupToInteger));
+                        .setTableType(FieldDefinition.ColumnType.Integer));
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
 
@@ -454,7 +454,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         //Change the Mother column lookup to point to the query, and then make sure that the table has lookups appropriately.
         changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
                 new FieldDefinition.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup")
-                .setTableType(FieldDefinition.ColumnType.LookupToInteger));
+                .setTableType(FieldDefinition.ColumnType.Integer));
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
     }
 

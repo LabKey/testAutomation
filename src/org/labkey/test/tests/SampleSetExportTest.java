@@ -21,12 +21,12 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
 import org.labkey.test.util.SampleSetHelper;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -51,7 +51,9 @@ public class SampleSetExportTest extends AbstractExportTest
 
         initTest.beginAt("/" + initTest.getProjectName() + "/experiment-listMaterialSources.view");
         SampleSetHelper sampleHelper = new SampleSetHelper(initTest);
-        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null, Map.of("Barcode", FieldDefinition.ColumnType.String), SAMPLE_DATA);
+        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME)
+                .setFields(List.of(new FieldDefinition("Barcode", FieldDefinition.ColumnType.String))),
+                SAMPLE_DATA);
     }
 
     @Override

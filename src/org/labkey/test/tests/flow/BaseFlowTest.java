@@ -23,11 +23,12 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.pages.ImportDataPage;
+import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
-import org.labkey.test.util.SampleSetHelper;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
@@ -37,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -237,20 +239,24 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         log("** Uploading sample set");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Upload Sample Descriptions"));
-        SampleSetHelper helper = new SampleSetHelper(this);
+        CreateSampleSetPage createPage = new CreateSampleSetPage(getDriver());
         StringBuilder nameExpression = new StringBuilder();
         for (String idCol : idCols)
         {
             nameExpression.append("-${").append(idCol).append("}");
         }
-        helper.setNameExpression(nameExpression.toString().substring(1));
+        createPage.setNameExpression(nameExpression.toString().substring(1));
+        List<FieldDefinition> fieldDefinitions = fields.entrySet().stream()
+                    .map(entry -> new FieldDefinition(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
 
-        clickButton("Create");
-        helper.addFields(fields);
+        createPage.addFields(fieldDefinitions);
+        createPage.clickSave(); // TODO: Will fail here. New UI doesn't support 'experiment-createSampleSet.view?name=Samples&nameReadOnly=true'
 
         clickAndWait(Locator.linkWithText("Upload More Samples"));
-        helper.setTsvData(TestFileUtils.getFileContents(sampleFile));
-        clickButton("Submit");
+        new ImportDataPage(getDriver())
+                .setFile(sampleFile)
+                .submit();
 
         log("** Join sample set with FCSFile keywords");
         goToFlowDashboard();
