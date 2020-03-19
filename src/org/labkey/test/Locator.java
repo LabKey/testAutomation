@@ -418,12 +418,13 @@ public abstract class Locator extends By
     {
         try
         {
-            return wait.ignoring(NotFoundException.class).until(new Function<SearchContext, List<WebElement>>()
+            return wait.until(new Function<SearchContext, List<WebElement>>()
             {
                 @Override
                 public List<WebElement> apply(SearchContext context)
                 {
-                    return findElements(context);
+                    List<WebElement> elements = findElements(context);
+                    return elements.isEmpty() ? null : elements;
                 }
 
                 @Override

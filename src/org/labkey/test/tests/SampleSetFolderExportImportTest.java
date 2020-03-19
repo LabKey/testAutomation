@@ -31,6 +31,7 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -267,7 +268,6 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
 
         log("Create the sample set named '" + SAMPLE_SET_NAME + "' and add the fields.");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(SAMPLE_SET_NAME);
         List<FieldDefinition> fields = new ArrayList<>();
         fields.add(new FieldDefinition(REQUIRED_FIELD_NAME)
                 .setType(FieldDefinition.ColumnType.String)
@@ -277,7 +277,8 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
                 .setType(FieldDefinition.ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
-        sampleHelper.addFields(fields);
+        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME).setFields(fields);
+        sampleHelper.createSampleSet(definition);
 
         clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
         sampleHelper = new SampleSetHelper(this);
