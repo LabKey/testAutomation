@@ -2089,6 +2089,51 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
 
+    @Test
+    public void testCreateViaScript()
+    {
+        String sampleSetName = "Created_by_Script";
+        String createScript = "LABKEY.Domain.create({\n" +
+                "  domainKind: \"SampleSet\",\n" +
+                "  domainDesign: {\n" +
+                "    name: \"" + sampleSetName +"\",\n" +
+                "    fields: [{\n" +
+                "       name: \"name\", rangeURI: \"string\"\n" +
+                "    },{\n" +
+                "       name: \"intField\", rangeURI: \"int\"\n" +
+                "    },{\n" +
+                "       name: \"strField\", rangeURI: \"string\"\n" +
+                "    }]\n" +
+                "  }\n" +
+                "});";
+
+        log("Go to project home.");
+        goToProjectHome();
+
+        log("Create a Sample Set using script.");
+        executeScript(createScript);
+
+        List<String> sampleNames = Arrays.asList("P-1", "P-2", "P-3", "P-4", "P-5");
+        List<Map<String, String>> sampleData = new ArrayList<>();
+        sampleNames.forEach(name -> {
+            sampleData.add(Map.of("Name", name, "intField", "42", "strField", "Sample: " + name));
+        });
+
+        log("Refresh the browser so the new sample set is shown.");
+        goToHome();
+        goToProjectHome();
+
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+
+        log("Add samples to the sample set.");
+        sampleHelper.goToSampleSet(sampleSetName);
+        sampleHelper.bulkImport(sampleData);
+
+        log("Check that the samples were added.");
+        assertEquals("Number of samples not as expected.", sampleNames.size(), sampleHelper.getSampleCount());
+
+    }
+
     private void setFileAttachment(int index, File attachment)
     {
         DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
