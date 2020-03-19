@@ -75,10 +75,12 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
                 fieldRow.allowMaxChar();
         if (fieldDefinition.getURL() != null)
             fieldRow.setUrl(fieldDefinition.getURL());
-        if (fieldDefinition.isMvEnabled())
-            fieldRow.setMissingValue(fieldDefinition.isMvEnabled());
-        if (fieldDefinition.isRequired())
-            fieldRow.setRequiredField(fieldDefinition.isRequired());
+        if (fieldDefinition.getMvEnabled())
+            fieldRow.setMissingValue(fieldDefinition.getMvEnabled());
+        if (fieldDefinition.getRequired())
+            fieldRow.setRequiredField(fieldDefinition.getRequired());
+        if (fieldDefinition.getLookupValidatorEnabled() != null)
+            fieldRow.setLookupValidatorEnabled(fieldDefinition.getLookupValidatorEnabled());
 
         if (fieldDefinition.getValidator() != null)
         {
@@ -321,8 +323,6 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
         WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
 
-        // TODO since the Assay Properties panel also has the notion of expand/collapse,
-        //  we should split that part out into an Abstract test class that both can use
         WebElement expandToggle = Locator.tagWithClass("svg", "domain-form-expand-btn").findWhenNeeded(DomainFormPanel.this);
         Locator.XPathLocator panelTitleLoc = Locator.tagWithClass("span", "domain-panel-title");
         WebElement panelTitle = panelTitleLoc.findWhenNeeded(DomainFormPanel.this);
@@ -333,7 +333,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
     {
-        final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-form-panel");
+        private final Locator.XPathLocator _panelLocator = Locator.tagWithClass("div", "domain-form-panel");
+
         private String _title = null;
 
         public DomainFormPanelFinder(WebDriver driver)
@@ -358,16 +359,13 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         {
             if (_title != null)
             {
-                Locator.XPathLocator titleLoc = Locator.tagWithClass("div", "domain-panel-header").child(Locator.tag("span")).startsWith(_title);
-                return getBaseLocator().withDescendant(titleLoc);
+                Locator.XPathLocator titleLoc = Locator.byClass("domain-panel-title").startsWith(_title);
+                return _panelLocator.withDescendant(titleLoc);
             }
             else
-                return getBaseLocator();
-        }
-
-        public Locator.XPathLocator getBaseLocator()
-        {
-            return _baseLocator;
+            {
+                return _panelLocator;
+            }
         }
     }
 }

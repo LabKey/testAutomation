@@ -489,6 +489,10 @@ public class ListHelper extends LabKeySiteWrapper
                 .addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
     }
 
+    /**
+     * @deprecated Use {@link FieldDefinition.RangeType}
+     */
+    @Deprecated
     public enum RangeType
     {
         Equals("Equals"), NE("Does Not Equal"), GT("Greater than"), GTE("Greater than or Equals"), LT("Less than"), LTE("Less than or Equals");
@@ -515,6 +519,10 @@ public class ListHelper extends LabKeySiteWrapper
         }
     }
 
+    /**
+     * @deprecated Use {@link FieldDefinition.ColumnType}
+     */
+    @Deprecated
     public enum ListColumnType
     {
         MultiLine("Multi-Line Text"),
@@ -542,7 +550,7 @@ public class ListHelper extends LabKeySiteWrapper
             return _description;
         }
 
-        private FieldDefinition.ColumnType toNew()
+        public FieldDefinition.ColumnType toNew()
         {
             for (FieldDefinition.ColumnType thisType : FieldDefinition.ColumnType.values())
             {
@@ -563,6 +571,10 @@ public class ListHelper extends LabKeySiteWrapper
         }
     }
 
+    /**
+     * @deprecated Use {@link FieldDefinition.LookupInfo}
+     */
+    @Deprecated
     public static class LookupInfo extends FieldDefinition.LookupInfo
     {
         public LookupInfo(@Nullable String folder, String schema, String table)
@@ -571,6 +583,10 @@ public class ListHelper extends LabKeySiteWrapper
         }
     }
 
+    /**
+     * @deprecated Use {@link FieldDefinition.RegExValidator}
+     */
+    @Deprecated
     public static class RegExValidator extends FieldDefinition.RegExValidator
     {
         public RegExValidator(String name, String description, String message, String expression)
@@ -579,27 +595,22 @@ public class ListHelper extends LabKeySiteWrapper
         }
     }
 
+    /**
+     * @deprecated Use {@link FieldDefinition.RangeValidator}
+     */
+    @Deprecated
     public static class RangeValidator extends FieldDefinition.RangeValidator
     {
         public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange)
         {
             super(name, description, message, firstType.toNew(), firstRange);
         }
-
-        public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange, RangeType secondType, String secondRange)
-        {
-            super(name, description, message, firstType.toNew(), firstRange, secondType.toNew(), secondRange);
-        }
     }
 
-    public static class LookUpValidator extends FieldDefinition.LookUpValidator
-    {
-        public LookUpValidator()
-        {
-            super();
-        }
-    }
-
+    /**
+     * @deprecated Use {@link FieldDefinition}
+     */
+    @Deprecated
     public static class ListColumn extends FieldDefinition
     {
         public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url, Integer scale)
@@ -649,14 +660,5 @@ public class ListHelper extends LabKeySiteWrapper
         {
             this(name, null, type);
         }
-    }
-
-    /**
-     * Set of locators for navigating the List Designer page
-     */
-    public static class DesignerLocators
-    {
-        public static Locator.XPathLocator maxCheckbox = Locator.xpath("//input[@name='isMaxText']");
-        public static Locator.XPathLocator scaleTextbox = Locator.xpath("//input[@name='scale']");
     }
 }

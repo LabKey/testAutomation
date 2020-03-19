@@ -155,7 +155,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         goToProjectHome();
         ListHelper.ListColumn[] cols = {
             new ListHelper.ListColumn("MyName", "MyName", ListHelper.ListColumnType.String, "My Name"),
-            new ListHelper.ListColumn("ListLookup", "ListLookup", ListHelper.ListColumnType.Integer, "List Lookup", new ListHelper.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName).setTableType(FieldDefinition.ColumnType.LookupToInteger)),
+            new ListHelper.ListColumn("ListLookup", "ListLookup", ListHelper.ListColumnType.Integer, "List Lookup", new ListHelper.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName).setTableType(FieldDefinition.ColumnType.Integer)),
         };
         String lookupSourceListName = "Project-LookupSource-List";
         _listHelper.createList(getProjectName(), lookupSourceListName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
@@ -218,7 +218,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Creating list with lookup to viscstudies.studies");
         ListHelper.ListColumn[] cols = {
-            new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "Study Lookup", new ListHelper.LookupInfo(null, "viscstudies", "studies").setTableType(FieldDefinition.ColumnType.LookupToString)),
+            new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "Study Lookup", new ListHelper.LookupInfo(null, "viscstudies", "studies").setTableType(FieldDefinition.ColumnType.String)),
         };
         _listHelper.createList(getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
 

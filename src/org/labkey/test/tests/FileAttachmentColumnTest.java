@@ -24,8 +24,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
-import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -138,14 +139,14 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         log("adding sample set with file column");
 
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(SAMPLESET_NAME, null, Map.of("color", FieldDefinition.ColumnType.String), Collections.singletonList(Map.of("Name", "ed", "color", "green")));
+        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLESET_NAME).setFields(List.of(new FieldDefinition("color", FieldDefinition.ColumnType.String))), Collections.singletonList(Map.of("Name", "ed", "color", "green")));
 
         // add a 'file' column
         log("editing fields for sample set");
         clickFolder(FOLDER_NAME);
-        DomainDesignerPage domainDesignerPage = sampleHelper.goToEditSampleSetFields(SAMPLESET_NAME);
-        domainDesignerPage.fieldsPanel().addField(new FieldDefinition("File", FieldDefinition.ColumnType.File));
-        domainDesignerPage.clickFinish();
+        UpdateSampleSetPage updatePage = sampleHelper.goToEditSampleSet(SAMPLESET_NAME);
+        updatePage.addFields(List.of(new FieldDefinition("File", FieldDefinition.ColumnType.File)));
+        updatePage.clickSave();
 
         StringBuilder sb = new StringBuilder("Name\tcolor\tfile\n");
         for (File file : DATAFILE_DIRECTORY.listFiles())

@@ -15,33 +15,34 @@
  */
 package org.labkey.test.util;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
+/**
+ * Helper methods for create Sample Types and import data into them through standard LabKey Server UI
+ */
 public class SampleSetHelper extends WebDriverWrapper
 {
     private final WebDriver _driver;
-    private Map<String, FieldDefinition.ColumnType> _fields;
     public static final String IMPORT_DATA_LABEL = "Insert";
     public static final String MERGE_DATA_LABEL = "Insert and Replace";
 
@@ -67,7 +68,7 @@ public class SampleSetHelper extends WebDriverWrapper
         return _driver;
     }
 
-    private SampleSetHelper createSampleSet(SampleSetDefinition props)
+    public void createSampleSet(SampleSetDefinition props)
     {
         CreateSampleSetPage createPage = goToCreateNewSampleSet();
 
@@ -81,162 +82,52 @@ public class SampleSetHelper extends WebDriverWrapper
             createPage.setDescription(props.getDescription());
         }
 
-        int i = 0;
-        for (String importHeader : props.getImportAliases().keySet())
+        for (String importHeader : props.getParentAliases().keySet())
         {
-            createPage.addParentColumnAlias(i, importHeader, props.getImportAliases().get(importHeader));
-            i++;
+            createPage.addParentAlias(importHeader, props.getParentAliases().get(importHeader));
         }
 
-        DomainDesignerPage domainDesignerPage = createPage.clickCreate();
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-        for (FieldDefinition fieldDefinition : props.getFields())
-        {
-            domainFormPanel.addField(fieldDefinition);
-        }
-        domainDesignerPage.clickFinish();
-
-        return this;
+        createPage.addFields(props.getFields());
+        createPage.clickSave();
     }
 
-    public SampleSetHelper createSampleSet(String name)
+    public void createSampleSet(SampleSetDefinition definition, File dataFile)
     {
-        return createSampleSet(name, null);
+        createSampleSet(definition);
+        goToSampleSet(definition.getName()).bulkImport(dataFile);
     }
 
-    public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression)
+    public void createSampleSet(SampleSetDefinition definition, String data)
     {
-        return createSampleSet(name, nameExpression, false);
+        createSampleSet(definition);
+        goToSampleSet(definition.getName()).bulkImport(data);
     }
 
-    public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression, boolean createFailureExpected)
+    public void createSampleSet(SampleSetDefinition definition, List<Map<String, String>> data)
     {
-        CreateSampleSetPage createSampleSetPage = goToCreateNewSampleSet();
-
-        createSampleSetPage.setName(name);
-        if (nameExpression != null)
-        {
-            createSampleSetPage.setNameExpression(nameExpression);
-        }
-
-        if (createFailureExpected)
-            createSampleSetPage.clickCreateExpectingError();
-        else
-            createSampleSetPage.clickCreate();
-
-        return this;
-    }
-
-    public SampleSetHelper createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields)
-    {
-        SampleSetDefinition props = new SampleSetDefinition();
-        props.setName(name);
-        props.setNameExpression(nameExpression);
-        _fields = fields;
-        if (fields != null)
-        {
-            for (String fieldName : fields.keySet())
-            {
-                props.addField(new FieldDefinition(fieldName).setType(fields.get(fieldName)));
-            }
-        }
-
-        createSampleSet(props);
-        return this;
-    }
-
-    public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields, File dataFile)
-    {
-        createSampleSet(name, nameExpression, fields);
-        goToSampleSet(name).bulkImport(dataFile);
-    }
-
-    public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields, String data)
-    {
-        createSampleSet(name, nameExpression, fields);
-        goToSampleSet(name).bulkImport(data);
-    }
-
-    public void createSampleSet(String name, @Nullable String nameExpression, Map<String, FieldDefinition.ColumnType> fields, List<Map<String, String>> data)
-    {
-        createSampleSet(name, nameExpression, fields);
-        goToSampleSet(name).bulkImport(data);
+        createSampleSet(definition);
+        goToSampleSet(definition.getName()).bulkImport(data);
     }
 
     public CreateSampleSetPage goToCreateNewSampleSet()
     {
-        getSampleSetsList().clickHeaderButtonAndWait("Create New Sample Set");
+        getSampleSetsList().clickHeaderButtonAndWait("New Sample Set");
         return new CreateSampleSetPage(getDriver());
     }
 
-
-    public SampleSetHelper setNameExpression(String nameExpression)
-    {
-        new CreateSampleSetPage(getDriver()).setNameExpression(nameExpression);
-        return this;
-    }
-
-    public SampleSetHelper selectImportOption(String label, int index)
+    public void selectImportOption(String label, int index)
     {
         waitForText("Import Lookups by Alternate Key");
         boolean merge = MERGE_DATA_LABEL.equals(label);
         String componentId = "insertOption" + index;
         String script = "Ext4.ComponentManager.get('" + componentId + "').setValue(" + (merge?"1":"0") + ")";
         executeScript(script);
-        return this;
-    }
-
-    public SampleSetHelper addParentColumnAlias(Map<String, String> aliases)
-    {
-        CreateSampleSetPage createSampleSetPage = new CreateSampleSetPage(getDriver());
-
-        int i = 0;
-        for(String importHeader : aliases.keySet())
-        {
-            createSampleSetPage.addParentColumnAlias(i, importHeader, aliases.get(importHeader));
-            i++;
-        }
-
-        return this;
-    }
-
-    public SampleSetHelper removeParentColumnAlias(String parentAlias)
-    {
-
-        List<WebElement> importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
-
-        int countOfInputs = importAliasInputs.size();
-
-        waitFor(()-> Locator.tagWithName("input", "importAliasKeys").findElements(getDriver()).size() > countOfInputs, 1000);
-
-        importAliasInputs = Locator.tagWithName("input", "importAliasKeys").findElements(getDriver());
-
-        int index = 0;
-        for(WebElement input : importAliasInputs)
-        {
-            if(getFormElement(input).trim().equalsIgnoreCase(parentAlias.trim()))
-            {
-                break;
-            }
-            index++;
-        }
-
-        if(index == importAliasInputs.size())
-            throw new NoSuchElementException("No 'Parent Alias' with the value of '" + parentAlias + "' was found.");
-
-        importAliasInputs = Locator.tagWithClass("a", "removeAliasTrigger").findElements(getDriver());
-
-        importAliasInputs.get(index).click();
-
-        clickButton("Update");
-
-        return this;
     }
 
     public SampleSetHelper goToSampleSet(String name)
     {
         TestLogger.log("Go to the sample set '" + name + "'");
-        click(Locator.linkWithText(name));
+        clickAndWait(Locator.linkWithText(name));
         return this;
     }
 
@@ -247,59 +138,14 @@ public class SampleSetHelper extends WebDriverWrapper
         return new UpdateSampleSetPage(getDriver());
     }
 
-    public DomainDesignerPage goToEditSampleSetFields(String name)
-    {
-        goToSampleSet(name);
-        waitAndClickAndWait(Locator.lkButton("Edit Fields"));
-        return new DomainDesignerPage(getDriver());
-    }
-
-    public void setFields(Map<String, FieldDefinition.ColumnType> fields)
-    {
-        _fields = fields;
-    }
-
-    @LogMethod
-    public SampleSetHelper addFields(Map<String, FieldDefinition.ColumnType> fields)
-    {
-        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
-
-        _fields = fields;
-        if (fields != null && !fields.isEmpty())
-        {
-            DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-            fields.forEach((name, type) -> domainFormPanel.addField(new FieldDefinition(name, type)));
-            domainDesignerPage.clickFinish();
-        }
-        else
-            clickButton("Cancel");
-
-        return this;
-    }
-
-    public SampleSetHelper addFields(List<FieldDefinition> fields)
-    {
-        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
-
-        if (null != fields && !fields.isEmpty())
-        {
-            DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-            fields.forEach(fieldDefinition -> domainFormPanel.addField(fieldDefinition));
-            domainDesignerPage.clickFinish();
-        }
-        else
-            clickButton("Cancel");
-
-        return this;
-    }
-
-    public SampleSetHelper verifyFields()
+    public void verifyFields(List<FieldDefinition> _fields)
     {
         TestLogger.log("Verify that the fields for the sample set are as expected");
-        List<String> actualNames = getSampleSetFields();
-        for (String name : _fields.keySet())
-            assertTrue("'" + name + "' should be one of the fields", actualNames.contains(name));
-        return this;
+        Set<String> actualNames = new HashSet<>(getSampleSetFields());
+        Set<String> expectedNames = _fields.stream().map(FieldDefinition::getName).collect(Collectors.toSet());
+        expectedNames.add("Name");
+        expectedNames.add("Flag");
+        assertEquals("Fields in sample set.", expectedNames, actualNames);
     }
 
     public DataRegionTable getSampleSetsList()
@@ -335,93 +181,90 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void bulkImport(File dataFile)
     {
-        bulkImport(dataFile, IMPORT_DATA_LABEL);
+        fileImport(dataFile, IMPORT_DATA_LABEL);
     }
 
-    public void bulkImport(File dataFile, String importOption)
+    public void mergeImport(File dataFile)
     {
-        if (dataFile != null)
-        {
-            DataRegionTable drt = getSamplesDataRegionTable();
-            TestLogger.log("Adding data from file");
-            drt.clickImportBulkData();
-            click(Locators.fileUpload);
-            selectImportOption(importOption, 0);
-            setFormElement(Locator.tagWithName("input", "file"), dataFile);
-            clickButton("Submit");
-        }
+        fileImport(dataFile, MERGE_DATA_LABEL);
     }
 
-    public void setTsvData(String tsvData)
+    private void fileImport(File dataFile, String importOption)
     {
-        setFormElement(Locator.name("text"), tsvData);
+        DataRegionTable drt = getSamplesDataRegionTable();
+        TestLogger.log("Adding data from file");
+        ImportDataPage importDataPage = drt.clickImportBulkData();
+        importDataPage.setFile(dataFile);
+        selectImportOption(importOption, 0);
+        importDataPage.submit();
     }
 
     public void bulkImport(String tsvData)
     {
-        bulkImport(tsvData, IMPORT_DATA_LABEL);
+        startTsvImport(tsvData, IMPORT_DATA_LABEL)
+                .submit();
     }
 
-    public void bulkImport(String tsvData, String importOption)
+    public void mergeImport(String tsvData)
     {
-        if (tsvData.length() > 0)
-        {
-            DataRegionTable drt = getSamplesDataRegionTable();
-            TestLogger.log("Adding tsv data via bulk import");
-            drt.clickImportBulkData();
-            selectImportOption(importOption, 1);
-            setTsvData(tsvData);
-            clickButton("Submit");
-        }
+        startTsvImport(tsvData, SampleSetHelper.MERGE_DATA_LABEL)
+                .submit();
     }
 
     public void bulkImport(List<Map<String, String>> data)
     {
-        bulkImport(data, IMPORT_DATA_LABEL, null);
+        startTsvImport(data, IMPORT_DATA_LABEL)
+                .submit();
     }
 
-    public void bulkImport(List<Map<String, String>> data, int waitTime)
+    public void mergeImport(List<Map<String, String>> data)
     {
-        bulkImport(data, IMPORT_DATA_LABEL, waitTime);
+        startTsvImport(data, SampleSetHelper.MERGE_DATA_LABEL)
+                .submit();
     }
 
-    public void bulkImport(List<Map<String, String>> data, String importOption)
+    public void bulkImportExpectingError(List<Map<String, String>> data, String importOption)
     {
-        bulkImport(data, importOption, null);
+        startTsvImport(data, importOption)
+                .submitExpectingError();
     }
 
-    public void bulkImport(List<Map<String, String>> data, String importOption, @Nullable Integer waitTime)
+    private ImportDataPage startTsvImport(String tsv, String importOption)
     {
-        if (data.size() > 0)
+        DataRegionTable drt = getSamplesDataRegionTable();
+        ImportDataPage importDataPage = drt.clickImportBulkData();
+        selectImportOption(importOption, 1);
+        importDataPage.setText(tsv);
+        return importDataPage;
+    }
+
+    private ImportDataPage startTsvImport(List<Map<String, String>> data, String importOption)
+    {
+        if (data == null || data.isEmpty())
         {
-            TestLogger.log ("Adding " + data.size() + " rows via bulk import");
-            DataRegionTable drt = getSamplesDataRegionTable();
-            drt.clickImportBulkData();
-            // first the header
-            List<String> rows = new ArrayList<>();
-            rows.add(String.join("\t", data.get(0).keySet()));
-            data.forEach(dataMap -> {
-                StringBuilder row = new StringBuilder();
-                data.get(0).keySet().forEach(key -> {
-                    row.append(dataMap.get(key));
-                    row.append("\t");
-                });
-                rows.add(row.substring(0, row.lastIndexOf("\t")));
-            });
-
-            selectImportOption(importOption, 1);
-            setTsvData(String.join("\n", rows));
-
-            // If an error is expected after clicking submit the page won't navigate. A 0 waitTime will avoid the "Page didn't navigate" error.
-            if(null != waitTime)
-                clickButton("Submit", waitTime);
-            else
-                clickButton("Submit");
-
+            throw new IllegalArgumentException("No data provided");
         }
+        return startTsvImport(convertMapToTsv(data), importOption);
     }
 
-    public SampleSetHelper deleteSamples(DataRegionTable samplesTable, String expectedTitle)
+    @NotNull
+    private static String convertMapToTsv(@NotNull List<Map<String, String>> data)
+    {
+        // first the header
+        List<String> rows = new ArrayList<>();
+        rows.add(String.join("\t", data.get(0).keySet()));
+        data.forEach(dataMap -> {
+            StringBuilder row = new StringBuilder();
+            data.get(0).keySet().forEach(key -> {
+                row.append(dataMap.get(key));
+                row.append("\t");
+            });
+            rows.add(row.substring(0, row.lastIndexOf("\t")));
+        });
+        return String.join("\n", rows);
+    }
+
+    public void deleteSamples(DataRegionTable samplesTable, String expectedTitle)
     {
         samplesTable.doAndWaitForUpdate(() -> {
             samplesTable.clickHeaderButton("Delete");
@@ -430,15 +273,9 @@ public class SampleSetHelper extends WebDriverWrapper
             Window.Window(getDriver()).withTitleContaining("Delete sample").waitFor();
             _ext4Helper.waitForMaskToDisappear();
         });
-        return this;
     }
 
-    public SampleSetHelper verifyDataRow(Map<String, String> data, int index)
-    {
-        return verifyDataRow(data, index, DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents"));
-    }
-
-    private SampleSetHelper verifyDataRow(Map<String, String> expectedData, int index, DataRegionTable drt)
+    private void verifyDataRow(Map<String, String> expectedData, int index, DataRegionTable drt)
     {
         Map<String, String> actualData = drt.getRowDataAsMap(index);
 
@@ -446,28 +283,15 @@ public class SampleSetHelper extends WebDriverWrapper
         {
             assertEquals(field.getKey() + " not as expected at index " + index, field.getValue(), actualData.get(field.getKey()));
         }
-        return this;
     }
 
-    public SampleSetHelper verifyDataValues(List<Map<String, String>> data)
-    {
-        return verifyDataValues(data, "Name");
-    }
-
-    public SampleSetHelper verifyDataValues(List<Map<String, String>> data, String keyField)
+    public void verifyDataValues(List<Map<String, String>> data)
     {
         DataRegionTable drt = getSamplesDataRegionTable();
         for (Map<String, String> expectedRow : data)
         {
-            int index = drt.getRowIndex(keyField, expectedRow.get(keyField));
+            int index = drt.getRowIndex("Name", expectedRow.get("Name"));
             verifyDataRow(expectedRow, index, drt);
         }
-        return this;
     }
-
-    public static class Locators
-    {
-        public static final Locator.XPathLocator fileUpload = Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)");
-    }
-
 }
