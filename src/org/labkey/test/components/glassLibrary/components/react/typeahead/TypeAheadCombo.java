@@ -101,18 +101,18 @@ public class TypeAheadCombo extends WebDriverComponent<TypeAheadCombo.ElementCac
     }
 
 
-    public static class RbtSelectFinder extends WebDriverComponentFinder<TypeAheadCombo, RbtSelectFinder>
+    public static class TypeAheadComboFinder extends WebDriverComponentFinder<TypeAheadCombo, TypeAheadComboFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "rbt")
                 .withDescendant(Locator.tagWithClass("input", "rbt-input")).parent();
         private String _label = null;
 
-        public RbtSelectFinder(WebDriver driver)
+        public TypeAheadComboFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public RbtSelectFinder withLabel(String label)
+        public TypeAheadComboFinder withLabel(String label)
         {
             _label = label;
             return this;
