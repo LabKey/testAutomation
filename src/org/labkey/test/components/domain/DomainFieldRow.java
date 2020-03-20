@@ -449,6 +449,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public String getSampleType()
+    {
+        expand();
+        return elementCache().getLookupSampleTypeSelect().getFirstSelectedOption().getText();
+    }
+
+    public DomainFieldRow setSampleType(String sampleTypeName)
+    {
+        expand();
+        elementCache().getLookupSampleTypeSelect().selectByVisibleText(sampleTypeName);
+        return this;
+    }
+
     public DomainFieldRow setLookupValidatorEnabled(boolean checked)
     {
         expand();
@@ -770,6 +783,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Select getLookupQuerySelect()
         {
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
+            return waitForSelectToLoad(select);
+        }
+
+        public Select getLookupSampleTypeSelect()
+        {
+            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-sampleTypeSelect")).find(this);
             return waitForSelectToLoad(select);
         }
 
