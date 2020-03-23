@@ -21,8 +21,6 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.labkey.test.util.TestLogger;
 
-import java.util.concurrent.TimeUnit;
-
 @Aspect
 public class ImpersonationLoggingAspect
 {
@@ -48,7 +46,7 @@ public class ImpersonationLoggingAspect
         else
         {
             TestLogger.decreaseIndent();
-            TestLogger.log("><Switch Impersonation : " + _impersonating + " [" + getElapsedString(_startTime) + "] -> " + impersonating);
+            TestLogger.log("><Switch Impersonation : " + _impersonating + TestLogger.formatElapsedTime(System.currentTimeMillis() - _startTime) + " -> " + impersonating);
             TestLogger.increaseIndent();
 
             _impersonating = impersonating;
@@ -61,21 +59,12 @@ public class ImpersonationLoggingAspect
     {
         String impersonating = _impersonating;
 
-        String elapsedStr = getElapsedString(_startTime);
+        String elapsedStr = TestLogger.formatElapsedTime(System.currentTimeMillis() - _startTime);
 
         TestLogger.decreaseIndent();
-        TestLogger.log("<<Stop Impersonating - " + impersonating + " [" + elapsedStr + "]");
+        TestLogger.log("<<Stop Impersonating - " + impersonating + elapsedStr);
 
         _impersonating = null;
     }
 
-    private String getElapsedString(Long startTime)
-    {
-        Long elapsed = System.currentTimeMillis() - startTime;
-        return String.format("%dm %d.%ds",
-                TimeUnit.MILLISECONDS.toMinutes(elapsed),
-                TimeUnit.MILLISECONDS.toSeconds(elapsed) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
-                elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
-    }
 }

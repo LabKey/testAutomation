@@ -16,11 +16,13 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.TestProperties;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class TestLogger
 {
@@ -102,5 +104,49 @@ public class TestLogger
     {
         String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()); // Include time with log entry.  Use format that matches labkey log.
         out.println(d + " " + getIndentString() + str);
+    }
+
+    /**
+     * Format an elapsed time to be suitable for log messages.
+     * Over one minute:
+     *  " &lt;1m 25s&gt;"
+     * Over one minute:
+     *  " &lt;8.059s&gt;"
+     * Less than on second:
+     *  " &lt;125ms&gt;"
+     * @param milliseconds Elapsed time in milliseconds
+     * @return Formatted time
+     */
+    @NotNull
+    public static String formatElapsedTime(long milliseconds)
+    {
+        long minutesPart = TimeUnit.MILLISECONDS.toMinutes(milliseconds);
+        long secondsPart = TimeUnit.MILLISECONDS.toSeconds(milliseconds) -
+                TimeUnit.MINUTES.toSeconds(minutesPart);
+        long millisecondsPart = milliseconds - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(milliseconds));
+
+        StringBuilder elapsedStr = new StringBuilder(" <");
+        if (minutesPart == 0 && secondsPart == 0) // milliseconds only
+        {
+            elapsedStr.append(millisecondsPart);
+            elapsedStr.append("ms");
+        }
+        else
+        {
+            if (minutesPart > 0)
+            {
+                elapsedStr.append(minutesPart).append("m ");
+            }
+            elapsedStr.append(secondsPart);
+            if (minutesPart == 0)
+            {
+                String millisecondsStr = String.valueOf(millisecondsPart);
+                String padding = StringUtils.repeat("0", 3 - millisecondsStr.length());
+                elapsedStr.append(".").append(padding).append(millisecondsPart);
+            }
+            elapsedStr.append("s");
+        }
+        elapsedStr.append(">");
+        return elapsedStr.toString();
     }
 }
