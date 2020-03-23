@@ -112,7 +112,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
     {
         Locator loc = Locator.tagWithClass("span", "list__advanced-settings-model__index-checkbox")
                 .withChild(Locator.tagWithText("span", "Index file attachments"))
-                .child(Locator.tagWithClass("span", "list__properties__checkbox--no-highlight"));
+                .child(Locator.tagWithClass("span", "list__properties__no-highlight"));
         SvgCheckbox checkbox = new SvgCheckbox(loc.waitForElement(this, 2000), getDriver());
         checkbox.set(checked);
         return this;
