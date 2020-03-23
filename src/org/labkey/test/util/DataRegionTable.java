@@ -31,6 +31,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.study.DatasetFacetPanel;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.selenium.WebElementWrapper;
@@ -1273,12 +1274,13 @@ public class DataRegionTable extends DataRegion
             clickHeaderButtonAndWait(getInsertNewButtonText());
     }
 
-    public void clickImportBulkData()
+    public ImportDataPage clickImportBulkData()
     {
         if (hasHeaderMenu("Insert data"))
             clickHeaderMenu("Insert data", getImportBulkDataText());
         else
             clickHeaderButtonAndWait(getImportBulkDataText());
+        return new ImportDataPage(getDriver());
     }
 
     public void clickDeleteAllButton()

@@ -26,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
@@ -75,7 +76,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
 
         //import a sample set
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(SAMPLE_SET_NAME, null, null,  SAMPLE_SET);
+        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME), SAMPLE_SET);
 
         _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, FOLDER_TYPE_STUDY);
 
@@ -84,8 +85,8 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         portalHelper.addWebPart("Assay List");
 
         //import more to sample set while in subfolder
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
-        sampleHelper.bulkImport(SAMPLE_SET_SUB_FOLDER, SampleSetHelper.MERGE_DATA_LABEL);
+        sampleHelper.goToSampleSet(SAMPLE_SET_NAME);
+        sampleHelper.mergeImport(SAMPLE_SET_SUB_FOLDER);
     }
 
     @Before

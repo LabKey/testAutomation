@@ -132,7 +132,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         if (col.getFormat() != null)
             fieldProperties().selectFormatTab().setPropertyFormat(col.getFormat());
 
-        if (col.isRequired())
+        if (col.getRequired())
             fieldProperties().selectValidatorsTab().setRequired(true);
 
         FieldDefinition.FieldValidator validator = col.getValidator();
@@ -167,7 +167,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         }
 
-        if (col.isMvEnabled())
+        if (col.getMvEnabled())
         {
             fieldProperties().selectAdvancedTab().setMvEnabled(true);
         }
@@ -774,7 +774,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
             else
                 Locator.tagWithClass("div", "test-marker-" + lookup.getSchema()).descendant("input").withAttribute("name", "schema").waitForElement(this, WAIT_FOR_JAVASCRIPT);
 
-            selectLookupTableComboItem(lookup.getTable(), lookup.getTableType());
+            selectLookupTableComboItem(lookup.getTable(), lookup.getTableType().name());
             return this;
         }
 

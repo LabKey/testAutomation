@@ -35,6 +35,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
@@ -184,7 +185,9 @@ public class ModuleAssayTest extends AbstractAssayTest
 
         portalHelper.addWebPart("Sample Sets");
         SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(SAMPLE_SET, null, Map.of("Barcode", FieldDefinition.ColumnType.String), SAMPLE_SET_ROWS);
+        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET)
+                .setFields(List.of(new FieldDefinition("Barcode", FieldDefinition.ColumnType.String))),
+                SAMPLE_SET_ROWS);
     }
 
     @Test

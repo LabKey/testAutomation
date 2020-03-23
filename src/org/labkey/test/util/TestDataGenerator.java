@@ -87,30 +87,13 @@ public class TestDataGenerator
      * @param columns   The fieldSet for the domain/sampleset/list.
      * @return
      */
-    public TestDataGenerator withColumns(List<PropertyDescriptor> columns)
+    public TestDataGenerator withColumns(List<? extends PropertyDescriptor> columns)
     {
         int index = 0;
         for (PropertyDescriptor fieldDef : columns)
         {
             _columns.put(fieldDef.getName(), fieldDef);
             _indices.put(index, fieldDef);
-            index++;
-        }
-        return this;
-    }
-
-    @Deprecated
-    /**
-     * use withColumns (list<PropertyDescriptor> columns) instead
-     */
-    public TestDataGenerator withColumnSet(List<FieldDefinition> columns)
-    {
-        int index = 0;
-        for (FieldDefinition fieldDef : columns)
-        {
-            PropertyDescriptor field = fieldDef.toPropertyDescriptor();
-            _columns.put(fieldDef.getName(), field);
-            _indices.put(index, field);
             index++;
         }
         return this;
@@ -402,9 +385,12 @@ public class TestDataGenerator
         return new TestDataValidator(_lookupInfo, _columns, _rows);
     }
 
-    // helper to generate a column or field definition
+    /**
+     * @deprecated Inline this.
+     */
+    @Deprecated
     static public PropertyDescriptor simpleFieldDef(String name, FieldDefinition.ColumnType type)
     {
-        return new PropertyDescriptor(name, type.getJsonType());
+        return new FieldDefinition(name, type);
     }
 }
