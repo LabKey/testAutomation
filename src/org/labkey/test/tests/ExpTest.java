@@ -136,10 +136,7 @@ public class ExpTest extends BaseWebDriverTest
         waitForElement(Locator.css(".labkey-status-info").withText("Saved"));
         clickButton("Edit Metadata");
         DomainDesignerPage designerPage = new DomainDesignerPage(getDriver());
-        int created_RowIndex = 5;
-        waitForElement(Locator.name("ff_label" + created_RowIndex), WAIT_FOR_JAVASCRIPT);
 
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitle("Metadata Properties").find();
         DomainFieldRow domainRow = designerPage.fieldsPanel().getField("Created");
         domainRow.setLabel("editedCreated");
         domainRow.setDateFormat("ddd MMM dd yyyy");
@@ -163,17 +160,16 @@ public class ExpTest extends BaseWebDriverTest
         selectQuery("exp", "Data"); // Select the one we want to edit
         waitForElement(Locator.linkWithText("edit metadata"), WAIT_FOR_JAVASCRIPT); //on Ext panel
         clickAndWait(Locator.linkWithText("edit metadata"));
-        waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
-        int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]")) - 1;
-        Locator lastField = Locator.xpath("//input[@name='ff_label" + lastFieldIndex + "']");
+
+        designerPage = new DomainDesignerPage(getDriver());
+        int lastFieldIndex = designerPage.fieldsPanel().fieldNames().size() -1;
         domainRow = designerPage.fieldsPanel().getField(lastFieldIndex);
         clickButton("Alias Field");
         SelectWrapper.Select(Locator.tagWithAttribute("select", "name", "aliasField")).findWhenNeeded(getDriver()).selectByVisibleText("RowId");
         clickButton("OK");
 
         // Make it a lookup into our custom query
-        editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Metadata Properties").find();
-        int fieldCount = getElementCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
+        int fieldCount = designerPage.fieldsPanel().fieldNames().size();
         assertTrue(fieldCount > 0);
         domainRow = designerPage.fieldsPanel().getField(fieldCount-1);
         domainRow.setType(FieldDefinition.ColumnType.Lookup).setFromSchema("exp").setFromTargetTable("dataCustomQuery");
