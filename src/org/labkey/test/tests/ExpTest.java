@@ -134,7 +134,7 @@ public class ExpTest extends BaseWebDriverTest
         _ext4Helper.clickExt4Tab("Source");
         clickButton("Save", 0);
         waitForElement(Locator.css(".labkey-status-info").withText("Saved"));
-        clickButton("Edit Metadata");
+        clickButton("Edit Metadata", "Metadata Properties");
         DomainDesignerPage designerPage = new DomainDesignerPage(getDriver());
 
         DomainFieldRow domainRow = designerPage.fieldsPanel().getField("Created");
