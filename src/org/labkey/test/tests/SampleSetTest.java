@@ -1892,6 +1892,7 @@ public class SampleSetTest extends BaseWebDriverTest
         // Make a grandchild set
         log("Create a grandparent sample set");
         clickTab("Experiment");
+        scrollIntoView(Locator.linkWithText("Sample Sets"));
         clickAndWait(Locator.linkWithText("Sample Sets"));
 
         sampleHelper.createSampleSet(new SampleSetDefinition(FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME).setFields(

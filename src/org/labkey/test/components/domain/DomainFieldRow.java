@@ -33,6 +33,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     final WebElement _el;
     final WebDriver _driver;
     final DomainFormPanel _formPanel;
+    public static final String ALL_SAMPLES_OPTION_TEXT = "All Samples";
 
     public DomainFieldRow(DomainFormPanel panel, WebElement element, WebDriver driver)
     {
@@ -671,6 +672,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     protected ElementCache newElementCache()
     {
         return new ElementCache();
+    }
+
+    public String getSampleType()
+    {
+        expand();
+        return elementCache().getLookupSampleTypeSelect().getFirstSelectedOption().getText();
+    }
+
+    public DomainFieldRow setSampleType(String sampleTypeName)
+    {
+        expand();
+        elementCache().getLookupSampleTypeSelect().selectByVisibleText(sampleTypeName);
+        return this;
     }
 
     public static class DomainFieldRowFinder extends WebDriverComponentFinder<DomainFieldRow, DomainFieldRowFinder>

@@ -734,7 +734,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 Long elapsed = System.currentTimeMillis() - testStartTimeStamp;
 
                 TestLogger.resetLogger();
-                TestLogger.log("\\\\ Test Case Complete - " + description.getMethodName() + " [" + getElapsedString(elapsed) + "] //");
+                TestLogger.log("\\\\ Test Case Complete - " + description.getMethodName() + TestLogger.formatElapsedTime(elapsed) + " //");
             }
 
             @Override
@@ -743,7 +743,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 Long elapsed = System.currentTimeMillis() - testStartTimeStamp;
 
                 TestLogger.resetLogger();
-                TestLogger.log("\\\\ Failed Test Case - " + description.getMethodName() + " [" + getElapsedString(elapsed) + "] //");
+                TestLogger.log("\\\\ Failed Test Case - " + description.getMethodName() + TestLogger.formatElapsedTime(elapsed) + " //");
             }
 
             @Override
@@ -756,15 +756,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     TestLogger.increaseIndent();
                 }
 
-            }
-
-            private String getElapsedString(long elapsed)
-            {
-                return String.format("%dm %d.%ds",
-                        TimeUnit.MILLISECONDS.toMinutes(elapsed),
-                        TimeUnit.MILLISECONDS.toSeconds(elapsed) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
-                        elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
             }
         };
 

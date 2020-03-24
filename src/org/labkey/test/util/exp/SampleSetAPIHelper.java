@@ -1,20 +1,15 @@
 package org.labkey.test.util.exp;
 
-import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
-import org.labkey.remoteapi.domain.Domain;
-import org.labkey.remoteapi.domain.GetDomainCommand;
-import org.labkey.remoteapi.domain.PropertyDescriptor;
-import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
@@ -50,7 +45,9 @@ public class SampleSetAPIHelper
             throw new RuntimeException("Failed to create sample set", e);
         }
 
-        return new TestDataGenerator("exp.materials", def.getName(), containerPath).withColumns(def.getFields());
+        List<FieldDefinition> fields = new ArrayList<>(def.getFields());
+        fields.add(new FieldDefinition("Name", FieldDefinition.ColumnType.String));
+        return new TestDataGenerator("exp.materials", def.getName(), containerPath).withColumns(fields);
     }
 
     /**
