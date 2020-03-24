@@ -450,19 +450,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    public String getSampleType()
-    {
-        expand();
-        return elementCache().getLookupSampleTypeSelect().getFirstSelectedOption().getText();
-    }
-
-    public DomainFieldRow setSampleType(String sampleTypeName)
-    {
-        expand();
-        elementCache().getLookupSampleTypeSelect().selectByVisibleText(sampleTypeName);
-        return this;
-    }
-
     public DomainFieldRow setLookupValidatorEnabled(boolean checked)
     {
         expand();
