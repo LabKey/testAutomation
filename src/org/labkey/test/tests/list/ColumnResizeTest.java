@@ -123,7 +123,6 @@ public class ColumnResizeTest extends BaseWebDriverTest
      * Uses: Lists and the List Designer
      */
     @Test
-    @Ignore // remove when resolved: https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=39938
     public void testColumnResizing()
     {
         setUpList(LIST_NAME);
@@ -133,7 +132,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
 
         log("Validate Scale: Existing fields");
         // Issue 39877: max text length options should not be visible for text key field of list
-        //assertWidgetNotVisible(fieldsPanel, KEY_ROW);    //Check scale widget is not available for key
+        assertMaxTextLengthNotVisible(fieldsPanel, KEY_ROW);    //Check scale widget is not available for key
 
         //Check unhidden
         assertMaxChecked(fieldsPanel, MAX_ROW);  //Check max checked for field set to max
@@ -143,7 +142,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         assertMaxNotChecked(fieldsPanel, MULTI_ROW);
 
         //Check hiding
-        assertWidgetNotVisible(fieldsPanel, NUMBER_ROW); //Check widget is not available for number
+        assertMaxTextLengthNotVisible(fieldsPanel, NUMBER_ROW); //Check widget is not available for number
 
         //Check value is as expected for field
         assertScaleEquals(fieldsPanel, LT_ROW, LT_SCALE);    //Check arbitrary scale can be set
@@ -180,7 +179,6 @@ public class ColumnResizeTest extends BaseWebDriverTest
      * Uses: Lists and the List Designer
      */
     @Test
-    @Ignore // remove when resolved: https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=39938
     public void testResizeColumnWithData()
     {
         //Create List
@@ -242,7 +240,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         assertEquals(String.format("Scale for row [%d] is actually [%d] vs expected [%d]", rowIndex, scale, expected), expected, scale);
     }
 
-    private void assertWidgetNotVisible(DomainFormPanel fieldsPanel, int rowIndex)
+    private void assertMaxTextLengthNotVisible(DomainFormPanel fieldsPanel, int rowIndex)
     {
         DomainFieldRow fieldRow = fieldsPanel.getField(rowIndex).expand();
         assertFalse("Max text length options should not be visible for field " + rowIndex, fieldRow.isMaxTextLengthPresent(rowIndex));

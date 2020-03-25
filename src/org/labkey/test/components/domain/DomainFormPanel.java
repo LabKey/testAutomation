@@ -1,6 +1,7 @@
 package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
@@ -69,10 +70,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         if (fieldDefinition.getFormat() != null)
             fieldRow.setNumberFormat(fieldDefinition.getFormat());
         if (fieldDefinition.getScale() != null)
-            if (fieldDefinition.getScale() <= 4000)
-                fieldRow.setCharCount(fieldDefinition.getScale());
-            else
-                fieldRow.allowMaxChar();
+            fieldRow.setCharCount(fieldDefinition.getScale());
         if (fieldDefinition.getURL() != null)
             fieldRow.setUrl(fieldDefinition.getURL());
         if (fieldDefinition.getMvEnabled())
@@ -225,10 +223,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
      */
     public String getPanelAlertText()
     {
-        if(elementCache().panelAlertText.isDisplayed())
-            return elementCache().panelAlertText.getText();
-        else
-            return "";
+        return getPanelAlertWebElement().getText();
     }
 
     /**
@@ -238,12 +233,12 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
      */
     public WebElement getPanelAlertWebElement()
     {
+        getWrapper().waitFor(()-> BootstrapLocators.errorBanner.existsIn(getDriver()),
+                "the error alert did not appear as expected", 1000);
+
         // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
         // may show different controls.
-        if(elementCache().panelAlertText.isDisplayed())
-            return elementCache().panelAlert;
-        else
-            return null;
+        return BootstrapLocators.errorBanner.existsIn(getDriver()) ? BootstrapLocators.errorBanner.findElement(getDriver()) : null;
     }
 
     @Override
@@ -326,8 +321,6 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         WebElement expandToggle = Locator.tagWithClass("svg", "domain-form-expand-btn").findWhenNeeded(DomainFormPanel.this);
         Locator.XPathLocator panelTitleLoc = Locator.tagWithClass("span", "domain-panel-title");
         WebElement panelTitle = panelTitleLoc.findWhenNeeded(DomainFormPanel.this);
-        WebElement panelAlert = Locator.css("div.alert-info").findWhenNeeded(DomainFormPanel.this);
-        WebElement panelAlertText = Locator.css("div.alert-info > div > div").findWhenNeeded(DomainFormPanel.this);
         WebElement panelBody = Locator.byClass("panel-body").findWhenNeeded(this);
     }
 

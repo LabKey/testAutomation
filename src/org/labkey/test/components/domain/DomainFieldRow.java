@@ -337,15 +337,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         elementCache().setCharCountRadio.set(true);
         getWrapper().waitFor(() -> !isCharCountDisabled(),
                 "character count input did not become enabled in time", 1000);
-        getWrapper().setFormElementJS(elementCache().charScaleInput, strCharCount);
-        elementCache().charScaleInput.sendKeys(Keys.TAB);
-        WebDriverWrapper.sleep(1000); // ugh;
+        elementCache().charScaleInput.setValue(strCharCount);
         return this;
     }
 
     public boolean isCharCountDisabled()
     {
-        return elementCache().charScaleInput.getAttribute("disabled") != null;
+        return elementCache().charScaleInput.getComponentElement().getAttribute("disabled") != null;
     }
 
     public boolean isCustomCharSelected()
@@ -357,7 +355,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public Integer getCustomCharCount()
     {
         expand();
-        return Integer.parseInt(getWrapper().getFormElement(elementCache().charScaleInput));
+        return Integer.parseInt(elementCache().charScaleInput.getValue());
     }
 
     public boolean isMaxTextLengthPresent(int rowIndex)
@@ -745,8 +743,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this));
         public RadioButton setCharCountRadio = new RadioButton(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-customLength-")
                 .refindWhenNeeded(this));
-        public WebElement charScaleInput = Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-scale")
-                .refindWhenNeeded(this);
+        public Input charScaleInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-scale")
+                .refindWhenNeeded(this), getDriver());
 
         public Locator.XPathLocator getCharScaleInputLocForRow(int rowIndex)
         {
