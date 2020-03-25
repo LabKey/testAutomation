@@ -25,7 +25,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
@@ -162,7 +161,7 @@ public class ExpTest extends BaseWebDriverTest
 
         designerPage = new DomainDesignerPage(getDriver());
         designerPage.click(Locator.button("Alias Field"));
-        click(Locator.button("OK"));
+        click(Locator.button("OK")); //the selected option is already RowId so no need to change
 
         // Make it a lookup into our custom query
         int fieldCount = designerPage.fieldsPanel().fieldNames().size();
@@ -191,5 +190,6 @@ public class ExpTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("edit metadata"));
         designerPage = new DomainDesignerPage(getDriver());
         designerPage.click(Locator.button("Reset To Default"));
+        click(Locator.button("Reset")); // Reset confirmation on the confirm modal
     }
 }
