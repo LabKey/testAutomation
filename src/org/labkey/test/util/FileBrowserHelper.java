@@ -625,7 +625,8 @@ public class FileBrowserHelper extends WebDriverWrapper
         IMPORT_DATA("database", "Import Data", "importData"),
         EMAIL_SETTINGS("envelope", "Email Preferences", "emailPreferences"),
         AUDIT_HISTORY("users", "Audit History", "auditLog", true),
-        ADMIN("cog", "Admin", "customize");
+        ADMIN("cog", "Admin", "customize"),
+        CREATE_RUN("sitemap", "Create Run", "createRun");
 
         private String _iconName;
         private String _buttonText;
