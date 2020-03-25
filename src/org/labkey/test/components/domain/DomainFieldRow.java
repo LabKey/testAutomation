@@ -33,6 +33,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     final WebElement _el;
     final WebDriver _driver;
     final DomainFormPanel _formPanel;
+    public static final String ALL_SAMPLES_OPTION_TEXT = "All Samples";
 
     public DomainFieldRow(DomainFormPanel panel, WebElement element, WebDriver driver)
     {
@@ -658,6 +659,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return new ElementCache();
     }
 
+    public String getSampleType()
+    {
+        expand();
+        return elementCache().getLookupSampleTypeSelect().getFirstSelectedOption().getText();
+    }
+
+    public DomainFieldRow setSampleType(String sampleTypeName)
+    {
+        expand();
+        elementCache().getLookupSampleTypeSelect().selectByVisibleText(sampleTypeName);
+        return this;
+    }
+
     public static class DomainFieldRowFinder extends WebDriverComponentFinder<DomainFieldRow, DomainFieldRowFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row");
@@ -768,6 +782,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public Select getLookupQuerySelect()
         {
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupQueryValue")).find(this);
+            return waitForSelectToLoad(select);
+        }
+
+        public Select getLookupSampleTypeSelect()
+        {
+            Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-sampleTypeSelect")).find(this);
             return waitForSelectToLoad(select);
         }
 
