@@ -44,6 +44,7 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
         clickAndWait(elementCache().editSourceButton);
     }
 
+    // TODO: Refactor to 'aliasField(String fieldName)', instead of just using the default selection.
     public void aliasField()
     {
         scrollIntoView(elementCache().aliasFieldButton);
