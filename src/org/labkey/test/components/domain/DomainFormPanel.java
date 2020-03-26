@@ -249,7 +249,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public WebElement getPanelAlertWebElement()
     {
         getWrapper().waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
-                "the error alert did not appear as expected", 1000);
+                "the info alert did not appear as expected", 1000);
 
         // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
         // may show different controls.
