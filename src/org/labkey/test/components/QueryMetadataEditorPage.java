@@ -39,7 +39,7 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
     {
         scrollIntoView(elementCache().editSourceButton);
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editSourceButton));
-        elementCache().editSourceButton.click();
+        clickAndWait(elementCache().editSourceButton);
     }
 
     public void aliasField()
