@@ -44,7 +44,7 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
 
     public void aliasField()
     {
-        scrollIntoView(newElementCache().aliasFieldButton);
+        scrollIntoView(elementCache().aliasFieldButton);
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().aliasFieldButton));
         elementCache().aliasFieldButton.click();
         click(Locator.button("OK")); //the selected option is the first field
