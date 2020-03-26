@@ -18,6 +18,7 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
         scrollIntoView(elementCache().finishButton());
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton()));
         click(Locator.button(elementCache().finishButton().getText()));
+        // TODO: Wait for success
     }
 
     public void reset()
@@ -26,6 +27,7 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().resetButton));
         elementCache().resetButton.click();
         click(Locator.button("Reset")); // Reset confirmation on the confirm modal
+        // TODO: Wait for reset
     }
 
     public void viewData()
@@ -48,6 +50,7 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().aliasFieldButton));
         elementCache().aliasFieldButton.click();
         click(Locator.button("OK")); //the selected option is the first field
+        // TODO: Wait for field
     }
 
     @Override
@@ -64,16 +67,16 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
 
     public class ElementCache extends DomainDesignerPage.ElementCache
     {
-        WebElement resetButton = Locator.button("Reset To Default")
+        final WebElement resetButton = Locator.button("Reset To Default")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        WebElement aliasFieldButton = Locator.button("Alias Field")
+        final WebElement aliasFieldButton = Locator.button("Alias Field")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        WebElement viewDataButton = Locator.button("View Data")
+        final WebElement viewDataButton = Locator.button("View Data")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        WebElement editSourceButton = Locator.button("Edit Source")
+        final WebElement editSourceButton = Locator.button("Edit Source")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
     }
