@@ -27,11 +27,18 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
 
     private final WebElement _el;
     private final WebDriver _driver;
+    private boolean _useFinishButton;
 
     public SampleTypeDesigner(WebDriver driver)
     {
         _driver = driver;
         _el = Locator.id("app").findElement(_driver); // Full page component
+    }
+
+    public SampleTypeDesigner(WebDriver driver, boolean useFinishButton)
+    {
+        this(driver);
+        _useFinishButton = useFinishButton;
     }
 
     @Override
@@ -85,17 +92,17 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
 
     public boolean isSaveButtonEnabled()
     {
-        return elementCache().saveButton.isEnabled();
+        return elementCache().getSaveButton().isEnabled();
     }
 
     public void clickSave()
     {
-        elementCache().saveButton.click();
+        elementCache().getSaveButton().click();
     }
 
     public List<WebElement> clickSaveExpectingError()
     {
-        elementCache().saveButton.click();
+        elementCache().getSaveButton().click();
         return BootstrapLocators.errorBanner.waitForElements(getWrapper().shortWait());
     }
 
@@ -207,6 +214,14 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
 
         protected final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
         protected final WebElement saveButton = Locator.button("Save").findWhenNeeded(this);
+
+        // the SM app uses alternate text for the sample type designer save buttons
+        protected final WebElement finishButton = Locator.buttonContainingText("Finish").findWhenNeeded(this);
+
+        protected WebElement getSaveButton()
+        {
+            return _useFinishButton ? finishButton : saveButton;
+        }
 
         protected List<Input> parentAliases()
         {
