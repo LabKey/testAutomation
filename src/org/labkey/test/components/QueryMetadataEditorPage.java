@@ -22,38 +22,38 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
 
     public void reset()
     {
-        scrollIntoView(newElementCache().resetButton());
-        shortWait().until(ExpectedConditions.elementToBeClickable(newElementCache().resetButton()));
-        click(Locator.button(newElementCache().resetButton().getText()));
+        scrollIntoView(elementCache().resetButton);
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().resetButton));
+        elementCache().resetButton.click();
         click(Locator.button("Reset")); // Reset confirmation on the confirm modal
     }
 
     public void viewData()
     {
-        scrollIntoView(newElementCache().viewDataButton());
-        shortWait().until(ExpectedConditions.elementToBeClickable(newElementCache().viewDataButton()));
-        click(Locator.button(newElementCache().viewDataButton().getText()));
+        scrollIntoView(elementCache().viewDataButton);
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().viewDataButton));
+        clickAndWait(elementCache().viewDataButton);
     }
 
     public void editSource()
     {
-        scrollIntoView(newElementCache().editSourceButton());
-        shortWait().until(ExpectedConditions.elementToBeClickable(newElementCache().editSourceButton()));
-        click(Locator.button(newElementCache().editSourceButton().getText()));
+        scrollIntoView(elementCache().editSourceButton);
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editSourceButton));
+        elementCache().editSourceButton.click();
     }
 
     public void aliasField()
     {
-        scrollIntoView(newElementCache().aliasFieldButton());
-        shortWait().until(ExpectedConditions.elementToBeClickable(newElementCache().aliasFieldButton()));
-        click(Locator.button(newElementCache().aliasFieldButton().getText()));
+        scrollIntoView(newElementCache().aliasFieldButton);
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().aliasFieldButton));
+        elementCache().aliasFieldButton.click();
         click(Locator.button("OK")); //the selected option is the first field
     }
 
     @Override
-    protected DomainDesignerPage.ElementCache elementCache()
+    protected QueryMetadataEditorPage.ElementCache elementCache()
     {
-        return super.elementCache();
+        return (QueryMetadataEditorPage.ElementCache) super.elementCache();
     }
 
     @Override
@@ -64,28 +64,17 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
 
     public class ElementCache extends DomainDesignerPage.ElementCache
     {
-        WebElement resetButton()
-        {
-            return Locator.button("Reset To Default")
-                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        }
+        WebElement resetButton = Locator.button("Reset To Default")
+                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        WebElement aliasFieldButton()
-        {
-            return Locator.button("Alias Field")
-                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        }
+        WebElement aliasFieldButton = Locator.button("Alias Field")
+                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        WebElement viewDataButton()
-        {
-            return Locator.button("View Data")
-                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        }
+        WebElement viewDataButton = Locator.button("View Data")
+                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        WebElement editSourceButton()
-        {
-            return Locator.button("Edit Source")
-                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        }
+        WebElement editSourceButton = Locator.button("Edit Source")
+                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+
     }
 }
