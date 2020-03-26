@@ -126,6 +126,7 @@ public class SampleSetTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment"});
         _containerHelper.createSubfolder(PROJECT_NAME, LINEAGE_FOLDER, new String[]{"Experiment"});
 
+        portalHelper.enterAdminMode();
         projectMenu().navigateToProject(PROJECT_NAME);
         portalHelper.addWebPart("Sample Sets");
 
@@ -134,6 +135,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
         portalHelper.addWebPart("Sample Sets");
+        portalHelper.exitAdminMode();
 
         Connection cn = createDefaultConnection(false);
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", true);
@@ -155,7 +157,7 @@ public class SampleSetTest extends BaseWebDriverTest
 //    }
 
     @Test
-    public void doLineageDerivationTest()
+    public void testLineageDerivation()
     {
         String sampleText = "Name\tIntCol\tStringCol\n" +
                 "Sample12ab\t1012\talpha\n" +
@@ -352,8 +354,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     /**
      *  coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37466
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
     @Ignore
@@ -435,8 +435,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     /**
      * regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37465
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
     public void testLookupWithInvalidLookupValue() throws IOException, CommandException
@@ -465,7 +463,7 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void samplesWithLookupsTest() throws IOException, CommandException
+    public void testSamplesWithLookups() throws IOException, CommandException
     {
         // create a basic sampleset
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
@@ -515,8 +513,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     /**
      *  regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37465
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
     public void testLookupWithInvalidParentColumnValue() throws IOException, CommandException
@@ -552,11 +548,9 @@ public class SampleSetTest extends BaseWebDriverTest
      * column and an ad-hoc column (MaterialInput/TableName) for lineage
      * The test then deletes some rows and confirms that values in the 'parent' columns persist when their parent row
      * is deleted, but lineage values in MaterialInputs/TableName do not persist after their parent is deleted,
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
-    public void deleteLineageParent() throws IOException, CommandException
+    public void testDeleteLineageParent() throws IOException, CommandException
     {
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
 
@@ -619,7 +613,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
         dgen.deleteDomain(createDefaultConnection(true));
     }
-
 
     @Test
     public void testStringLookupFields() throws IOException, CommandException
@@ -1848,7 +1841,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     }
 
-
     @Test
     public void testParentChild()
     {
@@ -2044,7 +2036,7 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void fileAttachmentTest()
+    public void testFileAttachment()
     {
         File experimentFilePath = new File(PIPELINE_PATH, "experiment.xar.xml");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
@@ -2088,7 +2080,6 @@ public class SampleSetTest extends BaseWebDriverTest
         expectedHeaders.remove("File Attachment");
         exportGridVerifyRowCountAndHeader(3, expectedHeaders);
     }
-
 
     @Test
     public void testCreateViaScript()
