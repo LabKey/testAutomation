@@ -215,6 +215,21 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return hasPanelTitle() ? elementCache().panelTitle.getText() : null;
     }
 
+    public String getPanelErrorText()
+    {
+        return getPanelErrorWebElement().getText();
+    }
+
+    public WebElement getPanelErrorWebElement()
+    {
+        getWrapper().waitFor(()-> BootstrapLocators.errorBanner.existsIn(getDriver()),
+                "the error alert did not appear as expected", 1000);
+
+        // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
+        // may show different controls.
+        return BootstrapLocators.errorBanner.existsIn(getDriver()) ? BootstrapLocators.errorBanner.findElement(getDriver()) : null;
+    }
+
     /**
      * Get the alert message that is shown only in the alert panel. An example of this is the Results Field in
      * Sample Manager requires a field that is a sample look-up, if it missing an alert is shown.
@@ -233,12 +248,12 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
      */
     public WebElement getPanelAlertWebElement()
     {
-        getWrapper().waitFor(()-> BootstrapLocators.errorBanner.existsIn(getDriver()),
+        getWrapper().waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
                 "the error alert did not appear as expected", 1000);
 
         // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
         // may show different controls.
-        return BootstrapLocators.errorBanner.existsIn(getDriver()) ? BootstrapLocators.errorBanner.findElement(getDriver()) : null;
+        return BootstrapLocators.infoBanner.existsIn(getDriver()) ? BootstrapLocators.infoBanner.findElement(getDriver()) : null;
     }
 
     @Override
