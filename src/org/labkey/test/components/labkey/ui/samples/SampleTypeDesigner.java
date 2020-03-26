@@ -9,6 +9,7 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.params.FieldDefinition;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -27,18 +28,11 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
 
     private final WebElement _el;
     private final WebDriver _driver;
-    private boolean _useFinishButton;
 
     public SampleTypeDesigner(WebDriver driver)
     {
         _driver = driver;
         _el = Locator.id("app").findElement(_driver); // Full page component
-    }
-
-    public SampleTypeDesigner(WebDriver driver, boolean useFinishButton)
-    {
-        this(driver);
-        _useFinishButton = useFinishButton;
     }
 
     @Override
@@ -220,7 +214,17 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
 
         protected WebElement getSaveButton()
         {
-            return _useFinishButton ? finishButton : saveButton;
+            try
+            {
+                if (finishButton.isDisplayed())
+                    return finishButton;
+            }
+            catch (NoSuchElementException nse)
+            {
+                // noop, just use the save button element
+            }
+
+            return saveButton;
         }
 
         protected List<Input> parentAliases()
