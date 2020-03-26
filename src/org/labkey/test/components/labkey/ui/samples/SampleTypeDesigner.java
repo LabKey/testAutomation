@@ -9,7 +9,6 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.params.FieldDefinition;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -86,17 +85,17 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
 
     public boolean isSaveButtonEnabled()
     {
-        return elementCache().getSaveButton().isEnabled();
+        return elementCache().saveButton.isEnabled();
     }
 
     public void clickSave()
     {
-        elementCache().getSaveButton().click();
+        elementCache().saveButton.click();
     }
 
     public List<WebElement> clickSaveExpectingError()
     {
-        elementCache().getSaveButton().click();
+        elementCache().saveButton.click();
         return BootstrapLocators.errorBanner.waitForElements(getWrapper().shortWait());
     }
 
@@ -207,25 +206,9 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         protected final DomainFormPanel _fieldEditorPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).index(1).timeout(1000).findWhenNeeded(this);
 
         protected final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
-        protected final WebElement saveButton = Locator.button("Save").findWhenNeeded(this);
 
         // the SM app uses alternate text for the sample type designer save buttons
-        protected final WebElement finishButton = Locator.buttonContainingText("Finish").findWhenNeeded(this);
-
-        protected WebElement getSaveButton()
-        {
-            try
-            {
-                if (finishButton.isDisplayed())
-                    return finishButton;
-            }
-            catch (NoSuchElementException nse)
-            {
-                // noop, just use the save button element
-            }
-
-            return saveButton;
-        }
+        protected final WebElement saveButton = Locator.XPathLocator.union(Locator.button("Save"), Locator.buttonContainingText("Finish")).findWhenNeeded(this);
 
         protected List<Input> parentAliases()
         {
