@@ -24,7 +24,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.QueryMetadataEditorPage;
+import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 
@@ -131,21 +132,16 @@ public class ExpTest extends BaseWebDriverTest
         _ext4Helper.clickExt4Tab("Source");
         clickButton("Save", 0);
         waitForElement(Locator.css(".labkey-status-info").withText("Saved"));
-        clickButton("Edit Metadata");
-        int created_RowIndex = 5;
-        waitForElement(Locator.name("ff_label" + created_RowIndex), WAIT_FOR_JAVASCRIPT);
+        clickButton("Edit Metadata", 6000);
+        QueryMetadataEditorPage designerPage = new QueryMetadataEditorPage(getDriver());
 
-        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitle("Metadata Properties").find();
-        PropertiesEditor.FieldRow row = editor.selectField("Created");
-        row.setLabel("editedCreated");
-        PropertiesEditor.FieldPropertyDock.FormatTabPane tabPane = row.properties().selectFormatTab();
-        tabPane.setPropertyFormat("ddd MMM dd yyyy");
-        clickButton("Save", 0);
-        waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
+        DomainFieldRow domainRow = designerPage.fieldsPanel().getField("Created");
+        domainRow.setLabel("editedCreated");
+        domainRow.setDateFormat("ddd MMM dd yyyy");
+        designerPage.clickFinish();
 
         // Verify that it ended up in the XML version of the metadata
-        clickButton("Edit Source");
-        sleep(1000);
+        designerPage.editSource();
         _ext4Helper.clickExt4Tab("XML Metadata");
         assertTextPresent("<columnTitle>editedCreated</columnTitle>", "<formatString>ddd MMM dd yyyy</formatString>");
 
@@ -160,29 +156,24 @@ public class ExpTest extends BaseWebDriverTest
         selectQuery("exp", "Data"); // Select the one we want to edit
         waitForElement(Locator.linkWithText("edit metadata"), WAIT_FOR_JAVASCRIPT); //on Ext panel
         clickAndWait(Locator.linkWithText("edit metadata"));
-        waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
-        int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]")) - 1;
-        Locator lastField = Locator.xpath("//input[@name='ff_label" + lastFieldIndex + "']");
-        click(lastField);
-        click(Locator.xpath("//span").append(Locator.lkButton("Alias Field")));
-        selectOptionByText(Locator.name("sourceColumn"), "RowId");
-        click(Locator.xpath("//span").append(Locator.lkButton("OK")));
+
+        designerPage = new QueryMetadataEditorPage(getDriver());
+        designerPage.aliasField(); // the first selected option is already RowId
 
         // Make it a lookup into our custom query
-        editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Metadata Properties").find();
-        int fieldCount = getElementCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
+        int fieldCount = designerPage.fieldsPanel().fieldNames().size();
         assertTrue(fieldCount > 0);
-        row = editor.selectField(fieldCount-1);
-        row.setType(new FieldDefinition.LookupInfo(null, "exp", "dataCustomQuery"));
+        domainRow = designerPage.fieldsPanel().getField(fieldCount-1);
+        domainRow.setType(FieldDefinition.ColumnType.Lookup).setFromSchema("exp").setFromTargetTable("dataCustomQuery" + " (Integer)");
 
         // Save it
-        clickButton("Save", 0);
-        waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
-        clickButton("View Data");
+        designerPage.clickFinish();
+        designerPage.viewData();
 
         // Customize the view to add the newly joined column
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("WrappedRowId/Created", "Wrapped Row Id editedCreated");
+        _customizeViewsHelper.showHiddenItems();
+        _customizeViewsHelper.addColumn("WrappedRowId/Created");
         _customizeViewsHelper.applyCustomView();
         // Verify that it was joined and formatted correctly
         textCount = countText(dateFormat.format(new Date()));
@@ -194,9 +185,7 @@ public class ExpTest extends BaseWebDriverTest
         // Wait for query to load
         waitForText("edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
-        waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
-        click(Locator.xpath("//span").append(Locator.lkButton("Reset to Default")));
-        click(Locator.xpath("//span").append(Locator.lkButton("OK")));
-        waitForText(WAIT_FOR_JAVASCRIPT, "Reset successful");
+        designerPage = new QueryMetadataEditorPage(getDriver());
+        designerPage.reset();
     }
 }
