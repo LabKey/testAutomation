@@ -117,6 +117,12 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return elementCache()._designer.getDomainEditor();
     }
 
+    public CreateSampleSetPage expandPropertiesPanel()
+    {
+        elementCache()._designer.expandPropertiesPanel();
+        return this;
+    }
+
     public void clickSave()
     {
         doAndWaitForPageToLoad(() -> elementCache()._designer.clickSave());
