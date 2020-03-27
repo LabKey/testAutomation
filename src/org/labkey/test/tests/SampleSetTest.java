@@ -46,6 +46,7 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -53,6 +54,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -122,18 +124,14 @@ public class SampleSetTest extends BaseWebDriverTest
     private void doSetup()
     {
         PortalHelper portalHelper = new PortalHelper(this);
-        _containerHelper.createProject(PROJECT_NAME, null);
-        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment"});
-        _containerHelper.createSubfolder(PROJECT_NAME, LINEAGE_FOLDER, new String[]{"Experiment"});
-
         portalHelper.enterAdminMode();
-        projectMenu().navigateToProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         portalHelper.addWebPart("Sample Sets");
 
-        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, "Collaboration");
         portalHelper.addWebPart("Sample Sets");
 
-        projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
+        _containerHelper.createSubfolder(PROJECT_NAME, LINEAGE_FOLDER, "Collaboration");
         portalHelper.addWebPart("Sample Sets");
         portalHelper.exitAdminMode();
 
@@ -612,6 +610,72 @@ public class SampleSetTest extends BaseWebDriverTest
                 0, linResponse.getSeed().getParents().size());
 
         dgen.deleteDomain(createDefaultConnection(true));
+    }
+
+    @Test
+    @Ignore("Corrupts the 'protocolapplication' table, rendering the test project undeletable.")
+    public void testDeleteParentage() throws CommandException, IOException
+    {
+        SampleSetDefinition sampleSet = new SampleSetDefinition("DeleteParentageSamples").addField(new FieldDefinition("strCol"));
+        DataClassDefinition dataClass = new DataClassDefinition("DeleteParentageData").addField(new FieldDefinition("strCol"));
+
+        TestDataGenerator sampleGenerator = TestDataGenerator.createDomain(getProjectName(), sampleSet);
+        TestDataGenerator dataGenerator = TestDataGenerator.createDomain(getProjectName(), dataClass);
+
+        final String sampleParentKey = "MaterialInputs/" + sampleSet.getName();
+        final String dataParentKey = "DataInputs/" + dataClass.getName();
+
+        dataGenerator.addCustomRow(Map.of("Name", "DPD-A"));
+        dataGenerator.addCustomRow(Map.of("Name", "DPD-B"));
+        dataGenerator.insertRows();
+
+        sampleGenerator.addRow(List.of("DPS-A", "a-v1"));
+        sampleGenerator.addRow(List.of("DPS-B", "b-v1"));
+        sampleGenerator.addCustomRow(Map.of("name", "DPS-C", "strCol", "c-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
+        sampleGenerator.addCustomRow(Map.of("name", "DPS-D", "strCol", "d-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
+        sampleGenerator.addCustomRow(Map.of("name", "DPS-E", "strCol", "e-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
+        sampleGenerator.addCustomRow(Map.of("name", "DPS-F", "strCol", "f-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
+        sampleGenerator.addCustomRow(Map.of("name", "DPS-G", "strCol", "g-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
+        sampleGenerator.addCustomRow(Map.of("name", "DPS-H", "strCol", "h-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
+        SaveRowsResponse saveRowsResponse = sampleGenerator.insertRows(createDefaultConnection(true), sampleGenerator.getRows());
+
+        goToProjectHome();
+
+        SampleSetHelper sampleHelper = new SampleSetHelper(getDriver());
+
+        goToModule("Experiment");
+        sampleHelper.goToSampleSet(sampleSet.getName());
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", "DPS-C", "strCol", "c-v2") // Just update data
+        ));
+
+        goToModule("Experiment");
+        sampleHelper.goToSampleSet(sampleSet.getName());
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", "DPS-D", sampleParentKey, "DPS-A,DPS-B") // Don't specify an existing parent column
+        ));
+
+        goToModule("Experiment");
+        sampleHelper.goToSampleSet(sampleSet.getName());
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", "DPS-E", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "") // Clear one parent column
+        ));
+
+        goToModule("Experiment");
+        sampleHelper.goToSampleSet(sampleSet.getName());
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", "DPS-F", sampleParentKey, "", dataParentKey, "") // Clear all lineage columns
+        ));
+
+        goToModule("Experiment");
+        sampleHelper.goToSampleSet(sampleSet.getName());
+        sampleHelper.mergeImport(List.of(
+                Maps.of("name", "DPS-G", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"), // Leave unmodified
+                Map.of("name", "DPS-H", sampleParentKey, "DPS-A", dataParentKey, "DPD-B") // Modify lineage columns
+        ));
+
+        sampleGenerator.deleteDomain(createDefaultConnection(true));
+        dataGenerator.deleteDomain(createDefaultConnection(true));
     }
 
     @Test
