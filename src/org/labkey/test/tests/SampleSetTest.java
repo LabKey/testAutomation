@@ -660,14 +660,14 @@ public class SampleSetTest extends BaseWebDriverTest
         saveLocation();
 
         // 40083: Excluding existing parent column from sample import makes project undeletable
-//        sampleHelper.mergeImport(List.of(
-//                Map.of("name", sampleC, "strCol", "c-v2") // Just update data
-//        ));
-//
-//        recallLocation();
-//        sampleHelper.mergeImport(List.of(
-//                Map.of("name", sampleD, sampleParentKey, "DPS-A,DPS-B") // Don't specify an existing parent column
-//        ));
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", sampleC, "strCol", "c-v2") // Just update data
+        ));
+
+        recallLocation();
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", sampleD, sampleParentKey, "DPS-A,DPS-B") // Don't specify an existing parent column
+        ));
 
         recallLocation();
         sampleHelper.mergeImport(List.of(
@@ -701,13 +701,13 @@ public class SampleSetTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(dataParentA));
         assertElementPresent(Locator.linkWithText(dataParentB));
         recallLocation();
-        clickAndWait(Locator.linkWithText(sampleF));
+        clickAndWait(Locator.linkWithText(sampleH));
         assertElementPresent(Locator.linkWithText(sampleParentA));
         assertElementNotPresent(Locator.linkWithText(sampleParentB));
         assertElementNotPresent(Locator.linkWithText(dataParentA));
         assertElementPresent(Locator.linkWithText(dataParentB));
         recallLocation();
-        clickAndWait(Locator.linkWithText(sampleF));
+        clickAndWait(Locator.linkWithText(sampleI));
         assertElementNotPresent(Locator.linkWithText(sampleParentA));
         assertElementNotPresent(Locator.linkWithText(sampleParentB));
         assertElementNotPresent(Locator.linkWithText(dataParentA));
