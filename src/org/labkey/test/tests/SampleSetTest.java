@@ -645,34 +645,37 @@ public class SampleSetTest extends BaseWebDriverTest
 
         goToModule("Experiment");
         sampleHelper.goToSampleSet(sampleSet.getName());
+        saveLocation();
+
         sampleHelper.mergeImport(List.of(
                 Map.of("name", "DPS-C", "strCol", "c-v2") // Just update data
         ));
+        // TODO: Verify
 
-        goToModule("Experiment");
-        sampleHelper.goToSampleSet(sampleSet.getName());
+        recallLocation();
         sampleHelper.mergeImport(List.of(
                 Map.of("name", "DPS-D", sampleParentKey, "DPS-A,DPS-B") // Don't specify an existing parent column
         ));
+        // TODO: Verify
 
-        goToModule("Experiment");
-        sampleHelper.goToSampleSet(sampleSet.getName());
+        recallLocation();
         sampleHelper.mergeImport(List.of(
                 Map.of("name", "DPS-E", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "") // Clear one parent column
         ));
+        // TODO: Verify
 
-        goToModule("Experiment");
-        sampleHelper.goToSampleSet(sampleSet.getName());
+        recallLocation();
         sampleHelper.mergeImport(List.of(
                 Map.of("name", "DPS-F", sampleParentKey, "", dataParentKey, "") // Clear all lineage columns
         ));
+        // TODO: Verify
 
-        goToModule("Experiment");
-        sampleHelper.goToSampleSet(sampleSet.getName());
+        recallLocation();
         sampleHelper.mergeImport(List.of(
                 Maps.of("name", "DPS-G", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"), // Leave unmodified
                 Map.of("name", "DPS-H", sampleParentKey, "DPS-A", dataParentKey, "DPD-B") // Modify lineage columns
         ));
+        // TODO: Verify
 
         sampleGenerator.deleteDomain(createDefaultConnection(true));
         dataGenerator.deleteDomain(createDefaultConnection(true));
