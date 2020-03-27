@@ -54,7 +54,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -692,7 +691,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         recallLocation();
         sampleHelper.mergeImport(List.of(
-                Maps.of("name", sampleG, sampleParentKey, sampleParents, dataParentKey, dataParents), // Leave unmodified
+                Map.of("name", sampleG, sampleParentKey, sampleParents, dataParentKey, dataParents), // Leave unmodified
                 Map.of("name", sampleH, sampleParentKey, sampleParentA, dataParentKey, dataParentB), // Modify lineage columns
                 Map.of("name", sampleI, sampleParentKey, "", dataParentKey, "") // Modify lineage columns
         ));
