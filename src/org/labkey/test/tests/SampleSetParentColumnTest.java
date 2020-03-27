@@ -11,6 +11,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
+import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
@@ -637,6 +638,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         final String ALIAS_NAME_CONFLICT = "ConflictName";
         final String GOOD_PARENT_NAME = "P8";
         final String SAMPLE_SET_NAME = "SimpleSampleSet08";
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
@@ -648,20 +650,23 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         fields.add(new FieldDefinition(ALIAS_NAME_CONFLICT)
                 .setType(FieldDefinition.ColumnType.String));
 
-        log("Create a sample set named '" + SAMPLE_SET_NAME + "' in '" + path + "'.");
-        createEmptySampleSet(SAMPLE_SET_NAME, path, fields);
+        log("Create Sample Set - Add a parent alias column to the sample set that conflicts with a given column name.");
+        CreateSampleSetPage createPage = sampleHelper.goToCreateNewSampleSet()
+                .setName(SAMPLE_SET_NAME)
+                .addParentAlias(ALIAS_NAME_CONFLICT)
+                .addFields(fields);
+        List<String> errors = getTexts(createPage.clickSaveExpectingError());
+        Assert.assertEquals("Error message not as expected.",
+                "An existing sample type property conflicts with parent alias header: " + ALIAS_NAME_CONFLICT,
+                String.join("\n", errors));
+        createPage.expandPropertiesPanel()
+                .removeParentAlias(0)
+                .clickSave();
 
-        // Because the sample set was create with the API the test will need to refresh the page
-        // in order to see the sample set in the dataregion
-        refresh();
-
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-
-        log("Add a parent alias column to the sample set that conflicts with a given column name.");
+        log("Update Sample Set - Add a parent alias column to the sample set that conflicts with a given column name.");
         UpdateSampleSetPage updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
         updatePage.addParentAlias(ALIAS_NAME_CONFLICT);
-        List<String> errors = getTexts(updatePage.clickSaveExpectingError());
-
+        errors = getTexts(updatePage.clickSaveExpectingError());
         Assert.assertEquals("Error message not as expected.",
                 "An existing sample type property conflicts with parent alias header: " + ALIAS_NAME_CONFLICT,
                 String.join("\n", errors));
@@ -676,7 +681,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         updatePage.getDomainEditor().addField(GOOD_PARENT_NAME);
         errors = getTexts(updatePage.clickSaveExpectingError());
 
-        String errorMsgExpectedTxt = "'" + GOOD_PARENT_NAME + "' is a reserved field name in '" + SAMPLE_SET_NAME + "'.";
+        String errorMsgExpectedTxt = "An existing sample type property conflicts with parent alias header: " + GOOD_PARENT_NAME;
         Assert.assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
 
         updatePage.clickCancel();

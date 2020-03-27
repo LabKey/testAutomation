@@ -41,8 +41,10 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
@@ -2089,6 +2091,46 @@ public class SampleSetTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_SET));
         assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLE_SET));
+    }
+
+    @Test
+    public void testReservedFieldNames()
+    {
+        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+
+        clickProject(PROJECT_NAME);
+        CreateSampleSetPage creaetePage = sampleHelper
+            .goToCreateNewSampleSet()
+            .setName("ReservedFieldNameValidation");
+
+        DomainFormPanel domainFormPanel = creaetePage.getDomainEditor();
+
+        log("Verify error message for reserved field names");
+        domainFormPanel.addField("created");
+        assertEquals("Sample Type reserved field name error", Arrays.asList(
+                "Property name 'created' is a reserved name."),
+                getTexts(creaetePage.clickSaveExpectingError()));
+        domainFormPanel.removeAllFields(false);
+        domainFormPanel.addField("rowid");
+        assertEquals("Sample Type reserved field name error", Arrays.asList(
+                "Property name 'rowid' is a reserved name."),
+                getTexts(creaetePage.clickSaveExpectingError()));
+        domainFormPanel.removeAllFields(false);
+
+        log("Verify error message for a few other special field names");
+        domainFormPanel.addField("name");
+        assertEquals("Sample Type 'name' field name error", Arrays.asList(
+                "The field name 'Name' is already taken. Please provide a unique name for each field.",
+                "Please correct errors in Fields before saving."),
+                getTexts(creaetePage.clickSaveExpectingError()));
+        domainFormPanel.removeAllFields(false);
+
+        log("Verify error message for a few other special field names");
+        domainFormPanel.addField("sampleid");
+        assertEquals("Sample Type SampleId field name error", Arrays.asList(
+                "The SampleId field name is reserved for imported or generated sample ids."),
+                getTexts(creaetePage.clickSaveExpectingError()));
+        domainFormPanel.removeAllFields(false);
     }
 
     @Test
