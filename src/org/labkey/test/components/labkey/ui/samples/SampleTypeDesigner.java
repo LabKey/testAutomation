@@ -196,17 +196,25 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         return elementCache().parentAliasSelect(index).getSelections().get(0);
     }
 
+    public void expandPropertiesPanel()
+    {
+        elementCache().propertiesPanelHeader.click();
+    }
+
     protected class ElementCache extends Component<?>.ElementCache
     {
         protected final Input nameInput = Input.Input(Locator.id("entity-name"), getDriver()).findWhenNeeded(this);
         protected final Input nameExpressionInput = Input.Input(Locator.id("entity-nameExpression"), getDriver()).waitFor(this);
         protected final Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver()).findWhenNeeded(this);
         protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
+        protected final WebElement propertiesPanelHeader = Locator.id("sample-type-properties-hdr").findWhenNeeded(this);
 
         protected final DomainFormPanel _fieldEditorPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).index(1).timeout(1000).findWhenNeeded(this);
 
         protected final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
-        protected final WebElement saveButton = Locator.button("Save").findWhenNeeded(this);
+
+        // the SM app uses alternate text for the sample type designer save buttons
+        protected final WebElement saveButton = Locator.XPathLocator.union(Locator.button("Save"), Locator.buttonContainingText("Finish")).findWhenNeeded(this);
 
         protected List<Input> parentAliases()
         {
