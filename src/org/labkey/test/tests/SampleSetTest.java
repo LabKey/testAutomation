@@ -613,11 +613,10 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    @Ignore("Corrupts the 'protocolapplication' table, rendering the test project undeletable.")
-    public void testDeleteParentage() throws CommandException, IOException
+    public void testDeleteSampleSources() throws CommandException, IOException
     {
-        SampleSetDefinition sampleSet = new SampleSetDefinition("DeleteParentageSamples").addField(new FieldDefinition("strCol"));
-        DataClassDefinition dataClass = new DataClassDefinition("DeleteParentageData").addField(new FieldDefinition("strCol"));
+        SampleSetDefinition sampleSet = new SampleSetDefinition("DeleteSourcesSamples").addField(new FieldDefinition("strCol"));
+        DataClassDefinition dataClass = new DataClassDefinition("DeleteSourcesData").addField(new FieldDefinition("strCol"));
 
         TestDataGenerator sampleGenerator = TestDataGenerator.createDomain(getProjectName(), sampleSet);
         TestDataGenerator dataGenerator = TestDataGenerator.createDomain(getProjectName(), dataClass);
@@ -625,18 +624,32 @@ public class SampleSetTest extends BaseWebDriverTest
         final String sampleParentKey = "MaterialInputs/" + sampleSet.getName();
         final String dataParentKey = "DataInputs/" + dataClass.getName();
 
-        dataGenerator.addCustomRow(Map.of("Name", "DPD-A"));
-        dataGenerator.addCustomRow(Map.of("Name", "DPD-B"));
+        final String dataParentA = "DPD-A";
+        final String dataParentB = "DPD-B";
+        final String dataParents = "DPD-A,DPD-B";
+        dataGenerator.addCustomRow(Map.of("Name", dataParentA));
+        dataGenerator.addCustomRow(Map.of("Name", dataParentB));
         dataGenerator.insertRows();
 
-        sampleGenerator.addRow(List.of("DPS-A", "a-v1"));
-        sampleGenerator.addRow(List.of("DPS-B", "b-v1"));
-        sampleGenerator.addCustomRow(Map.of("name", "DPS-C", "strCol", "c-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
-        sampleGenerator.addCustomRow(Map.of("name", "DPS-D", "strCol", "d-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
-        sampleGenerator.addCustomRow(Map.of("name", "DPS-E", "strCol", "e-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
-        sampleGenerator.addCustomRow(Map.of("name", "DPS-F", "strCol", "f-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
-        sampleGenerator.addCustomRow(Map.of("name", "DPS-G", "strCol", "g-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
-        sampleGenerator.addCustomRow(Map.of("name", "DPS-H", "strCol", "h-v1", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"));
+        final String sampleParentA = "DPS-A";
+        final String sampleParentB = "DPS-B";
+        final String sampleParents = "DPS-A,DPS-B";
+        sampleGenerator.addRow(List.of(sampleParentA, "a-v1"));
+        sampleGenerator.addRow(List.of(sampleParentB, "b-v1"));
+        final String sampleC = "DPS-C";
+        final String sampleD = "DPS-D";
+        final String sampleE = "DPS-E";
+        final String sampleF = "DPS-F";
+        final String sampleG = "DPS-G";
+        final String sampleH = "DPS-H";
+        final String sampleI = "DPS-I";
+        sampleGenerator.addCustomRow(Map.of("name", sampleC, "strCol", "c-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleD, "strCol", "d-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleE, "strCol", "e-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleF, "strCol", "f-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleG, "strCol", "g-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleH, "strCol", "h-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleI, "strCol", "i-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
         SaveRowsResponse saveRowsResponse = sampleGenerator.insertRows(createDefaultConnection(true), sampleGenerator.getRows());
 
         goToProjectHome();
@@ -647,38 +660,60 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleHelper.goToSampleSet(sampleSet.getName());
         saveLocation();
 
-        sampleHelper.mergeImport(List.of(
-                Map.of("name", "DPS-C", "strCol", "c-v2") // Just update data
-        ));
-        // TODO: Verify
+        // 40083: Excluding existing parent column from sample import makes project undeletable
+//        sampleHelper.mergeImport(List.of(
+//                Map.of("name", sampleC, "strCol", "c-v2") // Just update data
+//        ));
+//
+//        recallLocation();
+//        sampleHelper.mergeImport(List.of(
+//                Map.of("name", sampleD, sampleParentKey, "DPS-A,DPS-B") // Don't specify an existing parent column
+//        ));
 
         recallLocation();
         sampleHelper.mergeImport(List.of(
-                Map.of("name", "DPS-D", sampleParentKey, "DPS-A,DPS-B") // Don't specify an existing parent column
+                Map.of("name", sampleE, sampleParentKey, sampleParents, dataParentKey, "") // Clear one parent column
         ));
-        // TODO: Verify
+        clickAndWait(Locator.linkWithText(sampleE));
+        assertElementPresent(Locator.linkWithText(sampleParentA));
+        assertElementPresent(Locator.linkWithText(sampleParentB));
+        assertElementNotPresent(Locator.linkWithText(dataParentA));
+        assertElementNotPresent(Locator.linkWithText(dataParentB));
 
         recallLocation();
         sampleHelper.mergeImport(List.of(
-                Map.of("name", "DPS-E", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "") // Clear one parent column
+                Map.of("name", sampleF, sampleParentKey, "", dataParentKey, "") // Clear all lineage columns
         ));
-        // TODO: Verify
+        clickAndWait(Locator.linkWithText(sampleF));
+        assertElementNotPresent(Locator.linkWithText(sampleParentA));
+        assertElementNotPresent(Locator.linkWithText(sampleParentB));
+        assertElementNotPresent(Locator.linkWithText(dataParentA));
+        assertElementNotPresent(Locator.linkWithText(dataParentB));
 
         recallLocation();
         sampleHelper.mergeImport(List.of(
-                Map.of("name", "DPS-F", sampleParentKey, "", dataParentKey, "") // Clear all lineage columns
+                Maps.of("name", sampleG, sampleParentKey, sampleParents, dataParentKey, dataParents), // Leave unmodified
+                Map.of("name", sampleH, sampleParentKey, sampleParentA, dataParentKey, dataParentB), // Modify lineage columns
+                Map.of("name", sampleI, sampleParentKey, "", dataParentKey, "") // Modify lineage columns
         ));
-        // TODO: Verify
-
+        clickAndWait(Locator.linkWithText(sampleG));
+        assertElementPresent(Locator.linkWithText(sampleParentA));
+        assertElementPresent(Locator.linkWithText(sampleParentB));
+        assertElementPresent(Locator.linkWithText(dataParentA));
+        assertElementPresent(Locator.linkWithText(dataParentB));
         recallLocation();
-        sampleHelper.mergeImport(List.of(
-                Maps.of("name", "DPS-G", sampleParentKey, "DPS-A,DPS-B", dataParentKey, "DPD-A,DPD-B"), // Leave unmodified
-                Map.of("name", "DPS-H", sampleParentKey, "DPS-A", dataParentKey, "DPD-B") // Modify lineage columns
-        ));
-        // TODO: Verify
+        clickAndWait(Locator.linkWithText(sampleF));
+        assertElementPresent(Locator.linkWithText(sampleParentA));
+        assertElementNotPresent(Locator.linkWithText(sampleParentB));
+        assertElementNotPresent(Locator.linkWithText(dataParentA));
+        assertElementPresent(Locator.linkWithText(dataParentB));
+        recallLocation();
+        clickAndWait(Locator.linkWithText(sampleF));
+        assertElementNotPresent(Locator.linkWithText(sampleParentA));
+        assertElementNotPresent(Locator.linkWithText(sampleParentB));
+        assertElementNotPresent(Locator.linkWithText(dataParentA));
+        assertElementNotPresent(Locator.linkWithText(dataParentB));
 
-        sampleGenerator.deleteDomain(createDefaultConnection(true));
-        dataGenerator.deleteDomain(createDefaultConnection(true));
     }
 
     @Test
