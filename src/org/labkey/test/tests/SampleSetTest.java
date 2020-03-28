@@ -102,6 +102,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
     protected static final File PIPELINE_PATH = TestFileUtils.getSampleData("xarfiles/expVerify");
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");
@@ -125,8 +126,8 @@ public class SampleSetTest extends BaseWebDriverTest
     private void doSetup()
     {
         PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.enterAdminMode();
         _containerHelper.createProject(PROJECT_NAME, null);
+        portalHelper.enterAdminMode();
         portalHelper.addWebPart("Sample Sets");
 
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, "Collaboration");
