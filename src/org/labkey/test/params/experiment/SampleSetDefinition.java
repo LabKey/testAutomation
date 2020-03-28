@@ -28,8 +28,6 @@ public class SampleSetDefinition extends DomainProps
     // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
     private Set<String> _dataParentAliases = new HashSet<>();
 
-    public SampleSetDefinition() { }
-
     public SampleSetDefinition(String name)
     {
         _name = name;

@@ -25,8 +25,6 @@ public class DataClassDefinition extends DomainProps
     private String _materialSource;
     private List<FieldDefinition> _fields = new ArrayList<>();
 
-    public DataClassDefinition() { }
-
     public DataClassDefinition(String name)
     {
         _name = name;

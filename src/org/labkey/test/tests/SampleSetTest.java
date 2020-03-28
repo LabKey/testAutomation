@@ -651,7 +651,7 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleGenerator.addCustomRow(Map.of("name", sampleG, "strCol", "g-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
         sampleGenerator.addCustomRow(Map.of("name", sampleH, "strCol", "h-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
         sampleGenerator.addCustomRow(Map.of("name", sampleI, "strCol", "i-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
-        SaveRowsResponse saveRowsResponse = sampleGenerator.insertRows(createDefaultConnection(true), sampleGenerator.getRows());
+        sampleGenerator.insertRows(createDefaultConnection(true), sampleGenerator.getRows());
 
         goToProjectHome();
 
@@ -661,15 +661,24 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleHelper.goToSampleSet(sampleSet.getName());
         saveLocation();
 
-        // 40083: Excluding existing parent column from sample import makes project undeletable
         sampleHelper.mergeImport(List.of(
                 Map.of("name", sampleC, "strCol", "c-v2") // Just update data
         ));
+        clickAndWait(Locator.linkWithText(sampleC));
+        assertElementPresent(Locator.linkWithText(sampleParentA));
+        assertElementPresent(Locator.linkWithText(sampleParentB));
+        assertElementPresent(Locator.linkWithText(dataParentA));
+        assertElementPresent(Locator.linkWithText(dataParentB));
 
         recallLocation();
         sampleHelper.mergeImport(List.of(
-                Map.of("name", sampleD, sampleParentKey, "DPS-A,DPS-B") // Don't specify an existing parent column
+                Map.of("name", sampleD, sampleParentKey, sampleParents) // Don't specify an existing parent column
         ));
+        clickAndWait(Locator.linkWithText(sampleD));
+        assertElementPresent(Locator.linkWithText(sampleParentA));
+        assertElementPresent(Locator.linkWithText(sampleParentB));
+        assertElementNotPresent(Locator.linkWithText(dataParentA));
+        assertElementNotPresent(Locator.linkWithText(dataParentB));
 
         recallLocation();
         sampleHelper.mergeImport(List.of(
