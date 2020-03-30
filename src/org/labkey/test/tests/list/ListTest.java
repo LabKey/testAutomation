@@ -21,6 +21,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.DomainResponse;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
+import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -50,6 +54,7 @@ import org.labkey.test.util.ListHelper.LookupInfo;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.By;
@@ -683,6 +688,68 @@ public class ListTest extends BaseWebDriverTest
         // no need to query the list; nothing will be inserted if the batch insert fails/errors
     }
 
+    @Test
+    public void testAddListColumnOverRemoteAPI() throws Exception
+    {
+        List<FieldDefinition> cols = Arrays.asList(
+               new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                new FieldDefinition("title", FieldDefinition.ColumnType.String),
+                new FieldDefinition("dewey", FieldDefinition.ColumnType.Decimal)
+        );
+        String listName = "remoteApiListTestAddColumn";
+        FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(info)
+                .withColumns(cols);
+        DomainResponse createResponse = dgen.createList(createDefaultConnection(true), "key");
+        Domain listDomain = createResponse.getDomain();
+        List<PropertyDescriptor> listFields = createResponse.getDomain().getFields();
+        listFields.add(new FieldDefinition("volume", FieldDefinition.ColumnType.Decimal));
+        listDomain.setFields(listFields);
+
+        // now save with an extra field
+        SaveDomainCommand saveCmd = new SaveDomainCommand(info.getSchema(), info.getTable());
+        saveCmd.setDomainDesign(listDomain);
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(true), info.getFolder());
+
+        // now verify
+        assertEquals(listFields.size(), saveResponse.getDomain().getFields().size());
+        for (PropertyDescriptor expectedField : listFields)
+        {
+            checker().verifyTrue( "expect field [" + expectedField.getName() + "] with type [" +expectedField.getRangeURI()+ "]",
+                    saveResponse.getDomain().getFields().stream()
+                    .anyMatch(a -> a.getName().equals(expectedField.getName()) &&
+                            a.getRangeURI().endsWith(expectedField.getRangeURI())));
+        }
+    }
+
+    @Test
+    public void testRemoveColumnOverAPI() throws Exception
+    {
+        List<FieldDefinition> cols = Arrays.asList(
+                new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                new FieldDefinition("title", FieldDefinition.ColumnType.String),
+                new FieldDefinition("dewey", FieldDefinition.ColumnType.Decimal),
+                new FieldDefinition("removeMe", FieldDefinition.ColumnType.Decimal)
+        );
+        String listName = "remoteApiListTestRemoveColumn";
+        FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(info)
+                .withColumns(cols);
+        DomainResponse createResponse = dgen.createList(createDefaultConnection(true), "key");
+        Domain listDomain = createResponse.getDomain();
+        List<PropertyDescriptor> listFields = createResponse.getDomain().getFields();
+        listFields.removeIf(a-> a.getName().equals("removeMe"));
+        listDomain.setFields(listFields);
+
+        SaveDomainCommand saveCmd = new SaveDomainCommand(info.getSchema(), info.getTable());
+        saveCmd.setDomainDesign(listDomain);
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(true), info.getFolder());
+
+        checker().verifyFalse("expect field [title] with type [" +FieldDefinition.ColumnType.String.getConceptURI()+ "]",
+                saveResponse.getDomain().getFields().stream()
+                        .anyMatch(a -> a.getName().equals("removeMe") &&
+                                a.getRangeURI().endsWith(FieldDefinition.ColumnType.String.getConceptURI())));
+    }
 
     /*  Issue 6883: Create test for list self join
         Issue 10394: Test spaces & special characters in table/column names
