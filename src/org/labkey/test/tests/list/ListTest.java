@@ -751,6 +751,29 @@ public class ListTest extends BaseWebDriverTest
                                 a.getRangeURI().endsWith(FieldDefinition.ColumnType.String.getConceptURI())));
     }
 
+    @Test
+    public void testChangeListName() throws Exception
+    {
+        List<FieldDefinition> cols = Arrays.asList(
+                new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                new FieldDefinition("title", FieldDefinition.ColumnType.String),
+                new FieldDefinition("dewey", FieldDefinition.ColumnType.Decimal)
+        );
+        String listName = "remoteAPIBeforeRename";
+        FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(info)
+                .withColumns(cols);
+        DomainResponse createResponse = dgen.createList(createDefaultConnection(true), "key");
+        Domain listDomain = createResponse.getDomain();
+        listDomain.setName("remoteAPIAfterRename");
+
+        SaveDomainCommand saveCmd = new SaveDomainCommand(listDomain.getDomainId());
+        saveCmd.setDomainDesign(listDomain);
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(true), info.getFolder());
+
+        assertEquals("remoteAPIAfterRename", saveResponse.getDomain().getName());
+    }
+
     /*  Issue 6883: Create test for list self join
         Issue 10394: Test spaces & special characters in table/column names
 
