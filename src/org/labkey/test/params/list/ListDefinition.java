@@ -122,4 +122,16 @@ public class ListDefinition extends DomainProps
         options.put("keyName", getKeyName());
         return options;
     }
+
+    @Override
+    protected @NotNull String getSchemaName()
+    {
+        return "lists";
+    }
+
+    @Override
+    protected @NotNull String getQueryName()
+    {
+        return getName();
+    }
 }

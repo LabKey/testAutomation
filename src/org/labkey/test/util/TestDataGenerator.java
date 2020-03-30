@@ -33,6 +33,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.property.DomainProps;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -392,5 +393,22 @@ public class TestDataGenerator
     static public PropertyDescriptor simpleFieldDef(String name, FieldDefinition.ColumnType type)
     {
         return new FieldDefinition(name, type);
+    }
+
+    public static TestDataGenerator createDomain(String containerPath, DomainProps def) throws CommandException
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+
+        CreateDomainCommand createSampleSetCommand = def.getCreateCommand();
+        try
+        {
+            CommandResponse response = createSampleSetCommand.execute(connection, containerPath);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to create domain", e);
+        }
+
+        return def.getTestDataGenerator(containerPath);
     }
 }

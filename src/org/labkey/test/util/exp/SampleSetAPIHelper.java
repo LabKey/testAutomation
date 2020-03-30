@@ -2,19 +2,14 @@ package org.labkey.test.util.exp;
 
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,25 +24,19 @@ public class SampleSetAPIHelper
      *
      * @param containerPath Container in which to create the sample set
      * @param def domain properties for the new sample set
-     * @return
+     * @return A TestDataGenerator for inserting rows into the created sample set
      */
     public static TestDataGenerator createEmptySampleSet(String containerPath, SampleSetDefinition def)
     {
-        Connection connection = WebTestHelper.getRemoteApiConnection();
-
-        CreateDomainCommand createSampleSetCommand = def.getCreateCommand();
         try
         {
-            CommandResponse response = createSampleSetCommand.execute(connection, containerPath);
+            return TestDataGenerator.createDomain(containerPath, def);
         }
-        catch (CommandException | IOException e)
+        catch (CommandException e)
         {
             throw new RuntimeException("Failed to create sample set", e);
         }
 
-        List<FieldDefinition> fields = new ArrayList<>(def.getFields());
-        fields.add(new FieldDefinition("Name", FieldDefinition.ColumnType.String));
-        return new TestDataGenerator("exp.materials", def.getName(), containerPath).withColumns(fields);
     }
 
     /**
