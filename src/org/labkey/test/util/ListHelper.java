@@ -213,8 +213,8 @@ public class ListHelper extends LabKeySiteWrapper
             waitForAnyElement(Locator.linkWithText("view data"), Locator.byClass("lk-qd-error"));
             artifactCollector.dumpPageSnapshot("schemaBrowser", subdir, false);
 
-            // query-metadataQuery.view?schemaName=lists&query.queryName=People
-            beginAt(WebTestHelper.buildURL("query", containerPath, "metadataQuery", Map.of("schemaName", schemaName, "query.queryName", queryName)));
+            // query-metadataQuery.view?schemaName=lists&queryName=People
+            beginAt(WebTestHelper.buildURL("query", containerPath, "metadataQuery", Map.of("schemaName", schemaName, "queryName", queryName)));
             waitForElement(Locators.pageSignal("propertiesEditorChange"));
             artifactCollector.dumpPageSnapshot("metadataEditor", subdir, false);
 
