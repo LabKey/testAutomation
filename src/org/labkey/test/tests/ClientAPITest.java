@@ -39,7 +39,6 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
-import org.labkey.test.categories.Wiki;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.dumbster.EmailRecordTable;
@@ -74,12 +73,11 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 
-@Category({BVT.class, Wiki.class})
+@Category({BVT.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 14)
 public class ClientAPITest extends BaseWebDriverTest
 {
