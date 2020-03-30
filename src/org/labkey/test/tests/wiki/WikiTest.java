@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.labkey.test.tests;
+package org.labkey.test.tests.wiki;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
