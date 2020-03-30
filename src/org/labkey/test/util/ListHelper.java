@@ -215,7 +215,6 @@ public class ListHelper extends LabKeySiteWrapper
 
             // query-metadataQuery.view?schemaName=lists&queryName=People
             beginAt(WebTestHelper.buildURL("query", containerPath, "metadataQuery", Map.of("schemaName", schemaName, "queryName", queryName)));
-            waitForElement(Locators.pageSignal("propertiesEditorChange"));
             artifactCollector.dumpPageSnapshot("metadataEditor", subdir, false);
 
             // query-rawTableMetaData.view?schemaName=lists&query.queryName=People
