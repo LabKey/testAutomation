@@ -240,6 +240,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Upload Sample Descriptions"));
         CreateSampleSetPage createPage = new CreateSampleSetPage(getDriver());
+        // NOTE: name for the sample set is coming from URL param - 'experiment-createSampleSet.view?name=Samples&nameReadOnly=true'
         StringBuilder nameExpression = new StringBuilder();
         for (String idCol : idCols)
         {
@@ -251,9 +252,10 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                     .collect(Collectors.toList());
 
         createPage.addFields(fieldDefinitions);
-        createPage.clickSave(); // TODO: Will fail here. New UI doesn't support 'experiment-createSampleSet.view?name=Samples&nameReadOnly=true'
+        createPage.clickSave();
 
-        clickAndWait(Locator.linkWithText("Upload More Samples"));
+        clickAndWait(Locator.linkWithText("Samples"));
+        clickAndWait(Locator.linkWithText("Import More Samples"));
         new ImportDataPage(getDriver())
                 .setFile(sampleFile)
                 .submit();
