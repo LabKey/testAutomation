@@ -174,12 +174,12 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
             .setType(FieldDefinition.ColumnType.Lookup)
             .setFromSchema("lists")
             .setFromTargetTable("Ages (Integer)")
-            .setMissingValue(true);
+            .setMissingValuesEnabled(true);
 
         resultsPanel.addField("sex")
             .setLabel("Sex")
             .setType(FieldDefinition.ColumnType.String)
-            .setMissingValue(true);
+            .setMissingValuesEnabled(true);
 
         assayDesignerPage.clickFinish();
     }
