@@ -48,6 +48,7 @@ import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -101,6 +102,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
     protected static final File PIPELINE_PATH = TestFileUtils.getSampleData("xarfiles/expVerify");
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");
@@ -125,17 +127,15 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(PROJECT_NAME, null);
-        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment"});
-        _containerHelper.createSubfolder(PROJECT_NAME, LINEAGE_FOLDER, new String[]{"Experiment"});
-
-        projectMenu().navigateToProject(PROJECT_NAME);
+        portalHelper.enterAdminMode();
         portalHelper.addWebPart("Sample Sets");
 
-        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, "Collaboration");
         portalHelper.addWebPart("Sample Sets");
 
-        projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
+        _containerHelper.createSubfolder(PROJECT_NAME, LINEAGE_FOLDER, "Collaboration");
         portalHelper.addWebPart("Sample Sets");
+        portalHelper.exitAdminMode();
 
         Connection cn = createDefaultConnection(false);
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", true);
@@ -157,7 +157,7 @@ public class SampleSetTest extends BaseWebDriverTest
 //    }
 
     @Test
-    public void doLineageDerivationTest()
+    public void testLineageDerivation()
     {
         String sampleText = "Name\tIntCol\tStringCol\n" +
                 "Sample12ab\t1012\talpha\n" +
@@ -354,8 +354,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     /**
      *  coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37466
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
     @Ignore
@@ -437,8 +435,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     /**
      * regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37465
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
     public void testLookupWithInvalidLookupValue() throws IOException, CommandException
@@ -467,7 +463,7 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void samplesWithLookupsTest() throws IOException, CommandException
+    public void testSamplesWithLookups() throws IOException, CommandException
     {
         // create a basic sampleset
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
@@ -517,8 +513,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     /**
      *  regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37465
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
     public void testLookupWithInvalidParentColumnValue() throws IOException, CommandException
@@ -554,11 +548,9 @@ public class SampleSetTest extends BaseWebDriverTest
      * column and an ad-hoc column (MaterialInput/TableName) for lineage
      * The test then deletes some rows and confirms that values in the 'parent' columns persist when their parent row
      * is deleted, but lineage values in MaterialInputs/TableName do not persist after their parent is deleted,
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
-    public void deleteLineageParent() throws IOException, CommandException
+    public void testDeleteLineageParent() throws IOException, CommandException
     {
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
 
@@ -622,6 +614,118 @@ public class SampleSetTest extends BaseWebDriverTest
         dgen.deleteDomain(createDefaultConnection(true));
     }
 
+    @Test
+    public void testDeleteSampleSources() throws CommandException, IOException
+    {
+        SampleSetDefinition sampleSet = new SampleSetDefinition("DeleteSourcesSamples").addField(new FieldDefinition("strCol"));
+        DataClassDefinition dataClass = new DataClassDefinition("DeleteSourcesData").addField(new FieldDefinition("strCol"));
+
+        TestDataGenerator sampleGenerator = TestDataGenerator.createDomain(getProjectName(), sampleSet);
+        TestDataGenerator dataGenerator = TestDataGenerator.createDomain(getProjectName(), dataClass);
+
+        final String sampleParentKey = "MaterialInputs/" + sampleSet.getName();
+        final String dataParentKey = "DataInputs/" + dataClass.getName();
+
+        final String dataParentA = "DPD-A";
+        final String dataParentB = "DPD-B";
+        final String dataParents = "DPD-A,DPD-B";
+        dataGenerator.addCustomRow(Map.of("Name", dataParentA));
+        dataGenerator.addCustomRow(Map.of("Name", dataParentB));
+        dataGenerator.insertRows();
+
+        final String sampleParentA = "DPS-A";
+        final String sampleParentB = "DPS-B";
+        final String sampleParents = "DPS-A,DPS-B";
+        sampleGenerator.addRow(List.of(sampleParentA, "a-v1"));
+        sampleGenerator.addRow(List.of(sampleParentB, "b-v1"));
+        final String sampleC = "DPS-C";
+        final String sampleD = "DPS-D";
+        final String sampleE = "DPS-E";
+        final String sampleF = "DPS-F";
+        final String sampleG = "DPS-G";
+        final String sampleH = "DPS-H";
+        final String sampleI = "DPS-I";
+        sampleGenerator.addCustomRow(Map.of("name", sampleC, "strCol", "c-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleD, "strCol", "d-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleE, "strCol", "e-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleF, "strCol", "f-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleG, "strCol", "g-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleH, "strCol", "h-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.addCustomRow(Map.of("name", sampleI, "strCol", "i-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
+        sampleGenerator.insertRows(createDefaultConnection(true), sampleGenerator.getRows());
+
+        goToProjectHome();
+
+        SampleSetHelper sampleHelper = new SampleSetHelper(getDriver());
+
+        goToModule("Experiment");
+        sampleHelper.goToSampleSet(sampleSet.getName());
+        saveLocation();
+
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", sampleC, "strCol", "c-v2") // Just update data
+        ));
+        clickAndWait(Locator.linkWithText(sampleC));
+        assertElementPresent(Locator.linkWithText(sampleParentA));
+        assertElementPresent(Locator.linkWithText(sampleParentB));
+        assertElementPresent(Locator.linkWithText(dataParentA));
+        assertElementPresent(Locator.linkWithText(dataParentB));
+
+        recallLocation();
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", sampleD, sampleParentKey, sampleParents) // Don't specify an existing parent column
+        ));
+        clickAndWait(Locator.linkWithText(sampleD));
+        assertElementPresent(Locator.linkWithText(sampleParentA));
+        assertElementPresent(Locator.linkWithText(sampleParentB));
+        assertElementNotPresent(Locator.linkWithText(dataParentA));
+        assertElementNotPresent(Locator.linkWithText(dataParentB));
+
+        recallLocation();
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", sampleE, sampleParentKey, sampleParents, dataParentKey, "") // Clear one parent column
+        ));
+        clickAndWait(Locator.linkWithText(sampleE));
+        assertElementPresent(Locator.linkWithText(sampleParentA));
+        assertElementPresent(Locator.linkWithText(sampleParentB));
+        assertElementNotPresent(Locator.linkWithText(dataParentA));
+        assertElementNotPresent(Locator.linkWithText(dataParentB));
+
+        recallLocation();
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", sampleF, sampleParentKey, "", dataParentKey, "") // Clear all lineage columns
+        ));
+        clickAndWait(Locator.linkWithText(sampleF));
+        assertElementNotPresent(Locator.linkWithText(sampleParentA));
+        assertElementNotPresent(Locator.linkWithText(sampleParentB));
+        assertElementNotPresent(Locator.linkWithText(dataParentA));
+        assertElementNotPresent(Locator.linkWithText(dataParentB));
+
+        recallLocation();
+        sampleHelper.mergeImport(List.of(
+                Map.of("name", sampleG, sampleParentKey, sampleParents, dataParentKey, dataParents), // Leave unmodified
+                Map.of("name", sampleH, sampleParentKey, sampleParentA, dataParentKey, dataParentB), // Modify lineage columns
+                Map.of("name", sampleI, sampleParentKey, "", dataParentKey, "") // Modify lineage columns
+        ));
+        clickAndWait(Locator.linkWithText(sampleG));
+        assertElementPresent(Locator.linkWithText(sampleParentA));
+        assertElementPresent(Locator.linkWithText(sampleParentB));
+        assertElementPresent(Locator.linkWithText(dataParentA));
+        assertElementPresent(Locator.linkWithText(dataParentB));
+        recallLocation();
+        clickAndWait(Locator.linkWithText(sampleH));
+        assertElementPresent(Locator.linkWithText(sampleParentA));
+        assertElementNotPresent(Locator.linkWithText(sampleParentB));
+        assertElementNotPresent(Locator.linkWithText(dataParentA));
+        assertElementPresent(Locator.linkWithText(dataParentB));
+        recallLocation();
+        clickAndWait(Locator.linkWithText(sampleI));
+        assertElementNotPresent(Locator.linkWithText(sampleParentA));
+        assertElementNotPresent(Locator.linkWithText(sampleParentB));
+        assertElementNotPresent(Locator.linkWithText(dataParentA));
+        assertElementNotPresent(Locator.linkWithText(dataParentB));
+
+    }
 
     @Test
     public void testStringLookupFields() throws IOException, CommandException
@@ -1850,7 +1954,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     }
 
-
     @Test
     public void testParentChild()
     {
@@ -1893,7 +1996,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         // Make a grandchild set
         log("Create a grandparent sample set");
-        clickTab("Experiment");
+        goToModule("Experiment");
         scrollIntoView(Locator.linkWithText("Sample Sets"));
         clickAndWait(Locator.linkWithText("Sample Sets"));
 
@@ -2086,7 +2189,7 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void fileAttachmentTest()
+    public void testFileAttachment()
     {
         File experimentFilePath = new File(PIPELINE_PATH, "experiment.xar.xml");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
@@ -2130,7 +2233,6 @@ public class SampleSetTest extends BaseWebDriverTest
         expectedHeaders.remove("File Attachment");
         exportGridVerifyRowCountAndHeader(3, expectedHeaders);
     }
-
 
     @Test
     public void testCreateViaScript()

@@ -16,6 +16,7 @@ import java.util.Set;
 
 /**
  * Defines a Sample Type. Suitable for use with UI and API helpers.
+ * 'exp.materials'
  */
 public class SampleSetDefinition extends DomainProps
 {
@@ -24,9 +25,8 @@ public class SampleSetDefinition extends DomainProps
     private String _description;
     private List<FieldDefinition> _fields = new ArrayList<>();
     private Map<String, String> _parentAliases = new HashMap<>();
+    // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
     private Set<String> _dataParentAliases = new HashSet<>();
-
-    public SampleSetDefinition() { }
 
     public SampleSetDefinition(String name)
     {
@@ -132,7 +132,7 @@ public class SampleSetDefinition extends DomainProps
     {
         Domain domain = new Domain(getName());
         ArrayList<PropertyDescriptor> fields = new ArrayList<>(getFields());
-        fields.add(new PropertyDescriptor("Name", null));
+        fields.add(0, new PropertyDescriptor("Name", null));
         domain.setFields(fields);
         domain.setDescription(getDescription());
         return domain;
@@ -169,5 +169,17 @@ public class SampleSetDefinition extends DomainProps
             options.put("importAliases", importAliases);
         }
         return options;
+    }
+
+    @Override
+    protected @NotNull String getSchemaName()
+    {
+        return "exp.materials";
+    }
+
+    @Override
+    protected @NotNull String getQueryName()
+    {
+        return getName();
     }
 }
