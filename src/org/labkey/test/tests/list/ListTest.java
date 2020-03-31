@@ -18,6 +18,7 @@ package org.labkey.test.tests.list;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -747,11 +748,11 @@ public class ListTest extends BaseWebDriverTest
 
         checker().verifyFalse("expect field [title] with type [" +FieldDefinition.ColumnType.String.getConceptURI()+ "]",
                 saveResponse.getDomain().getFields().stream()
-                        .anyMatch(a -> a.getName().equals("removeMe") &&
-                                a.getRangeURI().endsWith(FieldDefinition.ColumnType.String.getConceptURI())));
+                        .anyMatch(a -> a.getName().equals("removeMe")));
     }
 
     @Test
+    @Ignore // ignore until remoteAPI supports rename
     public void testChangeListName() throws Exception
     {
         List<FieldDefinition> cols = Arrays.asList(
