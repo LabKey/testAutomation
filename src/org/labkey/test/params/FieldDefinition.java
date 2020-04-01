@@ -340,7 +340,7 @@ public class FieldDefinition extends PropertyDescriptor
 
         public String getRangeURI() { return _rangeURI; }
 
-        public String getConceptURI()
+        protected String getConceptURI()
         {
             return _conceptURI;
         }
