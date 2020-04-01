@@ -295,8 +295,7 @@ public class FieldDefinition extends PropertyDescriptor
         DateAndTime("Date Time", "Date Time", "date"),
         Boolean("Boolean", "Boolean", "boolean"),
         Double("Number (Double)", "Number (Double)", "float"), // TODO remove this after GWT designer removed
-        Decimal("Decimal", "Decimal", "float",
-            "http://www.labkey.org/exp/xml#float", null),
+        Decimal("Decimal", "Decimal", "float"),
         File("File", "File", "fileLink"),
         AutoInteger("Auto-Increment Integer", "Auto-Increment Integer", "int"),
         Flag("Flag", "Flag (String)", "string",
