@@ -289,7 +289,8 @@ public class FieldDefinition extends PropertyDescriptor
         MultiLine("Multi-Line Text", "Multi-Line Text", "string"),
         Integer("Integer", "Integer", "int"),
         String("Text", "Text (String)", "string"),
-        Subject("Subject/Participant", "Subject/Participant (String)", "string"),
+        Subject("Subject/Participant", "Subject/Participant (String)",
+                "string", "http://cpas.labkey.com/Study#ParticipantId", null),
         DateTime("DateTime", "DateTime", "date"), // TODO remove this after GWT designer removed
         DateAndTime("Date Time", "Date Time", "date"),
         Boolean("Boolean", "Boolean", "boolean"),

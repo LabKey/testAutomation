@@ -469,10 +469,10 @@ public class SampleSetTest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), LINEAGE_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "sampleData", getCurrentContainerPath())
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("strData", ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("intData", ColumnType.Integer),
-                        TestDataGenerator.simpleFieldDef("floatData", ColumnType.Double)
+                        new FieldDefinition("name", ColumnType.String),
+                        new FieldDefinition("strData", ColumnType.String),
+                        new FieldDefinition("intData", ColumnType.Integer),
+                        new FieldDefinition("floatData", ColumnType.Decimal)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "A", "strData", "argy", "intData", 6, "floatData", 2.5));
@@ -486,12 +486,12 @@ public class SampleSetTest extends BaseWebDriverTest
         // create another with a lookup to it
         TestDataGenerator lookupDgen = new TestDataGenerator("exp.materials", "sampleLookups", getCurrentContainerPath())
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("strLookup", ColumnType.String)
+                        new FieldDefinition("name", ColumnType.String),
+                        new FieldDefinition("strLookup", ColumnType.String)
                                 .setLookup("exp.materials", "sampleData", lookupContainer),
-                        TestDataGenerator.simpleFieldDef("intLookup", ColumnType.Integer)
+                        new FieldDefinition("intLookup", ColumnType.Integer)
                                 .setLookup("exp.materials", "sampleData", lookupContainer),
-                        TestDataGenerator.simpleFieldDef("floatLooky", ColumnType.Double)
+                        new FieldDefinition("floatLooky", ColumnType.Decimal)
                                 .setLookup("exp.materials", "sampleData", lookupContainer)
                 ));
         lookupDgen.createDomain(createDefaultConnection(true), "SampleSet");

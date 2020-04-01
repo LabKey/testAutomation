@@ -160,7 +160,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
                                 .setMvEnabled(true).setLabel("MV Field"),
-                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)
+                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Decimal)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "First", "mvStringData", "Q", "volume", 13.5));
@@ -222,7 +222,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
                                 .setMvEnabled(true).setLabel("MV Field"),
-                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)
+                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Decimal)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "A", "mvStringData", "Q", "volume", 13.5));
@@ -302,7 +302,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
                                 .setMvEnabled(true).setLabel("MV Field"),
-                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)
+                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Decimal)
                 ))
                 .withGeneratedRows(30);
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
@@ -356,7 +356,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
                                 .setMvEnabled(true).setLabel("MV Field"),
-                        TestDataGenerator.simpleFieldDef("vol", FieldDefinition.ColumnType.Double)
+                        TestDataGenerator.simpleFieldDef("vol", FieldDefinition.ColumnType.Decimal)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "1st", "mvStringData", "Q", "vol", 17.5));
@@ -405,7 +405,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
                                 .setMvEnabled(true).setLabel("MV Field"),
-                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)
+                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Decimal)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "First", "volume", 13.5));
@@ -490,7 +490,7 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
                                 .setMvEnabled(true).setLabel("MV Field"),
-                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)
+                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Decimal)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "1st", "volume", 13.5));
@@ -623,9 +623,9 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), samplesFolder);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", sampleSetName, getProjectName() + "/" + samplesFolder)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double),
-                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("volume", FieldDefinition.ColumnType.Decimal),
+                        new FieldDefinition("color", FieldDefinition.ColumnType.String)
                 ));
         dgen.createDomain(createDefaultConnection(true), "SampleSet");
         dgen.addCustomRow(Map.of("name", "1st", "volume", 13.5));
@@ -740,10 +740,10 @@ public class SampleSetRemoteAPITest extends BaseWebDriverTest
     private List<TestDataGenerator> generateAssayData(FieldDefinition.LookupInfo assayLookup)
     {
         List<PropertyDescriptor> resultsFieldset = List.of(
-                TestDataGenerator.simpleFieldDef("ParticipantID",FieldDefinition.ColumnType.String),
-                TestDataGenerator.simpleFieldDef("Date", FieldDefinition.ColumnType.DateTime),
-                TestDataGenerator.simpleFieldDef("SampleName", FieldDefinition.ColumnType.String),
-                TestDataGenerator.simpleFieldDef("SampleVolume", FieldDefinition.ColumnType.Double));
+                new FieldDefinition("ParticipantID",FieldDefinition.ColumnType.String),
+                new FieldDefinition("Date", FieldDefinition.ColumnType.DateAndTime),
+                new FieldDefinition("SampleName", FieldDefinition.ColumnType.String),
+                new FieldDefinition("SampleVolume", FieldDefinition.ColumnType.DateAndTime));
 
         TestDataGenerator dgen1 = new TestDataGenerator(assayLookup)
                 .withColumns(resultsFieldset)
