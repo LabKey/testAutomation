@@ -746,7 +746,7 @@ public class ListTest extends BaseWebDriverTest
         saveCmd.setDomainDesign(listDomain);
         DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(true), info.getFolder());
 
-        checker().verifyFalse("expect field [title] with type [" +FieldDefinition.ColumnType.String.getConceptURI()+ "]",
+        checker().verifyFalse("'removeMe' field was not deleted.",
                 saveResponse.getDomain().getFields().stream()
                         .anyMatch(a -> a.getName().equals("removeMe")));
     }
