@@ -120,7 +120,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public String detailsMessage()
     {
-        return elementCache().fieldDetailsMessage.getText();
+        return elementCache().fieldDetailsMessage.getText().trim();
     }
 
     public int getIndex()
