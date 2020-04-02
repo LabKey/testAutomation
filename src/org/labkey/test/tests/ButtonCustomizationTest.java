@@ -22,7 +22,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -33,7 +32,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, Wiki.class})
+@Category({DailyA.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ButtonCustomizationTest extends BaseWebDriverTest
 {

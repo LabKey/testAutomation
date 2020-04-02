@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.labkey.test.tests;
+package org.labkey.test.tests.filecontent;
 
 import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +33,7 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.tests.MessagesLongTest;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
