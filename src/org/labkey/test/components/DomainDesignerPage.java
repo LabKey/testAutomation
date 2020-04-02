@@ -6,6 +6,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.domain.DomainPanel;
 import org.labkey.test.components.domain.UnsavedChangesModalDialog;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
@@ -85,9 +86,9 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
      * Get a list of the Domain Panels on this page.
      * @return List of DomainFormElement
      */
-    public List<DomainFormPanel> getPanels()
+    public List<DomainPanel<?, ?>> getPanels()
     {
-        return new DomainFormPanel.DomainFormPanelFinder(getDriver()).findAll();
+        return new DomainPanel.DomainPanelFinder(getDriver()).findAll();
     }
 
     /**
@@ -97,7 +98,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     public List<String> getPanelTitles()
     {
         List<String> titles = new ArrayList<>();
-        for(DomainFormPanel formPanel : getPanels())
+        for(DomainPanel<?,?> formPanel : getPanels())
         {
             if (formPanel.hasPanelTitle())
                 titles.add(formPanel.getPanelTitle());

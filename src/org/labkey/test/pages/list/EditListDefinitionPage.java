@@ -21,6 +21,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.domain.DomainPanel;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.ToggleButton;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
@@ -114,7 +115,7 @@ public class EditListDefinitionPage extends LabKeyPage<EditListDefinitionPage.El
 
     public DomainFormPanel getFieldsPanel()
     {
-        DomainFormPanel panel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle("Fields").find();
+        DomainFormPanel panel = new DomainPanel.DomainPanelFinder(getDriver()).withTitle("Fields").find();
         panel.expand();
         return panel;
     }

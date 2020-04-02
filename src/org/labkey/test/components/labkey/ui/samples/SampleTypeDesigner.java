@@ -1,11 +1,10 @@
 package org.labkey.test.components.labkey.ui.samples;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
-import org.labkey.test.components.Component;
-import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.domain.DomainPanel;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.params.FieldDefinition;
@@ -21,29 +20,13 @@ import static org.labkey.test.WebDriverWrapper.sleep;
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/samples/SampleTypeDesigner.tsx
  * This is a full-page component and should be wrapped by a context-specific page class
  */
-public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.ElementCache>
+public class SampleTypeDesigner extends BaseDomainDesigner<SampleTypeDesigner.ElementCache>
 {
     public final static String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
 
-    private final WebElement _el;
-    private final WebDriver _driver;
-
     public SampleTypeDesigner(WebDriver driver)
     {
-        _driver = driver;
-        _el = Locator.id("app").findElement(_driver); // Full page component
-    }
-
-    @Override
-    public WebElement getComponentElement()
-    {
-        return _el;
-    }
-
-    @Override
-    public WebDriver getDriver()
-    {
-        return _driver;
+        super(driver);
     }
 
     @Override
@@ -54,7 +37,7 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
 
     public DomainFormPanel getDomainEditor()
     {
-        return elementCache()._fieldEditorPanel.expand();
+        return elementCache().fieldEditorPanel.expand();
     }
 
     public SampleTypeDesigner removeField(boolean confirmDialogExpected, String fieldName)
@@ -71,32 +54,6 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
             getDomainEditor().addField(field);
         }
         return this;
-    }
-
-    public boolean isCancelButtonEnabled()
-    {
-        return elementCache().cancelButton.isEnabled();
-    }
-
-    public void clickCancel()
-    {
-        elementCache().cancelButton.click();
-    }
-
-    public boolean isSaveButtonEnabled()
-    {
-        return elementCache().saveButton.isEnabled();
-    }
-
-    public void clickSave()
-    {
-        elementCache().saveButton.click();
-    }
-
-    public List<WebElement> clickSaveExpectingError()
-    {
-        elementCache().saveButton.click();
-        return BootstrapLocators.errorBanner.waitForElements(getWrapper().shortWait());
     }
 
     public SampleTypeDesigner setName(String name)
@@ -201,20 +158,14 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         elementCache().propertiesPanelHeader.click();
     }
 
-    protected class ElementCache extends Component<?>.ElementCache
+    protected class ElementCache extends BaseDomainDesigner<ElementCache>.ElementCache
     {
+        protected final DomainFormPanel propertiesPanel = new DomainFormPanel(new DomainPanel.DomainPanelFinder(getDriver()).index(0).timeout(1000).findWhenNeeded(this));
         protected final Input nameInput = Input.Input(Locator.id("entity-name"), getDriver()).findWhenNeeded(this);
         protected final Input nameExpressionInput = Input.Input(Locator.id("entity-nameExpression"), getDriver()).waitFor(this);
         protected final Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver()).findWhenNeeded(this);
         protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
         protected final WebElement propertiesPanelHeader = Locator.id("sample-type-properties-hdr").findWhenNeeded(this);
-
-        protected final DomainFormPanel _fieldEditorPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).index(1).timeout(1000).findWhenNeeded(this);
-
-        protected final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
-
-        // the SM app uses alternate text for the sample type designer save buttons
-        protected final WebElement saveButton = Locator.XPathLocator.union(Locator.button("Save"), Locator.buttonContainingText("Finish")).findWhenNeeded(this);
 
         protected List<Input> parentAliases()
         {
@@ -236,5 +187,7 @@ public class SampleTypeDesigner extends WebDriverComponent<SampleTypeDesigner.El
         {
             return Locator.tagWithClass("i","container--removal-icon").findElements(this).get(index);
         }
+
+        protected final DomainFormPanel fieldEditorPanel = new DomainFormPanel(new DomainPanel.DomainPanelFinder(getDriver()).index(1).timeout(1000).findWhenNeeded(this));
     }
 }

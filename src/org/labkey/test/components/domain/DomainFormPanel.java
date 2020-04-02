@@ -4,10 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
-import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,27 +19,25 @@ import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
-public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementCache>
+/**
+ * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/DomainForm.tsx
+ */
+public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, DomainFormPanel>
 {
-    private final WebElement _el;
-    private final WebDriver _driver;
-
-    public DomainFormPanel(WebElement element, WebDriver driver)
+    public DomainFormPanel(DomainPanel<?,?> panel)
     {
-        _el = element;
-        _driver = driver;
+        super(panel);
+    }
+
+    private DomainFormPanel(WebElement element, WebDriver driver)
+    {
+        super(element, driver);
     }
 
     @Override
-    public WebElement getComponentElement()
+    protected DomainFormPanel getThis()
     {
-        return _el;
-    }
-
-    @Override
-    public WebDriver getDriver()
-    {
-        return _driver;
+        return this;
     }
 
     public DomainFormPanel addField(FieldDefinition fieldDefinition)
@@ -180,41 +176,6 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
                 .collect(Collectors.toList());
     }
 
-    public DomainFormPanel expand()
-    {
-        if (!isExpanded())
-        {
-            elementCache().expandToggle.click();
-            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
-        }
-        return this;
-    }
-
-    public DomainFormPanel collapse()
-    {
-        if (isExpanded())
-        {
-            elementCache().expandToggle.click();
-            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
-        }
-        return this;
-    }
-
-    private boolean isExpanded()
-    {
-        return elementCache().panelBody.isDisplayed();
-    }
-
-    public boolean hasPanelTitle()
-    {
-        return elementCache().panelTitleLoc.existsIn(this);
-    }
-
-    public String getPanelTitle()
-    {
-        return hasPanelTitle() ? elementCache().panelTitle.getText() : null;
-    }
-
     public String getPanelErrorText()
     {
         return getPanelErrorWebElement().getText();
@@ -262,7 +223,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return new ElementCache();
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends DomainPanel<?,?>.ElementCache
     {
         protected WebElement addFieldButton = new WebElementWrapper()
         {
@@ -333,26 +294,18 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
         WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
 
-        WebElement expandToggle = Locator.tagWithClass("svg", "domain-form-expand-btn").findWhenNeeded(DomainFormPanel.this);
-        Locator.XPathLocator panelTitleLoc = Locator.tagWithClass("span", "domain-panel-title");
-        WebElement panelTitle = panelTitleLoc.findWhenNeeded(DomainFormPanel.this);
-        WebElement panelBody = Locator.byClass("panel-body").findWhenNeeded(this);
     }
 
-    public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
+    public static class DomainFormPanelFinder extends BaseDomainPanelFinder<DomainFormPanel, DomainFormPanelFinder>
     {
-        private final Locator.XPathLocator _panelLocator = Locator.tagWithClass("div", "domain-form-panel");
-
-        private String _title = null;
-
         public DomainFormPanelFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public DomainFormPanelFinder withTitle(String title)
+        @Override
+        protected DomainFormPanelFinder getThis()
         {
-            _title = title;
             return this;
         }
 
@@ -360,20 +313,6 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         protected DomainFormPanel construct(WebElement el, WebDriver driver)
         {
             return new DomainFormPanel(el, driver);
-        }
-
-        @Override
-        protected Locator locator()
-        {
-            if (_title != null)
-            {
-                Locator.XPathLocator titleLoc = Locator.byClass("domain-panel-title").startsWith(_title);
-                return _panelLocator.withDescendant(titleLoc);
-            }
-            else
-            {
-                return _panelLocator;
-            }
         }
     }
 }
