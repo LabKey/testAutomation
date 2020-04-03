@@ -28,6 +28,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.issues.AdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.pages.study.CreateStudyPage;
+import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.IssuesHelper;
@@ -71,6 +72,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     private static final File RLABKEY_API_QUERY = TestFileUtils.getSampleData("api/rlabkey-api-query.xml");
     private static final File RLABKEY_API_STUDY = TestFileUtils.getSampleData("api/rlabkey-api-study.xml");
     private static final File RLABKEY_API_WEBDAV = TestFileUtils.getSampleData("api/rlabkey-api-webdav.xml");
+    private static final File RLABKEY_API_SECURITY = TestFileUtils.getSampleData("api/rlabkey-api-security.xml");
 
     @BeforeClass
     public static void setupProject()
@@ -185,6 +187,19 @@ public class RlabkeyTest extends BaseWebDriverTest
         createCategoriesViaApi();
 
         doRLabkeyTest(RLABKEY_API_STUDY);
+    }
+
+    @Test
+    public void testRlabkeySecurityApi() throws Exception
+    {
+        doRLabkeyTest(RLABKEY_API_SECURITY);
+
+        // verify the folder creation, move, and deletion from the test
+        APIContainerHelper helper = (APIContainerHelper) _containerHelper;
+        assertTrue("Expected container to exist", helper.doesContainerExist(getProjectName() + "/FromAPI1"));
+        assertTrue("Expected container to exist", helper.doesContainerExist(getProjectName() + "/FromAPI2")); // exists because of alias to old location before move
+        assertTrue("Expected container to exist", helper.doesContainerExist(getProjectName() + "/FromAPI1/FromAPI2")); // exists because of alias to old location before move
+        assertTrue("Expected container not to exist", !helper.doesContainerExist(getProjectName() + "/FromAPI3")); // folder was deleted
     }
 
     @Test
