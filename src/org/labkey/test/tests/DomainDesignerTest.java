@@ -1079,10 +1079,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("manufacturer", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("color", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("manufacturer", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("volume", FieldDefinition.ColumnType.Decimal)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         dgen.addCustomRow(Map.of("name", "agar", "color", "green", "manufacturer", "glaxo", "volume", 2.34));
@@ -1116,10 +1116,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("manufacturer", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("volume", FieldDefinition.ColumnType.Double)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("color", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("manufacturer", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("volume", FieldDefinition.ColumnType.Decimal)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "SampleSet");
 
         dgen.addCustomRow(Map.of("name", "agar", "color", "green", "manufacturer", "glaxo", "volume", 2.34));
@@ -1154,9 +1154,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -1177,10 +1177,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -1212,10 +1212,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -1250,10 +1250,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -1292,8 +1292,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -1377,8 +1377,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("size", FieldDefinition.ColumnType.Integer)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -1441,8 +1441,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("superHero", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("superHero", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.tests;
+package org.labkey.test.tests.filecontent;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
