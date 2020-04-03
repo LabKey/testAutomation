@@ -23,6 +23,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -147,7 +148,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         }
     }
 
-    public DomainFieldRow setAdvancedSettings(AdvancedSettingsDialog.AdvancedFieldSettings settings)
+    public DomainFieldRow setAdvancedSettings(Map<AdvancedFieldSetting, Object> settings)
     {
         clickAdvancedSettings()
                 .setAdvancedFieldSettings(settings)
