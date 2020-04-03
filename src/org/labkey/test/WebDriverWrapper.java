@@ -1076,7 +1076,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         RelativeUrl queryURL = new RelativeUrl("query", "metadataQuery");
         queryURL.setContainerPath(getCurrentContainerPath());
         queryURL.addParameter("schemaName", schemaName);
-        queryURL.addParameter("query.queryName", queryName);
+        queryURL.addParameter("queryName", queryName);
         queryURL.setTimeout(msTimeout);
 
         queryURL.navigate(this);
