@@ -26,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -519,7 +520,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         log("Now validate that a wrapped field gives the expected error.");
         goToProjectHome();
         navigateToFolder(getProjectName(), STUDY_FOLDER);
-        wrapField("study", "Demographics","ParticipantId", "Pid2Consent");
+        wrapField("study", "Demographics","Participant ID", "Pid2Consent");
 
         log("Update the filter to use the wrapped field. Because the field is only wrapped and there is no foreign key it should error.");
         updatedMetaData = updatedMetaData.replace("ParticipantId/Study", "Pid2Consent/Study");
@@ -563,11 +564,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private void wrapField(String schema, String query, String fieldToWrap, String aliasFieldName)
     {
         navigateToMetadataQuery(schema, query);
-        clickButton("Alias Field", 0);
-        selectOptionByValue(Locator.gwtListBoxByName("sourceColumn"), fieldToWrap);
-        clickButton("OK", 0);
-        setFormElement(Locator.tagWithAttribute("input", "value", "Wrapped" + fieldToWrap), aliasFieldName);
-        clickButton("Save", 0);
+        QueryMetadataEditorPage queryMetadataEditorPage = new QueryMetadataEditorPage(getDriver());
+        queryMetadataEditorPage.aliasField().selectAliasField(fieldToWrap).clickApply();
+        queryMetadataEditorPage.fieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
+        queryMetadataEditorPage.clickFinish();
     }
 
     private String getCustomFilterMetadata(String familyName)

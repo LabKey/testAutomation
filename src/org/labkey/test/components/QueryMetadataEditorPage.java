@@ -1,6 +1,7 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.query.AliasFieldDialog;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -44,14 +45,10 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
         clickAndWait(elementCache().editSourceButton);
     }
 
-    // TODO: Refactor to 'aliasField(String fieldName)', instead of just using the default selection.
-    public void aliasField()
+    public AliasFieldDialog aliasField()
     {
-        scrollIntoView(elementCache().aliasFieldButton);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().aliasFieldButton));
         elementCache().aliasFieldButton.click();
-        click(Locator.button("OK")); //the selected option is the first field
-        // TODO: Wait for field
+        return new AliasFieldDialog(this);
     }
 
     @Override

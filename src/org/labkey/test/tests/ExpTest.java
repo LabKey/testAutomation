@@ -26,6 +26,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.query.AliasFieldDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 
@@ -158,7 +159,7 @@ public class ExpTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("edit metadata"));
 
         designerPage = new QueryMetadataEditorPage(getDriver());
-        designerPage.aliasField(); // the first selected option is already RowId
+        designerPage.aliasField().selectAliasField("Row Id").clickApply();
 
         // Make it a lookup into our custom query
         int fieldCount = designerPage.fieldsPanel().fieldNames().size();
