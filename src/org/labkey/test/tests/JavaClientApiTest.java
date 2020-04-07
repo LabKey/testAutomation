@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
@@ -43,15 +44,20 @@ import org.labkey.remoteapi.security.CreateGroupResponse;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.remoteapi.security.DeleteGroupCommand;
+import org.labkey.remoteapi.security.ImpersonateUserCommand;
 import org.labkey.remoteapi.security.RemoveGroupMembersCommand;
+import org.labkey.remoteapi.security.StopImpersonatingCommand;
+import org.labkey.remoteapi.security.WhoAmICommand;
+import org.labkey.remoteapi.security.WhoAmIResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIUserHelper;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper.PrincipalType;
 import org.labkey.test.util.PortalHelper;
 
@@ -65,11 +71,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -86,6 +95,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
     public static final String PROJECT_NAME = "~Java Client Api Verify Project~";
     public static final String LIST_NAME = "People";
     public static final String USER_NAME = "user1@javaclientapi.test";
+    public static final String USER2_NAME = "user2@javaclientapi.test";
     public static final String GROUP_NAME = "TEST GROUP";
 
     @BeforeClass
@@ -97,9 +107,30 @@ public class JavaClientApiTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void setupProject()
+    private void setupProject() throws Exception
     {
         _containerHelper.createProject(getProjectName(), null);
+
+        clickProject(PROJECT_NAME);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Lists");
+
+        log("Creating list for Query test...");
+        CreateDomainCommand createCmd = new CreateDomainCommand("IntList", LIST_NAME);
+        createCmd.setOptions(Collections.singletonMap("keyName", "key"));
+        Domain domain = createCmd.getDomainDesign();
+        domain.setFields(List.of(
+                new PropertyDescriptor("FirstName", "First Name", "string"),
+                new PropertyDescriptor("LastName", "Last Name", "string"),
+                new PropertyDescriptor("Birthdate", "Birthdate", "dateTime"),
+                new PropertyDescriptor("GooAmount", "Goo Amount", "double").setDescription("Amount of Goo"),
+                new PropertyDescriptor("Crazy", "Crazy", "boolean").setDescription("Crazy?"),
+                new PropertyDescriptor("Notes", "Notes", "string")
+        ));
+
+        Connection cn = createDefaultConnection(false);
+        DomainResponse createResp = createCmd.execute(cn, PROJECT_NAME);
+        assertEquals(200, createResp.getStatusCode());
     }
 
     @Test
@@ -111,16 +142,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         Connection cn = WebTestHelper.getRemoteApiConnection();
         cn.setAcceptSelfSignedCerts(true);
 
-        log("creating a new user...");
-        CreateUserCommand cmdNewUser = new CreateUserCommand(USER_NAME);
-        cmdNewUser.setSendEmail(false);
-        CreateUserResponse respNewUser = cmdNewUser.execute(cn, PROJECT_NAME);
-
-        if (null == respNewUser.getUserId())
-            fail("New user id not returned from create user command!");
-        int userId = respNewUser.getUserId().intValue();
-
-        assertUserExists(USER_NAME);
+        int userId = ensureUser(cn, USER_NAME);
 
         //create a new project group and verify
         log("creating new project group...");
@@ -152,29 +174,12 @@ public class JavaClientApiTest extends BaseWebDriverTest
         cmdDel.execute(cn, PROJECT_NAME);
 
         _permissionsHelper.assertGroupDoesNotExist(GROUP_NAME, PROJECT_NAME);
-
-        //delete the user
-        _userHelper.deleteUsers(true, USER_NAME);
     }
 
     @Test
     public void doQueryTest() throws Exception
     {
         log("Starting query portion of test...");
-        clickProject(PROJECT_NAME);
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Lists");
-
-        log("Creating list for Query test...");
-
-        _listHelper.createList(PROJECT_NAME, LIST_NAME,
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "First Name"),
-                new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "Last Name"),
-                new ListHelper.ListColumn("Birthdate", "Birthdate", ListHelper.ListColumnType.DateAndTime, "Birthdate"),
-                new ListHelper.ListColumn("GooAmount", "Goo Amount", ListHelper.ListColumnType.Decimal, "Amount of Goo"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"),
-                new ListHelper.ListColumn("Notes", "Notes", ListHelper.ListColumnType.String, "Notes"));
 
         log("Setting permissions...");
         clickProject(PROJECT_NAME);
@@ -380,7 +385,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         design.setFields(fields);
         DomainResponse response = createCmd.execute(cn, PROJECT_NAME);
 
-        assertTrue("Create domain request failed", 200 == response.getStatusCode());
+        assertEquals("Create domain request failed", 200, response.getStatusCode());
 
         Set<String> expected = new HashSet<>(Arrays.asList("key", "foo", "bar", "baz"));
         verifyDomain(response.getDomain(), expected);
@@ -429,6 +434,34 @@ public class JavaClientApiTest extends BaseWebDriverTest
         }
     }
 
+    public Integer getUserId(String email)
+    {
+        return new APIUserHelper(this).getUserId(email);
+    }
+
+    // Create a user with the given email if needed
+    public int ensureUser(Connection cn, String email) throws Exception
+    {
+        Integer userId = getUserId(email);
+        if (userId == null || userId < 1)
+            userId = createUser(cn, email);
+        assertUserExists(email);
+        return userId;
+    }
+
+    public int createUser(Connection cn, String email) throws Exception
+    {
+        log("creating a new user '" + email + "'...");
+        CreateUserCommand cmdNewUser = new CreateUserCommand(email);
+        cmdNewUser.setSendEmail(false);
+        CreateUserResponse respNewUser = cmdNewUser.execute(cn, PROJECT_NAME);
+
+        if (null == respNewUser.getUserId())
+            fail("New user id not returned from create user command!");
+
+        return respNewUser.getUserId().intValue();
+    }
+
     public void assertUserExists(String email)
     {
         log("asserting that user " + email + " exists...");
@@ -442,10 +475,132 @@ public class JavaClientApiTest extends BaseWebDriverTest
         log("user " + email + " exists.");
     }
 
+    @Test
+    public void testImpersonateInvalid() throws Exception
+    {
+        // require userId or email
+        try
+        {
+            Connection cn = createDefaultConnection(false);
+            ImpersonateUserCommand impCmd = new ImpersonateUserCommand(null);
+            CommandResponse resp = impCmd.execute(cn, PROJECT_NAME);
+            fail("Expect CommandException");
+        }
+        catch (CommandException e)
+        {
+            assertThat(e.getMessage(), containsString("Must specify an email or userId"));
+        }
+
+        // user doesn't exist
+        try
+        {
+            Connection cn = createDefaultConnection(false);
+            ImpersonateUserCommand impCmd = new ImpersonateUserCommand("email-does-not-exist");
+            CommandResponse resp = impCmd.execute(cn, PROJECT_NAME);
+            fail("Expect CommandException");
+        }
+        catch (CommandException e)
+        {
+            assertThat(e.getMessage(), containsString("User doesn't exist"));
+        }
+
+        // Can't impersonate yourself
+        try
+        {
+            Connection cn = createDefaultConnection(false);
+            ImpersonateUserCommand impCmd = new ImpersonateUserCommand(getCurrentUser());
+            CommandResponse resp = impCmd.execute(cn, PROJECT_NAME);
+            fail("Expect CommandException");
+        }
+        catch (CommandException e)
+        {
+            assertThat(e.getMessage(), containsString("Can't impersonate yourself"));
+        }
+    }
+
+    @Test
+    public void testImpersonateUser() throws Exception
+    {
+        goToProjectHome();
+
+        Connection cn = createDefaultConnection(false);
+        cn.setAcceptSelfSignedCerts(true);
+
+        // grant edit permission
+        int userId = ensureUser(cn, USER2_NAME);
+        ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
+        permHelper.setUserPermissions(USER2_NAME, "Editor");
+
+        // check whoami
+        WhoAmIResponse who = new WhoAmICommand().execute(cn, PROJECT_NAME);
+        assertEquals(getCurrentUser(), who.getEmail());
+        assertFalse(who.isImpersonated());
+
+        // begin impersonation
+        ImpersonateUserCommand impCmd = new ImpersonateUserCommand(USER2_NAME);
+        CommandResponse impResp = impCmd.execute(cn, PROJECT_NAME);
+        assertEquals(200, impResp.getStatusCode());
+
+        // check whoami
+        who = new WhoAmICommand().execute(cn, PROJECT_NAME);
+        assertEquals(USER2_NAME, who.getEmail());
+        assertTrue(who.isImpersonated());
+
+        // insert a row, verify it is inserted by the impersonated user
+        InsertRowsCommand insertCmd = new InsertRowsCommand("lists", LIST_NAME);
+        Map<String, Object> rowMap = new HashMap<>();
+        rowMap.put("FirstName", "inserted by impersonated user");
+        insertCmd.addRow(rowMap);
+        SaveRowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
+        assertEquals(1, saveResp.getRowsAffected().intValue());
+
+        // stop impersonation
+        StopImpersonatingCommand stopCmd = new StopImpersonatingCommand();
+        CommandResponse stopResp = stopCmd.execute(cn, PROJECT_NAME);
+        assertEquals(302, stopResp.getStatusCode());
+
+        // check whoami
+        who = new WhoAmICommand().execute(cn, PROJECT_NAME);
+        assertEquals(getCurrentUser(), who.getEmail());
+
+        // verify the inserted row has 'createdBy' of the impersonated user
+        SelectRowsCommand selectCmd = new SelectRowsCommand("lists", LIST_NAME);
+        selectCmd.setColumns(List.of("FirstName", "CreatedBy"));
+        selectCmd.addFilter(new Filter("FirstName", "inserted by impersonated user"));
+
+        SelectRowsResponse selectResp = selectCmd.execute(cn, PROJECT_NAME);
+        assertEquals(1, selectResp.getRowCount().intValue());
+        Integer createdBy = (Integer)selectResp.getRows().get(0).get("CreatedBy");
+        assertEquals(userId, createdBy.intValue());
+    }
+
+    @Test
+    public void testImpersonationConnection() throws Exception
+    {
+        goToProjectHome();
+
+        // grant edit permission
+        int userId = ensureUser(createDefaultConnection(false), USER2_NAME);
+        ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
+        permHelper.setUserPermissions(USER2_NAME, "Editor");
+
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword())
+                .impersonate(USER2_NAME, PROJECT_NAME);
+
+        // check whoami
+        WhoAmIResponse who = new WhoAmICommand().execute(cn, PROJECT_NAME);
+        assertEquals(USER2_NAME, who.getEmail());
+        assertTrue(who.isImpersonated());
+
+        cn.stopImpersonate();
+    }
+
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
+        _userHelper.deleteUsers(false, USER_NAME);
+        _userHelper.deleteUsers(false, USER2_NAME);
     }
 
     @Override
