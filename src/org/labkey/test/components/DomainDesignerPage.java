@@ -86,7 +86,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
      * Get a list of the Domain Panels on this page.
      * @return List of DomainFormElement
      */
-    public List<DomainPanel<?, ?>> getPanels()
+    public List<DomainPanel> getPanels()
     {
         return new DomainPanel.DomainPanelFinder(getDriver()).findAll();
     }

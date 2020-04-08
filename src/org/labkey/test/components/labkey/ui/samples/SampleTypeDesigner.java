@@ -22,7 +22,7 @@ import static org.labkey.test.WebDriverWrapper.sleep;
  */
 public class SampleTypeDesigner extends BaseDomainDesigner<SampleTypeDesigner.ElementCache>
 {
-    public final static String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
+    public static final String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
 
     public SampleTypeDesigner(WebDriver driver)
     {
@@ -49,48 +49,56 @@ public class SampleTypeDesigner extends BaseDomainDesigner<SampleTypeDesigner.El
 
     public SampleTypeDesigner addFields(FieldDefinition... fields)
     {
+        DomainFormPanel domainEditor = getDomainEditor();
         for (FieldDefinition field : fields)
         {
-            getDomainEditor().addField(field);
+            domainEditor.addField(field);
         }
         return this;
     }
 
     public SampleTypeDesigner setName(String name)
     {
+        elementCache().propertiesPanel.expand();
         elementCache().nameInput.set(name);
         return this;
     }
 
     public String getName()
     {
+        elementCache().propertiesPanel.expand();
         return elementCache().nameInput.get();
     }
 
     public SampleTypeDesigner setNameExpression(String nameExpression)
     {
+        elementCache().propertiesPanel.expand();
         elementCache().nameExpressionInput.set(nameExpression);
         return this;
     }
 
     public String getNameExpression()
     {
+        elementCache().propertiesPanel.expand();
         return elementCache().nameExpressionInput.get();
     }
 
     public SampleTypeDesigner setDescription(String description)
     {
+        elementCache().propertiesPanel.expand();
         elementCache().descriptionInput.set(description);
         return this;
     }
 
     public String getDescription()
     {
+        elementCache().propertiesPanel.expand();
         return elementCache().descriptionInput.get();
     }
 
     public SampleTypeDesigner addParentAlias(String alias, @Nullable String optionDisplayText)
     {
+        elementCache().propertiesPanel.expand();
         int initialCount = elementCache().parentAliases().size();
         elementCache().addAliasButton.click();
         if (optionDisplayText == null)
@@ -116,18 +124,21 @@ public class SampleTypeDesigner extends BaseDomainDesigner<SampleTypeDesigner.El
 
     public SampleTypeDesigner removeParentAlias(String parentAlias)
     {
+        elementCache().propertiesPanel.expand();
         int aliasIndex = getParentAliasIndex(parentAlias);
         return removeParentAlias(aliasIndex);
     }
 
     public SampleTypeDesigner removeParentAlias(int index)
     {
+        elementCache().propertiesPanel.expand();
         elementCache().removeParentAliasIcon(index).click();
         return this;
     }
 
     public SampleTypeDesigner setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
     {
+        elementCache().propertiesPanel.expand();
         elementCache().parentAlias(index).setValue(alias);
         if (optionDisplayText != null)
         {
@@ -138,6 +149,7 @@ public class SampleTypeDesigner extends BaseDomainDesigner<SampleTypeDesigner.El
 
     public SampleTypeDesigner setParentAlias(String alias, String optionDisplayText)
     {
+        elementCache().propertiesPanel.expand();
         int index = getParentAliasIndex(alias);
         elementCache().parentAliasSelect(index).select(optionDisplayText);
         return this;
@@ -145,22 +157,19 @@ public class SampleTypeDesigner extends BaseDomainDesigner<SampleTypeDesigner.El
 
     public String getParentAlias(int index)
     {
+        elementCache().propertiesPanel.expand();
         return elementCache().parentAlias(index).get();
     }
 
     public String getParentAliasSelectText(int index)
     {
+        elementCache().propertiesPanel.expand();
         return elementCache().parentAliasSelect(index).getSelections().get(0);
     }
 
-    public void expandPropertiesPanel()
+    protected class ElementCache extends BaseDomainDesigner.ElementCache
     {
-        elementCache().propertiesPanelHeader.click();
-    }
-
-    protected class ElementCache extends BaseDomainDesigner<ElementCache>.ElementCache
-    {
-        protected final DomainFormPanel propertiesPanel = new DomainFormPanel(new DomainPanel.DomainPanelFinder(getDriver()).index(0).timeout(1000).findWhenNeeded(this));
+        protected final DomainPanel propertiesPanel = new DomainPanel.DomainPanelFinder(getDriver()).index(0).timeout(1000).findWhenNeeded(this);
         protected final Input nameInput = Input.Input(Locator.id("entity-name"), getDriver()).findWhenNeeded(this);
         protected final Input nameExpressionInput = Input.Input(Locator.id("entity-nameExpression"), getDriver()).waitFor(this);
         protected final Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver()).findWhenNeeded(this);

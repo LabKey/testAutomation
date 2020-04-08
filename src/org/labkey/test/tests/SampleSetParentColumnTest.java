@@ -659,8 +659,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         Assert.assertEquals("Error message not as expected.",
                 "An existing sample type property conflicts with parent alias header: " + ALIAS_NAME_CONFLICT,
                 String.join("\n", errors));
-        createPage.expandPropertiesPanel()
-                .removeParentAlias(0)
+        createPage.removeParentAlias(0)
                 .clickSave();
 
         log("Update Sample Set - Add a parent alias column to the sample set that conflicts with a given column name.");

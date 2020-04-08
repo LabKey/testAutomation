@@ -11,7 +11,7 @@ import org.openqa.selenium.WebElement;
  * Wraps the functionality of the LabKey ui component defined in domainproperties/CollapsiblePanelHeader.tsx
  * Subclasses should add panel-specific functionality.
  */
-public abstract class DomainPanel<EC extends DomainPanel<?, ?>.ElementCache, T extends DomainPanel<?, T>> extends WebDriverComponent<EC>
+public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T extends DomainPanel<?, T>> extends WebDriverComponent<EC>
 {
     private final WebElement el;
     private final WebDriver driver;
@@ -79,7 +79,7 @@ public abstract class DomainPanel<EC extends DomainPanel<?, ?>.ElementCache, T e
     @Override
     protected abstract EC newElementCache();
 
-    protected class ElementCache extends Component<?>.ElementCache
+    public abstract class ElementCache extends Component<EC>.ElementCache
     {
         protected final WebElement expandToggle = Locator.tagWithClass("svg", "domain-form-expand-btn").findWhenNeeded(this);
         protected final Locator.XPathLocator panelTitleLoc = Locator.tagWithClass("span", "domain-panel-title");
@@ -87,7 +87,7 @@ public abstract class DomainPanel<EC extends DomainPanel<?, ?>.ElementCache, T e
         protected final WebElement panelBody = Locator.byClass("panel-body").findWhenNeeded(this);
     }
 
-    protected abstract static class BaseDomainPanelFinder<P extends DomainPanel<?, ?>, F extends BaseDomainPanelFinder<P,F>> extends WebDriverComponentFinder<P, F>
+    protected abstract static class BaseDomainPanelFinder<P extends DomainPanel, F extends BaseDomainPanelFinder<P,F>> extends WebDriverComponentFinder<P, F>
     {
         private final Locator.XPathLocator panelLocator = Locator.tagWithClass("div", "domain-form-panel");
 
@@ -118,7 +118,7 @@ public abstract class DomainPanel<EC extends DomainPanel<?, ?>.ElementCache, T e
         }
     }
 
-    public static class DomainPanelFinder extends BaseDomainPanelFinder<DomainPanelImpl, DomainPanelFinder>
+    public static class DomainPanelFinder extends BaseDomainPanelFinder<DomainPanel, DomainPanelFinder>
     {
         public DomainPanelFinder(WebDriver driver)
         {
@@ -132,7 +132,7 @@ public abstract class DomainPanel<EC extends DomainPanel<?, ?>.ElementCache, T e
         }
     }
 
-    private static final class DomainPanelImpl extends DomainPanel<DomainPanel<?, ?>.ElementCache, DomainPanelImpl>
+    private static final class DomainPanelImpl extends DomainPanel
     {
         private DomainPanelImpl(WebElement element, WebDriver driver)
         {
@@ -146,7 +146,7 @@ public abstract class DomainPanel<EC extends DomainPanel<?, ?>.ElementCache, T e
         }
 
         @Override
-        protected DomainPanel<?, ?>.ElementCache newElementCache()
+        protected DomainPanel.ElementCache newElementCache()
         {
             return null;
         }

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/BaseDomainDesigner.tsx
  */
-public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner<EC>.ElementCache> extends WebDriverComponent<EC>
+public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCache> extends WebDriverComponent<EC>
 {
     private final WebElement el;
     private final WebDriver driver;
@@ -64,10 +64,9 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner<EC>.Eleme
     @Override
     protected abstract EC newElementCache();
 
-    protected class ElementCache extends Component<EC>.ElementCache
+    public abstract class ElementCache extends Component<EC>.ElementCache
     {
         protected final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
         protected final WebElement saveButton = Locator.css(".domain-designer-buttons > .btn-primary").findWhenNeeded(this);
-
     }
 }

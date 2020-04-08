@@ -223,7 +223,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return new ElementCache();
     }
 
-    protected class ElementCache extends DomainPanel<?,?>.ElementCache
+    protected class ElementCache extends DomainPanel<ElementCache, DomainFormPanel>.ElementCache
     {
         protected WebElement addFieldButton = new WebElementWrapper()
         {
@@ -296,6 +296,10 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     }
 
+    /**
+     * This will find any domain panel.
+     * There is no simple method to differentiate field editor panels from other domain panels
+     */
     public static class DomainFormPanelFinder extends BaseDomainPanelFinder<DomainFormPanel, DomainFormPanelFinder>
     {
         public DomainFormPanelFinder(WebDriver driver)
