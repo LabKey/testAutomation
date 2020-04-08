@@ -70,7 +70,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         if (fieldDefinition.getURL() != null)
             fieldRow.setUrl(fieldDefinition.getURL());
         if (fieldDefinition.getMvEnabled())
-            fieldRow.setMissingValue(fieldDefinition.getMvEnabled());
+            fieldRow.setMissingValuesEnabled(fieldDefinition.getMvEnabled());
         if (fieldDefinition.getRequired())
             fieldRow.setRequiredField(fieldDefinition.getRequired());
         if (fieldDefinition.getLookupValidatorEnabled() != null)
@@ -80,7 +80,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         {
             FieldDefinition.FieldValidator validator = fieldDefinition.getValidator();
             if (validator instanceof FieldDefinition.RegExValidator)
-                fieldRow.setRegularExpressions(List.of((FieldDefinition.RegExValidator)validator));
+                fieldRow.setRegExValidators(List.of((FieldDefinition.RegExValidator)validator));
             else if (validator instanceof FieldDefinition.RangeValidator)
                 fieldRow.setRangeValidators(List.of((FieldDefinition.RangeValidator)validator));
             else

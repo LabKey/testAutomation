@@ -251,7 +251,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setType(FieldDefinition.ColumnType.DateAndTime)
                 .expand()
                 .setDateFormat("yyyy-MM-dd HH:mm")
-                .setDateShift(false)
+                .setExcludeFromDateShifting(false)
                 .setDescription("simplest date format of all")
                 .setLabel("DateTime");
         domainDesignerPage.clickFinish();
@@ -746,10 +746,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow missingValueRow = domainFormPanel.addField("missingValue");
-        missingValueRow.setMissingValue(true);
+        missingValueRow.setMissingValuesEnabled(true);
         // explicitly set missingValue false on extraField
         DomainFieldRow extraFieldRow = domainFormPanel.getField("extraField");
-        extraFieldRow.setMissingValue(false);
+        extraFieldRow.setMissingValuesEnabled(false);
 
         domainDesignerPage.clickFinish();
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
