@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/BaseDomainDesigner.tsx
+ * Defines standard save, cancel, and error handling
  */
 public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCache> extends WebDriverComponent<EC>
 {

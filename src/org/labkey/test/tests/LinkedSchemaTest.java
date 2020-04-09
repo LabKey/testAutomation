@@ -566,8 +566,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         navigateToMetadataQuery(schema, query);
         QueryMetadataEditorPage queryMetadataEditorPage = new QueryMetadataEditorPage(getDriver());
         queryMetadataEditorPage.aliasField().selectAliasField(fieldToWrap).clickApply();
-        queryMetadataEditorPage.fieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
-        queryMetadataEditorPage.clickFinish();
+        queryMetadataEditorPage.getFieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
+        queryMetadataEditorPage.clickSave();
     }
 
     private String getCustomFilterMetadata(String familyName)

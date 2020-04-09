@@ -114,7 +114,8 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
 
     public DomainFormPanel getDomainEditor()
     {
-        return elementCache()._designer.getDomainEditor();
+        elementCache();
+        return elementCache()._designer.getFieldsPanel();
     }
 
     public void clickSave()

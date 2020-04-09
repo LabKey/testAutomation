@@ -1041,8 +1041,10 @@ public class ListTest extends BaseWebDriverTest
 
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
         assertTextPresent("BarBar");
-        listDefinitionPage.setColumnName(1, "FooFoo");
-        listDefinitionPage.setColumnLabel(1, "FooFoo");
+        listDefinitionPage.getFieldsPanel()
+                .getField(1).setName("FooFoo");
+        listDefinitionPage.getFieldsPanel()
+                .getField(1).setLabel("FooFoo");
         listDefinitionPage.clickSave();
         assertTextPresent("FooFoo");
         assertTextNotPresent("BarBar");
@@ -1182,9 +1184,11 @@ public class ListTest extends BaseWebDriverTest
                                col(descriptionCol, ListColumnType.String),
                                col(attachmentCol, ListColumnType.Attachment));
         // index on attachment column
-        _listHelper.goToEditDesign(listName)
-            .checkIndexFileAttachements(true)
-            .clickSave();
+        EditListDefinitionPage editListDefinitionPage = _listHelper.goToEditDesign(listName);
+        editListDefinitionPage.openAdvancedListSettings()
+                .setIndexFileAttachments(true)
+                .clickApply() // Advanced settings
+                .clickSave();
 
         // Insert data, upload attachment
         goToProjectHome();

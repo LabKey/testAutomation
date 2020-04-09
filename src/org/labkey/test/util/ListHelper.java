@@ -389,7 +389,7 @@ public class ListHelper extends LabKeySiteWrapper
         log("Add List");
         clickButton("Create New List");
         EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
-        listDefinitionPage.setListName(listName);
+        listDefinitionPage.setName(listName);
         return listDefinitionPage;
     }
 
