@@ -1,0 +1,139 @@
+package org.labkey.test.tests;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.pages.EditDatasetDefinitionPage;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PortalHelper;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
+
+@Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 10)
+public class StudySurveyTest extends BaseWebDriverTest
+{
+    PortalHelper portalHelper = new PortalHelper(this);
+    private String datasetName = "SampleDataset";
+    private String surveyDesignName = "Dataset Survey Design";
+
+    @BeforeClass
+    public static void doSetup()
+    {
+        StudySurveyTest initTest = (StudySurveyTest) getCurrentTest();
+        initTest.setupProject();
+    }
+
+    public static String getDate(int incrementDays)
+    {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime date = LocalDateTime.now().plusDays(incrementDays);
+        return dtf.format(date);
+    }
+
+    @Override
+    protected String getProjectName()
+    {
+        return "Study Survey Test Project";
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    private void setupProject()
+    {
+        _containerHelper.createProject(getProjectName(), "Study");
+        clickButton("Create Study");
+        click(Locator.radioButtonById("continuousTimepointType"));
+        clickButton("Create Study");
+        _containerHelper.enableModule("Survey");
+
+        goToProjectHome();
+        portalHelper.addWebPart("Datasets");
+        portalHelper.addWebPart("Survey Designs");
+    }
+
+    @Test
+    public void testSteps()
+    {
+        String surveyLable = "Study Survey";
+        log("Creating a new dataset");
+        EditDatasetDefinitionPage editDatasetPage = _studyHelper
+                .goToManageDatasets()
+                .clickCreateNewDataset()
+                .setName(datasetName)
+                .submit();
+
+        gotoDataset(datasetName);
+        DataRegionTable table = new DataRegionTable("Dataset", getDriver());
+        table.clickInsertNewRow();
+        setFormElement(Locator.name("quf_ParticipantId"), "1");
+        setFormElement(Locator.name("quf_date"), getDate(-1));
+        clickButton("Submit");
+
+        goToProjectHome();
+        createSurveyDesign(surveyDesignName, null, "study", datasetName, null);
+
+        addSurveyWebpart(surveyDesignName);
+        clickButton("Create Survey", WAIT_FOR_JAVASCRIPT);
+        waitForText("Survey Label*");
+        setFormElement(Locator.name("_surveyLabel_"), surveyLable);
+        setFormElement(Locator.name("participantid"), "1");
+        setFormElement(Locator.name("date"), getDate(0));
+        clickButton("Submit completed form", 0);
+        _extHelper.waitForExtDialog("Success");
+        _extHelper.waitForExtDialogToDisappear("Success");
+
+        goToProjectHome();
+        clickEditForLabel("Surveys: " + surveyDesignName, surveyLable);
+        setFormElement(Locator.name("date"), getDate(2));
+        clickButton("Save", 0);
+        _extHelper.waitForExtDialog("Success");
+        _extHelper.waitForExtDialogToDisappear("Success");
+
+        goToProjectHome();
+        clickEditForLabel("Surveys: " + surveyDesignName, surveyLable);
+
+        checker().verifyEquals("Edited date is incorrect", getDate(2), getFormElement(Locator.name("date")));
+    }
+
+    private void gotoDataset(String datasetName)
+    {
+        goToProjectHome();
+        clickAndWait(Locator.linkContainingText("dataset"));
+        clickAndWait(Locator.linkWithText(datasetName));
+    }
+
+    private void addSurveyWebpart(String surveyDesignName)
+    {
+        log("Configure Surveys webpart");
+        portalHelper.addWebPart("Surveys");
+        waitForElement(Locator.css(".survey-designs-loaded-marker"));
+        _ext4Helper.selectComboBoxItem("Survey Design:", surveyDesignName);
+        clickButton("Submit");
+        waitForText("Surveys: " + surveyDesignName);
+    }
+
+    private void clickEditForLabel(String webPartTitle, String label)
+    {
+        waitForText(label);
+        DataRegionTable dt = DataRegionTable.findDataRegionWithinWebpart(this, webPartTitle);
+        dt.clickEditRow(dt.getRowIndex("Label", label));
+    }
+
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return Arrays.asList("study");
+    }
+
+}
