@@ -6,7 +6,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 
@@ -16,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyB.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 10)
+@BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class StudySurveyTest extends BaseWebDriverTest
 {
     PortalHelper portalHelper = new PortalHelper(this);
@@ -58,20 +57,19 @@ public class StudySurveyTest extends BaseWebDriverTest
         _containerHelper.enableModule("Survey");
 
         goToProjectHome();
+        portalHelper.enterAdminMode();
         portalHelper.addWebPart("Datasets");
         portalHelper.addWebPart("Survey Designs");
+        portalHelper.exitAdminMode();
     }
 
     @Test
     public void testSteps()
     {
-        String surveyLable = "Study Survey";
+        String surveyLabel = "Study Survey";
+
         log("Creating a new dataset");
-        EditDatasetDefinitionPage editDatasetPage = _studyHelper
-                .goToManageDatasets()
-                .clickCreateNewDataset()
-                .setName(datasetName)
-                .submit();
+        _studyHelper.goToManageDatasets().clickCreateNewDataset().setName(datasetName).submit();
 
         gotoDataset(datasetName);
         DataRegionTable table = new DataRegionTable("Dataset", getDriver());
@@ -86,7 +84,7 @@ public class StudySurveyTest extends BaseWebDriverTest
         addSurveyWebpart(surveyDesignName);
         clickButton("Create Survey", WAIT_FOR_JAVASCRIPT);
         waitForText("Survey Label*");
-        setFormElement(Locator.name("_surveyLabel_"), surveyLable);
+        setFormElement(Locator.name("_surveyLabel_"), surveyLabel);
         setFormElement(Locator.name("participantid"), "1");
         setFormElement(Locator.name("date"), getDate(0));
         clickButton("Submit completed form", 0);
@@ -94,14 +92,17 @@ public class StudySurveyTest extends BaseWebDriverTest
         _extHelper.waitForExtDialogToDisappear("Success");
 
         goToProjectHome();
-        clickEditForLabel("Surveys: " + surveyDesignName, surveyLable);
+        clickEditForLabel("Surveys: " + surveyDesignName, surveyLabel);
         setFormElement(Locator.name("date"), getDate(2));
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Success");
         _extHelper.waitForExtDialogToDisappear("Success");
 
         goToProjectHome();
-        clickEditForLabel("Surveys: " + surveyDesignName, surveyLable);
+        clickEditForLabel("Surveys: " + surveyDesignName, surveyLabel);
+
+        //Test is verifying that edited date is not messing up the survey.
+        //https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=39291
 
         checker().verifyEquals("Edited date is incorrect", getDate(2), getFormElement(Locator.name("date")));
     }
