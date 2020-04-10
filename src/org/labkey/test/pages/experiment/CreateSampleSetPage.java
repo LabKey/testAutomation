@@ -26,7 +26,7 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
 
     public static CreateSampleSetPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("experiment", containerPath, "createSampleSet"));
+        driver.beginAt(WebTestHelper.buildURL("experiment", containerPath, "editSampleSet"));
         return new CreateSampleSetPage(driver.getDriver());
     }
 
