@@ -12,7 +12,7 @@
         </propertyDescriptor>
     </properties>
     <requiredModuleContext>
-        <requiredModule name="Core" />
+        <module name="Core" />
     </requiredModuleContext>
     <enableOptions requireSitePermission="true"/>
     <clientDependencies>
