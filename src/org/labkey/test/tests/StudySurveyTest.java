@@ -64,7 +64,7 @@ public class StudySurveyTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps()
+    public void testUpdateSurveyDatasetDate()
     {
         String surveyLabel = "Study Survey";
 
