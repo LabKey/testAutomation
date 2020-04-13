@@ -19,7 +19,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.PropertiesEditor.DefaultType;
@@ -52,7 +52,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class})
+@Category({BVT.class})
 public class DomainDesignerTest extends BaseWebDriverTest
 {
     @Override
