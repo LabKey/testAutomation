@@ -678,8 +678,8 @@ public class SampleSetTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(sampleD));
         assertElementPresent(Locator.linkWithText(sampleParentA));
         assertElementPresent(Locator.linkWithText(sampleParentB));
-        assertElementNotPresent(Locator.linkWithText(dataParentA));
-        assertElementNotPresent(Locator.linkWithText(dataParentB));
+        assertElementPresent(Locator.linkWithText(dataParentA));
+        assertElementPresent(Locator.linkWithText(dataParentB));
 
         recallLocation();
         sampleHelper.mergeImport(List.of(
