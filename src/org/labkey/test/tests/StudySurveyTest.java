@@ -69,7 +69,10 @@ public class StudySurveyTest extends BaseWebDriverTest
         String surveyLabel = "Study Survey";
 
         log("Creating a new dataset");
-        _studyHelper.goToManageDatasets().clickCreateNewDataset().setName(datasetName).submit();
+        _studyHelper.goToManageDatasets()
+                .clickCreateNewDataset()
+                .setName(datasetName)
+                .submit();
 
         gotoDataset(datasetName);
         DataRegionTable table = new DataRegionTable("Dataset", getDriver());
