@@ -110,7 +110,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public boolean isStartNewDesignPresent()
     {
-        return elementCache().startNewDesignLink.isDisplayed();
+        return getWrapper().isElementPresent(elementCache().startNewDesignLoc);
     }
 
     public DomainFieldRow startNewDesign(String name)
@@ -333,8 +333,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             return fieldRows.get(fieldNames.get(name));
         }
 
-        WebElement startNewDesignLink = Locator.tagWithClass("span", "domain-form-add-link")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator startNewDesignLoc = Locator.tagWithClass("span", "domain-form-add-link");
+        WebElement startNewDesignLink = startNewDesignLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
 
