@@ -1,0 +1,65 @@
+<ApiTests xmlns="http://labkey.org/query/xml">
+    <test name="create containers" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.security.createContainer(baseUrl="%baseUrl%", parentPath="%projectName%", name = "FromAPI1", title = "From API 1", folderType = "Collaboration")
+                labkey.security.createContainer(baseUrl="%baseUrl%", parentPath="%projectName%", name = "FromAPI2", title = "From API 2", folderType = "Collaboration")
+                labkey.security.createContainer(baseUrl="%baseUrl%", parentPath="%projectName%", name = "FromAPI3", title = "From API 3", folderType = "Collaboration")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                name
+                [1] "FromAPI1"
+                $path
+                [1] "/RlabkeyTest Project/FromAPI1"
+                $title
+                [1] "From API 1"
+                name
+                [1] "FromAPI2"
+                $path
+                [1] "/RlabkeyTest Project/FromAPI2"
+                $title
+                [1] "From API 2"
+                name
+                [1] "FromAPI3"
+                $path
+                [1] "/RlabkeyTest Project/FromAPI3"
+                $title
+                [1] "From API 3"
+                $folderType
+                [1] "Collaboration"
+             ]]>
+        </response>
+    </test>
+    <test name="move container" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.security.moveContainer(baseUrl="%baseUrl%", folderPath = paste("%projectName%", "FromAPI2", sep="/"), destinationParent = paste("%projectName%", "FromAPI1", sep="/"))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $newPath
+                [1] "/RlabkeyTest Project/FromAPI1/FromAPI2"
+                $success
+                [1] TRUE
+             ]]>
+        </response>
+    </test>
+    <test name="delete container" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.security.deleteContainer(baseUrl="%baseUrl%", folderPath = paste("%projectName%", "FromAPI3", sep="/"))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                named list()
+             ]]>
+        </response>
+    </test>
+</ApiTests>
