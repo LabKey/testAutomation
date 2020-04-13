@@ -91,9 +91,10 @@ public class StudySurveyTest extends BaseWebDriverTest
         _extHelper.waitForExtDialog("Success");
         _extHelper.waitForExtDialogToDisappear("Success");
 
+        String newDate = getDate(2);
         goToProjectHome();
         clickEditForLabel("Surveys: " + surveyDesignName, surveyLabel);
-        setFormElement(Locator.name("date"), getDate(2));
+        setFormElement(Locator.name("date"), newDate);
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Success");
         _extHelper.waitForExtDialogToDisappear("Success");
@@ -104,7 +105,7 @@ public class StudySurveyTest extends BaseWebDriverTest
         //Test is verifying that edited date is not messing up the survey.
         //https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=39291
 
-        checker().verifyEquals("Edited date is incorrect", getDate(2), getFormElement(Locator.name("date")));
+        checker().verifyEquals("Edited date is incorrect", newDate, getFormElement(Locator.name("date")));
     }
 
     private void gotoDataset(String datasetName)
