@@ -17,16 +17,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class SampleSetAPIHelper
+public class SampleTypeAPIHelper
 {
     /**
-     * Create a sample set in the specified container with the fields provided.
+     * Create a sample type in the specified container with the fields provided.
      *
-     * @param containerPath Container in which to create the sample set
-     * @param def domain properties for the new sample set
-     * @return A TestDataGenerator for inserting rows into the created sample set
+     * @param containerPath Container in which to create the sample type.
+     * @param def domain properties for the new sample type.
+     * @return A TestDataGenerator for inserting rows into the created sample type.
      */
-    public static TestDataGenerator createEmptySampleSet(String containerPath, SampleSetDefinition def)
+    public static TestDataGenerator createEmptySampleType(String containerPath, SampleSetDefinition def)
     {
         try
         {
@@ -34,7 +34,7 @@ public class SampleSetAPIHelper
         }
         catch (CommandException e)
         {
-            throw new RuntimeException("Failed to create sample set", e);
+            throw new RuntimeException("Failed to create sample type.", e);
         }
 
     }
