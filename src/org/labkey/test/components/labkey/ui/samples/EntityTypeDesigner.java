@@ -55,6 +55,11 @@ public abstract class EntityTypeDesigner extends WebDriverComponent<EntityTypeDe
         return this;
     }
 
+    public EntityTypeDesigner addField(FieldDefinition field)
+    {
+        return addFields(List.of(field));
+    }
+
     public EntityTypeDesigner addFields(List<FieldDefinition> fields)
     {
         DomainFormPanel fieldsPanel = getDomainEditor();
