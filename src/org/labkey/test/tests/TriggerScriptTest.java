@@ -37,6 +37,8 @@ import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.pages.experiment.CreateDataClassPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
@@ -802,13 +804,11 @@ public class TriggerScriptTest extends BaseWebDriverTest
             drt.clickHeaderButtonAndWait("Delete");
             clickButton("Confirm Delete");
         }
-        drt.clickInsertNewRow();
-        setFormElement(Locator.name("name"), DATA_CLASSES_NAME);
-        clickButton("Create");
-        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-        domainFormPanel.addField(COMMENTS_FIELD).setLabel(COMMENTS_FIELD);
-        domainFormPanel.addField(COUNTRY_FIELD).setLabel(COUNTRY_FIELD);
-        domainDesignerPage.clickFinish();
+        drt.clickHeaderMenu("New Data Class", "Design Manually");
+
+        CreateDataClassPage createDataClassPage = new CreateDataClassPage(getDriver());
+        createDataClassPage.setName(DATA_CLASSES_NAME)
+            .addFields(List.of(new FieldDefinition(COMMENTS_FIELD), new FieldDefinition(COUNTRY_FIELD)))
+            .clickSave();
     }
 }

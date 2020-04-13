@@ -47,7 +47,7 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
         return this;
     }
 
-    public String getDescrption()
+    public String getDescription()
     {
         return elementCache()._designer.getDescription();
     }
@@ -105,10 +105,7 @@ public class CreateSampleSetPage extends LabKeyPage<CreateSampleSetPage.ElementC
 
     public CreateSampleSetPage addFields(List<FieldDefinition> fields)
     {
-        for (FieldDefinition fieldDefinition : fields)
-        {
-            getDomainEditor().addField(fieldDefinition);
-        }
+        elementCache()._designer.addFields(fields);
         return this;
     }
 

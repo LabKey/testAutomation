@@ -108,6 +108,11 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return newFieldRow;
     }
 
+    public boolean isStartNewDesignPresent()
+    {
+        return elementCache().startNewDesignLink.isDisplayed();
+    }
+
     public DomainFieldRow startNewDesign(String name)
     {
         getWrapper().scrollIntoView(elementCache().startNewDesignLink, true);
