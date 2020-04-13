@@ -40,11 +40,6 @@ project.dependencies {
     implementation "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
 }
 
-if (project.findProject(BuildUtils.getApiProjectPath(project.gradle)) != null)
-{
-    project.evaluationDependsOn(BuildUtils.getApiProjectPath(project.gradle))
-}
-
 BuildUtils.addLabKeyDependency(
         project: project,
         config: 'uiTestImplementation',
