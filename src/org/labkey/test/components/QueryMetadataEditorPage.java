@@ -42,6 +42,12 @@ public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorP
     }
 
     @Override
+    public void clickSave()
+    {
+        super.clickSave(false);
+    }
+
+    @Override
     protected QueryMetadataEditorPage.ElementCache newElementCache()
     {
         return new QueryMetadataEditorPage.ElementCache();

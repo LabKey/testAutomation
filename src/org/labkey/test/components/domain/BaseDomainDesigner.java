@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/BaseDomainDesigner.tsx
@@ -43,7 +44,19 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
 
     public void clickCancel()
     {
-        elementCache().cancelButton.click();
+        clickCancel(true);
+    }
+
+    protected final void clickCancel(boolean expectPageLoad)
+    {
+        if (expectPageLoad)
+        {
+            getWrapper().doAndWaitForPageToLoad(() -> elementCache().cancelButton.click());
+        }
+        else
+        {
+            elementCache().cancelButton.click();
+        }
     }
 
     public boolean isSaveButtonEnabled()
@@ -53,7 +66,19 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
 
     public void clickSave()
     {
-        elementCache().saveButton.click();
+        clickSave(true);
+    }
+
+    protected final void clickSave(boolean expectPageLoad)
+    {
+        if (expectPageLoad)
+        {
+            getWrapper().doAndWaitForPageToLoad(() -> elementCache().saveButton.click());
+        }
+        else
+        {
+            elementCache().saveButton.click();
+        }
     }
 
     public List<WebElement> clickSaveExpectingError()
