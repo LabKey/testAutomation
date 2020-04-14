@@ -804,7 +804,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
             drt.clickHeaderButtonAndWait("Delete");
             clickButton("Confirm Delete");
         }
-        drt.clickHeaderMenu("New Data Class", "Design Manually");
+        drt.clickHeaderButton("New Data Class");
 
         CreateDataClassPage createDataClassPage = new CreateDataClassPage(getDriver());
         createDataClassPage.setName(DATA_CLASSES_NAME)
