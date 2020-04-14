@@ -87,7 +87,7 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
         protected final WebElement panelBody = Locator.byClass("panel-body").findWhenNeeded(this);
     }
 
-    protected abstract static class BaseDomainPanelFinder<P extends DomainPanel> extends WebDriverComponentFinder<P, BaseDomainPanelFinder<P>>
+    protected abstract static class BaseDomainPanelFinder<P extends DomainPanel, F extends BaseDomainPanelFinder<P, F>> extends WebDriverComponentFinder<P, F>
     {
         private final Locator.XPathLocator panelLocator = Locator.tagWithClass("div", "domain-form-panel");
 
@@ -98,7 +98,7 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
             super(driver);
         }
 
-        public BaseDomainPanelFinder<P> withTitle(String title)
+        public F withTitle(String title)
         {
             this.titleLoc = Locator.byClass("domain-panel-title").startsWith(title);
             return getThis();
@@ -118,7 +118,7 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
         }
     }
 
-    public static class DomainPanelFinder extends BaseDomainPanelFinder<DomainPanel>
+    public static class DomainPanelFinder extends BaseDomainPanelFinder<DomainPanel, DomainPanelFinder>
     {
         public DomainPanelFinder(WebDriver driver)
         {

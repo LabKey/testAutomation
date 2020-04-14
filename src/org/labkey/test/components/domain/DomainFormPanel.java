@@ -300,7 +300,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      * This will find any domain panel.
      * There is no simple method to differentiate field editor panels from other domain panels
      */
-    public static class DomainFormPanelFinder extends BaseDomainPanelFinder<DomainFormPanel>
+    public static class DomainFormPanelFinder extends BaseDomainPanelFinder<DomainFormPanel, DomainFormPanelFinder>
     {
         public DomainFormPanelFinder(WebDriver driver)
         {
