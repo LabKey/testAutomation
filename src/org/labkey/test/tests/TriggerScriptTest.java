@@ -35,8 +35,6 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Data;
-import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -804,7 +802,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
             drt.clickHeaderButtonAndWait("Delete");
             clickButton("Confirm Delete");
         }
-        drt.clickHeaderButton("New Data Class");
+        drt.clickHeaderMenu("New Data Class", "Design Manually");
 
         CreateDataClassPage createDataClassPage = new CreateDataClassPage(getDriver());
         createDataClassPage.setName(DATA_CLASSES_NAME)
