@@ -32,7 +32,13 @@ public class NodeDetails extends WebDriverComponent<NodeDetails.ElementCache>
 
     public NodeDetailItem getItem(String itemName)
     {
-        return  elementCache().item(itemName);
+        return  elementCache().items().stream().filter(a-> a.getName().equals(itemName))
+                .findFirst().orElseThrow();
+    }
+
+    public NodeDetailItem getItemByTitle(String title)
+    {
+        return elementCache().item(title);
     }
 
     public List<NodeDetailItem> getItems()
@@ -69,15 +75,14 @@ public class NodeDetails extends WebDriverComponent<NodeDetails.ElementCache>
         WebElement summary = Locator.tagWithClass("summary", "lineage-name")
                 .findElement(this);
 
-        NodeDetailItem item(String itemName)
-        {
-            return new NodeDetailItem.NodeDetailItemFinder(getDriver()).withName(itemName)
-                    .find(this);
-        }
-
         List<NodeDetailItem> items()
         {
             return new NodeDetailItem.NodeDetailItemFinder(getDriver()).findAll(this);
+        }
+
+        NodeDetailItem item(String title)
+        {
+            return new NodeDetailItem.NodeDetailItemFinder(getDriver()).withTitle(title).find(this);
         }
     }
 

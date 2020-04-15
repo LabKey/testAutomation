@@ -19,17 +19,29 @@ public class NodeDetailItem extends WebDriverComponent<NodeDetailItem.ElementCac
 
     public String getName()
     {
-        return elementCache().name.getText();
+        if (isNameLinked())
+            return elementCache().nameLink.findElement(this).getText();
+        else
+            return elementCache().nameSpan.findElement(this).getText();
     }
 
-    public WebElement getOverViewLink()
+    private boolean isNameLinked()
     {
-        return elementCache().overviewLink;
+        return elementCache().nameSpan.existsIn(this);
     }
 
-    public WebElement getLineageGraphLink()
+    public void clickOverViewLink()
     {
-        return elementCache().lineageGraphLink;
+        getWrapper().mouseOver(getComponentElement());
+        getWrapper().waitFor(()-> elementCache().overviewLink.isEnabled(), 1000);
+        getWrapper().clickAndWait(elementCache().overviewLink);
+    }
+
+    public void getLineageGraphLink()
+    {
+        getWrapper().mouseOver(getComponentElement());
+        getWrapper().waitFor(()-> elementCache().lineageGraphLink.isEnabled(), 1000);
+        getWrapper().clickAndWait(elementCache().lineageGraphLink);
     }
 
     @Override
@@ -55,29 +67,25 @@ public class NodeDetailItem extends WebDriverComponent<NodeDetailItem.ElementCac
     {
         final WebElement image = Locator.tagWithClass("img", "lineage-sm-icon")
                 .findWhenNeeded(this);
-        final WebElement name = Locator.tag("span")
-                .findWhenNeeded(this);
+
         final WebElement overviewLink = Locator.linkWithSpan("Overview")
-                .findWhenNeeded(this);
+                .findWhenNeeded(this).withTimeout(2000);
         final WebElement lineageGraphLink = Locator.linkWithSpan("Lineage")
-                .findWhenNeeded(this);
+                .findWhenNeeded(this).withTimeout(2000);
+        final Locator nameLink = Locator.tagWithClass("a", "pointer");
+        final Locator nameSpan = Locator.tag("span");
     }
 
     public static class NodeDetailItemFinder extends WebDriverComponentFinder<NodeDetailItem, NodeDetailItemFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("li", "lineage-name");
         private String _name = null;
+        private String _linkedName = null;
         private String _title = null;
 
         public NodeDetailItemFinder(WebDriver driver)
         {
             super(driver);
-        }
-
-        public NodeDetailItemFinder withName(String name)
-        {
-            _name = name;
-            return this;
         }
 
         public NodeDetailItemFinder withTitle(String title)
@@ -96,9 +104,7 @@ public class NodeDetailItem extends WebDriverComponent<NodeDetailItem.ElementCac
         @Override
         protected Locator locator()
         {
-            if (_name != null)
-                return _baseLocator.withChild(Locator.tagWithText("span", _name));
-            else if (_title != null)
+           if (_title != null)
                 return _baseLocator.withAttribute("title", _title);
             else
                 return _baseLocator;
