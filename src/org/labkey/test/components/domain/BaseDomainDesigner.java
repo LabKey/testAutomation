@@ -42,9 +42,10 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
         return elementCache().cancelButton.isEnabled();
     }
 
-    public void clickCancel()
+    public Object clickCancel()
     {
         clickCancel(true);
+        return null;
     }
 
     protected final void clickCancel(boolean expectPageLoad)
@@ -64,9 +65,10 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
         return elementCache().saveButton.isEnabled();
     }
 
-    public void clickSave()
+    public Object clickSave()
     {
         clickSave(true);
+        return null;
     }
 
     protected final void clickSave(boolean expectPageLoad)
@@ -81,10 +83,10 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
         }
     }
 
-    public List<WebElement> clickSaveExpectingError()
+    public List<String> clickSaveExpectingErrors()
     {
         elementCache().saveButton.click();
-        return BootstrapLocators.errorBanner.waitForElements(getWrapper().shortWait());
+        return getWrapper().getTexts(BootstrapLocators.errorBanner.waitForElements(getWrapper().shortWait()));
     }
 
     @Override

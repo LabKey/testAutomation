@@ -655,7 +655,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 .setName(SAMPLE_SET_NAME)
                 .addParentAlias(ALIAS_NAME_CONFLICT)
                 .addFields(fields);
-        List<String> errors = getTexts(createPage.clickSaveExpectingError());
+        List<String> errors = createPage.clickSaveExpectingErrors();
         Assert.assertEquals("Error message not as expected.",
                 "An existing sample type property conflicts with parent alias header: " + ALIAS_NAME_CONFLICT,
                 String.join("\n", errors));
@@ -665,7 +665,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         log("Update Sample Set - Add a parent alias column to the sample set that conflicts with a given column name.");
         UpdateSampleSetPage updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
         updatePage.addParentAlias(ALIAS_NAME_CONFLICT);
-        errors = getTexts(updatePage.clickSaveExpectingError());
+        errors = updatePage.clickSaveExpectingErrors();
         Assert.assertEquals("Error message not as expected.",
                 "An existing sample type property conflicts with parent alias header: " + ALIAS_NAME_CONFLICT,
                 String.join("\n", errors));
@@ -678,7 +678,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         clickFolder(SUB_FOLDER_NAME);
         updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
         updatePage.getFieldsPanel().addField(GOOD_PARENT_NAME);
-        errors = getTexts(updatePage.clickSaveExpectingError());
+        errors = updatePage.clickSaveExpectingErrors();
 
         String errorMsgExpectedTxt = "An existing sample type property conflicts with parent alias header: " + GOOD_PARENT_NAME;
         Assert.assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
