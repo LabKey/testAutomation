@@ -22,6 +22,7 @@ import org.labkey.test.components.labkey.ui.samples.DataClassDesigner;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
@@ -75,6 +76,11 @@ public class CreateDataClassPage extends LabKeyPage<CreateDataClassPage.ElementC
     public void clickSave()
     {
         elementCache()._designer.clickSave();
+    }
+
+    public List<WebElement> clickSaveExpectingError()
+    {
+        return elementCache()._designer.clickSaveExpectingError();
     }
 
     public void clickCancel()
