@@ -677,7 +677,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         clickFolder(SUB_FOLDER_NAME);
         updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
-        updatePage.getDomainEditor().addField(GOOD_PARENT_NAME);
+        updatePage.getFieldsPanel().addField(GOOD_PARENT_NAME);
         errors = getTexts(updatePage.clickSaveExpectingError());
 
         String errorMsgExpectedTxt = "An existing sample type property conflicts with parent alias header: " + GOOD_PARENT_NAME;

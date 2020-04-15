@@ -19,7 +19,7 @@ import static org.labkey.test.WebDriverWrapper.sleep;
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/samples/SampleTypeDesigner.tsx
  * This is a full-page component and should be wrapped by a context-specific page class
  */
-public class SampleTypeDesigner extends DomainDesigner<SampleTypeDesigner.ElementCache>
+public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extends DomainDesigner<SampleTypeDesigner<T>.ElementCache>
 {
     public static final String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
 
@@ -34,28 +34,30 @@ public class SampleTypeDesigner extends DomainDesigner<SampleTypeDesigner.Elemen
         return new ElementCache();
     }
 
-    public SampleTypeDesigner removeField(boolean confirmDialogExpected, String fieldName)
+    protected abstract T getThis();
+    
+    public T removeField(boolean confirmDialogExpected, String fieldName)
     {
         getFieldsPanel().removeField(fieldName, confirmDialogExpected);
         sleep(250); // wait for collapse animation
-        return this;
+        return getThis();
     }
 
-    public SampleTypeDesigner addFields(FieldDefinition... fields)
+    public T addFields(List<FieldDefinition> fields)
     {
         DomainFormPanel domainEditor = getFieldsPanel();
         for (FieldDefinition field : fields)
         {
             domainEditor.addField(field);
         }
-        return this;
+        return getThis();
     }
 
-    public SampleTypeDesigner setName(String name)
+    public T setName(String name)
     {
         expandPropertiesPanel();
         elementCache().nameInput.set(name);
-        return this;
+        return getThis();
     }
 
     public String getName()
@@ -64,11 +66,11 @@ public class SampleTypeDesigner extends DomainDesigner<SampleTypeDesigner.Elemen
         return elementCache().nameInput.get();
     }
 
-    public SampleTypeDesigner setNameExpression(String nameExpression)
+    public T setNameExpression(String nameExpression)
     {
         expandPropertiesPanel();
         elementCache().nameExpressionInput.set(nameExpression);
-        return this;
+        return getThis();
     }
 
     public String getNameExpression()
@@ -77,11 +79,11 @@ public class SampleTypeDesigner extends DomainDesigner<SampleTypeDesigner.Elemen
         return elementCache().nameExpressionInput.get();
     }
 
-    public SampleTypeDesigner setDescription(String description)
+    public T setDescription(String description)
     {
         expandPropertiesPanel();
         elementCache().descriptionInput.set(description);
-        return this;
+        return getThis();
     }
 
     public String getDescription()
@@ -90,7 +92,12 @@ public class SampleTypeDesigner extends DomainDesigner<SampleTypeDesigner.Elemen
         return elementCache().descriptionInput.get();
     }
 
-    public SampleTypeDesigner addParentAlias(String alias, @Nullable String optionDisplayText)
+    public T addParentAlias(String alias)
+    {
+        return addParentAlias(alias, null);
+    }
+
+    public T addParentAlias(String alias, @Nullable String optionDisplayText)
     {
         expandPropertiesPanel();
         int initialCount = elementCache().parentAliases().size();
@@ -100,7 +107,7 @@ public class SampleTypeDesigner extends DomainDesigner<SampleTypeDesigner.Elemen
             optionDisplayText = CURRENT_SAMPLE_TYPE;
         }
         setParentAlias(initialCount, alias, optionDisplayText);
-        return this;
+        return getThis();
     }
 
     private int getParentAliasIndex(String parentAlias)
@@ -116,21 +123,21 @@ public class SampleTypeDesigner extends DomainDesigner<SampleTypeDesigner.Elemen
         throw new NotFoundException("No such parent alias: " + parentAlias);
     }
 
-    public SampleTypeDesigner removeParentAlias(String parentAlias)
+    public T removeParentAlias(String parentAlias)
     {
         expandPropertiesPanel();
         int aliasIndex = getParentAliasIndex(parentAlias);
         return removeParentAlias(aliasIndex);
     }
 
-    public SampleTypeDesigner removeParentAlias(int index)
+    public T removeParentAlias(int index)
     {
         expandPropertiesPanel();
         elementCache().removeParentAliasIcon(index).click();
-        return this;
+        return getThis();
     }
 
-    public SampleTypeDesigner setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
+    public T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
     {
         expandPropertiesPanel();
         elementCache().parentAlias(index).setValue(alias);
@@ -138,15 +145,15 @@ public class SampleTypeDesigner extends DomainDesigner<SampleTypeDesigner.Elemen
         {
             elementCache().parentAliasSelect(index).select(optionDisplayText);
         }
-        return this;
+        return getThis();
     }
 
-    public SampleTypeDesigner setParentAlias(String alias, String optionDisplayText)
+    public T setParentAlias(String alias, String optionDisplayText)
     {
         expandPropertiesPanel();
         int index = getParentAliasIndex(alias);
         elementCache().parentAliasSelect(index).select(optionDisplayText);
-        return this;
+        return getThis();
     }
 
     public String getParentAlias(int index)

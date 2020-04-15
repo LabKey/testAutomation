@@ -2113,7 +2113,7 @@ public class SampleSetTest extends BaseWebDriverTest
             .goToCreateNewSampleSet()
             .setName("ReservedFieldNameValidation");
 
-        DomainFormPanel domainFormPanel = creaetePage.getDomainEditor();
+        DomainFormPanel domainFormPanel = creaetePage.getFieldsPanel();
 
         log("Verify error message for reserved field names");
         domainFormPanel.addField("created");
@@ -2227,7 +2227,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Remove the attachment columns and validate that everything still works.");
         clickFolder(FOLDER_NAME);
         UpdateSampleSetPage domainDesignerPage = sampleHelper.goToEditSampleSet(sampleSetName);
-        domainDesignerPage.getDomainEditor().removeField("FileAttachment", true);
+        domainDesignerPage.getFieldsPanel().removeField("FileAttachment", true);
         domainDesignerPage.clickSave();
 
         expectedHeaders.remove("File Attachment");
