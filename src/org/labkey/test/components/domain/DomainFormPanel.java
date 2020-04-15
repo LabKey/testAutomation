@@ -108,16 +108,16 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return newFieldRow;
     }
 
-    public boolean isStartNewDesignPresent()
+    public boolean isManuallyDefineFieldsPresent()
     {
-        return getWrapper().isElementPresent(elementCache().startNewDesignLoc);
+        return getWrapper().isElementPresent(elementCache().manuallyDefineFieldsLoc);
     }
 
-    public DomainFieldRow startNewDesign(String name)
+    public DomainFieldRow manuallyDefineFields(String name)
     {
-        getWrapper().scrollIntoView(elementCache().startNewDesignLink, true);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().startNewDesignLink)); // give modal dialogs time to disappear
-        elementCache().startNewDesignLink.click();
+        getWrapper().scrollIntoView(elementCache().manuallyDefineFieldsLink, true);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineFieldsLink)); // give modal dialogs time to disappear
+        elementCache().manuallyDefineFieldsLink.click();
 
         DomainFieldRow newFieldRow = elementCache().findFieldRows().get(0);
         newFieldRow.setName(name);
@@ -333,8 +333,8 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             return fieldRows.get(fieldNames.get(name));
         }
 
-        Locator.XPathLocator startNewDesignLoc = Locator.tagWithClass("span", "domain-form-add-link");
-        WebElement startNewDesignLink = startNewDesignLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator manuallyDefineFieldsLoc = Locator.tagWithClass("span", "domain-form-add-link");
+        WebElement manuallyDefineFieldsLink = manuallyDefineFieldsLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
 

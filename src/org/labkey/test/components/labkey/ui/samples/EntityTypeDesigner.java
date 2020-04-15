@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.sleep;
 
-public abstract class EntityTypeDesigner extends WebDriverComponent<EntityTypeDesigner.ElementCache>
+public abstract class EntityTypeDesigner<T extends EntityTypeDesigner> extends WebDriverComponent<EntityTypeDesigner.ElementCache>
 {
     private final WebElement _el;
     private final WebDriver _driver;
@@ -43,33 +43,35 @@ public abstract class EntityTypeDesigner extends WebDriverComponent<EntityTypeDe
         return new ElementCache();
     }
 
+    protected abstract T getThis();
+
     public DomainFormPanel getDomainEditor()
     {
         return elementCache()._fieldEditorPanel.expand();
     }
 
-    public EntityTypeDesigner removeField(boolean confirmDialogExpected, String fieldName)
+    public T removeField(boolean confirmDialogExpected, String fieldName)
     {
         getDomainEditor().removeField(fieldName, confirmDialogExpected);
         sleep(250); // wait for collapse animation
-        return this;
+        return getThis();
     }
 
-    public EntityTypeDesigner addField(FieldDefinition field)
+    public T addField(FieldDefinition field)
     {
         return addFields(List.of(field));
     }
 
-    public EntityTypeDesigner addFields(List<FieldDefinition> fields)
+    public T addFields(List<FieldDefinition> fields)
     {
         DomainFormPanel fieldsPanel = getDomainEditor();
         boolean firstField = true;
 
         for (FieldDefinition field : fields)
         {
-            if (firstField && fieldsPanel.isStartNewDesignPresent())
+            if (firstField && fieldsPanel.isManuallyDefineFieldsPresent())
             {
-                fieldsPanel.startNewDesign(field.getName());
+                fieldsPanel.manuallyDefineFields(field.getName());
                 fieldsPanel.setField(field);
             }
             else
@@ -79,7 +81,7 @@ public abstract class EntityTypeDesigner extends WebDriverComponent<EntityTypeDe
 
             firstField = false;
         }
-        return this;
+        return getThis();
     }
 
     public boolean isCancelButtonEnabled()
@@ -108,10 +110,10 @@ public abstract class EntityTypeDesigner extends WebDriverComponent<EntityTypeDe
         return BootstrapLocators.errorBanner.waitForElements(getWrapper().shortWait());
     }
 
-    public EntityTypeDesigner setName(String name)
+    public T setName(String name)
     {
         elementCache().nameInput.set(name);
-        return this;
+        return getThis();
     }
 
     public String getName()
@@ -119,10 +121,10 @@ public abstract class EntityTypeDesigner extends WebDriverComponent<EntityTypeDe
         return elementCache().nameInput.get();
     }
 
-    public EntityTypeDesigner setNameExpression(String nameExpression)
+    public T setNameExpression(String nameExpression)
     {
         elementCache().nameExpressionInput.set(nameExpression);
-        return this;
+        return getThis();
     }
 
     public String getNameExpression()
@@ -130,10 +132,10 @@ public abstract class EntityTypeDesigner extends WebDriverComponent<EntityTypeDe
         return elementCache().nameExpressionInput.get();
     }
 
-    public EntityTypeDesigner setDescription(String description)
+    public T setDescription(String description)
     {
         elementCache().descriptionInput.set(description);
-        return this;
+        return getThis();
     }
 
     public String getDescription()

@@ -19,12 +19,18 @@ public class DataClassDesigner extends EntityTypeDesigner
     public DataClassDesigner setCategory(String value)
     {
          elementCache().categorySelect.select(value);
-        return this;
+        return getThis();
     }
 
     public DataClassDesigner setSampleSet(String value)
     {
         elementCache().sampleSetSelect.select(value);
+        return getThis();
+    }
+
+    @Override
+    protected DataClassDesigner getThis()
+    {
         return this;
     }
 

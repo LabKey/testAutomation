@@ -2116,19 +2116,19 @@ public class SampleSetTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
 
         log("Verify error message for reserved field names");
-        domainFormPanel.startNewDesign("created");
+        domainFormPanel.manuallyDefineFields("created");
         assertEquals("Sample Type reserved field name error", Arrays.asList(
                 "Property name 'created' is a reserved name."),
                 getTexts(createPage.clickSaveExpectingError()));
         domainFormPanel.removeAllFields(false);
-        domainFormPanel.startNewDesign("rowid");
+        domainFormPanel.manuallyDefineFields("rowid");
         assertEquals("Sample Type reserved field name error", Arrays.asList(
                 "Property name 'rowid' is a reserved name."),
                 getTexts(createPage.clickSaveExpectingError()));
         domainFormPanel.removeAllFields(false);
 
         log("Verify error message for a few other special field names");
-        domainFormPanel.startNewDesign("name");
+        domainFormPanel.manuallyDefineFields("name");
         assertEquals("Sample Type 'name' field name error", Arrays.asList(
                 "The field name 'Name' is already taken. Please provide a unique name for each field.",
                 "Please correct errors in Fields before saving."),
@@ -2136,7 +2136,7 @@ public class SampleSetTest extends BaseWebDriverTest
         domainFormPanel.removeAllFields(false);
 
         log("Verify error message for a few other special field names");
-        domainFormPanel.startNewDesign("sampleid");
+        domainFormPanel.manuallyDefineFields("sampleid");
         assertEquals("Sample Type SampleId field name error", Arrays.asList(
                 "The SampleId field name is reserved for imported or generated sample ids."),
                 getTexts(createPage.clickSaveExpectingError()));

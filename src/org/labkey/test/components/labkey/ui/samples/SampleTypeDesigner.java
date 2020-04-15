@@ -24,6 +24,12 @@ public class SampleTypeDesigner extends EntityTypeDesigner
     }
 
     @Override
+    protected SampleTypeDesigner getThis()
+    {
+        return this;
+    }
+
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -44,7 +50,7 @@ public class SampleTypeDesigner extends EntityTypeDesigner
             optionDisplayText = CURRENT_SAMPLE_TYPE;
         }
         setParentAlias(initialCount, alias, optionDisplayText);
-        return this;
+        return getThis();
     }
 
     private int getParentAliasIndex(String parentAlias)
@@ -69,7 +75,7 @@ public class SampleTypeDesigner extends EntityTypeDesigner
     public SampleTypeDesigner removeParentAlias(int index)
     {
         elementCache().removeParentAliasIcon(index).click();
-        return this;
+        return getThis();
     }
 
     public SampleTypeDesigner setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
@@ -79,14 +85,14 @@ public class SampleTypeDesigner extends EntityTypeDesigner
         {
             elementCache().parentAliasSelect(index).select(optionDisplayText);
         }
-        return this;
+        return getThis();
     }
 
     public SampleTypeDesigner setParentAlias(String alias, String optionDisplayText)
     {
         int index = getParentAliasIndex(alias);
         elementCache().parentAliasSelect(index).select(optionDisplayText);
-        return this;
+        return getThis();
     }
 
     public String getParentAlias(int index)

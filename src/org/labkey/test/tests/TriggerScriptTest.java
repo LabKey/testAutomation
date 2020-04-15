@@ -35,12 +35,13 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Data;
-import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.Alert;
 
 import java.io.IOException;
@@ -790,7 +791,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     /**
      * Setup the data class
      */
-    private void setupDataClass()
+    private void setupDataClass() throws CommandException
     {
         //Setup Data Class
         goToProjectHome();
@@ -802,11 +803,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
             drt.clickHeaderButtonAndWait("Delete");
             clickButton("Confirm Delete");
         }
-        drt.clickHeaderMenu("New Data Class", "Design Manually");
 
-        CreateDataClassPage createDataClassPage = new CreateDataClassPage(getDriver());
-        createDataClassPage.setName(DATA_CLASSES_NAME)
-            .addFields(List.of(new FieldDefinition(COMMENTS_FIELD), new FieldDefinition(COUNTRY_FIELD)))
-            .clickSave();
+        DataClassDefinition dataClass = new DataClassDefinition(DATA_CLASSES_NAME)
+                .setFields(List.of(new FieldDefinition(COMMENTS_FIELD), new FieldDefinition(COUNTRY_FIELD)));
+        TestDataGenerator.createDomain(getProjectName(), dataClass);
     }
 }
