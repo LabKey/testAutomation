@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.sleep;
 
-public abstract class EntityTypeDesigner<T extends EntityTypeDesigner> extends WebDriverComponent<EntityTypeDesigner.ElementCache>
+public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extends WebDriverComponent<EntityTypeDesigner<T>.ElementCache>
 {
     private final WebElement _el;
     private final WebDriver _driver;

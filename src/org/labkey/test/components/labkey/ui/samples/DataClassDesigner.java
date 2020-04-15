@@ -7,7 +7,7 @@ import org.openqa.selenium.WebDriver;
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/dataclasses/DataClassDesigner.tsx
  * This is a full-page component and should be wrapped by a context-specific page class
  */
-public class DataClassDesigner extends EntityTypeDesigner
+public class DataClassDesigner extends EntityTypeDesigner<DataClassDesigner>
 {
     public DataClassDesigner(WebDriver driver)
     {

@@ -14,7 +14,7 @@ import java.util.List;
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/samples/SampleTypeDesigner.tsx
  * This is a full-page component and should be wrapped by a context-specific page class
  */
-public class SampleTypeDesigner extends EntityTypeDesigner
+public class SampleTypeDesigner extends EntityTypeDesigner<SampleTypeDesigner>
 {
     public final static String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
 
