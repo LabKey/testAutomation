@@ -1,10 +1,7 @@
 package org.labkey.test.components.labkey.ui.samples;
 
-import org.labkey.test.Locator;
-import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/dataclasses/DataClassDesigner.tsx
