@@ -105,15 +105,9 @@ public class SampleTypeDesigner extends EntityTypeDesigner
         return elementCache().parentAliasSelect(index).getSelections().get(0);
     }
 
-    public void expandPropertiesPanel()
-    {
-        elementCache().propertiesPanelHeader.click();
-    }
-
     protected class ElementCache extends EntityTypeDesigner.ElementCache
     {
         protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
-        protected final WebElement propertiesPanelHeader = Locator.id("sample-type-properties-hdr").findWhenNeeded(this);
 
         protected List<Input> parentAliases()
         {

@@ -1,6 +1,7 @@
 package org.labkey.test.components.labkey.ui.samples;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -46,14 +47,8 @@ public class DataClassDesigner extends EntityTypeDesigner
         return  (ElementCache) super.elementCache();
     }
 
-    public void expandPropertiesPanel()
-    {
-        elementCache().propertiesPanelHeader.click();
-    }
-
     protected class ElementCache extends EntityTypeDesigner.ElementCache
     {
-        protected final WebElement propertiesPanelHeader = Locator.id("dataclass-properties-hdr").findWhenNeeded(this);
         protected ReactSelect categorySelect = ReactSelect.finder(getDriver()).withId("entity-category").findWhenNeeded(this);
         protected ReactSelect sampleSetSelect = ReactSelect.finder(getDriver()).withId("entity-sampleSet").findWhenNeeded(this);
     }

@@ -143,11 +143,17 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner> extends W
         return elementCache().descriptionInput.get();
     }
 
+    public DomainFormPanel expandPropertiesPanel()
+    {
+        return elementCache()._propertiesPanel.expand();
+    }
+
     protected class ElementCache extends Component<ElementCache>.ElementCache
     {
         protected final Input nameInput = Input.Input(Locator.id("entity-name"), getDriver()).findWhenNeeded(this);
         protected final Input nameExpressionInput = Input.Input(Locator.id("entity-nameExpression"), getDriver()).waitFor(this);
         protected final Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver()).findWhenNeeded(this);
+        protected final DomainFormPanel _propertiesPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).index(0).timeout(1000).findWhenNeeded(this);
         protected final DomainFormPanel _fieldEditorPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver()).index(1).timeout(1000).findWhenNeeded(this);
 
         protected final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
