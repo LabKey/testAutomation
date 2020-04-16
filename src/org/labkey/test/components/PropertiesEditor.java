@@ -908,29 +908,35 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
         }
     }
 
-    public enum PhiSelectType
+    /**
+     * Represents possible PHI levels for a field
+     *
+     * @see org.labkey.api.data.PHI
+     */
+    public enum PhiSelectType implements OptionSelect.SelectOption
     {
-        NotPHI("Not PHI", org.labkey.serverapi.data.PHI.NotPHI.ordinal(), null),
-        Limited("Limited PHI", org.labkey.serverapi.data.PHI.Limited.ordinal(), "Limited PHI Reader"),
-        PHI("Full PHI", org.labkey.serverapi.data.PHI.PHI.ordinal(), "Full PHI Reader"),
-        Restricted("Restricted PHI", org.labkey.serverapi.data.PHI.Restricted.ordinal(), "Restricted PHI Reader");
+        // Ordered from least to most restrictive
+        NotPHI("Not PHI", null),
+        Limited("Limited PHI", "Limited PHI Reader"),
+        PHI("Full PHI", "Full PHI Reader"),
+        Restricted("Restricted PHI", "Restricted PHI Reader");
 
-        String _text;
-        int _rank;
-        private String _roleName;
+        private final String _text;
+        private final String _roleName;
 
-        PhiSelectType(String text, int rank, String roleName)
+        PhiSelectType(String text, String roleName)
         {
             _text = text;
-            _rank = rank;
             _roleName = roleName;
         }
 
+        @Override
         public String getValue()
         {
             return name();
         }
 
+        @Override
         public String getText()
         {
             return _text;
@@ -938,7 +944,7 @@ public class PropertiesEditor extends WebPartPanel<PropertiesEditor.ElementCache
 
         public int getRank()
         {
-            return _rank;
+            return ordinal();
         }
 
         public String getRoleName()
