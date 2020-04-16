@@ -82,7 +82,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
     protected void runUploadTest()
     {
-        uploadViabilityRun("/sampledata/viability/small.VIA.csv", true);
+        uploadViabilityRun(TestFileUtils.getSampleData("viability/small.VIA.csv"), true);
 
         log("** Check form field values");
         assertFormElementEquals(Locator.name("_pool_1604505335_0_ParticipantID"), "160450533");
@@ -179,7 +179,7 @@ public class ViabilityTest extends AbstractViabilityTest
     {
         log("** Test Day2 re-run scenario");
         final String runName = "re-run scenario";
-        reuploadViabilityRun("/sampledata/viability/small.VIA.csv", runName);
+        reuploadViabilityRun(TestFileUtils.getSampleData("viability/small.VIA.csv"), runName);
 
         // Check the 'SpecimenIDs' and 'IntValue' field is copied on re-run
         assertFormElementEquals(Locator.xpath("//input[@name='_pool_1604505335_0_SpecimenIDs']").index(0), "foobar");
@@ -249,7 +249,7 @@ public class ViabilityTest extends AbstractViabilityTest
         assayDesigner.clickFinish();
 
         final String runName = "transformed assayId";
-        uploadViabilityRun("/sampledata/viability/small.VIA.csv", runName, false);
+        uploadViabilityRun(TestFileUtils.getSampleData("viability/small.VIA.csv"), runName, false);
 
         log("** Check form field values");
         assertFormElementEquals(Locator.name("_pool_1604505335_0_ParticipantID"), "160450533");
@@ -292,7 +292,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         log("** Import specimens2");
         // create a 'xyzzy' vial id
-        importSpecimens(STUDY2_NAME, "/sampledata/viability/specimens2.txt");
+        importSpecimens(STUDY2_NAME, TestFileUtils.getSampleData("viability/specimens2.txt"));
 
         log("** Test Target Study as Result Domain Field");
 
@@ -301,7 +301,7 @@ public class ViabilityTest extends AbstractViabilityTest
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign(true);
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
-        assayDesignerPage.expandFieldsPanel("Batch").removeField("TargetStudy");
+        assayDesignerPage.expandFieldsPanel("Batch").removeField("TargetStudy", true);
         assayDesignerPage.expandFieldsPanel("Result").addField(new FieldDefinition("TargetStudy").setLabel("Target Study").setType(FieldDefinition.ColumnType.String));
         assayDesignerPage.clickFinish();
 
@@ -310,7 +310,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickButton("Import Data");
 
         final String runName = "result-level target study";
-        uploadViabilityRun("/sampledata/viability/small.VIA.csv", runName, false);
+        uploadViabilityRun(TestFileUtils.getSampleData("viability/small.VIA.csv"), runName, false);
 
         log("** Test 'same' checkbox for TargetStudy");
         String targetStudyOptionText = "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)";

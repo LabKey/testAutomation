@@ -3,6 +3,7 @@ package org.labkey.test.components.glassLibrary.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -37,6 +38,23 @@ public class DetailTable extends WebDriverComponent
         return _tableElement;
     }
 
+    public Boolean isLoaded()
+    {
+        // Need to wrap the checks in a try / catch for a stale element exception. This can happen because the "this"
+        // reference can go stale after editing a sample and reloading the grid with the updated data is happening.
+        try
+        {
+            return !Locators.loadingGrid.existsIn(this) &&
+                    !Locators.spinner.existsIn(this) &&
+                    Locator.tag("td").existsIn(this);
+        }
+        catch(StaleElementReferenceException stale)
+        {
+            return false;
+        }
+
+    }
+
     // TODO Not sure if the get & click methods are correct (or appropriate?), for a @glass component.
     //  It may be appropriate to have these interfaces but maybe the way the cell is identified should be different.
 
@@ -68,6 +86,9 @@ public class DetailTable extends WebDriverComponent
      **/
     public List<List<String>> getTableData()
     {
+        // Explicitly check that the table has been loaded before trying to get the data.
+        getWrapper().waitFor(this::isLoaded, "Cannot get the table data because the table is not loaded.", 500);
+
         List<List<String>> tableData = new ArrayList<>();
 
         for(WebElement tableRow : getComponentElement().findElements(By.cssSelector("tr")))
@@ -94,6 +115,10 @@ public class DetailTable extends WebDriverComponent
         {
             return Locator.tagWithAttribute("td", "data-caption", caption);
         }
+
+        static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
+        static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
+        static final Locator spinner = Locator.css("span i.fa-spinner");
 
     }
 

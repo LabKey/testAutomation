@@ -22,7 +22,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -33,7 +32,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, Wiki.class})
+@Category({DailyA.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ButtonCustomizationTest extends BaseWebDriverTest
 {
@@ -98,8 +97,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         };
 
         _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
-
-        clickButton("Done");
+        goToManageLists();
         clickAndWait(Locator.linkWithText(LIST_NAME));
         assertButtonNotPresent(METADATA_OVERRIDE_BUTTON);
         DataRegionTable.findDataRegion(this).clickInsertNewRow();

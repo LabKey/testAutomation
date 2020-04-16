@@ -4,6 +4,7 @@
  */
 package org.labkey.test.components.glassLibrary.grids;
 
+import com.sun.istack.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -29,9 +30,9 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     final private WebDriver _driver;
     final private ResponsiveGrid _responsiveGrid;
 
-    protected GridBar(WebElement buttonBar, ResponsiveGrid responsiveGrid, WebDriver driver)
+    protected GridBar(WebDriver driver, WebElement container, ResponsiveGrid responsiveGrid)
     {
-        _gridBarElement = buttonBar;
+        _gridBarElement = Locators.gridBar().findWhenNeeded(container);
         _responsiveGrid = responsiveGrid;  // The responsive grid that is associated with this bar.
         _driver = driver;
     }
@@ -64,13 +65,15 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public int getRecordCount()
     {
-        if(getWrapper().isElementPresent(Locators.pagingCountsSpan) && getWrapper().isElementVisible(Locators.pagingCountsSpan))
+        try
         {
-            return Integer.parseInt(Locators.pagingCountsSpan.findElement(getDriver()).getAttribute("data-total"));
+            return Integer.parseInt(Locators.pagingCountsSpan.findElement(this).getAttribute("data-total"));
         }
-
-        // return the number of rows present
-        return _responsiveGrid.getRows().size();
+        catch(NoSuchElementException nse)
+        {
+            // If the paging count isn't present return the number of rows in the grid.
+            return _responsiveGrid.getRows().size();
+        }
     }
 
     public boolean isOnFirstPage()
@@ -78,7 +81,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         try
         {
-            return !Locators.pgLeftButton.findElement(getDriver()).isEnabled();
+            return !Locators.pgLeftButton.findElement(this).isEnabled();
         }
         catch(NoSuchElementException nse)
         {
@@ -91,7 +94,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     {
         try
         {
-        return !Locators.pgRightButton.findElement(getDriver()).isEnabled();
+        return !Locators.pgRightButton.findElement(this).isEnabled();
         }
         catch(NoSuchElementException nse)
         {
@@ -103,7 +106,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     // Should this really return a grid object?
     public ResponsiveGrid getNextPage()
     {
-        WebElement nextButton = Locators.pgRightButton.waitForElement(getDriver(), 2500);
+        WebElement nextButton = Locators.pgRightButton.waitForElement(this, 2500);
         if (nextButton.isEnabled())
         {
             _responsiveGrid.doAndWaitForUpdate(()->nextButton.click());
@@ -115,7 +118,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     // Should this really return a grid object?
     public ResponsiveGrid getPreviousPage()
     {
-        WebElement prevButton = Locators.pgLeftButton.waitForElement(getDriver(), 2500);
+        WebElement prevButton = Locators.pgLeftButton.waitForElement(this, 2500);
         if (prevButton.isEnabled())
         {
             _responsiveGrid.doAndWaitForUpdate(()->prevButton.click());
@@ -123,23 +126,76 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return _responsiveGrid;
     }
 
-    public GridBar selectAllInSet(boolean checked)
+    /**
+     * Click the 'Select All' button in the grid bar.
+     *
+     * @return This grid bar.
+     */
+    public GridBar selectAllInSet()
     {
-        _responsiveGrid.selectAllOnPage(checked);
-        if (checked)
+        _responsiveGrid.selectAllOnPage(true);
+
+        Locator selectBtn = Locator.xpath("//button[contains(text(), 'Select all')]");      // Select all n
+        Locator selectedText = Locator.xpath("//span[contains(text(),'Selected all ')]");   // Selected all n on this page
+        Locator allSelected = Locator.xpath("//span[contains(text(), 'All ')]");            // All n selected
+        WebElement btn = selectBtn.waitForElement(this, 5_000);
+        btn.click();
+
+        getWrapper().waitFor(() -> allSelected.findOptionalElement(this).isPresent() ||
+                        selectBtn.findOptionalElement(this).isEmpty() &&
+                                selectedText.findOptionalElement(this).isPresent() ,
+                WAIT_FOR_JAVASCRIPT);
+
+        return this;
+    }
+
+    /**
+     * Click the 'Clear All' button in the grid bar.
+     * @return This grid bar.
+     */
+    public GridBar clearAllInSet()
+    {
+        _responsiveGrid.selectAllOnPage(false);
+
+        // Clear button can have text values of 'Clear', 'Clear both' or 'Clear all ' so just look for clear.
+        Locator clearBtn = Locator.xpath("//button[contains(text(), 'Clear')]");
+
+        if(!clearBtn.findOptionalElement(this).isEmpty())
         {
-            Locator selectBtn = Locator.xpath("//button[contains(text(), 'Select all')]");      // Select all n
-            Locator selectedText = Locator.xpath("//span[contains(text(),'Selected all ')]");   // Selected all n on this page
-            Locator allSelected = Locator.xpath("//span[contains(text(), 'All ')]");            // All n selected
-            WebElement btn = selectBtn.waitForElement(this, 4000);
+
+            WebElement btn = clearBtn.waitForElement(this, 5_000);
             btn.click();
 
-            getWrapper().waitFor(() -> allSelected.findOptionalElement(this).isPresent() ||
-                            selectBtn.findOptionalElement(this).isEmpty() &&
-                                    selectedText.findOptionalElement(this).isPresent() ,
+            getWrapper().waitFor(() -> clearBtn.findOptionalElement(this).isEmpty(),
                     WAIT_FOR_JAVASCRIPT);
+
         }
+
         return this;
+    }
+
+    /**
+     * Click a button on the grid bar with the given text.
+     * @param buttonCaption Button caption.
+     * @param doAction The action to perform after the click. Can be null.
+     * @return This grid bar.
+     */
+    public void clickButton(String buttonCaption, @Nullable Runnable doAction)
+    {
+        Locator button = Locator.xpath("//button[contains(text(), '" + buttonCaption + "')]");
+
+        if(!button.findOptionalElement(this).isEmpty())
+        {
+            WebElement btn = button.waitForElement(this, 5_000);
+            btn.click();
+
+            if(doAction != null)
+            {
+                doAction.run();
+            }
+
+        }
+
     }
 
     public OmniBox getOmniBox()
@@ -232,8 +288,9 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
+
         public OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver).findWhenNeeded(this);
         private final Map<String, MultiMenu> menus = new HashMap<>();
         protected MultiMenu findMenu(String buttonText)
@@ -249,17 +306,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     {
         static public Locator.XPathLocator gridBar()
         {
-            return Locator.xpath("//div[contains(@class, 'table-responsive')]/ancestor::div[@class='panel-body']//div[contains(@class,'hidden-md')]/parent::div");
-        }
-
-        static public Locator.XPathLocator queryGridBar()
-        {
-            return Locator.xpath("//div[contains(@class, 'table-responsive')]/ancestor::div[@class='panel-body']//div[@class='query-grid-bar']");
-        }
-
-        static public Locator.XPathLocator gridBar(String gridId)
-        {
-            return Locator.xpath("//div[contains(@class, 'table-responsive')][@data-gridid='" + gridId + "']/ancestor::div[@class='panel-body']//div[contains(@class,'hidden-md')]/parent::div");
+            return Locator.tagWithClass("div", "query-grid-bar");
         }
 
         static final Locator pgRightButton = Locator.tagWithClassContaining("div", "paging")
@@ -284,33 +331,30 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     public static class GridBarFinder extends WebDriverComponentFinder<GridBar, GridBarFinder>
     {
         private Locator _locator;
-        private WebDriver _driver;
+        private WebElement _container;
         private ResponsiveGrid _responsiveGrid;
 
-        public GridBarFinder(WebDriver driver, ResponsiveGrid responsiveGrid)
+        /**
+         * At this time (Feb 2020) a grid bar will not exist without a grid panel, and a responsive grid. Rather
+         * than take a responsive grid and search up the html chain for a the correct grid bar, take a container
+         * element and search for the grid bar in it.
+         *
+         * @param driver A reference to a WebDriver
+         * @param containerPanel The panel / html element containing the grid bar.
+         * @param responsiveGrid The responsive grid associated with this grid bar.
+         */
+        public GridBarFinder(WebDriver driver, WebElement containerPanel, ResponsiveGrid responsiveGrid)
         {
             super(driver);
-            _driver = driver;
             _locator= Locators.gridBar();
             _responsiveGrid = responsiveGrid;
-        }
-
-        public GridBarFinder withQueryGrid()
-        {
-            _locator= Locators.queryGridBar();
-            return this;
-        }
-
-        public GridBarFinder withGridId(String gridId)
-        {
-            _locator= Locators.gridBar(gridId);
-            return this;
+            _container = containerPanel;
         }
 
         @Override
         protected GridBar construct(WebElement el, WebDriver driver)
         {
-            return new GridBar(el, _responsiveGrid, driver);
+            return new GridBar(driver, _container, _responsiveGrid);
         }
 
         @Override

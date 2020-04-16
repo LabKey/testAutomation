@@ -1,6 +1,7 @@
 package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
@@ -46,9 +47,19 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
     public DomainFormPanel addField(FieldDefinition fieldDefinition)
     {
         DomainFieldRow fieldRow = addField(fieldDefinition.getName());
+        return editField(fieldRow, fieldDefinition);
+    }
 
+    public DomainFormPanel setField(FieldDefinition fieldDefinition)
+    {
+        DomainFieldRow fieldRow = getField(fieldDefinition.getName());
+        return editField(fieldRow, fieldDefinition);
+    }
+
+    private DomainFormPanel editField(DomainFieldRow fieldRow, FieldDefinition fieldDefinition)
+    {
         if (fieldDefinition.getLookup() != null)
-            throw new IllegalArgumentException("Lookups are not yet supported");
+            fieldRow.setLookup(fieldDefinition.getLookup());
         else if (fieldDefinition.getType() != null)
             fieldRow.setType(fieldDefinition.getType());
 
@@ -62,12 +73,23 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             fieldRow.setCharCount(fieldDefinition.getScale());
         if (fieldDefinition.getURL() != null)
             fieldRow.setUrl(fieldDefinition.getURL());
+        if (fieldDefinition.getMvEnabled())
+            fieldRow.setMissingValuesEnabled(fieldDefinition.getMvEnabled());
+        if (fieldDefinition.getRequired())
+            fieldRow.setRequiredField(fieldDefinition.getRequired());
+        if (fieldDefinition.getLookupValidatorEnabled() != null)
+            fieldRow.setLookupValidatorEnabled(fieldDefinition.getLookupValidatorEnabled());
+
         if (fieldDefinition.getValidator() != null)
-            throw new IllegalArgumentException("Validators are not yet supported");
-        if (fieldDefinition.isMvEnabled())
-            fieldRow.setMissingValue(fieldDefinition.isMvEnabled());
-        if (fieldDefinition.isRequired())
-            fieldRow.setRequiredField(fieldDefinition.isRequired());
+        {
+            FieldDefinition.FieldValidator validator = fieldDefinition.getValidator();
+            if (validator instanceof FieldDefinition.RegExValidator)
+                fieldRow.setRegExValidators(List.of((FieldDefinition.RegExValidator)validator));
+            else if (validator instanceof FieldDefinition.RangeValidator)
+                fieldRow.setRangeValidators(List.of((FieldDefinition.RangeValidator)validator));
+            else
+                throw new IllegalArgumentException("Validators are not yet supported");
+        }
 
         fieldRow.collapse();
 
@@ -99,8 +121,13 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFormPanel removeField(String name)
     {
+        return  removeField(name, false);
+    }
+
+    public DomainFormPanel removeField(String name, boolean confirmDialogExpected)
+    {
         getWrapper().log("attempting to remove field " + name);
-        getField(name).clickRemoveField().dismiss("Yes, Remove Field");
+        getField(name).clickRemoveField(confirmDialogExpected);
         clearElementCache();
         return this;
     }
@@ -127,12 +154,12 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         }
     }
 
-    public DomainFormPanel removeAllFields()
+    public DomainFormPanel removeAllFields(boolean confirmDialogExpected)
     {
         List<String> fieldNames = fieldNames();
         for (String name : fieldNames)
         {
-            removeField(name);
+            removeField(name, confirmDialogExpected);
         }
         return this;
     }
@@ -155,32 +182,27 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
     public DomainFormPanel expand()
     {
-        if (isCollapsed())
+        if (!isExpanded())
         {
-            elementCache().expandIcon.click();
+            elementCache().expandToggle.click();
             getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
         }
         return this;
-    }
-
-    public boolean isExpanded()
-    {
-        return elementCache().collapseIconLoc.existsIn(this);
     }
 
     public DomainFormPanel collapse()
     {
         if (isExpanded())
         {
-            elementCache().collapseIcon.click();
+            elementCache().expandToggle.click();
             getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
         }
         return this;
     }
 
-    public boolean isCollapsed()
+    private boolean isExpanded()
     {
-        return elementCache().expandIconLoc.existsIn(this);
+        return elementCache().panelBody.isDisplayed();
     }
 
     public boolean hasPanelTitle()
@@ -193,6 +215,21 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return hasPanelTitle() ? elementCache().panelTitle.getText() : null;
     }
 
+    public String getPanelErrorText()
+    {
+        return getPanelErrorWebElement().getText();
+    }
+
+    public WebElement getPanelErrorWebElement()
+    {
+        getWrapper().waitFor(()-> BootstrapLocators.errorBanner.existsIn(getDriver()),
+                "the error alert did not appear as expected", 1000);
+
+        // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
+        // may show different controls.
+        return BootstrapLocators.errorBanner.existsIn(getDriver()) ? BootstrapLocators.errorBanner.findElement(getDriver()) : null;
+    }
+
     /**
      * Get the alert message that is shown only in the alert panel. An example of this is the Results Field in
      * Sample Manager requires a field that is a sample look-up, if it missing an alert is shown.
@@ -201,10 +238,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
      */
     public String getPanelAlertText()
     {
-        if(elementCache().panelAlertText.isDisplayed())
-            return elementCache().panelAlertText.getText();
-        else
-            return "";
+        return getPanelAlertWebElement().getText();
     }
 
     /**
@@ -214,12 +248,12 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
      */
     public WebElement getPanelAlertWebElement()
     {
+        getWrapper().waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
+                "the info alert did not appear as expected", 1000);
+
         // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
         // may show different controls.
-        if(elementCache().panelAlertText.isDisplayed())
-            return elementCache().panelAlert;
-        else
-            return null;
+        return BootstrapLocators.infoBanner.existsIn(getDriver()) ? BootstrapLocators.infoBanner.findElement(getDriver()) : null;
     }
 
     @Override
@@ -299,21 +333,16 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
 
         WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
 
-        // TODO since the Assay Properties panel also has the notion of expand/collapse,
-        //  we should split that part out into an Abstract test class that both can use
-        Locator.XPathLocator expandIconLoc = Locator.tagWithClass("svg", "domain-form-expand-btn");
-        WebElement expandIcon = expandIconLoc.refindWhenNeeded(DomainFormPanel.this);
-        Locator.XPathLocator collapseIconLoc = Locator.tagWithClass("svg", "domain-form-collapse-btn");
-        WebElement collapseIcon = collapseIconLoc.refindWhenNeeded(DomainFormPanel.this);
+        WebElement expandToggle = Locator.tagWithClass("svg", "domain-form-expand-btn").findWhenNeeded(DomainFormPanel.this);
         Locator.XPathLocator panelTitleLoc = Locator.tagWithClass("span", "domain-panel-title");
         WebElement panelTitle = panelTitleLoc.findWhenNeeded(DomainFormPanel.this);
-        WebElement panelAlert = Locator.css("div.alert-info").findWhenNeeded(DomainFormPanel.this);
-        WebElement panelAlertText = Locator.css("div.alert-info > div > div").findWhenNeeded(DomainFormPanel.this);
+        WebElement panelBody = Locator.byClass("panel-body").findWhenNeeded(this);
     }
 
     public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
     {
-        final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-form-panel");
+        private final Locator.XPathLocator _panelLocator = Locator.tagWithClass("div", "domain-form-panel");
+
         private String _title = null;
 
         public DomainFormPanelFinder(WebDriver driver)
@@ -338,16 +367,13 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         {
             if (_title != null)
             {
-                Locator.XPathLocator titleLoc = Locator.tagWithClass("div", "domain-panel-header").child(Locator.tag("span")).startsWith(_title);
-                return getBaseLocator().withDescendant(titleLoc);
+                Locator.XPathLocator titleLoc = Locator.byClass("domain-panel-title").startsWith(_title);
+                return _panelLocator.withDescendant(titleLoc);
             }
             else
-                return getBaseLocator();
-        }
-
-        public Locator.XPathLocator getBaseLocator()
-        {
-            return _baseLocator;
+            {
+                return _panelLocator;
+            }
         }
     }
 }

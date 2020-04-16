@@ -70,7 +70,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         init._containerHelper.createProject(init.getProjectName(), "Assay");
         PortalHelper portalHelper = new PortalHelper(init.getDriver());
         portalHelper.addWebPart("Pipeline Files");
-        init.setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/GPAT");
+        init.setPipelineRoot(TestFileUtils.getSampleData("GPAT").getAbsolutePath());
         init.goToProjectHome();
     }
 

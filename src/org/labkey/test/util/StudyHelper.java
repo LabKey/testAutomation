@@ -25,7 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.ManageDatasetsPage;
 import org.labkey.test.pages.study.CreateStudyPage;
@@ -45,6 +45,9 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class StudyHelper
 {
+    public static final File SPECIMEN_ARCHIVE_A = TestFileUtils.getSampleData("study/specimens/sample_a.specimens");
+    public static final File SPECIMEN_ARCHIVE_B = TestFileUtils.getSampleData("study/specimens/sample_b.specimens");
+
     protected BaseWebDriverTest _test;
 
     public StudyHelper(BaseWebDriverTest test)
@@ -433,40 +436,46 @@ public class StudyHelper
         return new ManageVisitPage(_test.getDriver());
     }
 
-    public PropertiesEditor goToEditSpecimenProperties()
+    public DomainDesignerPage goToEditSpecimenProperties()
     {
         return goToEditSpecimenProperties(SpecimenPropertyEditors.SPECIMEN_EVENT);
     }
 
-    public PropertiesEditor goToEditSpecimenProperties(SpecimenPropertyEditors editor)
+    public DomainDesignerPage goToEditSpecimenProperties(SpecimenPropertyEditors editor)
     {
-        String editorTitle;
+        _test.goToManageStudy();
+
         switch(editor)
         {
             case VIAL:
-                editorTitle = "Vial";
+                _test.waitAndClickAndWait(Locator.linkWithText("Edit Vial fields"));
                 break;
             case SPECIMEN:
-                editorTitle = "Specimen";
+                _test.waitAndClickAndWait(Locator.linkWithText("Edit Specimen fields"));
                 break;
             case SPECIMEN_EVENT:
             default:
-                editorTitle = "SpecimenEvent";
+                _test.waitAndClickAndWait(Locator.linkWithText("Edit Specimen Event fields"));
         }
 
-        _test.goToManageStudy();
-        _test.waitAndClickAndWait(Locator.linkWithText("Edit specimen properties"));
-        return PropertiesEditor.PropertiesEditor(_test.getDriver()).withTitleContaining(editorTitle).waitFor();
+        DomainDesignerPage designerPage = new DomainDesignerPage(_test.getDriver());
+
+        return designerPage;
     }
 
-    public static String getStudySampleDataPath()
+    public static File getStudyTempDir()
     {
-        return "/sampledata/study/";
+        return new File(getPipelinePath(), "drt_temp");
     }
 
     public static String getPipelinePath()
     {
-        return TestFileUtils.getLabKeyRoot() + getStudySampleDataPath();
+        return TestFileUtils.getLabKeyRoot() + "/sampledata/study/";
+    }
+
+    public static File getStudySampleData(String relativePath)
+    {
+        return TestFileUtils.getSampleData("study/" + relativePath);
     }
 
     public enum TimepointType

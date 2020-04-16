@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
-import java.util.concurrent.TimeUnit;
 
 @Aspect
 public class MethodLoggingAspect
@@ -119,25 +118,9 @@ public class MethodLoggingAspect
 
         if (!method.equals(caller)) // Don't double-log overloaded methods
         {
-            long minutesPart = TimeUnit.MILLISECONDS.toMinutes(elapsed);
-            long secondsPart = TimeUnit.MILLISECONDS.toSeconds(elapsed) -
-                    TimeUnit.MINUTES.toSeconds(minutesPart);
-            long millisecondsPart = elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed));
-            StringBuilder elapsedStr = new StringBuilder();
-            if (minutesPart > 0)
-            {
-                elapsedStr.append(minutesPart).append("m ");
-            }
-            elapsedStr.append(secondsPart);
-            if (minutesPart == 0)
-            {
-                String millisecondsStr = String.valueOf(millisecondsPart);
-                String padding = StringUtils.repeat("0", 3 - millisecondsStr.length());
-                elapsedStr.append(".").append(padding).append(millisecondsPart);
-            }
-            elapsedStr.append("s");
+            String elapsedStr = TestLogger.formatElapsedTime(elapsed);
             TestLogger.decreaseIndent();
-            TestLogger.log(logPrefix + method + argString + " <" + elapsedStr + ">"); // Only log on successful return
+            TestLogger.log(logPrefix + method + argString + " " + elapsedStr); // Only log on successful return
         }
     }
 

@@ -23,6 +23,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
@@ -34,11 +36,8 @@ import org.openqa.selenium.WrapsDriver;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -55,6 +54,15 @@ public class ListHelper extends LabKeySiteWrapper
     public ListHelper(WebDriver driver)
     {
         this(() -> driver);
+    }
+
+    private void enabledGwtListDesigner()
+    {
+        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-gwtlistdesigner");
+    }
+    private void disableGwtListDesigner()
+    {
+        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-gwtlistdesigner");
     }
 
     @Override
@@ -205,9 +213,8 @@ public class ListHelper extends LabKeySiteWrapper
             waitForAnyElement(Locator.linkWithText("view data"), Locator.byClass("lk-qd-error"));
             artifactCollector.dumpPageSnapshot("schemaBrowser", subdir, false);
 
-            // query-metadataQuery.view?schemaName=lists&query.queryName=People
-            beginAt(WebTestHelper.buildURL("query", containerPath, "metadataQuery", Map.of("schemaName", schemaName, "query.queryName", queryName)));
-            waitForElement(Locators.pageSignal("propertiesEditorChange"));
+            // query-metadataQuery.view?schemaName=lists&queryName=People
+            beginAt(WebTestHelper.buildURL("query", containerPath, "metadataQuery", Map.of("schemaName", schemaName, "queryName", queryName)));
             artifactCollector.dumpPageSnapshot("metadataEditor", subdir, false);
 
             // query-rawTableMetaData.view?schemaName=lists&query.queryName=People
@@ -307,52 +314,42 @@ public class ListHelper extends LabKeySiteWrapper
         clickButton("OK");
     }
 
+    /**
+     * Starting at the grid view of a list, confirm dependencies, and delete it
+     */
+    public void deleteList(String confirmText)
+    {
+        String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
+        beginAt(url);
+        assertTextPresent(confirmText);
+        clickButton("OK");
+    }
+
     @LogMethod
     public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
+        disableGwtListDesigner();
         beginCreateListFromTab(tabName, listName);
-        createListHelper(listName, listKeyType, listKeyName, cols);
+        createListHelper(listKeyType, listKeyName, cols);
     }
 
     @LogMethod
     public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
+        disableGwtListDesigner();
         beginCreateList(containerPath, listName);
-        createListHelper(listName, listKeyType, listKeyName, cols);
+        createListHelper(listKeyType, listKeyName, cols);
     }
 
-    private void createListHelper(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    private void createListHelper(ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        selectOptionByText(Locator.id("ff_keyType"), listKeyType.toString());
-        setFormElement(Locator.id("ff_keyName"), listKeyName);
-        fireEvent(Locator.id("ff_keyName"), BaseWebDriverTest.SeleniumEvent.blur);
-
-        clickButton("Create List", 0);
-        waitForElement(Locator.name("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.name("ff_name0"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        log("Check that list was created correctly");
-        waitForFormElementToEqual(Locator.name("ff_name"), listName);
-        waitForFormElementToEqual(Locator.name("ff_name0"), listKeyName);
-
-        log("Add columns");
-
+        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
+        DomainFormPanel fieldsPanel = listDefinitionPage.setKeyField(listKeyType, listKeyName);
         for (ListColumn col : cols)
         {
-            addField(col);
+            fieldsPanel.addField(col);
         }
-
-        clickSave();
-
-        Set<String> expectedTexts = new HashSet<>();
-        for (ListColumn col : cols)
-        {
-            expectedTexts.add(col.getName());
-            expectedTexts.add(col.getLabel());
-        }
-        expectedTexts.remove("");
-        expectedTexts.remove(null);
-        assertTextPresent(new ArrayList<>(expectedTexts));
+        listDefinitionPage.clickSave();
     }
 
     public void addField(ListColumn col)
@@ -360,7 +357,7 @@ public class ListHelper extends LabKeySiteWrapper
         getListFieldEditor().addField(col);
     }
 
-    public void beginCreateListFromTab(String tabName, String listName)
+    private void beginCreateListFromTab(String tabName, String listName)
     {
         clickTab(tabName.replace(" ", ""));
         beginCreateListHelper(listName);
@@ -373,13 +370,13 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
     // initial "create list" steps common to both manual and import from file scenarios
-    public void beginCreateList(String containerPath, String listName)
+    public EditListDefinitionPage beginCreateList(String containerPath, String listName)
     {
         beginAt(WebTestHelper.buildURL("project", containerPath, "begin"));
-        beginCreateListHelper(listName);
+        return beginCreateListHelper(listName);
     }
 
-    private void beginCreateListHelper(String listName)
+    private EditListDefinitionPage beginCreateListHelper(String listName)
     {
         if (!isElementPresent(Locator.linkWithText("Lists")))
         {
@@ -391,28 +388,26 @@ public class ListHelper extends LabKeySiteWrapper
 
         log("Add List");
         clickButton("Create New List");
-        waitForElement(Locator.id("ff_name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("ff_name"), listName);
-        fireEvent(Locator.id("ff_name"), BaseWebDriverTest.SeleniumEvent.blur);
+        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
+        listDefinitionPage.setListName(listName);
+        return listDefinitionPage;
     }
-
 
     public void createListFromFile(String containerPath, String listName, File inputFile)
     {
-        beginCreateList(containerPath, listName);
+        disableGwtListDesigner();
+        EditListDefinitionPage listEditPage = beginCreateList(containerPath, listName);
+        listEditPage.getFieldsPanel()
+            .setInferFieldFile(inputFile);
 
-        click(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
-        //test.clickCheckbox("fileImport");
+        // assumes we intend to key on auto-integer
+        DomainFieldRow keyRow = listEditPage.getFieldsPanel().getField("Key");
+        if (keyRow != null)
+            keyRow.clickRemoveField(false);
+        listEditPage.selectAutoIntegerKeyField();
 
-        clickButton("Create List", 0);
-
-        waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.name("uploadFormElement"), inputFile);
-
-        waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        clickButton("Import");
+        // assumes we intend to import from file
+        listEditPage.clickSave();
     }
 
     /**
@@ -468,27 +463,18 @@ public class ListHelper extends LabKeySiteWrapper
         submitImportTsv_success();
     }
 
-    public EditListDefinitionPage clickEditDesign()
+    public EditListDefinitionPage goToEditDesign(String listName)
     {
-        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
-        waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.id("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        goToList(listName);
+        clickAndWait(Locator.lkButton("Design"));
         return new EditListDefinitionPage(getDriver());
     }
 
-    public void clickSave()
+    public void goToList(String listName)
     {
-        WebElement saveButton = Locator.lkButton("Save").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        scrollToTop(); // After clicking save, sometimes the page scrolls so that the project menu is under the mouse
-        saveButton.click();
-        waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void clickDeleteList()
-    {
-        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Delete List"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        // if we are on the Manage List page, click the list name first
+        if (isElementPresent(Locators.bodyTitle("Available Lists")))
+            clickAndWait(Locator.linkWithText(listName));
     }
 
     /**
@@ -502,23 +488,10 @@ public class ListHelper extends LabKeySiteWrapper
                 .addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
     }
 
-    public List<String> getColumnNames()
-    {
-        List<String> columns = new ArrayList<>();
-
-        List<WebElement> nameFields = Locator.xpath("//input[contains(@name, 'ff_name')]").findElements(getDriver());
-        for(WebElement webElement : nameFields)
-        {
-            // If it is not the list name element then add it to the list.
-            if (!webElement.getAttribute("name").trim().toLowerCase().equals("ff_name"))
-            {
-                columns.add(webElement.getAttribute("value"));
-            }
-        }
-
-        return columns;
-    }
-
+    /**
+     * @deprecated Use {@link FieldDefinition.RangeType}
+     */
+    @Deprecated
     public enum RangeType
     {
         Equals("Equals"), NE("Does Not Equal"), GT("Greater than"), GTE("Greater than or Equals"), LT("Less than"), LTE("Less than or Equals");
@@ -545,10 +518,24 @@ public class ListHelper extends LabKeySiteWrapper
         }
     }
 
+    /**
+     * @deprecated Use {@link FieldDefinition.ColumnType}
+     */
+    @Deprecated
     public enum ListColumnType
     {
-        MultiLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"), DateTime("DateTime"), Boolean("Boolean"),
-        Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer"), Flag("Flag (String)"), Attachment("Attachment"), User("User");
+        MultiLine("Multi-Line Text"),
+        Integer("Integer"),
+        String("Text (String)"),
+        Subject("Subject/Participant (String)"),
+        DateAndTime("Date Time"),
+        Boolean("Boolean"),
+        Decimal("Decimal"),
+        File("File"),
+        AutoInteger("Auto-Increment Integer"),
+        Flag("Flag (String)"),
+        Attachment("Attachment"),
+        User("User");
 
         private final String _description;
 
@@ -562,7 +549,7 @@ public class ListHelper extends LabKeySiteWrapper
             return _description;
         }
 
-        private FieldDefinition.ColumnType toNew()
+        public FieldDefinition.ColumnType toNew()
         {
             for (FieldDefinition.ColumnType thisType : FieldDefinition.ColumnType.values())
             {
@@ -583,6 +570,10 @@ public class ListHelper extends LabKeySiteWrapper
         }
     }
 
+    /**
+     * @deprecated Use {@link FieldDefinition.LookupInfo}
+     */
+    @Deprecated
     public static class LookupInfo extends FieldDefinition.LookupInfo
     {
         public LookupInfo(@Nullable String folder, String schema, String table)
@@ -591,6 +582,10 @@ public class ListHelper extends LabKeySiteWrapper
         }
     }
 
+    /**
+     * @deprecated Use {@link FieldDefinition.RegExValidator}
+     */
+    @Deprecated
     public static class RegExValidator extends FieldDefinition.RegExValidator
     {
         public RegExValidator(String name, String description, String message, String expression)
@@ -599,27 +594,22 @@ public class ListHelper extends LabKeySiteWrapper
         }
     }
 
+    /**
+     * @deprecated Use {@link FieldDefinition.RangeValidator}
+     */
+    @Deprecated
     public static class RangeValidator extends FieldDefinition.RangeValidator
     {
         public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange)
         {
             super(name, description, message, firstType.toNew(), firstRange);
         }
-
-        public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange, RangeType secondType, String secondRange)
-        {
-            super(name, description, message, firstType.toNew(), firstRange, secondType.toNew(), secondRange);
-        }
     }
 
-    public static class LookUpValidator extends FieldDefinition.LookUpValidator
-    {
-        public LookUpValidator()
-        {
-            super();
-        }
-    }
-
+    /**
+     * @deprecated Use {@link FieldDefinition}
+     */
+    @Deprecated
     public static class ListColumn extends FieldDefinition
     {
         public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url, Integer scale)
@@ -669,14 +659,5 @@ public class ListHelper extends LabKeySiteWrapper
         {
             this(name, null, type);
         }
-    }
-
-    /**
-     * Set of locators for navigating the List Designer page
-     */
-    public static class DesignerLocators
-    {
-        public static Locator.XPathLocator maxCheckbox = Locator.xpath("//input[@name='isMaxText']");
-        public static Locator.XPathLocator scaleTextbox = Locator.xpath("//input[@name='scale']");
     }
 }

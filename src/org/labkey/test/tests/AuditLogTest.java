@@ -40,9 +40,12 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.ConditionalFormatDialog;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.Format;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Log4jUtils;
@@ -445,6 +448,7 @@ public class AuditLogTest extends BaseWebDriverTest
         _listHelper.createList(containerPath, listName, ListHelper.ListColumnType.AutoInteger, "Key", listColumns);
         if(null != tsvData)
         {
+            _listHelper.goToList(listName);
             _listHelper.clickImportData();
             _listHelper.submitTsvData(tsvData);
         }
@@ -616,22 +620,25 @@ public class AuditLogTest extends BaseWebDriverTest
         log("Looks like the created events were as expected. Now modify some column/field attributes.");
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
         clickAndWait(Locator.linkWithText(LIST_CHECK_LOG));
-        clickAndWait(Locator.lkButton("Design"));
-        _listHelper.clickEditDesign();
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
+        DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
 
         log("Change properties on field '" + FIELD01_NAME + "'.");
-        PropertiesEditor.FieldRow fr = _listHelper.getListFieldEditor().selectField(FIELD01_NAME);
-        fr.properties().selectAdvancedTab().setPhiLevel(PropertiesEditor.PhiSelectType.Restricted);
-        fr.properties().selectValidatorsTab().setRequired(true);
-        fr.properties().selectDisplayTab().setDescription(FIELD01_UPDATED_DESCRIPTION);
-        fr.setLabel(FIELD01_UPDATED_LABEL);
+        fieldsPanel.getField(FIELD01_NAME)
+                .setPHILevel(PropertiesEditor.PhiSelectType.Restricted)
+                .setRequiredField(true)
+                .setDescription(FIELD01_UPDATED_DESCRIPTION)
+                .setLabel(FIELD01_UPDATED_LABEL);
 
         log("Change properties on field '" + FIELD02_NAME + "'.");
-        fr = _listHelper.getListFieldEditor().selectField(FIELD02_NAME);
-        fr.properties().selectReportingTab().setDefaultScale(PropertiesEditor.ScaleType.LOG);
-        fr.properties().selectFormatTab().addConditionalFormat("5", Format.NONE);
-        fr.properties().selectFormatTab().setPropertyFormat("#!");
-        _listHelper.clickSave();
+        DomainFieldRow field2 = fieldsPanel.getField(FIELD02_NAME)
+                .setScaleType(PropertiesEditor.ScaleType.LOG)
+                .setNumberFormat("#!");
+        ConditionalFormatDialog formatDlg = field2.clickConditionalFormatButton();
+        formatDlg.getOpenFormatPanel().setFirstValue("5");
+        formatDlg.clickApply();
+
+        listDefinitionPage.clickSave();
 
         log("Get a list of ids from the Domain Events Audit Log again but this time remove from the list the ids from the created events.");
         domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
@@ -668,12 +675,12 @@ public class AuditLogTest extends BaseWebDriverTest
         log("The modified events were logged as expected. Now add a lookup field.");
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
         clickAndWait(Locator.linkWithText(LIST_CHECK_LOG));
-        clickAndWait(Locator.lkButton("Design"));
-        _listHelper.clickEditDesign();
-
-        PropertiesEditor editor = _listHelper.getListFieldEditor();
-        editor.addField(new FieldDefinition(FIELD03_NAME).setLabel(FIELD03_LABEL).setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)));
-        _listHelper.clickSave();
+        listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
+        listDefinitionPage.getFieldsPanel()
+                .addField(new FieldDefinition(FIELD03_NAME).setLabel(FIELD03_LABEL)
+                        .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)
+                                .setTableType(FieldDefinition.ColumnType.Integer)));
+        listDefinitionPage.clickSave();
 
         log("Validate that a 'Create' event was logged for the new filed.");
         domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
@@ -705,14 +712,13 @@ public class AuditLogTest extends BaseWebDriverTest
         log("The 'Created' event was logged as expected. Now modify the field to point to a new list in the lookup field.");
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
         clickAndWait(Locator.linkWithText(LIST_CHECK_LOG));
-        clickAndWait(Locator.lkButton("Design"));
-        _listHelper.clickEditDesign();
+        listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
 
         log("Change properties on field '" + FIELD03_NAME + "'.");
-        editor = _listHelper.getListFieldEditor();
-        PropertiesEditor.FieldRow row = editor.selectField(FIELD03_NAME);
-        row.setType(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02));
-        _listHelper.clickSave();
+        listDefinitionPage.getFieldsPanel()
+                .getField(FIELD03_NAME)
+                .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02).setTableType(FieldDefinition.ColumnType.Integer));
+        listDefinitionPage.clickSave();
 
         log("Validate that the expected row is there for the after modifying the Lookup field.");
         field03ExpectedColumns = Maps.of("action", "Modified");
@@ -735,11 +741,9 @@ public class AuditLogTest extends BaseWebDriverTest
         log("The 'Modified' event was logged as expected for the lookup. Now delete the field.");
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
         clickAndWait(Locator.linkWithText(LIST_CHECK_LOG));
-        clickAndWait(Locator.lkButton("Design"));
-        _listHelper.clickEditDesign();
-        _listHelper.getListFieldEditor().selectField(3)
-                .markForDeletion();
-        _listHelper.clickSave();
+        listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
+        listDefinitionPage.getFieldsPanel().getField(3).clickRemoveField(true);
+        listDefinitionPage.clickSave();
 
         log("Validate that the expected row is there after deleting the Lookup field.");
         field03ExpectedColumns = Maps.of("action", "Deleted");

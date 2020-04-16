@@ -155,6 +155,7 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         goToModule("List");
         _listHelper.createList(getProjectName(), "Ages", ListHelper.ListColumnType.Integer, "Age");
+        _listHelper.goToList("Ages");
         _listHelper.uploadData(TEST_DATA_AGE_LIST);
     }
 
@@ -173,12 +174,12 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
             .setType(FieldDefinition.ColumnType.Lookup)
             .setFromSchema("lists")
             .setFromTargetTable("Ages (Integer)")
-            .setMissingValue(true);
+            .setMissingValuesEnabled(true);
 
         resultsPanel.addField("sex")
             .setLabel("Sex")
             .setType(FieldDefinition.ColumnType.String)
-            .setMissingValue(true);
+            .setMissingValuesEnabled(true);
 
         assayDesignerPage.clickFinish();
     }

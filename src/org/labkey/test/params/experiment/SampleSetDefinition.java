@@ -1,22 +1,32 @@
 package org.labkey.test.params.experiment;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
+import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.property.DomainProps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class SampleSetDefinition
+/**
+ * Defines a Sample Type. Suitable for use with UI and API helpers.
+ * 'exp.materials'
+ */
+public class SampleSetDefinition extends DomainProps
 {
     private String _name;
     private String _nameExpression;
     private String _description;
     private List<FieldDefinition> _fields = new ArrayList<>();
-    private Map<String, String> _importAliases = new HashMap<>();
-
-    public SampleSetDefinition() { }
+    private Map<String, String> _parentAliases = new HashMap<>();
+    // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
+    private Set<String> _dataParentAliases = new HashSet<>();
 
     public SampleSetDefinition(String name)
     {
@@ -75,20 +85,101 @@ public class SampleSetDefinition
     }
 
     @NotNull
-    public Map<String, String> getImportAliases()
+    public Map<String, String> getParentAliases()
     {
-        return _importAliases;
+        return _parentAliases;
     }
 
-    public SampleSetDefinition setImportAliases(@NotNull Map<String, String> importAliases)
+    public SampleSetDefinition setParentAliases(@NotNull Map<String, String> parentAliases)
     {
-        _importAliases = new HashMap<>(importAliases);
+        _parentAliases = new HashMap<>(parentAliases);
+        _dataParentAliases.clear();
         return this;
     }
 
-    public SampleSetDefinition addImportAlias(@NotNull String columnName, @NotNull String sampleSetName)
+    /**
+     * Add an import alias referencing the specified Data Class ('exp.dataInputs')
+     */
+    public SampleSetDefinition addDataParentAlias(@NotNull String columnName, String dataClassName)
     {
-        _importAliases.put(columnName, sampleSetName);
+        _parentAliases.put(columnName, dataClassName);
+        _dataParentAliases.add(columnName);
         return this;
+    }
+
+    /**
+     * Add an import alias referencing the specified Sample Type ('exp.materialInputs')
+     */
+    public SampleSetDefinition addParentAlias(@NotNull String columnName, String sampleSetName)
+    {
+        _parentAliases.put(columnName, sampleSetName);
+        _dataParentAliases.remove(columnName);
+        return this;
+    }
+
+    public SampleSetDefinition addParentAlias(@NotNull String columnName)
+    {
+        return addParentAlias(columnName, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
+    }
+
+    /*
+    DomainProps
+     */
+
+    @NotNull
+    @Override
+    protected Domain getDomainDesign()
+    {
+        Domain domain = new Domain(getName());
+        ArrayList<PropertyDescriptor> fields = new ArrayList<>(getFields());
+        fields.add(0, new PropertyDescriptor("Name", null));
+        domain.setFields(fields);
+        domain.setDescription(getDescription());
+        return domain;
+    }
+
+    @NotNull
+    @Override
+    protected String getKind()
+    {
+        return "SampleSet";
+    }
+
+    @NotNull
+    @Override
+    protected Map<String, Object> getOptions()
+    {
+        Map<String, Object> options = new HashMap<>();
+        options.put("name", getName());
+        options.put("nameExpression", getNameExpression());
+        if (!getParentAliases().isEmpty())
+        {
+            Map<String, String> importAliases = new HashMap<>();
+            for (String columnName : getParentAliases().keySet())
+            {
+                String aliasTarget = getParentAliases().get(columnName);
+                if (aliasTarget == null || aliasTarget.equals(SampleTypeDesigner.CURRENT_SAMPLE_TYPE))
+                {
+                    aliasTarget = getName();
+                }
+                String inputPrefix = _dataParentAliases.contains(columnName) ? "dataInputs/" : "materialInputs/";
+                String aliasTable = inputPrefix + aliasTarget;
+                importAliases.put(columnName, aliasTable);
+            }
+            options.put("importAliases", importAliases);
+        }
+        return options;
+    }
+
+    @Override
+    protected @NotNull String getSchemaName()
+    {
+        return "exp.materials";
+    }
+
+    @Override
+    protected @NotNull String getQueryName()
+    {
+        return getName();
     }
 }

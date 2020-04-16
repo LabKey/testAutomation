@@ -23,6 +23,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.pages.core.login.LoginConfigRow;
+import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
@@ -33,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -137,7 +140,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
                 "view all site errors since reset",
                 "view primary site log file"));
         if (_containerHelper.getAllModules().contains("dataintegration"))
-            expectedLinkTexts.addAll(Arrays.asList("etl- all job histories", "etl- run site scope etls"));
+            expectedLinkTexts.addAll(Arrays.asList("etl - all job histories", "etl - run site scope etls"));
 
         expectedLinkTexts.removeIf(linkText -> isElementPresent(Locator.linkWithText(linkText)));
         assertTrue("Missing expected admin console links: " + expectedLinkTexts, expectedLinkTexts.isEmpty());
@@ -157,9 +160,10 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
 
         //authentication
-        goToAdminConsole().clickAuthentication();
-        assertElementNotPresent("expect 'enable' links to be disabled for appAdmin", Locator.linkWithText("enable"));
-        assertElementNotPresent("expect 'configure' links to be disabled for appAdmin", Locator.linkWithText("configure"));
+        LoginConfigurePage configurePage = goToAdminConsole().clickAuthentication();
+        List<LoginConfigRow> configRows = configurePage.getPrimaryConfigurations();
+        assertFalse("expect 'edit' links not to be available for auth configs", configRows.stream().anyMatch(a-> a.canEdit()));
+        assertFalse("expect 'add configuration' menu to be absent for AppAdmin", configurePage.canAddConfiguration());
         clickButton("Done");
         assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
 

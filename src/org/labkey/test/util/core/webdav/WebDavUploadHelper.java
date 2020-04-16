@@ -26,6 +26,7 @@ import org.labkey.test.util.TestLogger;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -158,6 +159,16 @@ public class WebDavUploadHelper
     public void mkDir(String relativePath) throws IOException
     {
         _sardine.createDirectory(_urlFactory.getPath(relativePath));
+    }
+
+    public void putText(String targetFile, String fileContents) throws IOException
+    {
+        String putUrl = _urlFactory.getPath(targetFile);
+        String message = targetFile + " => " + putUrl;
+        TestLogger.log("Uploading: " + message);
+        if (_sardine.exists(putUrl))
+            _sardine.delete(putUrl);
+        _sardine.put(putUrl, fileContents.getBytes(StandardCharsets.UTF_8));
     }
 
     public void putRandomBytes(String relativePath) throws IOException

@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -39,6 +40,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.SchemaHelper;
 import org.labkey.test.util.SimpleHttpResponse;
 
 import java.io.IOException;
@@ -63,10 +65,12 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ExternalSchemaProject";
     private static final String FOLDER_NAME = "SubFolder";
+    private static final String FOLDER_NAME_2 = "SubFolder2";
 
     private static final String DB_SCHEMA_NAME = "test";
     private static final String USER_SCHEMA_NAME = "Test";
     private static final String TABLE_NAME = "TestTable";
+    private SchemaHelper _schemaHelper = new SchemaHelper(this);
 
     private static class Row
     {
@@ -162,11 +166,19 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         }
     }
 
+    @BeforeClass
+    public static void doSetup() throws Exception
+    {
+        ExternalSchemaTest initTest = (ExternalSchemaTest)getCurrentTest();
+        initTest.createProject();
+    }
+
     void createProject()
     {
         log("** Create project: " + PROJECT_NAME);
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME_2);
     }
 
     void ensureExternalSchema(String containerPath)
@@ -233,7 +245,6 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 //                throw new IllegalStateException("Unknown database type");
 //        }
 //
-        createProject();
         ensureExternalSchema(PROJECT_NAME);
         doTestContainer();
 
@@ -247,6 +258,14 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         doTestViaForm();
         doTestViaJavaApi();
+    }
+
+    @Test
+    public void testExternalSchemaDelete()
+    {
+        String containerPath = PROJECT_NAME + "/" + FOLDER_NAME_2;
+        ensureExternalSchema(containerPath);
+        _schemaHelper.deleteSchema(containerPath, USER_SCHEMA_NAME);
     }
 
     void doTestUneditable()

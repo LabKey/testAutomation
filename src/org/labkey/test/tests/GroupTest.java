@@ -179,7 +179,7 @@ public class GroupTest extends BaseWebDriverTest
 
         //confirm username link leads to right user, page
         clickAndWait(Locator.linkWithText(displayName));
-        assertTextPresent("User Access Details: "  + TEST_USERS_FOR_GROUP[0]);
+        assertTextPresent("Role Assignments for User: "  + TEST_USERS_FOR_GROUP[0]);
         goBack();
     }
 

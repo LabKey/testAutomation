@@ -23,15 +23,25 @@ import org.labkey.remoteapi.assay.AddXarFileCommand;
 import org.labkey.remoteapi.assay.AssayListCommand;
 import org.labkey.remoteapi.assay.AssayListResponse;
 import org.labkey.remoteapi.assay.Batch;
+import org.labkey.remoteapi.assay.GetProtocolCommand;
 import org.labkey.remoteapi.assay.ImportRunCommand;
 import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.remoteapi.assay.Protocol;
+import org.labkey.remoteapi.assay.ProtocolResponse;
 import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
+import org.labkey.remoteapi.assay.SaveProtocolCommand;
+import org.labkey.remoteapi.query.Row;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -135,7 +145,7 @@ public class APIAssayHelper extends AbstractAssayHelper
 
     @LogMethod(quiet = true)
     public void importAssay(String assayName, String runName, File file, String projectPath,
-                                         @Nullable Map<String, Object> runProperties, @Nullable Map<String, Object> batchProperties)  throws CommandException, IOException
+                            @Nullable Map<String, Object> runProperties, @Nullable Map<String, Object> batchProperties)  throws CommandException, IOException
     {
         importAssay(getIdFromAssayName(assayName, projectPath), runName, file, projectPath, runProperties, batchProperties);
     }
@@ -194,10 +204,39 @@ public class APIAssayHelper extends AbstractAssayHelper
         if (alr.getDefinition(assayName) == null)
         {
             if (failIfNotFound)
-                fail("Assay not found");
+                fail("Assay not found: " + assayName);
             return 0;
         }
         return ((Long) alr.getDefinition(assayName).get("id")).intValue();
+    }
+
+    /**
+     * For a given container get a list of the assays present.
+     *
+     * @param containerPath Container path.
+     * @return A list of the names of assays that were found.
+     * @throws IOException Can be thrown by the SelectRowsCommand.
+     * @throws CommandException Can be thrown by the SelectRowsCommand.
+     */
+    public static List<String> getListOfAssayNames(String containerPath) throws IOException, CommandException
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        SelectRowsCommand cmd = new SelectRowsCommand("assay", "AssayList");
+        cmd.setColumns(Arrays.asList("Name", "Description", "Type"));
+
+        String formattedContainerPath = containerPath;
+        if(!formattedContainerPath.startsWith("/"))
+            formattedContainerPath = "/" + formattedContainerPath;
+
+        List<String> resultData = new ArrayList<>();
+
+        SelectRowsResponse response = cmd.execute(connection, formattedContainerPath);
+        for(Row row : response.getRowset())
+        {
+            resultData.add(row.getValue("Name").toString());
+        }
+
+        return resultData;
     }
 
     public void saveBatch(String assayName, String runName, Map<String, Object> runProperties, List<Map<String, Object>> resultRows, String projectName) throws IOException, CommandException
@@ -223,4 +262,57 @@ public class APIAssayHelper extends AbstractAssayHelper
         cmd.setTimeout(180000); // Wait 3 minutes for assay import
         cmd.execute(_test.createDefaultConnection(false), "/" + projectPath);
     }
+
+    public Protocol createAssayDesignWithDefaults(String containerPath, String providerName, String assayName) throws Exception
+    {
+        Connection connection = _test.createDefaultConnection(true);
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand(providerName);
+        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
+
+        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
+        newAssayProtocol.setName(assayName);
+        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
+        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, containerPath);
+        return saveProtocolResponse.getProtocol();
+    }
+
+    /**
+     * Copy an assay design
+     * @param assayId rowId of the existing assay design
+     * @param containerPath container for the new assay design
+     * @param assayName name of the new assay design
+     * @return new assay protocol
+     * @throws Exception might be thrown by the LabKey Java remote API
+     */
+    public Protocol copyAssayDesign(Integer assayId, String containerPath, String assayName) throws Exception
+    {
+        Connection connection = _test.createDefaultConnection(true);
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand(assayId, true);
+        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
+
+        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
+        newAssayProtocol.setName(assayName);
+        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
+        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, containerPath);
+        return saveProtocolResponse.getProtocol();
+    }
+
+    public void createAssayWithPlateSupport(String name)
+    {
+        ReactAssayDesignerPage assayDesigner = createAssayDesign("General", name);
+
+        assayDesigner.setPlateMetadata(true);
+        assayDesigner.clickFinish();
+    }
+
+    public String getPlateTemplateLsid(String folderPath) throws Exception
+    {
+        SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General", "PlateTemplate");
+        selectRowsCmd.setColumns(List.of("Lsid"));
+
+        SelectRowsResponse resp = selectRowsCmd.execute(_test.createDefaultConnection(false), folderPath);
+
+        return String.valueOf(resp.getRows().get(0).get("Lsid"));
+    }
+
 }

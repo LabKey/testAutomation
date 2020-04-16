@@ -37,6 +37,6 @@
         <dependency path="/simpletest/testfile.js" />
     </clientDependencies>
     <requiredModuleContext>
-        <requiredModule name="Core" />
+        <module name="Core" />
     </requiredModuleContext>
 </module>

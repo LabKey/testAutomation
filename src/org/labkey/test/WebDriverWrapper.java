@@ -1028,7 +1028,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
 
             long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
-            logMessage += " [" + elapsedTime + " ms]";
+            logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
 
             return elapsedTime;
@@ -1046,7 +1046,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
 
             long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(url), milliseconds);
-            logMessage += " [" + elapsedTime + " ms]";
+            logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
             return elapsedTime;
         }
@@ -1076,7 +1076,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         RelativeUrl queryURL = new RelativeUrl("query", "metadataQuery");
         queryURL.setContainerPath(getCurrentContainerPath());
         queryURL.addParameter("schemaName", schemaName);
-        queryURL.addParameter("query.queryName", queryName);
+        queryURL.addParameter("queryName", queryName);
         queryURL.setTimeout(msTimeout);
 
         queryURL.navigate(this);
@@ -1256,6 +1256,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         Alert alert = waitForAlert();
         String text = alert.getText();
         alert.accept();
+        TestLogger.log("Accepted alert: " + text);
         return text;
     }
 
@@ -1264,6 +1265,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         Alert alert = waitForAlert();
         String text = alert.getText();
         alert.dismiss();
+        TestLogger.log("Dismissed alert: " + text);
         return text;
     }
 
@@ -1747,7 +1749,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         _testTimeout = true;
         new WebDriverWait(getDriver(), millis / 1000)
-                .ignoring(WebDriverException.class)
                 .withMessage("waiting for browser to navigate")
                 .until(ExpectedConditions.stalenessOf(toBeStale));
         waitForOnReady("jQuery");
@@ -2019,7 +2020,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (!waitFor(checker, wait))
         {
-            throw new TimeoutException(failMessage + " [" + wait + "ms]");
+            throw new TimeoutException(failMessage + TestLogger.formatElapsedTime(wait));
         }
     }
 
@@ -2282,7 +2283,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void waitForTextToDisappear(final String text, int wait)
     {
-        String failMessage = "Text: " + text + " was still present after [" + wait + "ms]";
+        String failMessage = "Text: " + text + " was still present after [" + wait + " ms]";
         waitFor(() -> !isTextPresent(text), failMessage, wait);
     }
 

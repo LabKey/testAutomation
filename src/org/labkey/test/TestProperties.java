@@ -23,7 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY;
 import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY;
@@ -257,6 +262,35 @@ public abstract class TestProperties
     public static String getAdditionalPipelineTools()
     {
         return System.getProperty("additional.pipeline.tools");
+    }
+
+    public static Map<String, Boolean> getExperimentalFeatures()
+    {
+        Map<String, Boolean> features = new HashMap<>();
+
+        Properties props = System.getProperties();
+        for (Map.Entry<Object, Object> entry : props.entrySet())
+        {
+            String key = String.valueOf(entry.getKey());
+            Boolean value = (entry.getValue() instanceof Boolean)
+                    ? (Boolean)entry.getValue()
+                    : Boolean.valueOf(String.valueOf(entry.getValue()));
+
+            if (key.startsWith("experimental.") && value != null)
+            {
+                String feature = key.substring("experimental.".length());
+                features.put(feature, value);
+            }
+        }
+
+        return features;
+    }
+
+    public static List<String> getDebugLoggingPackages()
+    {
+        String prop = System.getProperty("webtest.debug.server.packages", "");
+        String[] packages = prop.split("\\s*,\\s*");
+        return Arrays.stream(packages).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
     }
 
     private static File dumpDir = null;

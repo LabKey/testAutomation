@@ -7,35 +7,36 @@ package org.labkey.test.components.glassLibrary.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Optional;
 
+/**
+ * The 'grid' element that contains two components.
+ * <p>The first component is a grid header bar which contains the omni-box, the paging
+ * controls, 'Select All' controls etc...
+ * </p>
+ * <p>The second component is the responsive grid which is the grid data.</p>
+ */
 public class QueryGrid extends WebDriverComponent
 {
 
     final private WebDriver _driver;
     final private WebElement _queryGridPanel;
-    private Optional<GridBar> _gridBar;
-    private Optional<ResponsiveGrid> _responsiveGrid;
+    private GridBar _gridBar;
+    private ResponsiveGrid _responsiveGrid;
+    private Optional<GridTabBar> _gridTabBar;
 
     protected QueryGrid(WebElement element, WebDriver driver)
     {
         _queryGridPanel = element;
         _driver = driver;
 
-        _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).findOptional(_queryGridPanel);
-
-        if (_responsiveGrid.isPresent())
-        {
-            _gridBar = new GridBar.GridBarFinder(_driver, _responsiveGrid.get()).withQueryGrid().findOptional(_queryGridPanel);
-        }
-        else
-        {
-            _gridBar = Optional.empty();
-        }
-
+        _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).find(_queryGridPanel);
+        _gridBar = new GridBar.GridBarFinder(_driver, _queryGridPanel, _responsiveGrid).find();
+        _gridTabBar = new GridTabBar.GridTabBarFinder(_driver, _responsiveGrid).findOptional(_queryGridPanel);
     }
 
     @Override
@@ -52,19 +53,11 @@ public class QueryGrid extends WebDriverComponent
 
     public ResponsiveGrid getGrid()
     {
-        _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).findOptional(_queryGridPanel);
-        return _responsiveGrid.orElseThrow();
+        _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).find(_queryGridPanel);
+        return _responsiveGrid;
     }
 
-    public boolean hasGridBar()
-    {
-        return _gridBar.isPresent();
-    }
-
-    public boolean hasGrid()
-    {
-        return _responsiveGrid.isPresent();
-    }
+    public boolean hasTabs() { return _gridTabBar.isPresent(); }
 
     public boolean gridErrorMessagePresent()
     {
@@ -94,39 +87,44 @@ public class QueryGrid extends WebDriverComponent
 
     public GridBar getGridBar()
     {
-        return _gridBar.orElseThrow();
+        return _gridBar;
+    }
+
+    public GridTabBar getGridTabBar()
+    {
+        return _gridTabBar.orElseThrow();
     }
 
     public int getRecordCount()
     {
-
-        if(_gridBar.isPresent())
-            return _gridBar.orElseThrow().getRecordCount();
-        else
-            return _responsiveGrid.orElseThrow().getRows().size();
-
+        return _gridBar.getRecordCount();
     }
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>
     {
         private Locator _locator;
 
+        /**
+         * Find the first div with a class of panel-body and assume the grid panel is in there.
+         *
+         * @param driver Reference to a WebDriver.
+         */
         public QueryGridFinder(WebDriver driver)
         {
             super(driver);
-            _locator= Locator.xpath("//div[contains(@class,'panel ')]//div[@class='table-responsive']/ancestor::div[@class='panel-body']");
+            _locator= Locator.tagWithClass("div", "panel-body");
         }
 
-        public QueryGridFinder withGridId(String gridId)
+        /**
+         * Given a containing web element find the grid panel in it.
+         *
+         * @param driver Reference to a WebDriver.
+         * @param containingPanel A locator to scope the search for a gridPanel.
+         */
+        public QueryGridFinder(WebDriver driver, Locator containingPanel)
         {
-            _locator= Locator.xpath("//div[contains(@class, 'table-responsive')][@data-gridid='" + gridId + "']/ancestor::div[@class='panel-body']");
-            return this;
-        }
-
-        public QueryGridFinder withPanelHeader(String panelHeader)
-        {
-            _locator= Locator.xpath("//div[@class='panel-heading'][text()='" + panelHeader + "']/parent::div[contains(@class,'panel')]//div[@class='panel-body']");
-            return this;
+            super(driver);
+            _locator= containingPanel;
         }
 
         @Override

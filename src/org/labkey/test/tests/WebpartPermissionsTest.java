@@ -154,7 +154,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
          * Flow Script = Read
          */
         _containerHelper.createProject(getProjectName(), "Collaboration");
-        importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/webpartPerm/webPerms.folder.zip"));
+        importFolderFromZip(TestFileUtils.getSampleData("webpartPerm/webPerms.folder.zip"));
         //set all users to Reader so they have access to the folder
         _securityHelper.setSiteGroupPermissions("All Site Users", "Reader");
     }

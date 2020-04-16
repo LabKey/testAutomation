@@ -29,6 +29,13 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
     public LookAndFeelSettingsPage(WebDriver driver)
     {
         super(driver);
+        waitForPage();
+    }
+
+    @Override
+    protected void waitForPage()
+    {
+        Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span","Save"), Locator.tagWithText("span","Done"));
     }
 
     public String getHeaderShortName()

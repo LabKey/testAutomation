@@ -51,7 +51,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
                     new ListHelper.ListColumn(FIRST_NAME_COLUMN, FIRST_NAME_COLUMN + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
                     new ListHelper.ListColumn(LAST_NAME_COLUMN, "Last Name", ListHelper.ListColumnType.String, "The last name"),
                     new ListHelper.ListColumn(AGE_COLUMN, "Age", ListHelper.ListColumnType.Integer, "The age" + INJECT_CHARS_1),
-                    new ListHelper.ListColumn(TEST_DATE_COLUMN, "Test Date", ListHelper.ListColumnType.DateTime, "The test date")
+                    new ListHelper.ListColumn(TEST_DATE_COLUMN, "Test Date", ListHelper.ListColumnType.DateAndTime, "The test date")
             };
 
     static
@@ -337,6 +337,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
             }
         }
 
+        _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData();
         _listHelper.submitTsvData(data.toString());
         for (String[] rowData : TEST_DATA)

@@ -125,7 +125,7 @@ public class UserTest extends BaseWebDriverTest
             DomainFieldRow domainFieldRow = domainFormPanel.getField(field);
             if (domainFieldRow != null)
             {
-                domainFormPanel.removeField(field);
+                domainFormPanel.removeField(field, true);
             }
         }
         domainDesignerPage.clickFinish();
@@ -360,8 +360,8 @@ public class UserTest extends BaseWebDriverTest
         row = usersTable.getRowIndex("Email", DEACTIVATED_USER);
         assertEquals(DEACTIVATED_USER + " should not be 'Active'", "false", usersTable.getDataAsText(row, "Active"));
         usersTable.checkCheckbox(row);
-        clickButton("Re-Activate");
-        clickButton("Re-activate");
+        clickButton("Reactivate");
+        clickButton("Reactivate");
         usersTable = new DataRegionTable("Users", this);
         row = usersTable.getRowIndex("Email", DEACTIVATED_USER);
         assertEquals(DEACTIVATED_USER + " should be 'Active'", "true", usersTable.getDataAsText(row, "Active"));

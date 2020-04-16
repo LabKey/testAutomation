@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AdvancedSettingsDialog extends ModalDialog
@@ -28,31 +29,43 @@ public class AdvancedSettingsDialog extends ModalDialog
         this(row, new ModalDialogFinder(row.getDriver()).withTitle("Advanced Settings and Properties"));
     }
 
-    public boolean showInDefaultView()
+    public AdvancedSettingsDialog setAdvancedFieldSettings(Map<AdvancedFieldSetting, Object> advancedSettings)
+    {
+        for (Map.Entry<AdvancedFieldSetting, Object> setting : advancedSettings.entrySet())
+        {
+            setting.getKey().setValue(this, setting.getValue());
+        }
+        return this;
+    }
+
+    public boolean isShownInDefaultView()
     {
         return elementCache().showInDefaultView.get();
     }
+
     public AdvancedSettingsDialog showInDefaultView(boolean checked)
     {
         elementCache().showInDefaultView.set(checked);
         return this;
     }
 
-    public boolean showOnInsertView()
+    public boolean isShownOnInsertView()
     {
         return elementCache().showInInsertView.get();
     }
-    public AdvancedSettingsDialog showOnInsertView(boolean checked)
+
+    public AdvancedSettingsDialog showInInsertView(boolean checked)
     {
         elementCache().showInInsertView.set(checked);
         return this;
     }
 
-    public boolean showOnUpdateView()
+    public boolean isShownInUpdateView()
     {
         return elementCache().showInUpdateView.get();
     }
-    public AdvancedSettingsDialog showOnUpdateView(boolean checked)
+
+    public AdvancedSettingsDialog showInUpdateView(boolean checked)
     {
         elementCache().showInUpdateView.set(checked);
         getWrapper().waitFor(()-> elementCache().showInUpdateView.get().equals(checked),
@@ -60,11 +73,12 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
-    public boolean showOnDetailsView()
+    public boolean isShownInDetailsView()
     {
         return elementCache().showInDetailsView.get();
     }
-    public AdvancedSettingsDialog showOnDetailsView(boolean checked)
+
+    public AdvancedSettingsDialog showInDetailsView(boolean checked)
     {
         elementCache().showInDetailsView.set(checked);
         getWrapper().waitFor(()-> elementCache().showInDetailsView.get().equals(checked),
@@ -77,6 +91,7 @@ public class AdvancedSettingsDialog extends ModalDialog
     {
         return elementCache().defaultTypeSelect.getFirstSelectedOption().getText();
     }
+
     public AdvancedSettingsDialog setDefaultValueType(PropertiesEditor.DefaultType type)
     {
         getWrapper().waitFor(()->  elementCache().defaultTypeSelect.getOptions()
@@ -96,6 +111,7 @@ public class AdvancedSettingsDialog extends ModalDialog
     {
         return elementCache().phiSelect.getFirstSelectedOption().getText();
     }
+
     public AdvancedSettingsDialog setPHILevel(PropertiesEditor.PhiSelectType phiLevel)
     {
         getWrapper().waitFor(()->  elementCache().phiSelect.getOptions()
@@ -105,11 +121,12 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
-    public boolean enableExcludeDateShifting()
+    public boolean isExcludedFromDateShifting()
     {
         return elementCache().excludeDateShifting.get();
     }
-    public AdvancedSettingsDialog enableExcludeDateShifting(boolean checked)
+
+    public AdvancedSettingsDialog excludeFromDateShifting(boolean checked)
     {
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(
                 elementCache().excludeDateShifting.getComponentElement()));
@@ -117,11 +134,12 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
-    public boolean enableMeasure()
+    public boolean isMeasure()
     {
         return elementCache().enableMeasure.get();
     }
-    public AdvancedSettingsDialog enableMeasure(boolean checked)
+
+    public AdvancedSettingsDialog setMeasure(boolean checked)
     {
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(
                 elementCache().enableMeasure.getComponentElement()));
@@ -129,11 +147,12 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
-    public boolean enableDimension()
+    public boolean isDimension()
     {
         return elementCache().enableDimension.get();
     }
-    public AdvancedSettingsDialog enableDimension(boolean checked)
+
+    public AdvancedSettingsDialog setDimension(boolean checked)
     {
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(
                 elementCache().enableDimension.getComponentElement()));
@@ -143,11 +162,12 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
-    public boolean enableRecommendedVariable()
+    public boolean isRecommendedVariable()
     {
         return elementCache().recommendedVariable.get();
     }
-    public AdvancedSettingsDialog enableRecommendedVariable(boolean checked)
+
+    public AdvancedSettingsDialog setRecommendedVariable(boolean checked)
     {
         elementCache().recommendedVariable.set(checked);
         getWrapper().waitFor(()-> elementCache().recommendedVariable.get().equals(checked),
@@ -155,11 +175,12 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
-    public boolean missingValueEnabled()
+    public boolean missingValuesEnabled()
     {
         return elementCache().enableMissingValues.get();
     }
-    public AdvancedSettingsDialog enableMissingValue(boolean checked)
+
+    public AdvancedSettingsDialog setMissingValuesEnabled(boolean checked)
     {
         elementCache().enableMissingValues.set(checked);
         getWrapper().waitFor(()-> elementCache().enableMissingValues.get().equals(checked),
@@ -201,7 +222,7 @@ public class AdvancedSettingsDialog extends ModalDialog
         public Checkbox showInInsertView = new Checkbox(
                 Locator.input("domainpropertiesrow-shownInInsertView").findWhenNeeded(this));
         public Checkbox showInDetailsView = new Checkbox(
-                Locator.input("domainpropertiesrow-showInDetailsView").findWhenNeeded(this));
+                Locator.input("domainpropertiesrow-shownInDetailsView").findWhenNeeded(this));
 
         // default value options
         private final EnumSelect<PropertiesEditor.DefaultType> defaultTypeSelect =

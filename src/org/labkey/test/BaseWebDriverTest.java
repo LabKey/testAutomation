@@ -57,6 +57,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.admin.ExportFolderPage;
+import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
@@ -573,7 +574,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
-        Log4jUtils.resetAllLogLevels();
+        setServerDebugLogging();
+        setExperimentalFlags();
 
         // Start logging JS errors.
         resumeJsErrorChecker();
@@ -602,6 +604,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         cleanup(false);
+    }
+
+    private void setServerDebugLogging()
+    {
+        Log4jUtils.resetAllLogLevels();
+        for (String pkg : TestProperties.getDebugLoggingPackages())
+        {
+            Log4jUtils.setLogLevel(pkg, ManagerPage.LoggingLevel.DEBUG);
+        }
     }
 
     private void assertModulesAvailable(List<String> modules)
@@ -723,7 +734,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 Long elapsed = System.currentTimeMillis() - testStartTimeStamp;
 
                 TestLogger.resetLogger();
-                TestLogger.log("\\\\ Test Case Complete - " + description.getMethodName() + " [" + getElapsedString(elapsed) + "] //");
+                TestLogger.log("\\\\ Test Case Complete - " + description.getMethodName() + TestLogger.formatElapsedTime(elapsed) + " //");
             }
 
             @Override
@@ -732,7 +743,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 Long elapsed = System.currentTimeMillis() - testStartTimeStamp;
 
                 TestLogger.resetLogger();
-                TestLogger.log("\\\\ Failed Test Case - " + description.getMethodName() + " [" + getElapsedString(elapsed) + "] //");
+                TestLogger.log("\\\\ Failed Test Case - " + description.getMethodName() + TestLogger.formatElapsedTime(elapsed) + " //");
             }
 
             @Override
@@ -745,15 +756,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     TestLogger.increaseIndent();
                 }
 
-            }
-
-            private String getElapsedString(long elapsed)
-            {
-                return String.format("%dm %d.%ds",
-                        TimeUnit.MILLISECONDS.toMinutes(elapsed),
-                        TimeUnit.MILLISECONDS.toSeconds(elapsed) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
-                        elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
             }
         };
 
@@ -1011,6 +1013,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (reenableMiniProfiler)
             setMiniProfilerEnabled(true);
+
+        resetExperimentalFlags();
     }
 
     private void waitForPendingRequests(int msWait)

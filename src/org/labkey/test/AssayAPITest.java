@@ -15,15 +15,29 @@
  */
 package org.labkey.test;
 
-import org.junit.Assert;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.assay.Batch;
+import org.labkey.remoteapi.assay.GetProtocolCommand;
+import org.labkey.remoteapi.assay.ImportRunCommand;
 import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.remoteapi.assay.Protocol;
+import org.labkey.remoteapi.assay.ProtocolResponse;
+import org.labkey.remoteapi.assay.Run;
+import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
+import org.labkey.remoteapi.assay.SaveProtocolCommand;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -40,6 +54,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -47,11 +62,24 @@ import static org.junit.Assert.fail;
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class AssayAPITest extends BaseWebDriverTest
 {
-    protected final static File CREST_FILE =  TestFileUtils.getSampleData("InlineImages/crest.png");
+    protected final static File CREST_FILE = TestFileUtils.getSampleData("InlineImages/crest.png");
     protected final static File SCREENSHOT_FILE = TestFileUtils.getSampleData("InlineImages/screenshot.png");
     protected final static File FOO_XLS_FILE = TestFileUtils.getSampleData("InlineImages/foo.xls");
     protected final static File HELP_ICON_FILE = TestFileUtils.getSampleData("InlineImages/help.jpg");
-    protected final static File CREST_2_FILE =  TestFileUtils.getSampleData("InlineImages/crest-2.png");
+    protected final static File CREST_2_FILE = TestFileUtils.getSampleData("InlineImages/crest-2.png");
+
+    private final static String PLATE_METADATA = "{\n" +
+            "      \"control\" : {\n" +
+            "        \"positive\" : {\"dilution\":  0.005},\n" +
+            "        \"negative\" : {\"dilution\":  1.01}\n" +
+            "      },\n" +
+            "      \"sample\" : {\n" +
+            "        \"SA01\" : {\"dilution\": 1.05, \"Barcode\" : \"BC_111\", \"Concentration\" : 0.0125},\n" +
+            "        \"SA02\" : {\"dilution\": 2.05, \"Barcode\" : \"BC_222\"},\n" +
+            "        \"SA03\" : {\"dilution\": 3.05, \"Barcode\" : \"BC_333\"},\n" +
+            "        \"SA04\" : {\"dilution\": 4.05, \"Barcode\" : \"BC_444\"}\n" +
+            "      }\n" +
+            "    }";
 
     @Override
     protected String getProjectName()
@@ -62,7 +90,7 @@ public class AssayAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        AssayAPITest initTest = (AssayAPITest)getCurrentTest();
+        AssayAPITest initTest = (AssayAPITest) getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), "Assay");
 
         initTest.log("upload inline files to the pipeline root");
@@ -70,6 +98,8 @@ public class AssayAPITest extends BaseWebDriverTest
         initTest._fileBrowserHelper.uploadFile(CREST_FILE);
         initTest._fileBrowserHelper.uploadFile(SCREENSHOT_FILE);
         initTest._fileBrowserHelper.uploadFile(FOO_XLS_FILE);
+
+        initTest.createPlateTemplate();
     }
 
     @Test
@@ -93,7 +123,7 @@ public class AssayAPITest extends BaseWebDriverTest
     }
 
     protected void importAssayAndRun(File assayPath, int pipelineCount, String assayName, File runPath,
-                                      String runName, String[] textToCheck) throws IOException, CommandException
+                                     String runName, String[] textToCheck) throws IOException, CommandException
     {
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         assayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
@@ -106,6 +136,40 @@ public class AssayAPITest extends BaseWebDriverTest
         assertTextPresent(textToCheck);
     }
 
+    @Test
+    public void testGpatAssayOverAPI() throws Exception
+    {
+        String assayName = "testGpatAssay";
+        String assayDescription = "generated for test purposes over remoteAPI";
+
+        Connection connection = createDefaultConnection(true);
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand("General");                      // gets a template from the server
+        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, getCurrentContainerPath());
+
+        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
+        newAssayProtocol.setName(assayName)
+                .setDescription(assayDescription)
+                .setQCEnabled(true)
+                .setEditableResults(true)
+                .setEditableRuns(true);
+        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
+        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, getCurrentContainerPath());
+        Long protocolId = saveProtocolResponse.getProtocol().getProtocolId();
+
+        assertEquals(assayDescription, saveProtocolResponse.getProtocol().getDescription());
+        assertTrue(saveProtocolResponse.getProtocol().getQcEnabled());
+        assertTrue(saveProtocolResponse.getProtocol().getEditableResults());
+        assertTrue(saveProtocolResponse.getProtocol().getEditableRuns());
+
+        GetProtocolCommand protocolCommand = new GetProtocolCommand(protocolId);
+        ProtocolResponse doubleCheckProtocolResponse = protocolCommand.execute(connection, getCurrentContainerPath());
+
+        assertEquals(assayDescription, doubleCheckProtocolResponse.getProtocol().getDescription());
+        assertTrue(doubleCheckProtocolResponse.getProtocol().getQcEnabled());
+        assertTrue(doubleCheckProtocolResponse.getProtocol().getEditableResults());
+        assertTrue(doubleCheckProtocolResponse.getProtocol().getEditableRuns());
+    }
+
     // Issue 30003: support importing assay data relative to pipeline root
     @Test
     public void testImportRun_serverFilePath() throws Exception
@@ -116,10 +180,7 @@ public class AssayAPITest extends BaseWebDriverTest
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
         if (assayId == 0)
-        {
-            assayHelper.createAssayDesignWithDefaults("General", assayName);
-            assayId = assayHelper.getIdFromAssayName(assayName, getProjectName());
-        }
+            assayId = assayHelper.createAssayDesignWithDefaults(getProjectName(), "General", assayName).getProtocolId().intValue();
 
         // First, simulate file already being uploaded to the server by copying to the pipeline root
         List<String> lines1 = Arrays.asList(
@@ -262,14 +323,14 @@ public class AssayAPITest extends BaseWebDriverTest
         resultRows.add(Maps.of("ptid", "188438418", "SpecimenID", "K770K3VY-19", "DataFileField", "crest.png"));
         resultRows.add(Maps.of("ptid", "188487431", "SpecimenID", "A770K4W1-15", "DataFileField", "screenshot.png"));
 
-        ((APIAssayHelper)_assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", "foo.xls"), resultRows, getProjectName());
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", "foo.xls"), resultRows, getProjectName());
 
         log("verify assay saveBatch worked");
         goToManageAssays();
         clickAndWait(Locator.linkContainingText(assayName));
         clickAndWait(Locator.linkContainingText(runName));
         DataRegionTable table = new DataRegionTable("Data", this);
-        Assert.assertEquals(Arrays.asList("K770K3VY-19", "A770K4W1-15"), table.getColumnDataAsText("SpecimenID"));
+        assertEquals(Arrays.asList("K770K3VY-19", "A770K4W1-15"), table.getColumnDataAsText("SpecimenID"));
 
         // verify images are resolved and rendered properly
         assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 1);
@@ -281,7 +342,7 @@ public class AssayAPITest extends BaseWebDriverTest
         resultRows.add(Maps.of("ptid", "188438419", "SpecimenID", "K770K3VY-20", "DataFileField", "help.jpg"));
 
         runName = "file resolution run";
-        ((APIAssayHelper)_assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", "help.jpg"), resultRows, getProjectName());
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", "help.jpg"), resultRows, getProjectName());
         goToManageAssays();
         clickAndWait(Locator.linkContainingText(assayName));
         clickAndWait(Locator.linkContainingText(runName));
@@ -299,5 +360,174 @@ public class AssayAPITest extends BaseWebDriverTest
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("assay");
+    }
+
+    @Test
+    public void testGpatSaveBatchWithPlate() throws Exception
+    {
+        goToProjectHome();
+
+        String assayName = "GPAT-SaveBatch-Plate";
+        ((APIAssayHelper) _assayHelper).createAssayWithPlateSupport(assayName);
+
+        String runName = "created-via-saveBatch";
+        String folderPath = "/" + getProjectName();
+
+        // get the plate lsid
+        String lsid = ((APIAssayHelper) _assayHelper).getPlateTemplateLsid(folderPath);
+
+        log("create run via saveBatch");
+        Run run = new Run();
+        run.setName(runName);
+        run.setProperties(Maps.of("PlateTemplate", lsid));
+
+        List<Map<String, Object>> resultRows = new ArrayList<>();
+        resultRows.add(Maps.of("ptid", "188438418", "visitId", "111"));
+        run.setResultData(resultRows);
+
+        Batch batch = new Batch();
+        batch.setRuns(List.of(run));
+
+        int assayId = ((APIAssayHelper)_assayHelper).getIdFromAssayName(assayName, getProjectName());
+        SaveAssayBatchCommand cmd = new SaveAssayBatchCommand(assayId, batch);
+        checkErrors();
+
+        try
+        {
+            // verify that plate metadata JSON is required
+            cmd.execute(createDefaultConnection(false), folderPath);
+        }
+        catch (CommandException e)
+        {
+            assertTrue("Expecting a failure because of missing plate metadata", e.getResponseText().contains("Unable to locate the ExpData with the plate metadata"));
+        }
+        resetErrors();
+
+        JSONParser parser = new JSONParser();
+        run.setPlateMetadata((JSONObject)parser.parse(PLATE_METADATA));
+
+        try
+        {
+            // verify that the well location property is required
+            cmd.execute(createDefaultConnection(false), folderPath);
+        }
+        catch (CommandException e)
+        {
+            assertTrue("Expecting a failure because of missing plate metadata", e.getResponseText().contains("Imported data must contain a WellLocation column to support plate metadata integration"));
+        }
+        resetErrors();
+
+        resultRows.clear();
+        resultRows.add(Maps.of("ptid", "111", "visitId", "111", "wellLocation", "A11"));
+        resultRows.add(Maps.of("ptid", "222", "visitId", "111", "wellLocation", "H12"));
+        resultRows.add(Maps.of("ptid", "333", "visitId", "111", "wellLocation", "A1"));
+        resultRows.add(Maps.of("ptid", "444", "visitId", "111", "wellLocation", "B5"));
+        resultRows.add(Maps.of("ptid", "555", "visitId", "111", "wellLocation", "E8"));
+        resultRows.add(Maps.of("ptid", "666", "visitId", "111", "wellLocation", "G10"));
+
+        cmd.execute(createDefaultConnection(false), folderPath);
+
+        SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General." + assayName, "Data");
+        selectRowsCmd.addFilter("run/name", runName, Filter.Operator.EQUAL);
+        SelectRowsResponse resp = selectRowsCmd.execute(createDefaultConnection(false), folderPath);
+
+        List<Map<String, Object>> expectedRows = new ArrayList<>();
+        expectedRows.add(Maps.of("wellLocation", "A11", "plateData/dilution", 0.005));
+        expectedRows.add(Maps.of("wellLocation", "H12", "plateData/dilution", 1.01));
+        expectedRows.add(Maps.of("wellLocation", "A1", "plateData/dilution", 1.05, "plateData/barcode", "BC_111", "plateData/concentration", 0.0125));
+        expectedRows.add(Maps.of("wellLocation", "B5", "plateData/dilution", 2.05, "plateData/barcode", "BC_222"));
+        expectedRows.add(Maps.of("wellLocation", "E8", "plateData/dilution", 3.05, "plateData/barcode", "BC_333"));
+        expectedRows.add(Maps.of("wellLocation", "G10", "plateData/dilution", 4.05, "plateData/barcode", "BC_444"));
+
+        verifyPlateMetadata(resp, expectedRows);
+    }
+
+    private void verifyPlateMetadata(SelectRowsResponse resp, List<Map<String, Object>> expectedRows)
+    {
+        assertTrue("Wrong number of data rows returned", resp.getRowCount().intValue() == expectedRows.size());
+
+        int i = 0;
+        for (Map<String, Object> row : resp.getRows())
+        {
+            for (Map.Entry<String, Object> expected : expectedRows.get(i++).entrySet())
+            {
+                Object value = row.get(expected.getKey());
+
+                assertTrue("Expected property: " + expected.getKey() + " not found", value != null);
+                assertTrue("Expected property value : " + expected.getValue() + " not found", expected.getValue().equals(value));
+            }
+        }
+    }
+
+    @Test
+    public void testGpatImportRunWithPlate() throws Exception
+    {
+        goToProjectHome();
+
+        String assayName = "GPAT-ImportRun-Plate";
+        ((APIAssayHelper) _assayHelper).createAssayWithPlateSupport(assayName);
+
+        String runName = "created-via-importRun";
+        String folderPath = "/" + getProjectName();
+
+        // get the plate lsid
+        String lsid =  ((APIAssayHelper) _assayHelper).getPlateTemplateLsid(folderPath);
+        int assayId = ((APIAssayHelper)_assayHelper).getIdFromAssayName(assayName, getProjectName());
+
+        log("create run via importRun");
+        List<Map<String, Object>> resultRows = new ArrayList<>();
+        resultRows.add(Maps.of("ptid", "111", "visitId", "111", "wellLocation", "H11"));
+        resultRows.add(Maps.of("ptid", "222", "visitId", "111", "wellLocation", "A12"));
+        resultRows.add(Maps.of("ptid", "333", "visitId", "111", "wellLocation", "A3"));
+        resultRows.add(Maps.of("ptid", "444", "visitId", "111", "wellLocation", "B6"));
+        resultRows.add(Maps.of("ptid", "555", "visitId", "111", "wellLocation", "E7"));
+        resultRows.add(Maps.of("ptid", "666", "visitId", "111", "wellLocation", "G9"));
+
+        ImportRunCommand cmd = new ImportRunCommand(assayId, resultRows);
+        cmd.setProperties(Maps.of("PlateTemplate", lsid));
+        JSONParser parser = new JSONParser();
+        cmd.setPlateMetadata((JSONObject)parser.parse(PLATE_METADATA));
+        cmd.setName(runName);
+        cmd.execute(createDefaultConnection(false), folderPath);
+
+        SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General." + assayName, "Data");
+        selectRowsCmd.addFilter("run/name", runName, Filter.Operator.EQUAL);
+        SelectRowsResponse resp = selectRowsCmd.execute(createDefaultConnection(false), folderPath);
+
+        List<Map<String, Object>> expectedRows = new ArrayList<>();
+        expectedRows.add(Maps.of("wellLocation", "H11", "plateData/dilution", 0.005));
+        expectedRows.add(Maps.of("wellLocation", "A12", "plateData/dilution", 1.01));
+        expectedRows.add(Maps.of("wellLocation", "A3", "plateData/dilution", 1.05, "plateData/barcode", "BC_111", "plateData/concentration", 0.0125));
+        expectedRows.add(Maps.of("wellLocation", "B6", "plateData/dilution", 2.05, "plateData/barcode", "BC_222"));
+        expectedRows.add(Maps.of("wellLocation", "E7", "plateData/dilution", 3.05, "plateData/barcode", "BC_333"));
+        expectedRows.add(Maps.of("wellLocation", "G9", "plateData/dilution", 4.05, "plateData/barcode", "BC_444"));
+
+        verifyPlateMetadata(resp, expectedRows);
+    }
+
+    public void createPlateTemplate()
+    {
+        PlateDesignerPage.PlateDesignerParams params = new PlateDesignerPage.PlateDesignerParams(8, 12);
+        params.setTemplateType("blank");
+        params.setAssayType("GPAT (General)");
+        PlateDesignerPage plateDesigner = PlateDesignerPage.beginAt(this,params);
+
+        // create the sample well groups
+        plateDesigner.createWellGroup("SAMPLE", "SA01");
+        plateDesigner.createWellGroup("SAMPLE", "SA02");
+        plateDesigner.createWellGroup("SAMPLE", "SA03");
+        plateDesigner.createWellGroup("SAMPLE", "SA04");
+
+        // mark the regions on the plate to use the well groups
+        plateDesigner.selectWellsForWellgroup("CONTROL", "Positive", "A11", "H11");
+        plateDesigner.selectWellsForWellgroup("CONTROL", "Negative", "A12", "H12");
+
+        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA01", "A1", "H3");
+        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA02", "A4", "H6");
+        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA03", "A7", "H8");
+        plateDesigner.selectWellsForWellgroup("SAMPLE", "SA04", "A9", "H10");
+
+        plateDesigner.setName("GPAT");
+        plateDesigner.save();
     }
 }

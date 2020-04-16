@@ -134,7 +134,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         setFormElement(Locator.name("defaultDateTimeFormat"), DATE_TIME_FORMAT_INJECTION);
         clickButtonContainingText("Save");
         _listHelper.createList(getProjectName(), "IceCream", ListHelper.ListColumnType.AutoInteger, "IceCreamID",
-                new ListHelper.ListColumn("IceCreamDate", "", ListHelper.ListColumnType.DateTime, ""));
+                new ListHelper.ListColumn("IceCreamDate", "", ListHelper.ListColumnType.DateAndTime, ""));
         goToProjectHome();
         clickAndWait(Locator.linkWithText("IceCream"));
         Map<String, String> testRow = new HashMap<>();

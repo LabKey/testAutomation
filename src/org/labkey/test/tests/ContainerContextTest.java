@@ -33,6 +33,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
@@ -154,11 +155,10 @@ public class ContainerContextTest extends BaseWebDriverTest
         goToProjectHome();
         ListHelper.ListColumn[] cols = {
             new ListHelper.ListColumn("MyName", "MyName", ListHelper.ListColumnType.String, "My Name"),
-            new ListHelper.ListColumn("ListLookup", "ListLookup", ListHelper.ListColumnType.String, "List Lookup", new ListHelper.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName)),
+            new ListHelper.ListColumn("ListLookup", "ListLookup", ListHelper.ListColumnType.Integer, "List Lookup", new ListHelper.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName).setTableType(FieldDefinition.ColumnType.Integer)),
         };
         String lookupSourceListName = "Project-LookupSource-List";
         _listHelper.createList(getProjectName(), lookupSourceListName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
-        clickButton("Done");
 
         log("** Insert row into list");
         goToProjectHome();
@@ -218,10 +218,9 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Creating list with lookup to viscstudies.studies");
         ListHelper.ListColumn[] cols = {
-            new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "Study Lookup", new ListHelper.LookupInfo(null, "viscstudies", "studies")),
+            new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "Study Lookup", new ListHelper.LookupInfo(null, "viscstudies", "studies").setTableType(FieldDefinition.ColumnType.String)),
         };
         _listHelper.createList(getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
-        clickButton("Done");
 
         log("** Inserting row into list");
         goToProjectHome();
@@ -280,7 +279,6 @@ public class ContainerContextTest extends BaseWebDriverTest
         };
         String listName = folder + "-Issue15751-List";
         _listHelper.createList(getProjectName() + "/" + folder, listName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
-        clickButton("Done");
 
         log("** Creating background R script");
         goToProjectHome();

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -34,6 +33,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.property.DomainProps;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -88,32 +88,13 @@ public class TestDataGenerator
      * @param columns   The fieldSet for the domain/sampleset/list.
      * @return
      */
-    public TestDataGenerator withColumns(List<PropertyDescriptor> columns)
+    public TestDataGenerator withColumns(List<? extends PropertyDescriptor> columns)
     {
         int index = 0;
         for (PropertyDescriptor fieldDef : columns)
         {
             _columns.put(fieldDef.getName(), fieldDef);
             _indices.put(index, fieldDef);
-            index++;
-        }
-        return this;
-    }
-
-    @Deprecated
-    /**
-     * use withColumns (list<PropertyDescriptor> columns) instead
-     */
-    public TestDataGenerator withColumnSet(List<FieldDefinition> columns)
-    {
-        int index = 0;
-        for (FieldDefinition fieldDef : columns)
-        {
-            JSONObject json = new JSONObject();
-            json.putAll(fieldDef.toMap());
-            PropertyDescriptor field = new PropertyDescriptor(json);
-            _columns.put(fieldDef.getName(), field);
-            _indices.put(index, field);
             index++;
         }
         return this;
@@ -191,7 +172,7 @@ public class TestDataGenerator
         return _rows.size();
     }
 
-    private List<PropertyDescriptor> getColumns()
+    public List<PropertyDescriptor> getColumns()
     {
         List<PropertyDescriptor> cols = new ArrayList<>();
         for (PropertyDescriptor field : _columns.values())
@@ -405,9 +386,29 @@ public class TestDataGenerator
         return new TestDataValidator(_lookupInfo, _columns, _rows);
     }
 
-    // helper to generate a column or field definition
+    /**
+     * @deprecated Inline this.
+     */
+    @Deprecated
     static public PropertyDescriptor simpleFieldDef(String name, FieldDefinition.ColumnType type)
     {
-        return new PropertyDescriptor(name, type.getJsonType());
+        return new FieldDefinition(name, type);
+    }
+
+    public static TestDataGenerator createDomain(String containerPath, DomainProps def) throws CommandException
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+
+        CreateDomainCommand createSampleSetCommand = def.getCreateCommand();
+        try
+        {
+            CommandResponse response = createSampleSetCommand.execute(connection, containerPath);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to create domain", e);
+        }
+
+        return def.getTestDataGenerator(containerPath);
     }
 }

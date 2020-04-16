@@ -26,7 +26,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.QueryMetadataEditorPage;
+import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -100,7 +102,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private static final String TARGET_FOLDER = "TargetFolder";
     private static final String OTHER_FOLDER = "OtherFolder";
     private static final String STUDY_FOLDER = "StudyFolder"; // Folder used to validate fix for issues 32454 & 32456
-    private static final int MOTHER_ID = 3;
+    private static final String MOTHER = "Mother";
     private static final String READER_USER = "reader@linkedschema.test";
 
     public static final String LIST_NAME = "LinkedSchemaTestPeople";
@@ -407,6 +409,15 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         createLinkedSchema();
         verifyLinkedSchema();
+        deleteLinkedSchema();
+    }
+
+    @LogMethod
+    void deleteLinkedSchema()
+    {
+        log("Verify linked schema deletion");
+        String containerPath = getProjectName() + "/" + TARGET_FOLDER;
+        _schemaHelper.deleteSchema(containerPath, A_PEOPLE_SCHEMA_NAME);
     }
 
     @Test
@@ -427,7 +438,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         // Linked schemas disallow lookups to other folders outside of the current folder.
         //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propagating
-        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics"));
+        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
+                new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics")
+                        .setTableType(FieldDefinition.ColumnType.Integer));
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
 
@@ -440,7 +453,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
 
         //Change the Mother column lookup to point to the query, and then make sure that the table has lookups appropriately.
-        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup"));
+        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
+                new FieldDefinition.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup")
+                .setTableType(FieldDefinition.ColumnType.Integer));
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
     }
 
@@ -479,8 +494,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _listHelper.createList(getProjectName() + "/" + STUDY_FOLDER, STUDY_LIST_NAME,
                 ListHelper.ListColumnType.String, "GlobalPid",
                 new ListHelper.ListColumn("Study", "Study", ListHelper.ListColumnType.String, "Study"));
-
-        clickButton("Import Data");
+        _listHelper.goToList(STUDY_LIST_NAME);
+        _listHelper.clickImportData();
         _listHelper.submitTsvData(STUDY_LIST_DATA);
 
         log("Create the linked schema to the study.");
@@ -505,7 +520,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         log("Now validate that a wrapped field gives the expected error.");
         goToProjectHome();
         navigateToFolder(getProjectName(), STUDY_FOLDER);
-        wrapField("study", "Demographics","ParticipantId", "Pid2Consent");
+        wrapField("study", "Demographics","Participant ID", "Pid2Consent");
 
         log("Update the filter to use the wrapped field. Because the field is only wrapped and there is no foreign key it should error.");
         updatedMetaData = updatedMetaData.replace("ParticipantId/Study", "Pid2Consent/Study");
@@ -549,11 +564,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private void wrapField(String schema, String query, String fieldToWrap, String aliasFieldName)
     {
         navigateToMetadataQuery(schema, query);
-        clickButton("Alias Field", 0);
-        selectOptionByValue(Locator.gwtListBoxByName("sourceColumn"), fieldToWrap);
-        clickButton("OK", 0);
-        setFormElement(Locator.tagWithAttribute("input", "value", "Wrapped" + fieldToWrap), aliasFieldName);
-        clickButton("Save", 0);
+        QueryMetadataEditorPage queryMetadataEditorPage = new QueryMetadataEditorPage(getDriver());
+        queryMetadataEditorPage.aliasField().selectAliasField(fieldToWrap).clickApply();
+        queryMetadataEditorPage.fieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
+        queryMetadataEditorPage.clickFinish();
     }
 
     private String getCustomFilterMetadata(String familyName)
@@ -620,7 +634,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 new ListHelper.ListColumn("Z", LIST_DEF_TITLE + " Z", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL));
 
         log("** Importing some data...");
-        clickButton("Import Data");
+        _listHelper.goToList(LIST_NAME);
+        _listHelper.clickImportData();
         _listHelper.submitTsvData(LIST_DATA);
 
         log("** Applying metadata xml override to list...");
@@ -858,18 +873,16 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         }
     }
 
-    protected void changelistLookup(String sourceFolder, String tableName, int index, ListHelper.LookupInfo info)
+    protected void changelistLookup(String sourceFolder, String tableName, String fieldName, FieldDefinition.LookupInfo info)
     {
         clickFolder(sourceFolder);
 
-        goToManageLists().getGrid()
-                .viewListDesign(tableName);
+        goToManageLists();
 
-        _listHelper.clickEditDesign();
-        PropertiesEditor editor = _listHelper.getListFieldEditor();
-        editor.selectField(index).setType(info);
-        _listHelper.clickSave();
-
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(tableName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName).setLookup(info);
+        listDefinitionPage.clickSave();
     }
 
     protected void createLinkedSchemaQuery(String sourceFolder, String schemaName, String queryName, String tableName)

@@ -140,8 +140,8 @@ public class FolderExportTest extends BaseWebDriverTest
         createUsersAndGroupsWithPermissions();
 
         new File(dataDir, folderZip).delete();
-        ZipUtil zipFolder = new ZipUtil(new File(dataDir, folderArchive), dataDir);
-        zipFolder.zipIt();
+        ZipUtil zipFolder = new ZipUtil(new File(dataDir, folderArchive));
+        zipFolder.zipInto(dataDir);
     }
 
     @Test

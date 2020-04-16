@@ -20,9 +20,13 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.AbstractDataRegionExportOrSignHelper;
+import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Select;
+
+import java.io.File;
 
 public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
 {
@@ -57,6 +61,12 @@ public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
     public DataRegionTable getLogTable()
     {
         return new DataRegionTable("query", getDriver());
+    }
+
+    public File exportExcelxlsx()
+    {
+        return new DataRegionExportHelper(getLogTable())
+                .exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
     }
 
     protected ElementCache newElementCache()

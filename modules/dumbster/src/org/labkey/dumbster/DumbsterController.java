@@ -64,6 +64,7 @@ public class DumbsterController extends SpringActionController
     @RequiresPermission(ReadPermission.class)
     public class BeginAction extends SimpleViewAction
     {
+        @Override
         public ModelAndView getView(Object o, BindException errors)
         {
             if (getUser().hasRootAdminPermission())
@@ -72,6 +73,7 @@ public class DumbsterController extends SpringActionController
                 return new HtmlView("You must be a site or application administrator to view the email record.");
         }
 
+        @Override
         public NavTree appendNavTrail(NavTree root)
         {
             return root.addChild("Mail Record");
@@ -81,6 +83,7 @@ public class DumbsterController extends SpringActionController
     @RequiresPermission(AdminPermission.class)
     public class SetRecordEmailAction extends MutatingApiAction<RecordEmailForm>
     {
+        @Override
         public ApiResponse execute(RecordEmailForm form, BindException errors)
         {
             if (!getUser().hasRootAdminPermission())
@@ -165,7 +168,7 @@ public class DumbsterController extends SpringActionController
                 throw new UnauthorizedException();
 
             SmtpMessage[] messages = DumbsterManager.get().getMessages();
-            if (form.getMessage() >= messages.length)
+            if (form.getMessage() < 0 || form.getMessage() >= messages.length)
                 throw new NotFoundException();
             SmtpMessage message = messages[form.getMessage()];
             Map<String, String> map = MailHelper.getBodyParts(DumbsterManager.convertToMimeMessage(message));
@@ -205,5 +208,4 @@ public class DumbsterController extends SpringActionController
             response.flushBuffer();
         }
     }
-
 }

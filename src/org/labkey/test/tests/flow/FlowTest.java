@@ -20,8 +20,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
@@ -44,6 +44,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ import static org.junit.Assert.assertTrue;
 public class FlowTest extends BaseFlowTest
 {
     public static final String SELECT_CHECKBOX_NAME = ".select";
-    private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
+    private static final File QUV_ANALYSIS_SCRIPT = TestFileUtils.getSampleData("flow/8color/quv-analysis.xml");
     private static final String FCS_FILE_1 = "L02-060120-QUV-JS";
     private static final String FCS_FILE_2 = "L04-060120-QUV-JS";
     private static final String QUV_ANALYSIS_NAME = "QUV analysis";
@@ -510,7 +511,7 @@ public class FlowTest extends BaseFlowTest
         fields.put("Thaw Date", FieldDefinition.ColumnType.DateAndTime);
         fields.put("Comment", FieldDefinition.ColumnType.String);
 
-        uploadSampleDescriptions("/sampledata/flow/8color/sample-set.tsv", fields, new String[]{"Exp Name", "Well Id"}, new String[]{"EXPERIMENT NAME", "WELL ID"});
+        uploadSampleDescriptions(TestFileUtils.getSampleData("flow/8color/sample-set.tsv"), fields, new String[]{"Exp Name", "Well Id"}, new String[]{"EXPERIMENT NAME", "WELL ID"});
         setProtocolMetadata(null, "Sample PTID", null, "Sample Visit", true);
 
         goToFlowDashboard();
@@ -825,7 +826,7 @@ public class FlowTest extends BaseFlowTest
     {
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         DataRegionTable drt = new DataRegionTable("query", getDriver());
-        String error = Locators.alertWarning.findElement(drt.getComponentElement()).getText();
+        String error = BootstrapLocators.warningBanner.findElement(drt.getComponentElement()).getText();
         assertEquals("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.", error);
     }
 

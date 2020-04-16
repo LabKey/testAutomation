@@ -19,9 +19,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -37,7 +37,7 @@ public class HTTPApiTest extends BaseWebDriverTest
     private static final String LIST_NAME = "Test List";
 
     private static final ListHelper.ListColumn COL1 = new ListHelper.ListColumn("Like", "Like", ListHelper.ListColumnType.String, "What the color is like");
-    private static final ListHelper.ListColumn COL2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
+    private static final ListHelper.ListColumn COL2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateAndTime, "When to wear the color", "M");
     private static final ListHelper.ListColumn COL3 = new ListHelper.ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
     private final static String[][] TEST_DATA = { { "Blue", "Green", "Red", "Yellow" },
             { "Zany", "Robust", "Mellow", "Light"},
@@ -89,14 +89,15 @@ public class HTTPApiTest extends BaseWebDriverTest
 
         log("Create List");
         _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
-        _listHelper.clickEditDesign();
-        selectOptionByText(Locator.id("ff_titleColumn"), "Like");    // Explicitly set to the PK (auto title will pick wealth column)
-        clickButton("Save", 0);
-        waitForElement(Locator.id("button_Import Data"), WAIT_FOR_JAVASCRIPT);
-        assertTextPresent("Like");
+        _listHelper.goToList(LIST_NAME);
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
+        listDefinitionPage.openAdvancedListSettings().setFieldUsedForDisplayTitle("Like").clickApply();
+        listDefinitionPage.clickSave();
+        _listHelper.goToList(LIST_NAME);
+        waitForText("Like");
 
         log("Upload data");
-        clickButton("Import Data");
+        _listHelper.clickImportData();
         _listHelper.submitTsvData(LIST_DATA);
     }
 

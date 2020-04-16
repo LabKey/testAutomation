@@ -20,7 +20,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
@@ -32,7 +31,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class, Wiki.class})
+@Category({DailyA.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class TimelineTest extends BaseWebDriverTest
 {
@@ -49,8 +48,8 @@ public class TimelineTest extends BaseWebDriverTest
     {
         new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "The first name"),
         new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
-        new ListHelper.ListColumn("DOB", "DOB", ListHelper.ListColumnType.DateTime, "Date of Birth"),
-        new ListHelper.ListColumn("DOD", "DOD", ListHelper.ListColumnType.DateTime, "Date of Death"),
+        new ListHelper.ListColumn("DOB", "DOB", ListHelper.ListColumnType.DateAndTime, "Date of Birth"),
+        new ListHelper.ListColumn("DOD", "DOD", ListHelper.ListColumnType.DateAndTime, "Date of Death"),
     };
 
     private final static String[][] TEST_DATA =
@@ -174,7 +173,8 @@ public class TimelineTest extends BaseWebDriverTest
             }
         }
 
-        clickButton("Import Data");
+        _listHelper.goToList(LIST_NAME);
+        _listHelper.clickImportData();
         _listHelper.submitTsvData(data.toString());
         for (String[] rowData : TEST_DATA)
         {
