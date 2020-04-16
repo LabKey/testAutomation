@@ -26,6 +26,8 @@ import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.GetQueriesCommand;
+import org.labkey.remoteapi.query.GetQueriesResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -411,4 +413,22 @@ public class TestDataGenerator
 
         return def.getTestDataGenerator(containerPath);
     }
+
+    static public CommandResponse deleteDomain(final String containerPath, final String schema, final String domainName)
+            throws IOException, CommandException
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        DropDomainCommand delCmd = new DropDomainCommand(schema, domainName);
+        return delCmd.execute(connection, containerPath);
+    }
+
+    static public boolean doesDomainExists(final String containerPath, final String schema, final String domainName)
+            throws IOException, CommandException
+    {
+        GetQueriesCommand qcmd = new GetQueriesCommand(schema);
+        GetQueriesResponse resp = qcmd.execute(WebTestHelper.getRemoteApiConnection(), containerPath);
+
+        return resp.getQueryNames().contains(domainName);
+    }
+
 }

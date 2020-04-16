@@ -125,19 +125,16 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      *
      * @return A reference to the appropriate combo that will be for the new parent sample or source type.
      */
-    private ReactSelect getTypeCombo()
+    protected ReactSelect getAddNewTypeCombo()
     {
         int numOfTypes = numberOfTypeFields();
 
-        ReactSelect typeCombo = ReactSelect.finder(getDriver())
-                .followingLabelWithSpan(_parentType.getTextValue() + " Type " + numOfTypes)
-                .find(this);
+        ReactSelect typeCombo = getTypeCombo(_parentType.getTextValue() + " Type " + numOfTypes);
 
-        // If the number of fields is > 1 or the one combo that is present does not contain the text "Select a..." it
-        // means that there is already a parent added.
-        if((numOfTypes > 1) ||
-                (!typeCombo.getSelections().contains("Select a Source Type ...") &&
-                        !typeCombo.getSelections().contains("Select a Parent Type ...")))
+        // If the 'last' combo in the list contains the text "Select a..." it can be used to add a new type.
+        // If it does not contain that then the addButton must be clicked.
+        if(!typeCombo.getSelections().contains("Select a Source Type ...") &&
+                        !typeCombo.getSelections().contains("Select a Parent Type ..."))
         {
             // Since there is already a parent need to click the "Add" button to add a new one.
             elementCache().addButton.click();
@@ -158,12 +155,65 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     }
 
     /**
+     * Get the type combos by it's index (zero based). This would include any 'add new' combos.
+     *
+     * @return A combo at the given position in the colection of combos..
+     */
+    protected ReactSelect getTypeCombo(int index)
+    {
+        return getAllTypeCombo().get(index);
+    }
+
+    /**
+     * Get the type combos by it's index (zero based). This would include any 'add new' combos.
+     *
+     * @return A combo at the given position in the colection of combos..
+     */
+    protected ReactSelect getTypeCombo(String labelText)
+    {
+        return ReactSelect.finder(getDriver())
+                .followingLabelWithSpan(labelText)
+                .find(this);
+    }
+
+    /**
+     * Get the type combos by it's index (zero based). This would include any 'add new' combos.
+     *
+     * @return A combo at the given position in the colection of combos..
+     */
+    protected ReactSelect getTypeComboWithSelection(String selection)
+    {
+        ReactSelect theCombo = null;
+        List<ReactSelect> allCombos = getAllTypeCombo();
+        for(ReactSelect combo : allCombos)
+        {
+            if(combo.getSelections().contains(selection))
+            {
+                theCombo = combo;
+                break;
+            }
+        }
+
+        return theCombo;
+    }
+
+    /**
+     * Get all of the type combos in the panel. This includes those already set and any 'add new' combos as well.
+     *
+     * @return A collection of all of the combos that select the type.
+     */
+    protected List<ReactSelect> getAllTypeCombo()
+    {
+        return ReactSelect.finder(getDriver()).findAll(this);
+    }
+
+    /**
      * Get the combo that will list the individual elements, either samples or sources, that will become a parent.
      * This combo will only show up after a type is selected.
      *
      * @return A reference to the appropriate combo that will be for the new parent sample or source.
      */
-    private FilteringReactSelect getIdCombo()
+    protected FilteringReactSelect getIdCombo()
     {
         // Will get the ID Combo for the last field. A new parent is added to the end.
         int numOfTypes = numberOfTypeFields();
@@ -198,7 +248,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public ParentEntityEditPanel addType(String typeName, List<String> ids)
     {
-        ReactSelect parentTypeCombo = getTypeCombo();
+        ReactSelect parentTypeCombo = getAddNewTypeCombo();
 
         getWrapper().scrollIntoView(parentTypeCombo.getComponentElement());
 
