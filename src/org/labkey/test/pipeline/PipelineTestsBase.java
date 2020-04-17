@@ -25,7 +25,7 @@ import static org.junit.Assert.assertFalse;
 
 /**
  * MS2TestsBase class
-* <p/>
+*
 * Created: Aug 15, 2007
 *
 * @author bmaclean

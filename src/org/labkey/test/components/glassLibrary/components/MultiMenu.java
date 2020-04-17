@@ -31,7 +31,6 @@ public class MultiMenu extends BootstrapMenu
      * Send in a list of menu text to click, they will be clicked in the order given.
      *
      * @param pathToAction List of the menus to click
-     * @return void
      **/
     public void doMenuAction(List<String> pathToAction)
     {

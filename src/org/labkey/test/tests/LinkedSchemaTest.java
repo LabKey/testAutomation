@@ -68,7 +68,7 @@ import static org.junit.Assert.assertTrue;
  * - Linked schema tables have FKs and URLs removed, other metadata is intact.
  * - Linked schema template or instance metadata xml
  *   (overrides title and URL for P, Q, R, S, T, U, V, W)
- * - File metadata xml in linkedschematest/queries/&lt;schema>/LinkedSchemaTestPeople.query.xml
+ * - File metadata xml in linkedschematest/queries/&lt;schema&gt;/LinkedSchemaTestPeople.query.xml
  *   (overrides title and URL for P, Q, R, S, T, U, V)
  * - Database metadata xml
  *   (overrides title and URL for P, Q, R, S, T, U)
@@ -87,7 +87,7 @@ import static org.junit.Assert.assertTrue;
  * - Linked schema tables have FKs and URLs removed, other metadata is intact.
  * - Linked schema template or instance metadata xml
  *   (overrides title and URL for P, Q, R)
- * - File metadata xml in linkedschematest/queries/&lt;schema>/LinkedSchemaTestQuery.query.xml
+ * - File metadata xml in linkedschematest/queries/&lt;schema&gt;/LinkedSchemaTestQuery.query.xml
  *   (overrides title and URL for P, Q)
  * - Database metadata xml
  *   (overrides title and URL for P)

@@ -222,7 +222,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
      * Set value of scale widget
      * @param rowIndex row Index of field to change scale on
      * @param newScale new scale value
-     * @param checkMax Override flag to set Max (will not unset Max if newScale >4K)
+     * @param checkMax Override flag to set Max (will not unset Max if newScale &gt; 4K)
      */
     private void changeScale(DomainFormPanel fieldsPanel, int rowIndex, int newScale, boolean checkMax)
     {
