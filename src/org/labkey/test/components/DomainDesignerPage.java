@@ -5,19 +5,20 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.DomainPanel;
 import org.labkey.test.components.domain.UnsavedChangesModalDialog;
-import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCache>
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
+public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.ElementCache>
 {
     public DomainDesignerPage(WebDriver driver)
     {
@@ -32,23 +33,19 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public void clickFinish()
     {
-        scrollIntoView(elementCache().finishButton());
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton()));
-        clickAndWait(elementCache().finishButton());
+        clickSave();
     }
 
     public DomainDesignerPage clickFinishExpectingError()
     {
-        scrollIntoView(elementCache().finishButton());
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton()));
-        elementCache().finishButton().click();
-        waitForError();
+        clickSaveExpectingErrors();
         return this;
     }
 
+    @Override
     public UnsavedChangesModalDialog clickCancel()
     {
-        elementCache().cancelBtn().click();
+        clickCancel(false);
         UnsavedChangesModalDialog unsavedChangesModal = new UnsavedChangesModalDialog(
                 new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"));
         return unsavedChangesModal;
@@ -58,16 +55,6 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
     {
         clickCancel().discardChanges();
         return new DomainDesignerPage(getDriver());
-    }
-
-    public boolean isAlertVisible()
-    {
-        return Locators.alert.findOptionalElement(getDriver()).map(WebElement::isDisplayed).orElse(false);
-    }
-
-    public WebElement finishButton()
-    {
-        return elementCache().finishButton();
     }
 
     // this will return the first domain fields panel if there are multiple on the page
@@ -108,7 +95,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public String waitForError()
     {
-        waitFor(()-> BootstrapLocators.errorBanner.existsIn(getDriver()),
+        WebDriverWrapper.waitFor(()-> BootstrapLocators.errorBanner.existsIn(getDriver()),
                 "the error alert did not appear as expected", 1000);
         return  errorAlert().getText();
     }
@@ -120,7 +107,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public String waitForWarning()
     {
-        waitFor(()-> BootstrapLocators.warningBanner.existsIn(getDriver()),
+        WebDriverWrapper.waitFor(()-> BootstrapLocators.warningBanner.existsIn(getDriver()),
                 "the warning alert did not appear as expected", 1000);
         return  warningAlert().getText();
     }
@@ -132,7 +119,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public String waitForInfo()
     {
-        waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
+        WebDriverWrapper.waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
                 "the info alert did not appear as expected", 1000);
         return  infoAlert().getText();
     }
@@ -144,7 +131,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
 
     public String waitForAnyAlert()
     {
-        WebElement alert = Locator.waitForAnyElement(shortWait(),
+        WebElement alert = Locator.waitForAnyElement(getWrapper().shortWait(),
                 BootstrapLocators.errorBanner, BootstrapLocators.infoBanner, BootstrapLocators.warningBanner, BootstrapLocators.successBanner);
         return alert.getText();
     }
@@ -165,7 +152,7 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends BaseDomainDesigner<ElementCache>.ElementCache
     {
         DomainFormPanel firstDomainFormPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())   // for situations where there's only one on the page
                 .timeout(WAIT_FOR_JAVASCRIPT)
@@ -175,18 +162,6 @@ public class DomainDesignerPage extends LabKeyPage<DomainDesignerPage.ElementCac
         {
             return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).findWhenNeeded(this);
         }                                                     // and the caller is too lazy to specify which one they want
-
-        WebElement finishButton()
-        {
-            return Locator.button("Save")
-                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        }
-
-        WebElement cancelBtn()
-        {
-            return Locator.button("Cancel")
-                    .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        }
     }
 
     public static class Locators
