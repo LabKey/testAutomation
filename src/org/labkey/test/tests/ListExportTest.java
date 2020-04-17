@@ -118,7 +118,7 @@ public class ListExportTest extends AbstractExportTest
     }
 
     @Override
-    public void goToDataRegionPage()
+    protected void goToDataRegionPage()
     {
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(LIST_NAME));
