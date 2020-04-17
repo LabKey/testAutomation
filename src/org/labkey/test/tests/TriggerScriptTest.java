@@ -35,12 +35,13 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Data;
-import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.Alert;
 
 import java.io.IOException;
@@ -790,7 +791,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     /**
      * Setup the data class
      */
-    private void setupDataClass()
+    private void setupDataClass() throws CommandException
     {
         //Setup Data Class
         goToProjectHome();
@@ -802,13 +803,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
             drt.clickHeaderButtonAndWait("Delete");
             clickButton("Confirm Delete");
         }
-        drt.clickInsertNewRow();
-        setFormElement(Locator.name("name"), DATA_CLASSES_NAME);
-        clickButton("Create");
-        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-        domainFormPanel.addField(COMMENTS_FIELD).setLabel(COMMENTS_FIELD);
-        domainFormPanel.addField(COUNTRY_FIELD).setLabel(COUNTRY_FIELD);
-        domainDesignerPage.clickFinish();
+
+        DataClassDefinition dataClass = new DataClassDefinition(DATA_CLASSES_NAME)
+                .setFields(List.of(new FieldDefinition(COMMENTS_FIELD), new FieldDefinition(COUNTRY_FIELD)));
+        TestDataGenerator.createDomain(getProjectName(), dataClass);
     }
 }
