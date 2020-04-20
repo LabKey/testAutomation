@@ -6,6 +6,9 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+/**
+ * Automates the labkey UI for node details (implemented in /lineage/LineageNodeList.tsx)
+ */
 public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
 {
     final WebElement _el;

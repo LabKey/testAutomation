@@ -10,12 +10,15 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Automates the Labkey UI lineageGraph component implemented in /components/lineage/lineageGraph.tsx
+ */
 public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 {
     final WebElement _el;
     final WebDriver _driver;
 
-    public LineageGraph(WebElement element, WebDriver driver)
+    protected LineageGraph(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
