@@ -42,7 +42,6 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     public ReactAssayDesignerPage(WebDriver driver)
     {
         super(driver);
-        elementCache().descriptionInput.getComponentElement().isEnabled();
     }
 
     public ReactAssayDesignerPage setName(String name)
@@ -243,7 +242,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public class ElementCache extends DomainDesignerPage.ElementCache
     {
-        protected final DomainPanel<?, ?> propertiesPanel = new DomainPanel.DomainPanelFinder(getDriver()).index(0).findWhenNeeded(this);
+        protected final DomainPanel<?, ?> propertiesPanel = new DomainPanel.DomainPanelFinder(getDriver()).index(0).timeout(5000).findWhenNeeded(this);
         final Input nameInput = Input(Locator.id("assay-design-name"), getDriver()).findWhenNeeded(propertiesPanel);
         final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(propertiesPanel);
         final Select autoCopyTargetSelect = Select(Locator.id("assay-design-autoCopyTargetContainerId")).findWhenNeeded(propertiesPanel);
