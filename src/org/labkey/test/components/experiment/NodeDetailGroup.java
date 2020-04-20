@@ -9,13 +9,13 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class NodeDetails extends WebDriverComponent<NodeDetails.ElementCache>
+public class NodeDetailGroup extends WebDriverComponent<NodeDetailGroup.ElementCache>
 {
     final WebElement _el;
     final WebDriver _driver;
     final String _groupName;
 
-    public NodeDetails(WebElement element, String groupName, WebDriver driver)
+    public NodeDetailGroup(WebElement element, String groupName, WebDriver driver)
     {
         _el = element;
         _driver = driver;
@@ -30,25 +30,25 @@ public class NodeDetails extends WebDriverComponent<NodeDetails.ElementCache>
             return elementCache().summary.getText();
     }
 
-    public NodeDetailItem getItem(String itemName)
+    public NodeDetail getItem(String itemName)
     {
         return  elementCache().items().stream().filter(a-> a.getName().equals(itemName))
                 .findFirst().orElseThrow();
     }
 
-    public NodeDetailItem getItemByTitle(String title)
+    public NodeDetail getItemByTitle(String title)
     {
         return elementCache().item(title);
     }
 
-    public List<NodeDetailItem> getItems()
+    public List<NodeDetail> getItems()
     {
         return elementCache().items();
     }
 
     public List<String> getItemNames()
     {
-        return elementCache().items().stream().map(NodeDetailItem::getName).collect(Collectors.toList());
+        return elementCache().items().stream().map(NodeDetail::getName).collect(Collectors.toList());
     }
 
     @Override
@@ -75,18 +75,18 @@ public class NodeDetails extends WebDriverComponent<NodeDetails.ElementCache>
         WebElement summary = Locator.tagWithClass("summary", "lineage-name")
                 .findElement(this);
 
-        List<NodeDetailItem> items()
+        List<NodeDetail> items()
         {
-            return new NodeDetailItem.NodeDetailItemFinder(getDriver()).findAll(this);
+            return new NodeDetail.NodeDetailItemFinder(getDriver()).findAll(this);
         }
 
-        NodeDetailItem item(String title)
+        NodeDetail item(String title)
         {
-            return new NodeDetailItem.NodeDetailItemFinder(getDriver()).withTitle(title).find(this);
+            return new NodeDetail.NodeDetailItemFinder(getDriver()).withTitle(title).find(this);
         }
     }
 
-    public static class NodeDetailsFinder extends WebDriverComponentFinder<NodeDetails, NodeDetailsFinder>
+    public static class NodeDetailsFinder extends WebDriverComponentFinder<NodeDetailGroup, NodeDetailsFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tag("details")
                 .withChild(Locator.tagWithClass("summary", "lineage-name"));
@@ -104,9 +104,9 @@ public class NodeDetails extends WebDriverComponent<NodeDetails.ElementCache>
         }
 
         @Override
-        protected NodeDetails construct(WebElement el, WebDriver driver)
+        protected NodeDetailGroup construct(WebElement el, WebDriver driver)
         {
-            return new NodeDetails(el, _title, driver);
+            return new NodeDetailGroup(el, _title, driver);
         }
 
         @Override

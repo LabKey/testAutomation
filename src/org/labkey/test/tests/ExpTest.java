@@ -107,7 +107,7 @@ public class ExpTest extends BaseWebDriverTest
         Locator.linkWithSpan("Toggle Beta Graph (new!)").waitForElement(getDriver(), 4000)
                 .click();
         LineageGraph graph = new LineageGraph.LineageGraphFinder(getDriver()).waitFor();
-        graph.getDetails("Data Parents").getItemByTitle("Data: CAexample_mini.mzXML").clickOverViewLink();
+        graph.getDetailGroup("Data Parents").getItemByTitle("Data: CAexample_mini.mzXML").clickOverViewLink(true);
         assertTextPresent("CAexample_mini.mzXML", "File Not Found");
 
         // Write a simple custom query that wraps the data table

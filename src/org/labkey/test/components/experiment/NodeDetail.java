@@ -6,12 +6,12 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class NodeDetailItem extends WebDriverComponent<NodeDetailItem.ElementCache>
+public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
 {
     final WebElement _el;
     final WebDriver _driver;
 
-    public NodeDetailItem(WebElement element, WebDriver driver)
+    public NodeDetail(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
@@ -19,10 +19,7 @@ public class NodeDetailItem extends WebDriverComponent<NodeDetailItem.ElementCac
 
     public String getName()
     {
-        if (isNameLinked())
-            return elementCache().nameLink.findElement(this).getText();
-        else
-            return elementCache().nameSpan.findElement(this).getText();
+       return elementCache().nameElement.getText();
     }
 
     private boolean isNameLinked()
@@ -30,18 +27,26 @@ public class NodeDetailItem extends WebDriverComponent<NodeDetailItem.ElementCac
         return elementCache().nameSpan.existsIn(this);
     }
 
-    public void clickOverViewLink()
+    public void clickOverViewLink(boolean wait)
     {
         getWrapper().mouseOver(getComponentElement());
         getWrapper().waitFor(()-> elementCache().overviewLink.isEnabled(), 1000);
-        getWrapper().clickAndWait(elementCache().overviewLink);
+        if (wait)
+            getWrapper().clickAndWait(elementCache().overviewLink);
+        else
+            elementCache().overviewLink.click();
     }
 
-    public void getLineageGraphLink()
+    public void clickLineageGraphLink()
     {
         getWrapper().mouseOver(getComponentElement());
         getWrapper().waitFor(()-> elementCache().lineageGraphLink.isEnabled(), 1000);
         getWrapper().clickAndWait(elementCache().lineageGraphLink);
+    }
+
+    public WebElement getIcon()
+    {
+        return elementCache().icon;
     }
 
     @Override
@@ -65,22 +70,21 @@ public class NodeDetailItem extends WebDriverComponent<NodeDetailItem.ElementCac
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement image = Locator.tagWithClass("img", "lineage-sm-icon")
+        final WebElement icon = Locator.tagWithClass("img", "lineage-sm-icon")
                 .findWhenNeeded(this);
 
         final WebElement overviewLink = Locator.linkWithSpan("Overview")
                 .findWhenNeeded(this).withTimeout(2000);
         final WebElement lineageGraphLink = Locator.linkWithSpan("Lineage")
                 .findWhenNeeded(this).withTimeout(2000);
-        final Locator nameLink = Locator.tagWithClass("a", "pointer");
-        final Locator nameSpan = Locator.tag("span");
+        final Locator.XPathLocator nameLink = Locator.tagWithClass("a", "pointer");
+        final Locator.XPathLocator nameSpan = Locator.tag("span");
+        final WebElement nameElement = Locator.XPathLocator.union(nameLink, nameSpan).findElement(this);
     }
 
-    public static class NodeDetailItemFinder extends WebDriverComponentFinder<NodeDetailItem, NodeDetailItemFinder>
+    public static class NodeDetailItemFinder extends WebDriverComponentFinder<NodeDetail, NodeDetailItemFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("li", "lineage-name");
-        private String _name = null;
-        private String _linkedName = null;
         private String _title = null;
 
         public NodeDetailItemFinder(WebDriver driver)
@@ -95,9 +99,9 @@ public class NodeDetailItem extends WebDriverComponent<NodeDetailItem.ElementCac
         }
 
         @Override
-        protected NodeDetailItem construct(WebElement el, WebDriver driver)
+        protected NodeDetail construct(WebElement el, WebDriver driver)
         {
-            return new NodeDetailItem(el, driver);
+            return new NodeDetail(el, driver);
         }
 
 
