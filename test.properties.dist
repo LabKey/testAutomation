@@ -1,0 +1,58 @@
+## Server properties
+# These properties define how we will connect to the server under test
+labkey.port=8080
+labkey.server=http://localhost
+labkey.contextpath=/labkey
+
+## Server configuration properties
+# These define certain Tomcat startup properties. Mostly only used by TeamCity
+disableAssertions=false
+devMode=true
+additional.pipeline.tools=
+# Enable/Disable experimental features
+#experimental.legacy-lineage=false
+
+## Test suite construction properties
+# Properties used to specify which tests to run and where to find them
+suite=
+test=
+addToSuite=
+removeFromSuite=
+shuffleTests=false
+test.packages=org.labkey.test
+extra.test.packages=
+
+## Runtime test properties - additional checks
+linkCheck=false
+injectCheck=false
+crawlerTimeout=120
+memCheck=false
+scriptCheck=true
+queryCheck=false
+viewCheck=true
+use.cloud.pipeline=false
+cloud.pipeline.bucket=s3-labkey-test-teamcity
+webtest.ignoreMissingModules=false
+
+## Test runner properties
+haltOnError=true
+cleanOnly=false
+clean=false
+webtest.timeout.multiplier=1.0
+close.on.fail=false
+debugSuspendSelenium=n
+selenium.debug.port=5005
+failure.output.dir=build/modules/test/test/logs
+# test.credentials.file=/home/tchad/development/labkey/test_secure/test.credentials.json
+
+## WebDriver properties
+selenium.browser=firefox
+webdriver.gecko.driver=
+webdriver.chrome.driver=
+selenium.firefox.binary=
+selenium.reuseWebDriver=true
+webtest.webdriver.logging=false
+webtest.webdriver.headless=false
+
+## Special properties
+dumpTsv=

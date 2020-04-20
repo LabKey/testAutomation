@@ -106,7 +106,7 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
         DomainFormPanel fieldsPanel = getFieldsPanel();
         if (listKeyType == ListHelper.ListColumnType.AutoInteger)
         {
-            fieldsPanel.startNewDesign("REMOVE_ME");
+            fieldsPanel.manuallyDefineFields("REMOVE_ME");
             selectAutoIntegerKeyField();
             sleep(500); // wait just a bit for the auto integer key field to be added
             fieldsPanel.getField(0).setName(listKeyName);
@@ -114,7 +114,7 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
         }
         else
         {
-            DomainFieldRow keyField = fieldsPanel.startNewDesign(listKeyName);
+            DomainFieldRow keyField = fieldsPanel.manuallyDefineFields(listKeyName);
             keyField.setType(FieldDefinition.ColumnType.valueOf(listKeyType.name()));
             selectKeyField(listKeyName);
         }

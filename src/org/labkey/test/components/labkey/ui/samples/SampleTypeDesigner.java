@@ -2,26 +2,21 @@ package org.labkey.test.components.labkey.ui.samples;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
-import org.labkey.test.components.domain.DomainDesigner;
-import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-import static org.labkey.test.WebDriverWrapper.sleep;
-
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/samples/SampleTypeDesigner.tsx
  * This is a full-page component and should be wrapped by a context-specific page class
  */
-public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extends DomainDesigner<SampleTypeDesigner<T>.ElementCache>
+public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extends EntityTypeDesigner<T>
 {
-    public static final String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
+    public final static String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
 
     public SampleTypeDesigner(WebDriver driver)
     {
@@ -29,67 +24,18 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
     }
 
     @Override
+    protected abstract T getThis();
+
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected abstract T getThis();
-    
-    public T removeField(boolean confirmDialogExpected, String fieldName)
+    @Override
+    protected ElementCache elementCache()
     {
-        getFieldsPanel().removeField(fieldName, confirmDialogExpected);
-        sleep(250); // wait for collapse animation
-        return getThis();
-    }
-
-    public T addFields(List<FieldDefinition> fields)
-    {
-        DomainFormPanel domainEditor = getFieldsPanel();
-        for (FieldDefinition field : fields)
-        {
-            domainEditor.addField(field);
-        }
-        return getThis();
-    }
-
-    public T setName(String name)
-    {
-        expandPropertiesPanel();
-        elementCache().nameInput.set(name);
-        return getThis();
-    }
-
-    public String getName()
-    {
-        expandPropertiesPanel();
-        return elementCache().nameInput.get();
-    }
-
-    public T setNameExpression(String nameExpression)
-    {
-        expandPropertiesPanel();
-        elementCache().nameExpressionInput.set(nameExpression);
-        return getThis();
-    }
-
-    public String getNameExpression()
-    {
-        expandPropertiesPanel();
-        return elementCache().nameExpressionInput.get();
-    }
-
-    public T setDescription(String description)
-    {
-        expandPropertiesPanel();
-        elementCache().descriptionInput.set(description);
-        return getThis();
-    }
-
-    public String getDescription()
-    {
-        expandPropertiesPanel();
-        return elementCache().descriptionInput.get();
+        return  (ElementCache) super.elementCache();
     }
 
     public T addParentAlias(String alias)
@@ -168,12 +114,9 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         return elementCache().parentAliasSelect(index).getSelections().get(0);
     }
 
-    protected class ElementCache extends DomainDesigner.ElementCache
+    protected class ElementCache extends EntityTypeDesigner<T>.ElementCache
     {
-        protected final Input nameInput = Input.Input(Locator.id("entity-name"), getDriver()).findWhenNeeded(propertiesPanel);
-        protected final Input nameExpressionInput = Input.Input(Locator.id("entity-nameExpression"), getDriver()).waitFor(propertiesPanel);
-        protected final Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver()).findWhenNeeded(propertiesPanel);
-        protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(propertiesPanel);
+        protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
 
         protected List<Input> parentAliases()
         {
