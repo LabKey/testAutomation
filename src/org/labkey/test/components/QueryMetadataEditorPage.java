@@ -42,10 +42,10 @@ public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorP
     }
 
     @Override
-    public Void clickSave()
+    public QueryMetadataEditorPage clickSave()
     {
-        super.clickSave(false);
-        return null;
+        elementCache().saveButton.click();
+        return this;
     }
 
     @Override

@@ -38,7 +38,7 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
 
     public UnsavedChangesModalDialog clickCancelWithUnsavedChanges()
     {
-        clickCancel(false);
+        elementCache().cancelButton.click();
         UnsavedChangesModalDialog unsavedChangesModal = new UnsavedChangesModalDialog(
                 new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"));
         return unsavedChangesModal;

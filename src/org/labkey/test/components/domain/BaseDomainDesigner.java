@@ -42,22 +42,15 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
         return elementCache().cancelButton.isEnabled();
     }
 
+    /**
+     * Click cancel button. Subclasses should override to return a particular destination page page or if a page load is
+     * not expected.
+     * @return Varies by designer and context. 'null' by default
+     */
     public Object clickCancel()
     {
-        clickCancel(true);
+        getWrapper().clickAndWait(elementCache().cancelButton);
         return null;
-    }
-
-    protected final void clickCancel(boolean expectPageLoad)
-    {
-        if (expectPageLoad)
-        {
-            getWrapper().doAndWaitForPageToLoad(() -> elementCache().cancelButton.click());
-        }
-        else
-        {
-            elementCache().cancelButton.click();
-        }
     }
 
     public boolean isSaveButtonEnabled()
@@ -65,22 +58,15 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
         return elementCache().saveButton.isEnabled();
     }
 
+    /**
+     * Save changes to domain. Subclasses should override to return a particular destination page or if a page load is
+     * not expected.
+     * @return Varies by designer and context. 'null' by default
+     */
     public Object clickSave()
     {
-        clickSave(true);
+        getWrapper().clickAndWait(elementCache().saveButton);
         return null;
-    }
-
-    protected final void clickSave(boolean expectPageLoad)
-    {
-        if (expectPageLoad)
-        {
-            getWrapper().doAndWaitForPageToLoad(() -> elementCache().saveButton.click());
-        }
-        else
-        {
-            elementCache().saveButton.click();
-        }
     }
 
     public List<String> clickSaveExpectingErrors()
@@ -94,7 +80,7 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
 
     public abstract class ElementCache extends Component<EC>.ElementCache
     {
-        protected final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
-        protected final WebElement saveButton = Locator.css(".domain-designer-buttons > .pull-right").findWhenNeeded(this);
+        public final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
+        public final WebElement saveButton = Locator.css(".domain-designer-buttons > .pull-right").findWhenNeeded(this);
     }
 }
