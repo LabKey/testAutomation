@@ -95,6 +95,6 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
     public abstract class ElementCache extends Component<EC>.ElementCache
     {
         protected final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
-        protected final WebElement saveButton = Locator.css(".domain-designer-buttons > .btn-primary").findWhenNeeded(this);
+        protected final WebElement saveButton = Locator.css(".domain-designer-buttons > .pull-right").findWhenNeeded(this);
     }
 }
