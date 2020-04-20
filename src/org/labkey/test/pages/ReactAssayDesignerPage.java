@@ -224,13 +224,6 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return expandFieldsPanel("Results");
     }
 
-    public DomainFormPanel expandFieldsPanel(String title)
-    {
-        DomainFormPanel panel = fieldsPanel(title);
-        panel.expand();
-        return panel;
-    }
-
     protected void expandPropertiesPanel()
     {
         elementCache().propertiesPanel.expand();
@@ -250,7 +243,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public class ElementCache extends DomainDesignerPage.ElementCache
     {
-        protected final DomainPanel propertiesPanel = new DomainPanel.DomainPanelFinder(getDriver()).index(0).findWhenNeeded(this);
+        protected final DomainPanel<?, ?> propertiesPanel = new DomainPanel.DomainPanelFinder(getDriver()).index(0).findWhenNeeded(this);
         final Input nameInput = Input(Locator.id("assay-design-name"), getDriver()).findWhenNeeded(propertiesPanel);
         final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(propertiesPanel);
         final Select autoCopyTargetSelect = Select(Locator.id("assay-design-autoCopyTargetContainerId")).findWhenNeeded(propertiesPanel);

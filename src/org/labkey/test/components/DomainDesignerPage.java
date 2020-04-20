@@ -36,25 +36,12 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
         clickSave();
     }
 
-    public DomainDesignerPage clickFinishExpectingError()
-    {
-        clickSaveExpectingErrors();
-        return this;
-    }
-
-    @Override
-    public UnsavedChangesModalDialog clickCancel()
+    public UnsavedChangesModalDialog clickCancelWithUnsavedChanges()
     {
         clickCancel(false);
         UnsavedChangesModalDialog unsavedChangesModal = new UnsavedChangesModalDialog(
                 new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Keep unsaved changes?"));
         return unsavedChangesModal;
-    }
-
-    public DomainDesignerPage clickCancelAndDiscardChanges()
-    {
-        clickCancel().discardChanges();
-        return new DomainDesignerPage(getDriver());
     }
 
     // this will return the first domain fields panel if there are multiple on the page
@@ -64,9 +51,10 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
         return elementCache().firstDomainFormPanel;
     }
 
-    public DomainFormPanel fieldsPanel(String title)
+    public DomainFormPanel expandFieldsPanel(String title)
     {
-        return elementCache().domainFormPanel(title);
+        return elementCache().domainFormPanel(title)
+                .expand();
     }
 
     /**
@@ -162,15 +150,5 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
         {
             return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).findWhenNeeded(this);
         }                                                     // and the caller is too lazy to specify which one they want
-    }
-
-    public static class Locators
-    {
-        static public Locator.XPathLocator domainDesignerButton(String text)
-        {
-            return Locator.tagWithClass("button", "btn-success-default").withText(text);
-        }
-
-        static public Locator alert = Locator.tagWithClass("div" , "alert");
     }
 }

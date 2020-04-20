@@ -296,7 +296,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // add a new field, but leave the name field blank
         DomainFieldRow noNameRow = domainFormPanel.addField("");
-        domainDesignerPage.clickFinishExpectingError();
+        domainDesignerPage.clickSaveExpectingErrors();
 
         assertTrue("field should report error if saved without a name", noNameRow.hasFieldError());
         assertTrue(noNameRow.detailsMessage().contains("New Field. Error: Please provide a name for each field."));
@@ -312,7 +312,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String expectedWarning = "New Field. Warning: Field name contains special characters.";
         assertThat("expected error", warningFieldMessage, containsString(expectedWarning));
 
-        domainDesignerPage.clickCancelAndDiscardChanges();
+        domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
     }
 
     @Test
@@ -334,7 +334,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // add a new field, but leave the name field blank
         DomainFieldRow firstcol = domainFormPanel.getField("firstCol");
         DomainFieldRow dupeNameRow = domainFormPanel.addField("firstCol");
-        domainDesignerPage.clickFinishExpectingError();
+        domainDesignerPage.clickSaveExpectingErrors();
 
         // confirm the page shows the summary error
         String dupeError = domainDesignerPage.waitForError();
@@ -352,7 +352,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect field-level warning to contain [" + expectedError + "] but was[" + dupeColErrorStatus + "]",
                 dupeColErrorStatus.contains(expectedError));
 
-        domainDesignerPage.clickCancelAndDiscardChanges();
+        domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
     }
 
     @Test
@@ -516,7 +516,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow blarg2 = domainFormPanel.addField("blarg");
         DomainFieldRow clientFieldWarning = domainFormPanel.addField("select * from table");
 
-        domainDesignerPage.clickFinishExpectingError();
+        domainDesignerPage.clickSaveExpectingErrors();
         String expectedWarnMsg = "New Field. Warning: Field name contains special characters.";
         String blargErrMsg = "New Field. Error: The field name 'blarg' is already taken. Please provide a unique name for each field.";
         String reservedErrMsg = "New Field. Error: 'modified' is a reserved field name in 'fieldsWithReservedNamesSampleSet'.";
@@ -536,7 +536,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertTrue("expect error for duplicate field names", blarg2.hasFieldError());
         assertTrue("expect warning for field name with spaces or special characters", clientFieldWarning.hasFieldWarning());
 
-        domainDesignerPage.clickCancelAndDiscardChanges();
+        domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
     }
 
     /**
@@ -563,7 +563,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         DomainFieldRow testCol = domainFormPanel.getField("testCol");
         testCol.setName("modified");
-        domainDesignerPage.clickFinishExpectingError();
+        domainDesignerPage.clickSaveExpectingErrors();
 
         // confirm expected error warning
         String expectedError = "'modified' is a reserved field name";
@@ -578,7 +578,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 CoreMatchers.allOf(hasItems("Name", "testCol", "extraField"),
                         CoreMatchers.not(CoreMatchers.hasItem("modified"))));
 
-        domainDesignerPage.clickCancelAndDiscardChanges();
+        domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
     }
 
     /**
@@ -1057,7 +1057,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // ensure current location
         assertEquals(currentUrl, getDriver().getCurrentUrl());
 
-        domainDesignerPage.clickCancel().saveChanges(); // this should save the changes
+        domainDesignerPage.clickCancelWithUnsavedChanges().saveChanges(); // this should save the changes
 
         DomainResponse response = dgen.getDomain(createDefaultConnection(true));
 
@@ -1098,10 +1098,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now attempt to mark 'manufacturer' field 'required'
         domainFormPanel.getField("manufacturer")
                 .setRequiredField(true);
-        domainDesignerPage.clickFinishExpectingError();     // expect error warning here; this should warn the user
+        // expect error warning here; this should warn the user
+        domainDesignerPage.clickSaveExpectingErrors();
         String expectedWarning = domainDesignerPage.waitForAnyAlert();
         assertTrue(expectedWarning.contains("cannot be required when it contains rows with blank values."));
-        domainDesignerPage.clickCancel().discardChanges();  // discard the changes to free the browser to go on to the next page
+        domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();  // discard the changes to free the browser to go on to the next page
     }
 
     /**
