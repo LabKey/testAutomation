@@ -912,7 +912,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText("view history"));
 
         table = new DataRegionTable("query", this);
-        assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
+        assertEquals("A row was updated.", table.getDataAsText(0, "Comment"));
         assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
         // click the details link
