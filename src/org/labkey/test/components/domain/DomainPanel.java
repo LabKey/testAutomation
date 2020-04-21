@@ -7,6 +7,8 @@ import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.Optional;
+
 /**
  * Wraps the functionality of the LabKey ui component defined in domainproperties/CollapsiblePanelHeader.tsx
  * Subclasses should add panel-specific functionality.
@@ -61,6 +63,11 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
         return getThis();
     }
 
+    public WebElement getStatusIcon()
+    {
+        return elementCache().headerStatusIcon;
+    }
+
     public boolean isExpanded()
     {
         return elementCache().panelBody.isDisplayed();
@@ -76,6 +83,11 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
         return hasPanelTitle() ? elementCache().panelTitle.getText() : null;
     }
 
+    public String getFieldCountMessage()
+    {
+        return elementCache().getHeaderFieldCount().map(WebElement::getText).orElse(null);
+    }
+
     @Override
     protected abstract EC newElementCache();
 
@@ -83,8 +95,14 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
     {
         protected final WebElement expandToggle = Locator.tagWithClass("svg", "domain-form-expand-btn").findWhenNeeded(this);
         protected final Locator.XPathLocator panelTitleLoc = Locator.tagWithClass("span", "domain-panel-title");
+        protected final WebElement headerStatusIcon = Locator.css(".domain-panel-status-icon > svg").findWhenNeeded(this);
         protected final WebElement panelTitle = panelTitleLoc.findWhenNeeded(this);
         protected final WebElement panelBody = Locator.byClass("panel-body").findWhenNeeded(this);
+
+        protected final Optional<WebElement> getHeaderFieldCount()
+        {
+            return Locator.byClass("domain-panel-header-fields-defined").findOptionalElement(this);
+        }
     }
 
     protected abstract static class BaseDomainPanelFinder<P extends DomainPanel, F extends BaseDomainPanelFinder<P, F>> extends WebDriverComponentFinder<P, F>

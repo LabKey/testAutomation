@@ -8,7 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/BaseDomainDesigner.tsx
@@ -72,7 +72,9 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
     public List<String> clickSaveExpectingErrors()
     {
         elementCache().saveButton.click();
-        return getWrapper().getTexts(BootstrapLocators.errorBanner.waitForElements(getWrapper().shortWait()));
+        return getWrapper().getTexts(BootstrapLocators.errorBanner.waitForElements(getWrapper().shortWait())).stream()
+                .map(String::trim)
+                .collect(Collectors.toList());
     }
 
     @Override
