@@ -7,6 +7,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
+import org.labkey.test.components.html.OptionSelect;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -92,14 +93,14 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     public void clickCancel()
     {
         clickButtonWaitForPanel(elementCache()
-                .button("Cancel", "Editing " + _parentType.getTextValue() + " Details"));
+                .button("Cancel", "Editing " + _parentType.getType() + " Details"));
     }
 
     /** Click the 'Save' button. */
     public void clickSave()
     {
         clickButtonWaitForPanel(elementCache()
-                .button("Save", "Editing " + _parentType.getTextValue() + " Details"));
+                .button("Save", "Editing " + _parentType.getType() + " Details"));
     }
 
     /**
@@ -110,7 +111,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     public String clickSaveExpectingError()
     {
         elementCache()
-                .button("Save", "Editing " + _parentType.getTextValue() + " Details")
+                .button("Save", "Editing " + _parentType.getType() + " Details")
                 .click();
         return BootstrapLocators.errorBanner.waitForElement(this, 1_000).getText();
     }
@@ -124,8 +125,19 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     {
         // If element is enabled the disabled attribute will not be there and getAttribute will return null.
         return null == elementCache()
-                .button("Save", "Editing " + _parentType.getTextValue() + " Details")
+                .button("Save", "Editing " + _parentType.getType() + " Details")
                 .getAttribute("disabled");
+    }
+
+    /**
+     * Check to see if the 'Add' button is enabled. Once all types have been added the button should not be enabled.
+     *
+     * @return True if enabled, false otherwise.
+     */
+    public boolean isAddButtonEnabled()
+    {
+        // If element is enabled the class attribute not contain the word 'disabled'.
+        return !elementCache().addButton.getAttribute("class").toLowerCase().contains("disabled");
     }
 
     /**
@@ -138,7 +150,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     {
         int numOfTypes = numberOfTypeFields();
 
-        ReactSelect typeCombo = getTypeCombo(_parentType.getTextValue() + " Type " + numOfTypes);
+        ReactSelect typeCombo = getTypeCombo(_parentType.getType() + " Type " + numOfTypes);
 
         // If the 'last' combo in the list contains the text "Select a..." it can be used to add a new type.
         // If it does not contain that then the addButton must be clicked.
@@ -154,7 +166,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                     1_000);
 
             typeCombo = ReactSelect.finder(getDriver())
-                    .followingLabelWithSpan(_parentType.getTextValue() + " Type " + (numOfTypes + 1))
+                    .followingLabelWithSpan(_parentType.getType() + " Type " + (numOfTypes + 1))
                     .find(this);
 
         }
@@ -247,7 +259,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         int numOfTypes = numberOfTypeFields();
 
         return FilteringReactSelect.finder(getDriver())
-                .followingLabelWithSpan(_parentType.getTextValue() + " IDs")
+                .followingLabelWithSpan(_parentType.getType() + " IDs")
                 .findAll(this).get(numOfTypes - 1);
 
     }
@@ -436,31 +448,27 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         WebElement removeButton(int index)
         {
             return Locator
-                    .tagWithText("span", "Remove " + _parentType.getTextValue() + " Type " + index)
+                    .tagWithText("span", "Remove " + _parentType.getType() + " Type " + index)
                     .findElement(this);
         }
 
     }
 
-    /**
-     * This enum is used to identify which type of lineage entity is being edited. An enum of this type is passed
-     * into the constructor for the panel.
-     */
-    public enum ParentType
+    public interface ParentType
     {
-        SAMPLE("Parent"),
-        SOURCE("Source");
+        String getType();
 
-        private final String _textValue;
-
-        public String getTextValue()
+        static ParentType setParentType(String typeName)
         {
-            return _textValue;
-        }
+            return new ParentType()
+            {
+                @Override
+                public String getType()
+                {
+                    return typeName;
+                }
 
-        ParentType(String textValue)
-        {
-            _textValue = textValue;
+            };
         }
     }
 
