@@ -239,9 +239,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                 if (reactSelect.getComponentElement().getAttribute("class").contains("Select--single"))
                     typeCombos.add(reactSelect);
             }
-            catch (NoSuchElementException nse)
+            catch (NoSuchElementException | StaleElementReferenceException ex)
             {
-                // Finder returned a react select not in scope. Ignore this error.
+                // Finder returned a react select that is stale or not in scope. Ignore this error.
             }
         }
         return typeCombos;
