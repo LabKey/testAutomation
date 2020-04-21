@@ -144,11 +144,12 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
     {
         DomainFormPanel firstDomainFormPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())   // for situations where there's only one on the page
                 .timeout(WAIT_FOR_JAVASCRIPT)
-                .findWhenNeeded(this);                                                          // and the caller is too lazy to specify which one they want
+                .findWhenNeeded(this);
 
         DomainFormPanel domainFormPanel(String title) // for situations with multiple domainformpanels on the same page
         {
-            return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title).findWhenNeeded(this);
-        }                                                     // and the caller is too lazy to specify which one they want
+            return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title)
+                    .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
+        }
     }
 }
