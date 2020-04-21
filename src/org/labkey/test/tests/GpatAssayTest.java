@@ -27,7 +27,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
@@ -42,7 +42,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({Assays.class, DailyB.class})
+@Category({Assays.class, BVT.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class GpatAssayTest extends BaseWebDriverTest
 {

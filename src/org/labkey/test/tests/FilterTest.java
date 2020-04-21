@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
@@ -46,7 +46,7 @@ import static org.junit.Assert.assertEquals;
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter
  */
-@Category({BVT.class, Data.class})
+@Category({DailyB.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 18)
 public class FilterTest extends BaseWebDriverTest
 {
