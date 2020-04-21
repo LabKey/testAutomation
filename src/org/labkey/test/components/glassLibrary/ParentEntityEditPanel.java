@@ -7,7 +7,6 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
-import org.labkey.test.pages.samplemanagement.samples.SampleOverviewPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -67,33 +66,40 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         return _driver;
     }
 
-    /**
-     * Click the 'Cancel' button. The edit panel will go away and the user is returned to the Sample Overview page.
-     *
-     * @return A new reference to the Sample Overview page.
-     */
-    public SampleOverviewPage clickCancel()
-    {
-        elementCache()
-                .button("Cancel", "Editing " + _parentType.getTextValue() + " Details")
-                .click();
+    // TODO: It would be nice if the save and cancel buttons would return a specific page type. That would require
+    //  using generics (much in the same way the modal dialog does), but I don't have time to do that right now.
 
-        return new SampleOverviewPage(getWrapper());
+    /**
+     * Clicking either the 'Save' or 'Cancel' button will remove this edit panel. This helper function will click the
+     * button sent to it and then wait until it has some indication the edit panel is gone and the default panel is
+     * shown.
+     *
+     * @param button
+     */
+    private void clickButtonWaitForPanel(WebElement button)
+    {
+        int count = Locator.tagWithClass("div", "panel-default").findElements(getDriver()).size();
+
+        button.click();
+
+        WebDriverWrapper.waitFor(()->
+                        Locator.tagWithClass("div", "panel-default").findElements(getDriver()).size() > count,
+                "Panel did not exit edit mode", 1_000
+        );
     }
 
-    /** Click the 'Save' button The edit panel will go away and the user is returned to the Sample Overview page.
-     *
-     * @return A new reference to the Sample Overview page.
-     */
-    public SampleOverviewPage clickSave()
+    /** Click the 'Cancel' button. This will make the edit panel go away. */
+    public void clickCancel()
     {
-        elementCache()
-                .button("Save", "Editing " + _parentType.getTextValue() + " Details")
-                .click();
+        clickButtonWaitForPanel(elementCache()
+                .button("Cancel", "Editing " + _parentType.getTextValue() + " Details"));
+    }
 
-        getWrapper().waitForElementToDisappear(Locator.tagWithClass("div", "detail__editing"));
-
-        return new SampleOverviewPage(getWrapper());
+    /** Click the 'Save' button. */
+    public void clickSave()
+    {
+        clickButtonWaitForPanel(elementCache()
+                .button("Save", "Editing " + _parentType.getTextValue() + " Details"));
     }
 
     /**
@@ -388,7 +394,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      * @param id The id of the parent to remove.
      * @return This edit panel.
      */
-    public ParentEntityEditPanel removeParentId(int index, String id)
+    protected ParentEntityEditPanel removeParentId(int index, String id)
     {
         // The FilteringReactSelect doesn't appear to have this functionality so have to implement it here.
         String xpath = String.format("//span[text()='%s']/preceding-sibling::span", id);
