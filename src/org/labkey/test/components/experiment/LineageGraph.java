@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Automates the Labkey UI lineageGraph component implemented in /components/lineage/lineageGraph.tsx
+ * Automates the Labkey UI component implemented in /components/lineage/LineageGraph.tsx
  */
 public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 {
