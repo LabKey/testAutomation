@@ -179,7 +179,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
                 .removeField("VisitID")
                 .removeField("ParticipantID")
                 .removeField("SpecimenID");
-        dataFields.startNewDesign("Name");
+        dataFields.manuallyDefineFields("Name");
         dataFields.addField("Age").setType(FieldDefinition.ColumnType.Integer);
         assayDesignerPage.clickFinish();
 

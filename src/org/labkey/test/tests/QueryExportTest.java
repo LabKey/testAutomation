@@ -61,7 +61,7 @@ public class QueryExportTest extends AbstractExportTest
     }
 
     @Override
-    public ColumnHeaderType[] getExportHeaderTypes()
+    protected ColumnHeaderType[] getExportHeaderTypes()
     {
         return new ColumnHeaderType[]{ColumnHeaderType.Caption, ColumnHeaderType.None, ColumnHeaderType.FieldKey};
     }
@@ -121,7 +121,7 @@ public class QueryExportTest extends AbstractExportTest
     }
 
     @Override
-    public void goToDataRegionPage()
+    protected void goToDataRegionPage()
     {
         clickProject(getProjectName());
         navigateToQuery("lists", QUERY_NAME);

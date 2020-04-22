@@ -279,7 +279,7 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add(getCurrentUser() + " stopped impersonating group: " + adminGroup);
         expectedLogValues.add(getCurrentUser() + " logged out.");
         expectedLogValues.add(AUDIT_TEST_USER + " failed to login: incorrect password");
-        expectedLogValues.add(getCurrentUser() + " logged in successfully via Database authentication.");
+        expectedLogValues.add(getCurrentUser() + " logged in successfully via the \"Standard database authentication\" configuration.");
         expectedLogValues.add(AUDIT_TEST_USER + "fail failed to login: user does not exist");
         expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
 
