@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.ElementCache>
 {
@@ -72,11 +73,11 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
      */
     public List<String> getPanelTitles()
     {
+        waitFor(() -> getPanels().size() > 0, "No form panels found on page.", WAIT_FOR_JAVASCRIPT);
         List<String> titles = new ArrayList<>();
         for(DomainPanel<?,?> formPanel : getPanels())
         {
-            if (formPanel.hasPanelTitle())
-                titles.add(formPanel.getPanelTitle());
+            titles.add(formPanel.getPanelTitle());
         }
         return titles;
     }
