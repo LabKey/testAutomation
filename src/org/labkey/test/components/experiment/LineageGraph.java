@@ -29,6 +29,16 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
        return elementCache().detailsComponentTable().getData();
     }
 
+    public WebElement getFocusedNodeImage()
+    {
+        return elementCache().componentDetailImage;
+    }
+
+    public String getFocusedNodeText()
+    {
+        return elementCache().nodeDetailName.getText();
+    }
+
     /**
      * finds the list of edges/nodes to the one currently focused, by name
      * @param listTitle
@@ -106,6 +116,10 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
         // container for the details of the currently-selected node
         final WebElement nodeDetailContainer = Locator.tagWithClass("div", "lineage-node-detail-container")
                 .findWhenNeeded(this).withTimeout(4000);
+        WebElement componentDetailImage = Locator.tagWithClass("i", "component-detail--child--img")
+                .child(Locator.tag("img")).findWhenNeeded(nodeDetailContainer);
+        WebElement nodeDetailName = Locator.tagWithClass("h4", "lineage-name-data")
+                .findWhenNeeded(nodeDetailContainer);
         WebElement nodeDetailLinksContainer = Locator.tagWithClass("div", "lineage-node-detail")
                 .findWhenNeeded(nodeDetailContainer);
         WebElement nodeOverviewLink = Locator.linkWithSpan("Overview").withClass("lineage-data-link--text")

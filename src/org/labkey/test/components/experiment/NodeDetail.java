@@ -40,11 +40,14 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
             elementCache().overviewLink.click();
     }
 
-    public void clickLineageGraphLink()
+    public void clickLineageGraphLink(boolean wait)
     {
         getWrapper().mouseOver(getComponentElement());
         getWrapper().waitFor(()-> elementCache().lineageGraphLink.isEnabled(), 1000);
-        getWrapper().clickAndWait(elementCache().lineageGraphLink);
+        if (wait)
+            getWrapper().clickAndWait(elementCache().lineageGraphLink);
+        else
+            elementCache().lineageGraphLink.click();
     }
 
     public WebElement getIcon()
