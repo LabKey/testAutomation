@@ -381,7 +381,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     {
         GoToDataUI goToDataset = () -> goToDataset(DATASET_NAME);
 
-        doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true, false);
+        doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true);
 
         //For some reason these only get logged for datasets...
         checkExpectedErrors(6);
@@ -445,7 +445,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         GoToDataUI goToDataClass = () -> goToDataClass(DATA_CLASSES_NAME);
 
         setupDataClass();
-        doIndividualTriggerTest("query", goToDataClass, "Name", false, true);
+        doIndividualTriggerTest("query", goToDataClass, "Name", false);
     }
 
 
@@ -557,18 +557,11 @@ public class TriggerScriptTest extends BaseWebDriverTest
     /**
      * Execute a set of tests against a datatype and preset trigger script
      */
-    private void doIndividualTriggerTest(String dataRegionName, GoToDataUI goToData, String keyColumnName, boolean requiresDate, boolean toLower)
+    private void doIndividualTriggerTest(String dataRegionName, GoToDataUI goToData, String keyColumnName, boolean requiresDate)
     {
         String flagField = COMMENTS_FIELD; //Field to watch in trigger script
         String updateField = COUNTRY_FIELD; //Field updated by trigger script
         String testName = INDIVIDUAL_TEST;
-
-        if (toLower && WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
-        {
-            // This is a compromise to get around casing problems for Dataset v DataClass domain columns
-            flagField = flagField.toLowerCase();
-            updateField = updateField.toLowerCase();
-        }
 
         Map<String,String> caughtAfter = new HashMap<>();
         String badParticipant = "101345";
