@@ -26,6 +26,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.experiment.LineageGraph;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 
@@ -102,8 +103,11 @@ public class ExpTest extends BaseWebDriverTest
         waitForText("Example 5 Run");
         clickAndWait(Locator.linkWithText(RUN_NAME));
         clickAndWait(Locator.linkWithText("Graph Summary View"));
-        clickAndWait(Locator.imageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP));
-        clickAndWait(Locator.imageMapLinkByTitle("graphmap", DATA_OBJECT_TITLE));
+
+        Locator.linkWithSpan("Toggle Beta Graph (new!)").waitForElement(getDriver(), 4000)
+                .click();
+        LineageGraph graph = new LineageGraph.LineageGraphFinder(getDriver()).waitFor();
+        graph.getDetailGroup("Data Parents").getItemByTitle("Data: CAexample_mini.mzXML").clickOverViewLink(true);
         assertTextPresent("CAexample_mini.mzXML", "File Not Found");
 
         // Write a simple custom query that wraps the data table
