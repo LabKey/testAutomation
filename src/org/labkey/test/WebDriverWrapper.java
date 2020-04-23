@@ -3077,15 +3077,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setFormElement(Locator l, String text)
     {
-        try
-        {
-            WebElement el = l.waitForElement(new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT / 1000));
-            setFormElement(el, text);
-        }
-        catch (NoSuchElementException nse)
-        {
-            throw new ListHelper(getDriver()).dumpListMetadataInfo(nse);
-        }
+        WebElement el = l.waitForElement(new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT / 1000));
+        setFormElement(el, text);
     }
 
     /**
