@@ -404,31 +404,74 @@ public class TestDataGenerator
         CreateDomainCommand createSampleSetCommand = def.getCreateCommand();
         try
         {
-            CommandResponse response = createSampleSetCommand.execute(connection, containerPath);
+            createSampleSetCommand.execute(connection, containerPath);
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Failed to create domain", e);
+            throw new RuntimeException("Failed to create domain.", e);
         }
 
         return def.getTestDataGenerator(containerPath);
     }
 
-    static public CommandResponse deleteDomain(final String containerPath, final String schema, final String domainName)
-            throws IOException, CommandException
+    /**
+     * Delete a domain.
+     *
+     * @param containerPath Container where the domain exists.
+     * @param schema The schema of the domain. For example for sample types it would be 'exp.data'.
+     * @param queryName The name of the query to delete. For example for a sample type it would be its name.
+     * @return The command response after executing the delete. Calling function would need to validate the response.
+     * @throws CommandException Thrown if there is some kind of exception deleting the domain.
+     */
+    public static CommandResponse deleteDomain(final String containerPath, final String schema,
+                                                 final String queryName)
+            throws CommandException
     {
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        DropDomainCommand delCmd = new DropDomainCommand(schema, domainName);
-        return delCmd.execute(connection, containerPath);
+        DropDomainCommand delCmd = new DropDomainCommand(schema, queryName);
+
+        try
+        {
+            return delCmd.execute(connection, containerPath);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to delete domain.", e);
+        }
+
     }
 
-    static public boolean doesDomainExists(final String containerPath, final String schema, final String domainName)
-            throws IOException, CommandException
+    /**
+     * Check to see if a domain exists.
+     *
+     * @param containerPath The container to look for the domain/query.
+     * @param schema The schema of the domain. For example for sample types it would be 'exp.data'.
+     * @param queryName The name of the query to look for. For example for a sample type it would be its name.
+     * @return True if it exists in the given container false otherwise.
+     * @throws IOException Thrown if there is an issue while looking for the domain.
+     */
+    public static boolean doesDomainExists(final String containerPath, final String schema,
+                                                final String queryName)
     {
-        GetQueriesCommand qcmd = new GetQueriesCommand(schema);
-        GetQueriesResponse resp = qcmd.execute(WebTestHelper.getRemoteApiConnection(), containerPath);
+        boolean exist;
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        GetDomainCommand cmd = new GetDomainCommand(schema, queryName);
+        try
+        {
+            DomainResponse response = cmd.execute(connection, containerPath);
+            exist = response.getStatusCode() != 404;
+        }
+        catch (CommandException ce)
+        {
+            exist = false;
+        }
+        catch (IOException ioe)
+        {
+            throw new RuntimeException("IO exception while looking for the domain.", ioe);
+        }
 
-        return resp.getQueryNames().contains(domainName);
+        return exist;
+
     }
 
 }

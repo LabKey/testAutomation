@@ -418,6 +418,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         private boolean _mustBeEnabled = false;
         private boolean _findParent = true;
 
+        // Issue 40267: Calling findAll for the react select test component needs to be refined.
         protected BaseReactSelectFinder(WebDriver driver)
         {
             super(driver);

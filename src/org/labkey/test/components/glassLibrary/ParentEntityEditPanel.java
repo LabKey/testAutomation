@@ -7,13 +7,10 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
-import org.labkey.test.components.html.OptionSelect;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -178,7 +175,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     /**
      * Get the type combos by it's index (zero based). This would include any 'add new' combos.
      *
-     * @return A combo at the given position in the colection of combos..
+     * @return A combo at the given position in the collection of combos.
      */
     protected ReactSelect getTypeCombo(int index)
     {
@@ -186,9 +183,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     }
 
     /**
-     * Get the type combos by it's index (zero based). This would include any 'add new' combos.
+     * Get the type combos by its label. This is the label to the left of the control.
      *
-     * @return A combo at the given position in the colection of combos..
+     * @return A combo beside a label with the given text.
      */
     protected ReactSelect getTypeCombo(String labelText)
     {
@@ -198,9 +195,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     }
 
     /**
-     * Get the type combos by it's index (zero based). This would include any 'add new' combos.
+     * Get the type combos with the current selected text.
      *
-     * @return A combo at the given position in the colection of combos..
+     * @return A combo that has the given selection.
      */
     protected ReactSelect getTypeComboWithSelection(String selection)
     {
@@ -225,26 +222,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     protected List<ReactSelect> getAllTypeCombo()
     {
-        // Calling ReactSelect.finder(getDriver()).findAll(this) is not specific enough, it returns all divs with
-        // 'select' in the class. That can return multiple controls for one react select (div.Select, div.Select-control,
-        // div.Select-value,div.Select-input). That is if there is only one element selected. If it is a multi-select
-        // control each selected value will have div.Select-value.
-
-        List<ReactSelect> allControls = ReactSelect.finder(getDriver()).findAll(this);
-        List<ReactSelect> typeCombos = new ArrayList<>();
-        for(ReactSelect reactSelect : allControls)
-        {
-            try
-            {
-                if (reactSelect.getComponentElement().getAttribute("class").contains("Select--single"))
-                    typeCombos.add(reactSelect);
-            }
-            catch (NoSuchElementException | StaleElementReferenceException ex)
-            {
-                // Finder returned a react select that is stale or not in scope. Ignore this error.
-            }
-        }
-        return typeCombos;
+        return ReactSelect.finder(getDriver())
+                .locatedBy(Locator.tag("div").withClasses("Select", "Select--single"))
+                .findAll(this);
     }
 
     /**
@@ -284,26 +264,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     protected List<FilteringReactSelect> getAllIdCombo()
     {
-        // Calling ReactSelect.finder(getDriver()).findAll(this) is not specific enough, it returns all divs with
-        // 'select' in the class. That can return multiple controls for one react select (div.Select, div.Select-control,
-        // div.Select-value,div.Select-input). That is if there is only one element selected. If it is a multi-select
-        // control each selected value will have div.Select-value.
-
-        List<FilteringReactSelect> allControls = FilteringReactSelect.finder(getDriver()).findAll(this);
-        List<FilteringReactSelect> idCombos = new ArrayList<>();
-        for(FilteringReactSelect reactSelect : allControls)
-        {
-            try
-            {
-                if (reactSelect.getComponentElement().getAttribute("class").contains("Select--multi"))
-                    idCombos.add(reactSelect);
-            }
-            catch (NoSuchElementException nse)
-            {
-                // Finder returned a react select not in scope. Ignore this error.
-            }
-        }
-        return idCombos;
+        return FilteringReactSelect.finder(getDriver())
+                .locatedBy(Locator.tag("div").withClasses("Select", "Select--multi"))
+                .findAll(this);
     }
 
     /**
