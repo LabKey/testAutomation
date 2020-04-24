@@ -84,7 +84,7 @@ public class DataClassTest extends BaseWebDriverTest
         createPage.setName(name);
         assertEquals("Data class name conflict error", Arrays.asList(
                 "DataClass 'Name Already Exists Test' already exists."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         createPage.clickCancel();
 
         log("Try creating data class with same name but different casing");
@@ -92,7 +92,7 @@ public class DataClassTest extends BaseWebDriverTest
         createPage.setName(name.toLowerCase());
         assertEquals("Data class name conflict error", Arrays.asList(
                 "DataClass 'Name Already Exists Test' already exists."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         createPage.clickCancel();
     }
 
@@ -110,19 +110,19 @@ public class DataClassTest extends BaseWebDriverTest
         domainFormPanel.manuallyDefineFields("created");
         assertEquals("Data class reserved field name error", Arrays.asList(
                 "Property name 'created' is a reserved name."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         domainFormPanel.manuallyDefineFields("rowid");
         assertEquals("Data class reserved field name error", Arrays.asList(
                 "Property name 'rowid' is a reserved name."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         domainFormPanel.manuallyDefineFields("name");
         assertEquals("Data class reserved field name error", Arrays.asList(
                 "Property name 'name' is a reserved name."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         createPage.clickCancel();
@@ -143,7 +143,7 @@ public class DataClassTest extends BaseWebDriverTest
         assertEquals("Data class missing field name error", Arrays.asList(
                 "Please provide a name for each field.",
                 "Please correct errors in Fields before saving."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         log("Verify error message for unique field names");
@@ -152,7 +152,7 @@ public class DataClassTest extends BaseWebDriverTest
         assertEquals("Data class unique field name error", Arrays.asList(
                 "The field name 'Duplicate' is already taken. Please provide a unique name for each field.",
                 "Please correct errors in Fields before saving."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         createPage.clickCancel();

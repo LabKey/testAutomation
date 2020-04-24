@@ -178,7 +178,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      * Click a button on the grid bar with the given text.
      * @param buttonCaption Button caption.
      * @param doAction The action to perform after the click. Can be null.
-     * @return This grid bar.
      */
     public void clickButton(String buttonCaption, @Nullable Runnable doAction)
     {

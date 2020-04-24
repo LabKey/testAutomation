@@ -14,7 +14,7 @@ import java.util.List;
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/samples/SampleTypeDesigner.tsx
  * This is a full-page component and should be wrapped by a context-specific page class
  */
-public class SampleTypeDesigner extends EntityTypeDesigner<SampleTypeDesigner>
+public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extends EntityTypeDesigner<T>
 {
     public final static String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
 
@@ -24,10 +24,7 @@ public class SampleTypeDesigner extends EntityTypeDesigner<SampleTypeDesigner>
     }
 
     @Override
-    protected SampleTypeDesigner getThis()
-    {
-        return this;
-    }
+    protected abstract T getThis();
 
     @Override
     protected ElementCache newElementCache()
@@ -41,8 +38,14 @@ public class SampleTypeDesigner extends EntityTypeDesigner<SampleTypeDesigner>
         return  (ElementCache) super.elementCache();
     }
 
-    public SampleTypeDesigner addParentAlias(String alias, @Nullable String optionDisplayText)
+    public T addParentAlias(String alias)
     {
+        return addParentAlias(alias, null);
+    }
+
+    public T addParentAlias(String alias, @Nullable String optionDisplayText)
+    {
+        expandPropertiesPanel();
         int initialCount = elementCache().parentAliases().size();
         elementCache().addAliasButton.click();
         if (optionDisplayText == null)
@@ -66,20 +69,23 @@ public class SampleTypeDesigner extends EntityTypeDesigner<SampleTypeDesigner>
         throw new NotFoundException("No such parent alias: " + parentAlias);
     }
 
-    public SampleTypeDesigner removeParentAlias(String parentAlias)
+    public T removeParentAlias(String parentAlias)
     {
+        expandPropertiesPanel();
         int aliasIndex = getParentAliasIndex(parentAlias);
         return removeParentAlias(aliasIndex);
     }
 
-    public SampleTypeDesigner removeParentAlias(int index)
+    public T removeParentAlias(int index)
     {
+        expandPropertiesPanel();
         elementCache().removeParentAliasIcon(index).click();
         return getThis();
     }
 
-    public SampleTypeDesigner setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
+    public T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
     {
+        expandPropertiesPanel();
         elementCache().parentAlias(index).setValue(alias);
         if (optionDisplayText != null)
         {
@@ -88,8 +94,9 @@ public class SampleTypeDesigner extends EntityTypeDesigner<SampleTypeDesigner>
         return getThis();
     }
 
-    public SampleTypeDesigner setParentAlias(String alias, String optionDisplayText)
+    public T setParentAlias(String alias, String optionDisplayText)
     {
+        expandPropertiesPanel();
         int index = getParentAliasIndex(alias);
         elementCache().parentAliasSelect(index).select(optionDisplayText);
         return getThis();
@@ -97,21 +104,23 @@ public class SampleTypeDesigner extends EntityTypeDesigner<SampleTypeDesigner>
 
     public String getParentAlias(int index)
     {
+        expandPropertiesPanel();
         return elementCache().parentAlias(index).get();
     }
 
     public String getParentAliasSelectText(int index)
     {
+        expandPropertiesPanel();
         return elementCache().parentAliasSelect(index).getSelections().get(0);
     }
 
-    protected class ElementCache extends EntityTypeDesigner.ElementCache
+    protected class ElementCache extends EntityTypeDesigner<T>.ElementCache
     {
         protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
 
         protected List<Input> parentAliases()
         {
-            return Input.Input(Locator.name("alias"), getDriver()).findAll(this);
+            return Input.Input(Locator.name("alias"), getDriver()).findAll(propertiesPanel);
         }
 
         protected Input parentAlias(int index)
@@ -122,12 +131,12 @@ public class SampleTypeDesigner extends EntityTypeDesigner<SampleTypeDesigner>
         protected ReactSelect parentAliasSelect(int index)
         {
             return ReactSelect.finder(getDriver()).locatedBy(Locator.byClass("sampleset-insert--parent-select"))
-                    .index(index).find(this);
+                    .index(index).find(propertiesPanel);
         }
 
         protected WebElement removeParentAliasIcon(int index)
         {
-            return Locator.tagWithClass("i","container--removal-icon").findElements(this).get(index);
+            return Locator.tagWithClass("i","container--removal-icon").findElements(propertiesPanel).get(index);
         }
     }
 }

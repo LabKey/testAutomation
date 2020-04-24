@@ -133,14 +133,16 @@ import static org.labkey.test.components.html.RadioButton.RadioButton;
  * Shared setup steps should be in a public static void method annotated with org.junit.BeforeClass
  * The name of the method is not important. The JUnit runner finds the method solely based on the BeforeClass annotation
  *
- * @BeforeClass
+ * <pre>
+ * &amp;BeforeClass
  * public static void setupProject() throws Exception
  * {
  *     MyTestClass initTest = (MyTestClass)getCurrentTest();
  *     initTest.doSetup(); // Perform shared setup steps here
  * }
+ *</pre>
  *
- * @{link org.junit.AfterClass} is also supported, but should not be used to perform any destructive cleanup or
+ * {@link org.junit.AfterClass} is also supported, but should not be used to perform any destructive cleanup or
  * navigation as it is executed before the base test class can perform its final checks -- link check, leak check, etc.
  * The doCleanup method should be overridden for initial and final project cleanup
  */

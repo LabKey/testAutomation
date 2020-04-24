@@ -139,10 +139,10 @@ public class ExpTest extends BaseWebDriverTest
         clickButton("Edit Metadata", 6000);
         QueryMetadataEditorPage designerPage = new QueryMetadataEditorPage(getDriver());
 
-        DomainFieldRow domainRow = designerPage.fieldsPanel().getField("Created");
+        DomainFieldRow domainRow = designerPage.getFieldsPanel().getField("Created");
         domainRow.setLabel("editedCreated");
         domainRow.setDateFormat("ddd MMM dd yyyy");
-        designerPage.clickFinish();
+        designerPage.clickSave();
 
         // Verify that it ended up in the XML version of the metadata
         designerPage.editSource();
@@ -165,13 +165,13 @@ public class ExpTest extends BaseWebDriverTest
         designerPage.aliasField().selectAliasField("Row Id").clickApply();
 
         // Make it a lookup into our custom query
-        int fieldCount = designerPage.fieldsPanel().fieldNames().size();
+        int fieldCount = designerPage.getFieldsPanel().fieldNames().size();
         assertTrue(fieldCount > 0);
-        domainRow = designerPage.fieldsPanel().getField(fieldCount-1);
+        domainRow = designerPage.getFieldsPanel().getField(fieldCount-1);
         domainRow.setType(FieldDefinition.ColumnType.Lookup).setFromSchema("exp").setFromTargetTable("dataCustomQuery" + " (Integer)");
 
         // Save it
-        designerPage.clickFinish();
+        designerPage.clickSave();
         designerPage.viewData();
 
         // Customize the view to add the newly joined column
@@ -190,6 +190,6 @@ public class ExpTest extends BaseWebDriverTest
         waitForText("edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
         designerPage = new QueryMetadataEditorPage(getDriver());
-        designerPage.reset();
+        designerPage.resetToDefault();
     }
 }

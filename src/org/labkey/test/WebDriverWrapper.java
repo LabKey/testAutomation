@@ -2405,7 +2405,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @deprecated Use {@link org.junit.Assert#assertEquals(String, Object, Object) and {@link #getSelectedOptionText(Locator)}
+     * @deprecated Use {@link org.junit.Assert#assertEquals(String, Object, Object)} and
+     * {@link #getSelectedOptionText(Locator)}
      */
     @Deprecated
     public void assertOptionEquals(Locator loc, String value)
@@ -3083,8 +3084,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
     /**
      * Clears and sets the text of the specified input element.
      * Warning: Clear unfocuses the element which causes some inputs to disappear.
-     * <a href="https://www.w3.org/TR/webdriver/#element-clear>WebDriver Docs</a>
-     * Use {@link WebElement#sendKeys(CharSequence...)} for such inputs.
+     * See <a href="https://www.w3.org/TR/webdriver/#element-clear">WebDriver Docs</a>
+     * Use {@link WebElement#sendKeys} for such inputs.
      */
     public void setFormElement(WebElement el, String text)
     {

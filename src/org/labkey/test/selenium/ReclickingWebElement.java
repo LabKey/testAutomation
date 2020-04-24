@@ -130,8 +130,8 @@ public class ReclickingWebElement extends WebElementDecorator
     }
 
     /**
-     * Calculate the center of a convex <area> in an image-map. Can handle 'rect', 'circle', and 'poly' shapes
-     * Doc: https://www.w3schools.com/tags/tag_area.asp
+     * Calculate the center of a convex &lt;area&gt; in an image-map. Can handle 'rect', 'circle', and 'poly' shapes
+     * Doc: <a href="https://www.w3schools.com/tags/tag_area.asp">tag_area</a>
      * TODO: Implement this formula for concave polygons [https://en.wikipedia.org/wiki/Centroid#Of_a_polygon]
      * @return The center point of the area element relative to the image
      */

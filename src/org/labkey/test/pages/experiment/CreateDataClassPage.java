@@ -70,7 +70,8 @@ public class CreateDataClassPage extends LabKeyPage<CreateDataClassPage.ElementC
 
     public DomainFormPanel getDomainEditor()
     {
-        return elementCache()._designer.getDomainEditor();
+        elementCache();
+        return elementCache()._designer.getFieldsPanel();
     }
 
     public void clickSave()
@@ -78,9 +79,9 @@ public class CreateDataClassPage extends LabKeyPage<CreateDataClassPage.ElementC
         elementCache()._designer.clickSave();
     }
 
-    public List<WebElement> clickSaveExpectingError()
+    public List<String> clickSaveExpectingErrors()
     {
-        return elementCache()._designer.clickSaveExpectingError();
+        return elementCache()._designer.clickSaveExpectingErrors();
     }
 
     public void clickCancel()
