@@ -453,24 +453,25 @@ public class TestDataGenerator
     public static boolean doesDomainExists(final String containerPath, final String schema,
                                                 final String queryName)
     {
-        boolean exist;
         Connection connection = WebTestHelper.getRemoteApiConnection();
         GetDomainCommand cmd = new GetDomainCommand(schema, queryName);
         try
         {
             DomainResponse response = cmd.execute(connection, containerPath);
-            exist = response.getStatusCode() != 404;
+            return true;
         }
         catch (CommandException ce)
         {
-            exist = false;
+            if(ce.getStatusCode() == 404)
+            {
+                return false;
+            }
+            throw new RuntimeException("Exception while looking for domain.", ce);
         }
         catch (IOException ioe)
         {
             throw new RuntimeException("IO exception while looking for the domain.", ioe);
         }
-
-        return exist;
 
     }
 
