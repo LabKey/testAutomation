@@ -47,6 +47,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         return this;
     }
 
+    // TODO: Issue 40180: ReactSelect needs to deal with control being recreated after a selection is made.
     public ReactSelect select(String option)
     {
         List<String> selections = scrollIntoView()

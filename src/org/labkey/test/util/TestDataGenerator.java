@@ -26,6 +26,8 @@ import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.GetQueriesCommand;
+import org.labkey.remoteapi.query.GetQueriesResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -402,13 +404,75 @@ public class TestDataGenerator
         CreateDomainCommand createSampleSetCommand = def.getCreateCommand();
         try
         {
-            CommandResponse response = createSampleSetCommand.execute(connection, containerPath);
+            createSampleSetCommand.execute(connection, containerPath);
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Failed to create domain", e);
+            throw new RuntimeException("Failed to create domain.", e);
         }
 
         return def.getTestDataGenerator(containerPath);
     }
+
+    /**
+     * Delete a domain.
+     *
+     * @param containerPath Container where the domain exists.
+     * @param schema The schema of the domain. For example for sample types it would be 'exp.data'.
+     * @param queryName The name of the query to delete. For example for a sample type it would be its name.
+     * @return The command response after executing the delete. Calling function would need to validate the response.
+     * @throws CommandException Thrown if there is some kind of exception deleting the domain.
+     */
+    public static CommandResponse deleteDomain(final String containerPath, final String schema,
+                                                 final String queryName)
+            throws CommandException
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        DropDomainCommand delCmd = new DropDomainCommand(schema, queryName);
+
+        try
+        {
+            return delCmd.execute(connection, containerPath);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to delete domain.", e);
+        }
+
+    }
+
+    /**
+     * Check to see if a domain exists.
+     *
+     * @param containerPath The container to look for the domain/query.
+     * @param schema The schema of the domain. For example for sample types it would be 'exp.data'.
+     * @param queryName The name of the query to look for. For example for a sample type it would be its name.
+     * @return True if it exists in the given container false otherwise.
+     * @throws IOException Thrown if there is an issue while looking for the domain.
+     */
+    public static boolean doesDomainExists(final String containerPath, final String schema,
+                                                final String queryName)
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        GetDomainCommand cmd = new GetDomainCommand(schema, queryName);
+        try
+        {
+            DomainResponse response = cmd.execute(connection, containerPath);
+            return true;
+        }
+        catch (CommandException ce)
+        {
+            if(ce.getStatusCode() == 404)
+            {
+                return false;
+            }
+            throw new RuntimeException("Exception while looking for domain.", ce);
+        }
+        catch (IOException ioe)
+        {
+            throw new RuntimeException("IO exception while looking for the domain.", ioe);
+        }
+
+    }
+
 }
