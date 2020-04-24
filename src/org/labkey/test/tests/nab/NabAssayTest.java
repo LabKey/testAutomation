@@ -560,7 +560,7 @@ public class NabAssayTest extends AbstractAssayTest
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
-        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/napApiTest.html")));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/nabApiTest.html")));
         wikiHelper.saveWikiPage();
         waitForElement(Locator.id(TEST_DIV_ID));
         waitForElements(Locator.id(TEST_DIV_ID).child(Locator.tagWithText("div", "Success!")), 2);
