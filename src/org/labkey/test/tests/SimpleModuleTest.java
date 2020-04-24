@@ -941,7 +941,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.tagWithClass("div", "lk-body-title")
                 .child(Locator.tagWithText("*", "Details")));
         table = new DataRegionTable("query", this);
-        assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
+        assertEquals("A row was updated.", table.getDataAsText(0, "Comment"));
         assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
         // click the details link

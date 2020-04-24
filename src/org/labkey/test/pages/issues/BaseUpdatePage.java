@@ -52,7 +52,7 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
     }
 
     /**
-     * Find a named field you know to be a <select>
+     * Find a named field you know to be a &lt;select&gt;
      */
     public OptionSelect selectWithName(String fieldName)
     {

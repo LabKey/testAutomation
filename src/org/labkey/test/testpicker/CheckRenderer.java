@@ -29,7 +29,7 @@ import javax.swing.tree.TreeCellRenderer;
 
 /**
 @author Nobuo Tamemasa
-@editedBy Erik Ulberg
+@author Erik Ulberg
 */
 public class CheckRenderer extends JPanel implements TreeCellRenderer {
     protected JCheckBox _check;

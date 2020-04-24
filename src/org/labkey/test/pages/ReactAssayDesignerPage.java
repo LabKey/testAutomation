@@ -18,9 +18,11 @@ package org.labkey.test.pages;
 import org.labkey.test.Locator;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.domain.DomainPanel;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -32,6 +34,9 @@ import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.Input.Input;
 import static org.labkey.test.components.html.SelectWrapper.Select;
 
+/**
+ * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/assay/AssayDesignerPanels.tsx
+ */
 public class ReactAssayDesignerPage extends DomainDesignerPage
 {
     public ReactAssayDesignerPage(WebDriver driver)
@@ -39,21 +44,16 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         super(driver);
     }
 
-    @Override
-    public void waitForPage()
-    {
-        waitForElement(Locator.id("assay-design-description"), WAIT_FOR_JAVASCRIPT);
-        elementCache().descriptionInput.get();
-    }
-
     public ReactAssayDesignerPage setName(String name)
     {
+        expandPropertiesPanel();
         elementCache().nameInput.set(name);
         return this;
     }
 
     public String getName()
     {
+        expandPropertiesPanel();
         return elementCache().nameInput.get();
     }
 
@@ -61,112 +61,131 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     // For example once an assay is created you can't change it's name so the field will be disabled.
     public boolean isNameEnabled()
     {
+        expandPropertiesPanel();
         return elementCache().nameInput.getComponentElement().isEnabled();
     }
 
     public ReactAssayDesignerPage setDescription(String description)
     {
+        expandPropertiesPanel();
         elementCache().descriptionInput.set(description);
         return this;
     }
 
     public String getDescription()
     {
+        expandPropertiesPanel();
         return elementCache().descriptionInput.get();
     }
 
     public ReactAssayDesignerPage setAutoCopyTarget(String containerPath)
     {
+        expandPropertiesPanel();
         elementCache().autoCopyTargetSelect.selectByVisibleText(containerPath);
         return this;
     }
 
     public ReactAssayDesignerPage setPlateTemplate(String template)
     {
+        expandPropertiesPanel();
         elementCache().plateTemplateSelect.selectByVisibleText(template);
         return this;
     }
 
-    public void goToConfigureTemplates()
+    public PlateTemplateListPage goToConfigureTemplates()
     {
-        clickAndWait(elementCache().configureTemplatesLink);
-        // todo: return the class that wraps this page
+        expandPropertiesPanel();
+        getWrapper().clickAndWait(elementCache().configureTemplatesLink);
+        return new PlateTemplateListPage(getDriver());
     }
 
     public ReactAssayDesignerPage setDetectionMethod(String method)
     {
+        expandPropertiesPanel();
         elementCache().detectionMethodSelect.selectByVisibleText(method);
         return this;
     }
 
     public ReactAssayDesignerPage setMetaDataInputFormat(MetadataInputFormat format)
     {
+        expandPropertiesPanel();
         elementCache().metadataInputSelect.selectOption(format);
         return this;
     }
 
     public ReactAssayDesignerPage setSaveScriptData(boolean checked)
     {
+        expandPropertiesPanel();
         elementCache().saveScriptFilesCheckbox.set(checked);
         return this;
     }
 
     public ReactAssayDesignerPage setEditableRuns(boolean checked)
     {
+        expandPropertiesPanel();
         elementCache().editableRunsCheckbox.set(checked);
         return this;
     }
 
     public boolean getEditableRuns()
     {
+        expandPropertiesPanel();
         return elementCache().editableRunsCheckbox.get();
     }
 
     public ReactAssayDesignerPage setEditableResults(boolean checked)
     {
+        expandPropertiesPanel();
         elementCache().editableResultCheckbox.set(checked);
         return this;
     }
 
     public boolean getEditableResults()
     {
+        expandPropertiesPanel();
         return elementCache().editableResultCheckbox.get();
     }
 
     public ReactAssayDesignerPage setBackgroundImport(boolean checked)
     {
+        expandPropertiesPanel();
         elementCache().backgroundUploadCheckbox.set(checked);
         return this;
     }
 
     public ReactAssayDesignerPage setQCStates(boolean checked)
     {
+        expandPropertiesPanel();
         elementCache().qcEnabledCheckbox.set(checked);
         return this;
     }
 
     public ReactAssayDesignerPage setPlateMetadata(boolean checked)
     {
+        expandPropertiesPanel();
         elementCache().plateTemplateCheckbox.set(checked);
         return this;
     }
 
     public ReactAssayDesignerPage addTransformScript(File transformScript)
     {
+        expandPropertiesPanel();
         int index = Locator.xpath("//input[starts-with(@id, 'assay-design-protocolTransformScripts')]").findElements(getDriver()).size();
-        click(Locator.tagWithClass("span", "btn").containing("Add Script"));
+        getWrapper().click(Locator.tagWithClass("span", "btn").containing("Add Script"));
         return setTransformScript(transformScript, index);
     }
 
     public ReactAssayDesignerPage setTransformScript(File transformScript)
     {
+        expandPropertiesPanel();
         return setTransformScript(transformScript, 0);
     }
 
     public ReactAssayDesignerPage setTransformScript(File transformScript, int index)
     {
+        expandPropertiesPanel();
         assertTrue("Unable to locate the transform script: " + transformScript, transformScript.exists());
-        setFormElement(Locator.xpath("//input[@id='assay-design-protocolTransformScripts" + index + "']"), transformScript.getAbsolutePath());
+        getWrapper().setFormElement(Locator.xpath("//input[@id='assay-design-protocolTransformScripts" + index + "']"), transformScript.getAbsolutePath());
         return this;
     }
 
@@ -204,11 +223,9 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return expandFieldsPanel("Results");
     }
 
-    public DomainFormPanel expandFieldsPanel(String title)
+    protected void expandPropertiesPanel()
     {
-        DomainFormPanel panel = fieldsPanel(title);
-        panel.expand();
-        return panel;
+        elementCache().propertiesPanel.expand();
     }
 
     @Override
@@ -225,18 +242,19 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public class ElementCache extends DomainDesignerPage.ElementCache
     {
-        final Input nameInput = Input(Locator.id("assay-design-name"), getDriver()).findWhenNeeded(this);
-        final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(this);
-        final Select autoCopyTargetSelect = Select(Locator.id("assay-design-autoCopyTargetContainerId")).findWhenNeeded(this);
-        final Select plateTemplateSelect = Select(Locator.id("assay-design-selectedPlateTemplate")).findWhenNeeded(this);
-        final WebElement configureTemplatesLink = Locator.linkContainingText("Configure Templates").findWhenNeeded(this);
-        final Select detectionMethodSelect = Select(Locator.id("assay-design-selectedDetectionMethod")).findWhenNeeded(this);
-        final OptionSelect<MetadataInputFormat> metadataInputSelect = OptionSelect.finder(Locator.id("assay-design-selectedMetadataInputFormat"), MetadataInputFormat.class).findWhenNeeded(this);
-        final Checkbox saveScriptFilesCheckbox = Checkbox(Locator.checkboxById("assay-design-saveScriptFiles")).findWhenNeeded(this);
-        final Checkbox editableRunsCheckbox = Checkbox(Locator.checkboxById("assay-design-editableRuns")).findWhenNeeded(this);
-        final Checkbox editableResultCheckbox = Checkbox(Locator.checkboxById("assay-design-editableResults")).findWhenNeeded(this);
-        final Checkbox backgroundUploadCheckbox = Checkbox(Locator.checkboxById("assay-design-backgroundUpload")).findWhenNeeded(this);
-        final Checkbox qcEnabledCheckbox = Checkbox(Locator.checkboxById("assay-design-qcEnabled")).findWhenNeeded(this);
-        final Checkbox plateTemplateCheckbox = Checkbox(Locator.checkboxById("assay-design-plateMetadata")).findWhenNeeded(this);
+        protected final DomainPanel<?, ?> propertiesPanel = new DomainPanel.DomainPanelFinder(getDriver()).index(0).timeout(5000).findWhenNeeded(this);
+        final Input nameInput = Input(Locator.id("assay-design-name"), getDriver()).findWhenNeeded(propertiesPanel);
+        final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(propertiesPanel);
+        final Select autoCopyTargetSelect = Select(Locator.id("assay-design-autoCopyTargetContainerId")).findWhenNeeded(propertiesPanel);
+        final Select plateTemplateSelect = Select(Locator.id("assay-design-selectedPlateTemplate")).findWhenNeeded(propertiesPanel);
+        final WebElement configureTemplatesLink = Locator.linkContainingText("Configure Templates").findWhenNeeded(propertiesPanel);
+        final Select detectionMethodSelect = Select(Locator.id("assay-design-selectedDetectionMethod")).findWhenNeeded(propertiesPanel);
+        final OptionSelect<MetadataInputFormat> metadataInputSelect = OptionSelect.finder(Locator.id("assay-design-selectedMetadataInputFormat"), MetadataInputFormat.class).findWhenNeeded(propertiesPanel);
+        final Checkbox saveScriptFilesCheckbox = Checkbox(Locator.checkboxById("assay-design-saveScriptFiles")).findWhenNeeded(propertiesPanel);
+        final Checkbox editableRunsCheckbox = Checkbox(Locator.checkboxById("assay-design-editableRuns")).findWhenNeeded(propertiesPanel);
+        final Checkbox editableResultCheckbox = Checkbox(Locator.checkboxById("assay-design-editableResults")).findWhenNeeded(propertiesPanel);
+        final Checkbox backgroundUploadCheckbox = Checkbox(Locator.checkboxById("assay-design-backgroundUpload")).findWhenNeeded(propertiesPanel);
+        final Checkbox qcEnabledCheckbox = Checkbox(Locator.checkboxById("assay-design-qcEnabled")).findWhenNeeded(propertiesPanel);
+        final Checkbox plateTemplateCheckbox = Checkbox(Locator.checkboxById("assay-design-plateMetadata")).findWhenNeeded(propertiesPanel);
     }
 }

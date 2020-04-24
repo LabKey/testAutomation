@@ -1177,7 +1177,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
-     * @deprecated Use {@link #projectMenu().open()}
+     * @deprecated Use {@link org.labkey.test.components.api.ProjectMenu#open}
      */
     @Deprecated
     public void openProjectMenu()

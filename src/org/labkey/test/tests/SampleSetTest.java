@@ -2093,11 +2093,11 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleHelper.createSampleSet(new SampleSetDefinition(CASE_INSENSITIVE_SAMPLE_SET));
 
         clickProject(PROJECT_NAME);
-        List<WebElement> errors = sampleHelper
+        List<String> errors = sampleHelper
                 .goToCreateNewSampleSet()
                 .setName(LOWER_CASE_SAMPLE_SET)
-                .clickSaveExpectingError();
-        assertEquals("Sample Type creation error", Arrays.asList("A Sample Type with that name already exists."), getTexts(errors));
+                .clickSaveExpectingErrors();
+        assertEquals("Sample Type creation error", Arrays.asList("A Sample Type with that name already exists."), errors);
         clickProject(PROJECT_NAME);
         assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_SET));
         assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLE_SET));
@@ -2113,18 +2113,18 @@ public class SampleSetTest extends BaseWebDriverTest
             .goToCreateNewSampleSet()
             .setName("ReservedFieldNameValidation");
 
-        DomainFormPanel domainFormPanel = createPage.getDomainEditor();
+        DomainFormPanel domainFormPanel = createPage.getFieldsPanel();
 
         log("Verify error message for reserved field names");
         domainFormPanel.manuallyDefineFields("created");
         assertEquals("Sample Type reserved field name error", Arrays.asList(
                 "Property name 'created' is a reserved name."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
         domainFormPanel.manuallyDefineFields("rowid");
         assertEquals("Sample Type reserved field name error", Arrays.asList(
                 "Property name 'rowid' is a reserved name."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         log("Verify error message for a few other special field names");
@@ -2132,14 +2132,14 @@ public class SampleSetTest extends BaseWebDriverTest
         assertEquals("Sample Type 'name' field name error", Arrays.asList(
                 "The field name 'Name' is already taken. Please provide a unique name for each field.",
                 "Please correct errors in Fields before saving."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         log("Verify error message for a few other special field names");
         domainFormPanel.manuallyDefineFields("sampleid");
         assertEquals("Sample Type SampleId field name error", Arrays.asList(
                 "The SampleId field name is reserved for imported or generated sample ids."),
-                getTexts(createPage.clickSaveExpectingError()));
+                createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
     }
 
@@ -2227,7 +2227,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Remove the attachment columns and validate that everything still works.");
         clickFolder(FOLDER_NAME);
         UpdateSampleSetPage domainDesignerPage = sampleHelper.goToEditSampleSet(sampleSetName);
-        domainDesignerPage.getDomainEditor().removeField("FileAttachment", true);
+        domainDesignerPage.getFieldsPanel().removeField("FileAttachment", true);
         domainDesignerPage.clickSave();
 
         expectedHeaders.remove("File Attachment");
