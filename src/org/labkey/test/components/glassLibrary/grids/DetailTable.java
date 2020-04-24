@@ -7,8 +7,9 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is a 'special' table that has only two columns, and no header. An example of this table can be seen in the
@@ -80,28 +81,23 @@ public class DetailTable extends WebDriverComponent
     }
 
     /**
-     * Returns a list of a list of the values in the grid. All values are treated a string.
+     * Returns a map of the values in the grid. The key is the first column and the value is the second column. The
+     * first column is a property or attribute name or some identifier. The second column is the value of that property.
      *
-     * @return A list of list of strings.
+     * @return A map with string values.
      **/
-    public List<List<String>> getTableData()
+    public Map<String, String> getTableData()
     {
         // Explicitly check that the table has been loaded before trying to get the data.
         getWrapper().waitFor(this::isLoaded, "Cannot get the table data because the table is not loaded.", 500);
 
-        List<List<String>> tableData = new ArrayList<>();
+        Map<String, String> tableData = new HashMap<>();
 
         for(WebElement tableRow : getComponentElement().findElements(By.cssSelector("tr")))
         {
             List<WebElement> tds = tableRow.findElements(By.tagName("td"));
-            List<String> rowData = new ArrayList<>();
 
-            for(WebElement td : tds)
-            {
-                rowData.add(td.getText());
-            }
-
-            tableData.add(rowData);
+            tableData.put(tds.get(0).getText(), tds.get(1).getText());
         }
 
         return tableData;
