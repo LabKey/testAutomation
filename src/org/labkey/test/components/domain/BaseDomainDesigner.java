@@ -82,7 +82,13 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
 
     public abstract class ElementCache extends Component<EC>.ElementCache
     {
-        public final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
-        public final WebElement saveButton = Locator.css(".domain-designer-buttons > .pull-right").findWhenNeeded(this);
+        protected final WebElement buttonPanel = buttonPanelLocator().findWhenNeeded(this);
+        public final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(buttonPanel);
+        public final WebElement saveButton = Locator.byClass("pull-right").findWhenNeeded(buttonPanel);
+
+        protected Locator.XPathLocator buttonPanelLocator()
+        {
+            return Locator.byClass("domain-designer-buttons");
+        }
     }
 }

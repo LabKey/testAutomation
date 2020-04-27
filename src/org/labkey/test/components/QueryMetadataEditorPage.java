@@ -57,18 +57,24 @@ public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorP
     public class ElementCache extends DomainDesigner.ElementCache
     {
         private final WebElement resetButton = Locator.button("Reset To Default")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
         private final WebElement aliasFieldButton = Locator.button("Alias Field")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
         private final WebElement viewDataButton = Locator.button("View Data")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
         private final WebElement editSourceButton = Locator.button("Edit Source")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         @Override
         protected int getFieldPanelIndex()
         {
             return 0;
+        }
+
+        @Override
+        protected Locator.XPathLocator buttonPanelLocator()
+        {
+            return Locator.byClass("query-metadata-editor-buttons");
         }
     }
 }
