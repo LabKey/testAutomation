@@ -473,7 +473,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 "   options : {\n" +
                 "       keyPropertyName : 'intFieldOne',\n" +
                 "       useTimeKeyField : false,\n" +
-                "       demographics : true\n" +
+                "       demographics : false\n" +
                 "   },\n" +
                 "   success: callback," +
                 "   failure: callback"+
