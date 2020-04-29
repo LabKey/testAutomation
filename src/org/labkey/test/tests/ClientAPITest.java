@@ -152,6 +152,27 @@ public class ClientAPITest extends BaseWebDriverTest
             "</script>\n" +
             "<div id=\"" + TEST_DIV_NAME + "\"></div>";
 
+    private static final String DOMAIN_FIELDS =
+            "       fields: [{\n" +
+            "           name: \"intFieldOne\",\n" +
+            "           rangeURI: \"int\"\n" +
+            "       },{\n" +
+            "           name: \"intFieldTwo\",\n" +
+            "           rangeURI: \"int\"\n" +
+            "       },{\n" +
+            "           name: \"stringFieldOne\",\n" +
+            "           rangeURI: \"string\"\n" +
+            "       },{\n" +
+            "           name: \"labName\",\n" +
+            "           rangeURI: \"string\"\n" +
+            "       },{\n" +
+            "           name : \"labLocation\",\n" +
+            "           rangeURI : \"string\"\n" +
+            "       },{\n" +
+            "           name : \"dateFieldOne\",\n" +
+            "           rangeURI : \"dateTime\"\n" +
+            "       }]\n";
+
     public static String getFullSource(String testFragment)
     {
         return SRC_PREFIX + "\n" + testFragment + "\n" + SRC_SUFFIX;
@@ -356,7 +377,7 @@ public class ClientAPITest extends BaseWebDriverTest
     }
 
     @Test
-    public void createStudyDatasetVisitWithTimeKeyField()
+    public void validateStudyDatasetVisitWithTimeKeyField()
     {
         // this test case attempts to create a time-keyed dataset in a visit-based study folder, which should
         // fail on create.
@@ -366,85 +387,310 @@ public class ClientAPITest extends BaseWebDriverTest
                 "   kind: \"StudyDatasetVisit\",\n" +
                 "   domainDesign: {\n" +
                 "       name : '"+dataSetName+"',\n" +
-                "       fields: [{\n" +
-                "           name: \"intFieldOne\",\n" +
-                "           rangeURI: \"int\"\n" +
-                "       },{\n" +
-                "           name: \"stringFieldOne\",\n" +
-                "           rangeURI: \"string\"\n" +
-                "       },{\n" +
-                "           name: \"labName\",\n" +
-                "           rangeURI: \"string\"\n" +
-                "       },{\n" +
-                "           name : \"labLocation\",\n" +
-                "           rangeURI : \"string\"\n" +
-                "       }]\n" +
+                DOMAIN_FIELDS +
                 "   },\n" +
                 "   options : {\n" +
-                "       keyPropertyName : 'intFieldOne',\n" +
                 "       useTimeKeyField : true,\n" +
-                "       demographics : true\n" +
                 "   },\n" +
-                "   success: callback," +
-                "   failure: callback"+
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
                 "});\n";
-        checkErrors();
-        try
-        {
-            executeAsyncScript(create);
-            fail("Should not have successfully created the domain");
-        }
-        catch(AssertionError expected)
-        {
-            log("success: " + expected.getMessage());
-            resetErrors();
-        }
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "Additional key property cannot be Time (from Date/Time) for visit based studies.", error.get("exception"));
     }
 
     @Test
-    public void createStudyDatasetDateWithoutTimeKeyField()
+    public void validateStudyDatasetVisitDomainKindInDateBasedStudy()
     {
+        // make sure you can't use StudyDatasetVisit domain kind in a date based study
         projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
+        String dataSetName = "ThisShouldBlowUp";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "Date based studies require a date based dataset domain. Please specify a kind name of : StudyDatasetDate.", error.get("exception"));
+    }
+
+    @Test
+    public void validateStudyDatasetDateDomainKindInVisitBasedStudy()
+    {
+        // make sure you can't use StudyDatasetVisit domain kind in a date based study
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetDate\",\n" +
                 "   domainDesign: {\n" +
-                "       name : '" + dataSetName + "',\n" +
-                "       fields: [{\n" +
-                "           name: \"intFieldOne\",\n" +
-                "           rangeURI: \"int\"\n" +
-                "       },{\n" +
-                "           name: \"intFieldTwo\",\n" +
-                "           rangeURI: \"int\"\n" +
-                "       },{\n" +
-                "           name: \"stringFieldOne\",\n" +
-                "           rangeURI: \"string\"\n" +
-                "       },{\n" +
-                "           name: \"labName\",\n" +
-                "           rangeURI: \"string\"\n" +
-                "       },{\n" +
-                "           name : \"labLocation\",\n" +
-                "           rangeURI : \"string\"\n" +
-                "       }]\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "Visit based studies require a visit based dataset domain. Please specify a kind name of : StudyDatasetVisit.", error.get("exception"));
+    }
+
+    @Test
+    public void validateUseTimeKeyFieldWithKeyPropertyName()
+    {
+        // make sure you can't set the useTimeKeyField and keyPropertyName at the same time
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "ThisShouldBlowUp";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
                 "   },\n" +
                 "   options : {\n" +
                 "       keyPropertyName : 'intFieldOne',\n" +
-                "       useTimeKeyField : false\n" +
+                "       useTimeKeyField : true,\n" +
                 "   },\n" +
-                "   success: callback," +
-                "   failure: callback" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
                 "});\n";
-        checkErrors();
-        try
-        {
-            executeAsyncScript(create);
-            fail("Should not have created this domain");
-        }
-        catch(AssertionError expected)
-        {
-            log("success." + expected.getMessage());
-            resetErrors();
-        }
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "KeyPropertyName should not be provided when using additional key of Time (from Date/Time).", error.get("exception"));
+    }
+
+    @Test
+    public void validateUseTimeKeyFieldWithKeyPropertyManaged()
+    {
+        // make sure you can't set the useTimeKeyField and keyPropertyName at the same time
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "ThisShouldBlowUp";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
+                "   },\n" +
+                "   options : {\n" +
+                "       keyPropertyName : 'intFieldOne',\n" +
+                "       keyPropertyManaged : true,\n" +
+                "       useTimeKeyField : true,\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "Additional key cannot be a managed field if KeyPropertyName is Time (from Date/Time).", error.get("exception"));
+    }
+
+    @Test
+    public void validateDemographicDataWithKeyPropertyName()
+    {
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "ThisShouldBlowUp";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
+                "   },\n" +
+                "   options : {\n" +
+                "       keyPropertyName : 'intFieldOne',\n" +
+                "       demographicData : true\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "There cannot be an Additional Key Column if the dataset is Demographic Data.", error.get("exception"));
+    }
+
+    @Test
+    public void validateKeyPropertyManagedDataType()
+    {
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "ThisShouldBlowUp";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
+                "   },\n" +
+                "   options : {\n" +
+                "       keyPropertyName : 'dateFieldOne',\n" +
+                "       keyPropertyManaged : true\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "If Additional Key Column is managed, the column type must be numeric or text-based.", error.get("exception"));
+    }
+
+    @Test
+    public void validateKeyPropertyManagedWithoutKeyPropertyName()
+    {
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "ThisShouldBlowUp";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
+                "   },\n" +
+                "   options : {\n" +
+                "       keyPropertyManaged : true\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "Additional Key Column name must be specified if field is managed.", error.get("exception"));
+    }
+
+    @Test
+    public void validateKeyPropertyNameExistsInDomain()
+    {
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "ThisShouldBlowUp";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
+                "   },\n" +
+                "   options : {\n" +
+                "       keyPropertyName : 'dateFieldOneDoesNotExist'\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "Additional Key Column name \"dateFieldOneDoesNotExist\" must be the name of a column.", error.get("exception"));
+    }
+
+    @Test
+    public void validateKeyPropertyNameIsNotBlank()
+    {
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "ThisShouldBlowUp";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
+                "   },\n" +
+                "   options : {\n" +
+                "       keyPropertyName : ''\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "Please select a field name for the additional key.", error.get("exception"));
+    }
+
+    @Test
+    public void validateDatasetDuplicateName()
+    {
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "DatasetDuplicateNameCheck";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        executeAsyncScript(create); // first call should succeed and create the dataset
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "A Dataset or Query already exists with the name \"" + dataSetName + "\".", error.get("exception"));
+    }
+
+    @Test
+    public void validateDatasetDuplicateLabel()
+    {
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String dataSetName = "DatasetDuplicateLabelCheck";
+        String dataSetLabel = "Dataset Duplicate Label Check";
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
+                "   },\n" +
+                "   options : {\n" +
+                "       label : '"+dataSetLabel+"',\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        executeAsyncScript(create); // first call should succeed and create the dataset
+
+        dataSetName = "DatasetDuplicateLabelCheck2"; // need to change the name so that validation check passes
+        create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '"+dataSetName+"',\n" +
+                DOMAIN_FIELDS +
+                "   },\n" +
+                "   options : {\n" +
+                "       label : '"+dataSetLabel+"',\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "A Dataset already exists with the label \"" + dataSetLabel + "\".", error.get("exception"));
+    }
+
+    @Test
+    public void validateDatasetNameIsNotBlank()
+    {
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : '',\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "Dataset name cannot be empty.", error.get("exception"));
+    }
+
+    @Test
+    public void validateDatasetNameMaxLength()
+    {
+        // max length allowed should be 200, this name's length is 201
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        String create = "LABKEY.Domain.create({\n" +
+                "   kind: \"StudyDatasetVisit\",\n" +
+                "   domainDesign: {\n" +
+                "       name : 'Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890Test567890X',\n" +
+                "   },\n" +
+                "   success: function(data){callback(data); },\n" +
+                "   failure: function(e){callback(e); }\n" +
+                "});\n";
+
+        Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
+        assertEquals("Unexpected error message", "Dataset name must be under 200 characters.", error.get("exception"));
     }
 
     @Test
@@ -456,19 +702,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 "   kind: \"StudyDatasetVisit\",\n" +
                 "   domainDesign: {\n" +
                 "       name : '"+dataSetName+"',\n" +
-                "       fields: [{\n" +
-                "           name: \"intFieldOne\",\n" +
-                "           rangeURI: \"int\"\n" +
-                "       },{\n" +
-                "           name: \"stringFieldOne\",\n" +
-                "           rangeURI: \"string\"\n" +
-                "       },{\n" +
-                "           name: \"labName\",\n" +
-                "           rangeURI: \"string\"\n" +
-                "       },{\n" +
-                "           name : \"labLocation\",\n" +
-                "           rangeURI : \"string\"\n" +
-                "       }]\n" +
+                DOMAIN_FIELDS +
                 "   },\n" +
                 "   options : {\n" +
                 "       keyPropertyName : 'intFieldOne',\n" +
@@ -481,7 +715,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         Map<String, Object> createResult = (Map<String,Object>)executeAsyncScript(create);
         List<Map<String, Object>> fields = (List<Map<String, Object>>)createResult.get("fields");
-        assertTrue(fields.size() == 4);
+        assertTrue(fields.size() == 6);
         assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldOne")));
         assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("stringFieldOne")));
         assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("labName")));
@@ -528,7 +762,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         Map<String, Object> updateResult = (Map<String, Object>)executeAsyncScript(updateDomain);
         List<Map<String, Object>> updatedFields = (List<Map<String, Object>>) updateResult.get("fields");
-        assertTrue(updatedFields.size() == 5);
+        assertTrue(updatedFields.size() == 7);
         assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("intFieldOne")));
         assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("stringFieldOne")));
         assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("labName")));
@@ -557,22 +791,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 "   kind: \"StudyDatasetDate\",\n" +
                 "   domainDesign: {\n" +
                 "       name : '"+dataSetName+"',\n" +
-                "       fields: [{\n" +
-                "           name: \"intFieldOne\",\n" +
-                "           rangeURI: \"int\"\n" +
-                "       },{\n" +
-                "           name: \"intFieldTwo\",\n" +
-                "           rangeURI: \"int\"\n" +
-                "       },{\n" +
-                "           name: \"stringFieldOne\",\n" +
-                "           rangeURI: \"string\"\n" +
-                "       },{\n" +
-                "           name: \"labName\",\n" +
-                "           rangeURI: \"string\"\n" +
-                "       },{\n" +
-                "           name : \"labLocation\",\n" +
-                "           rangeURI : \"string\"\n" +
-                "       }]\n" +
+                DOMAIN_FIELDS +
                 "   },\n" +
                 "   options : {\n" +
                 "       keyPropertyName : 'intFieldOne',\n" +
@@ -583,7 +802,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         Map<String, Object> createResult = (Map<String,Object>)executeAsyncScript(create);
         List<Map<String, Object>> fields = (List<Map<String, Object>>)createResult.get("fields");
-        assertEquals(5, fields.size());
+        assertEquals(6, fields.size());
         assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldOne")
                     && a.get("rangeURI").toString().endsWith("int")));
         assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldTwo")));
@@ -634,7 +853,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 "});";
         Map<String, Object> updateResult = (Map<String, Object>)executeAsyncScript(updateDomain);
         List<Map<String, Object>> updatedFields = (List<Map<String, Object>>)updateResult.get("fields");
-        assertEquals(6, updatedFields.size());
+        assertEquals(7, updatedFields.size());
         assertTrue(updatedFields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldOne")
                 && a.get("rangeURI").toString().endsWith("int")));
         assertTrue(updatedFields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldTwo")));
@@ -678,19 +897,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 "   kind: \"StudyDatasetVisit\",\n" +
                 "   domainDesign: {\n" +
                 "       name : 'My Test Dataset',\n" +
-                "       fields: [{\n" +
-                "           name: \"intFieldOne\",\n" +
-                "           rangeURI: \"int\"\n" +
-                "       },{\n" +
-                "           name: \"stringFieldOne\",\n" +
-                "           rangeURI: \"string\"\n" +
-                "       },{\n" +
-                "           name: \"labName\",\n" +
-                "           rangeURI: \"string\"\n" +
-                "       },{\n" +
-                "           name : \"labLocation\",\n" +
-                "           rangeURI : \"string\"\n" +
-                "       }]\n" +
+                DOMAIN_FIELDS +
                 "   },\n" +
                 "   options : {\n" +
                 "       datasetId : 81005\n" +
