@@ -173,6 +173,9 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return this;
     }
 
+    // TODO: add ability to select "import data"/"don't import" here, after inferring fields from file
+    // for datasets, the ability to map key columns is exposed when 'import data' is selected
+
     public List<String> fieldNames()
     {
         return elementCache().findFieldRows()

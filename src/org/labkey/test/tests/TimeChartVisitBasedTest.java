@@ -22,8 +22,8 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
-import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.TimeChartWizard;
+import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
 import org.labkey.test.tests.visualization.TimeChartTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -186,7 +186,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         waitForElement(Locator.xpath("//input[@name='dsName']"));
         assertEquals("APXwtkg", getFormElement(Locator.name("ff_name1")));
         setFormElement(Locator.name("ff_name1"), "APXwtkgCHANGED");
-        editDatasetPage.save();
+        editDatasetPage.clickSave();
         clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
         waitAndClickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
         waitForText("Error: Unable to find field APXwtkg in study.APX-1.");
