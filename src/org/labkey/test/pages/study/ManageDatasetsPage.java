@@ -4,6 +4,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -25,11 +27,13 @@ public class ManageDatasetsPage extends LabKeyPage<ManageDatasetsPage.ElementCac
         return new ManageDatasetsPage(driver.getDriver());
     }
 
-    public CreateDatasetPage clickCreateNewDataset()
+    public EditDatasetDefinitionPage clickCreateNewDataset()
     {
+        ExperimentalFeaturesHelper.enableExperimentalFeature(
+                createDefaultConnection(true),"experimental-reactdesigner");
         clickAndWait(elementCache().createNewDataset);
 
-        return new CreateDatasetPage(getDriver());
+        return new EditDatasetDefinitionPage(getDriver());
     }
 
     protected ElementCache newElementCache()

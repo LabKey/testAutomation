@@ -16,6 +16,7 @@
 package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
+import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
 import org.openqa.selenium.WebDriver;
 
 /**
