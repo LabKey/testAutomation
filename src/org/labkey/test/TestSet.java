@@ -28,15 +28,15 @@ import java.util.Set;
 public class TestSet
 {
     private String _suite;
-    private List<Class> _tests;
+    private List<Class<?>> _tests;
 
-    TestSet(@NotNull Set<Class> tests, @NotNull String suite)
+    TestSet(@NotNull Set<Class<?>> tests, @NotNull String suite)
     {
         _tests = new ArrayList<>(tests);
         _suite = suite;
     }
 
-    public TestSet(Set<Class> tests)
+    public TestSet(Set<Class<?>> tests)
     {
         this(tests, "Custom");
     }
@@ -46,7 +46,7 @@ public class TestSet
         this(new HashSet<>());
     }
 
-    void setTests(List<Class> tests)
+    void setTests(List<Class<?>> tests)
     {
         _tests = tests;
     }
@@ -56,9 +56,9 @@ public class TestSet
         addTests(tests.getTestList());
     }
 
-    void addTests(Collection<Class> tests)
+    void addTests(Collection<Class<?>> tests)
     {
-        for (Class test : tests)
+        for (Class<?> test : tests)
         {
             if (!_tests.contains(test))
                 _tests.add(test);
@@ -70,7 +70,7 @@ public class TestSet
         removeTests(tests.getTestList());
     }
 
-    void removeTests(Collection<Class> tests)
+    void removeTests(Collection<Class<?>> tests)
     {
         _tests.removeAll(tests);
     }
@@ -85,7 +85,7 @@ public class TestSet
         return _suite;
     }
 
-    public List<Class> getTestList()
+    public List<Class<?>> getTestList()
     {
         return _tests;
     }
@@ -93,13 +93,13 @@ public class TestSet
     public List<String> getTestNames()
     {
         List<String> testNames = new ArrayList<>();
-        for (Class test : _tests)
+        for (Class<?> test : _tests)
             testNames.add(test.getSimpleName());
         return testNames;
     }
 
     // Move the named test to the Nth position in the list, maintaining the order of all other tests.
-    public boolean prioritizeTest(Class priorityTest, int N)
+    public boolean prioritizeTest(Class<?> priorityTest, int N)
     {
         if (_tests.contains(priorityTest))
         {
