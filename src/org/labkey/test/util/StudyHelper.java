@@ -24,9 +24,10 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.ManageDatasetsPage;
-import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.pages.study.StudySecurityPage;
@@ -386,37 +387,39 @@ public class StudyHelper
     @LogMethod
     public EditDatasetDefinitionPage defineDataset(@LoggedParam String name, String containerPath, @Nullable String id)
     {
-        EditDatasetDefinitionPage page = EditDatasetDefinitionPage.beginAt(_test, containerPath);
-        page.setName(name);
+        _test.beginAt(WebTestHelper.buildURL("study", containerPath, "defineDatasetType"));
+
+        _test.setFormElement(Locator.name("typeName"), name);
 
         if (id != null)
         {
-            page.openAdvancedDatasetSettings()
-                    .setDatasetId(id)
-                    .clickApply();
+            _test.uncheckCheckbox(Locator.name("autoDatasetId"));
+            _test.setFormElement(Locator.id("datasetId"), id);
         }
         else
         {
-            page.openAdvancedDatasetSettings()
-                    .setDatasetId("")
-                    .clickApply();
+            _test.checkCheckbox(Locator.name("autoDatasetId"));
         }
 
-       return page;
+        _test.clickButton("Next");
+
+        return new EditDatasetDefinitionPage(_test.getDriver());
     }
 
     @LogMethod
     public void importDataset(@LoggedParam String name, String containerPath, String id, File datasetFile)
     {
-        EditDatasetDefinitionPage page = EditDatasetDefinitionPage.beginAt(_test, containerPath);
-        page.setName(name)
-            .openAdvancedDatasetSettings()
-            .setDatasetId(id)
-            .clickApply();
-        page.getFieldsPanel()
-                .setInferFieldFile(datasetFile);
-        // todo: 'import data' is default behavior, but is optional if the slider is toggled.
-        page.clickSave();
+        _test.beginAt(WebTestHelper.buildURL("study", containerPath, "defineDatasetType"));
+
+        _test.setFormElement(Locator.name("typeName"), name);
+        _test.uncheckCheckbox(Locator.name("autoDatasetId"));
+        _test.setFormElement(Locator.id("datasetId"), id);
+        _test.checkCheckbox(Locator.name("fileImport"));
+        _test.clickButton("Next");
+
+        _test.waitForElement(Locator.name("uploadFormElement"));
+        _test.setFormElement(Locator.name("uploadFormElement"), datasetFile);
+        _test.clickButton("Import");
     }
 
     public ManageDatasetsPage goToManageDatasets()

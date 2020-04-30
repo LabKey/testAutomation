@@ -432,7 +432,7 @@ public class ParticipantReportTest extends ReportTest
                 .selectDatasetByName("DEM-1")
                 .clickEditDefinition()
                 .setIsDemographicData(true)
-                .clickSave();
+                .save();
 
         goToManageViews().clickAddReport("Mouse Report");
         // select some measures from the demographics

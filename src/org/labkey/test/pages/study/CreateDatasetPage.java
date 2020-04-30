@@ -17,8 +17,8 @@ package org.labkey.test.pages.study;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 

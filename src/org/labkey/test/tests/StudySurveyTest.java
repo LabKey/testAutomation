@@ -72,7 +72,7 @@ public class StudySurveyTest extends BaseWebDriverTest
         _studyHelper.goToManageDatasets()
                 .clickCreateNewDataset()
                 .setName(datasetName)
-                .clickSave();
+                .submit();
 
         gotoDataset(datasetName);
         DataRegionTable table = new DataRegionTable("Dataset", getDriver());

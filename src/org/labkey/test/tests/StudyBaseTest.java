@@ -263,7 +263,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
                 .selectDatasetByLabel(datasetLabel)
                 .clickEditDefinition()
                 .setIsDemographicData(demographics)
-                .clickSave();
+                .save();
     }
 
     // Must be on study home page or "manage study" page
@@ -273,7 +273,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
                 .selectDatasetByLabel(datasetLabel)
                 .clickEditDefinition()
                 .setShowInOverview(showByDefault)
-                .clickSave();
+                .save();
     }
 
     public void selectOption(String name, int i, String value)
