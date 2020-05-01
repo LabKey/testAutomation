@@ -409,6 +409,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         String initialValue = elementCache().lookupContainerSelect.getFirstSelectedOption().getAttribute("value");
         if (!containerPath.equals(initialValue))
         {
+            WebDriverWrapper.sleep(500);
             elementCache().lookupContainerSelect.selectByValue(containerPath);
             getWrapper().shortWait().withMessage("Schema select didn't clear after selecting lookup container")
                     .until(ExpectedConditions.attributeToBe(elementCache().getLookupSchemaSelect().getWrappedElement(), "value", ""));
