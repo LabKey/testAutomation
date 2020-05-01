@@ -120,6 +120,13 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return newFieldRow;
     }
 
+    public DomainFieldRow manuallyDefineFields(FieldDefinition fieldDefinition)
+    {
+        DomainFieldRow fieldRow = manuallyDefineFields(fieldDefinition.getName());
+        setField(fieldDefinition);
+        return fieldRow;
+    }
+
     public DomainFormPanel removeField(String name)
     {
         return  removeField(name, false);
