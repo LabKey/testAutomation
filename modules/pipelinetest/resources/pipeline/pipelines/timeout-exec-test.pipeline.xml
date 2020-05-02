@@ -10,9 +10,10 @@
             <outputs>
                 <file name="output.tsv"/>
             </outputs>
-            <!-- jjs is the command-line frontend to Nashorn included in the JDK -->
+            <!-- JDK 11 java can compile and execute a single source file -->
+            <!-- See: https://openjdk.java.net/jeps/330 -->
             <exec installPath="${JAVA_HOME}/bin" timeout="3">
-                jjs pipeline/pipelines/timeout-exec-test.js -- -t 8
+                java pipeline/pipelines/TimeoutExecTest.java -t 8
                     ${pipeline, protocol name} "${httpSessionId}"
             </exec>
         </task>
