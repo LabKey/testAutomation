@@ -138,7 +138,6 @@ public class ScatterPlotTest extends GenericChartsTest
                 .clickEditDefinition();
 
         final DomainFormPanel datasetFieldsPanel = editDatasetDefinitionPage.getFieldsPanel();
-        waitForElement(Locator.lkButton("Export Fields"));
 
         log("Select the HEENT field");
         DomainFieldRow  apxField = datasetFieldsPanel.getField(APXHEENT);
@@ -151,8 +150,8 @@ public class ScatterPlotTest extends GenericChartsTest
 
         log("Change the column's reporting status to 'dimension'");
         pulseField.setDimension(true);
+        editDatasetDefinitionPage.clickSave();
 
-        clickAndWait(Locator.linkWithSpan("Save"));
         waitForText("APX-1: Abbreviated Physical Exam Dataset Properties");
 
         navigateToFolder(getProjectName(), getFolderName());
@@ -516,7 +515,6 @@ public class ScatterPlotTest extends GenericChartsTest
         final String FIELDS_REGION_TITLE = "Dataset Fields";
 
         ChartTypeDialog chartTypeDialog;
-        List<String> listOfMeasureLabels;
         int listIndex;
 
         log("Remove color and shape measures.");
@@ -526,18 +524,14 @@ public class ScatterPlotTest extends GenericChartsTest
                 .selectDatasetByName("APX-1")
                 .clickEditDefinition();
 
-        waitForText(FIELDS_REGION_TITLE);
         DomainFormPanel domainFormPanel = editDatasetPage.getFieldsPanel();
 
-        listOfMeasureLabels = getLabels(FIELDS_REGION_TITLE);
         log("Remove color measure.");
-        listIndex = listOfMeasureLabels.indexOf(MEASURE_7_NECK);
-        domainFormPanel.getField(listIndex)
+        domainFormPanel.getField("APXneck")
                 .clickRemoveField(true);
 
         log("Remove shape measure.");
-        listIndex = listOfMeasureLabels.indexOf(MEASURE_16_EVAL_SUM);
-        domainFormPanel.getField(listIndex)
+        domainFormPanel.getField("APXcemh")
                 .clickRemoveField(true);
 
         editDatasetPage.clickSave();
@@ -569,11 +563,8 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Manage", WAIT_FOR_PAGE);
         editDatasetPage = new DatasetPropertiesPage(getDriver()).clickEditDefinition();
 
-        waitForText(FIELDS_REGION_TITLE);
-        listOfMeasureLabels = getLabels(FIELDS_REGION_TITLE);
         log("Remove x-axis measure.");
-        listIndex = listOfMeasureLabels.indexOf(MEASURE_FORM_LANGUAGE);
-        editDatasetPage.getFieldsPanel().getField(listIndex).clickRemoveField(true);
+        editDatasetPage.getFieldsPanel().getField("formlang").clickRemoveField(true);
         editDatasetPage.clickSave();
 
         log("Verify missing measure error message.");

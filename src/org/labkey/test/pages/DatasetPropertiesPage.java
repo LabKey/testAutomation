@@ -34,6 +34,13 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
         // TODO: Need to figure out a way to wait for buttons to be responsive so that we don't need to use clickUntilStale
     }
 
+    public void waitForPage()
+    {
+        waitFor(()-> Locator.tagWithClass("div", "lk-body-title")
+                        .withChild(Locator.tag("h3")).existsIn(getDriver()),
+                "The page did not render in time", WAIT_FOR_PAGE);
+    }
+
     protected DatasetPropertiesPage.ElementCache newElementCache()
     {
         return new DatasetPropertiesPage.ElementCache();
