@@ -79,18 +79,18 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
         final WebElement icon = Locator.tagWithClass("img", "lineage-sm-icon")
                 .findWhenNeeded(this);
 
-        final WebElement overviewLink = Locator.linkWithSpan("Overview")
-                .findWhenNeeded(this).withTimeout(2000);
-        final WebElement lineageGraphLink = Locator.linkWithSpan("Lineage")
-                .findWhenNeeded(this).withTimeout(2000);
-        final Locator.XPathLocator nameLink = Locator.tagWithClass("a", "pointer");
+        final WebElement overviewLink = Locator.tagWithClass("a", "lineage-data-link--text")
+                .withText("Overview").findWhenNeeded(this).withTimeout(2000);
+        final WebElement lineageGraphLink = Locator.tagWithClass("a", "lineage-data-link--text")
+                .withText("Lineage").findWhenNeeded(this).withTimeout(2000);
+        final Locator.XPathLocator nameLink = Locator.tagWithClass("a", "lineage-link");
         final Locator.XPathLocator nameSpan = Locator.tag("span");
         final WebElement nameElement = Locator.XPathLocator.union(nameLink, nameSpan).findElement(this);
     }
 
     public static class NodeDetailItemFinder extends WebDriverComponentFinder<NodeDetail, NodeDetailItemFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("li", "lineage-name");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "lineage-item-test");
         private String _title = null;
 
         public NodeDetailItemFinder(WebDriver driver)
