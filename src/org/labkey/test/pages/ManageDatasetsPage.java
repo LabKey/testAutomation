@@ -17,6 +17,7 @@ package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
 import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -50,6 +51,8 @@ public class ManageDatasetsPage extends LabKeyPage<ManageDatasetsPage.ElementCac
 
     public EditDatasetDefinitionPage clickCreateNewDataset()
     {
+        ExperimentalFeaturesHelper.enableExperimentalFeature(
+                createDefaultConnection(true),"experimental-reactdesigner");
         clickAndWait(elementCache().createNewDatasetLink);
         return new EditDatasetDefinitionPage(getDriver());
     }
