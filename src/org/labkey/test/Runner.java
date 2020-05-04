@@ -89,7 +89,7 @@ public class Runner extends TestSuite
     private static SuiteBuilder _suites = SuiteBuilder.getInstance();
     private static Map<Test, Long> _testStats = new LinkedHashMap<>();
     private static int _testCount;
-    private static List<Class> _remainingTests;
+    private static List<Class<?>> _remainingTests;
     private static List<String> _passedTests = new ArrayList<>();
     private static List<String> _failedTests = new ArrayList<>();
     private static List<String> _erroredTests = new ArrayList<>();
@@ -104,7 +104,7 @@ public class Runner extends TestSuite
 
     private void updateRemainingTests(Test test, boolean failed, boolean errored)
     {
-        Class testClass = getTestClass(test);
+        Class<?> testClass = getTestClass(test);
         _remainingTests.remove(testClass);
         if (failed)
             _failedTests.add(test.toString());
@@ -119,7 +119,7 @@ public class Runner extends TestSuite
         ArrayList<String> failedAndRemaining = new ArrayList<>();
         failedAndRemaining.addAll(_failedTests);
         failedAndRemaining.addAll(_erroredTests);
-        for (Class clazz : _remainingTests)
+        for (Class<?> clazz : _remainingTests)
             failedAndRemaining.add(clazz.getName());
         writeClasses(failedAndRemaining, getRemainingTestsFile());
     }
@@ -137,9 +137,9 @@ public class Runner extends TestSuite
         }
    }
 
-    private static List<Class> readClasses(File file)
+    private static List<Class<?>> readClasses(File file)
     {
-        List<Class> testClasses = new ArrayList<>();
+        List<Class<?>> testClasses = new ArrayList<>();
 
         if (file.exists())
         {
@@ -169,12 +169,12 @@ public class Runner extends TestSuite
         return testClasses;
     }
 
-    private static Class[] readClasses(File recentlyFailedTestsFile, List<Class> tests)
+    private static Class<?>[] readClasses(File recentlyFailedTestsFile, List<Class<?>> tests)
     {
-        List<Class> recentlyFailedTests = readClasses(recentlyFailedTestsFile);
-        ArrayList<Class> filteredRecentlyFailedTests = new ArrayList<>();
+        List<Class<?>> recentlyFailedTests = readClasses(recentlyFailedTestsFile);
+        ArrayList<Class<?>> filteredRecentlyFailedTests = new ArrayList<>();
 
-        for (Class item: recentlyFailedTests)
+        for (Class<?> item: recentlyFailedTests)
         {
             if (tests.contains(item))
             {
@@ -182,7 +182,7 @@ public class Runner extends TestSuite
             }
         }
         
-        return filteredRecentlyFailedTests.toArray(new Class[filteredRecentlyFailedTests.size()]);
+        return filteredRecentlyFailedTests.toArray(new Class[0]);
     }
 
     private static File getRemainingTestsFile()
@@ -206,6 +206,7 @@ public class Runner extends TestSuite
         _testStats.put(currentWebTest, durationMs);
     }
 
+    @Override
     public synchronized void runTest(final Test test, final TestResult testResult)
     {
         long startTimeMs = System.currentTimeMillis();
@@ -230,7 +231,7 @@ public class Runner extends TestSuite
                     JUnit4TestAdapter adapter = (JUnit4TestAdapter) test;
                     if (Cleanable.class.isAssignableFrom(adapter.getTestClass()))
                     {
-                        Cleanable cleanable = (Cleanable) adapter.getTestClass().newInstance();
+                        Cleanable cleanable = (Cleanable) adapter.getTestClass().getDeclaredConstructor().newInstance();
                         cleanable.cleanup();
                     }
                 }
@@ -253,7 +254,7 @@ public class Runner extends TestSuite
 
             if (_failedTests.size() + _erroredTests.size() < _maxTestFailures || _maxTestFailures <= 0)
             {
-                final Class currentTestClass = getTestClass(test);
+                final Class<?> currentTestClass = getTestClass(test);
                 final String currentTestName = currentTestClass.getSimpleName();
 
                 TestListener classFailListener = new TestListener()
@@ -326,7 +327,7 @@ public class Runner extends TestSuite
             writeTimeReport();
             if (_failedTests.isEmpty() && _erroredTests.isEmpty())
             {
-                getRemainingTestsFile().delete();
+                getRemainingTestsFile().deleteOnExit();
             }
         }
     }
@@ -346,13 +347,13 @@ public class Runner extends TestSuite
         }
     }
 
-    private static Map<Class, List<String>> specifiedTestMethods = new HashMap<>();
+    private static Map<Class<?>, List<String>> specifiedTestMethods = new HashMap<>();
     // Set up only the requested tests
-    private static List<Class> getTestClasses(List<String> testNames)
+    private static List<Class<?>> getTestClasses(List<String> testNames)
     {
-        Map<String, Class> nameMap = new HashMap<>();
+        Map<String, Class<?>> nameMap = new HashMap<>();
         TestSet allTests = _suites.getAllTests();
-        for (Class testClass : allTests.getTestList())
+        for (Class<?> testClass : allTests.getTestList())
         {
             String simpleName = testClass.getSimpleName().toLowerCase();
             nameMap.put(simpleName, testClass);
@@ -368,7 +369,7 @@ public class Runner extends TestSuite
             }
         }
 
-        List<Class> testClasses = new ArrayList<>(testNames.size());
+        List<Class<?>> testClasses = new ArrayList<>(testNames.size());
 
         for (String testName : testNames)
         {
@@ -384,7 +385,7 @@ public class Runner extends TestSuite
             else
                 testClassName = testName;
 
-            Class testClass = nameMap.get(testClassName.toLowerCase());
+            Class<?> testClass = nameMap.get(testClassName.toLowerCase());
             if (testClass == null)
             {
                 System.err.println("Couldn't find test '" + testClassName + "'.  Valid tests are:");
@@ -404,10 +405,10 @@ public class Runner extends TestSuite
         return testClasses;
     }
 
-    private static TestSuite getSuite(List<Class> testClasses, boolean cleanOnly) throws Exception
+    private static TestSuite getSuite(List<Class<?>> testClasses, boolean cleanOnly) throws Exception
     {
         // Remove duplicate tests (e.g., don't run "basic" test twice if bvt & drt are selected via ant test) but keep the order
-        Set<Class> testClassesCopy = new LinkedHashSet<>(testClasses);
+        Set<Class<?>> testClassesCopy = new LinkedHashSet<>(testClasses);
         TestSuite suite = new Runner(cleanOnly);
 
         addTests(suite, testClassesCopy);
@@ -415,10 +416,10 @@ public class Runner extends TestSuite
         return suite;
     }
 
-    private static void addTests(TestSuite suite, Set<Class> testClasses)
+    private static void addTests(TestSuite suite, Set<Class<?>> testClasses)
     {
         boolean foundServerSideTest = false;
-        for (Class testClass : testClasses)
+        for (Class<?> testClass : testClasses)
         {
             Test test = null;
             try
@@ -740,12 +741,7 @@ public class Runner extends TestSuite
     {
         int contentLength = prefix.length() + suffix.length();
         int padding = Math.max(0, length - contentLength);
-        StringBuilder result = new StringBuilder();
-        result.append(prefix);
-        for (int i = 0; i < padding; i++)
-            result.append(" ");
-        result.append(suffix);
-        return result.toString();
+        return prefix + " ".repeat(padding) + suffix;
     }
 
     private static TestSet getCompositeTestSet(List<String> suitesColl)
@@ -869,7 +865,7 @@ public class Runner extends TestSuite
     private static void dumpTsv(String fileName)
     {
         Map<String, Set<String>> testsSuites = new TreeMap<>();
-        Map<String, Class> testsClasses = new HashMap<>();
+        Map<String, Class<?>> testsClasses = new HashMap<>();
 
         List<String> nonSuites = Arrays.asList("daily", "weekly", "test", "continue", "empty");
         List<String> suites = new ArrayList<>(_suites.getSuites()).stream()
@@ -881,7 +877,7 @@ public class Runner extends TestSuite
         {
             TestSet testSet = _suites.getTestSet(suite);
 
-            for (Class test : testSet.getTestList())
+            for (Class<?> test : testSet.getTestList())
             {
                 String testName = test.getSimpleName();
                 if (!testsSuites.containsKey(testName))
@@ -899,20 +895,20 @@ public class Runner extends TestSuite
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(dumpFile)))
         {
-            List<Class> checkedInterfaces = Arrays.asList(PostgresOnlyTest.class, SqlserverOnlyTest.class, WindowsOnlyTest.class, NonWindowsTest.class, DevModeOnlyTest.class);
+            List<Class<?>> checkedInterfaces = Arrays.asList(PostgresOnlyTest.class, SqlserverOnlyTest.class, WindowsOnlyTest.class, NonWindowsTest.class, DevModeOnlyTest.class);
             writer.write(String.format("Test\tNightly Suites\tSuites\tTimeout\tpackage\t%s\t%s\n",
-                    String.join("\t", checkedInterfaces.stream().map(Class::getSimpleName).collect(Collectors.toList())),
+                    checkedInterfaces.stream().map(Class::getSimpleName).collect(Collectors.joining("\t")),
                     String.join("\t", suites)));
             for (String testName : testsSuites.keySet())
             {
-                Class testClass = testsClasses.get(testName);
+                Class<?> testClass = testsClasses.get(testName);
                 String line = testName + "\t" + // Test
-                        String.join(", ", testsSuites.get(testName).stream().filter(nightlySuites::contains).collect(Collectors.toList())) + "\t" + // Nightly Suites
+                        testsSuites.get(testName).stream().filter(nightlySuites::contains).collect(Collectors.joining(", ")) + "\t" + // Nightly Suites
                         String.join(", ", testsSuites.get(testName)) + "\t" + // Suites
                         getTestTimeout(testClass) + "\t" + // Timeout
                         testClass.getPackage().getName() + "\t" + // Package
-                        String.join("\t", checkedInterfaces.stream().map(i -> i.isAssignableFrom(testClass) ? i.getSimpleName() : "").collect(Collectors.toList())) + "\t" + // Interfaces
-                        String.join("\t", suites.stream().map(s -> testsSuites.get(testName).contains(s) ? s : "").collect(Collectors.toList())) + "\t" + // Suites
+                        checkedInterfaces.stream().map(i -> i.isAssignableFrom(testClass) ? i.getSimpleName() : "").collect(Collectors.joining("\t")) + "\t" + // Interfaces
+                        suites.stream().map(s -> testsSuites.get(testName).contains(s) ? s : "").collect(Collectors.joining("\t")) + "\t" + // Suites
                         "\n";
                 writer.write(line);
             }
@@ -926,9 +922,9 @@ public class Runner extends TestSuite
         System.out.println("Test list dumped to: " + dumpFile.getAbsolutePath());
     }
 
-    private static int getTestTimeout(Class testClass)
+    private static int getTestTimeout(Class<?> testClass)
     {
-        BaseWebDriverTest.ClassTimeout timeout = (BaseWebDriverTest.ClassTimeout) testClass.getAnnotation(BaseWebDriverTest.ClassTimeout.class);
+        BaseWebDriverTest.ClassTimeout timeout = testClass.getAnnotation(BaseWebDriverTest.ClassTimeout.class);
         if (timeout != null)
             return timeout.minutes();
         return -1;
@@ -996,8 +992,8 @@ public class Runner extends TestSuite
             if (testRecentlyFailed && 0<recentlyFailedTestsFile.length())
             {
                 //put previously failed tests at the front of the test queue (determined by TeamCity).
-                Class[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile), set.getTestList());
-                for (Class test: recentlyFailedTests)
+                Class<?>[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile), set.getTestList());
+                for (Class<?> test: recentlyFailedTests)
                 {
                     set.prioritizeTest(test, 0);
                 }
@@ -1008,7 +1004,7 @@ public class Runner extends TestSuite
 
         set.prioritizeTest(DatabaseDiagnosticsTest.class, set.getTestList().size() - 1); // Always end with DatabaseDiagnosticsTest (if present)
 
-        List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(testNames);
+        List<Class<?>> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(testNames);
 
         TestSuite suite = getSuite(testClasses, cleanOnly);
 
@@ -1024,7 +1020,7 @@ public class Runner extends TestSuite
             for (Enumeration<Test> e = suite.tests(); e.hasMoreElements(); )
             {
                 Test test = e.nextElement();
-                Class testClass = getTestClass(test);
+                Class<?> testClass = getTestClass(test);
                 _remainingTests.add(testClass);
                 System.out.println("  " + testClass.getSimpleName());
                 for (String testMethod : specifiedTestMethods.getOrDefault(testClass, Collections.emptyList()))
@@ -1055,11 +1051,11 @@ public class Runner extends TestSuite
             int movedTests = 0;
             for (String moduleDir : modifiedModules)
             {
-                Collection<Class> associatedTests = WebTestProperties.getAssociatedTests(moduleDir);
+                Collection<Class<?>> associatedTests = WebTestProperties.getAssociatedTests(moduleDir);
 
                 if (null != associatedTests)
                 {
-                    for (Class test : associatedTests)
+                    for (Class<?> test : associatedTests)
                     {
                         // Bubble up associated Test, if present.
                         if (set.prioritizeTest(test, movedTests))
@@ -1131,7 +1127,7 @@ public class Runner extends TestSuite
         return null;
     }
 
-    private static Class getTestClass(Test test)
+    private static Class<?> getTestClass(Test test)
     {
         if (test instanceof JUnit4TestAdapter)
             return ((JUnit4TestAdapter) test).getTestClass();
