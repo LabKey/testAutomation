@@ -183,9 +183,10 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         EditDatasetDefinitionPage editDatasetPage = _studyHelper.goToManageDatasets()
                 .selectDatasetByName("APX-1")
                 .clickEditDefinition();
-        waitForElement(Locator.xpath("//input[@name='dsName']"));
-        assertEquals("APXwtkg", getFormElement(Locator.name("ff_name1")));
-        setFormElement(Locator.name("ff_name1"), "APXwtkgCHANGED");
+
+        editDatasetPage.getFieldsPanel()
+                .getField("APXwtkg").setName("APXwtkgCHANGED");
+
         editDatasetPage.clickSave();
         clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
         waitAndClickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
