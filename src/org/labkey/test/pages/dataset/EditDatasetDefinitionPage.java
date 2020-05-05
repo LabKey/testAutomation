@@ -172,13 +172,14 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
 
     public EditDatasetDefinitionPage saveExpectFail(String expectedError)
     {
+        elementCache().saveButton.click();
         // todo- handle failure message
         return this;
     }
 
     public DatasetPropertiesPage clickSave()
     {
-        elementCache().saveButton.click();
+        getWrapper().doAndWaitForPageToLoad(()-> elementCache().saveButton.click());
         return new DatasetPropertiesPage(getDriver());
     }
 
