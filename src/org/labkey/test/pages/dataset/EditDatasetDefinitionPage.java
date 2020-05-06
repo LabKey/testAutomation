@@ -111,13 +111,13 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
     public EditDatasetDefinitionPage setIsDemographicData(boolean checked)
     {
         expandPropertiesPanel();
-        elementCache().isDemographicRadioBtn.set(checked);
+        elementCache().participantsOnlyRadioBtn.set(checked);
         return this;
     }
 
     public boolean isDemographicsData()
     {
-        return  elementCache().isDemographicRadioBtn.get();
+        return  elementCache().participantsOnlyRadioBtn.get();
     }
 
     public EditDatasetDefinitionPage setAdditionalKeyColDataField(String field)
@@ -137,12 +137,14 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
 
     public EditDatasetDefinitionPage setAdditionalKeyColumnType(LookupAdditionalKeyColType type)
     {
-        new RadioButton(elementCache().dataRowRadioBtn(type.getLabel()).findElement(getDriver())).check();
+        expandPropertiesPanel();
+        new RadioButton(elementCache().dataRowRadioBtn(type.getIndex()).findElement(getDriver())).check();
         return this;
     }
 
     public boolean isAdditionalKeyManagedEnabled()
     {
+        expandPropertiesPanel();
         return elementCache().additionalKeyFieldRadioBtn.isChecked() &&
                 elementCache().keyFieldSelect.hasValue() &&
                 elementCache().keyPropertyManagedBox.isChecked();
@@ -185,17 +187,22 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
 
     public enum LookupAdditionalKeyColType
     {
-        NONE("Participants only (demographic data)"),
-        DATAFIELD("Participants and visits"),
-        MANAGEDFIELD("Participants, visits, and additional key field");
+        NONE("Participants only (demographic data)", 0),
+        DATAFIELD("Participants and visits", 1),
+        MANAGEDFIELD("Participants, visits, and additional key field", 2);
 
         private String _label;
+        private Integer _index;
 
         public String getLabel(){
             return this._label;
         }
-        LookupAdditionalKeyColType(String label){
+        public Integer getIndex(){
+            return this._index;
+        }
+        LookupAdditionalKeyColType(String label, Integer index){
             this._label = label;
+            this._index = index;
         }
     }
 
@@ -231,29 +238,28 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         protected Input descriptionInput = new Input(Locator.id("description").findWhenNeeded(propertiesPanel),
                 getDriver());
 
-        private WebElement categoryRow = Locator.tagWithClass("div", "row")
+        private WebElement categoryRow = Locator.tagWithClass("div", "margin-top")
                 .containingIgnoreCase("Category").findWhenNeeded(propertiesPanel);
         protected ReactSelect categorySelect = ReactSelect.finder(getDriver()).findWhenNeeded(categoryRow);
         protected Input labelInput = new Input(Locator.inputById("label").findWhenNeeded(categoryRow), getDriver());
 
         private WebElement rowUniquenessContainer = Locator.tagWithClass("div", "dataset_data_row_uniqueness_container")
                 .findWhenNeeded(propertiesPanel);
-        protected Locator dataRowRadioBtn(String labelText)
+        protected Locator dataRowRadioBtn(Integer index)
         {
-            return Locator.tag("label").withAttribute("title").containing(labelText).child(Locator.input("dataRowSetting"));
+            return Locator.tag("label").withAttribute("title").child(Locator.input("dataRowSetting")
+                    .withAttribute("value", index.toString()));
         }
-        protected RadioButton participantsOnlyRadioBtn = new RadioButton(dataRowRadioBtn("(demographic data)")
+        protected RadioButton participantsOnlyRadioBtn = new RadioButton(dataRowRadioBtn(0) // demographic data
             .findWhenNeeded(rowUniquenessContainer));
-        protected RadioButton participantsAndVisitsRadioBtn = new RadioButton(dataRowRadioBtn("Participants and visits")
+        protected RadioButton participantsAndVisitsRadioBtn = new RadioButton(dataRowRadioBtn(1) //Participants and visits"
                 .findWhenNeeded(rowUniquenessContainer));
-        protected RadioButton additionalKeyFieldRadioBtn = new RadioButton(dataRowRadioBtn("additional key field")
+        protected RadioButton additionalKeyFieldRadioBtn = new RadioButton(dataRowRadioBtn(2) // additional key field"
                 .findWhenNeeded(rowUniquenessContainer));
 
-        private WebElement keyFieldRow = Locator.tagWithClass("div", "row")
+        private WebElement keyFieldRow = Locator.tagWithClass("div", "dataset_data_row_element_show")
                 .containingIgnoreCase("Additional Key Field").findWhenNeeded(propertiesPanel);
         protected ReactSelect keyFieldSelect = ReactSelect.finder(getDriver()).findWhenNeeded(keyFieldRow);
-
-        RadioButton isDemographicRadioBtn = new RadioButton(Locator.input("dataRowSetting").findWhenNeeded(propertiesPanel));
 
         Checkbox keyPropertyManagedBox = new Checkbox(Locator.inputById("keyPropertyManaged")
                 .findWhenNeeded(propertiesPanel));
