@@ -212,7 +212,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     {
         clickAndWait(Locator.linkContainingText(assayName));
         clickAndWait(new DataRegionTable("Batches", this).link(0, "Name"));
-        clickAndWait(Locator.tag("img").withAttribute("src", "/labkey/Experiment/images/graphIcon.gif"));
+        clickAndWait(Locator.tag("img").withAttribute("src", "/labkey/experiment/images/graphIcon.gif"));
         clickAndWait(Locator.linkWithText("Text View"));
         clickAndWait(Locator.linkContainingText("123456"));
     }
