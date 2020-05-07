@@ -5,6 +5,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.dataset.AdvancedDatasetSettingsDialog;
 import org.labkey.test.components.domain.DomainDesigner;
+import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -85,7 +86,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
     public EditDatasetDefinitionPage setCategory(String category)
     {
         expandPropertiesPanel();
-        elementCache().categorySelect.select(category);
+        elementCache().categorySelect.filterSelect(category);
         return this;
     }
 
@@ -240,7 +241,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
 
         private WebElement categoryRow = Locator.tagWithClass("div", "margin-top")
                 .containingIgnoreCase("Category").findWhenNeeded(propertiesPanel);
-        protected ReactSelect categorySelect = ReactSelect.finder(getDriver()).findWhenNeeded(categoryRow);
+        protected FilteringReactSelect categorySelect = FilteringReactSelect.finder(getDriver()).findWhenNeeded(categoryRow);
         protected Input labelInput = new Input(Locator.inputById("label").findWhenNeeded(categoryRow), getDriver());
 
         private WebElement rowUniquenessContainer = Locator.tagWithClass("div", "dataset_data_row_uniqueness_container")
