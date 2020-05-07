@@ -145,7 +145,7 @@ public class ScatterPlotTest extends GenericChartsTest
         log("Change the column's reporting status to 'measure'");
         apxField.setMeasure(true);
 
-        log("click on the 'Pulse' field");
+        log("get the 'Pulse' field");
         DomainFieldRow pulseField = datasetFieldsPanel.getField(APXPULSE);
 
         log("Change the column's reporting status to 'dimension'");
