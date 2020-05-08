@@ -14,6 +14,10 @@ import org.labkey.test.pages.DatasetPropertiesPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
@@ -121,9 +125,17 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         return  elementCache().participantsOnlyRadioBtn.get();
     }
 
+    public String getAdditionalKeyColDataField()
+    {
+        if (!elementCache().keyFieldSelect.isEnabled())
+            return null;
+        else
+            return elementCache().keyFieldSelect.getValue();
+    }
+
     public EditDatasetDefinitionPage setAdditionalKeyColDataField(String field)
     {
-        setAdditionalKeyColumnType(LookupAdditionalKeyColType.DATAFIELD);
+        setAdditionalKeyColumnType(LookupAdditionalKeyColType.MANAGEDFIELD);
         elementCache().keyFieldSelect.select(field);
         return this;
     }
@@ -175,8 +187,8 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
 
     public EditDatasetDefinitionPage saveExpectFail(String expectedError)
     {
-        elementCache().saveButton.click();
-        // todo- handle failure message
+        List<String>  errors = clickSaveExpectingErrors();
+        assertThat("Errors on the page should include this expected one", errors, hasItem(expectedError));
         return this;
     }
 
@@ -258,8 +270,10 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         protected RadioButton additionalKeyFieldRadioBtn = new RadioButton(dataRowRadioBtn(2) // additional key field"
                 .findWhenNeeded(rowUniquenessContainer));
 
-        private WebElement keyFieldRow = Locator.tagWithClass("div", "dataset_data_row_element_show")
-                .containingIgnoreCase("Additional Key Field").findWhenNeeded(propertiesPanel);
+        private WebElement keyFieldRow = Locator.XPathLocator.union(
+                Locator.tagWithClass("div", "dataset_data_row_element_show"),
+                Locator.tagWithClass("div", "dataset_data_row_element_hide"))
+                .containing("Additional Key Field").refindWhenNeeded(propertiesPanel);
         protected ReactSelect keyFieldSelect = ReactSelect.finder(getDriver()).findWhenNeeded(keyFieldRow);
 
         Checkbox keyPropertyManagedBox = new Checkbox(Locator.inputById("keyPropertyManaged")
