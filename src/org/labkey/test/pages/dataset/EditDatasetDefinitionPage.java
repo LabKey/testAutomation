@@ -254,7 +254,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         private WebElement categoryRow = Locator.tagWithClass("div", "margin-top")
                 .containingIgnoreCase("Category").findWhenNeeded(propertiesPanel);
         protected FilteringReactSelect categorySelect = FilteringReactSelect.finder(getDriver()).findWhenNeeded(categoryRow);
-        protected Input labelInput = new Input(Locator.inputById("label").findWhenNeeded(categoryRow), getDriver());
+        protected Input labelInput = new Input(Locator.inputById("label").findWhenNeeded(propertiesPanel), getDriver());
 
         private WebElement rowUniquenessContainer = Locator.tagWithClass("div", "dataset_data_row_uniqueness_container")
                 .findWhenNeeded(propertiesPanel);
