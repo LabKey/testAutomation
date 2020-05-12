@@ -116,7 +116,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
     public EditDatasetDefinitionPage setIsDemographicData(boolean checked)
     {
         expandPropertiesPanel();
-        elementCache().participantsOnlyRadioBtn.set(checked);
+        setDataRowUniquenessType(DataRowUniquenessType.PTID_ONLY);
         return this;
     }
 
@@ -135,20 +135,20 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
 
     public EditDatasetDefinitionPage setAdditionalKeyColDataField(String field)
     {
-        setAdditionalKeyColumnType(LookupAdditionalKeyColType.MANAGEDFIELD);
+        setDataRowUniquenessType(DataRowUniquenessType.PTID_TIMEPOINT_ADDITIONAL_KEY);
         elementCache().keyFieldSelect.select(field);
         return this;
     }
 
     public EditDatasetDefinitionPage setAdditionalKeyColManagedField(String field)
     {
-        setAdditionalKeyColumnType(LookupAdditionalKeyColType.MANAGEDFIELD);
+        setDataRowUniquenessType(DataRowUniquenessType.PTID_TIMEPOINT_ADDITIONAL_KEY);
         elementCache().keyFieldSelect.select(field);
         elementCache().keyPropertyManagedBox.check();
         return this;
     }
 
-    public EditDatasetDefinitionPage setAdditionalKeyColumnType(LookupAdditionalKeyColType type)
+    public EditDatasetDefinitionPage setDataRowUniquenessType(DataRowUniquenessType type)
     {
         expandPropertiesPanel();
         new RadioButton(elementCache().dataRowRadioBtn(type.getIndex()).findElement(getDriver())).check();
@@ -166,12 +166,6 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
     public boolean isAdditionalKeyDataFieldEnabled()
     {
         return  elementCache().keyFieldSelect.isEnabled();
-    }
-
-    public boolean isAdditionalFieldNoneEnabled()
-    {
-        return elementCache().additionalKeyFieldRadioBtn.isChecked() &&
-                !elementCache().keyFieldSelect.hasValue();
     }
 
     // get/select additional key field
@@ -198,11 +192,11 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         return new DatasetPropertiesPage(getDriver());
     }
 
-    public enum LookupAdditionalKeyColType
+    public enum DataRowUniquenessType
     {
-        NONE("Participants only (demographic data)", 0),
-        DATAFIELD("Participants and visits", 1),
-        MANAGEDFIELD("Participants, visits, and additional key field", 2);
+        PTID_ONLY("Participants only (demographic data)", 0),
+        PTID_TIMEPOINT("Participants and visits", 1),
+        PTID_TIMEPOINT_ADDITIONAL_KEY("Participants, visits, and additional key field", 2);
 
         private String _label;
         private Integer _index;
@@ -213,7 +207,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         public Integer getIndex(){
             return this._index;
         }
-        LookupAdditionalKeyColType(String label, Integer index){
+        DataRowUniquenessType(String label, Integer index){
             this._label = label;
             this._index = index;
         }
