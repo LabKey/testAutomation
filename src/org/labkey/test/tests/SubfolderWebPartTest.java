@@ -47,6 +47,15 @@ public class SubfolderWebPartTest extends BaseWebDriverTest
     public static String TEST_USER = "subfolderwebpartrest@test.testuser";
     private static final File TEST_FILE = TestFileUtils.getSampleData("study/Protocol.txt");
 
+    // TODO: here are a list of regressions found during testing of changes in May 2020 which I believe should be added as test cases in this test:
+    // Customize webpart to show a different, specific folder which has subfolders and more then one level and check that the "Include Direct Children Only" checkbox works as expected
+    // Customize webpart to show a different, specific folder which has no subfolders and verify display message as a guest user
+    // Customize webpart to show a different, specific folder and verify display a user that does not have permissions to the other folder
+    // Verify that the webpart shows the container title instead of the container name
+    // Verify that this webpart shows expected project information when being used at the project level vs in a non-project folder
+    // Verify that the subfolder display takes into account a custom sort order for child folders
+    // Verify that the "Create New" button goes to the correct path when the webpart is configured to use a different, specific folder
+
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
