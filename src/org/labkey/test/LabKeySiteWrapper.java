@@ -989,7 +989,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     /**
      * @deprecated Use {@link org.labkey.test.LabKeySiteWrapper#goToAdminConsole}
      */
-    @Deprecated
+    @Deprecated (forRemoval = true)
     public void goToAdmin()
     {
         goToAdminConsole();
