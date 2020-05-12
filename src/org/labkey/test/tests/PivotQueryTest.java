@@ -143,19 +143,16 @@ public class PivotQueryTest extends ReportTest
         log("Go and edit the column definition to be a measure");
         clickProject(getProjectName());
 
-        log("Go to the schema browser and modify some of the fields.");
-        goToSchemaBrowser();
+        log("Go to the dataset and modify some of the fields.");
         String LUMINEXASSAY = "LuminexAssay";
-        selectQuery("study", LUMINEXASSAY);
-        click(Locator.linkWithText("edit definition"));
+        EditDatasetDefinitionPage datasetDesignerPage = _studyHelper.goToManageDatasets()
+                .selectDatasetByName(LUMINEXASSAY)
+                .clickEditDefinition();
 
-        log("Select the ConcInRange field");
-        EditDatasetDefinitionPage datasetDesignerPage = new EditDatasetDefinitionPage(getDriver());
-        DomainFieldRow fieldRow = datasetDesignerPage.getFieldsPanel()
-                .getField(CONC_INRANGE_STRING);
-
-        log("Change the column's reporting status to 'measure'");
-        fieldRow.setMeasure(true);
+        log("Select the ConcInRange field and change the column's reporting status to 'measure'");
+        datasetDesignerPage.getFieldsPanel()
+                .getField(CONC_INRANGE_STRING)
+                .setMeasure(true);
         datasetDesignerPage.clickSave();
 
         // Add a value in LuminexAssay with ConcInRangeString non-numeric for Analyte IL-10 (23)
