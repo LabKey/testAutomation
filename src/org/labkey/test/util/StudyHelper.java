@@ -26,8 +26,8 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.ManageDatasetsPage;
-import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
 import org.labkey.test.pages.study.CreateStudyPage;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.pages.study.StudySecurityPage;
 import org.openqa.selenium.interactions.Actions;
@@ -378,15 +378,15 @@ public class StudyHelper
         _test.waitForPipelineJobsToComplete(expectedPipelineJobs, "Publish Study", false);
     }
 
-    public EditDatasetDefinitionPage defineDataset(@LoggedParam String name, String containerPath)
+    public DatasetDesignerPage defineDataset(@LoggedParam String name, String containerPath)
     {
         return defineDataset(name, containerPath, null);
     }
 
     @LogMethod
-    public EditDatasetDefinitionPage defineDataset(@LoggedParam String name, String containerPath, @Nullable String id)
+    public DatasetDesignerPage defineDataset(@LoggedParam String name, String containerPath, @Nullable String id)
     {
-        EditDatasetDefinitionPage page = EditDatasetDefinitionPage.beginAt(_test, containerPath);
+        DatasetDesignerPage page = DatasetDesignerPage.beginAt(_test, containerPath);
         page.setName(name);
 
         if (id != null)
@@ -408,7 +408,7 @@ public class StudyHelper
     @LogMethod
     public void importDataset(@LoggedParam String name, String containerPath, String id, File datasetFile)
     {
-        EditDatasetDefinitionPage page = EditDatasetDefinitionPage.beginAt(_test, containerPath);
+        DatasetDesignerPage page = DatasetDesignerPage.beginAt(_test, containerPath);
         page.setName(name)
             .openAdvancedDatasetSettings()
             .setDatasetId(id)

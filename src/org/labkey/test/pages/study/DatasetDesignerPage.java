@@ -1,15 +1,15 @@
-package org.labkey.test.pages.dataset;
+package org.labkey.test.pages.study;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.dataset.AdvancedDatasetSettingsDialog;
 import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.study.AdvancedDatasetSettingsDialog;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -21,22 +21,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
-public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinitionPage.ElementCache>
+public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.ElementCache>
 {
-    public EditDatasetDefinitionPage(WebDriver driver)
+    public DatasetDesignerPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static EditDatasetDefinitionPage beginAt(WebDriverWrapper webDriverWrapper)
+    public static DatasetDesignerPage beginAt(WebDriverWrapper webDriverWrapper)
     {
         return beginAt(webDriverWrapper, webDriverWrapper.getCurrentContainerPath());
     }
 
-    public static EditDatasetDefinitionPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
+    public static DatasetDesignerPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("study", containerPath, "defineDatasetType"));
-        return new EditDatasetDefinitionPage(webDriverWrapper.getDriver());
+        return new DatasetDesignerPage(webDriverWrapper.getDriver());
     }
 
     public void waitForPage()
@@ -45,7 +45,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
                 "The page did not render in time", WAIT_FOR_PAGE);
     }
 
-    public EditDatasetDefinitionPage shareDemographics(String option)
+    public DatasetDesignerPage shareDemographics(String option)
     {
         expandPropertiesPanel();
         openAdvancedDatasetSettings()
@@ -61,7 +61,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         return new AdvancedDatasetSettingsDialog(this);
     }
 
-    public EditDatasetDefinitionPage setName(String name)
+    public DatasetDesignerPage setName(String name)
     {
         expandPropertiesPanel();
         elementCache().nameInput.set(name);
@@ -73,7 +73,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         return elementCache().nameInput.get();
     }
 
-    public EditDatasetDefinitionPage setDescription(String description)
+    public DatasetDesignerPage setDescription(String description)
     {
         expandPropertiesPanel();
         elementCache().descriptionInput.set(description);
@@ -87,7 +87,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
 
     // properties panel interactions
     // get/set category
-    public EditDatasetDefinitionPage setCategory(String category)
+    public DatasetDesignerPage setCategory(String category)
     {
         expandPropertiesPanel();
         elementCache().categorySelect.filterSelect(category);
@@ -100,7 +100,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
     }
 
     // get/set label
-    public EditDatasetDefinitionPage setDatasetLabel(String label)
+    public DatasetDesignerPage setDatasetLabel(String label)
     {
         expandPropertiesPanel();
         elementCache().labelInput.set(label);
@@ -113,7 +113,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
     }
 
     // get/select radio button for: participants only(demographic data)/participants and visit/participants, visit, and additional key field
-    public EditDatasetDefinitionPage setIsDemographicData(boolean checked)
+    public DatasetDesignerPage setIsDemographicData(boolean checked)
     {
         expandPropertiesPanel();
         setDataRowUniquenessType(DataRowUniquenessType.PTID_ONLY);
@@ -133,14 +133,14 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
             return elementCache().keyFieldSelect.getValue();
     }
 
-    public EditDatasetDefinitionPage setAdditionalKeyColDataField(String field)
+    public DatasetDesignerPage setAdditionalKeyColDataField(String field)
     {
         setDataRowUniquenessType(DataRowUniquenessType.PTID_TIMEPOINT_ADDITIONAL_KEY);
         elementCache().keyFieldSelect.select(field);
         return this;
     }
 
-    public EditDatasetDefinitionPage setAdditionalKeyColManagedField(String field)
+    public DatasetDesignerPage setAdditionalKeyColManagedField(String field)
     {
         setDataRowUniquenessType(DataRowUniquenessType.PTID_TIMEPOINT_ADDITIONAL_KEY);
         elementCache().keyFieldSelect.select(field);
@@ -148,7 +148,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         return this;
     }
 
-    public EditDatasetDefinitionPage setDataRowUniquenessType(DataRowUniquenessType type)
+    public DatasetDesignerPage setDataRowUniquenessType(DataRowUniquenessType type)
     {
         expandPropertiesPanel();
         new RadioButton(elementCache().dataRowRadioBtn(type.getIndex()).findElement(getDriver())).check();
@@ -171,7 +171,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
     // get/select additional key field
     // get/set 'let server manage fields to make entries unique' checkbox
 
-    public EditDatasetDefinitionPage setShowInOverview(boolean checked)
+    public DatasetDesignerPage setShowInOverview(boolean checked)
     {
         expandPropertiesPanel();
         return openAdvancedDatasetSettings()
@@ -179,7 +179,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
                 .clickApply();
     }
 
-    public EditDatasetDefinitionPage saveExpectFail(String expectedError)
+    public DatasetDesignerPage saveExpectFail(String expectedError)
     {
         List<String>  errors = clickSaveExpectingErrors();
         assertThat("Errors on the page should include this expected one", errors, hasItem(expectedError));
@@ -198,8 +198,8 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         PTID_TIMEPOINT("Participants and visits", 1),
         PTID_TIMEPOINT_ADDITIONAL_KEY("Participants, visits, and additional key field", 2);
 
-        private String _label;
-        private Integer _index;
+        private final String _label;
+        private final Integer _index;
 
         public String getLabel(){
             return this._label;
@@ -218,7 +218,7 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
         NONE("No"),
         PTID("Share by ParticipantId");
 
-        private String _option;
+        private final String _option;
         public String getOption()
         {
             return _option;
@@ -257,20 +257,20 @@ public class EditDatasetDefinitionPage extends DomainDesigner<EditDatasetDefinit
             return Locator.tag("label").withAttribute("title").child(Locator.input("dataRowSetting")
                     .withAttribute("value", index.toString()));
         }
-        protected RadioButton participantsOnlyRadioBtn = new RadioButton(dataRowRadioBtn(0) // demographic data
+        protected final RadioButton participantsOnlyRadioBtn = new RadioButton(dataRowRadioBtn(0) // demographic data
             .findWhenNeeded(rowUniquenessContainer));
-        protected RadioButton participantsAndVisitsRadioBtn = new RadioButton(dataRowRadioBtn(1) //Participants and visits"
+        protected final RadioButton participantsAndVisitsRadioBtn = new RadioButton(dataRowRadioBtn(1) //Participants and visits"
                 .findWhenNeeded(rowUniquenessContainer));
-        protected RadioButton additionalKeyFieldRadioBtn = new RadioButton(dataRowRadioBtn(2) // additional key field"
+        protected final RadioButton additionalKeyFieldRadioBtn = new RadioButton(dataRowRadioBtn(2) // additional key field"
                 .findWhenNeeded(rowUniquenessContainer));
 
-        private WebElement keyFieldRow = Locator.XPathLocator.union(
+        private final WebElement keyFieldRow = Locator.XPathLocator.union(
                 Locator.tagWithClass("div", "dataset_data_row_element_show"),
                 Locator.tagWithClass("div", "dataset_data_row_element_hide"))
                 .containing("Additional Key Field").refindWhenNeeded(propertiesPanel);
-        protected ReactSelect keyFieldSelect = ReactSelect.finder(getDriver()).findWhenNeeded(keyFieldRow);
+        protected final ReactSelect keyFieldSelect = ReactSelect.finder(getDriver()).findWhenNeeded(keyFieldRow);
 
-        Checkbox keyPropertyManagedBox = new Checkbox(Locator.inputById("keyPropertyManaged")
+        protected final Checkbox keyPropertyManagedBox = new Checkbox(Locator.inputById("keyPropertyManaged")
                 .findWhenNeeded(propertiesPanel));
     }
 }

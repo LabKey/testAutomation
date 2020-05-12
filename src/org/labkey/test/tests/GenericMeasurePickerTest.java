@@ -29,7 +29,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.TimeChartWizard;
-import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebElement;
 
@@ -79,11 +79,11 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText(DATASET));
 
-        EditDatasetDefinitionPage editDatasetDefinitionPage = new DatasetPropertiesPage(getDriver()).clickEditDefinition();
-        editDatasetDefinitionPage.getFieldsPanel()
+        DatasetDesignerPage datasetDesignerPage = new DatasetPropertiesPage(getDriver()).clickEditDefinition();
+        datasetDesignerPage.getFieldsPanel()
                 .getField("HIVRapidTest")
                 .setDimension(true);
-        editDatasetDefinitionPage.clickSave();
+        datasetDesignerPage.clickSave();
     }
 
     @Before

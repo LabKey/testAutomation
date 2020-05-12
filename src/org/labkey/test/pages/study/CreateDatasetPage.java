@@ -18,7 +18,6 @@ package org.labkey.test.pages.study;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -33,12 +32,6 @@ public class CreateDatasetPage extends LabKeyPage<CreateDatasetPage.ElementCache
     {
         elementCache().nameInput.set(name);
         return this;
-    }
-
-    public EditDatasetDefinitionPage submit()
-    {
-        clickAndWait(elementCache().nextButton);
-        return new EditDatasetDefinitionPage(getDriver());
     }
 
     protected ElementCache newElementCache()

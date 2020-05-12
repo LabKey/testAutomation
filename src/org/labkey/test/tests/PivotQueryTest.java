@@ -25,8 +25,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.ChartTypeDialog;
-import org.labkey.test.components.domain.DomainFieldRow;
-import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -145,7 +144,7 @@ public class PivotQueryTest extends ReportTest
 
         log("Go to the dataset and modify some of the fields.");
         String LUMINEXASSAY = "LuminexAssay";
-        EditDatasetDefinitionPage datasetDesignerPage = _studyHelper.goToManageDatasets()
+        DatasetDesignerPage datasetDesignerPage = _studyHelper.goToManageDatasets()
                 .selectDatasetByName(LUMINEXASSAY)
                 .clickEditDefinition();
 

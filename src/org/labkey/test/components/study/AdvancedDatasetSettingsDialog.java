@@ -1,18 +1,18 @@
-package org.labkey.test.components.dataset;
+package org.labkey.test.components.study;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.openqa.selenium.WebElement;
 
 public class AdvancedDatasetSettingsDialog extends ModalDialog
 {
-    private final EditDatasetDefinitionPage _page;
+    private final DatasetDesignerPage _page;
 
-    public AdvancedDatasetSettingsDialog(EditDatasetDefinitionPage page)
+    public AdvancedDatasetSettingsDialog(DatasetDesignerPage page)
     {
         super(new ModalDialogFinder(page.getDriver()).withTitle("Advanced Dataset Settings"));
         _page = page;
@@ -78,23 +78,23 @@ public class AdvancedDatasetSettingsDialog extends ModalDialog
         elementCache().shareDemographicSelect.select(by);
         return this;
     }
-    public AdvancedDatasetSettingsDialog shareDemographics(EditDatasetDefinitionPage.ShareDemographicsBy by)
+    public AdvancedDatasetSettingsDialog shareDemographics(DatasetDesignerPage.ShareDemographicsBy by)
     {
         elementCache().shareDemographicSelect.select(by.getOption());
         return this;
     }
-    public EditDatasetDefinitionPage.ShareDemographicsBy getShareDemographicsSelection()
+    public DatasetDesignerPage.ShareDemographicsBy getShareDemographicsSelection()
     {
-        return EditDatasetDefinitionPage.ShareDemographicsBy.valueOf(elementCache().shareDemographicSelect.getValue());
+        return DatasetDesignerPage.ShareDemographicsBy.valueOf(elementCache().shareDemographicSelect.getValue());
     }
 
-    public EditDatasetDefinitionPage clickApply()
+    public DatasetDesignerPage clickApply()
     {
         dismiss("Apply");
         return _page;
     }
 
-    public EditDatasetDefinitionPage clickCancel()
+    public DatasetDesignerPage clickCancel()
     {
         dismiss("Cancel");
         return _page;

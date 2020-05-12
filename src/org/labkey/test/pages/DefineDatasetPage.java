@@ -16,7 +16,7 @@
 package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
-import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.openqa.selenium.WebDriver;
 
 /**
@@ -45,10 +45,10 @@ public class DefineDatasetPage extends LabKeyPage<DefineDatasetPage.ElementCache
         if(fromFile) checkCheckbox(elementCache().importFromFile);
     }
 
-    public EditDatasetDefinitionPage clickNext()
+    public DatasetDesignerPage clickNext()
     {
         clickAndWait(elementCache().nextButton);
-        return new EditDatasetDefinitionPage(getDriver());
+        return new DatasetDesignerPage(getDriver());
     }
 
     public void clickCancel()

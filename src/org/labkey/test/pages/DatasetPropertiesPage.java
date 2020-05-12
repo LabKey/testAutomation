@@ -18,7 +18,7 @@ package org.labkey.test.pages;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
@@ -46,12 +46,12 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
         return new DatasetPropertiesPage.ElementCache();
     }
 
-    public EditDatasetDefinitionPage clickEditDefinition()
+    public DatasetDesignerPage clickEditDefinition()
     {
         ExperimentalFeaturesHelper.enableExperimentalFeature(
                 createDefaultConnection(true),"experimental-reactdesigner");
         doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(elementCache().editDefinitionButton)));
-        return new EditDatasetDefinitionPage(getDriver());
+        return new DatasetDesignerPage(getDriver());
     }
 
     public ViewDatasetDataPage clickViewData()

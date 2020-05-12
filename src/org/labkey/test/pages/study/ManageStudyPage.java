@@ -20,6 +20,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.ManageDatasetsPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 

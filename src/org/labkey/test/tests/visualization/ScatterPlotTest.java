@@ -36,7 +36,7 @@ import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.pages.ViewDatasetDataPage;
-import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -133,11 +133,11 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Submit");
 
         log("Go and edit the column definition to be a measure");
-        EditDatasetDefinitionPage editDatasetDefinitionPage = new ViewDatasetDataPage(getDriver())
+        DatasetDesignerPage datasetDesignerPage = new ViewDatasetDataPage(getDriver())
                 .clickManageDataset()
                 .clickEditDefinition();
 
-        final DomainFormPanel datasetFieldsPanel = editDatasetDefinitionPage.getFieldsPanel();
+        final DomainFormPanel datasetFieldsPanel = datasetDesignerPage.getFieldsPanel();
 
         log("Select the HEENT field");
         DomainFieldRow  apxField = datasetFieldsPanel.getField(APXHEENT);
@@ -150,7 +150,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         log("Change the column's reporting status to 'dimension'");
         pulseField.setDimension(true);
-        editDatasetDefinitionPage.clickSave();
+        datasetDesignerPage.clickSave();
 
         waitForText("APX-1: Abbreviated Physical Exam Dataset Properties");
 
@@ -520,7 +520,7 @@ public class ScatterPlotTest extends GenericChartsTest
         log("Remove color and shape measures.");
         navigateToFolder(getProjectName(), getFolderName());
 
-        EditDatasetDefinitionPage editDatasetPage = _studyHelper.goToManageDatasets()
+        DatasetDesignerPage editDatasetPage = _studyHelper.goToManageDatasets()
                 .selectDatasetByName("APX-1")
                 .clickEditDefinition();
 
