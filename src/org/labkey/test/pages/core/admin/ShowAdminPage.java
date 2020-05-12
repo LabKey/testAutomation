@@ -70,6 +70,12 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return getTexts(elementCache().findActiveUsers());
     }
 
+    public String getServerGUID()
+    {
+        goToServerInformationSection();
+        return elementCache().findServerGUID().getText();
+    }
+
     public void clickAnalyticsSettings()
     {
         goToSettingsSection();
@@ -219,6 +225,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected List<WebElement> findActiveUsers()
         {
             return Locator.tagWithName("table", "activeUsers").append(Locator.tag("td").position(1)).findElements(this);
+        }
+
+        protected WebElement findServerGUID()
+        {
+            return Locator.tagWithText("td", "Server GUID").followingSibling("td").findElement(this);
         }
     }
 }
