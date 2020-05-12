@@ -25,7 +25,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.ChartTypeDialog;
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.pages.dataset.EditDatasetDefinitionPage;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -148,20 +149,15 @@ public class PivotQueryTest extends ReportTest
         selectQuery("study", LUMINEXASSAY);
         click(Locator.linkWithText("edit definition"));
 
-        final PropertiesEditor datasetFieldsPanel = PropertiesEditor.PropertiesEditor(getDriver()).withTitle("Dataset Fields").findWhenNeeded();
-        waitForElement(Locator.lkButton("Export Fields"));
-
         log("Select the ConcInRange field");
-        PropertiesEditor.FieldRow row = datasetFieldsPanel.selectField(CONC_INRANGE_STRING);
+        EditDatasetDefinitionPage datasetDesignerPage = new EditDatasetDefinitionPage(getDriver());
+        DomainFieldRow fieldRow = datasetDesignerPage.getFieldsPanel()
+                .getField(CONC_INRANGE_STRING);
 
         log("Change the column's reporting status to 'measure'");
-        PropertiesEditor.FieldPropertyDock.ReportingTabPane tabPane = row.properties().selectReportingTab();
-        tabPane.setMeasure(true);
+        fieldRow.setMeasure(true);
+        datasetDesignerPage.clickSave();
 
-        doAndWaitForPageToLoad(() -> {
-            click(Locator.linkWithSpan("Save"));
-            waitForText("LuminexAssay Dataset Properties");
-        });
         // Add a value in LuminexAssay with ConcInRangeString non-numeric for Analyte IL-10 (23)
         log("Go to the schema browser and add a row with non-number ConcInRangeString.");
         goToSchemaBrowser();
