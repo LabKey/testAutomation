@@ -96,7 +96,7 @@ public class ColumnChartTest extends BaseWebDriverTest
         DATA_SOURCE_1_DIMENSIONS.add(PREGNANCY_COLUMN_NAME);
 
         domainFormPanel.getField(LANGUAGE_COLUMN_NAME)
-            .setMeasure(true)
+            .setDimension(true)
             .setMeasure(false);
         DATA_SOURCE_1_DIMENSIONS.add(LANGUAGE_COLUMN_NAME);
 
