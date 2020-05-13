@@ -120,6 +120,13 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return newFieldRow;
     }
 
+    public DomainFieldRow manuallyDefineFields(FieldDefinition fieldDefinition)
+    {
+        DomainFieldRow fieldRow = manuallyDefineFields(fieldDefinition.getName());
+        setField(fieldDefinition);
+        return fieldRow;
+    }
+
     public DomainFormPanel removeField(String name)
     {
         return  removeField(name, false);
@@ -172,6 +179,9 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 "fields were not inferred from file in time", WAIT_FOR_JAVASCRIPT);
         return this;
     }
+
+    // TODO: add ability to select "import data"/"don't import" here, after inferring fields from file
+    // for datasets, the ability to map key columns is exposed when 'import data' is selected
 
     public List<String> fieldNames()
     {

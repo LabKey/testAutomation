@@ -43,10 +43,11 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.SiteNavBar;
-import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -1670,7 +1671,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private static final String DATASET_NAME = "Data Name";
     private static final String DATASET_LABEL = "Data Label";
-    private static final String DATASET_FIELDS = "Property\nFirst\nLast";
 
     @LogMethod
     private void doTestDatasetsAndFileBasedQueries()
@@ -1681,17 +1681,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
         waitForText("Create Study");
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));
-        EditDatasetDefinitionPage editDatasetPage = _studyHelper.goToManageDatasets()
+        DatasetDesignerPage editDatasetPage = _studyHelper.goToManageDatasets()
                 .clickCreateNewDataset()
                 .setName(DATASET_NAME)
-                .submit()
                 .setDatasetLabel(DATASET_LABEL);
-        clickButton("Import Fields", "Paste tab-delimited");
-        setFormElement(Locator.name("tsv"), DATASET_FIELDS);
-        clickButton("Import", 0);
-        waitForText("First");
-        editDatasetPage
-                .save()
+
+        DomainFormPanel fieldsPanel = editDatasetPage.getFieldsPanel();
+        fieldsPanel.manuallyDefineFields("First");
+        fieldsPanel.addField("Last");
+
+        editDatasetPage.clickSave()
                 .clickViewData();
         assertTextPresent("My Custom View", "Hello Dataset", "Visit");
         assertTextNotPresent("Participant Identifier");
