@@ -140,7 +140,7 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 
         NodeDetailGroup summaryList(String nodeLabel)
         {
-            return new NodeDetailGroup.NodeDetailsFinder(getDriver()).withTitle(nodeLabel).find(nodeDetailContainer);
+            return new NodeDetailGroup.NodeDetailsFinder(getDriver()).withTitle(nodeLabel).waitFor(nodeDetailContainer);
         }
 
         List<NodeDetailGroup> summaryLists()
