@@ -83,12 +83,8 @@ public class ColumnChartTest extends BaseWebDriverTest
         selectQuery("study", DATA_SOURCE_1);
         click(Locator.linkWithText("edit definition"));
 
-        waitForText("Edit Dataset Definition");
-
         log("Set the '" + PREGNANCY_COLUMN_NAME + "', '" + LANGUAGE_COLUMN_NAME + "', and '" + SIGNATURE_COLUMN_NAME + "' fields to be dimensions but not measures.");
-
         DatasetDesignerPage datasetDesignerPage = new DatasetDesignerPage(getDriver());
-
         DomainFormPanel domainFormPanel = datasetDesignerPage.getFieldsPanel();
         domainFormPanel.getField(PREGNANCY_COLUMN_NAME)
                 .setDimension(true)
