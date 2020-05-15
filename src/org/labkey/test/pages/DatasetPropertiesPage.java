@@ -48,8 +48,6 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
 
     public DatasetDesignerPage clickEditDefinition()
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(
-                createDefaultConnection(true),"experimental-reactdesigner");
         doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(elementCache().editDefinitionButton)));
         return new DatasetDesignerPage(getDriver());
     }
