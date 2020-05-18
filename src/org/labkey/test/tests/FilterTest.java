@@ -295,7 +295,7 @@ public class FilterTest extends BaseWebDriverTest
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
         issuesHelper.goToAdmin();
-        issuesHelper.setIssueAssignmentList("Site:Administrators");
+        issuesHelper.setIssueAssignmentList("Site: Administrators");
         clickButton("Save");
 
         clickProject(getProjectName());

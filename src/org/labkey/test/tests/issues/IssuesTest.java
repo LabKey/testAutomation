@@ -786,7 +786,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // set default group and user
         _issuesHelper.goToAdmin();
-        _issuesHelper.setIssueAssignmentList("Site:Users");
+        _issuesHelper.setIssueAssignmentList("Site: Users");
         _issuesHelper.setIssueAssignmentUser(NAME);
         clickButton("Save");
 
