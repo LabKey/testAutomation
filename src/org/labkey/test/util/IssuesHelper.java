@@ -209,19 +209,18 @@ public class IssuesHelper extends WebDriverWrapper
     @LogMethod
     public void setIssueAssignmentList(@Nullable @LoggedParam String group)
     {
-        new AdminPage(getDriver()).setIssueAssignmentList(group);
+        new AdminPage(getDriver()).setAssignedTo(group);
     }
 
     @LogMethod
     public void setIssueAssignmentUser(@Nullable @LoggedParam String user)
     {
-        new AdminPage(getDriver()).setIssueAssignmentUser(user);
+        new AdminPage(getDriver()).setDefaultUser(user);
     }
 
     public AdminPage goToAdmin()
     {
         clickButton("Admin");
-        waitForText("Configure Fields");
         return new AdminPage(getDriver());
     }
 }

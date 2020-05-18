@@ -134,8 +134,8 @@ public class RlabkeyTest extends BaseWebDriverTest
         issuesHelper.createNewIssuesList(name, _containerHelper);
 
         AdminPage.beginAt(this, name)
-                .setIssueAssignmentList(null)
-                .save();
+                .setAssignedTo(null) // All Project Users
+                .clickSave();
         ListPage.beginAt(this, name);
     }
 

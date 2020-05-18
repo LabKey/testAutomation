@@ -75,8 +75,8 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
         _issuesHelper.createNewIssuesList(LIST_NAME, _containerHelper);
         AdminPage adminPage = AdminPage.beginAt(this, getProjectName(), LIST_NAME);
-        adminPage.setIssueAssignmentList(null);
-        adminPage.save();
+        adminPage.setAssignedTo(null); // All Project Users
+        adminPage.clickSave();
     }
 
     @Test
@@ -126,11 +126,10 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _issuesHelper.goToIssueListDefinitions(PROJECT3).createIssuesListDefinition("issues");
 
         goToModule("Issues");
-        _issuesHelper.goToAdmin();
-
-        setFormElement(Locator.name("entrySingularName"), singular);
-        setFormElement(Locator.name("entryPluralName"), plural);
-        clickButton("Save");
+        _issuesHelper.goToAdmin()
+                .setSingularName(singular)
+                .setPluralName(plural)
+                .clickSave();
 
         log("Verify issues-list action respects custom noun");
         assertTextPresent(plural + " List", singular + " ID");

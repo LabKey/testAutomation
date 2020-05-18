@@ -272,8 +272,8 @@ public class FilterTest extends BaseWebDriverTest
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
         issuesHelper.goToAdmin()
-                .setIssueAssignmentList("Site:Administrators")
-                .save();
+                .setAssignedTo("Site: Administrators")
+                .clickSave();
         IssuesTest.addLookupValues(this, "issues", "Type", Arrays.asList("typea", "typeb"));
 
         HashMap<String, String> projectIssue = new HashMap<>();

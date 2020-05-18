@@ -15,30 +15,21 @@
  */
 package org.labkey.test.pages.issues;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.PropertiesEditor;
-import org.labkey.test.components.html.EnumSelect;
+import org.labkey.test.components.domain.DomainDesigner;
+import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.pages.BaseDesignerPage;
-import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.components.html.OptionSelect;
-import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
-import static org.labkey.test.components.html.RadioButton.RadioButton;
-import static org.labkey.test.components.html.OptionSelect.OptionSelect;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
-public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
+public class AdminPage extends DomainDesigner<AdminPage.ElementCache>
 {
     public AdminPage(WebDriver driver)
     {
@@ -56,79 +47,87 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         return new AdminPage(driver.getDriver());
     }
 
-    public ListPage cancel()
+    public void waitForPage()
     {
-        clickButton("Cancel");
-        return new ListPage(getDriver());
+        waitFor(()-> getFieldsPanel().getComponentElement().isDisplayed(),
+                "The page did not render in time", WAIT_FOR_PAGE);
     }
 
-    public LabKeyPage clickEmailTemplate()
+    public AdminPage setSingularName(String value)
     {
-        clickAndWait(elementCache().customizeEmailButton);
-        return new LabKeyPage(getDriver());
-    }
-
-    public Input singularName()
-    {
-        return elementCache().singularNameInput;
-    }
-
-    public Input pluralName()
-    {
-        return elementCache().pluralNameInput;
-    }
-
-    public EnumSelect<SortDirection> commentSortDirection()
-    {
-        return elementCache().commentSortSelect;
-    }
-
-    public AssignToList assignToList()
-    {
-        return new AssignToList();
-    }
-
-    public DefaultAssignTo defaultAssignedTo()
-    {
-        return new DefaultAssignTo();
-    }
-
-    public PropertiesEditor configureFields()
-    {
-        return elementCache().configureFieldsPanel;
-    }
-
-    @LogMethod
-    public AdminPage setIssueAssignmentList(@Nullable @LoggedParam String group)
-    {
-        if (group != null)
-            assignToList().set(AssignToListOption.specificGroup(group));
-        else
-            assignToList().set(AssignToListOption.allProjectUsers());
+        expandPropertiesPanel();
+        elementCache().singularNameInput.set(value);
         return this;
     }
 
-    @LogMethod
-    public AdminPage setIssueAssignmentUser(@Nullable @LoggedParam String user)
+    public String getSingularName()
     {
-        if (user != null)
-            defaultAssignedTo().set(DefaultAssignToOption.specificUser(user));
-        else
-            defaultAssignedTo().set(DefaultAssignToOption.noDefault());
+        return elementCache().singularNameInput.get();
+    }
+
+    public AdminPage setPluralName(String value)
+    {
+        expandPropertiesPanel();
+        elementCache().pluralNameInput.set(value);
         return this;
     }
 
-    @Override
-    public ListPage save()
+    public String getPluralName()
     {
-        clickButton("Save");
+        return elementCache().pluralNameInput.get();
+    }
+
+    public AdminPage setCommentSortDirection(SortDirection value)
+    {
+        elementCache().commentSortDirSelect.select(value.getText());
+        return this;
+    }
+
+    public SortDirection getCommentSortDirection()
+    {
+        return SortDirection.valueOf(elementCache().commentSortDirSelect.getValue());
+    }
+
+    public AdminPage setAssignedTo(String value)
+    {
+        if (value == null)
+            elementCache().assignedToSelect.clearSelection();
+        else
+            elementCache().assignedToSelect.select(value);
+        return this;
+    }
+
+    public String getAssignedTo()
+    {
+        return elementCache().assignedToSelect.getValue();
+    }
+
+    public AdminPage setDefaultUser(String value)
+    {
+        if (value == null)
+            elementCache().defaultUserSelect.clearSelection();
+        else
+            elementCache().defaultUserSelect.select(value);
+        return this;
+    }
+
+    public String getDefaultUser()
+    {
+        return elementCache().defaultUserSelect.getValue();
+    }
+
+    @Override
+    public ListPage clickSave()
+    {
+        getWrapper().clickAndWait(elementCache().saveButton);
         return new ListPage(getDriver());
     }
 
     @Override
-    public ListPage saveAndClose()
+    public ListPage clickCancel()
     {
-        return save();
+        getWrapper().clickAndWait(elementCache().cancelButton);
+        return new ListPage(getDriver());
     }
 
     public enum SortDirection implements OptionSelect.SelectOption
@@ -162,134 +161,15 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends BaseDesignerPage.ElementCache
+    protected class ElementCache extends DomainDesigner.ElementCache
     {
-        public WebElement customizeEmailButton = new RefindingWebElement(Locator.lkButton("Customize Email Template"), this);
-        public Input singularNameInput = new Input(Locator.id("entrySingularName").findWhenNeeded(this), getDriver());
-        public Input pluralNameInput = new Input(Locator.id("entryPluralName").findWhenNeeded(this), getDriver());
-        public EnumSelect<SortDirection> commentSortSelect = EnumSelect.EnumSelect(Locator.name("sortDirection"), SortDirection.class).findWhenNeeded(this);
-        public RadioButton assignedToAllProjectUsersRadio = RadioButton(Locator.css(".assigned-to-group-project > input")).findWhenNeeded(this);
-        public RadioButton assignedToSpecificGroupRadio = RadioButton(Locator.css(".assigned-to-group-specific > input")).findWhenNeeded(this);
-        public OptionSelect<OptionSelect.SelectOption> assignedToSpecificGroupSelect = OptionSelect(Locator.css("select.assigned-to-group")).findWhenNeeded(this);
-        public RadioButton noDefaultAssignedToRadio = RadioButton(Locator.css(".assigned-to-empty > input")).findWhenNeeded(this);
-        public RadioButton specificDefaultAssignedToRadio = RadioButton(Locator.css(".assigned-to-specific-user > input")).findWhenNeeded(this);
-        public OptionSelect<OptionSelect.SelectOption> defaultAssignedToSelect = OptionSelect(Locator.css("select.assigned-to-user")).findWhenNeeded(this);
-        public PropertiesEditor configureFieldsPanel = PropertiesEditor(getDriver()).withTitle("Configure Fields").findWhenNeeded();
-    }
-
-    public static class AssignToListOption
-    {
-        private OptionSelect.SelectOption option;
-
-        public AssignToListOption(OptionSelect.SelectOption option)
-        {
-            this.option = option;
-        }
-
-        public static AssignToListOption specificGroup(String group)
-        {
-            return new AssignToListOption(OptionSelect.SelectOption.textOption(group));
-        }
-
-        public static AssignToListOption specificGroup(@NotNull Integer groupId)
-        {
-            return new AssignToListOption(OptionSelect.SelectOption.valueOption(groupId.toString()));
-        }
-
-        public static AssignToListOption allProjectUsers()
-        {
-            return null;
-        }
-    }
-
-    public enum AssignedToRadioOption
-    {
-        AllProjectUsers,
-        SpecificGroup
-    }
-    
-    public class AssignToList
-    {
-        public void set(AssignToListOption from)
-        {
-            if (null == from)
-                elementCache().assignedToAllProjectUsersRadio.check();
-            else
-            {
-                elementCache().assignedToSpecificGroupRadio.check();
-                elementCache().assignedToSpecificGroupSelect.selectOption(from.option);
-            }
-        }
-
-        public OptionSelect.SelectOption get()
-        {
-            return elementCache().assignedToSpecificGroupSelect.getSelection();
-        }
-
-        public AssignedToRadioOption getRadioSelection()
-        {
-            if (elementCache().assignedToAllProjectUsersRadio.isChecked())
-                return AssignedToRadioOption.AllProjectUsers;
-            else
-                return AssignedToRadioOption.SpecificGroup;
-        }
-    }
-    
-    public static class DefaultAssignToOption
-    {
-        private OptionSelect.SelectOption option;
-
-        private DefaultAssignToOption(OptionSelect.SelectOption option)
-        {
-            this.option = option;
-        }
-
-        public static DefaultAssignToOption specificUser(String displayName)
-        {
-            return new DefaultAssignToOption(OptionSelect.SelectOption.textOption(displayName));
-        }
-
-        public static DefaultAssignToOption specificUser(@NotNull Integer userId)
-        {
-            return new DefaultAssignToOption(OptionSelect.SelectOption.valueOption(userId.toString()));
-        }
-
-        public static DefaultAssignToOption noDefault()
-        {
-            return null;
-        }
-    }
-
-    public enum DefaultAssignedToRadioOption
-    {
-        NoDefault,
-        SpecificUser
-    }
-    
-    public class DefaultAssignTo
-    {
-        public void set(DefaultAssignToOption defaultUser)
-        {
-            if (null == defaultUser)
-                elementCache().noDefaultAssignedToRadio.check();
-            else
-            {
-                elementCache().specificDefaultAssignedToRadio.check();
-                elementCache().defaultAssignedToSelect.selectOption(defaultUser.option);
-            }
-        }
-
-        public OptionSelect.SelectOption get()
-        {
-            return elementCache().defaultAssignedToSelect.getSelection();
-        }
-
-        public DefaultAssignedToRadioOption getRadioSelection()
-        {
-            if (elementCache().noDefaultAssignedToRadio.isChecked())
-                return DefaultAssignedToRadioOption.NoDefault;
-            else
-                return DefaultAssignedToRadioOption.SpecificUser;
-        }
+        Input singularNameInput = new Input(Locator.inputById("singularItemName").findWhenNeeded(propertiesPanel), getDriver());
+        Input pluralNameInput = new Input(Locator.inputById("pluralItemName").findWhenNeeded(propertiesPanel), getDriver());
+        WebElement commentSortDirRow = Locator.tagWithClass("div", "row").containingIgnoreCase("Comment Sort").findWhenNeeded(this);
+        ReactSelect commentSortDirSelect = ReactSelect.finder(getDriver()).findWhenNeeded(commentSortDirRow);
+        WebElement assignedToRow = Locator.tagWithClass("div", "row").containingIgnoreCase("Assigned To").findWhenNeeded(this);
+        ReactSelect assignedToSelect = ReactSelect.finder(getDriver()).findWhenNeeded(assignedToRow);
+        WebElement defaultUserRow = Locator.tagWithClass("div", "row").containingIgnoreCase("Default User").findWhenNeeded(this);
+        ReactSelect defaultUserSelect = ReactSelect.finder(getDriver()).findWhenNeeded(defaultUserRow);
     }
 }

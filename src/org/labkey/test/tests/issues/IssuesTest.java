@@ -235,7 +235,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         for (ListHelper.ListColumn col : fields)
         {
-            adminPage.configureFields().addField(col);
+            adminPage.getFieldsPanel().addField(col);
         }
         clickButton("Save");
 
@@ -334,7 +334,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         for (int pos : positions)
         {
-            adminPage.configureFields().selectField(pos).properties().selectValidatorsTab().setRequired(selected);
+            adminPage.getFieldsPanel().getField(pos).setRequiredField(selected);
         }
     }
 
@@ -490,10 +490,10 @@ public class IssuesTest extends BaseWebDriverTest
 
         for (ListHelper.ListColumn col : fields)
         {
-            adminPage.configureFields().addField(col);
+            adminPage.getFieldsPanel().addField(col);
         }
         setRequiredFields(adminPage, requiredFieldPos, true);
-        adminPage.save();
+        adminPage.clickSave();
         clickButton("New Issue");
         clickButton("Save");
 
@@ -512,7 +512,7 @@ public class IssuesTest extends BaseWebDriverTest
         // clear all required selections except title
         setRequiredFields(adminPage, requiredFieldPos, false);
         setRequiredFields(adminPage, new int[]{0}, true);
-        adminPage.save();
+        adminPage.clickSave();
 
         clickButton("New Issue");
         clickButton("Save");
