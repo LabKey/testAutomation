@@ -396,9 +396,8 @@ public class IssuesTest extends BaseWebDriverTest
     {
         // CustomizeEmailAction
         goToModule("Issues");
-        clickButton("Admin");
         clickButton("Customize Email Template");
-        String subject = getFormElement(Locator.name("emailSubject"));
+        Assert.assertEquals("Wrong email template class", "org.labkey.issue.IssueUpdateEmailTemplate", getFormElement(Locator.name("templateClass")));
         setFormElement(Locator.name("emailMessage"), TEST_EMAIL_TEMPLATE_BAD);
         clickButton("Save");
     }
