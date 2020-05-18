@@ -117,7 +117,10 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
     public DatasetDesignerPage setIsDemographicData(boolean checked)
     {
         expandPropertiesPanel();
-        setDataRowUniquenessType(DataRowUniquenessType.PTID_ONLY);
+        if (checked)
+            setDataRowUniquenessType(DataRowUniquenessType.PTID_ONLY);
+        else
+            setDataRowUniquenessType(DataRowUniquenessType.PTID_TIMEPOINT);
         return this;
     }
 
