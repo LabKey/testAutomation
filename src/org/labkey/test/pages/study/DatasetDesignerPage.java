@@ -234,13 +234,13 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
     // note: auto-import slider is only shown when you've inferred fields from file
     public DatasetDesignerPage setAutoImport(boolean autoImport)
     {
-        elementCache().autoImportSlider().set(autoImport);
+        elementCache().autoImportToggle().set(autoImport);
         return this;
     }
 
     public boolean getAutoImport()
     {
-        return elementCache().autoImportSlider().get();
+        return elementCache().autoImportToggle().get();
     }
 
     public DatasetDesignerPage setPreviewMappedColumn(String columnLabel, String value)
@@ -302,7 +302,7 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
                 .findWhenNeeded(propertiesPanel));
 
         // this is only shown when inferring fields from a file
-        protected ToggleButton autoImportSlider()
+        protected ToggleButton autoImportToggle()
         {
             return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Import Data").waitFor(fieldsPanel);
         }

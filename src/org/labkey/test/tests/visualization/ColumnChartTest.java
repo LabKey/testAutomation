@@ -81,7 +81,7 @@ public class ColumnChartTest extends BaseWebDriverTest
         log("Go to the schema browser and modify some of the fields.");
         goToSchemaBrowser();
         selectQuery("study", DATA_SOURCE_1);
-        click(Locator.linkWithText("edit definition"));
+        clickAndWait(Locator.linkWithText("Edit Definition"));
 
         log("Set the '" + PREGNANCY_COLUMN_NAME + "', '" + LANGUAGE_COLUMN_NAME + "', and '" + SIGNATURE_COLUMN_NAME + "' fields to be dimensions but not measures.");
         DatasetDesignerPage datasetDesignerPage = new DatasetDesignerPage(getDriver());
