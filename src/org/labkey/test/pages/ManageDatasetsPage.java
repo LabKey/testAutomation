@@ -51,8 +51,6 @@ public class ManageDatasetsPage extends LabKeyPage<ManageDatasetsPage.ElementCac
 
     public DatasetDesignerPage clickCreateNewDataset()
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(
-                createDefaultConnection(true),"experimental-reactdesigner");
         clickAndWait(elementCache().createNewDatasetLink);
         return new DatasetDesignerPage(getDriver());
     }
