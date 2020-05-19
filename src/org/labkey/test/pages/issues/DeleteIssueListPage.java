@@ -16,14 +16,9 @@
 package org.labkey.test.pages.issues;
 
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.IssueListDefDataRegion;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.selenium.LazyWebElement;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 public class DeleteIssueListPage extends LabKeyPage
 {

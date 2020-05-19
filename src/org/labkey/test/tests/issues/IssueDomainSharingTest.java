@@ -24,7 +24,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Issues;
-import org.labkey.test.components.IssueListDefDataRegion;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.DetailsPage;

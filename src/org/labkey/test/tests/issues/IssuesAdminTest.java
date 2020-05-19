@@ -23,7 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Issues;
-import org.labkey.test.components.IssueListDefDataRegion;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.InsertPage;

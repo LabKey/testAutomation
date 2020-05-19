@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.components;
+package org.labkey.test.components.issues;
 
 import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.DeleteIssueListPage;

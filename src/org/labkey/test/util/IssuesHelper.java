@@ -28,7 +28,7 @@ import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.IssueListDefDataRegion;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.InsertPage;

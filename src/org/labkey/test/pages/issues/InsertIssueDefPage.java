@@ -16,7 +16,7 @@
 package org.labkey.test.pages.issues;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.IssueListDefDataRegion;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
