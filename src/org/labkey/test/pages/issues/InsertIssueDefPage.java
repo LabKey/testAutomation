@@ -86,10 +86,10 @@ public class InsertIssueDefPage extends LabKeyPage
             super("Create Issue List Definition?", driver);
         }
 
-        public AdminPage clickYes()
+        public IssuesAdminPage clickYes()
         {
             clickButton("Yes");
-            return new AdminPage(getDriver());
+            return new IssuesAdminPage(getDriver());
         }
 
         public InsertIssueDefPage clickYesError()

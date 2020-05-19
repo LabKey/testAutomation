@@ -15,7 +15,7 @@
  */
 package org.labkey.test.components;
 
-import org.labkey.test.pages.issues.AdminPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.DeleteIssueListPage;
 import org.labkey.test.pages.issues.InsertIssueDefPage;
 import org.labkey.test.pages.issues.ListPage;
@@ -54,12 +54,12 @@ public class IssueListDefDataRegion extends DataRegionTable
         return new DeleteIssueListPage(getDriver());
     }
 
-    public AdminPage createIssuesListDefinition(String name)
+    public IssuesAdminPage createIssuesListDefinition(String name)
     {
         return startCreateIssuesListDefinition(name).clickYes();
     }
 
-    public AdminPage createIssuesListDefinition(String name, String kind)
+    public IssuesAdminPage createIssuesListDefinition(String name, String kind)
     {
         return startCreateIssuesListDefinition(name, kind).clickYes();
     }

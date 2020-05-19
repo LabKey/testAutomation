@@ -26,7 +26,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Issues;
 import org.labkey.test.components.IssueListDefDataRegion;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.pages.issues.AdminPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.InsertIssueDefPage;
 import org.labkey.test.pages.issues.InsertPage;
@@ -101,7 +101,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
                 confirmationWindow.getBody());
         confirmationWindow.clickButton("Yes");
 
-        AdminPage adminPage = AdminPage.beginAt(this, getProjectName(), listDef);
+        IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), listDef);
         String inheritedField = "inheritedfield";
         adminPage.getFieldsPanel().addField(new FieldDefinition(inheritedField).setLabel(inheritedField).setType(ColumnType.String));
         adminPage.clickSave();
@@ -139,11 +139,11 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
                 "This existing definition will be shared with your new issue list if created.",
                 confirmationWindow.getBody());
         confirmationWindow.clickButton("Yes");
-        AdminPage adminPage = AdminPage.beginAt(this, getProjectName(), listDef);
+        IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), listDef);
         adminPage.setAssignedTo(null); // All Project Users
         adminPage.clickSave();
 
-        adminPage = AdminPage.beginAt(this, "Shared", listDef);
+        adminPage = IssuesAdminPage.beginAt(this, "Shared", listDef);
         // Append ":" to field name: Issue 32057: Issues forms can't handle complex field names
         adminPage.getFieldsPanel().addField(new FieldDefinition(inheritedField + ":").setLabel(inheritedField).setType(ColumnType.String));
         adminPage.clickSave();
@@ -184,7 +184,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
                 confirmationWindow.getBody());
         confirmationWindow.clickButton("Yes");
 
-        AdminPage adminPage = AdminPage.beginAt(this, PROJECT2, listDef);
+        IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, PROJECT2, listDef);
         String inheritedField = "uninheritedfield";
         adminPage.getFieldsPanel().addField(new FieldDefinition(inheritedField).setLabel(inheritedField).setType(ColumnType.String));
         adminPage.clickSave();
@@ -211,7 +211,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
                 "A new Issue Definition will be generated in this folder: /" + getProjectName(),
                 confirmationWindow.getBody());
 
-        AdminPage adminPage = confirmationWindow.clickYes();
+        IssuesAdminPage adminPage = confirmationWindow.clickYes();
         String inheritedField = "uninheritedfield";
         adminPage.getFieldsPanel().addField(new FieldDefinition(inheritedField).setLabel(inheritedField).setType(ColumnType.String));
         adminPage.clickSave();

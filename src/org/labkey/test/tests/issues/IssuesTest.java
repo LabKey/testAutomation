@@ -32,7 +32,7 @@ import org.labkey.test.categories.Issues;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.pages.issues.AdminPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.EmailPrefsPage;
@@ -231,7 +231,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         clickProject(getProjectName());
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
-        AdminPage adminPage = _issuesHelper.goToAdmin();
+        IssuesAdminPage adminPage = _issuesHelper.goToAdmin();
 
         for (ListHelper.ListColumn col : fields)
         {
@@ -330,7 +330,7 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void setRequiredFields(AdminPage adminPage, int[] positions, boolean selected)
+    private void setRequiredFields(IssuesAdminPage adminPage, int[] positions, boolean selected)
     {
         for (int pos : positions)
         {
@@ -485,7 +485,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         clickFolder(subFolder);
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
-        AdminPage adminPage = _issuesHelper.goToAdmin();
+        IssuesAdminPage adminPage = _issuesHelper.goToAdmin();
 
         for (ListHelper.ListColumn col : fields)
         {

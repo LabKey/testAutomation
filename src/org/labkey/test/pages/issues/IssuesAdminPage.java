@@ -29,22 +29,22 @@ import org.openqa.selenium.WebElement;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
-public class AdminPage extends DomainDesigner<AdminPage.ElementCache>
+public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache>
 {
-    public AdminPage(WebDriver driver)
+    public IssuesAdminPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static AdminPage beginAt(WebDriverWrapper driver, String issueDefName)
+    public static IssuesAdminPage beginAt(WebDriverWrapper driver, String issueDefName)
     {
         return beginAt(driver, driver.getCurrentContainerPath(), issueDefName);
     }
 
-    public static AdminPage beginAt(WebDriverWrapper driver, String containerPath, String issueDefName)
+    public static IssuesAdminPage beginAt(WebDriverWrapper driver, String containerPath, String issueDefName)
     {
         driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "admin", Maps.of("issueDefName", issueDefName.toLowerCase())));
-        return new AdminPage(driver.getDriver());
+        return new IssuesAdminPage(driver.getDriver());
     }
 
     public void waitForPage()
@@ -53,7 +53,7 @@ public class AdminPage extends DomainDesigner<AdminPage.ElementCache>
                 "The page did not render in time", WAIT_FOR_PAGE);
     }
 
-    public AdminPage setSingularName(String value)
+    public IssuesAdminPage setSingularName(String value)
     {
         expandPropertiesPanel();
         elementCache().singularNameInput.set(value);
@@ -65,7 +65,7 @@ public class AdminPage extends DomainDesigner<AdminPage.ElementCache>
         return elementCache().singularNameInput.get();
     }
 
-    public AdminPage setPluralName(String value)
+    public IssuesAdminPage setPluralName(String value)
     {
         expandPropertiesPanel();
         elementCache().pluralNameInput.set(value);
@@ -77,7 +77,7 @@ public class AdminPage extends DomainDesigner<AdminPage.ElementCache>
         return elementCache().pluralNameInput.get();
     }
 
-    public AdminPage setCommentSortDirection(SortDirection value)
+    public IssuesAdminPage setCommentSortDirection(SortDirection value)
     {
         elementCache().commentSortDirSelect.select(value.getText());
         return this;
@@ -88,7 +88,7 @@ public class AdminPage extends DomainDesigner<AdminPage.ElementCache>
         return SortDirection.valueOf(elementCache().commentSortDirSelect.getValue());
     }
 
-    public AdminPage setAssignedTo(String value)
+    public IssuesAdminPage setAssignedTo(String value)
     {
         if (value == null)
             elementCache().assignedToSelect.clearSelection();
@@ -102,7 +102,7 @@ public class AdminPage extends DomainDesigner<AdminPage.ElementCache>
         return elementCache().assignedToSelect.getValue();
     }
 
-    public AdminPage setDefaultUser(String value)
+    public IssuesAdminPage setDefaultUser(String value)
     {
         if (value == null)
             elementCache().defaultUserSelect.clearSelection();

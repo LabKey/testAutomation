@@ -29,7 +29,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.IssueListDefDataRegion;
-import org.labkey.test.pages.issues.AdminPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.ListPage;
@@ -209,18 +209,18 @@ public class IssuesHelper extends WebDriverWrapper
     @LogMethod
     public void setIssueAssignmentList(@Nullable @LoggedParam String group)
     {
-        new AdminPage(getDriver()).setAssignedTo(group);
+        new IssuesAdminPage(getDriver()).setAssignedTo(group);
     }
 
     @LogMethod
     public void setIssueAssignmentUser(@Nullable @LoggedParam String user)
     {
-        new AdminPage(getDriver()).setDefaultUser(user);
+        new IssuesAdminPage(getDriver()).setDefaultUser(user);
     }
 
-    public AdminPage goToAdmin()
+    public IssuesAdminPage goToAdmin()
     {
         clickButton("Admin");
-        return new AdminPage(getDriver());
+        return new IssuesAdminPage(getDriver());
     }
 }
