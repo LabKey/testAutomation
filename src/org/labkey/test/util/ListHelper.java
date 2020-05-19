@@ -28,14 +28,11 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -77,11 +74,6 @@ public class ListHelper extends LabKeySiteWrapper
         setFormElement(Locator.id("tsv3"), listData);
         _extHelper.selectComboBoxItem("Format:", "Comma-separated text (csv)");
         submitImportTsv_success();
-    }
-
-    public PropertiesEditor getListFieldEditor()
-    {
-        return PropertiesEditor.PropertiesEditor(getDriver()).withTitle("List Fields").find();
     }
 
     public void uploadData(String listData)
@@ -278,11 +270,6 @@ public class ListHelper extends LabKeySiteWrapper
             fieldsPanel.addField(col);
         }
         listDefinitionPage.clickSave();
-    }
-
-    public void addField(ListColumn col)
-    {
-        getListFieldEditor().addField(col);
     }
 
     private void beginCreateListFromTab(String tabName, String listName)
