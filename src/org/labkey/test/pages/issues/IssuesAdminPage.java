@@ -29,6 +29,11 @@ import org.openqa.selenium.WebElement;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
+/**
+ * Automates the LabKey ui components defined in: packages/components/src/components/domainproperties/issues/IssuesListDefDesignerPanels.tsx
+ * Currently only exposed in LKS. Move to 'org.labkey.test.components.issues.IssuesListDesigner' once needed for LKB or LKSM
+ */
+
 public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache>
 {
     public IssuesAdminPage(WebDriver driver)
