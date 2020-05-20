@@ -26,14 +26,11 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
@@ -45,12 +42,9 @@ import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.SampleSetDefinition;
-import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
-import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -121,24 +115,17 @@ public class SampleSetTest extends BaseWebDriverTest
         portalHelper.addWebPart("Sample Sets");
         portalHelper.exitAdminMode();
 
-        Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", true);
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    protected void doCleanup(boolean afterTest)
     {
         super.doCleanup(afterTest);
-        Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", false);
-    }
 
-    // Uncomment this function (after you run once) it will make iterating on tests much easier.
-//    @Override
-//    protected void doCleanup(boolean afterTest)
-//    {
+        // If you are debugging tests change this function to do nothing.
+        // It can make re-running faster but you need to valid the integrity of the test data on your own.
 //        log("Do nothing.");
-//    }
+    }
 
     @Test
     public void testCreateSampleSetNoExpression()
@@ -359,72 +346,6 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testStringLookupFields() throws IOException, CommandException
-    {
-        String sampleSetName = "10000Samples"; // Testing with 10,000 samples because as per the product the lookup is converted into text field only when the samples exceed 10,000 samples
-        String listName = "MainList";
-
-        goToProjectHome();
-        new PortalHelper(this).addWebPart("Lists");
-
-        log("Creating the sample set of 10000 samples");
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
-        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("label", ColumnType.String)));
-        dgen.addDataSupplier("label", () -> dgen.randomString(10))
-                .withGeneratedRows(10000);
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
-        log("Successfully  inserted " + saveRowsResponse.getRowsAffected());
-
-        log("Waiting for the sample data to get generated");
-        goToProjectHome();
-        waitAndClickAndWait(Locator.linkWithText(sampleSetName));
-
-        log("Inserting 10,001 row in the sampleset");
-        DataRegionTable table = new DataRegionTable("Material", getDriver());
-        table.clickInsertNewRow();
-
-        setFormElement(Locator.name("quf_Name"), "Sample1");
-        setFormElement(Locator.name("quf_label"), "Sample1");
-        clickButton("Submit");
-
-        log("Creating the list via API");
-        ListDefinition listDef = new ListDefinition(listName);
-        listDef.setKeyName("id");
-        listDef.addField(new FieldDefinition("name", ColumnType.String));
-        listDef.addField(new FieldDefinition("lookUpField",
-                new FieldDefinition.LookupInfo(null, "exp.materials", "10000Samples")
-                        .setTableType(ColumnType.Integer))
-                .setDescription("LookUp in same container with 10000 samples"));
-
-        listDef.getCreateCommand().execute(createDefaultConnection(true), getProjectName());
-
-        log("Inserting the new row in the list with the newly created sample as lookup");
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(listName));
-        table = new DataRegionTable("query", getDriver());
-        table.clickInsertNewRow();
-        setFormElement(Locator.name("quf_id"), "1");
-        setFormElement(Locator.name("quf_name"), "1");
-        setFormElement(Locator.name("quf_lookUpField"), "Sample2");
-        clickButton("Submit");
-
-        String errMsg = Locators.labkeyError.findElement(getDriver()).getText();
-        assertEquals("Expecpted error is different", "Could not convert value: Sample2", errMsg);
-
-        setFormElement(Locator.name("quf_lookUpField"), "Sample1");
-        clickButton("Submit");
-
-        log("Verifying row is inserted correctly");
-        table = new DataRegionTable("query", getDriver());
-        assertEquals("Lookup field value is incorrect", Arrays.asList("Sample1"), table.getColumnDataAsText("lookUpField"));
-
-    }
-
-    @Test
     public void testDeleteMultipleSamplesNoDependencies()
     {
         final String SAMPLE_SET_NAME = "DeleteIndependentSamples";
@@ -450,94 +371,12 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testDeleteSamplesSomeWithDerivedSamples()
-    {
-        final String SAMPLE_SET_NAME = "DeleteSamplesWithParents";
-        List<String> parentSampleNames = Arrays.asList("P-1", "P-2", "P-3");
-        List<Map<String, String>> sampleData = new ArrayList<>();
-        parentSampleNames.forEach(name -> {
-            sampleData.add(Map.of("Name", name));
-        });
-
-        clickProject(PROJECT_NAME);
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        log("Create a sample set with some potential parents");
-        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME), sampleData);
-        DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
-        log("Derive one sample from another");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
-        clickButton("Derive Samples");
-        clickButton("Next");
-        String childName = parentSampleNames.get(0) + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), childName);
-        clickButton("Submit");
-
-        log("Derive a sample from the one just created");
-        clickAndWait(Locator.linkContainingText("derive samples from this sample"));
-        clickButton("Next");
-        String grandchildName = childName + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), grandchildName);
-        clickButton("Submit");
-
-        log("Derive a sample with two parents");
-        clickAndWait(Locator.linkContainingText(SAMPLE_SET_NAME));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
-        clickButton("Derive Samples");
-        clickButton("Next");
-        String twoParentChildName = parentSampleNames.get(1) + "+" + childName + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), twoParentChildName);
-        clickButton("Submit");
-
-        clickAndWait(Locator.linkContainingText(SAMPLE_SET_NAME));
-
-        log("Try to delete parent sample");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
-        drtSamples.clickHeaderButton("Delete");
-        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
-                .clickButton("Dismiss", true);
-
-        log("Try to delete multiple parent samples");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
-        drtSamples.clickHeaderButton("Delete");
-        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
-                .clickButton("Dismiss", true);
-
-        log("Try to delete parent and child");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
-
-        assertEquals("Deleted sample " + twoParentChildName + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
-        assertTrue("Parent sample " + parentSampleNames.get(1) + " does not appears in grid", drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name") > -1);
-
-        log("Now that the child is gone, try to delete the parent");
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
-
-        assertEquals("Deleted sample " + parentSampleNames.get(1) + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-
-        log("Now try to delete what's left, in several hitches");
-        drtSamples.checkAllOnPage();
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 2 samples");
-        assertEquals("Number of samples after deletion not as expected", 2, drtSamples.getDataRowCount());
-
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
-        assertEquals("Number of samples after deletion not as expected", 1, drtSamples.getDataRowCount());
-
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
-        assertEquals("Number of samples after deletion not as expected", 0, drtSamples.getDataRowCount());
-
-    }
-
-    @Test
     public void testDeleteSamplesSomeWithAssayData()
     {
         final PortalHelper portalHelper = new PortalHelper(this);
         final String SAMPLE_SET_NAME = "DeleteSamplesWithAssayData";
         final String SAMPLE_ID_FIELD_NAME = "sampleId";
         final String DATA_ID_ASSAY = "GPAT - SampleId Data";
-        final String BATCH_ID_ASSAY = "GPAT - SampleId Batch";
         final String RUN_ID_ASSAY = "GPAT - SampleId Run";
         List<String> sampleNames = Arrays.asList("P-1", "P-2", "P-3", "P-4", "P-5");
         final String BATCH_SAMPLE_NAME = sampleNames.get(1);
@@ -946,6 +785,7 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         return areDataListEqual(list01, list02, true);
     }
+
     protected boolean areDataListEqual(List<Map<String, String>> list01, List<Map<String, String>> list02, boolean logMismatch)
     {
         if( list01.size() != list02.size())
@@ -1076,8 +916,6 @@ public class SampleSetTest extends BaseWebDriverTest
         else
             INDICATOR_FIELD_NAME = MISSING_FIELD_NAME + "_mvindicator";
 
-        StringBuilder errorLog = new StringBuilder();
-
         log("Validate missing values and required fields in a Sample Set.");
 
         log("Create expected missing value indicators.");
@@ -1187,18 +1025,12 @@ public class SampleSetTest extends BaseWebDriverTest
         testDataIndex = getSampleIndexFromTestInput(UPDATE_SAMPLE_NAME, sampleData);
         sampleData.get(testDataIndex).replace(MISSING_FIELD_NAME, "");
 
-        Assert.assertTrue("Newly inserted Sample Set data not as expected. Stopping the test here.", areDataListEqual(resultsFromDB, sampleData));
+        checker().fatal().verifyTrue("Newly inserted sample type data not as expected. Fatal error.",
+                areDataListEqual(resultsFromDB, sampleData));
 
-        // Not going to use asserts (and possibly fail on first test), will try all the scenarios and then check at the end.
-        String errorMsg;
-        if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
-        {
-            errorMsg = "Number of missing value UI indicators is not as expected.\nExpected " + expectedMissingCount + " found " + getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]"));
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyEquals("Number of missing value UI indicators is not as expected.",
+                Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
+                expectedMissingCount);
 
         log("Now update a sample (give a value in the missing value field) and validate.");
         final String UPDATED_VALUE = "This should remove the unknown value indicator.";
@@ -1225,38 +1057,23 @@ public class SampleSetTest extends BaseWebDriverTest
 //
 //        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
 
-        if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
-        {
-            errorMsg = "After updating a value the number of missing UI indicators is not as expected.\nExpected " + expectedMissingCount + " found " + getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]"));
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyEquals("After updating a value the number of missing UI indicators is not as expected.",
+                Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
+                expectedMissingCount);
 
         resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
-        if(!areDataListEqual(resultsFromDB, sampleData))
-        {
-            errorMsg = "After updating a value the data in the DB is not as expected.";
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyTrue("After updating a value the data in the DB is not as expected.",
+                areDataListEqual(resultsFromDB, sampleData));
 
         // Not really sure this is useful, we can remove in the future.
         log("Validate that the help div is shown when mouse over a missing value.");
         mouseOver(Locator.linkWithText(MV_INDICATOR_03));
         sleep(500);
-        if(!isElementVisible(Locator.xpath("//span[@id='helpDivBody'][text()='" + MV_DESCRIPTION_03 + "']")))
-        {
-            errorMsg = "The missing value pop-up helper was shown as expected.\nExpected a div control with the text '" + MV_DESCRIPTION_03 + "'.";
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyTrue(
+                String.format("Expected a value pop-up helper (div control) with the text '%s'.",
+                        MV_DESCRIPTION_03),
+                isElementVisible(Locator.xpath("//span[@id='helpDivBody'][text()='" + MV_DESCRIPTION_03 + "']")));
 
         log("Now add a single sample via the UI");
         final String UI_INSERT_SAMPLE_NAME = "mv09";
@@ -1280,50 +1097,28 @@ public class SampleSetTest extends BaseWebDriverTest
         // Add this element to expected sample data.
         sampleData.add(Map.of("Name", UI_INSERT_SAMPLE_NAME, REQUIRED_FIELD_NAME, UI_STATIC_FIELD_TEXT, MISSING_FIELD_NAME, "", INDICATOR_FIELD_NAME, MV_INDICATOR_03));
 
-        if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
-        {
-            errorMsg = "After adding a sample with a missing value through the UI the number of missing UI indicators is not as expected.\nExpected " + expectedMissingCount + " found " + getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]"));
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyEquals("After adding a sample with a missing value through the UI the number of missing UI indicators is not as expected.",
+                Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
+                expectedMissingCount);
 
         resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
-        if(!areDataListEqual(resultsFromDB, sampleData))
-        {
-            errorMsg = "After adding a sample with a missing value through the UI the data in the DB is not as expected.";
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyTrue("After adding a sample with a missing value through the UI the data in the DB is not as expected.",
+                areDataListEqual(resultsFromDB, sampleData));
 
         log("Validate that the required field check works as expected.");
         updateSampleData = new ArrayList<>();
         updateSampleData.add(Map.of("Name", "mv10", REQUIRED_FIELD_NAME, "", MISSING_FIELD_NAME, "There should be no value in the required field.", INDICATOR_FIELD_NAME, ""));
         sampleHelper.bulkImportExpectingError(updateSampleData, SampleSetHelper.IMPORT_DATA_LABEL);
 
-        boolean errorMsgShown;
         try
         {
             waitForElementToBeVisible(Locator.xpath("//div[contains(@class, 'labkey-error')][contains(text(),'Missing value for required property')]"));
-            errorMsgShown = true;
             clickButton("Cancel");
         }
         catch(NoSuchElementException nse)
         {
-            errorMsgShown = false;
-        }
-
-        if(!errorMsgShown)
-        {
-            errorMsg = "No error message was shown when a required field is missing.";
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
+            checker().error("No error message was shown when a required field is missing.");
         }
 
         log("Now validate that adding a single row from the UI has the same behavior.");
@@ -1340,32 +1135,18 @@ public class SampleSetTest extends BaseWebDriverTest
         try
         {
             waitForElementToBeVisible(Locator.xpath("//span[contains(@class, 'help-block')]/font[@class='labkey-error'][text()='This field is required']"));
-            errorMsgShown = true;
             clickButton("Cancel");
         }
         catch(NoSuchElementException nse)
         {
-            errorMsgShown = false;
-        }
-
-        if(!errorMsgShown)
-        {
-            errorMsg = "No error message was shown when a required field is missing in the UI.";
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
+            checker().error("No error message was shown when a required field is missing in the UI.");
         }
 
         // How about automation that updates an existing field?
 
-        if(errorLog.length() > 0)
-            Assert.fail(errorLog.toString());
-
         log("All done.");
     }
 
-    @LogMethod
     private void setupMVIndicators(List<Map<String, String>> missingValueIndicators)
     {
         goToFolderManagement();
@@ -1444,19 +1225,21 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Verify error message for reserved field names");
         domainFormPanel.manuallyDefineFields("created");
-        assertEquals("Sample Type reserved field name error", Arrays.asList(
-                "Property name 'created' is a reserved name."),
+        checker().verifyEquals("Sample Type reserved field name error",
+                Arrays.asList("Property name 'created' is a reserved name."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
+
         domainFormPanel.manuallyDefineFields("rowid");
-        assertEquals("Sample Type reserved field name error", Arrays.asList(
-                "Property name 'rowid' is a reserved name."),
+        checker().verifyEquals("Sample Type reserved field name error",
+                Arrays.asList("Property name 'rowid' is a reserved name."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         log("Verify error message for a few other special field names");
         domainFormPanel.manuallyDefineFields("name");
-        assertEquals("Sample Type 'name' field name error", Arrays.asList(
+        checker().verifyEquals("Sample Type 'name' field name error",
+                Arrays.asList(
                 "The field name 'Name' is already taken. Please provide a unique name for each field.",
                 "Please correct errors in Fields before saving."),
                 createPage.clickSaveExpectingErrors());
@@ -1464,8 +1247,8 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Verify error message for a few other special field names");
         domainFormPanel.manuallyDefineFields("sampleid");
-        assertEquals("Sample Type SampleId field name error", Arrays.asList(
-                "The SampleId field name is reserved for imported or generated sample ids."),
+        checker().verifyEquals("Sample Type SampleId field name error",
+                Arrays.asList("The SampleId field name is reserved for imported or generated sample ids."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
     }
@@ -1602,7 +1385,9 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleHelper.bulkImport(sampleData);
 
         log("Check that the samples were added.");
-        assertEquals("Number of samples not as expected.", sampleNames.size(), sampleHelper.getSampleCount());
+        checker().verifyEquals("Number of samples not as expected.",
+                sampleNames.size(),
+                sampleHelper.getSampleCount());
 
     }
 
