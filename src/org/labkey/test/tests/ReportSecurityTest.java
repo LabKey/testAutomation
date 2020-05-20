@@ -159,7 +159,7 @@ public class ReportSecurityTest extends ReportTest
         assertTextPresent("999320016");
         pushLocation();
         DataRegionTable dt = new DataRegionTable("Dataset", getDriver());
-        dt.goToView("default");
+        dt.goToView("Default");
         assertTextPresent("User does not have read permission on this dataset.");
         stopImpersonating();
     }

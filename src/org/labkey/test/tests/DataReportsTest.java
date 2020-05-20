@@ -376,7 +376,7 @@ public class DataReportsTest extends ReportTest
         popLocation();
 
         log("Check saved R script");
-        DataRegionTable.DataRegion(getDriver()).find().goToView("default");
+        DataRegionTable.DataRegion(getDriver()).find().goToView("Default");
         pushLocation();
         DataRegionTable.DataRegion(getDriver()).find().goToReport(R_SCRIPTS[0]);
         waitForText(WAIT_FOR_PAGE, "Console output");
