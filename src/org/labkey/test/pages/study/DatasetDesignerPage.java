@@ -9,6 +9,7 @@ import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.html.ToggleButton;
 import org.labkey.test.components.study.AdvancedDatasetSettingsDialog;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.openqa.selenium.WebDriver;
@@ -116,7 +117,10 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
     public DatasetDesignerPage setIsDemographicData(boolean checked)
     {
         expandPropertiesPanel();
-        setDataRowUniquenessType(DataRowUniquenessType.PTID_ONLY);
+        if (checked)
+            setDataRowUniquenessType(DataRowUniquenessType.PTID_ONLY);
+        else
+            setDataRowUniquenessType(DataRowUniquenessType.PTID_TIMEPOINT);
         return this;
     }
 
@@ -168,8 +172,6 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
         return  elementCache().keyFieldSelect.isEnabled();
     }
 
-    // get/select additional key field
-    // get/set 'let server manage fields to make entries unique' checkbox
 
     public DatasetDesignerPage setShowInOverview(boolean checked)
     {
@@ -229,6 +231,32 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
         }
     }
 
+    // note: auto-import slider is only shown when you've inferred fields from file
+    public DatasetDesignerPage setAutoImport(boolean autoImport)
+    {
+        elementCache().autoImportToggle().set(autoImport);
+        return this;
+    }
+
+    public boolean getAutoImport()
+    {
+        return elementCache().autoImportToggle().get();
+    }
+
+    public DatasetDesignerPage setPreviewMappedColumn(String columnLabel, String value)
+    {
+        elementCache().columnMapSelect(columnLabel).filterSelect(value);
+        return this;
+    }
+
+    public String getPreviewMappedColumnValue(String columnLabel)
+    {
+        return elementCache().columnMapSelect(columnLabel).getValue();
+    }
+    // find ptid column select
+    // find visit column select
+
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -272,5 +300,19 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
 
         protected final Checkbox keyPropertyManagedBox = new Checkbox(Locator.inputById("keyPropertyManaged")
                 .findWhenNeeded(propertiesPanel));
+
+        // this is only shown when inferring fields from a file
+        protected ToggleButton autoImportToggle()
+        {
+            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Import Data").waitFor(fieldsPanel);
+        }
+
+        protected FilteringReactSelect columnMapSelect(String labelText)
+        {   // find the row with the specified label span, then get the select in it
+            WebElement container = Locator.tag("div").withChild(Locator.tag("div")
+                    .withChild(Locator.tagWithClass("span", "domain-no-wrap").withText(labelText)))
+                    .waitForElement(fieldsPanel, 2000);
+            return FilteringReactSelect.finder(getDriver()).find(container);
+        }
     }
 }

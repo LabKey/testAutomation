@@ -578,8 +578,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         signIn();
         setServerDebugLogging();
         setExperimentalFlags();
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true),
-                "experimental-reactdesigner");
 
         // Start logging JS errors.
         resumeJsErrorChecker();
