@@ -1037,23 +1037,26 @@ public class ListTest extends BaseWebDriverTest
     {
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
         String listName = "new";
-        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListColumnType.String, "Some new column"));
+        String origFieldName = "BarBar";
+        String newFieldName = "FooFoo";
+        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key", new ListColumn(origFieldName, origFieldName, ListColumnType.String, "first column"));
 
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
-        assertTextPresent("BarBar");
         listDefinitionPage.getFieldsPanel()
-                .getField(1).setName("FooFoo");
-        listDefinitionPage.getFieldsPanel()
-                .getField(1).setLabel("FooFoo");
+                .getField(origFieldName)
+                .setName(newFieldName)
+                .setLabel(newFieldName);
         listDefinitionPage.clickSave();
-        assertTextPresent("FooFoo");
-        assertTextNotPresent("BarBar");
+
+        assertTextPresent(newFieldName);
+        assertTextNotPresent(origFieldName);
 
         listDefinitionPage = _listHelper.goToEditDesign(listName);
-        ListColumn newCol = new ListColumn("BarBar", "BarBar", ListColumnType.String, "None");
+        ListColumn newCol = new ListColumn(origFieldName, origFieldName, ListColumnType.String, "second column");
         listDefinitionPage.addField(newCol);
         listDefinitionPage.clickSave();
-        assertTextBefore("FooFoo", "BarBar");
+
+        assertTextBefore(newFieldName, origFieldName);
     }
 
     @Test
