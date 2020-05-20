@@ -64,10 +64,10 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
         return new InsertPage(getDriver());
     }
 
-    public AdminPage clickAdmin()
+    public IssuesAdminPage clickAdmin()
     {
         elementCache().issuesList.clickHeaderButtonAndWait("Admin");
-        return new AdminPage(getDriver());
+        return new IssuesAdminPage(getDriver());
     }
 
     public EmailPrefsPage clickEmailPreferences()

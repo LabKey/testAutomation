@@ -25,7 +25,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.pages.issues.AdminPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.util.APIContainerHelper;
@@ -133,9 +133,9 @@ public class RlabkeyTest extends BaseWebDriverTest
     {
         issuesHelper.createNewIssuesList(name, _containerHelper);
 
-        AdminPage.beginAt(this, name)
-                .setIssueAssignmentList(null)
-                .save();
+        IssuesAdminPage.beginAt(this, name)
+                .setAssignedTo(null) // All Project Users
+                .clickSave();
         ListPage.beginAt(this, name);
     }
 

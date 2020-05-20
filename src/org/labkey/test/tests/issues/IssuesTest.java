@@ -32,7 +32,7 @@ import org.labkey.test.categories.Issues;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.pages.issues.AdminPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.EmailPrefsPage;
@@ -231,11 +231,11 @@ public class IssuesTest extends BaseWebDriverTest
 
         clickProject(getProjectName());
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
-        AdminPage adminPage = _issuesHelper.goToAdmin();
+        IssuesAdminPage adminPage = _issuesHelper.goToAdmin();
 
         for (ListHelper.ListColumn col : fields)
         {
-            adminPage.configureFields().addField(col);
+            adminPage.getFieldsPanel().addField(col);
         }
         clickButton("Save");
 
@@ -330,11 +330,11 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void setRequiredFields(AdminPage adminPage, int[] positions, boolean selected)
+    private void setRequiredFields(IssuesAdminPage adminPage, int[] positions, boolean selected)
     {
         for (int pos : positions)
         {
-            adminPage.configureFields().selectField(pos).properties().selectValidatorsTab().setRequired(selected);
+            adminPage.getFieldsPanel().getField(pos).setRequiredField(selected);
         }
     }
 
@@ -396,9 +396,8 @@ public class IssuesTest extends BaseWebDriverTest
     {
         // CustomizeEmailAction
         goToModule("Issues");
-        clickButton("Admin");
         clickButton("Customize Email Template");
-        String subject = getFormElement(Locator.name("emailSubject"));
+        Assert.assertEquals("Wrong email template class", "org.labkey.issue.IssueUpdateEmailTemplate", getFormElement(Locator.name("templateClass")));
         setFormElement(Locator.name("emailMessage"), TEST_EMAIL_TEMPLATE_BAD);
         clickButton("Save");
     }
@@ -486,14 +485,14 @@ public class IssuesTest extends BaseWebDriverTest
 
         clickFolder(subFolder);
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
-        AdminPage adminPage = _issuesHelper.goToAdmin();
+        IssuesAdminPage adminPage = _issuesHelper.goToAdmin();
 
         for (ListHelper.ListColumn col : fields)
         {
-            adminPage.configureFields().addField(col);
+            adminPage.getFieldsPanel().addField(col);
         }
         setRequiredFields(adminPage, requiredFieldPos, true);
-        adminPage.save();
+        adminPage.clickSave();
         clickButton("New Issue");
         clickButton("Save");
 
@@ -512,7 +511,7 @@ public class IssuesTest extends BaseWebDriverTest
         // clear all required selections except title
         setRequiredFields(adminPage, requiredFieldPos, false);
         setRequiredFields(adminPage, new int[]{0}, true);
-        adminPage.save();
+        adminPage.clickSave();
 
         clickButton("New Issue");
         clickButton("Save");
@@ -786,7 +785,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // set default group and user
         _issuesHelper.goToAdmin();
-        _issuesHelper.setIssueAssignmentList("Site:Users");
+        _issuesHelper.setIssueAssignmentList("Site: Users");
         _issuesHelper.setIssueAssignmentUser(NAME);
         clickButton("Save");
 
