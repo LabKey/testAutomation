@@ -738,16 +738,20 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         log("Test complete.");
     }
 
-    private void checkRowsInDataRegion(String dataRegionName, String columnName, List<String> expectedValues)
+    private void checkRowsInDataRegion(String dataRegionName, String columnName, final List<String> expectedValues)
     {
         DataRegionTable dataRegionTable = new DataRegionTable(dataRegionName, this);
 
         List<String> dataInTable = dataRegionTable.getColumnDataAsText(columnName);
-
-        Collections.sort(expectedValues);
         Collections.sort(dataInTable);
+
+        // Protect when a list created using list.of is passed in. List.of creates an unmodifiable list and results in
+        // a UnsupportedOperationException if sorted.
+        List<String> localExpectedValues = new ArrayList<>(expectedValues);
+        Collections.sort(localExpectedValues);
+
         checker().verifyEquals("Entries in the column '" + columnName + "' are not as expected.",
-                expectedValues, dataInTable);
+                localExpectedValues, dataInTable);
 
     }
 
