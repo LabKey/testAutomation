@@ -1320,7 +1320,7 @@ public class SampleSetTest extends BaseWebDriverTest
         expectedHeaders.add("File Attachment");
 
         setFileAttachment(0, experimentFilePath);
-        setFileAttachment(1, TestFileUtils.getSampleData( "sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
+        setFileAttachment(1, TestFileUtils.getSampleData( "RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
 
         DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
         drt.clickInsertNewRow();
