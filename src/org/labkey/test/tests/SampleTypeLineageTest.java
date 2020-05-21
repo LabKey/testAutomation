@@ -743,16 +743,10 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         List<String> dataInTable = dataRegionTable.getColumnDataAsText(columnName);
 
-        checker().verifyEquals("Number of entries in the column '" + columnName + "' is not as expected.",
-                expectedValues.size(), dataInTable.size());
-
-        for(String expectedValue : expectedValues)
-        {
-            checker().verifyTrue(String.format("Value '%s' was not shown in column '%s' in data region '%s'.",
-                    expectedValue, columnName, dataRegionName),
-                    dataInTable.contains(expectedValue));
-
-        }
+        Collections.sort(expectedValues);
+        Collections.sort(dataInTable);
+        checker().verifyEquals("Entries in the column '" + columnName + "' are not as expected.",
+                expectedValues, dataInTable);
 
     }
 
