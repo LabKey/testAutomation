@@ -335,16 +335,4 @@ public class GpatAssayTest extends BaseWebDriverTest
         log("Clicking +  to add new file");
         click(Locator.xpath("//a[contains(@class, 'labkey-file-add-icon-enabled')]"));
     }
-
-
-    private void waitForGwtDialog(String caption)
-    {
-        waitForElement(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='" + caption + "']"), WAIT_FOR_JAVASCRIPT);
-    }
-
-    private void clickGwtTab(String tabName)
-    {
-        WebElement element = Locator.tagWithClass("div", "gwt-TabBarItem").withChild(Locator.xpath("//div[contains(@class, 'gwt-Label') and text()='" + tabName + "']")).findElement(getDriver());
-        element.click();
-    }
 }
