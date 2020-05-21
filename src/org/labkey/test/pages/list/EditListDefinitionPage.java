@@ -39,7 +39,7 @@ import static org.labkey.test.WebDriverWrapper.waitFor;
 
 /**
  * Automates the LabKey ui components defined in: packages/components/src/components/domainproperties/list/ListDesignerPanels.tsx
- * Currently only exposed in LSK. Move to 'org.labkey.test.components.list.ListDesigner' once needed for LKB or LKSM
+ * Currently only exposed in LKS. Move to 'org.labkey.test.components.list.ListDesigner' once needed for LKB or LKSM
  */
 public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPage.ElementCache>
 {

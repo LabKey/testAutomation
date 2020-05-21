@@ -16,7 +16,7 @@
 package org.labkey.test.pages.issues;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.IssueListDefDataRegion;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
@@ -86,10 +86,10 @@ public class InsertIssueDefPage extends LabKeyPage
             super("Create Issue List Definition?", driver);
         }
 
-        public AdminPage clickYes()
+        public IssuesAdminPage clickYes()
         {
             clickButton("Yes");
-            return new AdminPage(getDriver());
+            return new IssuesAdminPage(getDriver());
         }
 
         public InsertIssueDefPage clickYesError()
