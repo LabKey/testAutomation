@@ -841,11 +841,6 @@ public abstract class Locator extends By
         return tagWithAttribute("input", "type", "checkbox").withPredicate(xpath("../../following-sibling::td/span").containing(label));
     }
 
-    public static XPathLocator gwtNextButtonOnImportGridByColLabel(String label)
-    {
-        return tagWithClass("div", "x-tbar-page-next").withPredicate(xpath("../preceding-sibling::td/span").containing(label));
-    }
-
     public static Locator permissionRendered()
     {
         return Locators.pageSignal("policyRendered");

@@ -108,21 +108,11 @@ public class GpatAssayTest extends BaseWebDriverTest
         setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_XLS);
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         uncheckCheckbox(Locator.gwtCheckBoxOnImportGridByColLabel("Role"));
-        click(Locator.gwtNextButtonOnImportGridByColLabel("Score"));
-        waitForGwtDialog("Score Column Properties");
-        clickGwtTab("Validators");
-        checkCheckbox(Locator.checkboxByName("required"));
-        clickButton("OK", 0);
-        click(Locator.gwtNextButtonOnImportGridByColLabel("Primary"));
-        waitForGwtDialog("Primary Column Properties");
-        clickGwtTab("Advanced");
-        checkCheckbox(Locator.checkboxByName("mvEnabled"));
-        clickButton("OK", 0);
         assertEquals("SpecimenID", getFormElement(Locator.name("SpecimenID")));
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
         assertEquals("DrawDt", getFormElement(Locator.name("Date")));
-        clickButton("Begin import");
+        setAssayResultsProperties();
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLS));
@@ -155,21 +145,11 @@ public class GpatAssayTest extends BaseWebDriverTest
         setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_XLSX);
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         uncheckCheckbox(Locator.gwtCheckBoxOnImportGridByColLabel("Role"));
-        click(Locator.gwtNextButtonOnImportGridByColLabel("Score"));
-        waitForGwtDialog("Score Column Properties");
-        clickGwtTab("Validators");
-        checkCheckbox(Locator.checkboxByName("required"));
-        clickButton("OK", 0);
-        click(Locator.gwtNextButtonOnImportGridByColLabel("Primary"));
-        waitForGwtDialog("Primary Column Properties");
-        clickGwtTab("Advanced");
-        checkCheckbox(Locator.checkboxByName("mvEnabled"));
-        clickButton("OK", 0);
         assertEquals("SpecimenID", getFormElement(Locator.name("SpecimenID")));
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
         assertEquals("DrawDt", getFormElement(Locator.name("Date")));
-        clickButton("Begin import");
+        setAssayResultsProperties();
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLSX));
@@ -183,30 +163,22 @@ public class GpatAssayTest extends BaseWebDriverTest
         setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_TSV);
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         uncheckCheckbox(Locator.gwtCheckBoxOnImportGridByColLabel("Role"));
-        click(Locator.gwtNextButtonOnImportGridByColLabel("Score"));
-        waitForGwtDialog("Score Column Properties");
-        clickGwtTab("Validators");
-        checkCheckbox(Locator.checkboxByName("required"));
-        clickButton("OK", 0);
-        click(Locator.gwtNextButtonOnImportGridByColLabel("Primary"));
-        waitForGwtDialog("Primary Column Properties");
-        clickGwtTab("Advanced");
-        checkCheckbox(Locator.checkboxByName("mvEnabled"));
-        clickButton("OK", 0);
         assertEquals("SpecimenID", getFormElement(Locator.name("SpecimenID")));
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
         assertEquals("DrawDt", getFormElement(Locator.name("Date")));
 
-        clickButton("Show Assay Designer");     // todo: map this page
+        clickButton("Show Assay Designer");
         ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
         DomainFormPanel results = assayDesignerPage.expandFieldsPanel("Results");
-        results.getField(4)
-                .setLabel("Blank");
-        results.getField(7)
+        results.getField(4) // field name = Primary
+                .setLabel("Blank")
+                .setMissingValuesEnabled(true);
+        results.getField(7) // field name = Score
                 .setName("Result")
                 .setLabel("Result")
-                .setImportAliases("Score");
+                .setImportAliases("Score")
+                .setRequiredField(true);
         assayDesignerPage.clickFinish();
 
         clickButton("Next", defaultWaitForPage);
@@ -256,6 +228,16 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertTextPresent(
                 "Header", "HCJDRSZ07IVO6P", "HCJDRSZ07IL1GX", "HCJDRSZ07H5SPZ",
                 "CACCAGACAGGTGTTATGGTGTGTGCCTGTAATCCCAGCTACTTGGGAGGGAGCTCAGGT");
+    }
+
+    private void setAssayResultsProperties()
+    {
+        clickButton("Show Assay Designer");
+        ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
+        DomainFormPanel results = assayDesignerPage.expandFieldsPanel("Results");
+        results.getField("Score").setRequiredField(true);
+        results.getField("Primary").setMissingValuesEnabled(true);
+        assayDesignerPage.clickFinish();
     }
 
     private void importFastaGpatAssay(String fileName, String assayName)
