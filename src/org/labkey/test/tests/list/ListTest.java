@@ -36,7 +36,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -1079,10 +1078,10 @@ public class ListTest extends BaseWebDriverTest
 
         // set phi levels
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
-        listDefinitionPage.setColumnPhiLevel("NotPhiColumn", PropertiesEditor.PhiSelectType.NotPHI);
-        listDefinitionPage.setColumnPhiLevel("LimitedPhiColumn", PropertiesEditor.PhiSelectType.Limited);
-        listDefinitionPage.setColumnPhiLevel("PhiColumn", PropertiesEditor.PhiSelectType.PHI);
-        listDefinitionPage.setColumnPhiLevel("RestrictedPhiColumn", PropertiesEditor.PhiSelectType.Restricted);
+        listDefinitionPage.setColumnPhiLevel("NotPhiColumn", FieldDefinition.PhiSelectType.NotPHI);
+        listDefinitionPage.setColumnPhiLevel("LimitedPhiColumn", FieldDefinition.PhiSelectType.Limited);
+        listDefinitionPage.setColumnPhiLevel("PhiColumn", FieldDefinition.PhiSelectType.PHI);
+        listDefinitionPage.setColumnPhiLevel("RestrictedPhiColumn", FieldDefinition.PhiSelectType.Restricted);
         listDefinitionPage.clickSave();
 
         goToProjectHome();
