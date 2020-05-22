@@ -293,6 +293,7 @@ public class FieldDefinition extends PropertyDescriptor
         Subject("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null),
         DateAndTime("Date Time", "date"),
         Boolean("Boolean", "boolean"),
+        Double("Number (Double)", "float"),
         Decimal("Decimal", "float"),
         File("File", "fileLink"),
         AutoInteger("Auto-Increment Integer", "int"),
