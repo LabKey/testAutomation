@@ -121,8 +121,8 @@ import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.logToServer;
-import static org.labkey.test.components.PropertiesEditor.PhiSelectType;
-import static org.labkey.test.components.PropertiesEditor.PhiSelectType.NotPHI;
+import static org.labkey.test.params.FieldDefinition.PhiSelectType;
+import static org.labkey.test.params.FieldDefinition.PhiSelectType.NotPHI;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
 
