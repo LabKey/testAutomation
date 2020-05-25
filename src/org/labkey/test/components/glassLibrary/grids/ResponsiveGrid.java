@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.util.TestLogger.log;
@@ -29,6 +30,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
     final WebElement _gridElement;
     private WebDriver _driver;
     private List<Map<String, String>> _gridData;
+    private List<GridRow> _gridRows;
 
     protected ResponsiveGrid(WebElement queryGrid, WebDriver driver)
     {
@@ -87,7 +89,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return elementCache().emptyGrid.isEmpty();
     }
 
-    public List<WebElement> getRows()
+    public List<GridRow> getRows()
     {
         return elementCache().getRows();
     }
@@ -195,22 +197,27 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return box.isChecked() || (isIndeterminate != null && isIndeterminate.equals("true"));
     }
 
-    private WebElement getRow(int index)
+    public List<GridRow> getSelectedRows()
+    {
+        return getRows().stream().filter(a -> a.isRowSelected()).collect(Collectors.toList());
+    }
+
+    private GridRow getRow(int index)
     {
         return getRows().get(index);
     }
 
     protected WebElement getCell(int rowIndex, int colIndex)
     {
-        return Locator.tag("td").index(colIndex).findElement(getRow(rowIndex));
+        return getRows().get(rowIndex).getCell(colIndex);
     }
 
     public Integer getRowIndex(String containsText)
     {
-        List<WebElement> rows = getRows();
+        List<GridRow> rows = getRows();
         for(int i=0; i<rows.size(); i++ )
         {
-            if (getRow(i).getText().contains(containsText))
+            if (getRow(i).getValues().contains(containsText))
             {
                 return i;
             }
@@ -220,7 +227,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 
     public Integer getRowIndex(String containsText, String searchColumnHeader)
     {
-        List<WebElement> rows = getRows();
+        List<GridRow> rows = getRows();
         int colIndex = getColumnIndex(searchColumnHeader);
         for(int i=0; i<rows.size(); i++ )
         {
@@ -255,11 +262,11 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 
     public Integer getRowIndex(Locator containing)
     {
-        List<WebElement> rows = getRows();
+        List<GridRow> rows = getRows();
         for(int i=0; i<rows.size(); i++ )
         {
             // find the intended element in the row, if it exists
-            WebElement targetRow = getRow(i);
+            GridRow targetRow = getRow(i);
             if (containing.findOptionalElement(targetRow).isPresent())
             {
                 return i;
@@ -270,7 +277,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 
     public Integer getRowIndex(Locator containing, String searchColumnHeader)
     {
-        List<WebElement> rows = getRows();
+        List<GridRow> rows = getRows();
         for(int i=0; i<rows.size(); i++ )
         {
             // find the nth td in the row, see if its text matches
@@ -314,43 +321,17 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         if (!hasData())
             throw new IllegalStateException("Attempting to get a row by index, but no rows exist");
 
-        List<String> rowValues = getWrapper().getTexts(Locator.css("td").findElements(getRow(rowIndex)));
-        if (hasSelectColumn())
-        {
-            rowValues.remove(0);
-        }
-        return rowValues;
+        return getRow(rowIndex).getValues();
     }
 
     public Map<String, String> getRowMap(int rowIndex)
     {
-        HashMap<String, String> map = new HashMap<>();
-        List<String> columns = getColumnNames();
-        List<String> rowCellTexts = getRowValues(rowIndex);
-        for (int i=0; i < columns.size(); i++)
-        {
-            map.put(columns.get(i), rowCellTexts.get(i));
-        }
-        return map;
+        return getRow(rowIndex).getRowMap();
     }
 
     public Map<String, String> getRowMap(WebElement row)
     {
-        List<String> tableColumns = getColumnNames();
-        List<String> rowValues = getWrapper().getTexts(Locator.css("td").findElements(row));
-
-        // If it has a select column remove that entry from the rowValues.
-        if(hasSelectColumn())
-        {
-            rowValues.remove(0);
-        }
-
-        Map<String, String> rowMap = new HashMap<>();
-        for (int i=0; i < tableColumns.size(); i++)
-        {
-            rowMap.put(tableColumns.get(i), rowValues.get(i));
-        }
-        return  rowMap;
+        return new GridRow(this, row, getDriver()).getRowMap();
     }
 
     public String getCellValue(int rowIndex, String columnHeader)
@@ -391,10 +372,10 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
     private List<Map<String, String>> _initGridData()
     {
         List<Map<String, String>> rowMaps = new ArrayList<>();
-        List<WebElement> rows = getRows();
-        for(int i=0; i < rows.size(); i++)
+        _gridRows = getRows();
+        for(GridRow row : _gridRows)
         {
-            rowMaps.add(getRowMap(i));
+            rowMaps.add(row.getRowMap());
         }
         return rowMaps;
     }
@@ -465,12 +446,14 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
             return columnNames;
         }
 
-        private List<WebElement> rows;
-        protected List<WebElement> getRows()
+        private List<GridRow> rows;
+        protected List<GridRow> getRows()
         {
             if (rows == null)
             {
-                rows = Locators.rows.findElements(getComponentElement());
+                rows = Locators.rows.findElements(getComponentElement()).stream()
+                        .map(r -> new GridRow(ResponsiveGrid.this, r, getDriver()))
+                        .collect(Collectors.toList());
             }
             return rows;
         }
