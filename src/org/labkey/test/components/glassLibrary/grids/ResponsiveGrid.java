@@ -253,11 +253,10 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return columnData;
     }
 
-    public WebElement getRow(String exactColumnText, String columnHeader)
+    public GridRow getRow(String exactColumnText, String columnHeader)
     {
-        int colIndex = getColumnIndex(columnHeader);
-        return Locator.xpath("//tbody/tr[./td[" + (colIndex + 1) + "]/span[text()=normalize-space('" + exactColumnText + "')]]")
-                .findOptionalElement(this).orElseThrow(() -> new NoSuchElementException("Could not find a row where column '" + columnHeader + "' had a value of '" + exactColumnText + "'."));
+        return getRows().stream().filter(a -> a.getValue(columnHeader).equals(exactColumnText))
+                .findFirst().orElseThrow(() -> new NoSuchElementException("Could not find a row where column '" + columnHeader + "' had a value of '" + exactColumnText + "'."));
     }
 
     public Integer getRowIndex(Locator containing)
