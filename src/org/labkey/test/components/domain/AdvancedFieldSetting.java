@@ -1,6 +1,6 @@
 package org.labkey.test.components.domain;
 
-import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.params.FieldDefinition;
 
 import java.util.function.BiConsumer;
 
@@ -14,7 +14,7 @@ public class AdvancedFieldSetting<T>
             new AdvancedFieldSetting<>(AdvancedSettingsDialog::showInInsertView);
     public static final AdvancedFieldSetting<Boolean> shownInDetailsView =
             new AdvancedFieldSetting<>(AdvancedSettingsDialog::showInDetailsView);
-    public static final AdvancedFieldSetting<PropertiesEditor.DefaultType> defaultType =
+    public static final AdvancedFieldSetting<FieldDefinition.DefaultType> defaultType =
             new AdvancedFieldSetting<>(AdvancedSettingsDialog::setDefaultValueType);
     public static final AdvancedFieldSetting<Boolean> excludeFromShifting =
             new AdvancedFieldSetting<>(AdvancedSettingsDialog::excludeFromDateShifting);

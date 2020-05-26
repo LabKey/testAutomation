@@ -23,7 +23,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.ext4.Window;

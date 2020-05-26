@@ -3,7 +3,6 @@ package org.labkey.test.components.domain;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
@@ -302,18 +301,18 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    public DomainFieldRow setScaleType(PropertiesEditor.ScaleType scaleType)
+    public DomainFieldRow setScaleType(FieldDefinition.ScaleType scaleType)
     {
         expand();
         elementCache().defaultScaleTypeSelect.selectByVisibleText(scaleType.getText());
         return this;
     }
 
-    public PropertiesEditor.ScaleType getScaleType()
+    public FieldDefinition.ScaleType getScaleType()
     {
         expand();
         String scaleTypeString = getWrapper().getFormElement(elementCache().defaultScaleTypeSelect.getWrappedElement());
-        return Enum.valueOf(PropertiesEditor.ScaleType.class, scaleTypeString.toUpperCase());
+        return Enum.valueOf(FieldDefinition.ScaleType.class, scaleTypeString.toUpperCase());
     }
 
     //
@@ -495,7 +494,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    public DomainFieldRow setPHILevel(PropertiesEditor.PhiSelectType phiLevel)
+    public DomainFieldRow setPHILevel(FieldDefinition.PhiSelectType phiLevel)
     {
         clickAdvancedSettings()
                 .setPHILevel(phiLevel)
