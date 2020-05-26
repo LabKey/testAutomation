@@ -30,11 +30,13 @@ abstract public class PipelineWebTestBase extends BaseWebDriverTest
         _projectName = projectName;
     }
 
+    @Override
     public String getProjectName()
     {
         return _projectName;
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

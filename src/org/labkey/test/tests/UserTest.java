@@ -107,6 +107,7 @@ public class UserTest extends BaseWebDriverTest
         createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor");
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

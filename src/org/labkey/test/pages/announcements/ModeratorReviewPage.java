@@ -62,6 +62,7 @@ public class ModeratorReviewPage extends LabKeyPage<ModeratorReviewPage.ElementC
         return new ModeratorReviewPage(getDriver());
     }
 
+    @Override
     protected ModeratorReviewPage.ElementCache newElementCache()
     {
         return new ModeratorReviewPage.ElementCache();

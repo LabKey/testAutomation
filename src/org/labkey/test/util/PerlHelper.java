@@ -50,6 +50,7 @@ public class PerlHelper
             File perlHomeDir = new File(perlHome);
             FileFilter perlFilenameFilter = new FileFilter()
             {
+                @Override
                 public boolean accept(File file)
                 {
                     return ("perl.exe".equalsIgnoreCase(file.getName()) || "perl".equalsIgnoreCase(file.getName())) && file.canExecute();

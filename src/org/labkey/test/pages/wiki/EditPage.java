@@ -121,6 +121,7 @@ public class EditPage extends LabKeyPage<EditPage.ElementCache>
         return elementCache().filePicker;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

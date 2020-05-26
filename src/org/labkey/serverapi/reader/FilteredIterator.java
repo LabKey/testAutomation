@@ -31,11 +31,13 @@ public class FilteredIterator<T> implements Iterator<T>
         toNext();
     }
 
+    @Override
     public boolean hasNext()
     {
         return _next != null;
     }
 
+    @Override
     public T next()
     {
         if (_next == null)
@@ -47,6 +49,7 @@ public class FilteredIterator<T> implements Iterator<T>
         return returnValue;
     }
 
+    @Override
     public void remove()
     {
         throw new UnsupportedOperationException();

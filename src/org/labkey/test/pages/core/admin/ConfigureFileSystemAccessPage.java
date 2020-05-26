@@ -85,6 +85,7 @@ public class ConfigureFileSystemAccessPage extends LabKeyPage<ConfigureFileSyste
         return new MapNetworkDrivePage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

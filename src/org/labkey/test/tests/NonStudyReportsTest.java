@@ -69,6 +69,7 @@ public class NonStudyReportsTest extends ReportTest
         super.doCleanup(afterTest);
     }
 
+    @Override
     @LogMethod
     protected void doCreateSteps()
     {
@@ -80,6 +81,7 @@ public class NonStudyReportsTest extends ReportTest
         rReportHelper.ensureRConfig();
     }
 
+    @Override
     @LogMethod
     protected void doVerifySteps()
     {

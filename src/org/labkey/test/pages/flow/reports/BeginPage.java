@@ -44,6 +44,7 @@ public class BeginPage extends LabKeyPage<BeginPage.ElementCache>
         return elementCache().reportsWebpart;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

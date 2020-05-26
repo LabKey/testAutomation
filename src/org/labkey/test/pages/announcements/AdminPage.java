@@ -169,6 +169,7 @@ public class AdminPage extends LabKeyPage<AdminPage.ElementCache>
         return this;
     }
 
+    @Override
     protected AdminPage.ElementCache newElementCache()
     {
         return new AdminPage.ElementCache();

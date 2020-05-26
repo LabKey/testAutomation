@@ -59,6 +59,7 @@ public abstract class IssuesFormItemFinder<C> extends org.labkey.test.components
             return itemTd.childTag(itemTag());
     }
 
+    @Override
     protected Locator.XPathLocator labelLoc()
     {
         return _labelLoc();

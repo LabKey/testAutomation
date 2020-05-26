@@ -78,6 +78,7 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return clickAndWaitForDownload(elementCache().exportBtn);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

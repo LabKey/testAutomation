@@ -243,6 +243,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return getCurrentTest() != null ? getCurrentTest().getClass() : null;
     }
 
+    @Override
     public WebDriver getWrappedDriver()
     {
         return SingletonWebDriver.getInstance().getWebDriver();
@@ -1071,6 +1072,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    @Override
     public void cleanup() throws Exception
     {
         try

@@ -123,6 +123,7 @@ public class ManagerPage extends LabKeyPage<ManagerPage.ElementCache>
         return getFormElement(elementCache().searchText);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

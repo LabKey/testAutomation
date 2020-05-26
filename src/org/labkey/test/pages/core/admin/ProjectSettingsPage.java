@@ -51,6 +51,7 @@ public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementC
         return elementCache().enableDiscussion;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -91,6 +91,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     public static final String COMMENT_COLUMN = "Comment";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("audit");
@@ -130,6 +131,7 @@ public class AuditLogTest extends BaseWebDriverTest
     {
     } // Skip.  Project is deleted as part of test
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         // Needed for pre-clean only. User & project are deleted during test.

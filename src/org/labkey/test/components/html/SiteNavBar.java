@@ -52,6 +52,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     {
         return elementCache().navbarNavBlock;
     }
+    @Override
     protected WebDriver getDriver()
     {
         return _driver;

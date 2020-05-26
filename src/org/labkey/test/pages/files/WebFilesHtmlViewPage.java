@@ -47,6 +47,7 @@ public class WebFilesHtmlViewPage extends LabKeyPage<WebFilesHtmlViewPage.Elemen
         return new LabKeyPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

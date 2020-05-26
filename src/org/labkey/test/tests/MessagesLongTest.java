@@ -92,6 +92,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     private final PortalHelper _portalHelper = new PortalHelper(this);
     private String _messageUserId;
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("announcements");
@@ -128,6 +129,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         stopImpersonating();
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsersIfPresent(USER1, USER2, USER3, RESPONDER, USER);

@@ -46,6 +46,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
     protected static final String APP_ADMIN_USER = "app_admin_test_user@adminconsole.test";
     protected static final String APP_ADMIN_USER_PASS = PasswordUtil.getPassword();
 
+    @Override
     public String getProjectName()
     {
         return null;
@@ -213,6 +214,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("admin");

@@ -56,6 +56,7 @@ public class DumbsterController extends SpringActionController
         setActionResolver(_actionResolver);
     }
 
+    @Override
     public PageConfig defaultPageConfig()
     {
         return new PageConfig();

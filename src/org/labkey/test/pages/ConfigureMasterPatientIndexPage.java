@@ -92,6 +92,7 @@ public class ConfigureMasterPatientIndexPage extends LabKeyPage<ConfigureMasterP
             return "";
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

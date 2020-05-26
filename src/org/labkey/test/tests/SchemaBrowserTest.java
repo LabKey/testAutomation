@@ -39,6 +39,7 @@ public class SchemaBrowserTest extends BaseWebDriverTest
     public static final String PUBLISHERS_LIST = "Publishers" + TRICKY_CHARACTERS_NO_QUOTES;
     public static final String BOOKS_LIST = "Books" + TRICKY_CHARACTERS_NO_QUOTES;
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("query");
@@ -56,6 +57,7 @@ public class SchemaBrowserTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

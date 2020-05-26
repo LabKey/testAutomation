@@ -25,6 +25,7 @@ public class GetCategoriesCommand extends Command<GetCategoriesResponse>
         super("reports", "getCategories");
     }
 
+    @Override
     protected GetCategoriesResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
         return new GetCategoriesResponse(text, status, contentType, json, copy());
