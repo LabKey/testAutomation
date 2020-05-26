@@ -24,7 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.PropertiesEditor.PhiSelectType;
+import org.labkey.test.params.FieldDefinition.PhiSelectType;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.util.APITestHelper;

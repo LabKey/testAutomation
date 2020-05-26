@@ -23,9 +23,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Issues;
-import org.labkey.test.components.IssueListDefDataRegion;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.components.html.OptionSelect;
-import org.labkey.test.pages.issues.AdminPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -74,9 +74,9 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _userHelper.createUser(USER);
         _containerHelper.createProject(getProjectName(), null);
         _issuesHelper.createNewIssuesList(LIST_NAME, _containerHelper);
-        AdminPage adminPage = AdminPage.beginAt(this, getProjectName(), LIST_NAME);
-        adminPage.setIssueAssignmentList(null);
-        adminPage.save();
+        IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), LIST_NAME);
+        adminPage.setAssignedTo(null); // All Project Users
+        adminPage.clickSave();
     }
 
     @Test
@@ -126,11 +126,10 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _issuesHelper.goToIssueListDefinitions(PROJECT3).createIssuesListDefinition("issues");
 
         goToModule("Issues");
-        _issuesHelper.goToAdmin();
-
-        setFormElement(Locator.name("entrySingularName"), singular);
-        setFormElement(Locator.name("entryPluralName"), plural);
-        clickButton("Save");
+        _issuesHelper.goToAdmin()
+                .setSingularName(singular)
+                .setPluralName(plural)
+                .clickSave();
 
         log("Verify issues-list action respects custom noun");
         assertTextPresent(plural + " List", singular + " ID");

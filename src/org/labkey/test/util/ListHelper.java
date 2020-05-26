@@ -22,7 +22,6 @@ import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
@@ -51,15 +50,6 @@ public class ListHelper extends LabKeySiteWrapper
     public ListHelper(WebDriver driver)
     {
         this(() -> driver);
-    }
-
-    private void enabledGwtListDesigner()
-    {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-gwtlistdesigner");
-    }
-    private void disableGwtListDesigner()
-    {
-        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-gwtlistdesigner");
     }
 
     @Override
@@ -248,7 +238,6 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod
     public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        disableGwtListDesigner();
         beginCreateListFromTab(tabName, listName);
         createListHelper(listKeyType, listKeyName, cols);
     }
@@ -256,7 +245,6 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod
     public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        disableGwtListDesigner();
         beginCreateList(containerPath, listName);
         createListHelper(listKeyType, listKeyName, cols);
     }
@@ -310,7 +298,6 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void createListFromFile(String containerPath, String listName, File inputFile)
     {
-        disableGwtListDesigner();
         EditListDefinitionPage listEditPage = beginCreateList(containerPath, listName);
         listEditPage.getFieldsPanel()
             .setInferFieldFile(inputFile);
@@ -390,17 +377,6 @@ public class ListHelper extends LabKeySiteWrapper
         // if we are on the Manage List page, click the list name first
         if (isElementPresent(Locators.bodyTitle("Available Lists")))
             clickAndWait(Locator.linkWithText(listName));
-    }
-
-    /**
-     * @deprecated Use {@link PropertiesEditor#addField(FieldDefinition)}
-     */
-    @Deprecated
-    @LogMethod(quiet = true)
-    public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
-    {
-        PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(areaTitle).find()
-                .addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
     }
 
     /**

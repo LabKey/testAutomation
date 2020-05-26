@@ -21,8 +21,6 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.PropertiesEditor;
-import org.labkey.test.components.PropertiesEditor.DefaultType;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -102,7 +100,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .addField("integerField")
                 .setType(FieldDefinition.ColumnType.Integer)
                 .setNumberFormat("###,###,###")
-                .setScaleType(PropertiesEditor.ScaleType.LINEAR)
+                .setScaleType(FieldDefinition.ScaleType.LINEAR)
                 .setDescription("field for an Integer")
                 .setLabel("IntegerFieldLabel");
 
@@ -110,7 +108,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .addField("decimalField")
                 .setType(FieldDefinition.ColumnType.Decimal)
                 .setNumberFormat("###,###,###.000")
-                .setScaleType(PropertiesEditor.ScaleType.LOG)
+                .setScaleType(FieldDefinition.ScaleType.LOG)
                 .setDescription("field for a decimal")
                 .setLabel("DecimalField");
         domainDesignerPage.clickFinish();
@@ -707,13 +705,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow notPhi = domainFormPanel.addField("notPHI");
-        notPhi.setPHILevel(PropertiesEditor.PhiSelectType.NotPHI);
+        notPhi.setPHILevel(FieldDefinition.PhiSelectType.NotPHI);
         DomainFieldRow limitedPHI = domainFormPanel.addField("limitedPHI");
-        limitedPHI.setPHILevel(PropertiesEditor.PhiSelectType.Limited);
+        limitedPHI.setPHILevel(FieldDefinition.PhiSelectType.Limited);
         DomainFieldRow fullPHI = domainFormPanel.addField("fullPHI");
-        fullPHI.setPHILevel(PropertiesEditor.PhiSelectType.PHI);
+        fullPHI.setPHILevel(FieldDefinition.PhiSelectType.PHI);
         DomainFieldRow restrictedPHI = domainFormPanel.addField("restrictedPHI");
-        restrictedPHI.setPHILevel(PropertiesEditor.PhiSelectType.Restricted);
+        restrictedPHI.setPHILevel(FieldDefinition.PhiSelectType.Restricted);
 
         domainDesignerPage.clickFinish();
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
@@ -988,7 +986,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         DomainFieldRow testRow = domainFormPanel.getField("color");
         testRow.clickAdvancedSettings()
-                .setDefaultValueType(DefaultType.FIXED_EDITABLE)  //"Editable default"
+                .setDefaultValueType(FieldDefinition.DefaultType.FIXED_EDITABLE)  //"Editable default"
                 .apply();
         domainDesignerPage.clickFinish();
 

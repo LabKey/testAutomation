@@ -344,7 +344,7 @@ public class UserTest extends BaseWebDriverTest
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
         issuesHelper.goToAdmin();
-        issuesHelper.setIssueAssignmentList("Site:Users");
+        issuesHelper.setIssueAssignmentList("Site: Users");
         clickButton("Save");
         clickAndWait(Locator.linkWithText("New Issue"));
         assertElementNotPresent(createAssignedToOptionLocator(disabledUserId));
