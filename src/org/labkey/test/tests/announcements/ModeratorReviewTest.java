@@ -159,12 +159,15 @@ public class ModeratorReviewTest extends BaseWebDriverTest
         goToProjectHome();
         impersonate(user);
         log("Insert message");
+        log("Currently impersonating user:" + user);
         // make title unique in test scope, to check email notifications later
         title = title + " " + System.currentTimeMillis();
+        log("Inserting message with title " + title);
         InsertPage.beginAt(this)
                 .setTitle(title)
                 .setBody(title)
                 .submit();
+        log("Submission of message (supposedly) complete");
         stopImpersonating();
         if (expectAutoApproval)
         {
