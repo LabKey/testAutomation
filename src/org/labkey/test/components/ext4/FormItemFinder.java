@@ -38,6 +38,7 @@ public abstract class FormItemFinder<C, F extends FormItemFinder<C, F>> extends 
         return (F)this;
     }
 
+    @Override
     protected Locator locator()
     {
         if (labelText == null)

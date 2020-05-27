@@ -82,6 +82,7 @@ public class RangeValidatorDialog extends ModalDialog
         return _row;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

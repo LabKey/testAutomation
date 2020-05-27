@@ -100,6 +100,7 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
         return new DetailsPage(getDriver());
     }
 
+    @Override
     protected EC newElementCache()
     {
         return (EC) new ElementCache();

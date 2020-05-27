@@ -44,6 +44,7 @@ public class AssayDataPage extends LabKeyPage<AssayDataPage.ElementCache>
         return DataRegionTable.DataRegion(getDriver()).withName("Data").findWhenNeeded(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

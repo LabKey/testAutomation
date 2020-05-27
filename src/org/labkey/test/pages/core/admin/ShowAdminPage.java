@@ -191,6 +191,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ConfigureReportsAndScriptsPage(this);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

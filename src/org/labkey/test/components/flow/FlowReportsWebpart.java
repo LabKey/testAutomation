@@ -85,6 +85,7 @@ public class FlowReportsWebpart extends BodyWebPart<FlowReportsWebpart.ElementCa
         return new LabKeyPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

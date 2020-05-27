@@ -46,6 +46,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 {
     protected static final File PIPELINE_PATH = TestFileUtils.getSampleData("flow");
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("flow");
@@ -157,6 +158,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         popLocation(longWaitForPage);
     }
 
+    @Override
     protected void doCleanup(boolean afterTest)
     {
         deleteAllRuns();

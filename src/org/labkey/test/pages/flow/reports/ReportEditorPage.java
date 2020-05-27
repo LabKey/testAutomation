@@ -170,6 +170,7 @@ public abstract class ReportEditorPage<Page extends ReportEditorPage> extends La
 
     protected abstract Locator.XPathLocator getSubsetInput();
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

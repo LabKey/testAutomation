@@ -104,6 +104,7 @@ public class SecurityTest extends BaseWebDriverTest
         return false;
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

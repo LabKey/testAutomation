@@ -74,6 +74,7 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
         _includeBlankLines = includeBlankLines;
     }
 
+    @Override
     public final ColumnDescriptor[] getColumns() throws IOException
     {
         ensureInitialized();
@@ -284,6 +285,7 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
     /**
      * Returns an iterator over the data
      */
+    @Override
     public abstract CloseableIterator<Map<String, Object>> iterator();
 
 
@@ -292,11 +294,13 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
      */
     // Caution: Using this instead of iterating directly has lead to many scalability problems in the past.
     // TODO: Migrate usages to iterator()
+    @Override
     public List<Map<String, Object>> load()
     {
         return IteratorUtils.toList(iterator());
     }
 
+    @Override
     public abstract void close();
 
 

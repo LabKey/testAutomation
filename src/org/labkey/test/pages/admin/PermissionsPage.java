@@ -472,6 +472,7 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         return this;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

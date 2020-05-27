@@ -74,6 +74,7 @@ public class SimpleSmtpServer implements Runnable {
   /**
    * Main loop of the SMTP server.
    */
+  @Override
   public void run() {
     try {
       try {

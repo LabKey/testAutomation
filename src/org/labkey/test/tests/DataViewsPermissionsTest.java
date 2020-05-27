@@ -54,6 +54,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         return "My Study Data Views";
     }
 
+    @Override
     protected void doCreateSteps()
     {
         importStudy();
@@ -135,6 +136,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         _ext4Helper.waitForMaskToDisappear();
     }
 
+    @Override
     protected void doVerifySteps()
     {
         impersonate(EDITOR_USER);

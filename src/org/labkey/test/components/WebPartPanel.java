@@ -107,6 +107,7 @@ public class WebPartPanel<EC extends WebPartPanel.ElementCache> extends WebDrive
         }
     }
 
+    @Override
     protected EC newElementCache()
     {
         return (EC) new ElementCache();

@@ -80,6 +80,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");

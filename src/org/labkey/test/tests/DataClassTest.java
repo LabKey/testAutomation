@@ -141,9 +141,12 @@ public class DataClassTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.manuallyDefineFields(" ");
         assertEquals("Data class missing field name error", Arrays.asList(
-                "Please provide a name for each field.",
+                "Missing required field properties.",
                 "Please correct errors in Fields before saving."),
                 createPage.clickSaveExpectingErrors());
+        assertEquals("Data class missing field name detail error",
+                "New Field. Error: Please provide a name for each field.",
+                domainFormPanel.getField(0).detailsMessage());
         domainFormPanel.removeAllFields(false);
 
         log("Verify error message for unique field names");

@@ -51,6 +51,7 @@ public class HTTPApiTest extends BaseWebDriverTest
     private final String LIST_DATA = "Color\t" + COL1.getName() +
             "\t" + COL2.getName() + "\t" + COL3.getName() + "\n" + LIST_ROW1 + "\n" + LIST_ROW2 + "\n" + LIST_ROW3 + "\n" + LIST_ROW4;
 
+    @Override
     protected String getProjectName()
     {
         return "HTTPApiVerifyProject";
@@ -67,6 +68,7 @@ public class HTTPApiTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("query");

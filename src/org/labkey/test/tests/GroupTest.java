@@ -69,6 +69,7 @@ public class GroupTest extends BaseWebDriverTest
         return getProjectName() + "2";
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _permissionsHelper.deleteGroup(COMPOUND_GROUP);

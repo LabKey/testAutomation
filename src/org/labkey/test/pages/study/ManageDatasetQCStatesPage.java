@@ -118,6 +118,7 @@ public class ManageDatasetQCStatesPage extends LabKeyPage<ManageDatasetQCStatesP
         return new ManageStudyPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

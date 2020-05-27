@@ -52,6 +52,7 @@ public class ExecuteQueryPage extends LabKeyPage<ExecuteQueryPage.ElementCache>
         return elementCache()._dataRegionTable;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

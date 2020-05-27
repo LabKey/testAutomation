@@ -55,6 +55,7 @@ public class ElisaAssayTest extends AbstractAssayTest
 
     private static final String PLATE_TEMPLATE_NAME = "ELISAAssayTest Template";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("assay");

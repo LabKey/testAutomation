@@ -98,6 +98,7 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
         return new EmailPrefsPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
