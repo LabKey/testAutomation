@@ -89,6 +89,7 @@ public class TimelineTest extends BaseWebDriverTest
         return SRC_PREFIX + "\n" + testFragment + "\n" + SRC_SUFFIX;
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("timeline");

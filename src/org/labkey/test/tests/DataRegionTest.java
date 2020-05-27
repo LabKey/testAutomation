@@ -112,6 +112,7 @@ public class DataRegionTest extends AbstractQWPTest
         TOTAL_ROWS = map.size();
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return null;

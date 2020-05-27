@@ -31,12 +31,14 @@ public abstract class AbstractDataLoaderFactory extends AbstractDocumentParser i
         super();
     }
 
+    @Override
     @NotNull
     public DataLoader createLoader(InputStream is, boolean hasColumnHeaders) throws IOException
     {
         return createLoader(is, hasColumnHeaders);
     }
 
+    @Override
     @NotNull
     public DataLoader createLoader(File file, boolean hasColumnHeaders) throws IOException
     {

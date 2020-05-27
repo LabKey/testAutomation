@@ -129,6 +129,7 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String HEADER_CONTENT =
             "Yo! This is the header!";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("wiki");
@@ -737,6 +738,7 @@ public class WikiLongTest extends BaseWebDriverTest
             clickButton("Use HTML Source Editor");
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsersIfPresent(USER1);

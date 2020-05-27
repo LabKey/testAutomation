@@ -149,11 +149,13 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
             _text = text;
         }
 
+        @Override
         public String getValue()
         {
             return _value;
         }
 
+        @Override
         public String getText()
         {
             return _text;

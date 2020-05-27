@@ -62,6 +62,7 @@ public class WikiTest extends BaseWebDriverTest
         SearchAdminAPIHelper.pauseCrawler(getDriver());
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("wiki");

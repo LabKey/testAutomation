@@ -471,6 +471,7 @@ public class TabLoader extends DataLoader
         _mapFilter = mapFilter;
     }
 
+    @Override
     public CloseableIterator<Map<String, Object>> iterator()
     {
         TabLoaderIterator iter;
@@ -569,6 +570,7 @@ public class TabLoader extends DataLoader
         }
     }
 
+    @Override
     public String[][] getFirstNLines(int n) throws IOException
     {
         BufferedReader reader = getReader();
@@ -623,6 +625,7 @@ public class TabLoader extends DataLoader
             }
         }
 
+        @Override
         public void close() throws IOException
         {
             try

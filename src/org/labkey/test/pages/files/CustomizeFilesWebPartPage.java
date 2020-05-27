@@ -124,6 +124,7 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
         selectFileRoot(false, nodeParts);
     }
 
+    @Override
     protected ElementCache elementCache()
     {
         return new ElementCache();

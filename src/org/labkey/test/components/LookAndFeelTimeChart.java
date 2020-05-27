@@ -27,24 +27,28 @@ public class LookAndFeelTimeChart extends ChartLayoutDialog<LookAndFeelTimeChart
         super(wDriver);
     }
 
+    @Override
     public LookAndFeelTimeChart setPlotTitle(String title)
     {
         super.setPlotTitle(title);
         return this;
     }
 
+    @Override
     public LookAndFeelTimeChart clickResetTitle()
     {
         super.clickResetTitle();
         return this;
     }
 
+    @Override
     public LookAndFeelTimeChart setPlotWidth(String width)
     {
         super.setPlotWidth(width);
         return this;
     }
 
+    @Override
     public LookAndFeelTimeChart setPlotHeight(String height)
     {
         super.setPlotHeight(height);

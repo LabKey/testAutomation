@@ -119,6 +119,7 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
         return _driver;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

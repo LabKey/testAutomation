@@ -225,6 +225,7 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         getWrapper().clickAndWait(elementCache().cancelButton);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

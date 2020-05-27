@@ -54,6 +54,7 @@ public class ImportListArchivePage extends LabKeyPage<ImportListArchivePage.Elem
         return new BeginPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

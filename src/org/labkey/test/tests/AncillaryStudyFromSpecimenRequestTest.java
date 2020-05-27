@@ -42,6 +42,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         waitForPipelineJobsToComplete(2, "study import", false);
     }
 
+    @Override
     public void doVerifySteps()
     {
         setupRequestStatuses();

@@ -27,18 +27,21 @@ public class LookAndFeelPieChart extends ChartLayoutDialog<LookAndFeelPieChart.E
         super(wDriver);
     }
 
+    @Override
     public LookAndFeelPieChart setPlotTitle(String title)
     {
         super.setPlotTitle(title);
         return this;
     }
 
+    @Override
     public LookAndFeelPieChart setPlotWidth(String width)
     {
         super.setPlotWidth(width);
         return this;
     }
 
+    @Override
     public LookAndFeelPieChart setPlotHeight(String height)
     {
         super.setPlotHeight(height);

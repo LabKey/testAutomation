@@ -66,6 +66,7 @@ public class ManageStudyPage extends LabKeyPage<ManageStudyPage.ElementCache>
         return new DomainDesignerPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

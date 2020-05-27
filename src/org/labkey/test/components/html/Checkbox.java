@@ -73,6 +73,7 @@ public class Checkbox extends Component implements FormItem<Boolean>
         set(false);
     }
 
+    @Override
     public void set(@NotNull Boolean checked)
     {
         if (checked != isChecked())

@@ -188,6 +188,7 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
         return this;
     }
 
+    @Override
     public DatasetPropertiesPage clickSave()
     {
         getWrapper().doAndWaitForPageToLoad(()-> elementCache().saveButton.click());

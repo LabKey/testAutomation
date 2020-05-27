@@ -197,6 +197,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
         return PortalTab.find(currentTabText, getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

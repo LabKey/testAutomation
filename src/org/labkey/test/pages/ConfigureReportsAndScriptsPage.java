@@ -524,6 +524,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
             return this;
         }
 
+        @Override
         public Map<Locator, String> getConfigMap()
         {
             Map<Locator, String> configMap = super.getConfigMap();
@@ -536,6 +537,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
             return configMap;
         }
 
+        @Override
         public void configureEngine(EngineType type, Window configWindow, WebDriverWrapper wrapper)
         {
             // need to set the change password checkbox
