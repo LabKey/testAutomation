@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.test.components.html.OptionSelect;
 
 public class FieldDefinition extends PropertyDescriptor
 {
@@ -82,6 +83,7 @@ public class FieldDefinition extends PropertyDescriptor
         return json;
     }
 
+    @Override
     public FieldDefinition setLabel(String label)
     {
         super.setLabel(label);
@@ -286,51 +288,38 @@ public class FieldDefinition extends PropertyDescriptor
 
     public enum ColumnType
     {
-        MultiLine("Multi-Line Text", "Multi-Line Text", "string"),
-        Integer("Integer", "Integer", "int"),
-        String("Text", "Text (String)", "string"),
-        Subject("Subject/Participant", "Subject/Participant (String)",
-                "string", "http://cpas.labkey.com/Study#ParticipantId", null),
-        DateTime("DateTime", "DateTime", "date"), // TODO remove this after GWT designer removed
-        DateAndTime("Date Time", "Date Time", "date"),
-        Boolean("Boolean", "Boolean", "boolean"),
-        Double("Number (Double)", "Number (Double)", "float"), // TODO remove this after GWT designer removed
-        Decimal("Decimal", "Decimal", "float"),
-        File("File", "File", "fileLink"),
-        AutoInteger("Auto-Increment Integer", "Auto-Increment Integer", "int"),
-        Flag("Flag", "Flag (String)", "string",
-                "http://www.labkey.org/exp/xml#flag", null),
-        Attachment("Attachment", "Attachment", "attachment"),
-        User("User", "User", "int", null,
-                new LookupInfo(null, "core", "users")),
-        Lookup("Lookup", "Lookup", null),
-        Sample("Sample", "Sample", "int",
-                "http://www.labkey.org/exp/xml#sample",
-                new LookupInfo(null, "exp", "Materials"));
+        MultiLine("Multi-Line Text", "string"),
+        Integer("Integer", "int"),
+        String("Text", "string"),
+        Subject("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null),
+        DateAndTime("Date Time", "date"),
+        Boolean("Boolean", "boolean"),
+        Double("Number (Double)", "float"),
+        Decimal("Decimal", "float"),
+        File("File", "fileLink"),
+        AutoInteger("Auto-Increment Integer", "int"),
+        Flag("Flag", "string", "http://www.labkey.org/exp/xml#flag", null),
+        Attachment("Attachment", "attachment"),
+        User("User", "int", null, new LookupInfo(null, "core", "users")),
+        Lookup("Lookup", null),
+        Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials"));
 
         private final String _label; // the display value in the UI for this kind of field
-        private final String _description; // TODO remove this after GWT designer removed
         private final String _rangeURI;     // the key used inside the API
         private final String _conceptURI;
         private final LookupInfo _lookupInfo;
 
-        ColumnType(String label, String description, String rangeURI, String conceptURI, LookupInfo lookupInfo)
+        ColumnType(String label, String rangeURI, String conceptURI, LookupInfo lookupInfo)
         {
             _label = label;
-            _description = description;
             _rangeURI = rangeURI;
             _conceptURI = conceptURI;
             _lookupInfo = lookupInfo;
         }
 
-        ColumnType(String label, String description, String rangeURI)
+        ColumnType(String label, String rangeURI)
         {
-            this(label, description, rangeURI, null, null);
-        }
-
-        public String toString()
-        {
-            return _description;
+            this(label, rangeURI, null, null);
         }
 
         public String getLabel()
@@ -348,6 +337,102 @@ public class FieldDefinition extends PropertyDescriptor
         protected LookupInfo getLookupInfo()
         {
             return _lookupInfo;
+        }
+    }
+
+    public enum ScaleType implements OptionSelect.SelectOption
+    {
+        LINEAR("Linear"),
+        LOG("Log");
+
+        String _text;
+
+        ScaleType(String text)
+        {
+            _text = text;
+        }
+
+        @Override
+        public String getValue()
+        {
+            return name();
+        }
+
+        @Override
+        public String getText()
+        {
+            return _text;
+        }
+    }
+
+    public enum DefaultType implements OptionSelect.SelectOption
+    {
+        FIXED_EDITABLE("Editable default"),
+        LAST_ENTERED("Last entered"),
+        FIXED_NON_EDITABLE("Fixed value");
+
+        String _text;
+
+        DefaultType(String text)
+        {
+            _text = text;
+        }
+
+        @Override
+        public String getValue()
+        {
+            return name();
+        }
+
+        @Override
+        public String getText()
+        {
+            return _text;
+        }
+    }
+
+    /**
+     * Represents possible PHI levels for a field
+     *
+     * @see org.labkey.api.data.PHI
+     */
+    public enum PhiSelectType implements OptionSelect.SelectOption
+    {
+        // Ordered from least to most restrictive
+        NotPHI("Not PHI", null),
+        Limited("Limited PHI", "Limited PHI Reader"),
+        PHI("Full PHI", "Full PHI Reader"),
+        Restricted("Restricted PHI", "Restricted PHI Reader");
+
+        private final String _text;
+        private final String _roleName;
+
+        PhiSelectType(String text, String roleName)
+        {
+            _text = text;
+            _roleName = roleName;
+        }
+
+        @Override
+        public String getValue()
+        {
+            return name();
+        }
+
+        @Override
+        public String getText()
+        {
+            return _text;
+        }
+
+        public int getRank()
+        {
+            return ordinal();
+        }
+
+        public String getRoleName()
+        {
+            return _roleName;
         }
     }
 

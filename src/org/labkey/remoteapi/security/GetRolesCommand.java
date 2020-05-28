@@ -25,6 +25,7 @@ public class GetRolesCommand extends Command<GetRolesResponse>
         super("security", "getRoles");
     }
 
+    @Override
     protected GetRolesResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
         return new GetRolesResponse(text, status, contentType, json, copy());

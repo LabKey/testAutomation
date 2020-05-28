@@ -22,9 +22,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.components.PropertiesEditor.DefaultType;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -55,6 +55,7 @@ public class ElisaAssayTest extends AbstractAssayTest
 
     private static final String PLATE_TEMPLATE_NAME = "ELISAAssayTest Template";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("assay");
@@ -102,7 +103,7 @@ public class ElisaAssayTest extends AbstractAssayTest
         assayDesignerPage.expandFieldsPanel("Sample")
             .getField("SpecimenId")
             .clickAdvancedSettings()
-            .setDefaultValueType(DefaultType.LAST_ENTERED)
+            .setDefaultValueType(FieldDefinition.DefaultType.LAST_ENTERED)
             .apply();
         assayDesignerPage.clickFinish();
 

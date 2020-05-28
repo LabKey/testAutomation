@@ -109,6 +109,7 @@ public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.
         return !elementCache().collapseIconLocator.existsIn(this);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

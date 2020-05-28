@@ -96,6 +96,7 @@ public class IssuesTest extends BaseWebDriverTest
     private IssuesHelper _issuesHelper = new IssuesHelper(this);
     private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("issues");
@@ -113,6 +114,7 @@ public class IssuesTest extends BaseWebDriverTest
         return "IssuesVerifyProject";
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _userHelper.deleteUsers(false, USER1, USER2);

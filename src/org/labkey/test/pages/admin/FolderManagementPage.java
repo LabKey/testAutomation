@@ -163,6 +163,7 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return new ReorderFoldersPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -82,6 +82,7 @@ public class ManageVisitPage extends LabKeyPage<ManageVisitPage.ElementCache>
         waitForElement(Locator.lkButton("Delete Visit"));
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -78,6 +78,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         log(this.getClass().getName() + " Cleaning Up");

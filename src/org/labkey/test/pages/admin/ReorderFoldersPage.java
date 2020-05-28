@@ -89,6 +89,7 @@ public class ReorderFoldersPage extends LabKeyPage<ReorderFoldersPage.ElementCac
         return new FolderManagementPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

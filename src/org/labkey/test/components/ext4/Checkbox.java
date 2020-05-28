@@ -32,6 +32,7 @@ public class Checkbox extends org.labkey.test.components.html.Checkbox
         return new CheckboxFinder();
     }
 
+    @Override
     public boolean isChecked()
     {
         //assertElementType();
@@ -41,6 +42,7 @@ public class Checkbox extends org.labkey.test.components.html.Checkbox
         return atlasYOffset.contains("-"); // Probably '-13px' or '-26px'. Unchecked states are all at offset zero
     }
 
+    @Override
     protected void assertElementType()
     {
         String backgroundImage = getComponentElement().getCssValue("background-image");
@@ -67,6 +69,7 @@ public class Checkbox extends org.labkey.test.components.html.Checkbox
             return new Checkbox(el);
         }
 
+        @Override
         protected Locator.XPathLocator itemLoc()
         {
             return _type.itemLoc();
@@ -77,6 +80,7 @@ public class Checkbox extends org.labkey.test.components.html.Checkbox
     {
         FORM
                 {
+                    @Override
                     protected Locator.XPathLocator itemLoc()
                     {
                         return Locator.tagWithClass("input", Ext4Helper.getCssPrefix() + "form-checkbox");
@@ -84,6 +88,7 @@ public class Checkbox extends org.labkey.test.components.html.Checkbox
                 },
         GRID_CHECKER_COLUMN
                 {
+                    @Override
                     protected Locator.XPathLocator itemLoc()
                     {
                         return Locator.tagWithClass("img", Ext4Helper.getCssPrefix() + "grid-checkcolumn");

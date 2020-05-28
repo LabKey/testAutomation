@@ -44,6 +44,7 @@ public class ReportSecurityTest extends ReportTest
         super.doCleanup(afterTest);
     }
 
+    @Override
     @LogMethod
     protected void doCreateSteps()
     {

@@ -84,6 +84,7 @@ public class RegexValidatorDialog extends ModalDialog
         return _row;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

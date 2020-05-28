@@ -76,6 +76,7 @@ public class CreateProjectPage extends LabKeyPage<CreateProjectPage.ElementCache
         return new SetFolderPermissionsPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

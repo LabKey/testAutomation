@@ -94,6 +94,7 @@ abstract class BaseUpdatePage<PAGE> extends LabKeyPage<BaseUpdatePage.ElementCac
 
     protected abstract PAGE getThis();
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -112,6 +112,7 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
         return _dialog;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

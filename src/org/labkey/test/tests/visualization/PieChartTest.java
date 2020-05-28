@@ -55,6 +55,7 @@ public class PieChartTest extends GenericChartsTest
         return clickChartLayoutButton(LookAndFeelPieChart.class);
     }
 
+    @Override
     @LogMethod
     protected void testPlots()
     {

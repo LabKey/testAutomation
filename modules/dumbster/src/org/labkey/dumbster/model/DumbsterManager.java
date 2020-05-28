@@ -130,10 +130,12 @@ public class DumbsterManager implements ShutdownListener
         return "Dumbster manager";
     }
 
+    @Override
     public void shutdownPre()
     {
     }
 
+    @Override
     public void shutdownStarted()
     {
         // Stop listening on the mail port before shutdown.

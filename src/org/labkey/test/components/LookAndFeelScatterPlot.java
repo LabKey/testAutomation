@@ -33,83 +33,97 @@ public class LookAndFeelScatterPlot extends ChartLayoutDialog<LookAndFeelScatter
         return new LookAndFeelScatterPlot.ElementCache();
     }
 
+    @Override
     public LookAndFeelScatterPlot setPlotTitle(String title)
     {
         super.setPlotTitle(title);
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setPlotWidth(String width)
     {
         super.setPlotWidth(width);
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setPlotHeight(String height)
     {
         super.setPlotHeight(height);
         return this;
     }
+    @Override
     public LookAndFeelScatterPlot clickGeneralTab()
     {
         super.clickGeneralTab();
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot clickXAxisTab()
     {
         super.clickXAxisTab();
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setXAxisLabel(String label)
     {
         super.setXAxisLabel(label);
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setXAxisScale(ScaleType scaleType)
     {
         super.setXAxisScale(scaleType);
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setXAxisRangeType(RangeType rangeType)
     {
         super.setXAxisRangeType(rangeType);
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setXAxisRangeMinMax(String min, String max)
     {
         super.setXAxisRangeMinMax(min, max);
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot clickYAxisTab()
     {
         super.clickYAxisTab();
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setYAxisLabel(String label)
     {
         super.setYAxisLabel(label);
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setYAxisScale(ScaleType scaleType)
     {
         super.setYAxisScale(scaleType);
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setYAxisRangeType(RangeType rangeType)
     {
         super.setYAxisRangeType(rangeType);
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setYAxisRangeMinMax(String min, String max)
     {
         super.setYAxisRangeMinMax(min, max);
@@ -174,6 +188,7 @@ public class LookAndFeelScatterPlot extends ChartLayoutDialog<LookAndFeelScatter
         return this;
     }
 
+    @Override
     public LookAndFeelScatterPlot setBinShape(BinShape shape)
     {
         super.setBinShape(shape);

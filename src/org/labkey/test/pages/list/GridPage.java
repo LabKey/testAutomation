@@ -56,6 +56,7 @@ public class GridPage extends LabKeyPage<GridPage.ElementCache>
         return elementCache().table;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

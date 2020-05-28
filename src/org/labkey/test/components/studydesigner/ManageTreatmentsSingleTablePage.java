@@ -170,6 +170,7 @@ public class ManageTreatmentsSingleTablePage extends LabKeyPage<ManageTreatments
         elementCache().cancelButton.click();
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

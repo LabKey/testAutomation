@@ -92,6 +92,7 @@ public class TestHelper
         TestHelper ui = new TestHelper();
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
+                @Override
                 public void run() {
                     awtThread = Thread.currentThread();
                 }
@@ -316,6 +317,7 @@ public class TestHelper
         _configDropDown = new JComboBox(loadConfigs);
         _configDropDown.setBorder(new MatteBorder(0, 0, 0, 10, Color.white));
         _configDropDown.addActionListener(new ActionListener(){
+            @Override
             public void actionPerformed(ActionEvent e) {
                 loadTestConfig((String) _configDropDown.getSelectedItem());
             }
@@ -338,6 +340,7 @@ public class TestHelper
 
         JButton deleteButton = new JButton("Delete");
         deleteButton.addActionListener(new ActionListener(){
+            @Override
             public void actionPerformed(ActionEvent e)
             {
                 String name = (String) _configDropDown.getSelectedItem();
@@ -351,6 +354,7 @@ public class TestHelper
 
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(new ActionListener(){
+            @Override
             public void actionPerformed(ActionEvent e)
             {
                 String name = JOptionPane.showInputDialog(_window, "Enter a name:",
@@ -385,6 +389,7 @@ public class TestHelper
 
         JButton continueButton = new JButton("Continue");
         continueButton.addActionListener(new ActionListener(){
+            @Override
             public void actionPerformed(ActionEvent e)
             {
                 setResult(SuiteBuilder.getInstance().getTestSet(Continue.class.getSimpleName()), new ArrayList<String>());
@@ -415,6 +420,7 @@ public class TestHelper
 
         JButton userPropsButton = new JButton("User Props");
         userPropsButton.addActionListener(new ActionListener(){
+            @Override
             public void actionPerformed(ActionEvent e)
             {
                 loadUserProps();
@@ -425,6 +431,7 @@ public class TestHelper
 
         JButton clearButton = new JButton("Clear");
         clearButton.addActionListener(new ActionListener(){
+            @Override
             public void actionPerformed(ActionEvent e)
             {
                 reloadPage(new TestConfig());
@@ -750,6 +757,7 @@ public class TestHelper
             _tree = tree;
         }
 
+        @Override
         public void mouseClicked(MouseEvent e)
         {
             int x = e.getX();
@@ -789,6 +797,7 @@ public class TestHelper
             _treeRoot = root;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             List<String> selectedTests = getSelectedTests(_treeRoot);
@@ -841,6 +850,7 @@ public class TestHelper
             super(name);
             _dependentCheckBox = checkBox;
             addActionListener(new ActionListener(){
+                @Override
                 public void actionPerformed(ActionEvent e)
                 {
                     if (isSelected())

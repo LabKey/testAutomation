@@ -85,6 +85,7 @@ public class ManageAssayQCStatesPage extends LabKeyPage<ManageAssayQCStatesPage.
         clickButton("Cancel");
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

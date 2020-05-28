@@ -39,7 +39,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Hosting;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -92,6 +91,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     public static final String COMMENT_COLUMN = "Comment";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("audit");
@@ -131,6 +131,7 @@ public class AuditLogTest extends BaseWebDriverTest
     {
     } // Skip.  Project is deleted as part of test
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         // Needed for pre-clean only. User & project are deleted during test.
@@ -625,14 +626,14 @@ public class AuditLogTest extends BaseWebDriverTest
 
         log("Change properties on field '" + FIELD01_NAME + "'.");
         fieldsPanel.getField(FIELD01_NAME)
-                .setPHILevel(PropertiesEditor.PhiSelectType.Restricted)
+                .setPHILevel(FieldDefinition.PhiSelectType.Restricted)
                 .setRequiredField(true)
                 .setDescription(FIELD01_UPDATED_DESCRIPTION)
                 .setLabel(FIELD01_UPDATED_LABEL);
 
         log("Change properties on field '" + FIELD02_NAME + "'.");
         DomainFieldRow field2 = fieldsPanel.getField(FIELD02_NAME)
-                .setScaleType(PropertiesEditor.ScaleType.LOG)
+                .setScaleType(FieldDefinition.ScaleType.LOG)
                 .setNumberFormat("#!");
         ConditionalFormatDialog formatDlg = field2.clickConditionalFormatButton();
         formatDlg.getOpenFormatPanel().setFirstValue("5");

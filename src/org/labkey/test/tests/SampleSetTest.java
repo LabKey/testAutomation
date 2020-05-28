@@ -26,18 +26,11 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.experiment.LineageCommand;
-import org.labkey.remoteapi.experiment.LineageNode;
-import org.labkey.remoteapi.experiment.LineageResponse;
-import org.labkey.remoteapi.query.ContainerFilter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
@@ -48,14 +41,10 @@ import org.labkey.test.pages.experiment.CreateSampleSetPage;
 import org.labkey.test.pages.experiment.UpdateSampleSetPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
-import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleSetDefinition;
-import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
-import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleSetHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -73,15 +62,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
@@ -89,14 +74,7 @@ public class SampleSetTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleSetTestProject";
     private static final String FOLDER_NAME = "SampleSetTestFolder";
-    private static final String LINEAGE_FOLDER = "LineageSampleSetFolder";
-    private static final String LINEAGE_SAMPLE_SET_NAME = "LineageSampleSet";
-    private static final String PROJECT_SAMPLE_SET_NAME = "ProjectSampleSet";
-    private static final String PROJECT_PARENT_SAMPLE_SET_NAME = "ProjectParentSampleSet";
-    private static final String FOLDER_SAMPLE_SET_NAME = "FolderSampleSet";
-    private static final String PARENT_SAMPLE_SET_NAME = "ParentSampleSet";
-    private static final String FOLDER_CHILDREN_SAMPLE_SET_NAME = "FolderChildrenSampleSet";
-    private static final String FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME = "FolderGrandchildrenSampleSet";
+    private static final String LOOKUP_FOLDER = "LookupSampleSetFolder";
     private static final String CASE_INSENSITIVE_SAMPLE_SET = "CaseInsensitiveSampleSet";
     private static final String LOWER_CASE_SAMPLE_SET = "caseinsensitivesampleset";
 
@@ -133,66 +111,20 @@ public class SampleSetTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, "Collaboration");
         portalHelper.addWebPart("Sample Sets");
 
-        _containerHelper.createSubfolder(PROJECT_NAME, LINEAGE_FOLDER, "Collaboration");
+        _containerHelper.createSubfolder(PROJECT_NAME, LOOKUP_FOLDER, "Collaboration");
         portalHelper.addWebPart("Sample Sets");
         portalHelper.exitAdminMode();
 
-        Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", true);
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    protected void doCleanup(boolean afterTest)
     {
         super.doCleanup(afterTest);
-        Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", false);
-    }
 
-    // Uncomment this function (after you run once) it will make iterating on tests much easier.
-//    @Override
-//    protected void doCleanup(boolean afterTest)
-//    {
+        // If you are debugging tests change this function to do nothing.
+        // It can make re-running faster but you need to valid the integrity of the test data on your own.
 //        log("Do nothing.");
-//    }
-
-    @Test
-    public void testLineageDerivation()
-    {
-        String sampleText = "Name\tIntCol\tStringCol\n" +
-                "Sample12ab\t1012\talpha\n" +
-                "Sample13c4\t1023\tbeta\n" +
-                "Sample14d5\t1024\tgamma\n" +
-                "Sampleabcd\t1035\tepsilon\n" +
-                "Sampledefg\t1046\tzeta";
-        projectMenu().navigateToFolder(PROJECT_NAME, LINEAGE_FOLDER);
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition(LINEAGE_SAMPLE_SET_NAME).setFields(
-                List.of(new FieldDefinition("IntCol", ColumnType.Integer),
-                        new FieldDefinition("StringCol", ColumnType.String))),
-                sampleText);
-
-        // at this point, we're in the LINEAGE_FOLDER, on the Experiment tab, looking at the sample sets properties and Sample Set contents webparts.
-        // now we add more samples,
-        String deriveSamples = "Name\tMaterialInputs/LineageSampleSet\n" +
-                "A\t\n" +
-                "B\tA\n" +      // B and C both derive from A, so should get the same Run
-                "C\tA\n" +      // D derives from B, so should get its own run
-                "D\tB\n";
-        sampleHelper.bulkImport(deriveSamples);
-
-        log("foo");
-        SelectRowsResponse samples = executeSelectRowCommand("samples", LINEAGE_SAMPLE_SET_NAME, ContainerFilter.Current, getProjectName()+"/"+LINEAGE_FOLDER, null);
-        Map<String, Object> rowA =  samples.getRows().stream().filter((a)-> a.get("Name").equals("A")).collect(Collectors.toList()).get(0);
-        Map<String, Object> rowB =  samples.getRows().stream().filter((a)-> a.get("Name").equals("B")).collect(Collectors.toList()).get(0);
-        Map<String, Object> rowC =  samples.getRows().stream().filter((a)-> a.get("Name").equals("C")).collect(Collectors.toList()).get(0);
-        Map<String, Object> rowD =  samples.getRows().stream().filter((a)-> a.get("Name").equals("D")).collect(Collectors.toList()).get(0);
-
-        assertNull("Row A shouldn't have a parent", rowA.get("Run"));
-        assertEquals("Rows B and C should both derive from A and get the same run", rowB.get("Run"), rowC.get("Run"));
-        assertNotNull("RowD should have a parent", rowD.get("Run"));
-        assertNotEquals("RowD should not equal B", rowD.get("Run"), rowB.get("Run"));
-        assertNotEquals("RowD should not equal C", rowD.get("Run"), rowC.get("Run"));
     }
 
     @Test
@@ -346,127 +278,24 @@ public class SampleSetTest extends BaseWebDriverTest
         assertEquals(fieldNames.get(0) + " for sample 'Name2' not as expected", "Sea", rowData.get(fieldNames.get(0)));
 
         index = drt.getRowIndex("Name", "Name3");
-        assertTrue("Should have a row with the thrid sample name", index >= 0);
+        assertTrue("Should have a row with the third sample name", index >= 0);
         rowData = drt.getRowDataAsMap(index);
         assertEquals(fieldNames.get(0) + " for sample 'Name' not as expected", "Dee", rowData.get(fieldNames.get(0)));
 
     }
 
-    /**
-     *  coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37466
-     */
+    // I don't think this test is doing what was intended. I'm unclear if this is intended to be a lineage test or a
+    // test of a sample type with a look-up column to another sample-type. It behaves as the latter, but that is not
+    // working as expected, and the check at the end of the test fails to capture it.
+    // I think this test should just be deleted.
+    // Tracking in test issue: https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=40475
+    // Marking as Ignore
     @Test
     @Ignore
-    public void testLineageWithImplicitParentColumn() throws IOException, CommandException
-    {
-        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
-
-        // create a sampleset with the following explicit domain columns
-        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "implicitParentage", getCurrentContainerPath())
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("data", ColumnType.Integer),
-                        TestDataGenerator.simpleFieldDef("stringData", ColumnType.String)
-                ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        dgen.addRow(List.of("A", 12, dgen.randomString(15)));
-        dgen.addRow(List.of("B", 13, dgen.randomString(15)));
-        dgen.addRow(List.of("C", 15, dgen.randomString(15)));
-        dgen.addCustomRow(Map.of("name", "D", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "B"));
-        dgen.addCustomRow(Map.of("name", "E", "data", 14, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "B"));
-        dgen.addCustomRow(Map.of("name", "F", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "A,B"));
-        dgen.addCustomRow(Map.of("name", "G", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "C"));
-        dgen.addCustomRow(Map.of("name", "H", "data", 14, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "A,B,C"));
-        dgen.addCustomRow(Map.of("name", "I", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "B,G"));
-
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
-
-        // get row 'B' after insert
-        Map<String, Object> rowB = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("B"))
-            .findFirst().orElse(null);
-        Map<String, Object> rowH = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("H"))
-                .findFirst().orElse(null);
-        Map<String, Object> rowI = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("I"))
-                .findFirst().orElse(null);
-
-        refresh();
-        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
-        waitAndClickAndWait(Locator.linkWithText("implicitParentage"));
-        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-
-        // get the lineage graph
-        LineageCommand lineageCommand = new LineageCommand.Builder(rowB.get("lsid").toString())
-                .setChildren(true)
-                .setParents(false)
-                .setDepth(3).build();
-        LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(true), getCurrentContainerPath());
-        List<LineageNode> nodeChildren = new ArrayList<>();
-        for (LineageNode.Edge run : lineageResponse.getSeed().getChildren())
-        {
-            for (LineageNode.Edge child : run.getNode().getChildren()) // children in this context are runs
-            {
-                nodeChildren.add(child.getNode());      // in this case, D and E were processed as a single run
-            }
-        }
-        assertEquals(5, nodeChildren.size());
-
-        // now delete row B
-        dgen.deleteRows(createDefaultConnection(true), List.of(rowB));
-
-        // get the lineage graph
-        LineageCommand parents = new LineageCommand.Builder(rowH.get("lsid").toString())
-                .setChildren(false)
-                .setParents(true)
-                .setDepth(3).build();
-        LineageResponse parentResponse = parents.execute(createDefaultConnection(true), getCurrentContainerPath());
-        List<LineageNode> nodeParents = new ArrayList<>();
-        for (LineageNode.Edge run : parentResponse.getSeed().getParents())
-        {
-            for (LineageNode.Edge child : run.getNode().getParents()) // children in this context are runs
-            {
-                nodeParents.add(child.getNode());      // in this case, D and E were processed as a single run
-            }
-        }
-        assertEquals( "Issue 37466: Expect rowH to still derive from A and C",2, nodeParents.size());
-
-        // only delete on success
-        dgen.deleteDomain(createDefaultConnection(true));
-    }
-
-    /**
-     * regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37465
-     */
-    @Test
-    public void testLookupWithInvalidLookupValue() throws IOException, CommandException
-    {
-        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
-        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "badLookupTest", getCurrentContainerPath())
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("data", ColumnType.Integer)
-                ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
-        dgen.addCustomRow(Map.of("name", "B", "data", 12,  "MaterialInputs/badLookupTest", "A"));   // derives from A
-        dgen.addCustomRow(Map.of("name", "C", "data", 12,  "MaterialInputs/badLookupTest", "A"));
-        dgen.addCustomRow(Map.of("name", "D", "data", 12,  "MaterialInputs/badLookupTest", "BOGUS")); //<--bad lookup here
-        try
-        {
-            dgen.insertRows(createDefaultConnection(true), dgen.getRows());
-            fail("Expect CommandException when inserting bogus lookup");
-        }catch (CommandException successMaybe)
-        {
-            assertTrue("expect bad lookup to produce error containing [Sample input 'BOGUS' in SampleSet 'badLookupTest' not found];\n" +
-                            "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleSet 'badLookupTest' not found"));
-        }
-    }
-
-    @Test
     public void testSamplesWithLookups() throws IOException, CommandException
     {
         // create a basic sampleset
-        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
+        navigateToFolder(getProjectName(), LOOKUP_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "sampleData", getCurrentContainerPath())
                 .withColumns(List.of(
                         new FieldDefinition("name", ColumnType.String),
@@ -481,7 +310,7 @@ public class SampleSetTest extends BaseWebDriverTest
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
         // create the lookup sampleset in a different folder- configured to look to the first one
-        String lookupContainer = getProjectName() + "/" + LINEAGE_FOLDER;
+        String lookupContainer = getProjectName() + "/" + LOOKUP_FOLDER;
         navigateToFolder(getProjectName(), FOLDER_NAME);
         // create another with a lookup to it
         TestDataGenerator lookupDgen = new TestDataGenerator("exp.materials", "sampleLookups", getCurrentContainerPath())
@@ -496,360 +325,23 @@ public class SampleSetTest extends BaseWebDriverTest
                 ));
         lookupDgen.createDomain(createDefaultConnection(true), "SampleSet");
         lookupDgen.addCustomRow(Map.of("name", "B"));
+
+        // If this is to be a look-up to another sample type I believe the values should be the row index and not the name.
         lookupDgen.addCustomRow(Map.of("strLookup", "B"));
         lookupDgen.addCustomRow(Map.of("intLookup", "B"));
         lookupDgen.addCustomRow(Map.of("floatLooky", "B"));
         lookupDgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
         refresh();
-        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
         waitAndClick(Locator.linkWithText("sampleLookups"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+
+        // This only checks the number of rows returned but does not check the values in the rows.
         assertEquals(3, materialsList.getDataRowCount());
 
+        // Not sure why this is being deleted, it makes the test hard to debug.
         lookupDgen.deleteDomain(createDefaultConnection(true));
-        dgen.deleteDomain(createDefaultConnection(true));
-    }
-
-    /**
-     *  regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37465
-     */
-    @Test
-    public void testLookupWithInvalidParentColumnValue() throws IOException, CommandException
-    {
-        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
-        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "badParentLookup", getCurrentContainerPath())
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("data", ColumnType.Integer)
-                ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
-        dgen.addCustomRow(Map.of("name", "B", "data", 13,  "MaterialInputs/badParentLookup", "A"));   // derives from A
-        dgen.addCustomRow(Map.of("name", "C", "data", 14,  "MaterialInputs/badParentLookup", "B"));
-        dgen.addCustomRow(Map.of("name", "D", "data", 15,  "MaterialInputs/badParentLookup", "BOGUS")); //<--bad lookup here
-        try
-        {
-            dgen.insertRows(createDefaultConnection(true), dgen.getRows());
-            fail("Expect CommandException when inserting bogus lookup");
-        }catch (CommandException successMaybe)  // success looks like a CommandException with the expected message
-        {
-            assertTrue("expect bad lookup to produce error containing [Sample input 'BOGUS' in SampleSet 'badParentLookup' not found];\n" +
-                    "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleSet 'badParentLookup' not found"));
-        }
-
-        // clean up on success
-        dgen.deleteDomain(createDefaultConnection(true));
-    }
-
-    /**
-     * This test creates a domain with an explicit 'parent' column and supplies a set of lineage nodes that use the explicit
-     * column and an ad-hoc column (MaterialInput/TableName) for lineage
-     * The test then deletes some rows and confirms that values in the 'parent' columns persist when their parent row
-     * is deleted, but lineage values in MaterialInputs/TableName do not persist after their parent is deleted,
-     */
-    @Test
-    public void testDeleteLineageParent() throws IOException, CommandException
-    {
-        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
-
-        // create a sampleset with the following explicit domain columns
-        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "Family", getCurrentContainerPath())
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("age", ColumnType.Integer),
-                        TestDataGenerator.simpleFieldDef("height", ColumnType.Integer)
-                ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        dgen.addRow(List.of("A", 56, 60));
-        dgen.addRow(List.of("B", 48, 50));
-        dgen.addCustomRow(Map.of("name", "C", "age", 12, "height", 44, "MaterialInputs/Family", "A,B"));
-        dgen.addCustomRow(Map.of("name", "D", "age", 12, "height", 44, "MaterialInputs/Family", "B"));
-        dgen.addCustomRow(Map.of("name", "E", "age", 12, "height", 44, "MaterialInputs/Family", "B"));
-        dgen.addCustomRow(Map.of("name", "F", "age", 12, "height", 44, "MaterialInputs/Family", "A,B"));
-        dgen.addCustomRow(Map.of("name", "G", "age", 12, "height", 44, "MaterialInputs/Family", "C"));
-        dgen.addCustomRow(Map.of("name", "H", "age", 12, "height", 44, "MaterialInputs/Family", "A,B,C"));
-        dgen.addCustomRow(Map.of("name", "I", "age", 12, "height", 44, "MaterialInputs/Family", "G"));
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
-
-        refresh();
-        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
-        waitAndClick(Locator.linkWithText("Family"));
-        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        assertEquals(9, materialsList.getDataRowCount());
-
-        // peel saved rows A and B from the insert response
-        List<Map<String, Object>> rowsToDelete = saveRowsResponse.getRows().stream()
-                .filter((a)-> a.get("name").equals("B") ||
-                        a.get("name").equals("A")).collect(Collectors.toList());
-
-        Map<String, Object> E = saveRowsResponse.getRows().stream()
-                .filter((a)-> a.get("name").equals("E")).findFirst().orElse(null);
-        LineageCommand lineageCommand = new LineageCommand.Builder(E.get("lsid").toString())
-                .setChildren(false)
-                .setParents(true)
-                .setDepth(1).build();
-        LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(true), getCurrentContainerPath());
-        assertEquals("don't expect MaterialInput/tablename lookup to persist records that have been deleted",
-                1, lineageResponse.getSeed().getParents().size());
-
-        // delete rows A, B
-        dgen.deleteRows(createDefaultConnection(true), rowsToDelete);
-        SelectRowsResponse selectResponse = dgen.getRowsFromServer(createDefaultConnection(true),
-                List.of("rowId", "lsid", "name", "parent", "age", "height", "MaterialInputs/Family", "Inputs/First"));
-        List<Map<String, Object>> remainingRows = selectResponse.getRows();
-
-        // now make sure materialInputs derivations don't persist references to deleted records
-        Map<String, Object> rowE = remainingRows.stream()
-                .filter((a)-> a.get("name").equals("E")).findFirst().orElse(null);
-        LineageCommand linCmd = new LineageCommand.Builder(rowE.get("lsid").toString())
-                .setChildren(false)
-                .setParents(true)
-                .setDepth(1).build();
-        LineageResponse linResponse = linCmd.execute(createDefaultConnection(true), getCurrentContainerPath());
-        assertEquals("don't expect MaterialInput/tablename lookup to persist records that have been deleted",
-                0, linResponse.getSeed().getParents().size());
-
-        dgen.deleteDomain(createDefaultConnection(true));
-    }
-
-    @Test
-    public void testDeleteSampleSources() throws CommandException, IOException
-    {
-        SampleSetDefinition sampleSet = new SampleSetDefinition("DeleteSourcesSamples").addField(new FieldDefinition("strCol"));
-        DataClassDefinition dataClass = new DataClassDefinition("DeleteSourcesData").addField(new FieldDefinition("strCol"));
-
-        TestDataGenerator sampleGenerator = TestDataGenerator.createDomain(getProjectName(), sampleSet);
-        TestDataGenerator dataGenerator = TestDataGenerator.createDomain(getProjectName(), dataClass);
-
-        final String sampleParentKey = "MaterialInputs/" + sampleSet.getName();
-        final String dataParentKey = "DataInputs/" + dataClass.getName();
-
-        final String dataParentA = "DPD-A";
-        final String dataParentB = "DPD-B";
-        final String dataParents = "DPD-A,DPD-B";
-        dataGenerator.addCustomRow(Map.of("Name", dataParentA));
-        dataGenerator.addCustomRow(Map.of("Name", dataParentB));
-        dataGenerator.insertRows();
-
-        final String sampleParentA = "DPS-A";
-        final String sampleParentB = "DPS-B";
-        final String sampleParents = "DPS-A,DPS-B";
-        sampleGenerator.addRow(List.of(sampleParentA, "a-v1"));
-        sampleGenerator.addRow(List.of(sampleParentB, "b-v1"));
-        final String sampleC = "DPS-C";
-        final String sampleD = "DPS-D";
-        final String sampleE = "DPS-E";
-        final String sampleF = "DPS-F";
-        final String sampleG = "DPS-G";
-        final String sampleH = "DPS-H";
-        final String sampleI = "DPS-I";
-        sampleGenerator.addCustomRow(Map.of("name", sampleC, "strCol", "c-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
-        sampleGenerator.addCustomRow(Map.of("name", sampleD, "strCol", "d-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
-        sampleGenerator.addCustomRow(Map.of("name", sampleE, "strCol", "e-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
-        sampleGenerator.addCustomRow(Map.of("name", sampleF, "strCol", "f-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
-        sampleGenerator.addCustomRow(Map.of("name", sampleG, "strCol", "g-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
-        sampleGenerator.addCustomRow(Map.of("name", sampleH, "strCol", "h-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
-        sampleGenerator.addCustomRow(Map.of("name", sampleI, "strCol", "i-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
-        sampleGenerator.insertRows(createDefaultConnection(true), sampleGenerator.getRows());
-
-        goToProjectHome();
-
-        SampleSetHelper sampleHelper = new SampleSetHelper(getDriver());
-
-        goToModule("Experiment");
-        sampleHelper.goToSampleSet(sampleSet.getName());
-        saveLocation();
-
-        sampleHelper.mergeImport(List.of(
-                Map.of("name", sampleC, "strCol", "c-v2") // Just update data
-        ));
-        clickAndWait(Locator.linkWithText(sampleC));
-        assertElementPresent(Locator.linkWithText(sampleParentA));
-        assertElementPresent(Locator.linkWithText(sampleParentB));
-        assertElementPresent(Locator.linkWithText(dataParentA));
-        assertElementPresent(Locator.linkWithText(dataParentB));
-
-        recallLocation();
-        sampleHelper.mergeImport(List.of(
-                Map.of("name", sampleD, sampleParentKey, sampleParents) // Don't specify an existing parent column
-        ));
-        clickAndWait(Locator.linkWithText(sampleD));
-        assertElementPresent(Locator.linkWithText(sampleParentA));
-        assertElementPresent(Locator.linkWithText(sampleParentB));
-        assertElementPresent(Locator.linkWithText(dataParentA));
-        assertElementPresent(Locator.linkWithText(dataParentB));
-
-        recallLocation();
-        sampleHelper.mergeImport(List.of(
-                Map.of("name", sampleE, sampleParentKey, sampleParents, dataParentKey, "") // Clear one parent column
-        ));
-        clickAndWait(Locator.linkWithText(sampleE));
-        assertElementPresent(Locator.linkWithText(sampleParentA));
-        assertElementPresent(Locator.linkWithText(sampleParentB));
-        assertElementNotPresent(Locator.linkWithText(dataParentA));
-        assertElementNotPresent(Locator.linkWithText(dataParentB));
-
-        recallLocation();
-        sampleHelper.mergeImport(List.of(
-                Map.of("name", sampleF, sampleParentKey, "", dataParentKey, "") // Clear all lineage columns
-        ));
-        clickAndWait(Locator.linkWithText(sampleF));
-        assertElementNotPresent(Locator.linkWithText(sampleParentA));
-        assertElementNotPresent(Locator.linkWithText(sampleParentB));
-        assertElementNotPresent(Locator.linkWithText(dataParentA));
-        assertElementNotPresent(Locator.linkWithText(dataParentB));
-
-        recallLocation();
-        sampleHelper.mergeImport(List.of(
-                Map.of("name", sampleG, sampleParentKey, sampleParents, dataParentKey, dataParents), // Leave unmodified
-                Map.of("name", sampleH, sampleParentKey, sampleParentA, dataParentKey, dataParentB), // Modify lineage columns
-                Map.of("name", sampleI, sampleParentKey, "", dataParentKey, "") // Modify lineage columns
-        ));
-        clickAndWait(Locator.linkWithText(sampleG));
-        assertElementPresent(Locator.linkWithText(sampleParentA));
-        assertElementPresent(Locator.linkWithText(sampleParentB));
-        assertElementPresent(Locator.linkWithText(dataParentA));
-        assertElementPresent(Locator.linkWithText(dataParentB));
-        recallLocation();
-        clickAndWait(Locator.linkWithText(sampleH));
-        assertElementPresent(Locator.linkWithText(sampleParentA));
-        assertElementNotPresent(Locator.linkWithText(sampleParentB));
-        assertElementNotPresent(Locator.linkWithText(dataParentA));
-        assertElementPresent(Locator.linkWithText(dataParentB));
-        recallLocation();
-        clickAndWait(Locator.linkWithText(sampleI));
-        assertElementNotPresent(Locator.linkWithText(sampleParentA));
-        assertElementNotPresent(Locator.linkWithText(sampleParentB));
-        assertElementNotPresent(Locator.linkWithText(dataParentA));
-        assertElementNotPresent(Locator.linkWithText(dataParentB));
-
-    }
-
-    @Test
-    public void testStringLookupFields() throws IOException, CommandException
-    {
-        String sampleSetName = "10000Samples"; // Testing with 10,000 samples because as per the product the lookup is converted into text field only when the samples exceed 10,000 samples
-        String listName = "MainList";
-
-        goToProjectHome();
-        new PortalHelper(this).addWebPart("Lists");
-
-        log("Creating the sample set of 10000 samples");
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
-        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("label", ColumnType.String)));
-        dgen.addDataSupplier("label", () -> dgen.randomString(10))
-                .withGeneratedRows(10000);
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
-        log("Successfully  inserted " + saveRowsResponse.getRowsAffected());
-
-        log("Waiting for the sample data to get generated");
-        goToProjectHome();
-        waitAndClickAndWait(Locator.linkWithText(sampleSetName));
-
-        log("Inserting 10,001 row in the sampleset");
-        DataRegionTable table = new DataRegionTable("Material", getDriver());
-        table.clickInsertNewRow();
-
-        setFormElement(Locator.name("quf_Name"), "Sample1");
-        setFormElement(Locator.name("quf_label"), "Sample1");
-        clickButton("Submit");
-
-        log("Creating the list via API");
-        ListDefinition listDef = new ListDefinition(listName);
-        listDef.setKeyName("id");
-        listDef.addField(new FieldDefinition("name", ColumnType.String));
-        listDef.addField(new FieldDefinition("lookUpField",
-                new FieldDefinition.LookupInfo(null, "exp.materials", "10000Samples")
-                        .setTableType(ColumnType.Integer))
-                .setDescription("LookUp in same container with 10000 samples"));
-
-        listDef.getCreateCommand().execute(createDefaultConnection(true), getProjectName());
-
-        log("Inserting the new row in the list with the newly created sample as lookup");
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(listName));
-        table = new DataRegionTable("query", getDriver());
-        table.clickInsertNewRow();
-        setFormElement(Locator.name("quf_id"), "1");
-        setFormElement(Locator.name("quf_name"), "1");
-        setFormElement(Locator.name("quf_lookUpField"), "Sample2");
-        clickButton("Submit");
-
-        String errMsg = Locators.labkeyError.findElement(getDriver()).getText();
-        assertEquals("Expecpted error is different", "Could not convert value: Sample2", errMsg);
-
-        setFormElement(Locator.name("quf_lookUpField"), "Sample1");
-        clickButton("Submit");
-
-        log("Verifying row is inserted correctly");
-        table = new DataRegionTable("query", getDriver());
-        assertEquals("Lookup field value is incorrect", Arrays.asList("Sample1"), table.getColumnDataAsText("lookUpField"));
-
-    }
-
-    @Test
-    public void testInsertLargeLineageGraph() throws IOException, CommandException
-    {
-        navigateToFolder(getProjectName(), LINEAGE_FOLDER);
-        // create a sampleset with the following explicit domain columns
-        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "bigLineage", getCurrentContainerPath())
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("data", ColumnType.Integer),
-                        TestDataGenerator.simpleFieldDef("testIndex", ColumnType.Integer)
-                ));
-
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
-        Map indexRow = Map.of("name", "seed", "data", dgen.randomInt(3, 2000), "testIndex", 0); // create the first seed in the lineage
-        SaveRowsResponse seedInsert = dgen.insertRows(createDefaultConnection(true), List.of(indexRow));
-        SelectRowsResponse seedSelect = dgen.getRowsFromServer(createDefaultConnection(true),
-                List.of("lsid", "name", "parent", "data", "testIndex"));
-
-        // create a serial table of records; each derived from the former via parent:name column reference
-        // insert them all at once
-        String previousName = "seed";
-        int testIndex = 1;
-        int intendedGenerationDepth = 99;
-        for (int i = 0; i < intendedGenerationDepth; i++)
-        {
-            String name = dgen.randomString(30);
-            Map row = Map.of("name", name, "data", dgen.randomInt(3, 1395), "testIndex", testIndex , "MaterialInputs/bigLineage", previousName);
-            dgen.addCustomRow(row);
-            previousName = name;
-            testIndex++;
-        }
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
-        SelectRowsResponse insertedSelect = dgen.getRowsFromServer(createDefaultConnection(true),
-                List.of("name", "data", "testIndex"));
-
-        navigateToFolder(getProjectName(), LINEAGE_FOLDER);      // the dataregion is helpful when debugging, not needed for testing
-        DataRegionTable sampleSetList =  DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
-        waitAndClick(Locator.linkWithText("bigLineage"));
-        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-
-        Map<String, Object> seed = seedSelect.getRows().stream()
-                .filter((a)-> a.get("testIndex").equals(0)).findFirst().orElse(null);
-        LineageCommand linCmd = new LineageCommand.Builder(seed.get("lsid").toString())
-                .setChildren(true)
-                .setParents(false)
-                .setDepth(intendedGenerationDepth).build();
-        LineageResponse linResponse = linCmd.execute(createDefaultConnection(true), getCurrentContainerPath());
-        LineageNode node = linResponse.getSeed();
-        int generationDepth = 0;
-        while(node.getChildren().size()>0)  // walk the node depth until the end
-        {
-            node = node.getChildren().get(0).getNode();
-            generationDepth++;
-        }
-        assertEquals("Expect lineage depth to be" +intendedGenerationDepth, intendedGenerationDepth, generationDepth);
-
-        // clean up the sampleset on success
         dgen.deleteDomain(createDefaultConnection(true));
     }
 
@@ -879,94 +371,12 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testDeleteSamplesSomeWithDerivedSamples()
-    {
-        final String SAMPLE_SET_NAME = "DeleteSamplesWithParents";
-        List<String> parentSampleNames = Arrays.asList("P-1", "P-2", "P-3");
-        List<Map<String, String>> sampleData = new ArrayList<>();
-        parentSampleNames.forEach(name -> {
-            sampleData.add(Map.of("Name", name));
-        });
-
-        clickProject(PROJECT_NAME);
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        log("Create a sample set with some potential parents");
-        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME), sampleData);
-        DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
-        log("Derive one sample from another");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
-        clickButton("Derive Samples");
-        clickButton("Next");
-        String childName = parentSampleNames.get(0) + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), childName);
-        clickButton("Submit");
-
-        log("Derive a sample from the one just created");
-        clickAndWait(Locator.linkContainingText("derive samples from this sample"));
-        clickButton("Next");
-        String grandchildName = childName + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), grandchildName);
-        clickButton("Submit");
-
-        log("Derive a sample with two parents");
-        clickAndWait(Locator.linkContainingText(SAMPLE_SET_NAME));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
-        clickButton("Derive Samples");
-        clickButton("Next");
-        String twoParentChildName = parentSampleNames.get(1) + "+" + childName + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), twoParentChildName);
-        clickButton("Submit");
-
-        clickAndWait(Locator.linkContainingText(SAMPLE_SET_NAME));
-
-        log("Try to delete parent sample");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
-        drtSamples.clickHeaderButton("Delete");
-        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
-                .clickButton("Dismiss", true);
-
-        log("Try to delete multiple parent samples");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
-        drtSamples.clickHeaderButton("Delete");
-        Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
-                .clickButton("Dismiss", true);
-
-        log("Try to delete parent and child");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
-
-        assertEquals("Deleted sample " + twoParentChildName + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
-        assertTrue("Parent sample " + parentSampleNames.get(1) + " does not appears in grid", drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name") > -1);
-
-        log("Now that the child is gone, try to delete the parent");
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
-
-        assertEquals("Deleted sample " + parentSampleNames.get(1) + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-
-        log("Now try to delete what's left, in several hitches");
-        drtSamples.checkAllOnPage();
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 2 samples");
-        assertEquals("Number of samples after deletion not as expected", 2, drtSamples.getDataRowCount());
-
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
-        assertEquals("Number of samples after deletion not as expected", 1, drtSamples.getDataRowCount());
-
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
-        assertEquals("Number of samples after deletion not as expected", 0, drtSamples.getDataRowCount());
-
-    }
-
-    @Test
     public void testDeleteSamplesSomeWithAssayData()
     {
         final PortalHelper portalHelper = new PortalHelper(this);
         final String SAMPLE_SET_NAME = "DeleteSamplesWithAssayData";
         final String SAMPLE_ID_FIELD_NAME = "sampleId";
         final String DATA_ID_ASSAY = "GPAT - SampleId Data";
-        final String BATCH_ID_ASSAY = "GPAT - SampleId Batch";
         final String RUN_ID_ASSAY = "GPAT - SampleId Run";
         List<String> sampleNames = Arrays.asList("P-1", "P-2", "P-3", "P-4", "P-5");
         final String BATCH_SAMPLE_NAME = sampleNames.get(1);
@@ -1375,6 +785,7 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         return areDataListEqual(list01, list02, true);
     }
+
     protected boolean areDataListEqual(List<Map<String, String>> list01, List<Map<String, String>> list02, boolean logMismatch)
     {
         if( list01.size() != list02.size())
@@ -1505,8 +916,6 @@ public class SampleSetTest extends BaseWebDriverTest
         else
             INDICATOR_FIELD_NAME = MISSING_FIELD_NAME + "_mvindicator";
 
-        StringBuilder errorLog = new StringBuilder();
-
         log("Validate missing values and required fields in a Sample Set.");
 
         log("Create expected missing value indicators.");
@@ -1616,18 +1025,12 @@ public class SampleSetTest extends BaseWebDriverTest
         testDataIndex = getSampleIndexFromTestInput(UPDATE_SAMPLE_NAME, sampleData);
         sampleData.get(testDataIndex).replace(MISSING_FIELD_NAME, "");
 
-        Assert.assertTrue("Newly inserted Sample Set data not as expected. Stopping the test here.", areDataListEqual(resultsFromDB, sampleData));
+        checker().fatal().verifyTrue("Newly inserted sample type data not as expected. Fatal error.",
+                areDataListEqual(resultsFromDB, sampleData));
 
-        // Not going to use asserts (and possibly fail on first test), will try all the scenarios and then check at the end.
-        String errorMsg;
-        if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
-        {
-            errorMsg = "Number of missing value UI indicators is not as expected.\nExpected " + expectedMissingCount + " found " + getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]"));
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyEquals("Number of missing value UI indicators is not as expected.",
+                Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
+                expectedMissingCount);
 
         log("Now update a sample (give a value in the missing value field) and validate.");
         final String UPDATED_VALUE = "This should remove the unknown value indicator.";
@@ -1654,38 +1057,23 @@ public class SampleSetTest extends BaseWebDriverTest
 //
 //        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
 
-        if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
-        {
-            errorMsg = "After updating a value the number of missing UI indicators is not as expected.\nExpected " + expectedMissingCount + " found " + getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]"));
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyEquals("After updating a value the number of missing UI indicators is not as expected.",
+                Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
+                expectedMissingCount);
 
         resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
-        if(!areDataListEqual(resultsFromDB, sampleData))
-        {
-            errorMsg = "After updating a value the data in the DB is not as expected.";
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyTrue("After updating a value the data in the DB is not as expected.",
+                areDataListEqual(resultsFromDB, sampleData));
 
         // Not really sure this is useful, we can remove in the future.
         log("Validate that the help div is shown when mouse over a missing value.");
         mouseOver(Locator.linkWithText(MV_INDICATOR_03));
         sleep(500);
-        if(!isElementVisible(Locator.xpath("//span[@id='helpDivBody'][text()='" + MV_DESCRIPTION_03 + "']")))
-        {
-            errorMsg = "The missing value pop-up helper was shown as expected.\nExpected a div control with the text '" + MV_DESCRIPTION_03 + "'.";
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyTrue(
+                String.format("Expected a value pop-up helper (div control) with the text '%s'.",
+                        MV_DESCRIPTION_03),
+                isElementVisible(Locator.xpath("//span[@id='helpDivBody'][text()='" + MV_DESCRIPTION_03 + "']")));
 
         log("Now add a single sample via the UI");
         final String UI_INSERT_SAMPLE_NAME = "mv09";
@@ -1709,50 +1097,28 @@ public class SampleSetTest extends BaseWebDriverTest
         // Add this element to expected sample data.
         sampleData.add(Map.of("Name", UI_INSERT_SAMPLE_NAME, REQUIRED_FIELD_NAME, UI_STATIC_FIELD_TEXT, MISSING_FIELD_NAME, "", INDICATOR_FIELD_NAME, MV_INDICATOR_03));
 
-        if(getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]")) != expectedMissingCount)
-        {
-            errorMsg = "After adding a sample with a missing value through the UI the number of missing UI indicators is not as expected.\nExpected " + expectedMissingCount + " found " + getElementCount(Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]"));
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyEquals("After adding a sample with a missing value through the UI the number of missing UI indicators is not as expected.",
+                Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
+                expectedMissingCount);
 
         resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
-        if(!areDataListEqual(resultsFromDB, sampleData))
-        {
-            errorMsg = "After adding a sample with a missing value through the UI the data in the DB is not as expected.";
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
-        }
+        checker().verifyTrue("After adding a sample with a missing value through the UI the data in the DB is not as expected.",
+                areDataListEqual(resultsFromDB, sampleData));
 
         log("Validate that the required field check works as expected.");
         updateSampleData = new ArrayList<>();
         updateSampleData.add(Map.of("Name", "mv10", REQUIRED_FIELD_NAME, "", MISSING_FIELD_NAME, "There should be no value in the required field.", INDICATOR_FIELD_NAME, ""));
         sampleHelper.bulkImportExpectingError(updateSampleData, SampleSetHelper.IMPORT_DATA_LABEL);
 
-        boolean errorMsgShown;
         try
         {
             waitForElementToBeVisible(Locator.xpath("//div[contains(@class, 'labkey-error')][contains(text(),'Missing value for required property')]"));
-            errorMsgShown = true;
             clickButton("Cancel");
         }
         catch(NoSuchElementException nse)
         {
-            errorMsgShown = false;
-        }
-
-        if(!errorMsgShown)
-        {
-            errorMsg = "No error message was shown when a required field is missing.";
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
+            checker().error("No error message was shown when a required field is missing.");
         }
 
         log("Now validate that adding a single row from the UI has the same behavior.");
@@ -1769,32 +1135,18 @@ public class SampleSetTest extends BaseWebDriverTest
         try
         {
             waitForElementToBeVisible(Locator.xpath("//span[contains(@class, 'help-block')]/font[@class='labkey-error'][text()='This field is required']"));
-            errorMsgShown = true;
             clickButton("Cancel");
         }
         catch(NoSuchElementException nse)
         {
-            errorMsgShown = false;
-        }
-
-        if(!errorMsgShown)
-        {
-            errorMsg = "No error message was shown when a required field is missing in the UI.";
-            log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");
-
-            errorLog.append(errorMsg);
-            errorLog.append("\n");
+            checker().error("No error message was shown when a required field is missing in the UI.");
         }
 
         // How about automation that updates an existing field?
 
-        if(errorLog.length() > 0)
-            Assert.fail(errorLog.toString());
-
         log("All done.");
     }
 
-    @LogMethod
     private void setupMVIndicators(List<Map<String, String>> missingValueIndicators)
     {
         goToFolderManagement();
@@ -1820,121 +1172,6 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testCreateAndDeriveSamples()
-    {
-        List<FieldDefinition> sampleSetFields = List.of(
-                new FieldDefinition("IntCol", ColumnType.Integer),
-                new FieldDefinition("StringCol", ColumnType.String),
-                new FieldDefinition("DateCol", ColumnType.DateAndTime),
-                new FieldDefinition("BoolCol", ColumnType.Boolean));
-        File sampleSetFile = TestFileUtils.getSampleData("sampleSet.xlsx");
-
-        clickProject(PROJECT_NAME);
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition(PROJECT_SAMPLE_SET_NAME).setFields(sampleSetFields), sampleSetFile);
-
-        clickFolder(FOLDER_NAME);
-        sampleHelper.createSampleSet(new SampleSetDefinition(FOLDER_SAMPLE_SET_NAME).setFields(
-                List.of(new FieldDefinition("IntCol-Folder",  ColumnType.Integer),
-                        new FieldDefinition("StringCol-Folder", ColumnType.String))),
-                "Name\tIntCol-Folder\tStringCol-Folder\n" +
-                        "SampleSetBVT11\t101\taa\n" +
-                        "SampleSetBVT4\t102\tbb\n" +
-                        "SampleSetBVT12\t102\tbb\n" +
-                        "SampleSetBVT13\t103\tcc\n" +
-                        "SampleSetBVT14\t104\tdd");
-
-        // Do some manual derivation
-        clickAndWait(Locator.linkWithText("Sample Sets"));
-        assertTextPresent(PROJECT_SAMPLE_SET_NAME, FOLDER_NAME);
-
-        clickButton("Show All Materials");
-        assertTextPresent(FOLDER_SAMPLE_SET_NAME);
-        assertTextNotPresent(PROJECT_SAMPLE_SET_NAME);
-
-        checkCheckbox(Locator.name(".toggle"));
-        clickButton("Derive Samples");
-
-        if (isElementPresent(Locator.linkWithText("configure a valid pipeline root for this folder")))
-        {
-            setPipelineRoot(PIPELINE_PATH.getAbsolutePath());
-        }
-
-        clickFolder(FOLDER_NAME);
-        assertTextPresent(FOLDER_SAMPLE_SET_NAME, PROJECT_SAMPLE_SET_NAME);
-        clickAndWait(Locator.linkWithText(FOLDER_SAMPLE_SET_NAME));
-        checkCheckbox(Locator.name(".toggle"));
-        clickButton("Derive Samples");
-
-        selectOptionByText(Locator.name("inputRole0"), "Add a new role...");
-        setFormElement(Locator.id("customRole0"), "FirstRole");
-        selectOptionByText(Locator.name("inputRole1"), "Add a new role...");
-        setFormElement(Locator.id("customRole1"), "SecondRole");
-        selectOptionByText(Locator.name("inputRole2"), "Add a new role...");
-        setFormElement(Locator.id("customRole2"), "ThirdRole");
-        selectOptionByText(Locator.name("inputRole3"), "Add a new role...");
-        setFormElement(Locator.id("customRole3"), "FourthRole");
-        selectOptionByText(Locator.name("outputCount"), "2");
-        selectOptionByText(Locator.name("targetSampleSetId"), "FolderSampleSet in /SampleSetTestProject/SampleSetTestFolder");
-        clickButton("Next");
-
-        setFormElement(Locator.name("outputSample1_Name"), "SampleSetBVT15");
-        setFormElement(Locator.name("outputSample2_Name"), "SampleSetBVT16");
-        checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("outputSample1_IntColFolder"), "500a");
-        setFormElement(Locator.name("outputSample1_StringColFolder"), "firstOutput");
-        setFormElement(Locator.name("outputSample2_StringColFolder"), "secondOutput");
-        clickButton("Submit");
-
-        assertTextPresent("must be of type Integer");
-        checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("outputSample1_IntColFolder"), "500");
-        clickButton("Submit");
-
-        clickAndWait(Locator.linkContainingText("Derive 2 samples"));
-        clickAndWait(Locator.linkContainingText("Text View"));
-        assertTextPresent("FirstRole", "SecondRole", "ThirdRole", "FourthRole");
-
-        clickAndWait(Locator.linkContainingText("16"));
-        clickAndWait(Locator.linkContainingText("derive samples from this sample"));
-
-        selectOptionByText(Locator.name("inputRole0"), "FirstRole");
-        selectOptionByText(Locator.name("targetSampleSetId"), "ProjectSampleSet in /SampleSetTestProject");
-        clickButton("Next");
-
-        setFormElement(Locator.name("outputSample1_Name"), "200");
-        setFormElement(Locator.name("outputSample1_IntCol"), "600");
-        setFormElement(Locator.name("outputSample1_StringCol"), "String");
-        setFormElement(Locator.name("outputSample1_DateCol"), "BadDate");
-        uncheckCheckbox(Locator.name("outputSample1_BoolCol"));
-        clickButton("Submit");
-
-        assertTextPresent("must be of type Date and Time");
-        setFormElement(Locator.name("outputSample1_DateCol"), "1/1/2007");
-        clickButton("Submit");
-
-        assertElementPresent(Locator.linkWithText("Derive sample from SampleSetBVT16"));
-        assertElementPresent(Locator.linkWithText("SampleSetBVT11"));
-        assertElementPresent(Locator.linkWithText("SampleSetBVT12"));
-        assertElementPresent(Locator.linkWithText("SampleSetBVT13"));
-        assertElementPresent(Locator.linkWithText("SampleSetBVT14"));
-
-        clickAndWait(Locator.linkWithText("SampleSetBVT11"));
-
-        assertElementPresent(Locator.linkWithText("Derive sample from SampleSetBVT16"));
-        assertElementPresent(Locator.linkWithText("Derive 2 samples from SampleSetBVT11, SampleSetBVT12, SampleSetBVT13, SampleSetBVT14, SampleSetBVT4"));
-
-        clickFolder(FOLDER_NAME);
-        clickAndWait(Locator.linkWithText(FOLDER_SAMPLE_SET_NAME));
-
-        assertTextPresent("aa", "bb", "cc", "dd", "firstOutput", "secondOutput");
-
-        clickAndWait(Locator.linkWithText("Sample Sets"));
-        clickButton("Show All Materials");
-        assertTextPresent("ProjectSampleSet", "200");
-    }
-
-    @Test
     public void testAuditLog()
     {
         String sampleSetName = "TestAuditLogSampleSet";
@@ -1952,135 +1189,6 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTextPresent(
                 "Samples inserted in: " + sampleSetName);
 
-    }
-
-    @Test
-    public void testParentChild()
-    {
-        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        log("Create parent sample set");
-        sampleHelper.createSampleSet(new SampleSetDefinition(PARENT_SAMPLE_SET_NAME).setFields(
-                List.of(new FieldDefinition("IntCol",  ColumnType.Integer))),
-                "Name\tIntCol\n" +
-                        "SampleSetBVT11\t101\n" +
-                        "SampleSetBVT4\t102\n" +
-                        "SampleSetBVT12\t102\n" +
-                        "SampleSetBVT13\t103\n" +
-                        "SampleSetBVT14\t104");
-
-        log("Create child sample set");
-        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        sampleHelper.createSampleSet(new SampleSetDefinition(FOLDER_CHILDREN_SAMPLE_SET_NAME).setFields(
-                List.of(new FieldDefinition("OtherProp", ColumnType.Decimal))),
-                "Name\tMaterialInputs/" + PARENT_SAMPLE_SET_NAME + "\tOtherProp\n" +
-                        "SampleSetBVTChildA\tSampleSetBVT11\t1.1\n" +
-                        "SampleSetBVTChildB\tSampleSetBVT4\t2.2\n"
-                );
-
-
-        // Make sure that the parent got wired up
-        log("Verify parent references");
-        DataRegionTable table = sampleHelper.getSamplesDataRegionTable();
-        table.openCustomizeGrid();
-        _customizeViewsHelper.showHiddenItems();
-        _customizeViewsHelper.addColumn(new String[]{"Inputs", "Materials", PARENT_SAMPLE_SET_NAME});
-        _customizeViewsHelper.clickViewGrid();
-        waitAndClickAndWait(Locator.linkWithText("SampleSetBVT4"));
-
-        // Check out the run
-        clickAndWait(Locator.linkWithText("Derive sample from SampleSetBVT4"));
-        assertElementPresent(Locator.linkWithText("SampleSetBVT4"));
-        assertElementPresent(Locator.linkWithText("SampleSetBVTChildB"));
-
-        // Make a grandchild set
-        log("Create a grandparent sample set");
-        goToModule("Experiment");
-        scrollIntoView(Locator.linkWithText("Sample Sets"));
-        clickAndWait(Locator.linkWithText("Sample Sets"));
-
-        sampleHelper.createSampleSet(new SampleSetDefinition(FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME).setFields(
-                List.of(new FieldDefinition("OtherProp", ColumnType.Decimal))),
-                "Name\tMaterialInputs/" + FOLDER_CHILDREN_SAMPLE_SET_NAME + "\tOtherProp\n" +
-                        "SampleSetBVTGrandchildA\tSampleSetBVTChildA,SampleSetBVTChildB\t11.11\n");
-
-        waitAndClickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
-
-        // These two regions are used throughout the remaining jumps comparing parent/child sets
-        DataRegionTable childMaterialsRegion = new DataRegionTable("childMaterials", this.getDriver());
-        DataRegionTable parentMaterialsRegion = new DataRegionTable("parentMaterials", this.getDriver());
-
-        // Filter out any child materials, though there shouldn't be any
-        childMaterialsRegion.setFilter("Name", "Is Blank");
-        // Check for parents and grandparents
-        assertTextPresent("SampleSetBVTChildB", "SampleSetBVT4", "SampleSetBVT11");
-
-        // Verify that we've chained things together properly
-        clickAndWait(Locator.linkWithText("SampleSetBVTChildA"));
-        // Filter out any child materials so we can just check for parents
-        childMaterialsRegion.setFilter("Name", "Is Blank");
-        assertTextPresent("SampleSetBVT11");
-        assertElementNotPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
-        // Switch to filter out any parent materials so we can just check for children
-        parentMaterialsRegion.setFilter("Name", "Is Blank");
-        childMaterialsRegion.clearFilter("Name");
-        assertElementNotPresent(Locator.linkWithText("SampleSetBVT11"));
-        assertTextPresent("SampleSetBVTGrandchildA");
-
-        // Go up the chain one more hop
-        parentMaterialsRegion.clearAllFilters("Name");
-        clickAndWait(Locator.linkWithText("SampleSetBVT11"));
-        // Filter out any child materials so we can just check for parents
-        childMaterialsRegion.setFilter("Name", "Is Blank");
-        assertElementNotPresent(Locator.linkWithText("SampleSetBVTChildA"));
-        assertElementNotPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
-        // Switch to filter out any parent materials so we can just check for children
-        parentMaterialsRegion.setFilter("Name", "Is Blank");
-        childMaterialsRegion.clearFilter("Name");
-        assertTextPresent("SampleSetBVTChildA", "SampleSetBVTGrandchildA");
-
-        log("Change parents for the child samples");
-        clickAndWait(Locator.linkWithText(FOLDER_CHILDREN_SAMPLE_SET_NAME));
-        String REPARENTED_CHILD_SAMPLE_SET_TSV = "Name\tMaterialInputs/" + PARENT_SAMPLE_SET_NAME + "\tOtherProp\n" +
-                "SampleSetBVTChildA\tSampleSetBVT13\t1.111\n" +
-                "SampleSetBVTChildB\tSampleSetBVT14\t2.222\n";
-
-        sampleHelper.mergeImport(REPARENTED_CHILD_SAMPLE_SET_TSV);
-
-        clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
-        assertTextPresent("2.222");
-        assertElementNotPresent(Locator.linkWithText("SampleSetBVT4"));
-        // Filter out any child materials so we can just check for parents
-        childMaterialsRegion.setFilter("Name", "Is Blank");
-        assertElementPresent(Locator.linkWithText("SampleSetBVT14"));
-        assertElementNotPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
-        // Switch to filter out any parent materials so we can just check for children
-        parentMaterialsRegion.setFilter("Name", "Is Blank");
-        childMaterialsRegion.clearFilter("Name");
-        assertElementNotPresent(Locator.linkWithText("SampleSetBVT14"));
-        assertElementPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
-    }
-
-    @Test
-    public void testParentInProjectSampleSet()
-    {
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        clickProject(PROJECT_NAME);
-        sampleHelper.createSampleSet(new SampleSetDefinition(PROJECT_PARENT_SAMPLE_SET_NAME).setFields(
-                List.of(new FieldDefinition("Field1", ColumnType.String))),
-                "Name\tField1\n" +
-                        "ProjectS1\tsome value\n");
-
-        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        sampleHelper.createSampleSet(new SampleSetDefinition("ChildOfProject").setFields(
-                List.of(new FieldDefinition("IntCol",  ColumnType.Integer))),
-                "Name\tMaterialInputs/" + PROJECT_PARENT_SAMPLE_SET_NAME + "\n" +
-                        "COP1\tProjectS1\n");
-
-        // Verify it got linked up correctly
-        clickAndWait(Locator.linkWithText("COP1"));
-        assertElementPresent(Locator.linkWithText("ProjectS1"));
     }
 
     @Test
@@ -2117,19 +1225,21 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Verify error message for reserved field names");
         domainFormPanel.manuallyDefineFields("created");
-        assertEquals("Sample Type reserved field name error", Arrays.asList(
-                "Property name 'created' is a reserved name."),
+        checker().verifyEquals("Sample Type reserved field name error",
+                Arrays.asList("Property name 'created' is a reserved name."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
+
         domainFormPanel.manuallyDefineFields("rowid");
-        assertEquals("Sample Type reserved field name error", Arrays.asList(
-                "Property name 'rowid' is a reserved name."),
+        checker().verifyEquals("Sample Type reserved field name error",
+                Arrays.asList("Property name 'rowid' is a reserved name."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         log("Verify error message for a few other special field names");
         domainFormPanel.manuallyDefineFields("name");
-        assertEquals("Sample Type 'name' field name error", Arrays.asList(
+        checker().verifyEquals("Sample Type 'name' field name error",
+                Arrays.asList(
                 "The field name 'Name' is already taken. Please provide a unique name for each field.",
                 "Please correct errors in Fields before saving."),
                 createPage.clickSaveExpectingErrors());
@@ -2137,8 +1247,8 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Verify error message for a few other special field names");
         domainFormPanel.manuallyDefineFields("sampleid");
-        assertEquals("Sample Type SampleId field name error", Arrays.asList(
-                "The SampleId field name is reserved for imported or generated sample ids."),
+        checker().verifyEquals("Sample Type SampleId field name error",
+                Arrays.asList("The SampleId field name is reserved for imported or generated sample ids."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
     }
@@ -2210,7 +1320,7 @@ public class SampleSetTest extends BaseWebDriverTest
         expectedHeaders.add("File Attachment");
 
         setFileAttachment(0, experimentFilePath);
-        setFileAttachment(1, TestFileUtils.getSampleData( "sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
+        setFileAttachment(1, TestFileUtils.getSampleData( "RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
 
         DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
         drt.clickInsertNewRow();
@@ -2275,7 +1385,9 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleHelper.bulkImport(sampleData);
 
         log("Check that the samples were added.");
-        assertEquals("Number of samples not as expected.", sampleNames.size(), sampleHelper.getSampleCount());
+        checker().verifyEquals("Number of samples not as expected.",
+                sampleNames.size(),
+                sampleHelper.getSampleCount());
 
     }
 

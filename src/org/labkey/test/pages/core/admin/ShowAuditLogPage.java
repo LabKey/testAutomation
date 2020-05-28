@@ -69,6 +69,7 @@ public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
                 .exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

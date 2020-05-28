@@ -54,6 +54,7 @@ public class BeginPage extends LabKeyPage<BeginPage.ElementCache>
         return elementCache().listsGrid;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

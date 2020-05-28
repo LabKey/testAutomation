@@ -53,6 +53,7 @@ public class ChartQueryDialog extends ChartWizardDialog<ChartQueryDialog.Element
         return !elementCache().okButton.getAttribute("class").contains("disabled");
     }
 
+    @Override
     public void clickCancel()
     {
         getWrapper().clickAndWait(elementCache().cancelButton);

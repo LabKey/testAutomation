@@ -52,6 +52,7 @@ public class FileContentPage extends LabKeyPage<FileContentPage.ElementCache>
         return _fileBrowserHelper;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

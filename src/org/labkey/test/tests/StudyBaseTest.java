@@ -24,7 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.PropertiesEditor.PhiSelectType;
+import org.labkey.test.params.FieldDefinition.PhiSelectType;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.util.APITestHelper;
@@ -71,11 +71,13 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         new SpecimenHelper(this).setupRequestStatuses();
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("study");
     }
 
+    @Override
     protected String getProjectName()
     {
         return "StudyVerifyProject";
@@ -136,6 +138,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         return new File[0]; 
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -151,6 +154,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     {
         File dataRoot = new File(StudyHelper.getPipelinePath() + directoryName);
         File[] logFiles = dataRoot.listFiles(new FilenameFilter(){
+            @Override
             public boolean accept(File dir, String name)
             {
                 return name.endsWith(".log");
