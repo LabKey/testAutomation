@@ -10,7 +10,6 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -133,18 +132,17 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
     // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public ResponsiveGrid selectRow(int index, boolean checked)
     {
-        WebElement checkBox = Locator.css("td > input[type=checkbox]").findElement(getRow(index));
-        getWrapper().setCheckbox(checkBox, checked);
+        getRow(index).select(checked);
         return this;
     }
 
-    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public ResponsiveGrid selectRow(String columnName, String columnValue, boolean checked)
     {
-        return selectRow(columnName, List.of(columnValue), checked);
+        getRow(columnName, columnValue).get().select(checked);
+        return this;
     }
 
-    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
+    // TODO consider refactoring to use selectRow above in tests
     public ResponsiveGrid selectRow(String columnName, List<String> columnValues, boolean checked)
     {
         List<Map<String, String>> gridData = getRowMaps();
@@ -161,14 +159,12 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return this;
     }
 
-    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public boolean isRowSelected(int index)
     {
-        WebElement checkBox = elementCache().getRowCheckbox(index);
-        return checkBox.isSelected();
+        GridRow row = new GridRow.GridRowFinder(this).index(index).find(this);
+        return row.isSelected();
     }
 
-    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
     public ResponsiveGrid selectAllOnPage(boolean checked)
     {
         Checkbox box = elementCache().selectAllCheckbox;
@@ -199,12 +195,25 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 
     public List<GridRow> getSelectedRows()
     {
-        return getRows().stream().filter(a -> a.isRowSelected()).collect(Collectors.toList());
+        return new GridRow.GridRowFinder(this).withCheckedBox().findAll(this);
     }
 
     private GridRow getRow(int index)
     {
         return getRows().get(index);
+    }
+
+    public Optional<GridRow> getRow(String containsText)
+    {
+        return new GridRow.GridRowFinder(this).withValue(containsText).findOptional(this);
+    }
+
+    public Optional<GridRow> getRow(String containsText, String columnHeader)
+    {
+        // try to normalize column index to start at 0, excluding row selector column
+        Integer columnIndex = hasSelectColumn() ? getColumnIndex(columnHeader) : getColumnIndex(columnHeader) -1;
+        return new GridRow.GridRowFinder(this).withValueAtColumnIndex(containsText, columnIndex)
+                .findOptional(this);
     }
 
     protected WebElement getCell(int rowIndex, int colIndex)
@@ -225,21 +234,6 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return -1;
     }
 
-    public Integer getRowIndex(String containsText, String searchColumnHeader)
-    {
-        List<GridRow> rows = getRows();
-        int colIndex = getColumnIndex(searchColumnHeader);
-        for(int i=0; i<rows.size(); i++ )
-        {
-            // find the nth td in the row, see if its text matches
-            if (getCell(i, colIndex).getText().equalsIgnoreCase(containsText))
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     public List<String> getColumnDataAsText(String columnHeader)
     {
         List<String> columnData = new ArrayList<>();
@@ -251,41 +245,6 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         }
 
         return columnData;
-    }
-
-    public GridRow getRow(String exactColumnText, String columnHeader)
-    {
-        return getRows().stream().filter(a -> a.getValue(columnHeader).equals(exactColumnText))
-                .findFirst().orElseThrow(() -> new NoSuchElementException("Could not find a row where column '" + columnHeader + "' had a value of '" + exactColumnText + "'."));
-    }
-
-    public Integer getRowIndex(Locator containing)
-    {
-        List<GridRow> rows = getRows();
-        for(int i=0; i<rows.size(); i++ )
-        {
-            // find the intended element in the row, if it exists
-            GridRow targetRow = getRow(i);
-            if (containing.findOptionalElement(targetRow).isPresent())
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public Integer getRowIndex(Locator containing, String searchColumnHeader)
-    {
-        List<GridRow> rows = getRows();
-        for(int i=0; i<rows.size(); i++ )
-        {
-            // find the nth td in the row, see if its text matches
-            if (containing.findOptionalElement(getCell(i, getColumnIndex(searchColumnHeader))).isPresent())
-            {
-                return i;
-            }
-        }
-        return -1;
     }
 
     // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
@@ -458,16 +417,16 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         }
 
         // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
-        private final Map<Integer, WebElement> rowCheckboxes = new HashMap<>();
-        protected final WebElement getRowCheckbox(Integer rowIndex)
-        {
-            if (!rowCheckboxes.containsKey(rowIndex))
-            {
-                WebElement rowCheckbox = Locator.xpath("//td/input[@type='checkbox']").findElement(getRows().get(rowIndex));
-                rowCheckboxes.put(rowIndex, rowCheckbox);
-            }
-            return rowCheckboxes.get(rowIndex);
-        }
+//        private final Map<Integer, WebElement> rowCheckboxes = new HashMap<>();
+//        protected final WebElement getRowCheckbox(Integer rowIndex)
+//        {
+//            if (!rowCheckboxes.containsKey(rowIndex))
+//            {
+//                WebElement rowCheckbox = Locator.xpath("//td/input[@type='checkbox']").findElement(getRows().get(rowIndex));
+//                rowCheckboxes.put(rowIndex, rowCheckbox);
+//            }
+//            return rowCheckboxes.get(rowIndex);
+//        }
     }
 
     protected static abstract class Locators
