@@ -66,6 +66,7 @@ public class JUnitHeader extends BaseWebDriverTest
             _containerHelper.deleteFolder("Shared", "_junit");
     }
 
+    @Override
     @Test
     public void startSystemMaintenance()
     {

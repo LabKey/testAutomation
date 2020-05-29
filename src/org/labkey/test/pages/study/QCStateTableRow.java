@@ -94,6 +94,7 @@ public class QCStateTableRow extends WebDriverComponent<QCStateTableRow.ElementC
         Locator.tagWithClass("span", "fa-times").findElement(this).click();
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

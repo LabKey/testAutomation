@@ -170,6 +170,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
 
     }
 
+    @Override
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

@@ -99,6 +99,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         uploadTransformQCRuns();
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -341,6 +342,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         return dataRows;
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("query");

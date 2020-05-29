@@ -178,6 +178,7 @@ public class ClientAPITest extends BaseWebDriverTest
         return SRC_PREFIX + "\n" + testFragment + "\n" + SRC_SUFFIX;
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return null;
@@ -189,6 +190,7 @@ public class ClientAPITest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _userHelper.deleteUsers(false, EMAIL_API_USERS);

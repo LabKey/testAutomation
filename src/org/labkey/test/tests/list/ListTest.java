@@ -164,6 +164,7 @@ public class ListTest extends BaseWebDriverTest
     private final File TSV_SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("list");
@@ -192,6 +193,7 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

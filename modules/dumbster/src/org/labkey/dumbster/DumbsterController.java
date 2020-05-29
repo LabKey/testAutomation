@@ -56,6 +56,7 @@ public class DumbsterController extends SpringActionController
         setActionResolver(_actionResolver);
     }
 
+    @Override
     public PageConfig defaultPageConfig()
     {
         return new PageConfig();
@@ -74,9 +75,9 @@ public class DumbsterController extends SpringActionController
         }
 
         @Override
-        public NavTree appendNavTrail(NavTree root)
+        public void addNavTrail(NavTree root)
         {
-            return root.addChild("Mail Record");
+            root.addChild("Mail Record");
         }
     }
 

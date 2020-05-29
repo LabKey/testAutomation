@@ -47,6 +47,7 @@ public abstract class GenericChartsTest extends ReportTest
     private List<String> _plots = new ArrayList<>();
     private List<String> _plotDescriptions = new ArrayList<>();
 
+    @Override
     @LogMethod
     final protected void doCreateSteps()
     {
@@ -68,6 +69,7 @@ public abstract class GenericChartsTest extends ReportTest
         return false;
     }
 
+    @Override
     @LogMethod
     protected void doVerifySteps()
     {

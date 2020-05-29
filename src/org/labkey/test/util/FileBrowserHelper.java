@@ -516,6 +516,7 @@ public class FileBrowserHelper extends WebDriverWrapper
      *
      * @param file
      */
+    @Override
     @LogMethod
     public void dragAndDropFileInDropZone(@LoggedParam File file)
     {

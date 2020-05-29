@@ -146,7 +146,9 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         log("Verify that emails cannot be seen in list via lookup");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
         DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
-        assertElementPresent(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CHECKED_USER)));
+        assertTextPresent(_userHelper.getDisplayNameForEmail(CHECKED_USER));
+        // This user does not have permission to see user details, so no link
+        assertElementNotPresent(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CHECKED_USER)));
         assertTextNotPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
 
         stopImpersonating();

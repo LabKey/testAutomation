@@ -50,6 +50,7 @@ public class ExpTest extends BaseWebDriverTest
     private static final String RUN_NAME_IMAGEMAP = "Example 5 Run (XTandem peptide search)";
     private static final String DATA_OBJECT_TITLE = "Data: CAexample_mini.mzXML";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");
@@ -67,6 +68,7 @@ public class ExpTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

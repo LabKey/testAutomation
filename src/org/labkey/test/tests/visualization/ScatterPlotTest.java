@@ -78,6 +78,7 @@ public class ScatterPlotTest extends GenericChartsTest
         return true;
     }
 
+    @Override
     @LogMethod
     protected void testPlots()
     {

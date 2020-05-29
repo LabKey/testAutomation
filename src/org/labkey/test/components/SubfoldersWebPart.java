@@ -62,6 +62,7 @@ public class SubfoldersWebPart extends BodyWebPart<SubfoldersWebPart.ElementCach
         return new CreateSubFolderPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

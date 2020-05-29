@@ -30,6 +30,7 @@ public class UpdateUserDetailsPage extends LabKeyPage<UpdateUserDetailsPage.Elem
         return setField("DisplayName", value);
     }
 
+    @Override
     public String getDisplayName()
     {
         return getField("DisplayName");

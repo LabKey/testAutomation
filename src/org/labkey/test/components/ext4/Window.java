@@ -125,6 +125,7 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
         clearElementCache();
     }
 
+    @Override
     protected EC newElementCache()
     {
         return (EC) new ElementCache();

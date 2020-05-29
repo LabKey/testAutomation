@@ -56,6 +56,7 @@ public abstract class ImpersonateWindow extends Window<ImpersonateWindow.Element
         });
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -81,6 +81,7 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
         return elementCache().issuesList;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

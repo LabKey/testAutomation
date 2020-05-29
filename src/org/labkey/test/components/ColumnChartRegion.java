@@ -46,6 +46,7 @@ public class ColumnChartRegion extends WebDriverComponent
         return _dataRegionTable.getWrapper();
     }
 
+    @Override
     public WebElement getComponentElement()
     {
         WebElement webElement = Locator.css("div.lk-region-bar").findElementOrNull(_dataRegionTable);

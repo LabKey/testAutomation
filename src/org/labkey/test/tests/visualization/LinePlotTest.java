@@ -59,6 +59,7 @@ public class LinePlotTest extends GenericChartsTest
         super.doCleanup(afterTest);
     }
 
+    @Override
     @LogMethod
     protected void testPlots()
     {

@@ -34,6 +34,7 @@ public class DatasetInsertPage extends InsertPage
         super(driver);
     }
 
+    @Override
     protected void waitForReady()
     {
         super.waitForReady();

@@ -92,6 +92,7 @@ public class SimpleHttpRequest
             {
                 Authenticator.setDefault(new Authenticator()
                 {
+                    @Override
                     protected PasswordAuthentication getPasswordAuthentication()
                     {
                         return new PasswordAuthentication(_username, _password.toCharArray());

@@ -89,6 +89,7 @@ public class CreateDataClassPage extends LabKeyPage<CreateDataClassPage.ElementC
         elementCache()._designer.clickCancel();
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

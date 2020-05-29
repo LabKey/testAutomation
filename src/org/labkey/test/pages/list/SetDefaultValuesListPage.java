@@ -66,6 +66,7 @@ public class SetDefaultValuesListPage extends LabKeyPage<SetDefaultValuesListPag
         clickAndWait(elementCache().cancelButton);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

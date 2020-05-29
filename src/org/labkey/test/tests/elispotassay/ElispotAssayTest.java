@@ -80,6 +80,7 @@ public class ElispotAssayTest extends AbstractAssayTest
 
     public static final String FLUOROSPOT_FOLDER = "Fluorospot";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("nab");
@@ -470,6 +471,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         plateDesigner.saveAndClose();
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);

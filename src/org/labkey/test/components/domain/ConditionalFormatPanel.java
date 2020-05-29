@@ -125,6 +125,7 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
     }
 
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -61,11 +61,13 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _valid = true;
     }
 
+    @Override
     public PipelineWebTestBase getTest()
     {
         return _test;
     }
 
+    @Override
     public String getDataPath()
     {
         return _dataPath;
@@ -77,21 +79,25 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         return parts[parts.length - 1]; 
     }
 
+    @Override
     public String getProtocolName()
     {
         return _protocolName;
     }
 
+    @Override
     public String getProtocolType()
     {
         return _protocolType;
     }
 
+    @Override
     public String[] getSampleNames()
     {
         return _sampleNames;
     }
 
+    @Override
     public String getParametersFile()
     {
         return _parametersFile != null ? _parametersFile : _protocolType + ".xml";
@@ -102,6 +108,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _parametersFile = parametersFile;
     }
 
+    @Override
     public String[] getInputExtensions()
     {
         return _inputExtensions;
@@ -112,6 +119,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _inputExtensions = inputExtensions;
     }
 
+    @Override
     public String[] getOutputExtensions()
     {
         return _outputExtensions;
@@ -122,6 +130,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _outputExtensions = outputExtensions;
     }
 
+    @Override
     public String getRunKey()
     {
         return _dataPath + " (" + _protocolType + "/" + _protocolName + ")";
@@ -132,6 +141,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         return getDataDirName() + " (" + _protocolName + ")";
     }
 
+    @Override
     public String[] getExperimentLinks()
     {
         if (_experimentLinks == null)
@@ -152,31 +162,37 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         return _experimentLinks;
     }
 
+    @Override
     public void setExperimentLinks(String[] experimentLinks)
     {
         _experimentLinks = experimentLinks;
     }
 
+    @Override
     public PipelineFolder.MailSettings getMailSettings()
     {
         return _mailSettings;
     }
 
+    @Override
     public void setMailSettings(PipelineFolder.MailSettings mailSettings)
     {
         _mailSettings = mailSettings;
     }
 
+    @Override
     public boolean isExpectError()
     {
         return _expectError;
     }
 
+    @Override
     public void setExpectError(boolean expectError)
     {
         _expectError = expectError;
     }
 
+    @Override
     public void validate()
     {
         if (_mailSettings != null)
@@ -196,6 +212,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         }
     }
 
+    @Override
     public void validateTrue(String message, boolean condition)
     {
         if (!condition)
@@ -205,11 +222,13 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         }
     }
 
+    @Override
     public boolean isValid()
     {
         return _valid;
     }
 
+    @Override
     public void verifyClean(File rootDir)
     {
         File analysisDir = new File(rootDir, getDataPath() + File.separatorChar + getProtocolType());
@@ -217,11 +236,13 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
             fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
     }
 
+    @Override
     public void clean(File rootDir)
     {
         TestFileUtils.delete(new File(new File(rootDir, getDataPath()), getProtocolType()));
     }
 
+    @Override
     public void startProcessing()
     {
         _test.log("Start analysis of " + getDataPath());
@@ -243,6 +264,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
     protected abstract void clickSubmitButton();
 
+    @Override
     public void remove()
     {
         ExperimentRunTable tableExp = getExperimentRunTable();
@@ -363,6 +385,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         return false;
     }
 
+    @Override
     public void validateEmailEscalation(int sampleIndex)
     {
         assertNotNull("Email validation requires mail settings", _mailSettings);

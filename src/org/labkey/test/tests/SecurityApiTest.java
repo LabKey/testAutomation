@@ -108,6 +108,7 @@ public class SecurityApiTest extends BaseWebDriverTest
         apiTester.runApiTests(ADMIN_USER, ADMIN_USER_PWD);
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("query");

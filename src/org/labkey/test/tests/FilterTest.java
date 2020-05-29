@@ -83,6 +83,7 @@ public class FilterTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
+    @Override
     protected String getProjectName()
     {
         return "FilterVerifyProject";

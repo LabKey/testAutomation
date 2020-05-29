@@ -51,6 +51,7 @@ public class WikiHistoryTest extends BaseWebDriverTest
     private static final String WIKI_CHECK_CONTENT = "More HTML content";
     private static final String WIKI_CHECK_CONTENT_2 = "Amazing HTML content here";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("wiki");

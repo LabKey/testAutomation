@@ -146,6 +146,7 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
     }
 
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

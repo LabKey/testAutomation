@@ -50,6 +50,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         initTest.doSetupSteps();
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

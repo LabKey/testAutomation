@@ -54,6 +54,7 @@ public class SetInitialFolderSettingsPage extends LabKeyPage<SetInitialFolderSet
         return new LabKeyPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
