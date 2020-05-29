@@ -30,7 +30,8 @@ public class PlateTemplateListPage extends LabKeyPage<PlateTemplateListPage.Elem
 
     public PlateDesignerPage clickNewPlate(PlateDesignerPage.PlateDesignerParams params)
     {
-        clickAndWait(params.templateListLocator());
+        selectOptionByText(elementCache().templateList, params.templateListOption());
+        clickAndWait(Locator.lkButton("create"));
 
         return new PlateDesignerPage(getDriver());
     }
@@ -44,5 +45,6 @@ public class PlateTemplateListPage extends LabKeyPage<PlateTemplateListPage.Elem
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         WebElement templateTable = Locator.tagWithClass("table", "labkey-data-region-legacy").findWhenNeeded(this);
+        WebElement templateList = Locator.tagWithId("select", "plate_template").findWhenNeeded(this);
     }
 }
