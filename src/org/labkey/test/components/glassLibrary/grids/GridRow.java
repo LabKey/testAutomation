@@ -111,7 +111,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     public static class GridRowFinder extends WebDriverComponentFinder<GridRow, GridRowFinder>
     {
-        private Locator _locator;
+        private Locator _locator = Locator.tag("tbody").child("tr").withoutClass("grid-empty").withoutClass("grid-loading");
         private Locator.CssLocator _cssLocator = Locator.css("tbody").child("tr")
                 .withoutClass("grid-empty").withoutClass("grid-loading");
         private Locator.XPathLocator _xPathLocator = Locator.tag("tbody").child("tr")

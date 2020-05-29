@@ -5,13 +5,17 @@
 package org.labkey.test.components.glassLibrary.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
  * The 'grid' element that contains two components.
@@ -57,6 +61,23 @@ public class QueryGrid extends WebDriverComponent
         return _responsiveGrid;
     }
 
+    public Map<String, String> getRowMap(String containsText)
+    {
+        GridRow row = getGrid().getRow(containsText).orElseThrow();
+        return row.getRowMap();
+    }
+
+    public Map<String, String> getRowMap(String column, String containsText)
+    {
+        GridRow row = getGrid().getRow(column, containsText).orElseThrow();
+        return row.getRowMap();
+    }
+
+    public List<Map<String, String>> getRowMaps()
+    {
+        return getGrid().getRowMaps();
+    }
+
     public boolean hasTabs() { return _gridTabBar.isPresent(); }
 
     public boolean gridErrorMessagePresent()
@@ -100,6 +121,13 @@ public class QueryGrid extends WebDriverComponent
         return _gridBar.getRecordCount();
     }
 
+    public QueryGrid waitForRecordCount(int expectedCount)
+    {
+        WebDriverWrapper.waitFor(()-> getRecordCount() == expectedCount,
+                "did not get to the expected record count ["+expectedCount+"] in time",  WAIT_FOR_JAVASCRIPT);
+        return this;
+    }
+
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>
     {
         private Locator _locator;
@@ -113,6 +141,14 @@ public class QueryGrid extends WebDriverComponent
         {
             super(driver);
             _locator= Locator.tagWithClass("div", "panel-body");
+        }
+
+        public QueryGridFinder inPanelWithHeaderText(String panelHeading)
+        {
+            _locator = Locator.tagWithClass("div", "panel")
+                    .withChild(Locator.tagWithClass("div", "panel-heading").withText(panelHeading))
+                    .child(Locator.tagWithClass("div", "panel-body"));
+            return this;
         }
 
         /**
