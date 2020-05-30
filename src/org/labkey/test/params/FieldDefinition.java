@@ -83,6 +83,7 @@ public class FieldDefinition extends PropertyDescriptor
         return json;
     }
 
+    @Override
     public FieldDefinition setLabel(String label)
     {
         super.setLabel(label);
@@ -351,11 +352,13 @@ public class FieldDefinition extends PropertyDescriptor
             _text = text;
         }
 
+        @Override
         public String getValue()
         {
             return name();
         }
 
+        @Override
         public String getText()
         {
             return _text;
@@ -375,11 +378,13 @@ public class FieldDefinition extends PropertyDescriptor
             _text = text;
         }
 
+        @Override
         public String getValue()
         {
             return name();
         }
 
+        @Override
         public String getText()
         {
             return _text;

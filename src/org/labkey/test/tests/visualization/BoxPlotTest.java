@@ -50,6 +50,7 @@ public class BoxPlotTest extends GenericChartsTest
         return clickChartLayoutButton(LookAndFeelBoxPlot.class);
     }
 
+    @Override
     @LogMethod
     protected void testPlots()
     {

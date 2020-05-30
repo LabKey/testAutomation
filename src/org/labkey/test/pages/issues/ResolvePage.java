@@ -64,6 +64,7 @@ public class ResolvePage extends BaseUpdatePage<ResolvePage.ElementCache>
         return (OptionSelect) super.duplicate();
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

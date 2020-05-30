@@ -54,6 +54,7 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "SampleSetExportFolderTest";
     private static final String IMPORT_PROJECT_NAME = "SampleSetImportFolderTest";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");

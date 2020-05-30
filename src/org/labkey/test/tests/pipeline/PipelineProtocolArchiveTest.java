@@ -58,6 +58,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     private static final File SAMPLE_INPUT_FILE4 = TestFileUtils.getSampleData("pipeline/sample4.testIn.tsv");
     private static final File SAMPLE_INPUT_FILE5 = TestFileUtils.getSampleData("pipeline/sample5.testIn.tsv");
 
+    @Override
     @Nullable
     protected String getProjectName()
     {

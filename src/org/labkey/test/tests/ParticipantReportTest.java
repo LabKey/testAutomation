@@ -63,6 +63,7 @@ public class ParticipantReportTest extends ReportTest
     private static final String[] SPEC_PTID_TWO = {"999320518"};
     private static final String PARTICIPANT_REPORT5_NAME = "Demographic Participant Report";
 
+    @Override
     @LogMethod
     protected void doCreateSteps()
     {
@@ -89,6 +90,7 @@ public class ParticipantReportTest extends ReportTest
         setDemographicsBit("DEM-1: Demographics", false);
     }
 
+    @Override
     @LogMethod
     protected void doVerifySteps()
     {

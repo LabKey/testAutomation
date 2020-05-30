@@ -43,6 +43,7 @@ public class MenuBarTest extends BaseWebDriverTest
     private static final String DEM_STUDY_FOLDER = "DemStudyFolder";
     private static final String STUDY_FOLDER = "StudyFolder";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("core");
@@ -193,6 +194,7 @@ public class MenuBarTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(STUDY_FOLDER));
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

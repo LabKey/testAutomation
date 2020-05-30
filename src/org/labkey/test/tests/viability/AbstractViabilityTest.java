@@ -47,10 +47,12 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
         return BrowserType.CHROME;
     }
 
+    @Override
     protected abstract String getProjectName();
     protected abstract String getFolderName();
     protected abstract String getAssayName();
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);

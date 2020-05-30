@@ -25,6 +25,7 @@ public class GetModulesCommand extends Command<GetModulesResponse>
         super("admin", "getModules");
     }
 
+    @Override
     protected GetModulesResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
         return new GetModulesResponse(text, status, contentType, json, copy());

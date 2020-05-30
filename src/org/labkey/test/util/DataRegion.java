@@ -108,11 +108,13 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
         return elementCache().dataRegionApi;
     }
 
+    @Override
     public WebDriverWrapper getWrapper()
     {
         return _webDriverWrapper;
     }
 
+    @Override
     public WebDriver getDriver()
     {
         return getWrapper().getDriver();
@@ -148,6 +150,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     }
 
+    @Override
     public void afterPageLoad()
     {
         clearCache();

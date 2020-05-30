@@ -33,6 +33,7 @@ public class LookAndFeelLinePlot extends ChartLayoutDialog<LookAndFeelLinePlot.E
         return new LookAndFeelLinePlot.ElementCache();
     }
 
+    @Override
     public LookAndFeelLinePlot setPlotTitle(String title)
     {
         super.setPlotTitle(title);
@@ -59,77 +60,90 @@ public class LookAndFeelLinePlot extends ChartLayoutDialog<LookAndFeelLinePlot.E
     }
 
 
+    @Override
     public LookAndFeelLinePlot setPlotWidth(String width)
     {
         super.setPlotWidth(width);
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot setPlotHeight(String height)
     {
         super.setPlotHeight(height);
         return this;
     }
+    @Override
     public LookAndFeelLinePlot clickGeneralTab()
     {
         super.clickGeneralTab();
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot clickXAxisTab()
     {
         super.clickXAxisTab();
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot setXAxisLabel(String label)
     {
         super.setXAxisLabel(label);
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot setXAxisScale(ChartLayoutDialog.ScaleType scaleType)
     {
         super.setXAxisScale(scaleType);
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot setXAxisRangeType(ChartLayoutDialog.RangeType rangeType)
     {
         super.setXAxisRangeType(rangeType);
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot setXAxisRangeMinMax(String min, String max)
     {
         super.setXAxisRangeMinMax(min, max);
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot clickYAxisTab()
     {
         super.clickYAxisTab();
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot setYAxisLabel(String label)
     {
         super.setYAxisLabel(label);
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot setYAxisScale(ChartLayoutDialog.ScaleType scaleType)
     {
         super.setYAxisScale(scaleType);
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot setYAxisRangeType(ChartLayoutDialog.RangeType rangeType)
     {
         super.setYAxisRangeType(rangeType);
         return this;
     }
 
+    @Override
     public LookAndFeelLinePlot setYAxisRangeMinMax(String min, String max)
     {
         super.setYAxisRangeMinMax(min, max);

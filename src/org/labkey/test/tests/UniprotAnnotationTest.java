@@ -128,6 +128,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         getDriver().switchTo().window((String) windows[0]);
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

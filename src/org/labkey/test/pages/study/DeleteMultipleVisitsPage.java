@@ -76,6 +76,7 @@ public class DeleteMultipleVisitsPage extends LabKeyPage<DeleteMultipleVisitsPag
         return new ManageVisitPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -81,6 +81,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     private static final String LOOKUP_VALUE_1 = "Hydrogen";
     private static final String LOOKUP_VALUE_2 = "Helium";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("filecontent");
@@ -102,6 +103,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         initTest.doSetupSteps();
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

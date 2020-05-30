@@ -32,6 +32,7 @@ public class RadioButton extends Checkbox
         return new RadioButtonFinder();
     }
 
+    @Override
     protected void assertElementType()
     {
         String backgroundImage = getComponentElement().getCssValue("background-image");
@@ -48,6 +49,7 @@ public class RadioButton extends Checkbox
             return new RadioButton(el);
         }
 
+        @Override
         protected Locator.XPathLocator itemLoc()
         {
             return Locator.tagWithClass("input", Ext4Helper.getCssPrefix() + "form-radio");

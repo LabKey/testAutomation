@@ -82,6 +82,7 @@ public class EmailPrefsPage extends LabKeyPage<EmailPrefsPage.ElementCache>
         return new ListPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

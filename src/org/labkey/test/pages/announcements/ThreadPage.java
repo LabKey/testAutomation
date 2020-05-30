@@ -53,6 +53,7 @@ public class ThreadPage extends LabKeyPage<ThreadPage.ElementCache>
         return new UpdatePage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -314,6 +314,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         _userHelper.deleteUsers(afterTest, USER);
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return null;

@@ -103,6 +103,7 @@ public class DataRegionTable extends DataRegion
         return new Elements();
     }
 
+    @Override
     protected void clearCache()
     {
         super.clearCache();

@@ -125,6 +125,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
     protected class ElementCache extends BaseReactSelect<?>.ElementCache
     {
+        @Override
         @NotNull
         WebElement findOption(String option)
         {

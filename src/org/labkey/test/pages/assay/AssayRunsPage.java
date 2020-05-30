@@ -79,6 +79,7 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
                 .clickUpdate();
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

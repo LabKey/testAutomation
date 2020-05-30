@@ -102,6 +102,7 @@ public class ParticipantListWebPart extends BodyWebPart<ParticipantListWebPart.E
         return elementCache().statusMessage.getText();
     }
 
+    @Override
     public Elements newElementCache()
     {
         return new Elements();

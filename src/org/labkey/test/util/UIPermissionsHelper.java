@@ -39,6 +39,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         _test = test;
     }
 
+    @Override
     public Integer createGlobalPermissionsGroup(String groupName, String... users)
     {
         return createGlobalPermissionsGroup(groupName, true, users);
@@ -87,6 +88,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         return groupId;
     }
 
+    @Override
     public Integer createPermissionsGroup(String groupName)
     {
         _driver.log("Creating permissions group " + groupName);
@@ -101,12 +103,14 @@ public class UIPermissionsHelper extends PermissionsHelper
         return Integer.parseInt(addedGroup.getAttribute("groupId"));
     }
 
+    @Override
     public void assertNoPermission(String userOrGroupName, String permissionSetting)
     {
         enterPermissionsUI();
         _driver.waitForElementToDisappear(Locator.permissionButton(userOrGroupName, permissionSetting), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
+    @Override
     public void assertPermissionSetting(String userOrGroupName, String permissionSetting)
     {
         String role = toRole(permissionSetting);
@@ -137,6 +141,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         _driver.clickButton("Save and Finish");
     }
 
+    @Override
     public void checkInheritedPermissions()
     {
         enterPermissionsUI();
@@ -144,6 +149,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         saveAndFinish();
     }
 
+    @Override
     public void uncheckInheritedPermissions()
     {
         enterPermissionsUI();
@@ -151,12 +157,14 @@ public class UIPermissionsHelper extends PermissionsHelper
         savePermissions();
     }
 
+    @Override
     public boolean isPermissionsInherited()
     {
         enterPermissionsUI();
         return _driver.isElementPresent(Locator.css("table#inheritedCheckbox.x4-form-cb-checked"));
     }
 
+    @Override
     @LogMethod
     public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
     {
@@ -168,6 +176,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         _driver.log(new Date().toString());
     }
 
+    @Override
     protected void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType)
     {
         String role = toRole(permissionString);
@@ -203,6 +212,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         assertPermissionSetting(userOrGroupName, permissionString);
     }
 
+    @Override
     public void addUserToSiteGroup(String userName, String groupName)
     {
         _test.ensureAdminMode();
@@ -224,6 +234,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         addUserToGroupFromGroupScreen(userName);
     }
 
+    @Override
     protected void removeRoleAssignment(String groupName, String permissionString, MemberType memberType)
     {
         Locator close = Locator.closePermissionButton(groupName,permissionString);
@@ -236,6 +247,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         }
     }
 
+    @Override
     public void addUserToProjGroup(String userName, String projectName, String groupName)
     {
         if (!_driver.getCurrentContainerPath().startsWith("/" + projectName))
@@ -271,6 +283,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         }
     }
 
+    @Override
     @LogMethod(quiet = true)
     public void deleteGroup(@LoggedParam String groupName, boolean failIfNotFound)
     {
@@ -290,6 +303,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         removeUserFromGroup(groupName, userEmail);
     }
 
+    @Override
     public void removeUserFromGroup(String groupName, String userEmail)
     {
         if (!_driver.isTextPresent("Group " + groupName))
@@ -323,6 +337,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         return selectGroup(groupName, false);
     }
 
+    @Override
     public boolean doesGroupExist(String groupName, String projectName)
     {
         _test.ensureAdminMode();
@@ -337,6 +352,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         return (idx >= 0);
     }
 
+    @Override
     public boolean isUserInGroup(String user, String groupName, String projectName, PrincipalType principalType)
     {
         _test.ensureAdminMode();
@@ -356,6 +372,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         return ret;
     }
 
+    @Override
     public Integer createPermissionsGroup(String groupName, String... memberNames)
     {
         Integer groupId = createPermissionsGroup(groupName);

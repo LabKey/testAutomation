@@ -48,6 +48,7 @@ public class WebDavPage extends LabKeyPage<WebDavPage.ElementCache>
         return elementCache().webDavUrlElement.getText();
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

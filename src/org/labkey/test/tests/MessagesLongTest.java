@@ -92,6 +92,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     private final PortalHelper _portalHelper = new PortalHelper(this);
     private String _messageUserId;
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("announcements");
@@ -128,6 +129,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         stopImpersonating();
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsersIfPresent(USER1, USER2, USER3, RESPONDER, USER);
@@ -519,7 +521,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     {
         clickProject(PROJECT_NAME);
         // USER1 is now a reader
-        log("Test member list");
+        log("Test notify list");
         navBar().goToPermissionsPage()
             .removePermission("Users", "Editor")
             .setPermissions("Users", "Reader")
@@ -591,7 +593,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         // Also tests persistence of member list changes.
         setFormElement(Locator.id(MEMBER_LIST),USER1);
         clickButton("Submit");
-        assertTextPresent(_userHelper.getDisplayNameForEmail("Members: " + USER1));
+        assertTextPresent(_userHelper.getDisplayNameForEmail("Notify: " + USER1));
         assertTextNotPresent(USER1);
         stopImpersonating();
         log("Verify admin user still sees email address");
@@ -602,7 +604,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
     private void verifyMemberList()
     {
-        assertTextPresent("Members: "+ USER1 + " (" + _userHelper.getDisplayNameForEmail(USER1) +")");
+        assertTextPresent("Notify: "+ USER1 + " (" + _userHelper.getDisplayNameForEmail(USER1) +")");
     }
 
 
@@ -688,7 +690,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         // Check defaults for uncustomized message board
         assertElementNotPresent(Locator.lkLabel("Status"));
         assertElementNotPresent(Locator.lkLabel("Assigned To"));
-        assertElementNotPresent(Locator.lkLabel("Members"));
+        assertElementNotPresent(Locator.lkLabel("Notify"));
         assertElementNotPresent(Locator.lkLabel("Expires"));
 
         setFormElement(Locator.name("title"), MSG1_TITLE);

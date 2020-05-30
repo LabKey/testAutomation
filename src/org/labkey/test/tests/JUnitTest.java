@@ -103,9 +103,12 @@ public class JUnitTest extends TestSuite
 
     public static class JUnitSeleniumHelper extends BaseWebDriverTest
     {
+        @Override
         protected String getProjectName() {return null;}
+        @Override
         protected void doCleanup(boolean afterTest) throws TestTimeoutException
         { }
+        @Override
         public List<String> getAssociatedModules() { return null; }
 
         @Override public BrowserType bestBrowser() {return BrowserType.CHROME;}

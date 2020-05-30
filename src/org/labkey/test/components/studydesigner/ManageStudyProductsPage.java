@@ -117,6 +117,7 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
         doAndWaitForPageToLoad(() -> elements().saveButton.click());
     }
 
+    @Override
     public void cancel()
     {
         elements().cancelButton.click();

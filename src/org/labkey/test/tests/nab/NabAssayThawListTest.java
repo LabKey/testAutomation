@@ -62,6 +62,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
     private final String THAW_LIST_BAD_DATATYPES = THAW_LIST_NAME + "BadDataTypes";
     private static final File THAW_LIST_ARCHIVE_BAD_DATATYPES = TestFileUtils.getSampleData("Nab/" + THAW_LIST_NAME + "_BAD_DATATYPES.zip");
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("nab");

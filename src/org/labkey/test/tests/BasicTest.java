@@ -60,6 +60,7 @@ public class BasicTest extends BaseWebDriverTest
         _containerHelper = new UIContainerHelper(this);
     }
 
+    @Override
     protected String getProjectName()
     {
         return PROJECT_NAME;
@@ -180,6 +181,7 @@ public class BasicTest extends BaseWebDriverTest
         Assert.assertEquals("Initial user action did not redirect properly when logged in", expectedTitle, getDriver().getTitle());
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("core");

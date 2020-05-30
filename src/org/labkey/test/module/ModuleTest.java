@@ -30,6 +30,7 @@ public class ModuleTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "ModuleVerifyProject";
     private static final String TEST_MODULE_TEMPLATE_FOLDER_NAME = "testmodule";
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -47,6 +48,7 @@ public class ModuleTest extends BaseWebDriverTest
         assertTextPresent("Hello, and welcome to the " + TEST_MODULE_TEMPLATE_FOLDER_NAME + " module.");
     }
     
+    @Override
     public List<String> getAssociatedModules()
     {
         return null;
