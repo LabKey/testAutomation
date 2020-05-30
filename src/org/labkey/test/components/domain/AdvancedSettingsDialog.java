@@ -182,6 +182,7 @@ public class AdvancedSettingsDialog extends ModalDialog
 
     public AdvancedSettingsDialog setMissingValuesEnabled(boolean checked)
     {
+        getWrapper().scrollIntoView(Locator.name("domainpropertiesrow-mvEnabled"));
         elementCache().enableMissingValues.set(checked);
         getWrapper().waitFor(()-> elementCache().enableMissingValues.get().equals(checked),
                 "missingValue checkbox was not set as expected", 1000);
