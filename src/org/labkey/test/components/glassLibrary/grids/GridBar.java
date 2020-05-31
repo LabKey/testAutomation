@@ -367,7 +367,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     {
         CSV("fa-file-o"),
         EXCEL("fa-file-excel-o"),
-        TSV("fa-text-o");
+        TSV("fa-file-text-o");
 
         private final String _cssClass;
 

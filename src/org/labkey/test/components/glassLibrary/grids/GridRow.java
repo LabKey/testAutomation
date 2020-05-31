@@ -1,16 +1,20 @@
 package org.labkey.test.components.glassLibrary.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static org.labkey.test.util.TestLogger.log;
 
 public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 {
@@ -47,9 +51,33 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return Locator.tag("td").index(colIndex).findElement(this);
     }
 
+    public WebElement getCell(String columnHeader)
+    {
+        return getCell(_grid.getColumnIndex(columnHeader));
+    }
+
     public boolean contains(Locator loc)
     {
         return loc.existsIn(this);
+    }
+
+    private WebElement getLink(String text)
+    {
+        log("seeking link with text [" + text + "]");
+        WebElement link = Locator.linkWithText(text).findElement(getComponentElement());
+        getWrapper().scrollIntoView(link);
+        log("found element with text [" + link.getText() + "]");
+        return link;
+    }
+
+    public void clickLink(String text)
+    {
+        WebElement link = getLink(text);
+        String href = link.getAttribute("href");
+        link.click();
+        log("waiting for url to be: [" + href + "]");
+        WebDriverWrapper.waitFor(()-> getWrapper().getURL().toString().endsWith(href), 1000);
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(link));
     }
 
     public String getValue(String columnText)

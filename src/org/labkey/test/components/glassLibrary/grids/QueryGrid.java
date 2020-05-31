@@ -8,9 +8,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,27 +57,58 @@ public class QueryGrid extends WebDriverComponent
         return _driver;
     }
 
-    public ResponsiveGrid getGrid()
+    // get rowMaps
+
+    public Map<String, String> getRowMap(int rowIndex)
     {
-        _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).find(_queryGridPanel);
-        return _responsiveGrid;
+        return getGrid().getRowMap(rowIndex);
     }
 
     public Map<String, String> getRowMap(String containsText)
     {
-        GridRow row = getGrid().getRow(containsText).orElseThrow();
+        GridRow row = getGrid().getRow(containsText).orElseThrow(()->
+                new NotFoundException("No row was found with value ["+ containsText +"]"));
         return row.getRowMap();
     }
 
-    public Map<String, String> getRowMap(String column, String containsText)
+    public Map<String, String> getRowMap(String containsText, String column)
     {
-        GridRow row = getGrid().getRow(column, containsText).orElseThrow();
+        GridRow row = getGrid().getRow(containsText, column).orElseThrow(()->
+                new NotFoundException("No row was found with value ["+ containsText +"] in column ["+ column +"]"));
         return row.getRowMap();
+    }
+
+    public Map<String, String> getRowMap(Locator.XPathLocator containing)
+    {
+        return getGrid().getRow(containing).orElseThrow(()->
+                new NotFoundException("No row was found with  ["+ containing +"]")).getRowMap();
     }
 
     public List<Map<String, String>> getRowMaps()
     {
         return getGrid().getRowMaps();
+    }
+
+    // row selection
+
+    public QueryGrid selectRow(int index, boolean checked)
+    {
+        getGrid().getRows().get(index).select(checked);
+        return this;
+    }
+
+    public QueryGrid selectRow(String column, String containsText, boolean checked)
+    {
+        getGrid().getRow(containsText, column).orElseThrow(()->
+                new NotFoundException("No row was found with value ["+ containsText +"] in column ["+ column +"]"))
+                .select(checked);
+        return this;
+    }
+
+
+    public List<String> getColumnNames()
+    {
+        return getGrid().getColumnNames();
     }
 
     public boolean hasTabs() { return _gridTabBar.isPresent(); }
@@ -106,6 +139,14 @@ public class QueryGrid extends WebDriverComponent
         return errorMsg;
     }
 
+    // subcomponent getters
+
+    public ResponsiveGrid getGrid()
+    {
+        _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).find(_queryGridPanel);
+        return _responsiveGrid;
+    }
+
     public GridBar getGridBar()
     {
         return _gridBar;
@@ -116,6 +157,8 @@ public class QueryGrid extends WebDriverComponent
         return _gridTabBar.orElseThrow();
     }
 
+    // record count
+
     public int getRecordCount()
     {
         return _gridBar.getRecordCount();
@@ -125,6 +168,44 @@ public class QueryGrid extends WebDriverComponent
     {
         WebDriverWrapper.waitFor(()-> getRecordCount() == expectedCount,
                 "did not get to the expected record count ["+expectedCount+"] in time",  WAIT_FOR_JAVASCRIPT);
+        return this;
+    }
+
+    // search, sort and filter methods
+
+    public QueryGrid search(String searchTerm)
+    {
+        getGrid().doAndWaitForUpdate(()->
+                getGridBar().getOmniBox().setSearch(searchTerm));
+        return this;
+    }
+
+    public QueryGrid sortOn(String column, boolean descending)
+    {
+        getGrid().doAndWaitForUpdate(()->
+                getGridBar().getOmniBox().setSort(column, descending));
+        return this;
+    }
+
+    public QueryGrid filterOn(String columnName, String operator, String value)
+    {
+        getGrid().doAndWaitForUpdate(()->
+                getGridBar().getOmniBox().setFilter(columnName, operator, value));
+        return this;
+    }
+
+    public QueryGrid clearSortsAndFilters()
+    {
+        getGrid().doAndWaitForUpdate(()->
+                getGridBar().getOmniBox().clearAll());
+        return this;
+    }
+
+    // select view
+    public QueryGrid selectView(String viewName)
+    {
+        getGrid().doAndWaitForUpdate(()->
+                getGridBar().doMenuAction("Grid Views", Arrays.asList(viewName)));
         return this;
     }
 

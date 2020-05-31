@@ -5,11 +5,12 @@
 package org.labkey.test.components.glassLibrary.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
-import org.openqa.selenium.By;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.util.TestLogger.log;
 
 public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCache>
 {
@@ -87,36 +87,33 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return elementCache().emptyGrid.isEmpty();
     }
 
-    public List<GridRow> getRows()
-    {
-        return new GridRow.GridRowFinder(this).findAll(getComponentElement());
-    }
-
-    // TODO Responsive grids cannot be sorted, this should be moved to QueryGrid (or what ever it will be called).
+    /**
+     * Sorts from the grid header menu (rather than from the omnibox)
+     * @param columnName
+     * @return
+     */
     public ResponsiveGrid sortColumnAscending(String columnName)
     {
-        sortColumn(columnName, false);
+        doAndWaitForUpdate(()->
+            sortColumn(columnName, SortDirection.ASC));
         return this;
     }
 
-    // TODO Responsive grids cannot be sorted, this should be moved to QueryGrid (or what ever it will be called).
+    /**
+     * Sorts from the grid header menu (rather than from the omnibox)
+     * @param columnName
+     * @return
+     */
     public ResponsiveGrid sortColumnDescending(String columnName)
     {
-        sortColumn(columnName, true);
+        doAndWaitForUpdate(()->
+            sortColumn(columnName, SortDirection.DESC));
         return this;
     }
 
-    // TODO Responsive grids cannot be sorted, this should be moved to QueryGrid (or what ever it will be called).
-    public ResponsiveGrid sortOn(String column, boolean descending)
+    private void sortColumn(String columnName, SortDirection direction)
     {
-        sortColumn(column, descending);
-        return this;
-    }
-
-    // TODO Responsive grids cannot be sorted, this should be moved to QueryGrid (or what ever it will be called).
-    private void sortColumn(String columnName, boolean descending)
-    {
-        String sortCls = "fa-sort-amount-" + (descending ? "desc" : "asc");
+        String sortCls = "fa-sort-amount-" + (direction.equals(SortDirection.DESC) ? "desc" : "asc");
         WebElement headerCell = elementCache().getColumnHeaderCell(columnName);
         Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell)
@@ -136,7 +133,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 
     public ResponsiveGrid selectRow(String columnName, String columnValue, boolean checked)
     {
-        getRow(columnName, columnValue).get().select(checked);
+        getRow(columnValue, columnName).get().select(checked);
         return this;
     }
 
@@ -204,7 +201,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 
     private GridRow getRow(int index)
     {
-        return getRows().get(index);
+        return new GridRow.GridRowFinder(this).index(index).find(this);
     }
 
     public Optional<GridRow> getRow(String containsText)
@@ -212,30 +209,27 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return new GridRow.GridRowFinder(this).withValue(containsText).findOptional(this);
     }
 
-    public Optional<GridRow> getRow(String columnHeader, String containsText)
+    public Optional<GridRow> getRow(String containsText, String columnHeader)
     {
         // try to normalize column index to start at 0, excluding row selector column
-        Integer columnIndex = hasSelectColumn() ? getColumnIndex(columnHeader) : getColumnIndex(columnHeader) -1;
+        Integer columnIndex = getColumnIndex(columnHeader);
         return new GridRow.GridRowFinder(this).withValueAtColumnIndex(containsText, columnIndex)
                 .findOptional(this);
     }
 
-    protected WebElement getCell(int rowIndex, int colIndex)
+    public Optional<GridRow> getRow(Locator.XPathLocator containing)
     {
-        return getRows().get(rowIndex).getCell(colIndex);
+        return new GridRow.GridRowFinder(this).withDescendant(containing).findOptional();
     }
 
-    public Integer getRowIndex(String containsText)
+    public List<GridRow> getRows()
     {
-        List<GridRow> rows = getRows();
-        for(int i=0; i<rows.size(); i++ )
-        {
-            if (getRow(i).getValues().contains(containsText))
-            {
-                return i;
-            }
-        }
-        return -1;
+        return new GridRow.GridRowFinder(this).findAll(getComponentElement());
+    }
+
+    protected WebElement getCell(int rowIndex, String columnHeader)
+    {
+        return getRows().get(rowIndex).getCell(columnHeader);
     }
 
     public List<String> getColumnDataAsText(String columnHeader)
@@ -257,23 +251,36 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return elementCache().selectColumn.isPresent();
     }
 
-    protected Integer getColumnIndex(String columnHeader) // gets the column index t
+    /**
+     * used to find the raw index of a given column as rendered in the dom.
+     * To get the normalized index (which excludes selector rows if present) use
+     * elementCache().indexes.get(column).get("normalizedIndex")
+     */
+    protected Integer getColumnIndex(String columnHeader)
     {
-        List<String> columnTexts = getColumnNames();
-        int offset = hasSelectColumn() ? 1 : 0;
-        for (int i=0; i< columnTexts.size(); i++ )
+        if (elementCache().indexes == null)
         {
-            if (columnTexts.get(i).equalsIgnoreCase(columnHeader))
-                return i + offset;  // the presence of a select column in the grid will shift everything right by 1
+            getColumnNames();
         }
-        return -1;
+
+        if (elementCache().indexes.containsKey(columnHeader))
+            return elementCache().indexes.get(columnHeader).get("rawIndex");
+        else
+            return -1;
     }
 
     public List<String> getColumnNames()
     {
-        return elementCache().getColumnNames();
+        elementCache().initColumnsAndIndices();
+        return elementCache().columnNames;
     }
 
+    /**
+     * there are ways to get rowMaps without exposing indexes to outside use
+     * @param rowIndex
+     * @return
+     */
+    @Deprecated
     public List<String> getRowValues(int rowIndex)
     {
         // preserves the ordering of the values as they appear in the row.
@@ -295,7 +302,7 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 
     public String getCellValue(int rowIndex, String columnHeader)
     {
-        return getRowMap(rowIndex).get(columnHeader);
+        return getRow(rowIndex).getValue(columnHeader);
     }
 
     public String getCellValue(WebElement row, String columnHeader)
@@ -339,21 +346,10 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return rowMaps;
     }
 
-    private WebElement getLink(String text)
-    {
-        log("seeking link with text [" + text + "]");
-        WebElement link = getComponentElement().findElement(By.partialLinkText(text));
-        getWrapper().scrollIntoView(link);
-        log("found element with text [" + link.getText() + "]");
-        return link;
-
-    }
-
     public void clickLink(String text)
     {
-        WebElement link = getLink(text);
-        link.click();
-        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(link));
+        getRow(text).orElseThrow(()-> new NotFoundException("did not find a row with a link with text ["+text+"]"))
+                .clickLink(text);
     }
 
     @Override
@@ -389,22 +385,26 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         }
 
         private List<String> columnNames;
-        protected List<String> getColumnNames()
+        private Map<String, Map<String, Integer>> indexes;
+        protected void initColumnsAndIndices()
         {
-            if (columnNames == null)
+            if (columnNames == null || indexes == null)
             {
                 List<WebElement> headerCellElements = Locators.headerCells.findElements(this);
+                int offset = 0;
                 if (hasSelectColumn())
                 {
                     headerCellElements.remove(0);
+                    offset = 1;
                 }
                 columnNames = getWrapper().getTexts(headerCellElements);
+                indexes = new HashMap<>();
                 for (int i = 0; i < headerCellElements.size(); i++)
                 {
                     headerCells.put(columnNames.get(i), headerCellElements.get(i)); // Fill out the headerCells Map since we have them all
+                    indexes.put(columnNames.get(i), Map.of("normalizedIndex", i, "rawIndex", i + offset));
                 }
             }
-            return columnNames;
         }
     }
 
