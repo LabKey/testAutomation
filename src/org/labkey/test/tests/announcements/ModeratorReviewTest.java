@@ -191,20 +191,80 @@ public class ModeratorReviewTest extends BaseWebDriverTest
     private void verifyMessage(String title, boolean expect)
     {
         goToProjectHome();
-        if (expect)
-            assertTextPresent(title);
+        boolean condition = false;
+        int tries = 0;
+
+        // Give the message a change to show up, or be removed, from the home page.
+        while(!condition && tries < 5)
+        {
+            if (expect)
+                condition = isTextPresent(title);
+            else
+                condition = !isTextPresent(title);
+
+            // If the expected condition has been met, then break out of the loop.
+            if(condition)
+                break;
+
+            sleep(1_000);
+            refresh();
+            tries++;
+        }
+
+        if(!condition)
+        {
+            String msgFormat;
+            if(expect)
+                msgFormat = "Expected message with title '%s' was not present on home page.";
+            else
+                msgFormat = "Expected message with title '%s' was present on home page, it should not be.";
+
+            checker().fatal().error(String.format(msgFormat, title));
+        }
         else
-            assertTextNotPresent(title);
-        verifyNotification(title, expect);
+        {
+            verifyNotification(title, expect);
+        }
+
     }
 
     private void verifyNotification(String title, boolean expect)
     {
         goToModule("Dumbster");
-        EmailRecordTable.EmailMessage notification = new EmailRecordTable(this).getMessage(title);
-        if (expect)
-            assertNotNull("Expected email notification for message '" + title + "'", notification);
-        else
-            assertNull("Expected no email notification for message '" + title + "'", notification);
+        EmailRecordTable.EmailMessage notification;
+        boolean condition = false;
+        int tries = 0;
+
+        // Try five times for the expected condition to be met.
+        while (!condition && tries < 5)
+        {
+            notification = new EmailRecordTable(this).getMessage(title);
+
+            if(expect)
+                condition = notification != null;
+            else
+                condition = notification == null;
+
+            // If the expected condition has been met, then break out of the loop.
+            if(condition)
+                break;
+
+            sleep(1_000);
+            refresh();
+            tries++;
+
+        }
+
+        if(!condition)
+        {
+            String msgFormat;
+            if(expect)
+                msgFormat = "Expected email notification for message '%s' was not present.";
+            else
+                msgFormat = "Email notification for message '%s' was present, it should not be.";
+
+            checker().fatal().error(String.format(msgFormat, title));
+        }
+
     }
 }
