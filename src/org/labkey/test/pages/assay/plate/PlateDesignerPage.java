@@ -149,7 +149,7 @@ public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache
             return params;
         }
 
-        public Locator templateListLocator()
+        public String templateListOption()
         {
             StringBuilder sb = new StringBuilder();
             sb.append("new ")
@@ -165,8 +165,7 @@ public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache
                 sb.append(" ").append(templateType);
             }
             sb.append(" template");
-
-            return Locator.linkWithText(sb.toString());
+            return sb.toString();
         }
 
         public static PlateDesignerParams _96well()
