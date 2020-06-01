@@ -28,6 +28,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.DataRegionTable;
@@ -103,10 +105,11 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Assay List");
 
-        clickButton("Manage Assays");
-
-        clickButton("Configure Plate Templates");
-        clickAndWait(Locator.linkWithText("new 384 well (16x24) NAb multi-virus plate template"));
+        PlateTemplateListPage templateListPage = PlateTemplateListPage.beginAt(this);
+        templateListPage.clickNewPlate((PlateDesignerPage.PlateDesignerParams
+                ._384well()
+                .setAssayType("NAb")
+                .setTemplateType("multi-virus plate")));
 
         waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//input[@id='templateName']"), PLATE_TEMPLATE_NAME);

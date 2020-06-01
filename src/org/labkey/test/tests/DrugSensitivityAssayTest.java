@@ -22,6 +22,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -183,9 +185,11 @@ public class DrugSensitivityAssayTest extends AbstractAssayTest
 
     protected void createTemplate()
     {
-        clickButton("Manage Assays");
-        clickButton("Configure Plate Templates");
-        clickAndWait(Locator.linkWithText("new 96 well (8x12) Drug Sensitivity default template"));
+        PlateTemplateListPage templateListPage = PlateTemplateListPage.beginAt(this);
+        templateListPage.clickNewPlate((PlateDesignerPage.PlateDesignerParams
+                ._96well()
+                .setAssayType("Drug Sensitivity")
+                .setTemplateType("default")));
         final WebElement nameField = waitForElement(Locator.id("templateName"), WAIT_FOR_JAVASCRIPT);
         setFormElement(nameField, PLATE_TEMPLATE_NAME);
         fireEvent(nameField, SeleniumEvent.change);

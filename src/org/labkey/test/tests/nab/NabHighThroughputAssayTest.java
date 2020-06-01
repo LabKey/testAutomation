@@ -26,6 +26,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
@@ -79,11 +81,11 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         portalHelper.addWebPart("Assay List");
         clickProject(getProjectName());
 
-        //create a new nab assay
-        clickButton("Manage Assays");
-
-        clickButton("Configure Plate Templates");
-        clickAndWait(Locator.linkWithText("new 384 well (16x24) NAb high-throughput (single plate dilution) template"));
+        PlateTemplateListPage templateListPage = PlateTemplateListPage.beginAt(this);
+        templateListPage.clickNewPlate((PlateDesignerPage.PlateDesignerParams
+                ._384well()
+                .setAssayType("NAb")
+                .setTemplateType("high-throughput (single plate dilution)")));
 
         Locator.IdLocator nameField = Locator.id("templateName");
         waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
@@ -94,7 +96,11 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         assertTextPresent(PLATE_TEMPLATE_NAME);
 
         // create the cross plate dilution template
-        clickAndWait(Locator.linkWithText("new 384 well (16x24) NAb high-throughput (cross plate dilution) template"));
+        templateListPage = PlateTemplateListPage.beginAt(this);
+        templateListPage.clickNewPlate((PlateDesignerPage.PlateDesignerParams
+                ._384well()
+                .setAssayType("NAb")
+                .setTemplateType("high-throughput (cross plate dilution)")));
 
         waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
         setFormElement(nameField, CPD_PLATE_TEMPLATE_NAME);
