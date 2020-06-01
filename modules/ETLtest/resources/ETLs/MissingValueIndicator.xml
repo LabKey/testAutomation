@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Missing value Indicator</name>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <source schemaName="lists" queryName="MissingValueIndicatorSrcList"></source>
+            <destination schemaName="lists" queryName="MissingValueIndicatorDestList"/>
+        </transform>
+    </transforms>
+</etl>
