@@ -5,6 +5,7 @@
 package org.labkey.test.components.glassLibrary.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.NoSuchElementException;
@@ -180,10 +181,10 @@ public class QueryGrid extends WebDriverComponent
         return this;
     }
 
-    public QueryGrid sortOn(String column, boolean descending)
+    public QueryGrid sortOn(String column, SortDirection direction)
     {
         getGrid().doAndWaitForUpdate(()->
-                getGridBar().getOmniBox().setSort(column, descending));
+                getGridBar().getOmniBox().setSort(column, direction));
         return this;
     }
 
