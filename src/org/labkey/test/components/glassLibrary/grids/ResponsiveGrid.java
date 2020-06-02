@@ -352,6 +352,19 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
                 .clickLink(text);
     }
 
+    public boolean gridMessagePresent()
+    {
+        return Locator.tagWithClass("div", "grid-messages")
+                .withChild(Locator.tagWithClass("div", "grid-message")).existsIn(this);
+    }
+
+    public List<String> getGridMessages()
+    {
+        return getWrapper().getTexts(Locator.tagWithClass("div", "grid-messages")
+                .child(Locator.tagWithClass("div", "grid-message")).findElements(this));
+    }
+
+
     @Override
     protected ElementCache newElementCache()
     {
