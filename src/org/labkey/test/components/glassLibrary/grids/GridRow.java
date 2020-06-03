@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.TestLogger.log;
 
 public class GridRow extends WebDriverComponent<GridRow.ElementCache>
@@ -42,6 +43,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     public GridRow select(boolean checked)
     {
+        assertTrue("The row does not have a select box", hasSelectColumn());
         elementCache().selectCheckbox.set(checked);
         return this;
     }
@@ -61,31 +63,33 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return loc.existsIn(this);
     }
 
-    private WebElement getLink(String text)
+    public void clickLink(String text)
     {
         log("seeking link with text [" + text + "]");
         WebElement link = Locator.linkWithText(text).findElement(getComponentElement());
-        getWrapper().scrollIntoView(link);
         log("found element with text [" + link.getText() + "]");
-        return link;
-    }
-
-    public void clickLink(String text)
-    {
-        WebElement link = getLink(text);
         String href = link.getAttribute("href");
         link.click();
         log("waiting for url to be: [" + href + "]");
-        WebDriverWrapper.waitFor(()-> getWrapper().getURL().toString().endsWith(href), 1000);
-        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(link));
+        WebDriverWrapper.waitFor(()-> getWrapper().getURL().toString().endsWith(href) &&
+                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(link)), 1000);
     }
 
-    public String getValue(String columnText)
+    /**
+     * Returns the text in the row for the specified column
+     * @param columnText
+     * @return
+     */
+    public String getText(String columnText)
     {
         return getRowMap().get(columnText);
     }
 
-    public List<String> getValues()
+    /**
+     * Returns a list of the row values as text
+     * @return
+     */
+    public List<String> getTexts()
     {
         List<String> columnValues = getWrapper().getTexts(Locator.css("td")
                 .findElements(getComponentElement()));
@@ -100,7 +104,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         {
             _rowMap = new HashMap<>();
             List<String> columns = _grid.getColumnNames();
-            List<String> rowCellTexts = getValues();
+            List<String> rowCellTexts = getTexts();
             for (int i = 0; i < columns.size(); i++)
             {
                 _rowMap.put(columns.get(i), rowCellTexts.get(i));
@@ -158,25 +162,45 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
             return this;
         }
 
+        /**
+         * Matches rows with a checked selector box
+         * @return
+         */
         public GridRowFinder withCheckedBox()
         {
             _locator = _cssLocator.append(Locator.css(" input:checked[type=checkbox]"));
             return this;
         }
 
+        /**
+         * Matches rows with a descendant described by the supplied locator
+         * @param descendant
+         * @return
+         */
         public GridRowFinder withDescendant(Locator.XPathLocator descendant)
         {
             _locator = _xPathLocator.withDescendant(descendant);
             return this;
         }
 
-        public GridRowFinder withValue(String value)
+        /**
+         * Matches rows with a cell matching the full text supplied
+         * @param text
+         * @return
+         */
+        public GridRowFinder withCellWithText(String text)
         {
-            _locator = _xPathLocator.withChild(Locator.tagWithText("td", value));
+            _locator = _xPathLocator.withChild(Locator.tagWithText("td", text));
             return this;
         }
 
-        public GridRowFinder withValueAtColumnIndex(String value, int columnIndex)
+        /**
+         * Returns the first row with matching text in the specified column
+         * @param value
+         * @param columnIndex
+         * @return
+         */
+        protected GridRowFinder withTextAtColumn(String value, int columnIndex)
         {
             _locator = _xPathLocator.withChild(Locator.tag("td").index(columnIndex).withText(value));
             return this;

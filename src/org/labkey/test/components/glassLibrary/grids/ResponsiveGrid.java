@@ -27,8 +27,6 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 {
     final WebElement _gridElement;
     private WebDriver _driver;
-    private List<Map<String, String>> _gridData;
-    private List<GridRow> _gridRows;
 
     protected ResponsiveGrid(WebElement queryGrid, WebDriver driver)
     {
@@ -71,7 +69,6 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
     protected void clearElementCache()
     {
         super.clearElementCache();
-        _gridData = null;
     }
 
     public void doAndWaitForUpdate(Runnable func)
@@ -204,19 +201,35 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return new GridRow.GridRowFinder(this).index(index).find(this);
     }
 
+    /**
+     * Returns the first row containing a cell with matching full text
+     * @param containsText
+     * @return
+     */
     public Optional<GridRow> getRow(String containsText)
     {
-        return new GridRow.GridRowFinder(this).withValue(containsText).findOptional(this);
+        return new GridRow.GridRowFinder(this).withCellWithText(containsText).findOptional(this);
     }
 
+    /**
+     * Returns the first row with matching text in the specified column
+     * @param containsText The full text of the cell to match
+     * @param columnHeader The exact text of the column header
+     * @return
+     */
     public Optional<GridRow> getRow(String containsText, String columnHeader)
     {
         // try to normalize column index to start at 0, excluding row selector column
         Integer columnIndex = getColumnIndex(columnHeader);
-        return new GridRow.GridRowFinder(this).withValueAtColumnIndex(containsText, columnIndex)
+        return new GridRow.GridRowFinder(this).withTextAtColumn(containsText, columnIndex)
                 .findOptional(this);
     }
 
+    /**
+     * Returns the first row containing a descendant matching the supplied locator
+     * @param containing
+     * @return
+     */
     public Optional<GridRow> getRow(Locator.XPathLocator containing)
     {
         return new GridRow.GridRowFinder(this).withDescendant(containing).findOptional();
@@ -227,17 +240,12 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return new GridRow.GridRowFinder(this).findAll(getComponentElement());
     }
 
-    protected WebElement getCell(int rowIndex, String columnHeader)
-    {
-        return getRows().get(rowIndex).getCell(columnHeader);
-    }
-
     public List<String> getColumnDataAsText(String columnHeader)
     {
         List<String> columnData = new ArrayList<>();
         for (GridRow row : getRows())
         {
-            columnData.add(row.getValue(columnHeader));
+            columnData.add(row.getText(columnHeader));
         }
         return columnData;
     }
@@ -281,74 +289,57 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
      * @return
      */
     @Deprecated
-    public List<String> getRowValues(int rowIndex)
+    public List<String> getRowTexts(int rowIndex)
     {
         // preserves the ordering of the values as they appear in the row.
         if (!hasData())
             throw new IllegalStateException("Attempting to get a row by index, but no rows exist");
 
-        return getRow(rowIndex).getValues();
+        return getRow(rowIndex).getTexts();
     }
 
+    /**
+     * we should avoid having test code rely on row indexes; find the row by text/column where possible
+     * @param rowIndex
+     * @return
+     */
+    @Deprecated
     public Map<String, String> getRowMap(int rowIndex)
     {
         return getRow(rowIndex).getRowMap();
     }
 
-    public Map<String, String> getRowMap(WebElement row)
+    /**
+     * Where possible, avoid using row index in test code; use text/column or other means to get a GridRow
+     * @param rowIndex
+     * @param columnHeader
+     * @return
+     */
+    @Deprecated
+    public String getCellText(int rowIndex, String columnHeader)
     {
-        return new GridRow(this, row, getDriver()).getRowMap();
-    }
-
-    public String getCellValue(int rowIndex, String columnHeader)
-    {
-        return getRow(rowIndex).getValue(columnHeader);
-    }
-
-    public String getCellValue(WebElement row, String columnHeader)
-    {
-        return getRowMap(row).get(columnHeader);
+        return getRow(rowIndex).getText(columnHeader);
     }
 
     public List<Map<String, String>> getRowMaps()
     {
-        if(null == _gridData)
+        if(null == elementCache().mapList)
         {
-            _gridData = _initGridData();
+            elementCache().mapList = elementCache()._initGridData();
         }
-        return _gridData;
-    }
-
-    /**
-     * Call this function to force a re-initialization of the internal data representation of the grid data.
-     * When trying to be more efficient the grid data is stored in an internal variable (so this is a stateful object).
-     * On creates the internal grid data is initialize by calling waitForLoaded. The waitForLoaded function  is also
-     * called when the page/grid is navigated, but it is not when a search, or ordering is done. As a temporary work
-     * around this function is made public so the calling function can update the data.
-     *
-     * The real fix would be to add an event listener to the grid and reinitialize the internal data when it detects a change.
-     *
-     */
-    public void initGridData()
-    {
-        waitForLoaded();
-        _gridData = _initGridData();
-    }
-
-    private List<Map<String, String>> _initGridData()
-    {
-        List<Map<String, String>> rowMaps = new ArrayList<>();
-        _gridRows = getRows();
-        for(GridRow row : _gridRows)
-        {
-            rowMaps.add(row.getRowMap());
-        }
-        return rowMaps;
+        return elementCache().mapList;
     }
 
     public void clickLink(String text)
     {
-        getRow(text).orElseThrow(()-> new NotFoundException("did not find a row with a link with text ["+text+"]"))
+        getRow(text).orElseThrow(()-> new NotFoundException("Did not find a row with a link with text ["+text+"]"))
+                .clickLink(text);
+    }
+
+    public void clickLink(String text, String column)
+    {
+        getRow(text, column)
+                .orElseThrow(()-> new NotFoundException("Did not find a row with a link with text ["+text+"] at column ["+column+"]"))
                 .clickLink(text);
     }
 
@@ -364,6 +355,21 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
                 .child(Locator.tagWithClass("div", "grid-message")).findElements(this));
     }
 
+    /**
+     * Call this function to force a re-initialization of the internal data representation of the grid data.
+     * When trying to be more efficient the grid data is stored in an internal variable (so this is a stateful object).
+     * On creates the internal grid data is initialize by calling waitForLoaded. The waitForLoaded function  is also
+     * called when the page/grid is navigated, but it is not when a search, or ordering is done. As a temporary work
+     * around this function is made public so the calling function can update the data.
+     *
+     * The real fix would be to add an event listener to the grid and reinitialize the internal data when it detects a change.
+     *
+     */
+    public void initGridData()
+    {
+        waitForLoaded();
+        elementCache().mapList = elementCache()._initGridData();
+    }
 
     @Override
     protected ElementCache newElementCache()
@@ -418,6 +424,19 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
                     indexes.put(columnNames.get(i), Map.of("normalizedIndex", i, "rawIndex", i + offset));
                 }
             }
+        }
+
+        protected List<Map<String, String>> mapList;
+        protected List<GridRow> gridRows;
+        private List<Map<String, String>> _initGridData()
+        {
+            List<Map<String, String>> rowMaps = new ArrayList<>();
+            elementCache().gridRows = getRows();
+            for(GridRow row : elementCache().gridRows)
+            {
+                rowMaps.add(row.getRowMap());
+            }
+            return rowMaps;
         }
     }
 
