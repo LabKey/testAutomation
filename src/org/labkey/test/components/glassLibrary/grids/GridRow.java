@@ -92,7 +92,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     public List<String> getTexts()
     {
         List<String> columnValues = getWrapper().getTexts(Locator.css("td")
-                .findElements(getComponentElement()));
+                .findElements(this));
         if (hasSelectColumn())
             columnValues.remove(0);
         return columnValues;
@@ -143,11 +143,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     public static class GridRowFinder extends WebDriverComponentFinder<GridRow, GridRowFinder>
     {
-        private Locator _locator = Locator.tag("tbody").child("tr").withoutClass("grid-empty").withoutClass("grid-loading");
-        private Locator.CssLocator _cssLocator = Locator.css("tbody").child("tr")
-                .withoutClass("grid-empty").withoutClass("grid-loading");
-        private Locator.XPathLocator _xPathLocator = Locator.tag("tbody").child("tr")
-                .withoutClass("grid-empty").withoutClass("grid-loading");
+        private Locator.XPathLocator _locator = Locator.tag("tbody").child("tr").withoutClass("grid-empty").withoutClass("grid-loading");
         private ResponsiveGrid _grid;
 
         public GridRowFinder(ResponsiveGrid grid)
@@ -156,19 +152,9 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
             _grid = grid;
         }
 
-        public GridRowFinder atIndex(int index)
+        protected GridRowFinder atIndex(int index)
         {
-            _locator = _xPathLocator.index(index);
-            return this;
-        }
-
-        /**
-         * Matches rows with a checked selector box
-         * @return
-         */
-        public GridRowFinder withCheckedBox()
-        {
-            _locator = _cssLocator.append(Locator.css(" input:checked[type=checkbox]"));
+            _locator = _locator.index(index);
             return this;
         }
 
@@ -179,7 +165,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
          */
         public GridRowFinder withDescendant(Locator.XPathLocator descendant)
         {
-            _locator = _xPathLocator.withDescendant(descendant);
+            _locator = _locator.withDescendant(descendant);
             return this;
         }
 
@@ -190,7 +176,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
          */
         public GridRowFinder withCellWithText(String text)
         {
-            _locator = _xPathLocator.withChild(Locator.tagWithText("td", text));
+            _locator = _locator.withChild(Locator.tagWithText("td", text));
             return this;
         }
 
@@ -202,7 +188,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
          */
         protected GridRowFinder withTextAtColumn(String value, int columnIndex)
         {
-            _locator = _xPathLocator.withChild(Locator.tag("td").index(columnIndex).withText(value));
+            _locator = _locator.withChild(Locator.tag("td").index(columnIndex).withText(value));
             return this;
         }
 

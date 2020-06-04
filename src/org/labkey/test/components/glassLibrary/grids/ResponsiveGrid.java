@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 
@@ -122,30 +123,34 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         getWrapper().waitFor(()-> !menuItem.isDisplayed(), 1000);
     }
 
+    /**
+     * where possible, use text, column or other strategies to get the row
+     * @param index
+     * @param checked
+     * @return
+     */
+    @Deprecated
     public ResponsiveGrid selectRow(int index, boolean checked)
     {
         getRow(index).select(checked);
         return this;
     }
 
-    public ResponsiveGrid selectRow(String columnName, String columnValue, boolean checked)
+    public ResponsiveGrid selectRow(String text, String columnName, boolean checked)
     {
-        getRow(columnValue, columnName).get().select(checked);
+        getRow(text, columnName)
+            .orElseThrow(()-> new NotFoundException("did not find a row with text ["+text+"] in column ["+columnName+"]."))
+            .select(checked);
         return this;
     }
 
-    // TODO consider refactoring to use selectRow above in tests
-    public ResponsiveGrid selectRow(String columnName, List<String> columnValues, boolean checked)
+    public ResponsiveGrid selectRows(List<String> texts, String columnName, boolean checked)
     {
-        List<Map<String, String>> gridData = getRowMaps();
-        int index = 0;
-
-        for(Map<String, String> rowData : gridData)
+        for (String text : texts)
         {
-            if(columnValues.contains(rowData.get(columnName)))
-                selectRow(index, checked);
-
-            index++;
+            getRow(text, columnName)
+                .orElseThrow(() -> new NotFoundException("did not find a row with text [" + text + "] in column [" + columnName + "]."))
+                .select(checked);
         }
 
         return this;
@@ -233,7 +238,8 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
      */
     public List<GridRow> getSelectedRows()
     {
-        return new GridRow.GridRowFinder(this).withCheckedBox().findAll(this);
+        return new GridRow.GridRowFinder(this).findAll(this)
+                .stream().filter(a -> a.isSelected()).collect(Collectors.toList());
     }
 
     private GridRow getRow(int index)
