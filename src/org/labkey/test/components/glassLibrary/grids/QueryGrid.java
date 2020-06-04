@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -128,6 +129,7 @@ public class QueryGrid extends WebDriverComponent
     @Deprecated
     public QueryGrid selectRow(int index, boolean checked)
     {
+        assertTrue("Grid must have a select column to select rows", getGrid().hasSelectColumn());
         getGrid().getRows().get(index).select(checked);
         return this;
     }
@@ -141,6 +143,7 @@ public class QueryGrid extends WebDriverComponent
      */
     public QueryGrid selectRow(String text, String column, boolean checked)
     {
+        assertTrue("Grid must have a select column to select rows", getGrid().hasSelectColumn());
         getGrid().getRow(text, column).orElseThrow(()->
                 new NotFoundException("No row was found with value ["+ text +"] in column ["+ column +"]"))
                 .select(checked);

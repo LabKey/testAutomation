@@ -151,10 +151,39 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return this;
     }
 
+    /**
+     * where possible, find ways to identify rows other than via index
+     * use
+     * @param index
+     * @return
+     */
+    @Deprecated
     public boolean isRowSelected(int index)
     {
-        GridRow row = new GridRow.GridRowFinder(this).index(index).find(this);
-        return row.isSelected();
+       return new GridRow.GridRowFinder(this).index(index).find(this).isSelected();
+    }
+
+    /**
+     * returns whether or not the selector checkbox in the first row containing the specified text
+     * @param text
+     * @return
+     */
+    public boolean isRowSelected(String text)
+    {
+        return new GridRow.GridRowFinder(this).withCellWithText(text)
+                .find(this).isSelected();
+    }
+
+    /**
+     * returns whether or not the checkbox in the specified row is checked
+     * @param text
+     * @param column
+     * @return
+     */
+    public boolean isRowSelected(String text, String column)
+    {
+        return new GridRow.GridRowFinder(this).withTextAtColumn(text, getColumnIndex(column))
+                .find(this).isSelected();
     }
 
     protected Checkbox selectAllBox()
@@ -164,8 +193,15 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return box;
     }
 
-    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
-    public boolean areElementsSelected()
+    /**
+     * Use this method to know if the 'selectAllBox' is checked.
+     * Note: it has three possible states:
+     *      checked (meaning all rows on the page are selected)
+     *      indeterminate (meaning some rows are selected but others are not)
+     *      unchecked (meaning no rows on the page are selected)
+     * @return
+     */
+    public boolean areAllRowsOnPageSelected()
     {
         Checkbox box = selectAllBox();
 
@@ -191,6 +227,10 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return this;
     }
 
+    /**
+     * Returns a list of visible GridRows that are selected
+     * @return
+     */
     public List<GridRow> getSelectedRows()
     {
         return new GridRow.GridRowFinder(this).withCheckedBox().findAll(this);
