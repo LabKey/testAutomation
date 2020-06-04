@@ -60,31 +60,57 @@ public class QueryGrid extends WebDriverComponent
 
     // get rowMaps
 
+    /**
+     * Where possible, use text
+     * @param rowIndex
+     * @return
+     */
+    @Deprecated
     public Map<String, String> getRowMap(int rowIndex)
     {
         return getGrid().getRowMap(rowIndex);
     }
 
-    public Map<String, String> getRowMap(String containsText)
+    /**
+     * Returns the first row with a column text equivalent to the supplied text
+     * @param text
+     * @return
+     */
+    public Map<String, String> getRowMap(String text)
     {
-        GridRow row = getGrid().getRow(containsText).orElseThrow(()->
-                new NotFoundException("No row was found with value ["+ containsText +"]"));
+        GridRow row = getGrid().getRow(text).orElseThrow(()->
+                new NotFoundException("No row was found with value ["+ text +"]"));
         return row.getRowMap();
     }
 
-    public Map<String, String> getRowMap(String containsText, String column)
+    /**
+     * Returns the first row with the supplied text in the specified column
+     * @param text
+     * @param column    The text in the column header cell
+     * @return
+     */
+    public Map<String, String> getRowMap(String text, String column)
     {
-        GridRow row = getGrid().getRow(containsText, column).orElseThrow(()->
-                new NotFoundException("No row was found with value ["+ containsText +"] in column ["+ column +"]"));
+        GridRow row = getGrid().getRow(text, column).orElseThrow(()->
+                new NotFoundException("No row was found with value ["+ text +"] in column ["+ column +"]"));
         return row.getRowMap();
     }
 
+    /**
+     * returns the first row with a descendant matching the supplied locator
+     * @param containing
+     * @return
+     */
     public Map<String, String> getRowMap(Locator.XPathLocator containing)
     {
         return getGrid().getRow(containing).orElseThrow(()->
                 new NotFoundException("No row was found with  ["+ containing +"]")).getRowMap();
     }
 
+    /**
+     * Returns a list of current rows, as maps
+     * @return
+     */
     public List<Map<String, String>> getRowMaps()
     {
         return getGrid().getRowMaps();
@@ -92,20 +118,34 @@ public class QueryGrid extends WebDriverComponent
 
     // row selection
 
+    /**
+     * Tests should find ways to identify rows without relying on indexes, such as
+     * text/column combination
+     * @param index
+     * @param checked
+     * @return
+     */
+    @Deprecated
     public QueryGrid selectRow(int index, boolean checked)
     {
         getGrid().getRows().get(index).select(checked);
         return this;
     }
 
-    public QueryGrid selectRow(String column, String containsText, boolean checked)
+    /**
+     * Selects or un-selects the first row with the specified text in the specified column
+     * @param text
+     * @param column
+     * @param checked   whether or not to check the box
+     * @return
+     */
+    public QueryGrid selectRow(String text, String column, boolean checked)
     {
-        getGrid().getRow(containsText, column).orElseThrow(()->
-                new NotFoundException("No row was found with value ["+ containsText +"] in column ["+ column +"]"))
+        getGrid().getRow(text, column).orElseThrow(()->
+                new NotFoundException("No row was found with value ["+ text +"] in column ["+ column +"]"))
                 .select(checked);
         return this;
     }
-
 
     public List<String> getColumnNames()
     {
