@@ -1,3 +1,4 @@
+---
 # Workflow to automate merging release branches
 name: Release Merging
 
@@ -9,19 +10,19 @@ on:
 
 jobs:
   merge_release:
-    if: github.event.review.state == 'approved' && github.event.pull_request.user.login == 'github-actions[bot]'
+    if: >
+      github.event.review.state == 'approved' &&
+      github.event.pull_request.user.login == 'github-actions[bot]'
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Merge PR
-      uses: LabKey/gitHubActions/merge-release@master
-      with:
-        target_branch: ${{ github.event.pull_request.base.ref }}
-        merge_branch: ${{ github.event.pull_request.head.ref }}
-        pr_number: ${{ github.event.pull_request.number }}
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Merge PR
+        uses: LabKey/gitHubActions/merge-release@master
+        with:
+          target_branch: ${{ github.event.pull_request.base.ref }}
+          merge_branch: ${{ github.event.pull_request.head.ref }}
+          pr_number: ${{ github.event.pull_request.number }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
