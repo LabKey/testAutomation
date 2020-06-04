@@ -167,8 +167,13 @@ public class QueryGrid extends WebDriverComponent
 
     public QueryGrid waitForRecordCount(int expectedCount)
     {
+        return waitForRecordCount(expectedCount, WAIT_FOR_JAVASCRIPT);
+    }
+
+    public QueryGrid waitForRecordCount(int expectedCount, int milliseconds)
+    {
         WebDriverWrapper.waitFor(()-> getRecordCount() == expectedCount,
-                "did not get to the expected record count ["+expectedCount+"] in time",  WAIT_FOR_JAVASCRIPT);
+                "did not get to the expected record count ["+expectedCount+"] in time",  milliseconds);
         return this;
     }
 
