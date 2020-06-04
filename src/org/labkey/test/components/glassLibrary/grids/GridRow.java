@@ -48,7 +48,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return this;
     }
 
-    public WebElement getCell(int colIndex)
+    private WebElement getCell(int colIndex)
     {
         return Locator.tag("td").index(colIndex).findElement(this);
     }
