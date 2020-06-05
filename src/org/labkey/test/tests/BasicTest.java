@@ -33,6 +33,7 @@ import org.labkey.test.categories.Git;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.WebPart;
+import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.util.UIContainerHelper;
 import org.openqa.selenium.WebElement;
 
@@ -75,24 +76,27 @@ public class BasicTest extends BaseWebDriverTest
     @Test
     public void testSystemSettings()
     {
-        // Disable scheduled system maintenance
-        setSystemMaintenance(false);
+        if (!TestProperties.isPrimaryUserAppAdmin())
+        {
+            // Disable scheduled system maintenance
+            setSystemMaintenance(false);
+        }
 
         goToAdminConsole().goToServerInformationSection();
         WebElement modeElement = Locator.tagWithText("td", "Mode").append("/../td[2]").findElement(getDriver());
         String mode = modeElement.getText();
         if (TestProperties.isDevModeEnabled())
-            Assert.assertEquals("Development", mode); // Verify that we're running in dev mode
-        else
-            Assert.assertEquals("Production", mode); // Unless we're not supposed to be.
+            checker().verifyEquals("Wrong server mode",
+                    TestProperties.isDevModeEnabled() ? "Development" : "Production", mode); // Verify whether we're running in dev mode
 
-        goToAdminConsole().clickSiteSettings();
-        checkRadioButton(Locator.radioButtonByNameAndValue("usageReportingLevel", "NONE"));     // Don't report usage to labkey.org
-        checkRadioButton(Locator.radioButtonByNameAndValue("exceptionReportingLevel", "NONE"));   // Don't report exceptions to labkey.org - we leave the self-report setting unchanged
-        clickButton("Save");
+        CustomizeSitePage customizeSitePage = goToAdminConsole().clickSiteSettings();
+        customizeSitePage.setUsageReportingLevel(CustomizeSitePage.ReportingLevel.NONE); // Don't report usage to labkey.org
+        customizeSitePage.setExceptionReportingLevel(CustomizeSitePage.ReportingLevel.NONE); // Don't report exceptions to labkey.org
+        // Note: leave the self-report setting unchanged
+        customizeSitePage.save();
 
         // Verify scheduled system maintenance is disabled (see above). Can disable this only in dev mode.
-        if (TestProperties.isDevModeEnabled())
+        if (TestProperties.isDevModeEnabled() && !TestProperties.isPrimaryUserAppAdmin())
         {
             goToAdminConsole().clickRunningThreads();
             assertTextNotPresent("SystemMaintenance");
