@@ -31,38 +31,91 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         _grid = grid;
     }
 
+    /**
+     * indicates whether or not the row has a column containing a select checkbox
+     * @return
+     */
     public boolean hasSelectColumn()
     {
         return elementCache().selectColumn.isPresent();
     }
 
+    /**
+     * Returns the selected state of the row selector checkbox, if one is present
+     * @return
+     */
     public boolean isSelected()
     {
         return hasSelectColumn() && elementCache().selectCheckbox.isSelected();
     }
 
+    /**
+     * Sets the state of the row selector checkbox
+     * @param checked
+     * @return
+     */
     public GridRow select(boolean checked)
     {
         assertTrue("The row does not have a select box", hasSelectColumn());
         elementCache().selectCheckbox.set(checked);
+        WebDriverWrapper.waitFor(()-> elementCache().selectCheckbox.get().equals(checked), 500);
         return this;
     }
 
+    /**
+     * gets the cell at the specified index
+     * use columnHeader, which computes the appropriate index
+     * @param colIndex
+     * @return
+     */
+    @Deprecated
     private WebElement getCell(int colIndex)
     {
         return Locator.tag("td").index(colIndex).findElement(this);
     }
 
+    /**
+     * gets the cell corresponding to the specified column
+     * @param columnHeader
+     * @return
+     */
     public WebElement getCell(String columnHeader)
     {
         return getCell(_grid.getColumnIndex(columnHeader));
     }
 
+    /**
+     * Returns whether or not the current instance contains an element matching the supplied locator
+     * @param loc
+     * @return
+     */
     public boolean contains(Locator loc)
     {
         return loc.existsIn(this);
     }
 
+    /**
+     * Returns true if the row contains all of the specified column/value pairs
+     * @param partialMap Map of key (column) value (text)
+     * @return
+     */
+    protected boolean hasMatchingValues(Map<String, String> partialMap)
+    {
+        for (String key : partialMap.keySet())
+        {
+            String text = getText(key);
+            if (text==null || !text.equals(partialMap.get(key)))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * finds a link with the specified text, clicks it, and waits for the URL to match
+     * the HREF of the link.  (this is different from clickAndWait by virtue of not requiring
+     * a page load event)
+     * @param text
+     */
     public void clickLink(String text)
     {
         log("seeking link with text [" + text + "]");
@@ -98,6 +151,10 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return columnValues;
     }
 
+    /**
+     * gets a map of the row's values, keyed by column name
+     * @return
+     */
     public Map<String, String> getRowMap()
     {
         if (_rowMap == null)
@@ -124,7 +181,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     {
         return _driver;
     }
-
 
     @Override
     protected ElementCache newElementCache()

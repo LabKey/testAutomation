@@ -272,6 +272,21 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
     }
 
     /**
+     * Returns the first row with matching text in the specified columns
+     * @param partialMap Map of key (column), value (text)
+     * @return
+     */
+    public Optional<GridRow> getRow(Map<String, String> partialMap)
+    {
+        try        {
+            return getRows().stream().filter(a -> a.hasMatchingValues(partialMap))
+                    .findFirst();
+        }   catch (NullPointerException npe){
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Returns the first row containing a descendant matching the supplied locator
      * @param containing
      * @return

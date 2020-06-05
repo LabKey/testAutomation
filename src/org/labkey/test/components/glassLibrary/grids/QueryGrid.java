@@ -98,6 +98,18 @@ public class QueryGrid extends WebDriverComponent
     }
 
     /**
+     * returns the first row with matching text in the specified column(s)
+     * @param partialMap Map where keys are columnText, values are full text
+     * @return
+     */
+    public Map<String, String> getRowMap(Map<String, String> partialMap)
+    {
+        return  getGrid().getRow(partialMap)
+                .orElseThrow(()-> new NotFoundException("No row with matching parameters was present: ["+partialMap+"]"))
+                .getRowMap();
+    }
+
+    /**
      * returns the first row with a descendant matching the supplied locator
      * @param containing
      * @return
