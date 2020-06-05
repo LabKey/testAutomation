@@ -10,7 +10,7 @@ on:
 
 jobs:
   branch_release:
-    if: github.event.created # && github.event.sender.login == 'labkey-teamcity'
+    if: github.event.created && github.event.sender.login == 'labkey-teamcity'
     runs-on: ubuntu-latest
 
     steps:
