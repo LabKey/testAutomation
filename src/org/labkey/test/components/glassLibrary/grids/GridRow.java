@@ -58,7 +58,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     {
         assertTrue("The row does not have a select box", hasSelectColumn());
         elementCache().selectCheckbox.set(checked);
-        WebDriverWrapper.waitFor(()-> elementCache().selectCheckbox.get().equals(checked), 500);
         return this;
     }
 

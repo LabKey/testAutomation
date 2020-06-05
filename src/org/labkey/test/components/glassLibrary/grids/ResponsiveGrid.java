@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCache>
 {
@@ -146,13 +147,25 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
 
     public ResponsiveGrid selectRows(List<String> texts, String columnName, boolean checked)
     {
+        Locator selectedCheckboxes = Locator.css("tr td input:checked[type='checkbox']");
+        int initialCount = selectedCheckboxes.findElements(this).size();
+        int increment = 0;
         for (String text : texts)
         {
-            getRow(text, columnName)
-                .orElseThrow(() -> new NotFoundException("did not find a row with text [" + text + "] in column [" + columnName + "]."))
-                .select(checked);
+            GridRow row = getRow(text, columnName)
+                .orElseThrow(() -> new NotFoundException("did not find a row with text [" + text + "] in column [" + columnName + "]."));
+
+            if (checked && !row.isSelected())
+                increment++;
+            else if (!checked && row.isSelected())
+                increment--;
+
+            row.select(checked);
         }
 
+        int finalIncrement = increment;
+        int subsequentCount = selectedCheckboxes.findElements(this).size();
+        waitFor(()-> subsequentCount == initialCount + finalIncrement, 1000);
         return this;
     }
 
@@ -311,10 +324,10 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return columnData;
     }
 
-    // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
-    // This feels like a bug waiting to happen. The entry in the column name collections are removed if it is the
-    // select column. However a similar removal does not happen when getting the text from a row. This causes the
-    // getRowMap(WebElement row) function to be off by 1 if the table has a select column.
+    /**
+     * Returns whether or not the grid has a 'select all' checkbox
+     * @return
+     */
     public boolean hasSelectColumn()
     {
         return elementCache().selectColumn.isPresent();
