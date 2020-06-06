@@ -1,5 +1,6 @@
 package org.labkey.test.components.glassLibrary.grids;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -10,6 +11,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 {
@@ -155,6 +160,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return getRows().get(index);
     }
 
+    private WebElement getCell(int row, String column)
+    {
+        int columnIndex = getColumnIndex(column);
+        WebElement gridCell = getRow(row).findElement(By.cssSelector("td:nth-of-type(" + columnIndex + ")"));
+        getWrapper().scrollIntoView(gridCell);
+        return gridCell;
+    }
+
     public int getRowCount()
     {
         return getRows().size();
@@ -214,20 +227,28 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
     }
 
+    /**
+     *
+     * @param row   index of the row
+     * @param columnName
+     * @param value If the cell is a lookup, value should be List.of(value(s))
+     */
     public void setCellValue(int row, String columnName, Object value)
     {
         // Get a reference to the cell.
-        int columnIndex = getColumnIndex(columnName);
-        WebElement gridCell = getRow(row).findElement(By.cssSelector("td:nth-of-type(" + columnIndex + ")"));
-        getWrapper().scrollIntoView(gridCell);
+        WebElement gridCell = getCell(row, columnName);
 
-        // Double click to edit the cell.
-        Actions actions = new Actions(getDriver());
-        actions.doubleClick(gridCell).perform();
+
+
+
 
         // Check to see if the double click caused a select list to appear if it did select from it.
         if(value instanceof List)
         {
+            // Double click to edit the cell.
+            Actions actions = new Actions(getDriver());
+            actions.doubleClick(gridCell).perform();
+
             // If this is a list assume that it will need a lookup.
             List<String> values = (List)value;
 
@@ -253,12 +274,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         else
         {
             // Treat the object being sent in as a string.
+            getWrapper().actionPaste(gridCell, value.toString());       // pasting sets the value directly, quickly
+            WebElement inputCell = Locator.tagWithClass("div", "cellular-display")
+                    .withText(value.toString()).waitForElement(gridCell, 1000);          // find the input cell
+            inputCell.sendKeys(Keys.TAB);                               // tab out of it
+            waitFor(()-> !isCellSelected(gridCell), 1500);        //  wait for it to no longer be selected
 
             // Get the inputCell enter the text and then make the inputCell go away (hit RETURN).
-            WebElement inputCell = elementCache().inputCell();
 
-            inputCell.sendKeys(Keys.END + value.toString() + Keys.RETURN); // Add the RETURN to close the inputCell.
-            getWrapper().waitForElementToDisappear(Locators.inputCell, WAIT_FOR_JAVASCRIPT);
+//            WebElement inputCell = elementCache().inputCell();
+//            inputCell.clear();
+//
+//            inputCell.sendKeys(Keys.END + value.toString() + Keys.RETURN); // Add the RETURN to close the inputCell.
+//            getWrapper().waitForElementToDisappear(Locators.inputCell, WAIT_FOR_JAVASCRIPT);
 
             // Wait until the grid cell has the updated text. Check for contains, not equal, because when updating a cell
             // the cell's new value will be the old value plus the new value and the cursor may not be placed at the end
@@ -269,6 +297,57 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         }
 
+    }
+
+    public EditableGrid pasteFromCell(int row, String columnName, String pasteText)
+    {
+        WebElement gridCell = getCell(row, columnName);
+
+        if (!isCellSelected(gridCell))
+        {
+            gridCell.click();
+            getWrapper().waitFor(()->  isCellSelected(gridCell),
+                    "the target cell did not become selected", 4000);
+        }
+
+        Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        StringSelection sel = new StringSelection(pasteText);
+        c.setContents(sel, sel);
+
+        new Actions(getDriver())
+                .keyDown(cmdKey)
+                .sendKeys("v")       // paste the contents into whatever has focus now
+                .keyUp(cmdKey)
+                .perform();
+        return this;
+    }
+
+    private boolean isCellSelected(WebElement cell)
+    {
+        return Locator.tagWithClass("div", "cellular-display")
+                .findElement(cell)
+                .getAttribute("class").contains("cell-selected");
+    }
+
+    private boolean cellHasWarning(WebElement cell)
+    {
+        return Locator.tagWithClass("div", "cell-warning").existsIn(cell);
+    }
+
+    public String getCellError(int row, String column)
+    {
+        WebElement gridCell = getCell(row, column);
+
+        if (! cellHasWarning(gridCell))
+            return null;
+        else
+            return Locator.tagWithClass("div", "cell-warning").findElement(gridCell).getText();
+    }
+
+    public List<WebElement> getCellErrors()
+    {
+        return Locator.tagWithClass("div", "cell-warning").findElements(this);
     }
 
     public boolean isDisplayed()
