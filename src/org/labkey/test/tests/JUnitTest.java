@@ -338,7 +338,7 @@ public class JUnitTest extends TestSuite
                 Map<String, Object> params = new HashMap<>();
                 params.put("testCase", _remoteClass);
                 command.setParameters(params);
-                command.setTimeout(_timeout * 1000 * 2);
+                command.setTimeout(_timeout * 1000);
 
                 CommandResponse response = command.execute(connection, "/");
                 Map<String, Object> resultJson = response.getParsedData();
