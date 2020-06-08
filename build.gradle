@@ -32,7 +32,13 @@ project.dependencies {
     else
     {
         // Use local version outside of TeamCity so as to not confuse IntelliJ
-        BuildUtils.addLabKeyDependency(project: project, config: "implementation", depProjectPath: BuildUtils.getApiProjectPath(project.gradle), transitive: false)
+        BuildUtils.addLabKeyDependency(
+                project: project,
+                config: "implementation",
+                depProjectPath: BuildUtils.getApiProjectPath(project.gradle),
+                depProjectConfig: "default",  // TODO this is deprecated so need to figure out the proper way to declare this
+                transitive: false
+        )
     }
 
     // Issue 36184: Tests can't find selenium-ie-driver library when running on Windows on TeamCity
