@@ -14,8 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo "${{ github.event.sender.login }}"
-      - run: echo "${{ github.event.pusher.name }}"
       - name: Checkout
         uses: actions/checkout@v2
 
