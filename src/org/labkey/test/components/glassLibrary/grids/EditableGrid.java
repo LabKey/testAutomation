@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 {
@@ -238,17 +237,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         // Get a reference to the cell.
         WebElement gridCell = getCell(row, columnName);
 
-
-
-
+        // Double click to edit the cell.
+        Actions actions = new Actions(getDriver());
+        actions.doubleClick(gridCell).perform();
 
         // Check to see if the double click caused a select list to appear if it did select from it.
         if(value instanceof List)
         {
-            // Double click to edit the cell.
-            Actions actions = new Actions(getDriver());
-            actions.doubleClick(gridCell).perform();
-
             // If this is a list assume that it will need a lookup.
             List<String> values = (List)value;
 
@@ -274,19 +269,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         else
         {
             // Treat the object being sent in as a string.
-            getWrapper().actionPaste(gridCell, value.toString());       // pasting sets the value directly, quickly
-            WebElement inputCell = Locator.tagWithClass("div", "cellular-display")
-                    .withText(value.toString()).waitForElement(gridCell, 1000);          // find the input cell
-            inputCell.sendKeys(Keys.TAB);                               // tab out of it
-            waitFor(()-> !isCellSelected(gridCell), 1500);        //  wait for it to no longer be selected
-
             // Get the inputCell enter the text and then make the inputCell go away (hit RETURN).
 
-//            WebElement inputCell = elementCache().inputCell();
-//            inputCell.clear();
-//
-//            inputCell.sendKeys(Keys.END + value.toString() + Keys.RETURN); // Add the RETURN to close the inputCell.
-//            getWrapper().waitForElementToDisappear(Locators.inputCell, WAIT_FOR_JAVASCRIPT);
+            WebElement inputCell = elementCache().inputCell();
+            inputCell.clear();
+
+            inputCell.sendKeys(Keys.END + value.toString() + Keys.RETURN); // Add the RETURN to close the inputCell.
+            getWrapper().waitForElementToDisappear(Locators.inputCell, WAIT_FOR_JAVASCRIPT);
 
             // Wait until the grid cell has the updated text. Check for contains, not equal, because when updating a cell
             // the cell's new value will be the old value plus the new value and the cursor may not be placed at the end
