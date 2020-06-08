@@ -137,35 +137,48 @@ public class ResponsiveGrid extends WebDriverComponent<ResponsiveGrid.ElementCac
         return this;
     }
 
+    /**
+     * Finds the first row with the specified text in the specified column and sets its checkbox
+     * @param text          Text to be found in the specified column
+     * @param columnName    header text of the specified column
+     * @param checked       true for checked, false for unchecked
+     * @return
+     */
     public ResponsiveGrid selectRow(String text, String columnName, boolean checked)
-    {
-        getRow(text, columnName)
-            .orElseThrow(()-> new NotFoundException("did not find a row with text ["+text+"] in column ["+columnName+"]."))
-            .select(checked);
-        return this;
-    }
-
-    public ResponsiveGrid selectRows(List<String> texts, String columnName, boolean checked)
     {
         Locator selectedCheckboxes = Locator.css("tr td input:checked[type='checkbox']");
         int initialCount = selectedCheckboxes.findElements(this).size();
         int increment = 0;
-        for (String text : texts)
-        {
-            GridRow row = getRow(text, columnName)
-                .orElseThrow(() -> new NotFoundException("did not find a row with text [" + text + "] in column [" + columnName + "]."));
+        GridRow row = getRow(text, columnName)
+            .orElseThrow(()-> new NotFoundException("did not find a row with text ["+text+"] in column ["+columnName+"]."));
 
-            if (checked && !row.isSelected())
-                increment++;
-            else if (!checked && row.isSelected())
-                increment--;
+        if (checked && !row.isSelected())
+            increment++;
+        else if (!checked && row.isSelected())
+            increment--;
 
-            row.select(checked);
-        }
+        row.select(checked);
 
         int finalIncrement = increment;
         int subsequentCount = selectedCheckboxes.findElements(this).size();
         waitFor(()-> subsequentCount == initialCount + finalIncrement, 1000);
+        getWrapper().log("Row at column ["+columnName+"] with text ["+text+"] selection state set to + ["+row.isSelected()+"]");
+        return this;
+    }
+
+    /**
+     * Sets the specified rows' selector checkboxes to the requested select state
+     * @param texts         Text to search for in the specified column
+     * @param columnName    Header text of the column to search
+     * @param checked       True for checked, false for unchecked
+     * @return
+     */
+    public ResponsiveGrid selectRows(List<String> texts, String columnName, boolean checked)
+    {
+        for (String text : texts)
+        {
+            selectRow(text, columnName, checked);
+        }
         return this;
     }
 
