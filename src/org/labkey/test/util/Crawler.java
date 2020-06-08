@@ -238,6 +238,7 @@ public class Crawler
             new ControllerActionId("harvest", "sickSafeTime"),
             new ControllerActionId("harvest", "formatInvoice"),
             new ControllerActionId("targetedms", "downloadDocument"),
+            new ControllerActionId("targetedms", "showPeptide"),
 
                 // Disable crawler for single-page apps until we make `beginAt` work with them
                 new ControllerActionId("biologics", "app"),
