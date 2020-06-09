@@ -4,7 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.glassLibrary.components.ReactCheckBox;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -191,7 +191,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     {
         public Optional<WebElement> selectColumn = Locator.xpath("//td/input[@type='checkbox']")
                 .findOptionalElement(getComponentElement());
-        public Checkbox selectCheckbox = new Checkbox(Locator.tagWithAttribute("input", "type", "checkbox")
+        public ReactCheckBox selectCheckbox = new ReactCheckBox(Locator.tagWithAttribute("input", "type", "checkbox")
             .findWhenNeeded(this));
         public WebElement column = Locator.tag("tr").findWhenNeeded(getComponentElement());
     }
