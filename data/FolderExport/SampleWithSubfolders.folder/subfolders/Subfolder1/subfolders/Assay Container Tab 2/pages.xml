@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages xmlns="http://labkey.org/folder/xml">
+  <page index="1" name="DefaultDashboard" propertyString="" hidden="false"/>
+  <page index="0" name="portal.default" propertyString="" hidden="false">
+    <webpart>
+      <name>Query</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+      <properties>
+        <property key="schemaName" value="assay"/>
+        <property key="queryName" value="My Test Container Tab Query"/>
+        <property key="allowChooseQuery" value="false"/>
+        <property key="allowChooseView" value="true"/>
+        <property key="selectQuery" value="true"/>
+        <property key="buttonBarPosition" value="BOTH"/>
+      </properties>
+    </webpart>
+  </page>
+</pages>

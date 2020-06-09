@@ -1,0 +1,7 @@
+# plate016																										
+QCStateLabel	dfvalid	dfraster	dfstudy	dfplate	visit	ptid	llsdt	llshbdt	llshb	llshc	llshcv	llsstidt	llssyps	llssypc	llshivdt	llshiv	llsco1x	bit4_016	bit3_016	bit2_016	bit1_016	formlang	sfdt_016	dfscreen	dfcreate	dfmodify
+dirty	1	0549R01H3004	121	16	101	999320016	1/1/2005	12:00:00	Negative	Negative	0	12:00:00	non-reactive	0	12:00:00	Negative	0	0	0	0	1	English	1	dirty	12/8/2005 12:36	12/8/2005 12:36
+dirty	3	0601R00HT002	121	16	101	999320660	2/3/2006	12:00:00	Negative	Negative	Negative	12:00:00	non-reactive	Negative	12:00:00	Negative	0	0	0	0	1	English	0	dirty	1/5/2006 0:33	1/5/2006 0:33
+dirty	3	0602R00B7003	121	16	101	999320719	1/2/2006	12:00:00	Negative	Negative	0	12:00:00	non-reactive	0	12:00:00	Negative	Test lab test screen	0	0	0	1	English	0	dirty	1/9/2006 23:09	1/9/2006 23:09
+dirty	3	0602R00B5003	121	16	101	999321029	1/5/2006	12:00:00	Negative	Negative	0	12:00:00	non-reactive	0	12:00:00	Negative	0	0	0	0	1	English	0	dirty	1/9/2006 21:37	1/9/2006 21:37
+dirty	3	0602R00B6004	121	16	101	999321033	1/6/2006	12:00:00	Negative	Negative	0	12:00:00	non-reactive	0	12:00:00	Negative	0	0	0	0	1	English	0	dirty	1/9/2006 22:19	1/9/2006 22:19

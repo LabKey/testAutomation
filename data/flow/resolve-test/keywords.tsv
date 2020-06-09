@@ -1,0 +1,7 @@
+Sample	Keyword	Value
+# no match since both 118795.fcs and 118797.fcs could match
+no-resolve01	$TOT	10000
+no-resolve01	$PAR	12
+resolve02	$FIL	118795.fcs
+resolve03	$PAR	12
+resolve03	EXPORT TIME	29-MAR-2006-13:08:46

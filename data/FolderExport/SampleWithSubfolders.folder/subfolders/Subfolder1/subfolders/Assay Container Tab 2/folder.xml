@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/Folder%201/Subfolder1/Assay%20Container%20Tab%202/begin.view by cnathe@labkey.com on Fri Nov 02 10:33:32 CDT 2012-->
+<folder archiveVersion="12.28" label="Assay Container Tab 2" type="tab" title="Assay Container Tab 2" xmlns="http://labkey.org/folder/xml">
+  <folderType name="Assay">
+    <defaultModule>Core</defaultModule>
+    <modules>
+      <moduleName>Issues</moduleName>
+      <moduleName>Announcements</moduleName>
+      <moduleName>FileContent</moduleName>
+      <moduleName>Core</moduleName>
+      <moduleName>Wiki</moduleName>
+      <moduleName>Experiment</moduleName>
+      <moduleName>Query</moduleName>
+      <moduleName>Pipeline</moduleName>
+      <moduleName>Study</moduleName>
+    </modules>
+  </folderType>
+  <searchable>true</searchable>
+  <pages file="pages.xml"/>
+  <wikis dir="wikis"/>
+  <notifications>
+    <messagesDefault id="2" label="My conversations"/>
+    <filesDefault id="512" label="No Email"/>
+  </notifications>
+  <missingValueIndicators>
+    <ns:missingValueIndicator indicator="Q" label="Data currently under quality control review." xmlns:ns="http://labkey.org/study/xml"/>
+    <ns:missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'." xmlns:ns="http://labkey.org/study/xml"/>
+    <ns:missingValueIndicator indicator="UNK" label="Unknown" xmlns:ns="http://labkey.org/study/xml"/>
+  </missingValueIndicators>
+  <queries dir="queries"/>
+</folder>

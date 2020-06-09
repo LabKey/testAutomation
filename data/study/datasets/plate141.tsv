@@ -1,0 +1,5 @@
+# plate141																																	
+dfstate	dfvalid	dfraster	dfstudy	dfplate	visit	ptid	urfmidt	urfmiloc	urfmrbcp	urfmrbcl	urfmrbch	urfrtntc	urfmrbqc	urfmwbcp	urfmwbcl	urfmwbch	urfwtntc	urfmwbqc	urfmoth	urfmotqc	urfmothx	urfuover	urfuovqc	urfco2x	bit4_141	bit3_141	bit2_141	bit1_141	formlang	sfdt_141	dfscreen	dfcreate	dfmodify
+dirty	3	0601R00HK005	121	141	401	999320624	2/23/2006	site	No	0	0	0	No	No	0	0	0	0	Yes	0	Protein	abnormal/significant	0	0	0	0	0	1	English	0	dirty	1/5/2006 0:04	1/5/2006 0:04
+dirty	3	0602R00B7085	121	141	401	999320719	2/1/2006	lab	Yes	0	0	1	0	No	0	0	0	0	No	0	0	abnormal/significant	0	URF-2 test	0	0	0	1	English	0	dirty	1/9/2006 23:23	1/9/2006 23:23
+dirty	3	0602R00B7109	121	141	801	999320719	3/1/2006	site	No	0	0	0	No	No	0	0	0	0	No	0	0	normal	0	0	0	0	0	1	English	0	dirty	1/9/2006 23:25	1/9/2006 23:25
