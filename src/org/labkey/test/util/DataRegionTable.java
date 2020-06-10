@@ -26,6 +26,7 @@ import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PagingWidget;
+import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.components.SummaryStatisticsDialog;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -136,6 +137,15 @@ public class DataRegionTable extends DataRegion
             _pagingWidget = new PagingWidget(this);
         }
         return _pagingWidget;
+    }
+
+    public ViewPreferencesPage clicksetDefault()
+    {
+        if (!getCustomizeView().isPanelExpanded())
+        {
+            getViewsMenu().clickSubMenu(true, "Set Default");
+        }
+        return new ViewPreferencesPage(getDriver());
     }
 
     public CustomizeView openCustomizeGrid()
