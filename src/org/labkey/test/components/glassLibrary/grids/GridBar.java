@@ -308,12 +308,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             return Locator.tagWithClass("div", "query-grid-bar");
         }
 
-        static final Locator pgRightButton = Locator.tagWithClassContaining("div", "paging")
+        static final Locator pgRightButton = Locator.tagWithClassContaining("span", "paging")
                 .descendant(Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-right")));
-        static final Locator pgLeftButton =Locator.tagWithClassContaining("div", "paging")
+        static final Locator pgLeftButton =Locator.tagWithClassContaining("span", "paging")
                 .descendant(Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-left")));
 
-        static final Locator pagingCountsSpan = Locator.xpath("//div[contains(@class, 'paging')]/span[@data-min]");
+        static final Locator pagingCountsSpan = Locator.xpath("//span[contains(@class, 'paging')]/span[@data-min]");
         static final Locator.XPathLocator viewSelectorButtonGroup = Locator.tagWithClass("div", "dropdown")
                 .withChild(Locator.button("Grid Views"));
         static final Locator.XPathLocator viewSelectorToggleButton = Locator.button("Grid Views");
