@@ -60,6 +60,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -192,26 +193,25 @@ public abstract class TestFileUtils
     @NotNull
     public static File getSampleData(String relativePath)
     {
-        Set<String> sampledataDirs = new TreeSet<>();
+        Set<File> sampledataDirs = new TreeSet<>();
 
         File sampledataDirsFile = new File(getTestBuildDir(), "sampledata.dirs");
         if (sampledataDirsFile.exists())
         {
             String path = getFileContents(sampledataDirsFile);
-            sampledataDirs.addAll(Arrays.asList(path.split(";")));
+            sampledataDirs.addAll(Arrays.stream(path.split(";")).map(File::new).collect(Collectors.toList()));
         }
         else
         {
-//            sampledataDirs.add(new File(getLabKeyRoot(), "sampledata").toString());
-            sampledataDirs.add(new File(getTestRoot(), "data").toString());
+            sampledataDirs.add(new File(getTestRoot(), "data"));
         }
 
         //TODO: temp remove root/sampledata folder during move
-        sampledataDirs.remove(new File(getLabKeyRoot(), "sampledata").toString());
+        sampledataDirs.remove(new File(getLabKeyRoot(), "sampledata"));
 
 
         File foundFile = null;
-        for (String sampledataDir : sampledataDirs)
+        for (File sampledataDir : sampledataDirs)
         {
             File checkFile = new File(sampledataDir, relativePath);
             if (checkFile.exists())
@@ -228,7 +228,7 @@ public abstract class TestFileUtils
 
         assertNotNull("Sample data not found: " + relativePath + "\n" +
                 "Run `./gradlew :server:test:build :server:test:writeSampleDataFile` once to locate all sampledata" + "\n" +
-                "Currently known sample data locations: " + String.join("\n", sampledataDirs), foundFile);
+                "Currently known sample data locations: " + sampledataDirs.stream().map(File::getAbsolutePath).collect(Collectors.joining("\n")), foundFile);
         return foundFile;
     }
 
