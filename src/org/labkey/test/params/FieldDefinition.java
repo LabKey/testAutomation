@@ -295,7 +295,7 @@ public class FieldDefinition extends PropertyDescriptor
         DateAndTime("Date Time", "date"),
         Boolean("Boolean", "boolean"),
         Double("Number (Double)", "float"),
-        Decimal("Decimal", "float"),
+        Decimal("Decimal (floating point)", "float"),
         File("File", "fileLink"),
         AutoInteger("Auto-Increment Integer", "int"),
         Flag("Flag", "string", "http://www.labkey.org/exp/xml#flag", null),
