@@ -590,7 +590,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             enableEmailRecorder();
         }
-        catch (AssumptionViolatedException ignore) { } // Tests should, generally, enable dumbster if they need it
+        catch (AssumptionViolatedException | AssertionError ignore) { } // Tests should, generally, enable dumbster if they need it
         reenableMiniProfiler = disableMiniProfiler();
 
         if (isSystemMaintenanceDisabled())

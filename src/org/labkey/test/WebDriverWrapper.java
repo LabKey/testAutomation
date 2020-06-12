@@ -985,16 +985,19 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public Connection createDefaultConnection(boolean reuseSession)
     {
-        Connection connection = WebTestHelper.getRemoteApiConnection();
+        Connection connection = WebTestHelper.getRemoteApiConnection(false);
         if (reuseSession)
         {
-            Cookie cookie = getDriver().manage().getCookieNamed("JSESSIONID");
-            if (cookie == null)
+            if (getDriver().manage().getCookieNamed("JSESSIONID") == null)
             {
                 throw new IllegalStateException("No session cookie available to reuse.");
             }
 
-            connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
+            Set<Cookie> cookies = getDriver().manage().getCookies();
+            for (Cookie cookie : cookies)
+            {
+                connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
+            }
         }
 
         return connection;

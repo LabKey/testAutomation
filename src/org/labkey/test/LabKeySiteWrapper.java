@@ -324,7 +324,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         simpleSignOut();
         checkForUpgrade();
         simpleSignIn();
-        ensureAdminMode();
+        assertEquals("Signed in as wrong user.", PasswordUtil.getUsername(), getCurrentUser());
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
