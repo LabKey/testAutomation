@@ -26,13 +26,16 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.WebElement;
+import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,16 +49,16 @@ import static org.junit.Assert.assertEquals;
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class GpatAssayTest extends BaseWebDriverTest
 {
-    private static final String GPAT_ASSAY_XLS = "trial01.xls";
-    private static final String GPAT_ASSAY_XLSX = "trial01a.xlsx";
-    private static final String GPAT_ASSAY_TSV = "trial02.tsv";
-    private static final String ALIASED_ASSAY_1 = "trial01columns1.tsv";
-    private static final String ALIASED_ASSAY_2 = "trial01columns2.tsv";
-    private static final String ALIASED_ASSAY_3 = "trial01columns3.tsv";
-    private static final String ALIASED_ASSAY_4 = "trial01columns4.tsv";
-    private static final String GPAT_ASSAY_FNA_1 = "trial03.fna";
-    private static final String GPAT_ASSAY_FNA_2 = "trial04.fna";
-    private static final String GPAT_ASSAY_FNA_3 = "trial05.fna";
+    private static final File GPAT_ASSAY_XLS = TestFileUtils.getSampleData("GPAT/trial01.xls");
+    private static final File GPAT_ASSAY_XLSX = TestFileUtils.getSampleData("GPAT/trial01a.xlsx");
+    private static final File GPAT_ASSAY_TSV = TestFileUtils.getSampleData("GPAT/trial02.tsv");
+    private static final File ALIASED_ASSAY_1 = TestFileUtils.getSampleData("GPAT/trial01columns1.tsv");
+    private static final File ALIASED_ASSAY_2 = TestFileUtils.getSampleData("GPAT/trial01columns2.tsv");
+    private static final File ALIASED_ASSAY_3 = TestFileUtils.getSampleData("GPAT/trial01columns3.tsv");
+    private static final File ALIASED_ASSAY_4 = TestFileUtils.getSampleData("GPAT/trial01columns4.tsv");
+    private static final File GPAT_ASSAY_FNA_1 = TestFileUtils.getSampleData("GPAT/trial03.fna");
+    private static final File GPAT_ASSAY_FNA_2 = TestFileUtils.getSampleData("GPAT/trial04.fna");
+    private static final File GPAT_ASSAY_FNA_3 = TestFileUtils.getSampleData("GPAT/trial05.fna");
     private static final String ASSAY_NAME_XLS = "XLS Assay " + TRICKY_CHARACTERS;
     private static final String ASSAY_NAME_XLSX = "XLSX Assay";
     private static final String ASSAY_NAME_TSV = "TSV Assay";
@@ -63,14 +66,14 @@ public class GpatAssayTest extends BaseWebDriverTest
     private static final String ASSAY_NAME_FNA_MULTIPLE = "FASTA Assay - Multiple file upload";
     private static final String ASSAY_NAME_FNA_MULTIPLE_SINGLE_INPUT = "FASTA Assay - Multiple file single input upload";
 
+    private final WebDavUploadHelper _uploadHelper = new WebDavUploadHelper(getProjectName());
+
     @BeforeClass
     public static void doSetup()
     {
         GpatAssayTest init = (GpatAssayTest) getCurrentTest();
         init._containerHelper.createProject(init.getProjectName(), "Assay");
         PortalHelper portalHelper = new PortalHelper(init.getDriver());
-        portalHelper.addWebPart("Pipeline Files");
-        init.setPipelineRoot(TestFileUtils.getSampleData("GPAT").getAbsolutePath());
         init.goToProjectHome();
     }
 
@@ -101,13 +104,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
-        goToProjectHome();
-        log("Import XLS GPAT assay");
-        _fileBrowserHelper.importFile(GPAT_ASSAY_XLS, "Create New General Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
-        setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_XLS);
-        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
-        uncheckCheckbox(Locator.gwtCheckBoxOnImportGridByColLabel("Role"));
+        startCreateGpatAssay(GPAT_ASSAY_XLS, ASSAY_NAME_XLS);
         assertEquals("SpecimenID", getFormElement(Locator.name("SpecimenID")));
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
@@ -115,7 +112,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         setAssayResultsProperties();
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
-        waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLS));
+        waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLS.getName()));
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.tagWithClass("*", "labkey-column-header").withText("Role")); // excluded column
 
@@ -137,36 +134,18 @@ public class GpatAssayTest extends BaseWebDriverTest
             throw new RuntimeException(e);
         }
 
-
         log("Import XLSX GPAT assay");
-        clickProject(getProjectName());
-        _fileBrowserHelper.importFile(GPAT_ASSAY_XLSX, "Create New General Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
-        setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_XLSX);
-        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
-        uncheckCheckbox(Locator.gwtCheckBoxOnImportGridByColLabel("Role"));
-        assertEquals("SpecimenID", getFormElement(Locator.name("SpecimenID")));
-        assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
-        assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
-        assertEquals("DrawDt", getFormElement(Locator.name("Date")));
+        startAssayCreationAndVerifyFields(GPAT_ASSAY_XLSX, ASSAY_NAME_XLSX);
         setAssayResultsProperties();
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
-        waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLSX));
+        waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLSX.getName()));
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
 
         log("Import TSV GPAT assay");
         clickProject(getProjectName());
-        _fileBrowserHelper.importFile(GPAT_ASSAY_TSV, "Create New General Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
-        setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_TSV);
-        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
-        uncheckCheckbox(Locator.gwtCheckBoxOnImportGridByColLabel("Role"));
-        assertEquals("SpecimenID", getFormElement(Locator.name("SpecimenID")));
-        assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
-        assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
-        assertEquals("DrawDt", getFormElement(Locator.name("Date")));
+        startAssayCreationAndVerifyFields(GPAT_ASSAY_TSV, ASSAY_NAME_TSV);
 
         clickButton("Show Assay Designer");
         ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
@@ -183,38 +162,33 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
-        waitAndClick(Locator.linkWithText(GPAT_ASSAY_TSV));
+        waitAndClick(Locator.linkWithText(GPAT_ASSAY_TSV.getName()));
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
 
         log("Verify standard column aliases");
-        clickProject(getProjectName());
-        _fileBrowserHelper.importFile(ALIASED_ASSAY_1, "Create New General Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
+        startCreateGpatAssay(ALIASED_ASSAY_1, null);
         assertEquals("specId", getFormElement(Locator.name("SpecimenID")));
         assertEquals("ParticipantID", getFormElement(Locator.name("ParticipantID")));
         assertEquals("visitNo", getFormElement(Locator.name("VisitID")));
         assertEquals("draw_date", getFormElement(Locator.name("Date")));
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        _fileBrowserHelper.importFile(ALIASED_ASSAY_2, "Create New General Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
+        startCreateGpatAssay(ALIASED_ASSAY_2, null);
         assertEquals("vialId1", getFormElement(Locator.name("SpecimenID")));
         assertEquals(null, "ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("visit_no", getFormElement(Locator.name("VisitID")));
         assertEquals("drawDate", getFormElement(Locator.name("Date")));
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        _fileBrowserHelper.importFile(ALIASED_ASSAY_3, "Create New General Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
+        startCreateGpatAssay(ALIASED_ASSAY_3, null);
         assertEquals("vialId", getFormElement(Locator.name("SpecimenID")));
         assertEquals(null, "ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("visitId", getFormElement(Locator.name("VisitID")));
         assertEquals("date", getFormElement(Locator.name("Date")));
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        _fileBrowserHelper.importFile(ALIASED_ASSAY_4, "Create New General Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
+        startCreateGpatAssay(ALIASED_ASSAY_4, null);
         assertEquals("guspec", getFormElement(Locator.name("SpecimenID")));
         assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
         assertEquals("visitId", getFormElement(Locator.name("VisitID")));
@@ -223,7 +197,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         importFastaGpatAssay(GPAT_ASSAY_FNA_1, ASSAY_NAME_FNA);
         log("Verify data after the GPAT assay upload");
-        clickAndWait(Locator.linkWithText(GPAT_ASSAY_FNA_1));
+        clickAndWait(Locator.linkWithText(GPAT_ASSAY_FNA_1.getName()));
         waitForText("Sequence");
         assertTextPresent(
                 "Header", "HCJDRSZ07IVO6P", "HCJDRSZ07IL1GX", "HCJDRSZ07H5SPZ",
@@ -240,18 +214,39 @@ public class GpatAssayTest extends BaseWebDriverTest
         assayDesignerPage.clickFinish();
     }
 
-    private void importFastaGpatAssay(String fileName, String assayName)
+    @LogMethod
+    private void importFastaGpatAssay(File fnaFile, String assayName)
     {
-        log("Import FASTA GPAT assay");
-        goToProjectHome();
-        _fileBrowserHelper.importFile(fileName, "Create New General Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
-        setFormElement(Locator.name("AssayDesignerName"), assayName);
-        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
+        startCreateGpatAssay(fnaFile, assayName);
 
         clickButton("Begin import");
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
+    }
+
+    @LogMethod
+    private void startCreateGpatAssay(File dataFile, @LoggedParam String assayName)
+    {
+        log("Create GPAT assay from " + dataFile.getName());
+        _uploadHelper.uploadFile(dataFile);
+        beginAt(WebTestHelper.buildURL("pipeline", getProjectName(), "browse"));
+        _fileBrowserHelper.importFile(dataFile.getName(), "Create New General Assay Design");
+        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
+        if (assayName != null)
+        {
+            setFormElement(Locator.name("AssayDesignerName"), assayName);
+            fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
+        }
+    }
+
+    private void startAssayCreationAndVerifyFields(File dataFile, String assayName)
+    {
+        startCreateGpatAssay(dataFile, assayName);
+        uncheckCheckbox(Locator.gwtCheckBoxOnImportGridByColLabel("Role"));
+        assertEquals("SpecimenID", getFormElement(Locator.name("SpecimenID")));
+        assertEquals("ptid", getFormElement(Locator.name("ParticipantID")));
+        assertEquals("VisitID", getFormElement(Locator.name("VisitID")));
+        assertEquals("DrawDt", getFormElement(Locator.name("Date")));
     }
 
     @Test
@@ -325,6 +320,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         setFormElement(Locator.name(fileLoc), guavaFile);
     }
 
+    @LogMethod
     private void uploadAssayFiles(List<File> guavaFiles)
     {
         setInput(Locator.name("__primaryFile__"), guavaFiles);
@@ -333,6 +329,6 @@ public class GpatAssayTest extends BaseWebDriverTest
     private void addNewFile()
     {
         log("Clicking +  to add new file");
-        click(Locator.xpath("//a[contains(@class, 'labkey-file-add-icon-enabled')]"));
+        click(Locator.byClass("labkey-file-add-icon-enabled"));
     }
 }
