@@ -625,7 +625,7 @@ public class ListTest extends BaseWebDriverTest
                 "Owner", LIST2_FOREIGN_KEY_OUTSIDE));
 
         final DataRegionTable dt = DataRegion(getDriver()).withName("query").find();
-        dt.goToView("default");
+        dt.goToView("Default");
         assertTextPresent(TEST_DATA[1][1], 2);
 
         log("Test deleting rows");
