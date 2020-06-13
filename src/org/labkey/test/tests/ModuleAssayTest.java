@@ -35,13 +35,13 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
-import org.labkey.test.util.SampleSetHelper;
+import org.labkey.test.util.SampleTypeHelper;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
@@ -64,8 +64,8 @@ public class ModuleAssayTest extends AbstractAssayTest
     private static final String MODULE_NAME = "miniassay";
     private static final String ASSAY_NAME = "My Simple Assay";
 
-    private static final String SAMPLE_SET = "Test Sample Set";
-    private static final String SAMPLE_SET_ROWS = "Name\tBarcode\n" +
+    private static final String SAMPLE_TYPE = "Test Sample Type";
+    private static final String SAMPLE_TYPE_ROWS = "Name\tBarcode\n" +
             "First\t251379110131_A01\n" +
             "Second\t251379110131_A01\n" +
             "Third\t\n" +
@@ -145,7 +145,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         _containerHelper.enableModule("miniassay");
         setupPipeline(PROJECT_NAME);
         createAssayDesign();
-        createSampleSet();
+        createSampleType();
         checkErrors();
     }
 
@@ -176,18 +176,18 @@ public class ModuleAssayTest extends AbstractAssayTest
         assayDesignerPage.clickFinish();
     }
 
-    protected void createSampleSet()
+    protected void createSampleType()
     {
         PortalHelper portalHelper = new PortalHelper(this);
 
-        log("Creating sample set");
+        log("Creating sample type");
         clickProject(PROJECT_NAME);
 
-        portalHelper.addWebPart("Sample Sets");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET)
+        portalHelper.addWebPart("Sample Types");
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE)
                 .setFields(List.of(new FieldDefinition("Barcode", FieldDefinition.ColumnType.String))),
-                SAMPLE_SET_ROWS);
+                SAMPLE_TYPE_ROWS);
     }
 
     @Test

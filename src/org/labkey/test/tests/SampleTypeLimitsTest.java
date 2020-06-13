@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DATA_REGION_NAME;
+import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
 
 /**
  * Test cases that use large amounts of data or in other ways stress the system. If they fail they can interfere with
@@ -63,7 +65,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(PROJECT_NAME, null);
         portalHelper.enterAdminMode();
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
 
         Connection cn = createDefaultConnection(false);
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", true);
@@ -80,27 +82,27 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
     @Test
     public void testStringLookupFields() throws IOException, CommandException
     {
-        String sampleSetName = "10000Samples"; // Testing with 10,000 samples because as per the product the lookup is converted into text field only when the samples exceed 10,000 samples
+        String sampleTypeName = "10000Samples"; // Testing with 10,000 samples because as per the product the lookup is converted into text field only when the samples exceed 10,000 samples
         String listName = "MainList";
 
         goToProjectHome();
         new PortalHelper(this).addWebPart("Lists");
 
-        log("Creating the sample set of 10000 samples");
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
+        log("Creating the sample type of 10000 samples");
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleTypeName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
         dgen.addDataSupplier("label", () -> dgen.randomString(10))
                 .withGeneratedRows(10000);
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
         SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
         log("Successfully  inserted " + saveRowsResponse.getRowsAffected());
 
         log("Waiting for the sample data to get generated");
         goToProjectHome();
-        waitAndClickAndWait(Locator.linkWithText(sampleSetName));
+        waitAndClickAndWait(Locator.linkWithText(sampleTypeName));
 
         log("Inserting 10,001 row in the sampleset");
         DataRegionTable table = new DataRegionTable("Material", getDriver());
@@ -155,7 +157,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("testIndex", FieldDefinition.ColumnType.Integer)
                 ));
 
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
         Map indexRow = Map.of("name", "seed", "data", dgen.randomInt(3, 2000), "testIndex", 0); // create the first seed in the lineage
         SaveRowsResponse seedInsert = dgen.insertRows(createDefaultConnection(true), List.of(indexRow));
         SelectRowsResponse seedSelect = dgen.getRowsFromServer(createDefaultConnection(true),
@@ -178,7 +180,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         dgen.getRowsFromServer(createDefaultConnection(true), List.of("name", "data", "testIndex"));
 
         goToProjectHome();      // the dataregion is helpful when debugging, not needed for testing
-        DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).waitFor();
         waitAndClick(Locator.linkWithText("bigLineage"));
         DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 

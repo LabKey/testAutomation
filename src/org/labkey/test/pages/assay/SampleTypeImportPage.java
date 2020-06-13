@@ -18,14 +18,13 @@ package org.labkey.test.pages.assay;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebElement;
 
-public class SampleSetImportPage extends LabKeyPage<SampleSetImportPage.Elements>
+public class SampleTypeImportPage extends LabKeyPage<SampleTypeImportPage.Elements>
 {
-    public SampleSetImportPage(BaseWebDriverTest test)
+    public SampleTypeImportPage(BaseWebDriverTest test)
     {
         super(test);
     }

@@ -19,10 +19,10 @@ import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SampleSetHelper;
+import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.File;
@@ -41,6 +41,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
@@ -75,10 +76,10 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(PROJECT_NAME, null);
         portalHelper.enterAdminMode();
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
 
         _containerHelper.createSubfolder(PROJECT_NAME, SUB_FOLDER_NAME, "Collaboration");
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
 
         portalHelper.exitAdminMode();
     }
@@ -109,7 +110,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer),
                         TestDataGenerator.simpleFieldDef("stringData", FieldDefinition.ColumnType.String)
                 ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
         dgen.addRow(List.of("A", 12, dgen.randomString(15)));
         dgen.addRow(List.of("B", 13, dgen.randomString(15)));
         dgen.addRow(List.of("C", 15, dgen.randomString(15)));
@@ -129,7 +130,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 .findFirst().orElse(null);
 
         refresh();
-        DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DOMAIN_KIND).waitFor();
         waitAndClickAndWait(Locator.linkWithText("implicitParentage"));
         DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 
@@ -175,18 +176,18 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Test
     public void testLineageWithParentInRootFolder()
     {
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         clickProject(PROJECT_NAME);
         final String parentSampleType = "ParentSampleType_InRoot";
 
-        sampleHelper.createSampleSet(new SampleSetDefinition(parentSampleType).setFields(
+        sampleHelper.createSampleType(new SampleTypeDefinition(parentSampleType).setFields(
                 List.of(new FieldDefinition("Field1", FieldDefinition.ColumnType.String))),
                 "Name\tField1\n" +
                         "ProjectS1\tsome value\n");
 
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
         final String childSampleType = "ChildOfProject";
-        sampleHelper.createSampleSet(new SampleSetDefinition(childSampleType).setFields(
+        sampleHelper.createSampleType(new SampleTypeDefinition(childSampleType).setFields(
                 List.of(new FieldDefinition("IntCol",  FieldDefinition.ColumnType.Integer))),
                 "Name\tMaterialInputs/" + parentSampleType + "\n" +
                         "COP1\tProjectS1\n");
@@ -215,25 +216,25 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
          */
 
         log("Create a sample type in the root folder and import the data from a xls file.");
-        List<FieldDefinition> sampleSetFields = List.of(
+        List<FieldDefinition> sampleTypeFields = List.of(
                 new FieldDefinition("IntCol", FieldDefinition.ColumnType.Integer),
                 new FieldDefinition("StringCol", FieldDefinition.ColumnType.String),
                 new FieldDefinition("DateCol", FieldDefinition.ColumnType.DateAndTime),
                 new FieldDefinition("BoolCol", FieldDefinition.ColumnType.Boolean));
-        File sampleSetFile = TestFileUtils.getSampleData("sampleSet.xlsx");
+        File sampleTypeFile = TestFileUtils.getSampleData("sampleSet.xlsx");
 
         clickProject(PROJECT_NAME);
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
         final String parentFolderSampleType = "ParentFolder_SampleType";
 
-        sampleHelper.createSampleSet(new SampleSetDefinition(parentFolderSampleType).setFields(sampleSetFields), sampleSetFile);
+        sampleHelper.createSampleType(new SampleTypeDefinition(parentFolderSampleType).setFields(sampleTypeFields), sampleTypeFile);
 
         log("Create a sample type in a sub folder.");
         clickFolder(SUB_FOLDER_NAME);
         final String subFolderSampleType = "SubFolder_SampleType";
 
-        sampleHelper.createSampleSet(new SampleSetDefinition(subFolderSampleType).setFields(
+        sampleHelper.createSampleType(new SampleTypeDefinition(subFolderSampleType).setFields(
                 List.of(new FieldDefinition("IntCol-Folder",  FieldDefinition.ColumnType.Integer),
                         new FieldDefinition("StringCol-Folder", FieldDefinition.ColumnType.String))),
                 "Name\tIntCol-Folder\tStringCol-Folder\n" +
@@ -243,7 +244,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                         "SampleSetBVT13\t103\tcc\n" +
                         "SampleSetBVT14\t104\tdd");
 
-        clickAndWait(Locator.linkWithText("Sample Sets"));
+        clickAndWait(Locator.linkWithText("Sample Types"));
         checker().wrapAssertion(()->assertTextPresent(parentFolderSampleType, SUB_FOLDER_NAME));
 
         log("Validate that all materials visible in the subfolder do not include anything from the root folder.");
@@ -346,13 +347,13 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         checker().wrapAssertion(()->assertTextPresent("aa", "bb", "cc", "dd", "firstOutput", "secondOutput"));
 
         log("Look at all of the materials in the subfolder and validate that the expected derived sample is there.");
-        clickAndWait(Locator.linkWithText("Sample Sets"));
+        clickAndWait(Locator.linkWithText("Sample Types"));
         clickButton("Show All Materials");
         checker().wrapAssertion(()-> assertTextPresent(parentFolderSampleType, derivedSampleName));
 
         log("Go back to the root folder and verify that none of the samples in sub folder are visible.");
         goToProjectHome();
-        sampleHelper.goToSampleSet(parentFolderSampleType);
+        sampleHelper.goToSampleType(parentFolderSampleType);
         checker().wrapAssertion(()->assertElementNotPresent(Locator.linkWithText(derivedSampleName)));
     }
 
@@ -372,14 +373,14 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         goToProjectHome();
 
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
         log("Create a simple sample type with some samples imported from a file.");
-        final File sampleSetInitFile = TestFileUtils.getSampleData("Update_Lineage_A.tsv");
+        final File sampleTypeInitFile = TestFileUtils.getSampleData("Update_Lineage_A.tsv");
 
-        sampleHelper.createSampleSet(new SampleSetDefinition(sampleTypeName).setFields(
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeName).setFields(
                 List.of(new FieldDefinition(columnId,  FieldDefinition.ColumnType.Integer))),
-                sampleSetInitFile);
+                sampleTypeInitFile);
 
         log("Check that the imported data is as expected.");
         DataRegionTable dataRegionTable = new DataRegionTable("Material", this);
@@ -400,9 +401,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         waitAndClickAndWait(Locator.linkWithText(sampleTypeName));
 
-        final File sampleSetUpdateFile = TestFileUtils.getSampleData("Update_Lineage_B.tsv");
+        final File sampleTypeUpdateFile = TestFileUtils.getSampleData("Update_Lineage_B.tsv");
 
-        sampleHelper.mergeImport(sampleSetUpdateFile);
+        sampleHelper.mergeImport(sampleTypeUpdateFile);
 
         log("Check that the updated data is shown.");
         dataRegionTable = new DataRegionTable("Material", this);
@@ -427,10 +428,10 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     {
         goToProjectHome();
 
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        log("Create parent sample set");
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        log("Create parent sample type");
         final String parentSampleType = "ParentSampleType";
-        sampleHelper.createSampleSet(new SampleSetDefinition(parentSampleType).setFields(
+        sampleHelper.createSampleType(new SampleTypeDefinition(parentSampleType).setFields(
                 List.of(new FieldDefinition("IntCol",  FieldDefinition.ColumnType.Integer))),
                 "Name\tIntCol\n" +
                         "SampleSetBVT11\t101\n" +
@@ -442,11 +443,11 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         // Refresh the page so the new sample type shows up in the UI.
         refresh();
         log("Go to the sample type page to create a new sample type.");
-        clickAndWait(Locator.linkWithText("Sample Sets"));
+        clickAndWait(Locator.linkWithText("Sample Types"));
 
-        log("Create child sample set");
+        log("Create child sample type");
         final String childrenSampleType = "ChildrenSampleType";
-        sampleHelper.createSampleSet(new SampleSetDefinition(childrenSampleType).setFields(
+        sampleHelper.createSampleType(new SampleTypeDefinition(childrenSampleType).setFields(
                 List.of(new FieldDefinition("OtherProp", FieldDefinition.ColumnType.Decimal))),
                 "Name\tMaterialInputs/" + parentSampleType + "\tOtherProp\n" +
                         "SampleSetBVTChildA\tSampleSetBVT11\t1.1\n" +
@@ -468,14 +469,14 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText("SampleSetBVT4"));
         assertElementPresent(Locator.linkWithText("SampleSetBVTChildB"));
 
-        // Make a grandchild set
-        log("Create a grandparent sample set");
+        // Make a grandchild type
+        log("Create a grandparent sample type");
         goToModule("Experiment");
-        scrollIntoView(Locator.linkWithText("Sample Sets"));
-        clickAndWait(Locator.linkWithText("Sample Sets"));
+        scrollIntoView(Locator.linkWithText("Sample Types"));
+        clickAndWait(Locator.linkWithText("Sample Types"));
 
         final String grandchildrenSampleType = "FolderGrandchildrenSampleSet";
-        sampleHelper.createSampleSet(new SampleSetDefinition(grandchildrenSampleType).setFields(
+        sampleHelper.createSampleType(new SampleTypeDefinition(grandchildrenSampleType).setFields(
                 List.of(new FieldDefinition("OtherProp", FieldDefinition.ColumnType.Decimal))),
                 "Name\tMaterialInputs/" + childrenSampleType + "\tOtherProp\n" +
                         "SampleSetBVTGrandchildA\tSampleSetBVTChildA,SampleSetBVTChildB\t11.11\n");
@@ -517,11 +518,11 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         log("Change parents for the child samples");
         clickAndWait(Locator.linkWithText(childrenSampleType));
-        String REPARENTED_CHILD_SAMPLE_SET_TSV = "Name\tMaterialInputs/" + parentSampleType + "\tOtherProp\n" +
+        String REPARENTED_CHILD_SAMPLE_TYPE_TSV = "Name\tMaterialInputs/" + parentSampleType + "\tOtherProp\n" +
                 "SampleSetBVTChildA\tSampleSetBVT13\t1.111\n" +
                 "SampleSetBVTChildB\tSampleSetBVT14\t2.222\n";
 
-        sampleHelper.mergeImport(REPARENTED_CHILD_SAMPLE_SET_TSV);
+        sampleHelper.mergeImport(REPARENTED_CHILD_SAMPLE_TYPE_TSV);
 
         clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
         assertTextPresent("2.222");
@@ -547,11 +548,11 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 "Sampleabcd\t1035\tepsilon\n" +
                 "Sampledefg\t1046\tzeta";
         goToProjectHome();
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
         final String sampleTypeName = "LineageSampleType";
 
-        sampleHelper.createSampleSet(new SampleSetDefinition(sampleTypeName).setFields(
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeName).setFields(
                 List.of(new FieldDefinition("IntCol", FieldDefinition.ColumnType.Integer),
                         new FieldDefinition("StringCol", FieldDefinition.ColumnType.String))),
                 sampleText);
@@ -592,7 +593,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         log("Create a simple sample type with some samples.");
         final TestDataGenerator dgen = TestDataGenerator.createDomain(getProjectName(),
-                new SampleSetDefinition(sampleTypeName).setFields(new ArrayList<FieldDefinition>()));
+                new SampleTypeDefinition(sampleTypeName).setFields(new ArrayList<FieldDefinition>()));
 
         for(int i = 1; i < newSampleIndex; i++)
         {
@@ -642,9 +643,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         log("Go back to the sample type page and select several samples from the grid and derive a sample from them.");
         goToProjectHome();
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
-        sampleHelper.goToSampleSet(sampleTypeName);
+        sampleHelper.goToSampleType(sampleTypeName);
         DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
 
         List<String> parents = Arrays.asList(namePrefix + "2", namePrefix + "3", namePrefix + "4");
@@ -767,7 +768,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer)
                 ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
         dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
         dgen.addCustomRow(Map.of("name", "B", "data", 12,  "MaterialInputs/badLineageTest", "A"));   // derives from A
         dgen.addCustomRow(Map.of("name", "C", "data", 12,  "MaterialInputs/badLineageTest", "A"));
@@ -778,9 +779,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)
         {
-            assertTrue("expect bad lineage to produce error containing [Sample input 'BOGUS' in SampleSet 'badLineageTest' not found];\n" +
+            assertTrue("expect bad lineage to produce error containing [Sample input 'BOGUS' in SampleType 'badLineageTest' not found];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleSet 'badLineageTest' not found"));
+                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleType 'badLineageTest' not found"));
         }
     }
 
@@ -796,7 +797,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer)
                 ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
         dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
         dgen.addCustomRow(Map.of("name", "B", "data", 13,  "MaterialInputs/badParentLineage", "A"));   // derives from A
         dgen.addCustomRow(Map.of("name", "C", "data", 14,  "MaterialInputs/badParentLineage", "B"));
@@ -807,9 +808,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)  // success looks like a CommandException with the expected message
         {
-            assertTrue("expect bad lineage to produce error containing [Sample input 'BOGUS' in SampleSet 'badParentLineage' not found];\n" +
+            assertTrue("expect bad lineage to produce error containing [Sample input 'BOGUS' in SampleType 'badParentLineage' not found];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleSet 'badParentLineage' not found"));
+                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleType 'badParentLineage' not found"));
         }
 
         // clean up on success
@@ -835,7 +836,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("age", FieldDefinition.ColumnType.Integer),
                         TestDataGenerator.simpleFieldDef("height", FieldDefinition.ColumnType.Integer)
                 ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
         dgen.addRow(List.of("A", 56, 60));
         dgen.addRow(List.of("B", 48, 50));
         dgen.addCustomRow(Map.of("name", "C", "age", 12, "height", 44, "MaterialInputs/Family", "A,B"));
@@ -850,7 +851,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         // Refresh the page so the new sample type shows up in the UI.
         refresh();
 
-        DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DOMAIN_KIND).waitFor();
         waitAndClick(Locator.linkWithText("Family"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         assertEquals(9, materialsList.getDataRowCount());
@@ -893,13 +894,13 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Test
     public void testDeleteSampleSources() throws CommandException, IOException
     {
-        SampleSetDefinition sampleSet = new SampleSetDefinition("DeleteSourcesSamples").addField(new FieldDefinition("strCol"));
+        SampleTypeDefinition sampleType = new SampleTypeDefinition("DeleteSourcesSamples").addField(new FieldDefinition("strCol"));
         DataClassDefinition dataClass = new DataClassDefinition("DeleteSourcesData").addField(new FieldDefinition("strCol"));
 
-        TestDataGenerator sampleGenerator = TestDataGenerator.createDomain(getProjectName(), sampleSet);
+        TestDataGenerator sampleGenerator = TestDataGenerator.createDomain(getProjectName(), sampleType);
         TestDataGenerator dataGenerator = TestDataGenerator.createDomain(getProjectName(), dataClass);
 
-        final String sampleParentKey = "MaterialInputs/" + sampleSet.getName();
+        final String sampleParentKey = "MaterialInputs/" + sampleType.getName();
         final String dataParentKey = "DataInputs/" + dataClass.getName();
 
         final String dataParentA = "DPD-A";
@@ -932,10 +933,10 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         goToProjectHome();
 
-        SampleSetHelper sampleHelper = new SampleSetHelper(getDriver());
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(getDriver());
 
         goToModule("Experiment");
-        sampleHelper.goToSampleSet(sampleSet.getName());
+        sampleHelper.goToSampleType(sampleType.getName());
         saveLocation();
 
         sampleHelper.mergeImport(List.of(
@@ -1006,7 +1007,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Test
     public void testDeleteSamplesSomeWithDerivedSamples()
     {
-        final String SAMPLE_SET_NAME = "DeleteSamplesWithParents";
+        final String SAMPLE_TYPE_NAME = "DeleteSamplesWithParents";
         List<String> parentSampleNames = Arrays.asList("P-1", "P-2", "P-3");
         List<Map<String, String>> sampleData = new ArrayList<>();
         parentSampleNames.forEach(name -> {
@@ -1014,9 +1015,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         });
 
         clickProject(PROJECT_NAME);
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        log("Create a sample set with some potential parents");
-        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME), sampleData);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        log("Create a sample type with some potential parents");
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME), sampleData);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         log("Derive one sample from another");
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
@@ -1034,7 +1035,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("Derive a sample with two parents");
-        clickAndWait(Locator.linkContainingText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkContainingText(SAMPLE_TYPE_NAME));
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
         clickButton("Derive Samples");
@@ -1043,7 +1044,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         setFormElement(Locator.name("outputSample1_Name"), twoParentChildName);
         clickButton("Submit");
 
-        clickAndWait(Locator.linkContainingText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkContainingText(SAMPLE_TYPE_NAME));
 
         log("Try to delete parent sample");
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));

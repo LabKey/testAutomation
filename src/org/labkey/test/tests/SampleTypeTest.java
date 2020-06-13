@@ -37,16 +37,16 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ReactAssayDesignerPage;
-import org.labkey.test.pages.experiment.CreateSampleSetPage;
-import org.labkey.test.pages.experiment.UpdateSampleSetPage;
+import org.labkey.test.pages.experiment.CreateSampleTypePage;
+import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SampleSetHelper;
+import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -70,13 +70,17 @@ import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
-public class SampleSetTest extends BaseWebDriverTest
+public class SampleTypeTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = "SampleSetTestProject";
-    private static final String FOLDER_NAME = "SampleSetTestFolder";
-    private static final String LOOKUP_FOLDER = "LookupSampleSetFolder";
-    private static final String CASE_INSENSITIVE_SAMPLE_SET = "CaseInsensitiveSampleSet";
-    private static final String LOWER_CASE_SAMPLE_SET = "caseinsensitivesampleset";
+    // Global constants to ease migration from "Sample Set" to "Sample Type"
+    public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
+    public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleType";
+
+    private static final String PROJECT_NAME = "SampleTypeTestProject";
+    private static final String FOLDER_NAME = "SampleTypeTestFolder";
+    private static final String LOOKUP_FOLDER = "LookupSampleTypeFolder";
+    private static final String CASE_INSENSITIVE_SAMPLE_TYPE = "CaseInsensitiveSampleType";
+    private static final String LOWER_CASE_SAMPLE_TYPE = "caseinsensitivesampletype";
 
     protected static final File PIPELINE_PATH = TestFileUtils.getSampleData("xarfiles/expVerify");
 
@@ -95,7 +99,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleSetTest init = (SampleSetTest) getCurrentTest();
+        SampleTypeTest init = (SampleTypeTest) getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
@@ -106,13 +110,13 @@ public class SampleSetTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(PROJECT_NAME, null);
         portalHelper.enterAdminMode();
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
 
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, "Collaboration");
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
 
         _containerHelper.createSubfolder(PROJECT_NAME, LOOKUP_FOLDER, "Collaboration");
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
         portalHelper.exitAdminMode();
 
     }
@@ -128,59 +132,59 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testCreateSampleSetNoExpression()
+    public void testCreateSampleTypeNoExpression()
     {
-        final String sampleSetName = "SimpleCreateNoExp";
+        final String sampleTypeName = "SimpleCreateNoExp";
         final List<FieldDefinition> fields = List.of(
                 new FieldDefinition("StringValue", ColumnType.String),
                 new FieldDefinition("IntValue", ColumnType.Integer));
 
-        SampleSetDefinition sampleSetDefinition = new SampleSetDefinition(sampleSetName).setFields(fields);
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName).setFields(fields);
 
-        log("Create a new sample set with a name and no name expression");
+        log("Create a new sample type with a name and no name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        SampleSetHelper sampleSetHelper = new SampleSetHelper(this);
-        sampleSetHelper.createSampleSet(sampleSetDefinition);
-        sampleSetHelper.goToSampleSet(sampleSetName);
-        sampleSetHelper.verifyFields(fields);
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.createSampleType(sampleTypeDefinition);
+        sampleTypeHelper.goToSampleType(sampleTypeName);
+        sampleTypeHelper.verifyFields(fields);
 
-        log("Add a single row to the sample set");
+        log("Add a single row to the sample type");
         Map<String, String> fieldMap = Map.of("Name", "S-1", "StringValue", "Ess", "IntValue", "1");
-        sampleSetHelper.insertRow(fieldMap);
+        sampleTypeHelper.insertRow(fieldMap);
 
         log("Verify values were saved");
-        sampleSetHelper.verifyDataValues(Collections.singletonList(fieldMap));
+        sampleTypeHelper.verifyDataValues(Collections.singletonList(fieldMap));
 
         List<Map<String, String>> data = new ArrayList<>();
         data.add(Map.of("Name", "S-2", "StringValue", "Tee", "IntValue", "2"));
         data.add(Map.of("Name", "S-3", "StringValue", "Ewe", "IntValue", "3"));
-        sampleSetHelper.bulkImport(data);
+        sampleTypeHelper.bulkImport(data);
 
-        assertEquals("Number of samples not as expected", 3, sampleSetHelper.getSampleCount());
+        assertEquals("Number of samples not as expected", 3, sampleTypeHelper.getSampleCount());
 
-        sampleSetHelper.verifyDataValues(data);
+        sampleTypeHelper.verifyDataValues(data);
     }
 
     @Test
-    public void testCreateSampleSetWithExpression()
+    public void testCreateSampleTypeWithExpression()
     {
-        String sampleSetName = "SimpleCreateWithExp";
+        String sampleTypeName = "SimpleCreateWithExp";
         List<String> fieldNames = Arrays.asList("StringValue", "FloatValue");
         List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(fieldNames.get(0)), new FieldDefinition(fieldNames.get(1), ColumnType.Decimal));
-        SampleSetHelper sampleSetHelper = new SampleSetHelper(this);
-        log("Create a new sample set with a name and name expression");
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        log("Create a new sample type with a name and name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        SampleSetDefinition definition = new SampleSetDefinition(sampleSetName).setNameExpression("${" + fields.get(0).getName() + "}-${batchRandomId}-${randomId}").setFields(fields);
-        sampleSetHelper.createSampleSet(definition);
-        sampleSetHelper.goToSampleSet(sampleSetName);
-        sampleSetHelper.verifyFields(fields);
+        SampleTypeDefinition definition = new SampleTypeDefinition(sampleTypeName).setNameExpression("${" + fields.get(0).getName() + "}-${batchRandomId}-${randomId}").setFields(fields);
+        sampleTypeHelper.createSampleType(definition);
+        sampleTypeHelper.goToSampleType(sampleTypeName);
+        sampleTypeHelper.verifyFields(fields);
 
         log("Add data without supplying the name");
         Map<String, String> fieldMap = Map.of(fieldNames.get(0), "Vee", fieldNames.get(1), "1.6");
-        sampleSetHelper.insertRow(fieldMap);
+        sampleTypeHelper.insertRow(fieldMap);
 
         log("Verify values are as expected with name expression saved");
-        DataRegionTable drt = sampleSetHelper.getSamplesDataRegionTable();
+        DataRegionTable drt = sampleTypeHelper.getSamplesDataRegionTable();
         int index = drt.getRowIndex(fieldNames.get(0), "Vee");
         assertTrue("Did not find row containing data", index >= 0);
         Map<String, String> rowData = drt.getRowDataAsMap(index);
@@ -189,10 +193,10 @@ public class SampleSetTest extends BaseWebDriverTest
         assertEquals(fieldNames.get(1) + "not as expected", "1.6", rowData.get(fieldNames.get(1)));
 
         log("Add data with name provided");
-        sampleSetHelper.insertRow(Map.of("Name", "NoExpression"));
+        sampleTypeHelper.insertRow(Map.of("Name", "NoExpression"));
 
         log("Verify values are as expected with name value saved");
-        drt = sampleSetHelper.getSamplesDataRegionTable();
+        drt = sampleTypeHelper.getSamplesDataRegionTable();
         index = drt.getRowIndex("Name", "NoExpression");
         assertTrue("Did not find row with inserted name", index >= 0);
 
@@ -200,9 +204,9 @@ public class SampleSetTest extends BaseWebDriverTest
         List<Map<String, String>> data = new ArrayList<>();
         data.add(Map.of(fieldNames.get(0), "Dubya", fieldNames.get(1), "2.1"));
         data.add(Map.of(fieldNames.get(0), "Ex", fieldNames.get(1), "4.2"));
-        sampleSetHelper.bulkImport(data);
+        sampleTypeHelper.bulkImport(data);
 
-        assertEquals("Number of samples not as expected", 4, sampleSetHelper.getSampleCount());
+        assertEquals("Number of samples not as expected", 4, sampleTypeHelper.getSampleCount());
 
         assertTrue("Should have row with first imported value", drt.getRowIndex(fieldNames.get(0), "Dubya") >= 0);
         assertTrue("Should have row with second imported value", drt.getRowIndex(fieldNames.get(0), "Ex") >= 0);
@@ -211,17 +215,17 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testImportTypeOptions()
     {
-        String sampleSetName = "ImportErrors";
+        String sampleTypeName = "ImportErrors";
         List<String> fieldNames = Arrays.asList("StringValue");
 
-        log("Create a new sample set with a name");
+        log("Create a new sample type with a name");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition(sampleSetName).addField(new FieldDefinition("StringValue", ColumnType.String)));
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeName).addField(new FieldDefinition("StringValue", ColumnType.String)));
 
-        log("Go to the sample set and add some data");
-        clickAndWait(Locator.linkWithText(sampleSetName));
-        DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents")
+        log("Go to the sample type and add some data");
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents")
                 .clickInsertNewRow();
         setFormElement(Locator.name("quf_Name"), "Name1");
         setFormElement(Locator.name("quf_" + fieldNames.get(0)), "Bee");
@@ -238,7 +242,7 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Submit", "duplicate key");
 
         log("Switch to 'Insert and Replace'");
-        sampleHelper.selectImportOption(SampleSetHelper.MERGE_DATA_LABEL, 1);
+        sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 1);
         clickButton("Submit");
 
         log("Validate data was updated and new data added");
@@ -262,7 +266,7 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Submit", "duplicate key");
 
         log ("Switch to 'Insert and Replace'");
-        sampleHelper.selectImportOption(SampleSetHelper.MERGE_DATA_LABEL, 0);
+        sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 0);
         clickButton("Submit");
         log ("Validate data was updated and new data added");
         assertEquals("Number of samples not as expected", 3, drt.getDataRowCount());
@@ -303,7 +307,7 @@ public class SampleSetTest extends BaseWebDriverTest
                         new FieldDefinition("intData", ColumnType.Integer),
                         new FieldDefinition("floatData", ColumnType.Decimal)
                 ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
         dgen.addCustomRow(Map.of("name", "A", "strData", "argy", "intData", 6, "floatData", 2.5));
         dgen.addCustomRow(Map.of("name", "B", "strData", "bargy","intData", 7, "floatData", 3.5));
         dgen.addCustomRow(Map.of("name", "C", "strData", "foofoo","intData", 8, "floatData", 4.5));
@@ -323,7 +327,7 @@ public class SampleSetTest extends BaseWebDriverTest
                         new FieldDefinition("floatLooky", ColumnType.Decimal)
                                 .setLookup("exp.materials", "sampleData", lookupContainer)
                 ));
-        lookupDgen.createDomain(createDefaultConnection(true), "SampleSet");
+        lookupDgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
         lookupDgen.addCustomRow(Map.of("name", "B"));
 
         // If this is to be a look-up to another sample type I believe the values should be the row index and not the name.
@@ -333,7 +337,7 @@ public class SampleSetTest extends BaseWebDriverTest
         lookupDgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
         refresh();
-        DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DOMAIN_KIND).waitFor();
         waitAndClick(Locator.linkWithText("sampleLookups"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 
@@ -348,7 +352,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testDeleteMultipleSamplesNoDependencies()
     {
-        final String SAMPLE_SET_NAME = "DeleteIndependentSamples";
+        final String SAMPLE_TYPE_NAME = "DeleteIndependentSamples";
         List<String> sampleNames = Arrays.asList("I-1", "I-2", "I-3");
         List<Map<String, String>> sampleData = new ArrayList<>();
         sampleNames.forEach(name -> {
@@ -356,8 +360,8 @@ public class SampleSetTest extends BaseWebDriverTest
         });
 
         clickProject(PROJECT_NAME);
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME)
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME)
                         .setFields(List.of(new FieldDefinition("Field01",  ColumnType.String))),
                 sampleData);
 
@@ -374,7 +378,7 @@ public class SampleSetTest extends BaseWebDriverTest
     public void testDeleteSamplesSomeWithAssayData()
     {
         final PortalHelper portalHelper = new PortalHelper(this);
-        final String SAMPLE_SET_NAME = "DeleteSamplesWithAssayData";
+        final String SAMPLE_TYPE_NAME = "DeleteSamplesWithAssayData";
         final String SAMPLE_ID_FIELD_NAME = "sampleId";
         final String DATA_ID_ASSAY = "GPAT - SampleId Data";
         final String RUN_ID_ASSAY = "GPAT - SampleId Run";
@@ -400,9 +404,9 @@ public class SampleSetTest extends BaseWebDriverTest
         });
         goToProjectHome();
         portalHelper.addWebPart("Assay List");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        log("Create a sample set");
-        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME), sampleData);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        log("Create a sample type");
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME), sampleData);
 
 //  Note that we currently will not find runs where the batch id references a sampleId.  See Issue 37918.
 //        log("Create an assay with sampleId in the batch fields");
@@ -412,7 +416,7 @@ public class SampleSetTest extends BaseWebDriverTest
 //            .addField(SAMPLE_ID_FIELD_NAME)
 //            .setType(FieldDefinition.ColumnType.Lookup)
 //            .setFromSchema("samples")
-//            .setFromTargetTable(SAMPLE_SET_NAME + " (Integer)");
+//            .setFromTargetTable(SAMPLE_TYPE_NAME + " (Integer)");
 //        designerPage.clickFinish();
 //
 //        log("Upload assay data for batch-level sampleId");
@@ -428,7 +432,7 @@ public class SampleSetTest extends BaseWebDriverTest
 //
 //        log("Try to delete the sample referenced in the batch");
 //        goToProjectHome();
-//        click(Locator.linkWithText(SAMPLE_SET_NAME));
+//        click(Locator.linkWithText(SAMPLE_TYPE_NAME));
 //        DataRegionTable sampleTable = sampleHelper.getSamplesDataRegionTable();
 //        sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(BATCH_SAMPLE_NAME, "Name"));
 //        sampleTable.clickHeaderButton("Delete");
@@ -442,7 +446,7 @@ public class SampleSetTest extends BaseWebDriverTest
             .addField(SAMPLE_ID_FIELD_NAME)
             .setType(ColumnType.Lookup)
             .setFromSchema("samples")
-            .setFromTargetTable(SAMPLE_SET_NAME + " (Integer)");
+            .setFromTargetTable(SAMPLE_TYPE_NAME + " (Integer)");
         assayDesignerPage.clickFinish();
 
         log("Upload assay data referencing sampleId");
@@ -454,7 +458,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Try to delete all samples");
         goToProjectHome();
-        click(Locator.linkWithText(SAMPLE_SET_NAME));
+        click(Locator.linkWithText(SAMPLE_TYPE_NAME));
         DataRegionTable sampleTable = sampleHelper.getSamplesDataRegionTable();
         sampleTable.checkAllOnPage();
         sampleTable.clickHeaderButton("Delete");
@@ -475,7 +479,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 .addField(SAMPLE_ID_FIELD_NAME)
                 .setType(ColumnType.Lookup)
                 .setFromSchema("samples")
-                .setFromTargetTable(SAMPLE_SET_NAME + " (Integer)");
+                .setFromTargetTable(SAMPLE_TYPE_NAME + " (Integer)");
         assayDesignerPage.clickFinish();
 
         log("Upload assay data for run-level sampleId");
@@ -488,7 +492,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Try to delete the sampleId referenced in the run field");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
         sampleTable = sampleHelper.getSamplesDataRegionTable();
         sampleTable.uncheckAllOnPage();
         sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(RUN_SAMPLE_NAME, "Name"));
@@ -513,7 +517,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Now try to delete the sample that was referenced in the run properties");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
         sampleTable.uncheckAllOnPage();
         sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(RUN_SAMPLE_NAME, "Name"));
         sampleHelper.deleteSamples(sampleTable, "Permanently delete 1 sample");
@@ -531,7 +535,7 @@ public class SampleSetTest extends BaseWebDriverTest
 //        log("Now try to delete the sample that was referenced in the batch properties, but still referenced in the data of another assay");
         log("Now try to delete the sample is referenced in the data of an assay");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
         sampleTable.uncheckAllOnPage();
         sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(BATCH_SAMPLE_NAME, "Name"));
         sampleTable.clickHeaderButton("Delete");
@@ -548,7 +552,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Try to delete the rest of the samples");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
         sampleTable.checkAllOnPage();
         sampleHelper.deleteSamples(sampleTable, "Permanently delete 3 samples");
         assertEquals("Number of samples not as expected after deletion", 0, sampleTable.getDataRowCount());
@@ -558,7 +562,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testUpdateAndDeleteWithCommentsAndFlags()
     {
-        final String SAMPLE_SET_NAME = "UpdateAndDeleteFields";
+        final String SAMPLE_TYPE_NAME = "UpdateAndDeleteFields";
         final String SAMPLE_NAME_TO_DELETE = "ud01";
         final String SAMPLE_FLAG_UPDATE = "ud02";
         final String FLAG_UPDATE = "Updated Flag Value";
@@ -606,17 +610,17 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleData.add(Map.of("Name", "ud05", "Field01", "ee", "Description", "This is description for sample 5.", "Flag", "Flag Value 5"));
         sampleData.add(Map.of("Name", "ud06", "Field01", "ff", "Description", "This is description for sample 6.", "Flag", "Flag Value 6"));
 
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME)
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME)
                         .setFields(List.of(new FieldDefinition("Field01",  ColumnType.String))),
                 sampleData);
 
-        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/SampleSetTestProject","UpdateAndDeleteFields", Arrays.asList("Name", "Flag/Comment", "Field01", "Description"));
+        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,"UpdateAndDeleteFields", Arrays.asList("Name", "Flag/Comment", "Field01", "Description"));
 
-        Assert.assertTrue("Newly inserted Sample Set data not as expected. Stopping the test here.", areDataListEqual(resultsFromDB, sampleData));
+        Assert.assertTrue("Newly inserted Sample Type data not as expected. Stopping the test here.", areDataListEqual(resultsFromDB, sampleData));
 
         // Change the view so screen shot on failure is helpful.
-        sampleHelper = new SampleSetHelper(this);
+        sampleHelper = new SampleTypeHelper(this);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         CustomizeView cv = drtSamples.openCustomizeGrid();
         cv.addColumn("Description");
@@ -630,14 +634,14 @@ public class SampleSetTest extends BaseWebDriverTest
                 .clickButton("Yes, Delete", true);
         _ext4Helper.waitForMaskToDisappear();
 
-        // Remove the same row from the Sample Set input data.
+        // Remove the same row from the Sample Type input data.
         int testDataIndex = getSampleIndexFromTestInput(SAMPLE_NAME_TO_DELETE, sampleData);
         sampleData.remove(testDataIndex);
 
         log("Check that the Sample has been removed.");
 
         // Not going to use asserts (and possibly fail on first test), will try all the scenarios and then check at the end.
-        String errorMsg = "Sample Set data is not as expected after a delete.";
+        String errorMsg = "Sample Type data is not as expected after a delete.";
         if(!checkExpectedAgainstDB(sampleData, errorMsg))
         {
             errorLog.append("Failure with 'delete sample' test.\n");
@@ -650,9 +654,9 @@ public class SampleSetTest extends BaseWebDriverTest
         testDataIndex = getSampleIndexFromTestInput(SAMPLE_DESC_UPDATE, sampleData);
         sampleData.get(testDataIndex).replace("Description", DESC_UPDATE);
 
-        updateSampleSet(sampleData.get(testDataIndex));
+        updateSampleType(sampleData.get(testDataIndex));
 
-        errorMsg = "Sample Set data is not as expected after a update of Description.";
+        errorMsg = "Sample Type data is not as expected after a update of Description.";
         if(!checkExpectedAgainstDB(sampleData, errorMsg))
         {
             errorLog.append("Failure with 'update description' test.\n");
@@ -663,9 +667,9 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Now delete the sample's description.");
         sampleData.get(testDataIndex).replace("Description", "");
 
-        updateSampleSet(sampleData.get(testDataIndex));
+        updateSampleType(sampleData.get(testDataIndex));
 
-        errorMsg = "Sample Set data is not as expected after deleting the Description.";
+        errorMsg = "Sample Type data is not as expected after deleting the Description.";
         if(!checkExpectedAgainstDB(sampleData, errorMsg))
         {
             errorLog.append("Failure with 'delete description' test.\n");
@@ -677,9 +681,9 @@ public class SampleSetTest extends BaseWebDriverTest
         testDataIndex = getSampleIndexFromTestInput(SAMPLE_FLAG_UPDATE, sampleData);
         sampleData.get(testDataIndex).replace("Flag", FLAG_UPDATE);
 
-        updateSampleSet(sampleData.get(testDataIndex));
+        updateSampleType(sampleData.get(testDataIndex));
 
-        errorMsg = "Sample Set data is not as expected after a update of Flag/Comment.";
+        errorMsg = "Sample Type data is not as expected after a update of Flag/Comment.";
         if(!checkExpectedAgainstDB(sampleData, errorMsg))
         {
             errorLog.append("Failure with 'update flag/comment' test.\n");
@@ -690,9 +694,9 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Now delete the sample's Flag/Comment.");
         sampleData.get(testDataIndex).replace("Flag", "");
 
-        updateSampleSet(sampleData.get(testDataIndex));
+        updateSampleType(sampleData.get(testDataIndex));
 
-        errorMsg = "Sample Set data is not as expected after deleting the Flag/Comment.";
+        errorMsg = "Sample Type data is not as expected after deleting the Flag/Comment.";
         if(!checkExpectedAgainstDB(sampleData, errorMsg))
         {
             errorLog.append("Failure with 'delete flag/comment' test.\n");
@@ -705,9 +709,9 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleData.get(testDataIndex).replace("Flag", FLAG_UPDATE_1);
         sampleData.get(testDataIndex).replace("Description", DESC_UPDATE_1);
 
-        updateSampleSet(sampleData.get(testDataIndex));
+        updateSampleType(sampleData.get(testDataIndex));
 
-        errorMsg = "Sample Set data is not as expected after a adding a Description and a Flag/Comment to an existing sample.";
+        errorMsg = "Sample Type data is not as expected after a adding a Description and a Flag/Comment to an existing sample.";
         if(!checkExpectedAgainstDB(sampleData, errorMsg))
         {
             errorLog.append("Failure with 'adding a description and flag/comment' test.\n");
@@ -720,9 +724,9 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleData.get(testDataIndex).replace("Flag", FLAG_UPDATE_2);
         sampleData.get(testDataIndex).replace("Description", DESC_UPDATE_2);
 
-        updateSampleSet(sampleData.get(testDataIndex));
+        updateSampleType(sampleData.get(testDataIndex));
 
-        errorMsg = "Sample Set data is not as expected after a updating both a Description and a Flag/Comment.";
+        errorMsg = "Sample Type data is not as expected after a updating both a Description and a Flag/Comment.";
         if(!checkExpectedAgainstDB(sampleData, errorMsg))
         {
             errorLog.append("Failure with 'updating both a description and flag/comment' test.\n");
@@ -734,9 +738,9 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleData.get(testDataIndex).replace("Flag", "");
         sampleData.get(testDataIndex).replace("Description", "");
 
-        updateSampleSet(sampleData.get(testDataIndex));
+        updateSampleType(sampleData.get(testDataIndex));
 
-        errorMsg = "Sample Set data is not as expected after deleting the Description and Flag/Comment.";
+        errorMsg = "Sample Type data is not as expected after deleting the Description and Flag/Comment.";
         if(!checkExpectedAgainstDB(sampleData, errorMsg))
         {
             errorLog.append("Failure with 'deleting both a description and flag/comment' test.\n");
@@ -750,12 +754,12 @@ public class SampleSetTest extends BaseWebDriverTest
         log("All done.");
     }
 
-    private void updateSampleSet(Map<String, String> updatedFields)
+    private void updateSampleType(Map<String, String> updatedFields)
     {
         List<Map<String, String>> updateSampleData = new ArrayList<>();
         updateSampleData.add(updatedFields);
 
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.mergeImport(updateSampleData);
 
     }
@@ -765,7 +769,7 @@ public class SampleSetTest extends BaseWebDriverTest
         boolean returnValue;
         List<Map<String, String>> resultsFromDB;
 
-        resultsFromDB = getSampleDataFromDB("/SampleSetTestProject","UpdateAndDeleteFields", Arrays.asList("Name", "Flag/Comment", "Field01", "Description"));
+        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,"UpdateAndDeleteFields", Arrays.asList("Name", "Flag/Comment", "Field01", "Description"));
 
         if(!areDataListEqual(resultsFromDB, expectedData))
         {
@@ -840,13 +844,13 @@ public class SampleSetTest extends BaseWebDriverTest
 
     }
 
-    protected List<Map<String, String>> getSampleDataFromDB(String folderPath, String sampleSetName, List<String> fields)
+    protected List<Map<String, String>> getSampleDataFromDB(String folderPath, String sampleTypeName, List<String> fields)
     {
         List<Map<String, String>> results = new ArrayList<>(6);
         Map<String, String> tempRow;
 
         Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleSetName);
+        SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleTypeName);
         cmd.setColumns(fields);
 
         try
@@ -898,7 +902,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testMissingFieldIndicatorAndRequiredFields()
     {
-        final String SAMPLE_SET_NAME = "MissingValues";
+        final String SAMPLE_TYPE_NAME = "MissingValues";
         final String INDICATOR_ONLY_SAMPLE_NAME = "mv02";
         final String VALUE_ONLY_SAMPLE_NAME = "mv04";
         final String BOTH_FIELDS_SAMPLE_NAME = "mv06";
@@ -916,7 +920,7 @@ public class SampleSetTest extends BaseWebDriverTest
         else
             INDICATOR_FIELD_NAME = MISSING_FIELD_NAME + "_mvindicator";
 
-        log("Validate missing values and required fields in a Sample Set.");
+        log("Validate missing values and required fields in a Sample Type.");
 
         log("Create expected missing value indicators.");
         clickProject(PROJECT_NAME);
@@ -985,7 +989,7 @@ public class SampleSetTest extends BaseWebDriverTest
         sampleData.add(inconsistentSample);
         sampleData.add(updateSample);
 
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         List<FieldDefinition> fields = new ArrayList<>();
         fields.add(new FieldDefinition(REQUIRED_FIELD_NAME)
                 .setType(ColumnType.String)
@@ -995,20 +999,20 @@ public class SampleSetTest extends BaseWebDriverTest
                 .setType(ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
-        SampleSetDefinition def = new SampleSetDefinition(SAMPLE_SET_NAME).setFields(fields);
-        sampleHelper.createSampleSet(def);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME);
+        SampleTypeDefinition def = new SampleTypeDefinition(SAMPLE_TYPE_NAME).setFields(fields);
+        sampleHelper.createSampleType(def);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME);
         sampleHelper.bulkImport(sampleData);
 
         // Change the view so the missing value indicator is there and for the screen shot is useful on failure.
-        sampleHelper = new SampleSetHelper(this);
+        sampleHelper = new SampleTypeHelper(this);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         CustomizeView cv = drtSamples.openCustomizeGrid();
         cv.showHiddenItems();
         cv.addColumn(INDICATOR_FIELD_NAME);
         cv.saveCustomView();
 
-        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
         // After doing a bulk upload it looks like the value field is stored as an empty field in the DB.
         // Need to update the sample data to reflect what is expected from the DB.
@@ -1055,13 +1059,13 @@ public class SampleSetTest extends BaseWebDriverTest
 //        List<Map<String, String>> updateSampleData = new ArrayList<>();
 //        updateSampleData.add(tempSample);
 //
-//        sampleHelper.bulkImport(updateSampleData, SampleSetHelper.MERGE_DATA_LABEL);
+//        sampleHelper.bulkImport(updateSampleData, SampleTypeHelper.MERGE_DATA_LABEL);
 
         checker().verifyEquals("After updating a value the number of missing UI indicators is not as expected.",
                 Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
                 expectedMissingCount);
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
         checker().verifyTrue("After updating a value the data in the DB is not as expected.",
                 areDataListEqual(resultsFromDB, sampleData));
@@ -1101,7 +1105,7 @@ public class SampleSetTest extends BaseWebDriverTest
                 Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
                 expectedMissingCount);
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
         checker().verifyTrue("After adding a sample with a missing value through the UI the data in the DB is not as expected.",
                 areDataListEqual(resultsFromDB, sampleData));
@@ -1109,7 +1113,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Validate that the required field check works as expected.");
         updateSampleData = new ArrayList<>();
         updateSampleData.add(Map.of("Name", "mv10", REQUIRED_FIELD_NAME, "", MISSING_FIELD_NAME, "There should be no value in the required field.", INDICATOR_FIELD_NAME, ""));
-        sampleHelper.bulkImportExpectingError(updateSampleData, SampleSetHelper.IMPORT_DATA_LABEL);
+        sampleHelper.bulkImportExpectingError(updateSampleData, SampleTypeHelper.IMPORT_DATA_LABEL);
 
         try
         {
@@ -1174,10 +1178,10 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testAuditLog()
     {
-        String sampleSetName = "TestAuditLogSampleSet";
+        String sampleTypeName = "TestAuditLogSampleType";
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        SampleSetHelper helper = new SampleSetHelper(this);
-        helper.createSampleSet(new SampleSetDefinition(sampleSetName).setFields(
+        SampleTypeHelper helper = new SampleTypeHelper(this);
+        helper.createSampleType(new SampleTypeDefinition(sampleTypeName).setFields(
                 List.of(
                         new FieldDefinition("First", ColumnType.String),
                         new FieldDefinition("Second", ColumnType.Integer))),
@@ -1187,38 +1191,38 @@ public class SampleSetTest extends BaseWebDriverTest
         goToModule("Query");
         viewQueryData("auditLog", "SampleSetAuditEvent");
         assertTextPresent(
-                "Samples inserted in: " + sampleSetName);
+                "Samples inserted in: " + sampleTypeName);
 
     }
 
     @Test
     public void testCaseSensitivity()
     {
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
         // make sure we are case-sensitive when creating samplesets -- regression coverage for issue 33743
         clickProject(PROJECT_NAME);
-        sampleHelper.createSampleSet(new SampleSetDefinition(CASE_INSENSITIVE_SAMPLE_SET));
+        sampleHelper.createSampleType(new SampleTypeDefinition(CASE_INSENSITIVE_SAMPLE_TYPE));
 
         clickProject(PROJECT_NAME);
         List<String> errors = sampleHelper
-                .goToCreateNewSampleSet()
-                .setName(LOWER_CASE_SAMPLE_SET)
+                .goToCreateNewSampleType()
+                .setName(LOWER_CASE_SAMPLE_TYPE)
                 .clickSaveExpectingErrors();
         assertEquals("Sample Type creation error", Arrays.asList("A Sample Type with that name already exists."), errors);
         clickProject(PROJECT_NAME);
-        assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_SET));
-        assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLE_SET));
+        assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_TYPE));
+        assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLE_TYPE));
     }
 
     @Test
     public void testReservedFieldNames()
     {
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
         clickProject(PROJECT_NAME);
-        CreateSampleSetPage createPage = sampleHelper
-            .goToCreateNewSampleSet()
+        CreateSampleTypePage createPage = sampleHelper
+            .goToCreateNewSampleType()
             .setName("ReservedFieldNameValidation");
 
         DomainFormPanel domainFormPanel = createPage.getFieldsPanel();
@@ -1254,9 +1258,9 @@ public class SampleSetTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testLookUpValidatorForSampleSets()
+    public void testLookUpValidatorForSampleTypes()
     {
-        final String SAMPLE_SET= "Sample with lookup validator";
+        final String SAMPLE_TYPE= "Sample with lookup validator";
         final String listName = "Fruits from Excel";
         final String lookupColumnLabel = "Label for lookup column";
 
@@ -1270,15 +1274,15 @@ public class SampleSetTest extends BaseWebDriverTest
                 .getDataRowCount();
 
         goToProjectHome();
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE);
         definition.addField(new FieldDefinition("Key",
                 new FieldDefinition.LookupInfo(null, "lists", listName)
                         .setTableType(ColumnType.Integer)).setLabel(lookupColumnLabel).setLookupValidatorEnabled(true));
-        sampleHelper.createSampleSet(definition);
+        sampleHelper.createSampleType(definition);
 
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(SAMPLE_SET));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE));
         DataRegionTable table = sampleHelper.getSamplesDataRegionTable();
         table.clickInsertNewRow();
 
@@ -1304,9 +1308,9 @@ public class SampleSetTest extends BaseWebDriverTest
         File experimentFilePath = new File(PIPELINE_PATH, "experiment.xar.xml");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
 
-        String sampleSetName = "FileAttachmentSampleSet";
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition(sampleSetName).setFields(
+        String sampleTypeName = "FileAttachmentSampleType";
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeName).setFields(
                 List.of(new FieldDefinition("OtherProp", ColumnType.String),
                         new FieldDefinition("FileAttachment", ColumnType.File))),
                 "Name\tOtherProp\n" +
@@ -1322,9 +1326,9 @@ public class SampleSetTest extends BaseWebDriverTest
         setFileAttachment(0, experimentFilePath);
         setFileAttachment(1, TestFileUtils.getSampleData( "RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
 
-        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         drt.clickInsertNewRow();
-        setFormElement(Locator.name("quf_Name"), "SampleSetInsertedManually");
+        setFormElement(Locator.name("quf_Name"), "SampleTypeInsertedManually");
         setFormElement(Locator.name("quf_FileAttachment"), experimentFilePath);
         clickButton("Submit");
         //a double upload causes the file to be appended with a count
@@ -1336,7 +1340,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         log("Remove the attachment columns and validate that everything still works.");
         clickFolder(FOLDER_NAME);
-        UpdateSampleSetPage domainDesignerPage = sampleHelper.goToEditSampleSet(sampleSetName);
+        UpdateSampleTypePage domainDesignerPage = sampleHelper.goToEditSampleType(sampleTypeName);
         domainDesignerPage.getFieldsPanel().removeField("FileAttachment", true);
         domainDesignerPage.clickSave();
 
@@ -1347,11 +1351,11 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testCreateViaScript()
     {
-        String sampleSetName = "Created_by_Script";
+        String sampleTypeName = "Created_by_Script";
         String createScript = "LABKEY.Domain.create({\n" +
                 "  domainKind: \"SampleSet\",\n" +
                 "  domainDesign: {\n" +
-                "    name: \"" + sampleSetName +"\",\n" +
+                "    name: \"" + sampleTypeName +"\",\n" +
                 "    fields: [{\n" +
                 "       name: \"name\", rangeURI: \"string\"\n" +
                 "    },{\n" +
@@ -1365,7 +1369,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Go to project home.");
         goToProjectHome();
 
-        log("Create a Sample Set using script.");
+        log("Create a Sample Type using script.");
         executeScript(createScript);
 
         List<String> sampleNames = Arrays.asList("P-1", "P-2", "P-3", "P-4", "P-5");
@@ -1374,14 +1378,14 @@ public class SampleSetTest extends BaseWebDriverTest
             sampleData.add(Map.of("Name", name, "intField", "42", "strField", "Sample: " + name));
         });
 
-        log("Refresh the browser so the new sample set is shown.");
+        log("Refresh the browser so the new sample type is shown.");
         goToHome();
         goToProjectHome();
 
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
-        log("Add samples to the sample set.");
-        sampleHelper.goToSampleSet(sampleSetName);
+        log("Add samples to the sample type.");
+        sampleHelper.goToSampleType(sampleTypeName);
         sampleHelper.bulkImport(sampleData);
 
         log("Check that the samples were added.");
@@ -1393,7 +1397,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
     private void setFileAttachment(int index, File attachment)
     {
-        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         drt.clickEditRow(index);
         setFormElement(Locator.name("quf_FileAttachment"),  attachment);
         clickButton("Submit");

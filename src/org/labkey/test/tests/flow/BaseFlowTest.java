@@ -24,7 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.pages.ImportDataPage;
-import org.labkey.test.pages.experiment.CreateSampleSetPage;
+import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -238,11 +238,11 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
     protected void uploadSampleDescriptions(File sampleFile, Map<String, FieldDefinition.ColumnType> fields, String[] idCols, String[] keywordCols)
     {
-        log("** Uploading sample set");
+        log("** Uploading sample type");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Upload Sample Descriptions"));
-        CreateSampleSetPage createPage = new CreateSampleSetPage(getDriver());
-        // NOTE: name for the sample set is coming from URL param - 'experiment-createSampleSet.view?name=Samples&nameReadOnly=true'
+        CreateSampleTypePage createPage = new CreateSampleTypePage(getDriver());
+        // NOTE: name for the sample type is coming from URL param - 'experiment-createSampleSet.view?name=Samples&nameReadOnly=true'
         StringBuilder nameExpression = new StringBuilder();
         for (String idCol : idCols)
         {
@@ -262,7 +262,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 .setFile(sampleFile)
                 .submit();
 
-        log("** Join sample set with FCSFile keywords");
+        log("** Join sample type with FCSFile keywords");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Define sample description join fields"));
         for (int i = 0; i < idCols.length; i++)

@@ -14,11 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
+
 /**
  * Defines a Sample Type. Suitable for use with UI and API helpers.
  * 'exp.materials'
  */
-public class SampleSetDefinition extends DomainProps
+public class SampleTypeDefinition extends DomainProps
 {
     private String _name;
     private String _nameExpression;
@@ -28,7 +30,7 @@ public class SampleSetDefinition extends DomainProps
     // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
     private Set<String> _dataParentAliases = new HashSet<>();
 
-    public SampleSetDefinition(String name)
+    public SampleTypeDefinition(String name)
     {
         _name = name;
     }
@@ -38,7 +40,7 @@ public class SampleSetDefinition extends DomainProps
         return _name;
     }
 
-    public SampleSetDefinition setName(String name)
+    public SampleTypeDefinition setName(String name)
     {
         _name = name;
         return this;
@@ -49,7 +51,7 @@ public class SampleSetDefinition extends DomainProps
         return _nameExpression;
     }
 
-    public SampleSetDefinition setNameExpression(String nameExpression)
+    public SampleTypeDefinition setNameExpression(String nameExpression)
     {
         _nameExpression = nameExpression;
         return this;
@@ -60,7 +62,7 @@ public class SampleSetDefinition extends DomainProps
         return _description;
     }
 
-    public SampleSetDefinition setDescription(String description)
+    public SampleTypeDefinition setDescription(String description)
     {
         _description = description;
         return this;
@@ -72,13 +74,13 @@ public class SampleSetDefinition extends DomainProps
         return _fields;
     }
 
-    public SampleSetDefinition setFields(@NotNull List<FieldDefinition> fields)
+    public SampleTypeDefinition setFields(@NotNull List<FieldDefinition> fields)
     {
         _fields = new ArrayList<>(fields);
         return this;
     }
 
-    public SampleSetDefinition addField(@NotNull FieldDefinition field)
+    public SampleTypeDefinition addField(@NotNull FieldDefinition field)
     {
         _fields.add(field);
         return this;
@@ -90,7 +92,7 @@ public class SampleSetDefinition extends DomainProps
         return _parentAliases;
     }
 
-    public SampleSetDefinition setParentAliases(@NotNull Map<String, String> parentAliases)
+    public SampleTypeDefinition setParentAliases(@NotNull Map<String, String> parentAliases)
     {
         _parentAliases = new HashMap<>(parentAliases);
         _dataParentAliases.clear();
@@ -100,7 +102,7 @@ public class SampleSetDefinition extends DomainProps
     /**
      * Add an import alias referencing the specified Data Class ('exp.dataInputs')
      */
-    public SampleSetDefinition addDataParentAlias(@NotNull String columnName, String dataClassName)
+    public SampleTypeDefinition addDataParentAlias(@NotNull String columnName, String dataClassName)
     {
         _parentAliases.put(columnName, dataClassName);
         _dataParentAliases.add(columnName);
@@ -110,14 +112,14 @@ public class SampleSetDefinition extends DomainProps
     /**
      * Add an import alias referencing the specified Sample Type ('exp.materialInputs')
      */
-    public SampleSetDefinition addParentAlias(@NotNull String columnName, String sampleSetName)
+    public SampleTypeDefinition addParentAlias(@NotNull String columnName, String sampleTypeName)
     {
-        _parentAliases.put(columnName, sampleSetName);
+        _parentAliases.put(columnName, sampleTypeName);
         _dataParentAliases.remove(columnName);
         return this;
     }
 
-    public SampleSetDefinition addParentAlias(@NotNull String columnName)
+    public SampleTypeDefinition addParentAlias(@NotNull String columnName)
     {
         return addParentAlias(columnName, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
     }
@@ -142,7 +144,7 @@ public class SampleSetDefinition extends DomainProps
     @Override
     protected String getKind()
     {
-        return "SampleSet";
+        return SAMPLE_TYPE_DOMAIN_KIND;
     }
 
     @NotNull

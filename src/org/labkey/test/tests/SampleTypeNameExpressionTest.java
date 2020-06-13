@@ -23,10 +23,10 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SampleSetHelper;
+import org.labkey.test.util.SampleTypeHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,9 +38,9 @@ import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
-public class SampleSetNameExpressionTest extends BaseWebDriverTest
+public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = "SampleSetNameExprTest";
+    private static final String PROJECT_NAME = "SampleTypeNameExprTest";
 
     @Override
     public List<String> getAssociatedModules()
@@ -58,14 +58,14 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleSetNameExpressionTest test = (SampleSetNameExpressionTest)getCurrentTest();
+        SampleTypeNameExpressionTest test = (SampleTypeNameExpressionTest)getCurrentTest();
         test.doSetup();
     }
 
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        new PortalHelper(this).addWebPart("Sample Sets");
+        new PortalHelper(this).addWebPart("Sample Types");
     }
 
     @Before
@@ -82,8 +82,8 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
                 "a\tb\tc\n" +
                 "a\tb\tc\n" +
                 "a\tb\tc\n";
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition("SimpleNameExprTest")
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition("SimpleNameExprTest")
                         .setNameExpression(nameExpression)
                         .setFields(List.of(new FieldDefinition("A", FieldDefinition.ColumnType.String),
                                 new FieldDefinition("B", FieldDefinition.ColumnType.String),
@@ -91,7 +91,7 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
                 data
                 );
 
-        // Verify SampleSet details
+        // Verify SampleType details
         assertTextPresent(nameExpression);
 
         DataRegionTable materialTable = new DataRegionTable("Material", this);
@@ -124,8 +124,8 @@ public class SampleSetNameExpressionTest extends BaseWebDriverTest
                 // Name generated and uses defaultValue('SS')
                 "\tb\t\n";
 
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition("InputsExpressionTest")
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition("InputsExpressionTest")
                 .setNameExpression(nameExpression)
                 .setFields(List.of(new FieldDefinition("B", FieldDefinition.ColumnType.String))),
                 data);

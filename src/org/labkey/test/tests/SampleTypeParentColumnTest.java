@@ -11,13 +11,13 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
-import org.labkey.test.pages.experiment.CreateSampleSetPage;
-import org.labkey.test.pages.experiment.UpdateSampleSetPage;
+import org.labkey.test.pages.experiment.CreateSampleTypePage;
+import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SampleSetHelper;
+import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
@@ -29,21 +29,22 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Category({DailyC.class})
-public class SampleSetParentColumnTest extends BaseWebDriverTest
-{
+import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
 
-    private static final String PROJECT_NAME = "SampleSetParentAliasProject";
+@Category({DailyC.class})
+public class SampleTypeParentColumnTest extends BaseWebDriverTest
+{
+    private static final String PROJECT_NAME = "SampleTypeParentAliasProject";
     private static final String SUB_FOLDER_NAME = "ParentAliasSubFolder";
 
-    protected static final String PARENT_CONTAINER_SAMPLE_SET_NAME = "PrePopulatedSampleSet";
-    protected static final String PARENT_CONTAINER_SAMPLE_SET_CAPTION = "Pre Populated Sample Set";
+    protected static final String PARENT_CONTAINER_SAMPLE_TYPE_NAME = "PrePopulatedSampleType";
+    protected static final String PARENT_CONTAINER_SAMPLE_TYPE_CAPTION = "Pre Populated Sample Type";
 
     protected static final String PARENT_CONTAINER_DATA_CLASS_NAME = "PrePopulatedDataClass";
     protected static final String PARENT_CONTAINER_DATA_CLASS_CAPTION = "Pre Populated Data Class";
 
-    protected static final String SIBLING_SAMPLE_SET_NAME = "SiblingSampleSet";
-    protected static final String SIBLING_SAMPLE_SET_CAPTION = "Sibling Sample Set";
+    protected static final String SIBLING_SAMPLE_TYPE_NAME = "SiblingSampleType";
+    protected static final String SIBLING_SAMPLE_TYPE_CAPTION = "Sibling Sample Type";
 
     protected static final String SIBLING_DATA_CLASS_NAME = "SiblingDataClass";
     protected static final String SIBLING_DATA_CLASS_CAPTION = "Sibling Data Class";
@@ -78,7 +79,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleSetParentColumnTest init = (SampleSetParentColumnTest) getCurrentTest();
+        SampleTypeParentColumnTest init = (SampleTypeParentColumnTest) getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
@@ -91,37 +92,37 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(PROJECT_NAME, SUB_FOLDER_NAME, "Study");
 
         projectMenu().navigateToProject(PROJECT_NAME);
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
         portalHelper.addWebPart("Data Classes");
 
-        createAndPopulateSampleSet(PARENT_CONTAINER_SAMPLE_SET_NAME, PROJECT_NAME, "S_", "Use me as a parent. ");
+        createAndPopulateSampleType(PARENT_CONTAINER_SAMPLE_TYPE_NAME, PROJECT_NAME, "S_", "Use me as a parent. ");
         createAndPopulateDataClass(PARENT_CONTAINER_DATA_CLASS_NAME, PROJECT_NAME, "DC_", "DataClass Object parent. ");
 
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
         portalHelper.addWebPart("Data Classes");
 
-        createAndPopulateSampleSet(SIBLING_SAMPLE_SET_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, "SIB_", "Use me as a parent (sub folder). ");
+        createAndPopulateSampleType(SIBLING_SAMPLE_TYPE_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, "SIB_", "Use me as a parent (sub folder). ");
         createAndPopulateDataClass(SIBLING_DATA_CLASS_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, "DCSIB_", "DataClass Object parent (sub folder). ");
 
     }
 
-    private void createAndPopulateSampleSet(String sampleSetName, String path, String namePrefix, String descriptionPrefix)
+    private void createAndPopulateSampleType(String sampleTypeName, String path, String namePrefix, String descriptionPrefix)
     {
-        TestDataGenerator dataGen = createEmptySampleSet(sampleSetName, path);
+        TestDataGenerator dataGen = createEmptySampleType(sampleTypeName, path);
         populateDomainWithSimpleData(dataGen, namePrefix, descriptionPrefix);
     }
 
-    protected TestDataGenerator createEmptySampleSet(String sampleSetName, String path)
+    protected TestDataGenerator createEmptySampleType(String sampleTypeName, String path)
     {
-        return createEmptySampleSet(sampleSetName, path, null);
+        return createEmptySampleType(sampleTypeName, path, null);
     }
 
-    protected TestDataGenerator createEmptySampleSet(String sampleSetName, String path, @Nullable List<FieldDefinition> customFields)
+    protected TestDataGenerator createEmptySampleType(String sampleTypeName, String path, @Nullable List<FieldDefinition> customFields)
     {
         List<FieldDefinition> fields = new ArrayList<>();
 
-        // From what I saw I had problems if I did not create the name field for a sample set.
+        // From what I saw I had problems if I did not create the name field for a sample type.
         for(String key : _mapCaptionToName.keySet())
         {
 
@@ -141,7 +142,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         if(null != customFields)
             fields.addAll(customFields);
 
-        return createEmptyDomain("exp.materials", "SampleSet", sampleSetName, path, fields);
+        return createEmptyDomain("exp.materials", SAMPLE_TYPE_DOMAIN_KIND, sampleTypeName, path, fields);
     }
 
     private void createAndPopulateDataClass(String dataClassName, String path, String namePrefix, String descriptionPrefix)
@@ -157,7 +158,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
     protected TestDataGenerator createEmptyDataClass(String dataClassName, String path, @Nullable List<FieldDefinition> fields)
     {
-        // Unlike Sample Sets Data Classes complained if I explicitly created the name field.
+        // Unlike Sample Types, Data Classes complained if I explicitly created the name field.
         return createEmptyDomain("exp.data", "DataClass", dataClassName, path, fields);
     }
 
@@ -241,11 +242,10 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testParentInSameSampleSet()
+    public void testParentInSameSampleType()
     {
-
         final String PARENT_COLUMN = "P1";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet01";
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType01";
 
         String sampleText = "Name\t" + PARENT_COLUMN + "\n" +
                 "SA_01\t\n" +
@@ -254,14 +254,14 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SA_04\tSA_01\n" +
                 "SA_05\tSA_02\n";
 
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME);
         definition.addParentAlias(PARENT_COLUMN);
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Import samples that have a parent alias column.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
 
         log("Go to the detail page for various samples and make sure the precursor and child sample values are correct.");
 
@@ -274,7 +274,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SA_02"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
         log("Check sample 'SA_03' and make sure the child materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SA_03"));
@@ -292,7 +292,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     {
 
         final String PARENT_COLUMN_1 = "P2 Column";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet02";
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType02";
 
         String sampleText = "Name\t" + PARENT_COLUMN_1 + "\n" +
                 "SB_01\n" +
@@ -301,14 +301,14 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SB_04\tSB_01\n" +
                 "SB_05\tSB_02\n";
 
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME);
         definition.addParentAlias(PARENT_COLUMN_1);
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Import samples that have a parent alias column.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
 
         log("Go to the detail page for various samples and make sure the precursor and child sample values are correct.");
 
@@ -319,7 +319,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", "Derive sample from SB_03"));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SB_02"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
         log("Check sample 'SB_03' and make sure the child materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SB_03"));
@@ -329,7 +329,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SB_02", "Derive sample from SB_03"));
 
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
-        sampleHelper = new SampleSetHelper(this);
+        sampleHelper = new SampleTypeHelper(this);
 
         log("Insert samples where parent column is a different case.");
         sampleText = "Name\t" + PARENT_COLUMN_1.toLowerCase() + "\n" +
@@ -339,7 +339,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SB_09\tSB_06\n" +
                 "SB_10\tSB_07\n";
 
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME);
         sampleHelper.bulkImport(sampleText);
 
         log("Go to the detail page for the second set of samples imported and make sure the precursor and child sample values are correct.");
@@ -351,7 +351,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", "Derive sample from SB_08"));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SB_07"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
         log("Check sample 'SB_08' and make sure the child materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SB_08"));
@@ -367,7 +367,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     {
 
         final String PARENT_COLUMN = "P3";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet03";
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType03";
 
         String sampleText = "Name\t" + PARENT_COLUMN + "\n" +
                 "SC_01\n" +
@@ -376,14 +376,14 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SC_04\tS_1\n" +
                 "SC_05\tS_0\n";
 
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
-        definition.addParentAlias(PARENT_COLUMN, PARENT_CONTAINER_SAMPLE_SET_NAME);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME);
+        definition.addParentAlias(PARENT_COLUMN, PARENT_CONTAINER_SAMPLE_TYPE_NAME);
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Import samples that have a parent alias column.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
 
         log("Check sample 'SC_05' and make sure the parent materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SC_05"));
@@ -398,7 +398,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     {
 
         final String PARENT_COLUMN = "P4";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet04";
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType04";
 
         String sampleText = "Name\t" + PARENT_COLUMN + "\n" +
                 "SD_01\n" +
@@ -407,14 +407,14 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SD_04\tSIB_1\n" +
                 "SD_05\tSIB_0\n";
 
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
-        definition.addParentAlias(PARENT_COLUMN, SIBLING_SAMPLE_SET_NAME);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME);
+        definition.addParentAlias(PARENT_COLUMN, SIBLING_SAMPLE_TYPE_NAME);
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Import samples that have a parent alias column.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
 
         log("Check sample 'SD_05' and make sure the parent materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SD_05"));
@@ -430,7 +430,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         final String PARENT_COLUMN_SUB = "Parent-Sub-Folder";
         final String PARENT_COLUMN_CONTAINER = "Parent Parent Folder";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet05";
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType05";
 
         String sampleText = "Name\t" + PARENT_COLUMN_SUB + "\t" + PARENT_COLUMN_CONTAINER + "\n" +
                 "SE_01\n" +
@@ -439,37 +439,37 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SE_04\n" +
                 "SE_05\tSE_04\tS_11\n";
 
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
-        definition.addParentAlias(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_SET_NAME);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME);
+        definition.addParentAlias(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_TYPE_NAME);
         definition.addParentAlias(PARENT_COLUMN_SUB);
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Import samples that have a parent alias column.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
 
-        log("Check sample 'SE_02' and make sure the parent materials are correct. It's parent should be in the parent container.");
+        log("Check sample 'SE_02' and make sure the parent materials are correct. Its parent should be in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SE_02"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("S_10"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from S_10"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
-        log("Check sample 'SE_03' and make sure the parent materials are correct. It's parent should be in the same sample set.");
+        log("Check sample 'SE_03' and make sure the parent materials are correct. Its parent should be in the same sample type.");
         waitAndClickAndWait(Locator.linkWithText("SE_03"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SE_01"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SE_01"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
-        log("Check sample 'SE_05' which should have two parents, one in this sample set and another in the parent container sample set .");
+        log("Check sample 'SE_05' which should have two parents, one in this sample type and another in the parent container sample type .");
         waitAndClickAndWait(Locator.linkWithText("SE_05"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SE_04", "S_11"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
-        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
+        checkAllRowsInDataRegion("parentMaterials", "Sample Type", List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_11, SE_04|SE_04, S_11)");
 
@@ -484,9 +484,9 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         final String PARENT_COLUMN_SUB = "Parent-Sub-Folder";
         final String PARENT_COLUMN_CONTAINER = "Parent Parent Folder";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet06";
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType06";
 
-        String sampleText = "Name\tmaterialInputs/" + SAMPLE_SET_NAME + "\tmaterialInputs/" + PARENT_CONTAINER_SAMPLE_SET_NAME + "\n" +
+        String sampleText = "Name\tmaterialInputs/" + SAMPLE_TYPE_NAME + "\tmaterialInputs/" + PARENT_CONTAINER_SAMPLE_TYPE_NAME + "\n" +
                 "SF_01\t\n" +
                 "SF_02\t\tS_20\n" +
                 "SF_03\tSF_01\n" +
@@ -494,38 +494,38 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SF_05\tSF_04\tS_21\n";
 
         log("Add the parent columns just like before.");
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
-        definition.addParentAlias(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_SET_NAME);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME);
+        definition.addParentAlias(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_SAMPLE_TYPE_NAME);
         definition.addParentAlias(PARENT_COLUMN_SUB);
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Import samples that use the 'materialInputs column header.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
 
-        log("Check sample 'SF_02' and make sure the parent materials are correct. It's parent should be in the parent container.");
+        log("Check sample 'SF_02' and make sure the parent materials are correct. Its parent should be in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SF_02"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("S_20"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from S_20"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
-        log("Check sample 'SF_03' and make sure the parent materials are correct. It's parent should be in the same sample set.");
+        log("Check sample 'SF_03' and make sure the parent materials are correct. Its parent should be in the same sample type.");
         waitAndClickAndWait(Locator.linkWithText("SF_03"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_01"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SF_01"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
-        log("Check sample 'SF_05' which should have two parents, one in this sample set and another in the parent container sample set .");
+        log("Check sample 'SF_05' which should have two parents, one in this sample type and another in the parent container sample type .");
         waitAndClickAndWait(Locator.linkWithText("SF_05"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_04", "S_21"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
 
-        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
+        checkAllRowsInDataRegion("parentMaterials", "Sample Type", List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_21, SF_04|SF_04, S_21)");
 
@@ -539,30 +539,30 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SF_09\n" +
                 "SF_10\tSF_04\tS_23\n";
 
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME);
         sampleHelper.bulkImport(sampleText);
 
-        log("Check sample 'SF_07' and make sure the parent materials are correct. It's parent should be in the parent container.");
+        log("Check sample 'SF_07' and make sure the parent materials are correct. Its parent should be in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SF_07"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("S_22"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from S_22"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
-        log("Check sample 'SF_08' and make sure the parent materials are correct. It's parent should be in the same sample set.");
+        log("Check sample 'SF_08' and make sure the parent materials are correct. Its parent should be in the same sample type.");
         waitAndClickAndWait(Locator.linkWithText("SF_08"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_01"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SF_01"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
-        log("Check sample 'SF_10' which should have two parents, one in this sample set and another in the parent container sample set .");
+        log("Check sample 'SF_10' which should have two parents, one in this sample type and another in the parent container sample type .");
         waitAndClickAndWait(Locator.linkWithText("SF_10"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_04", "S_23"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
-        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_SET_NAME, PARENT_CONTAINER_SAMPLE_SET_NAME));
+        checkAllRowsInDataRegion("parentMaterials", "Sample Type", List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
 
     }
 
@@ -571,27 +571,27 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     {
 
         final String PARENT_COLUMN = "P7";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet07";
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType07";
 
         String sampleText = "Name\t" + PARENT_COLUMN + "\n" +
                 "SG_01\n" +
                 "SG_02\tSG_01\n";
 
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME);
         definition.addParentAlias(PARENT_COLUMN);
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Import samples that have a parent alias column.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
 
         log("Skip validation of this basic case (it is checked in another test).");
 
         log("Remove the parent alias column");
         clickButton("Edit Set");
 
-        UpdateSampleSetPage updatePage = new UpdateSampleSetPage(getDriver());
+        UpdateSampleTypePage updatePage = new UpdateSampleTypePage(getDriver());
 
         updatePage.removeParentAlias(PARENT_COLUMN);
         updatePage.clickSave();
@@ -609,9 +609,9 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         Assert.assertEquals("There should be no entries in the 'Precursor Samples' table.", 0, dataRegionTable.getDataRowCount());
 
-        log("Make sure that the original element still has it's parent.");
+        log("Make sure that the original element still has its parent.");
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
         log("Check sample 'SG_02' and make sure that the parent values are unchanged.");
         waitAndClickAndWait(Locator.linkWithText("SG_02"));
@@ -620,7 +620,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SG_01"));
 
         log("Go to SG_01 and make sure it still only has one child.");
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
         waitAndClickAndWait(Locator.linkWithText("SG_01"));
 
@@ -637,8 +637,8 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     {
         final String ALIAS_NAME_CONFLICT = "ConflictName";
         final String GOOD_PARENT_NAME = "P8";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet08";
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType08";
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
@@ -650,9 +650,9 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         fields.add(new FieldDefinition(ALIAS_NAME_CONFLICT)
                 .setType(FieldDefinition.ColumnType.String));
 
-        log("Create Sample Set - Add a parent alias column to the sample set that conflicts with a given column name.");
-        CreateSampleSetPage createPage = sampleHelper.goToCreateNewSampleSet()
-                .setName(SAMPLE_SET_NAME)
+        log("Create Sample Type - Add a parent alias column to the sample type that conflicts with a given column name.");
+        CreateSampleTypePage createPage = sampleHelper.goToCreateNewSampleType()
+                .setName(SAMPLE_TYPE_NAME)
                 .addParentAlias(ALIAS_NAME_CONFLICT)
                 .addFields(fields);
         List<String> errors = createPage.clickSaveExpectingErrors();
@@ -662,8 +662,8 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         createPage.removeParentAlias(0)
                 .clickSave();
 
-        log("Update Sample Set - Add a parent alias column to the sample set that conflicts with a given column name.");
-        UpdateSampleSetPage updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
+        log("Update Sample Type - Add a parent alias column to the sample type that conflicts with a given column name.");
+        UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);
         updatePage.addParentAlias(ALIAS_NAME_CONFLICT);
         errors = updatePage.clickSaveExpectingErrors();
         Assert.assertEquals("Error message not as expected.",
@@ -671,12 +671,12 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 String.join("\n", errors));
         updatePage.removeParentAlias(0);
 
-        log("Now add a valid parent column and check that you cannot now add a field in the sample set with the same name.");
+        log("Now add a valid parent column and check that you cannot now add a field in the sample type with the same name.");
         updatePage.addParentAlias(GOOD_PARENT_NAME, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
         updatePage.clickSave();
 
         clickFolder(SUB_FOLDER_NAME);
-        updatePage = sampleHelper.goToEditSampleSet(SAMPLE_SET_NAME);
+        updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);
         updatePage.getFieldsPanel().addField(GOOD_PARENT_NAME);
         errors = updatePage.clickSaveExpectingErrors();
 
@@ -693,7 +693,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     {
         final String PARENT_COLUMN_SUBFOLDER = "DC_Parent-Sub-Folder";
         final String PARENT_COLUMN_CONTAINER = "DC Parent Parent Folder";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet09";
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType09";
 
         String sampleText = "Name\t" + PARENT_COLUMN_SUBFOLDER + "\t" + PARENT_COLUMN_CONTAINER + "\n" +
                 "SI_01\n" +
@@ -702,29 +702,29 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SI_04\n" +
                 "SI_05\tDCSIB_2\tDC_2\n";
 
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME);
         definition.addDataParentAlias(PARENT_COLUMN_SUBFOLDER, SIBLING_DATA_CLASS_NAME);
         definition.addDataParentAlias(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_DATA_CLASS_NAME);
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Import samples that have a parent alias column.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
 
-        log("Check sample 'SI_02' and make sure the parent materials are correct. It's parent should be in from the Data Class in the parent container.");
+        log("Check sample 'SI_02' and make sure the parent materials are correct. Its parent should be in from the Data Class in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SI_02"));
         checkAllRowsInDataRegion("parentData", "Name", List.of("DC_1"));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from DC_1"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
-        log("Check sample 'SI_03' and make sure the parent materials are correct. It's parent should be from the Data Class in the same folder.");
+        log("Check sample 'SI_03' and make sure the parent materials are correct. Its parent should be from the Data Class in the same folder.");
         waitAndClickAndWait(Locator.linkWithText("SI_03"));
         checkAllRowsInDataRegion("parentData", "Name", List.of("DCSIB_1"));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from DCSIB_1"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
         log("Check sample 'SI_05' which should have two parents, one from the Data Class in this folder and another in the Data Class in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SI_05"));
@@ -740,7 +740,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     {
 
         final String PARENT_COLUMN = "P10";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet10";
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType10";
 
         // Add the Alias column as a regression test.
         String sampleText = "Name\tAlias\t" + PARENT_COLUMN + "\n" +
@@ -750,14 +750,14 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SJ_04\t\tS_1\n" +
                 "SJ_05\t\tS_0\n";
 
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
-        definition.addParentAlias(PARENT_COLUMN, PARENT_CONTAINER_SAMPLE_SET_NAME);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME);
+        definition.addParentAlias(PARENT_COLUMN, PARENT_CONTAINER_SAMPLE_TYPE_NAME);
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Import samples that have a parent alias column.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
 
         log("Check sample 'SJ_05' and make sure the parent materials are correct.");
         waitAndClickAndWait(Locator.linkWithText("SJ_05"));
@@ -772,7 +772,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     {
         final String PARENT_COLUMN_SUBFOLDER = "DC_Parent-Sub-Folder";
         final String PARENT_COLUMN_CONTAINER = "DC Parent Parent Folder";
-        final String SAMPLE_SET_NAME = "SimpleSampleSet11";
+        final String SAMPLE_TYPE_NAME = "SimpleSampleType11";
 
         // Add the Alias column as a regression test.
         String sampleText = "Name\tAlias\t" + PARENT_COLUMN_SUBFOLDER + "\t" + PARENT_COLUMN_CONTAINER + "\n" +
@@ -782,29 +782,29 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
                 "SK_04\n" +
                 "SK_05\t\tDCSIB_2\tDC_2\n";
 
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME);
         definition.addDataParentAlias(PARENT_COLUMN_CONTAINER, PARENT_CONTAINER_DATA_CLASS_NAME);
         definition.addDataParentAlias(PARENT_COLUMN_SUBFOLDER, SIBLING_DATA_CLASS_NAME);
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
         log("Import samples that have a parent alias column.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME).bulkImport(sampleText);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
 
-        log("Check sample 'SK_02' and make sure the parent materials are correct. It's parent should be in from the Data Class in the parent container.");
+        log("Check sample 'SK_02' and make sure the parent materials are correct. Its parent should be in from the Data Class in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SK_02"));
         checkAllRowsInDataRegion("parentData", "Name", List.of("DC_1"));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from DC_1"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
-        log("Check sample 'SK_03' and make sure the parent materials are correct. It's parent should be from the Data Class in the same folder.");
+        log("Check sample 'SK_03' and make sure the parent materials are correct. Its parent should be from the Data Class in the same folder.");
         waitAndClickAndWait(Locator.linkWithText("SK_03"));
         checkAllRowsInDataRegion("parentData", "Name", List.of("DCSIB_1"));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from DCSIB_1"));
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
         log("Check sample 'SK_05' which should have two parents, one from the Data Class in this folder and another in the Data Class in the parent container.");
         waitAndClickAndWait(Locator.linkWithText("SK_05"));
