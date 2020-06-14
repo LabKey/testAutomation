@@ -74,7 +74,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 {
     // Global constants to ease migration from "Sample Set" to "Sample Type"
     public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
-    public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleType";
+    public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";
 
     private static final String PROJECT_NAME = "SampleTypeTestProject";
     private static final String FOLDER_NAME = "SampleTypeTestFolder";
