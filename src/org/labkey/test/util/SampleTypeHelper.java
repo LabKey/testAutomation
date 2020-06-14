@@ -135,7 +135,7 @@ public class SampleTypeHelper extends WebDriverWrapper
     public UpdateSampleTypePage goToEditSampleType(String name)
     {
         goToSampleType(name);
-        waitAndClickAndWait(Locator.lkButton("Edit Set"));
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
         return new UpdateSampleTypePage(getDriver());
     }
 

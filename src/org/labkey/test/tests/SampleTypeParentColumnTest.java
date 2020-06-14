@@ -589,7 +589,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         log("Skip validation of this basic case (it is checked in another test).");
 
         log("Remove the parent alias column");
-        clickButton("Edit Set");
+        clickButton("Edit Type");
 
         UpdateSampleTypePage updatePage = new UpdateSampleTypePage(getDriver());
 
