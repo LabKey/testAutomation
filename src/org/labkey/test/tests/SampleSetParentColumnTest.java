@@ -469,7 +469,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkWithText("SE_05"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SE_04", "S_11"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
-        checkAllRowsInDataRegion("parentMaterials", "Sample Type", List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
+        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_11, SE_04|SE_04, S_11)");
 
@@ -525,7 +525,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_04", "S_21"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
 
-        checkAllRowsInDataRegion("parentMaterials", "Sample Type", List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
+        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_21, SF_04|SF_04, S_21)");
 
