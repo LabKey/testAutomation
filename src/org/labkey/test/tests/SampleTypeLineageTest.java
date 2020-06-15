@@ -41,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)

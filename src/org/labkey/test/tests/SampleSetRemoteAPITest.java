@@ -65,12 +65,12 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DATA_REGION_NAME;
-import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DATA_REGION_NAME;
+import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
-public class SampleTypeRemoteAPITest extends BaseWebDriverTest
+public class SampleSetRemoteAPITest extends BaseWebDriverTest
 {
     public final String FOLDER_NAME = "Samples";
     public final String LINEAGE_FOLDER = "LineageSamples";
@@ -84,7 +84,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeRemoteAPITest init = (SampleTypeRemoteAPITest) getCurrentTest();
+        SampleSetRemoteAPITest init = (SampleSetRemoteAPITest) getCurrentTest();
 
         init.doSetup();
     }

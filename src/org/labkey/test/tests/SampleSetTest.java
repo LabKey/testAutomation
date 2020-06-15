@@ -70,7 +70,7 @@ import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
-public class SampleTypeTest extends BaseWebDriverTest
+public class SampleSetTest extends BaseWebDriverTest
 {
     // Global constants to ease migration from "Sample Set" to "Sample Type"
     public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
@@ -99,7 +99,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeTest init = (SampleTypeTest) getCurrentTest();
+        SampleSetTest init = (SampleSetTest) getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();

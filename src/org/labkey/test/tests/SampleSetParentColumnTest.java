@@ -29,10 +29,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({DailyC.class})
-public class SampleTypeParentColumnTest extends BaseWebDriverTest
+public class SampleSetParentColumnTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleTypeParentAliasProject";
     private static final String SUB_FOLDER_NAME = "ParentAliasSubFolder";
@@ -79,7 +79,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeParentColumnTest init = (SampleTypeParentColumnTest) getCurrentTest();
+        SampleSetParentColumnTest init = (SampleSetParentColumnTest) getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
