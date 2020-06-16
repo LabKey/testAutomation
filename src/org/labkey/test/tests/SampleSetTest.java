@@ -75,6 +75,7 @@ public class SampleSetTest extends BaseWebDriverTest
     // Global constants to ease migration from "Sample Set" to "Sample Type"
     public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
     public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";
+    public static final String SAMPLE_TYPE_COLUMN_NAME = "Sample Set";
 
     private static final String PROJECT_NAME = "SampleTypeTestProject";
     private static final String FOLDER_NAME = "SampleTypeTestFolder";
@@ -101,7 +102,7 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         SampleSetTest init = (SampleSetTest) getCurrentTest();
 
-        // Comment out this line (after you run once) it will make iterating on  tests much easier.
+        // Comment out this line (after you run once) it will make iterating on tests much easier.
         init.doSetup();
     }
 

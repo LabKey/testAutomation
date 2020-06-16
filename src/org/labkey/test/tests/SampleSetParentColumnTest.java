@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_COLUMN_NAME;
 import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({DailyC.class})
@@ -220,7 +221,6 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         {
             Assert.assertTrue("Value '" + expectedValue + "' was not shown in column '" + columnName + "' in data region '" + dataRegionName +"'.", dataInTable.contains(expectedValue));
         }
-
     }
 
     private void regexCheckRowInDataRegion(String dataRegionName, int rowIndex, String columnName, String regexExpected)
@@ -238,7 +238,6 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         Matcher m = p.matcher(cellValue);
 
         Assert.assertTrue("For data-region '" + dataRegionName + "', column '" + columnName + "' the regular express '" + regexExpected + "' did not match the value '" + cellValue + "'.", m.find());
-
     }
 
     @Test
@@ -284,13 +283,11 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("childMaterials", "Run", List.of("Derive sample from SA_02", "Derive sample from SA_03"));
 
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SA_02", "Derive sample from SA_03"));
-
     }
 
     @Test
     public void testValidAliasNames()
     {
-
         final String PARENT_COLUMN_1 = "P2 Column";
         final String SAMPLE_TYPE_NAME = "SimpleSampleType02";
 
@@ -359,13 +356,11 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("childMaterials", "Name", List.of("SB_10", "SB_07"));
         checkAllRowsInDataRegion("childMaterials", "Run", List.of("Derive sample from SB_07", "Derive sample from SB_08"));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SB_07", "Derive sample from SB_08"));
-
     }
 
     @Test
     public void testParentInParentContainer()
     {
-
         final String PARENT_COLUMN = "P3";
         final String SAMPLE_TYPE_NAME = "SimpleSampleType03";
 
@@ -390,13 +385,11 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("S_0"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive 2 samples from S_0"));
-
     }
 
     @Test
     public void testParentInSiblingContainer()
     {
-
         final String PARENT_COLUMN = "P4";
         final String SAMPLE_TYPE_NAME = "SimpleSampleType04";
 
@@ -421,13 +414,11 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SIB_0"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive 2 samples from SIB_0"));
-
     }
 
     @Test
     public void testMultipleParentColumns()
     {
-
         final String PARENT_COLUMN_SUB = "Parent-Sub-Folder";
         final String PARENT_COLUMN_CONTAINER = "Parent Parent Folder";
         final String SAMPLE_TYPE_NAME = "SimpleSampleType05";
@@ -469,7 +460,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkWithText("SE_05"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SE_04", "S_11"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
-        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
+        checkAllRowsInDataRegion("parentMaterials", SAMPLE_TYPE_COLUMN_NAME, List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_11, SE_04|SE_04, S_11)");
 
@@ -525,7 +516,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_04", "S_21"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
 
-        checkAllRowsInDataRegion("parentMaterials", "Sample Set", List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
+        checkAllRowsInDataRegion("parentMaterials", SAMPLE_TYPE_COLUMN_NAME, List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_21, SF_04|SF_04, S_21)");
 
@@ -562,14 +553,12 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkWithText("SF_10"));
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("SF_04", "S_23"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" ", " "));
-        checkAllRowsInDataRegion("parentMaterials", "Sample Type", List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
-
+        checkAllRowsInDataRegion("parentMaterials", SAMPLE_TYPE_COLUMN_NAME, List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
     }
 
     @Test
     public void testUseThenRemoveAnAliasParentColumn()
     {
-
         final String PARENT_COLUMN = "P7";
         final String SAMPLE_TYPE_NAME = "SimpleSampleType07";
 
@@ -629,7 +618,6 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("childMaterials", "Run", List.of("Derive sample from SG_01"));
 
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SG_01"));
-
     }
 
     @Test
@@ -732,13 +720,11 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentData", "Name", List.of("DC_2", "DCSIB_2"));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:DC_2, DCSIB_2|DCSIB_2, DC_2)");
-
     }
 
     @Test
     public void testMaterialInputsWithColumnNamedAlias()
     {
-
         final String PARENT_COLUMN = "P10";
         final String SAMPLE_TYPE_NAME = "SimpleSampleType10";
 
@@ -764,7 +750,6 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentMaterials", "Name", List.of("S_0"));
         checkAllRowsInDataRegion("parentMaterials", "Run", List.of(" "));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive 2 samples from S_0"));
-
     }
 
     @Test
@@ -812,7 +797,5 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentData", "Name", List.of("DC_2", "DCSIB_2"));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:DC_2, DCSIB_2|DCSIB_2, DC_2)");
-
     }
-
 }
