@@ -216,7 +216,7 @@ public abstract class TestFileUtils
             File checkFile = new File(sampledataDir, relativePath);
             if (checkFile.exists())
             {
-                if (foundFile != null && foundFile.length() != checkFile.length()) // Allow duplicate files to ease migration
+                if (foundFile != null)
                     throw new IllegalArgumentException("Ambiguous file specified: " + relativePath + "\n" +
                             "Found:\n" +
                             foundFile + "\n" +
