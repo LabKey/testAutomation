@@ -912,7 +912,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void resetErrors()
     {
-        if (isGuestModeTest())
+        if (isGuestModeTest() || TestProperties.isPrimaryUserAppAdmin())
             return;
 
         invokeApiAction(null, "admin", "resetErrorMark", "Failed to reset server errors");

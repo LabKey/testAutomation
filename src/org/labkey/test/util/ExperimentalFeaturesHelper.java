@@ -20,6 +20,7 @@ import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.LabKeySiteWrapper;
+import org.labkey.test.TestProperties;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -76,6 +77,9 @@ public class ExperimentalFeaturesHelper
 
     private static void setFeature(Connection cn, String feature, boolean enable)
     {
+        if (TestProperties.isPrimaryUserAppAdmin())
+            return; // App admin can't enable/disable experimental features
+
         TestLogger.log((enable ? "Enabling" : "Disabling") + " experimental feature " + feature);
 
         Map<String, Object> parameters = new HashMap<>();

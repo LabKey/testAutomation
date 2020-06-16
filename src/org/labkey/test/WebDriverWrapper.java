@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.GuestCredentialsProvider;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
@@ -469,7 +470,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         // Turn on server side logging of client errors.
         if (isScriptCheckEnabled())
         {
-            Connection cn = createDefaultConnection(false);
+            Connection cn = createDefaultConnection(true);
             ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", true);
         }
     }
@@ -480,7 +481,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         // Turn off server side logging of client errors.
         if (isScriptCheckEnabled())
         {
-            Connection cn = createDefaultConnection(false);
+            Connection cn = createDefaultConnection(true);
             ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", false);
         }
     }
@@ -488,14 +489,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     @LogMethod(quiet = true)
     public void enableUxDomainDesigner()
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection(true);
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", true);
     }
 
     @LogMethod(quiet = true)
     public void disableUxDomainDesigner()
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection(true);
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", false);
     }
 
@@ -985,9 +986,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public Connection createDefaultConnection(boolean reuseSession)
     {
-        Connection connection = WebTestHelper.getRemoteApiConnection(false);
+        Connection connection;
         if (reuseSession)
         {
+            connection = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
             if (getDriver().manage().getCookieNamed("JSESSIONID") == null)
             {
                 throw new IllegalStateException("No session cookie available to reuse.");
@@ -998,6 +1000,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
             {
                 connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
             }
+        }
+        else
+        {
+            connection = WebTestHelper.getRemoteApiConnection(false);
         }
 
         return connection;
