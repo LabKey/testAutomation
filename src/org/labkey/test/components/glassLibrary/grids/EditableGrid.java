@@ -1,6 +1,5 @@
 package org.labkey.test.components.glassLibrary.grids;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -11,9 +10,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -299,16 +295,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                     "the target cell did not become selected", 4000);
         }
 
-        Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
-        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        StringSelection sel = new StringSelection(pasteText);
-        c.setContents(sel, sel);
-
-        new Actions(getDriver())
-                .keyDown(cmdKey)
-                .sendKeys("v")       // paste the contents into whatever has focus now
-                .keyUp(cmdKey)
-                .perform();
+        getWrapper().actionPaste(null, pasteText);
         return this;
     }
 
