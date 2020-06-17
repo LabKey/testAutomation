@@ -1,0 +1,1146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="GenericAssay" tableDbType="TABLE">
+    <description>Contains up to one row of GenericAssay data for each Participant/Visit/ObjectId combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="BatchMachine">
+        <datatype>varchar</datatype>
+        <columnTitle>Batch Machine</columnTitle>
+        <fk>
+          <fkDbSchema>lists</fkDbSchema>
+          <fkTable>Lab Machines</fkTable>
+          <fkColumnName>InstrumentID</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="BatchOperatorEmail">
+        <datatype>varchar</datatype>
+        <columnTitle>Batch Operator Email</columnTitle>
+        <description>The person who ran the diagnostic test.</description>
+      </column>
+      <column columnName="M1">
+        <datatype>integer</datatype>
+        <columnTitle>M1</columnTitle>
+      </column>
+      <column columnName="M2">
+        <datatype>integer</datatype>
+        <columnTitle>M2</columnTitle>
+      </column>
+      <column columnName="M3">
+        <datatype>double</datatype>
+        <columnTitle>M3</columnTitle>
+      </column>
+      <column columnName="ObjectId">
+        <datatype>integer</datatype>
+        <columnTitle>ObjectId</columnTitle>
+        <measure>true</measure>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="RunComments">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="RunCreatedBy">
+        <datatype>integer</datatype>
+        <columnTitle>Created By</columnTitle>
+        <fk>
+          <fkDbSchema>core</fkDbSchema>
+          <fkTable>Users</fkTable>
+          <fkColumnName>UserId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="RunCreatedOn">
+        <datatype>timestamp</datatype>
+        <columnTitle>Created</columnTitle>
+      </column>
+      <column columnName="RunMachineSetting">
+        <datatype>integer</datatype>
+        <columnTitle>Machine Setting</columnTitle>
+      </column>
+      <column columnName="RunName">
+        <datatype>varchar</datatype>
+        <columnTitle>Assay Id</columnTitle>
+        <description>The assay/experiment ID that uniquely identifies this assay run.</description>
+      </column>
+    </columns>
+    <tableTitle>GenericAssay</tableTitle>
+  </table>
+  <table tableName="ELISpotAssay" tableDbType="TABLE">
+    <description>Contains up to one row of ELISpotAssay data for each Participant/Visit/ObjectId combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="AntigenID">
+        <datatype>integer</datatype>
+        <columnTitle>Antigen ID</columnTitle>
+      </column>
+      <column columnName="AntigenName">
+        <datatype>varchar</datatype>
+        <columnTitle>Antigen Name</columnTitle>
+      </column>
+      <column columnName="CellWell">
+        <datatype>integer</datatype>
+        <columnTitle>Cell Well</columnTitle>
+      </column>
+      <column columnName="ObjectId">
+        <datatype>integer</datatype>
+        <columnTitle>ObjectId</columnTitle>
+        <measure>true</measure>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="RunComments">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="RunCreatedBy">
+        <datatype>integer</datatype>
+        <columnTitle>Created By</columnTitle>
+        <fk>
+          <fkDbSchema>core</fkDbSchema>
+          <fkTable>Users</fkTable>
+          <fkColumnName>UserId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="RunCreatedOn">
+        <datatype>timestamp</datatype>
+        <columnTitle>Created</columnTitle>
+      </column>
+      <column columnName="RunExperimentDate">
+        <datatype>timestamp</datatype>
+        <columnTitle>Experiment Date</columnTitle>
+      </column>
+      <column columnName="RunLabID">
+        <datatype>varchar</datatype>
+        <columnTitle>Lab ID</columnTitle>
+      </column>
+      <column columnName="RunName">
+        <datatype>varchar</datatype>
+        <columnTitle>Assay Id</columnTitle>
+        <description>The assay/experiment ID that uniquely identifies this assay run.</description>
+      </column>
+      <column columnName="RunPlateID">
+        <datatype>varchar</datatype>
+        <columnTitle>Plate ID</columnTitle>
+      </column>
+      <column columnName="RunPlateReader">
+        <datatype>varchar</datatype>
+        <columnTitle>Plate Reader</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="RunProtocol">
+        <datatype>varchar</datatype>
+        <columnTitle>Protocol</columnTitle>
+      </column>
+      <column columnName="RunTemplateID">
+        <datatype>varchar</datatype>
+        <columnTitle>Template ID</columnTitle>
+      </column>
+      <column columnName="SampleDescription">
+        <datatype>varchar</datatype>
+        <columnTitle>Sample Description</columnTitle>
+      </column>
+      <column columnName="SpecimenID">
+        <datatype>varchar</datatype>
+        <columnTitle>Specimen ID</columnTitle>
+      </column>
+      <column columnName="SpotCount">
+        <datatype>double</datatype>
+        <columnTitle>Spot Count</columnTitle>
+        <formatString>0.0</formatString>
+      </column>
+      <column columnName="WellgroupLocation">
+        <datatype>varchar</datatype>
+        <columnTitle>Wellgroup Location</columnTitle>
+      </column>
+      <column columnName="WellgroupName">
+        <datatype>varchar</datatype>
+        <columnTitle>Wellgroup Name</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>ELISpotAssay</tableTitle>
+  </table>
+  <table tableName="NAbAssay" tableDbType="TABLE">
+    <description>Contains up to one row of NAbAssay data for each Participant/Visit/ObjectId combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="CurveIC50">
+        <datatype>double</datatype>
+        <columnTitle>CurveIC50</columnTitle>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="CurveIC50OORIndicator">
+        <datatype>varchar</datatype>
+        <columnTitle>CurveIC50 OOR Indicator</columnTitle>
+      </column>
+      <column columnName="CurveIC50Number">
+        <datatype>double</datatype>
+        <columnTitle>CurveIC50 Number</columnTitle>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="CurveIC80">
+        <datatype>double</datatype>
+        <columnTitle>CurveIC80</columnTitle>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="CurveIC80OORIndicator">
+        <datatype>varchar</datatype>
+        <columnTitle>CurveIC80 OOR Indicator</columnTitle>
+      </column>
+      <column columnName="CurveIC80Number">
+        <datatype>double</datatype>
+        <columnTitle>CurveIC80 Number</columnTitle>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="Factor">
+        <datatype>double</datatype>
+        <columnTitle>Dilution Factor</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="FitError">
+        <datatype>double</datatype>
+        <columnTitle>Fit Error</columnTitle>
+        <formatString>0.0</formatString>
+      </column>
+      <column columnName="InitialDilution">
+        <datatype>double</datatype>
+        <columnTitle>Initial Dilution</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="Method">
+        <datatype>varchar</datatype>
+        <columnTitle>Method</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="ObjectId">
+        <datatype>integer</datatype>
+        <columnTitle>ObjectId</columnTitle>
+        <measure>true</measure>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="PointIC50">
+        <datatype>double</datatype>
+        <columnTitle>PointIC50</columnTitle>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="PointIC50OORIndicator">
+        <datatype>varchar</datatype>
+        <columnTitle>PointIC50 OOR Indicator</columnTitle>
+      </column>
+      <column columnName="PointIC50Number">
+        <datatype>double</datatype>
+        <columnTitle>PointIC50 Number</columnTitle>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="PointIC80">
+        <datatype>double</datatype>
+        <columnTitle>PointIC80</columnTitle>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="PointIC80OORIndicator">
+        <datatype>varchar</datatype>
+        <columnTitle>PointIC80 OOR Indicator</columnTitle>
+      </column>
+      <column columnName="PointIC80Number">
+        <datatype>double</datatype>
+        <columnTitle>PointIC80 Number</columnTitle>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="RunComments">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="RunCreatedBy">
+        <datatype>integer</datatype>
+        <columnTitle>Created By</columnTitle>
+        <fk>
+          <fkDbSchema>core</fkDbSchema>
+          <fkTable>Users</fkTable>
+          <fkColumnName>UserId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="RunCreatedOn">
+        <datatype>timestamp</datatype>
+        <columnTitle>Created</columnTitle>
+      </column>
+      <column columnName="RunCurveFitMethod">
+        <datatype>varchar</datatype>
+        <columnTitle>Curve Fit Method</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="RunCutoff1">
+        <datatype>integer</datatype>
+        <columnTitle>Cutoff Percentage (1)</columnTitle>
+        <nullable>false</nullable>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="RunCutoff2">
+        <datatype>integer</datatype>
+        <columnTitle>Cutoff Percentage (2)</columnTitle>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="RunCutoff3">
+        <datatype>integer</datatype>
+        <columnTitle>Cutoff Percentage (3)</columnTitle>
+        <formatString>0.0##</formatString>
+      </column>
+      <column columnName="RunExperimentDate">
+        <datatype>timestamp</datatype>
+        <columnTitle>Experiment Date</columnTitle>
+      </column>
+      <column columnName="RunExperimentID">
+        <datatype>varchar</datatype>
+        <columnTitle>Experiment ID</columnTitle>
+      </column>
+      <column columnName="RunExperimentPerformer">
+        <datatype>varchar</datatype>
+        <columnTitle>Experiment Performer</columnTitle>
+      </column>
+      <column columnName="RunFileID">
+        <datatype>varchar</datatype>
+        <columnTitle>File ID</columnTitle>
+      </column>
+      <column columnName="RunHostCell">
+        <datatype>varchar</datatype>
+        <columnTitle>Host Cell</columnTitle>
+      </column>
+      <column columnName="RunIncubationTime">
+        <datatype>varchar</datatype>
+        <columnTitle>Incubation Time</columnTitle>
+      </column>
+      <column columnName="RunLockYAxis">
+        <datatype>boolean</datatype>
+        <columnTitle>Lock Graph Y-Axis</columnTitle>
+      </column>
+      <column columnName="RunName">
+        <datatype>varchar</datatype>
+        <columnTitle>Assay Id</columnTitle>
+        <description>The assay/experiment ID that uniquely identifies this assay run.</description>
+      </column>
+      <column columnName="RunPlateNumber">
+        <datatype>varchar</datatype>
+        <columnTitle>Plate Number</columnTitle>
+      </column>
+      <column columnName="RunStudyName">
+        <datatype>varchar</datatype>
+        <columnTitle>Study Name</columnTitle>
+      </column>
+      <column columnName="RunVirusID">
+        <datatype>varchar</datatype>
+        <columnTitle>Virus ID</columnTitle>
+      </column>
+      <column columnName="RunVirusName">
+        <datatype>varchar</datatype>
+        <columnTitle>Virus Name</columnTitle>
+      </column>
+      <column columnName="SampleDescription">
+        <datatype>varchar</datatype>
+        <columnTitle>Sample Description</columnTitle>
+      </column>
+      <column columnName="SpecimenID">
+        <datatype>varchar</datatype>
+        <columnTitle>Specimen ID</columnTitle>
+      </column>
+      <column columnName="WellgroupName">
+        <datatype>varchar</datatype>
+        <columnTitle>Wellgroup Name</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>NAbAssay</tableTitle>
+  </table>
+  <table tableName="LuminexAssay" tableDbType="TABLE">
+    <description>Contains up to one row of LuminexAssay data for each Participant/Visit/RowId combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="AnalyteFitProb">
+        <datatype>double</datatype>
+        <columnTitle>Analyte FitProb</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="AnalyteIsotype">
+        <datatype>varchar</datatype>
+        <columnTitle>Analyte Isotype</columnTitle>
+      </column>
+      <column columnName="AnalyteMaxStandardRecovery">
+        <datatype>integer</datatype>
+        <columnTitle>Analyte MaxStandardRecovery</columnTitle>
+      </column>
+      <column columnName="AnalyteMinStandardRecovery">
+        <datatype>integer</datatype>
+        <columnTitle>Analyte MinStandardRecovery</columnTitle>
+      </column>
+      <column columnName="AnalyteName">
+        <datatype>varchar</datatype>
+        <columnTitle>Analyte Name</columnTitle>
+      </column>
+      <column columnName="AnalyteRegressionType">
+        <datatype>varchar</datatype>
+        <columnTitle>Analyte RegressionType</columnTitle>
+      </column>
+      <column columnName="AnalyteResVar">
+        <datatype>double</datatype>
+        <columnTitle>Analyte ResVar</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="AnalyteStdCurve">
+        <datatype>varchar</datatype>
+        <columnTitle>Analyte StdCurve</columnTitle>
+      </column>
+      <column columnName="AnalyteUnitsOfConcentration">
+        <datatype>varchar</datatype>
+        <columnTitle>Analyte Units of Concentration</columnTitle>
+      </column>
+      <column columnName="BatchAnalysisSoftware">
+        <datatype>varchar</datatype>
+        <columnTitle>Analysis Software</columnTitle>
+      </column>
+      <column columnName="BatchLabID">
+        <datatype>varchar</datatype>
+        <columnTitle>Lab ID</columnTitle>
+      </column>
+      <column columnName="BatchSpecies">
+        <datatype>varchar</datatype>
+        <columnTitle>Species</columnTitle>
+      </column>
+      <column columnName="ConcInRange">
+        <datatype>double</datatype>
+        <columnTitle>ConcInRange</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="ConcInRangeOORIndicator">
+        <datatype>varchar</datatype>
+        <columnTitle>ConcInRange OOR Indicator</columnTitle>
+      </column>
+      <column columnName="ConcInRangeNumber">
+        <datatype>double</datatype>
+        <columnTitle>ConcInRange Number</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="ConcInRangeString">
+        <datatype>varchar</datatype>
+        <columnTitle>ConcInRangeString</columnTitle>
+      </column>
+      <column columnName="DataRowGroup">
+        <datatype>varchar</datatype>
+        <columnTitle>DataRowGroup</columnTitle>
+      </column>
+      <column columnName="Description">
+        <datatype>varchar</datatype>
+        <columnTitle>Description</columnTitle>
+      </column>
+      <column columnName="Dilution">
+        <datatype>double</datatype>
+        <columnTitle>Dilution</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="ExpConc">
+        <datatype>double</datatype>
+        <columnTitle>ExpConc</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="ExtraSpecimenInfo">
+        <datatype>varchar</datatype>
+        <columnTitle>ExtraSpecimenInfo</columnTitle>
+      </column>
+      <column columnName="FI">
+        <datatype>double</datatype>
+        <columnTitle>FI</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="FIOORIndicator">
+        <datatype>varchar</datatype>
+        <columnTitle>FI OOR Indicator</columnTitle>
+      </column>
+      <column columnName="FINumber">
+        <datatype>double</datatype>
+        <columnTitle>FI Number</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="FIBackground">
+        <datatype>double</datatype>
+        <columnTitle>FIBackground</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="FIBackgroundOORIndicator">
+        <datatype>varchar</datatype>
+        <columnTitle>FIBackground OOR Indicator</columnTitle>
+      </column>
+      <column columnName="FIBackgroundNumber">
+        <datatype>double</datatype>
+        <columnTitle>FIBackground Number</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="FIBackgroundString">
+        <datatype>varchar</datatype>
+        <columnTitle>FIBackgroundString</columnTitle>
+      </column>
+      <column columnName="FIString">
+        <datatype>varchar</datatype>
+        <columnTitle>FIString</columnTitle>
+      </column>
+      <column columnName="ObsConc">
+        <datatype>double</datatype>
+        <columnTitle>ObsConc</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="ObsConcOORIndicator">
+        <datatype>varchar</datatype>
+        <columnTitle>ObsConc OOR Indicator</columnTitle>
+      </column>
+      <column columnName="ObsConcNumber">
+        <datatype>double</datatype>
+        <columnTitle>ObsConc Number</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="ObsConcString">
+        <datatype>varchar</datatype>
+        <columnTitle>ObsConcString</columnTitle>
+      </column>
+      <column columnName="ObsOverExp">
+        <datatype>double</datatype>
+        <columnTitle>ObsOverExp</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="Outlier">
+        <datatype>integer</datatype>
+        <columnTitle>Outlier</columnTitle>
+      </column>
+      <column columnName="Ratio">
+        <datatype>varchar</datatype>
+        <columnTitle>Ratio</columnTitle>
+      </column>
+      <column columnName="RowId">
+        <datatype>integer</datatype>
+        <columnTitle>RowId</columnTitle>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="RunAcquisitionDate">
+        <datatype>timestamp</datatype>
+        <columnTitle>Acquisition Date</columnTitle>
+      </column>
+      <column columnName="RunAdditive">
+        <datatype>varchar</datatype>
+        <columnTitle>Additive</columnTitle>
+      </column>
+      <column columnName="RunComments">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="RunCreatedBy">
+        <datatype>integer</datatype>
+        <columnTitle>Created By</columnTitle>
+        <fk>
+          <fkDbSchema>core</fkDbSchema>
+          <fkTable>Users</fkTable>
+          <fkColumnName>UserId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="RunCreatedOn">
+        <datatype>timestamp</datatype>
+        <columnTitle>Created</columnTitle>
+      </column>
+      <column columnName="RunDateModified">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date file was modified</columnTitle>
+      </column>
+      <column columnName="RunDerivative">
+        <datatype>varchar</datatype>
+        <columnTitle>Derivative</columnTitle>
+      </column>
+      <column columnName="RunFileName">
+        <datatype>varchar</datatype>
+        <columnTitle>File Name</columnTitle>
+      </column>
+      <column columnName="RunName">
+        <datatype>varchar</datatype>
+        <columnTitle>Assay Id</columnTitle>
+        <description>The assay/experiment ID that uniquely identifies this assay run.</description>
+      </column>
+      <column columnName="RunPlateID">
+        <datatype>varchar</datatype>
+        <columnTitle>Plate ID</columnTitle>
+      </column>
+      <column columnName="RunRP1PMTvolts">
+        <datatype>double</datatype>
+        <columnTitle>RP1 PMT (Volts)</columnTitle>
+      </column>
+      <column columnName="RunRP1Target">
+        <datatype>varchar</datatype>
+        <columnTitle>RP1 Target</columnTitle>
+      </column>
+      <column columnName="RunReaderSerialNumber">
+        <datatype>varchar</datatype>
+        <columnTitle>Reader Serial Number</columnTitle>
+      </column>
+      <column columnName="RunReplacesPreviousFile">
+        <datatype>boolean</datatype>
+        <columnTitle>Replaces Previous File</columnTitle>
+      </column>
+      <column columnName="RunSpecimenType">
+        <datatype>varchar</datatype>
+        <columnTitle>Specimen Type</columnTitle>
+      </column>
+      <column columnName="SamplingErrors">
+        <datatype>varchar</datatype>
+        <columnTitle>SamplingErrors</columnTitle>
+      </column>
+      <column columnName="StdDev">
+        <datatype>double</datatype>
+        <columnTitle>StdDev</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="StdDevOORIndicator">
+        <datatype>varchar</datatype>
+        <columnTitle>StdDev OOR Indicator</columnTitle>
+      </column>
+      <column columnName="StdDevNumber">
+        <datatype>double</datatype>
+        <columnTitle>StdDev Number</columnTitle>
+        <formatString>0.###</formatString>
+      </column>
+      <column columnName="StdDevString">
+        <datatype>varchar</datatype>
+        <columnTitle>StdDevString</columnTitle>
+      </column>
+      <column columnName="Type">
+        <datatype>varchar</datatype>
+        <columnTitle>Type</columnTitle>
+      </column>
+      <column columnName="Well">
+        <datatype>varchar</datatype>
+        <columnTitle>Well</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>LuminexAssay</tableTitle>
+  </table>
+  <table tableName="Microarray Test" tableDbType="TABLE">
+    <description>Contains up to one row of MicroarrayAssay data for each Participant/Visit/ObjectId combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="ObjectId">
+        <datatype>integer</datatype>
+        <columnTitle>ObjectId</columnTitle>
+        <measure>true</measure>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="RunComments">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="RunCreatedBy">
+        <datatype>integer</datatype>
+        <columnTitle>Created By</columnTitle>
+        <fk>
+          <fkDbSchema>core</fkDbSchema>
+          <fkTable>Users</fkTable>
+          <fkColumnName>UserId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="RunCreatedOn">
+        <datatype>timestamp</datatype>
+        <columnTitle>Created</columnTitle>
+      </column>
+      <column columnName="RunName">
+        <datatype>varchar</datatype>
+        <columnTitle>Name</columnTitle>
+      </column>
+      <column columnName="RunProducer">
+        <datatype>varchar</datatype>
+        <columnTitle>Producer</columnTitle>
+        <description>/MAGE-ML/Descriptions_assnlist/Description/Annotations_assnlist/OntologyEntry[@category='Producer']/@value</description>
+      </column>
+      <column columnName="RunProtocol_Name">
+        <datatype>varchar</datatype>
+        <columnTitle>Protocol_Name</columnTitle>
+        <description>/MAGE-ML/BioAssay_package/BioAssay_assnlist/MeasuredBioAssay/FeatureExtraction_assn/FeatureExtraction/ProtocolApplications_assnlist/ProtocolApplication/SoftwareApplications_assnlist/SoftwareApplication/ParameterValues_assnlist/ParameterValue[ParameterType_assnref/Parameter_ref/@identifier='Agilent.BRS:Parameter:Protocol_Name']/@value</description>
+      </column>
+      <column columnName="RunRunPropertyWithoutXPath">
+        <datatype>varchar</datatype>
+        <columnTitle>RunPropertyWithoutXPath</columnTitle>
+      </column>
+      <column columnName="RunVersion">
+        <datatype>varchar</datatype>
+        <columnTitle>Version</columnTitle>
+        <description>/MAGE-ML/Descriptions_assnlist/Description/Annotations_assnlist/OntologyEntry[@category='Version']/@value</description>
+      </column>
+    </columns>
+    <tableTitle>MicroarrayAssay</tableTitle>
+  </table>
+  <table tableName="FileBasedAssay" tableDbType="TABLE">
+    <description>Contains up to one row of FileBasedAssay data for each Participant/Visit/ObjectId combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="M1">
+        <datatype>integer</datatype>
+        <columnTitle>Measure1</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="ObjectId">
+        <datatype>integer</datatype>
+        <columnTitle>ObjectId</columnTitle>
+        <measure>true</measure>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="RunComments">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="RunCreatedBy">
+        <datatype>integer</datatype>
+        <columnTitle>Created By</columnTitle>
+        <fk>
+          <fkDbSchema>core</fkDbSchema>
+          <fkTable>Users</fkTable>
+          <fkColumnName>UserId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="RunCreatedOn">
+        <datatype>timestamp</datatype>
+        <columnTitle>Created</columnTitle>
+      </column>
+      <column columnName="RunName">
+        <datatype>varchar</datatype>
+        <columnTitle>Assay Id</columnTitle>
+        <description>The assay/experiment ID that uniquely identifies this assay run.</description>
+      </column>
+      <column columnName="Stim">
+        <datatype>boolean</datatype>
+        <columnTitle>Stimulated</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="Weight">
+        <datatype>double</datatype>
+        <columnTitle>Weight</columnTitle>
+        <nullable>false</nullable>
+      </column>
+    </columns>
+    <tableTitle>FileBasedAssay</tableTitle>
+  </table>
+  <table tableName="Participation and Genetic Consent" tableDbType="TABLE">
+    <description>Contains up to one row of Participation and Genetic Consent data for each Participant combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="ParticipationConsent">
+        <datatype>boolean</datatype>
+        <columnTitle>Participation Consent</columnTitle>
+      </column>
+      <column columnName="GeneticConsent">
+        <datatype>boolean</datatype>
+        <columnTitle>Genetic Consent</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>Participation and Genetic Consent</tableTitle>
+  </table>
+  <table tableName="Physical Exam" tableDbType="TABLE">
+    <description>Contains up to one row of Physical Exam data for each Participant/Visit combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="Weight_kg">
+        <datatype>integer</datatype>
+        <columnTitle>Weight (kg)</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="Temp_C">
+        <datatype>double</datatype>
+        <columnTitle>Temperature (C)</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="SystolicBloodPressure">
+        <datatype>integer</datatype>
+        <columnTitle>Systolic Blood Pressure xxx/</columnTitle>
+      </column>
+      <column columnName="DiastolicBloodPressure">
+        <datatype>integer</datatype>
+        <columnTitle>Diastolic Blood Pressure /xxx</columnTitle>
+      </column>
+      <column columnName="Pulse">
+        <datatype>integer</datatype>
+        <columnTitle>Pulse</columnTitle>
+        <conditionalFormats>
+          <conditionalFormat>
+            <filters>
+              <filter operator="gte" value="170"/>
+            </filters>
+            <backgroundColor>993300</backgroundColor>
+          </conditionalFormat>
+        </conditionalFormats>
+      </column>
+      <column columnName="Respirations">
+        <datatype>integer</datatype>
+        <columnTitle>Respirations</columnTitle>
+      </column>
+      <column columnName="Signature">
+        <datatype>integer</datatype>
+        <columnTitle>Clinician Signature/Date</columnTitle>
+      </column>
+      <column columnName="Pregnancy">
+        <datatype>varchar</datatype>
+        <columnTitle>Pregnancy Test</columnTitle>
+      </column>
+      <column columnName="Language">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>Physical Exam</tableTitle>
+  </table>
+  <table tableName="Demographics" tableDbType="TABLE">
+    <description>Contains up to one row of Demographics data for each Participant combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="StartDate">
+        <datatype>timestamp</datatype>
+        <columnTitle>Start Date</columnTitle>
+      </column>
+      <column columnName="Height">
+        <datatype>integer</datatype>
+        <columnTitle>Height</columnTitle>
+      </column>
+      <column columnName="Gender">
+        <datatype>varchar</datatype>
+        <columnTitle>Gender</columnTitle>
+      </column>
+      <column columnName="Country">
+        <datatype>varchar</datatype>
+        <columnTitle>Country</columnTitle>
+      </column>
+      <column columnName="Group">
+        <datatype>varchar</datatype>
+        <columnTitle>Group Assignment</columnTitle>
+      </column>
+      <column columnName="Status">
+        <datatype>varchar</datatype>
+        <columnTitle>Status of Infection</columnTitle>
+      </column>
+      <column columnName="Comments">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>Demographics</tableTitle>
+  </table>
+  <table tableName="Status Assessment" tableDbType="TABLE">
+    <description>Contains up to one row of Status Assessment data for each Participant/Visit combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="MeetsCriteria">
+        <datatype>boolean</datatype>
+        <columnTitle>Meets Criteria for Acute</columnTitle>
+      </column>
+      <column columnName="AgreesToAccuteSchedule">
+        <datatype>boolean</datatype>
+        <columnTitle>Agrees to Acute Schedule</columnTitle>
+      </column>
+      <column columnName="PartnerAgrees">
+        <datatype>boolean</datatype>
+        <columnTitle>Agrees to Provide Partner Info</columnTitle>
+      </column>
+      <column columnName="Partner1">
+        <datatype>integer</datatype>
+        <columnTitle>Partner #1 ID</columnTitle>
+      </column>
+      <column columnName="Partner2">
+        <datatype>varchar</datatype>
+        <columnTitle>Partner #2 ID</columnTitle>
+      </column>
+      <column columnName="Cohort">
+        <datatype>integer</datatype>
+        <columnTitle>Cohort</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>Status Assessment</tableTitle>
+  </table>
+  <table tableName="HIV Test Results" tableDbType="TABLE">
+    <description>Contains up to one row of HIV Test Results data for each Participant/Visit combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="HIVWestern">
+        <datatype>varchar</datatype>
+        <columnTitle>HIV Western Blot</columnTitle>
+      </column>
+      <column columnName="HIVStdAntibody">
+        <datatype>varchar</datatype>
+        <columnTitle>Standard HIV Antibody</columnTitle>
+      </column>
+      <column columnName="HIVLoadIneq">
+        <datatype>varchar</datatype>
+        <columnTitle><![CDATA[Viral Load > = <]]></columnTitle>
+      </column>
+      <column columnName="HIVLoadQuant">
+        <datatype>integer</datatype>
+        <columnTitle>Viral Load Quantified (copies/ml)</columnTitle>
+      </column>
+      <column columnName="HIVLoadQual">
+        <datatype>varchar</datatype>
+        <columnTitle>Viral Load Qualitative Result</columnTitle>
+      </column>
+      <column columnName="HIVRapidTest">
+        <datatype>varchar</datatype>
+        <columnTitle>HIV Rapid Blood Test</columnTitle>
+      </column>
+      <column columnName="HIVSourceLab">
+        <datatype>varchar</datatype>
+        <columnTitle>Source of HIV Tests</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>HIV Test Results</tableTitle>
+  </table>
+  <table tableName="Lab Results" tableDbType="TABLE">
+    <description>Contains up to one row of Lab Results data for each Participant/Visit combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="CD4">
+        <datatype>integer</datatype>
+        <columnTitle>CD4+ (cells/mm3)</columnTitle>
+      </column>
+      <column columnName="Lymphocytes">
+        <datatype>integer</datatype>
+        <columnTitle>Lymphs (cells/mm3)</columnTitle>
+      </column>
+      <column columnName="Hemoglobin">
+        <datatype>double</datatype>
+        <columnTitle>Hemoglobin</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+    </columns>
+    <tableTitle>Lab Results</tableTitle>
+  </table>
+</tables>

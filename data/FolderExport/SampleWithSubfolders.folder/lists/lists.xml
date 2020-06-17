@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/Folder%201/begin.view by cnathe@labkey.com on Tue Oct 30 14:41:56 CDT 2012-->
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="Reagents" tableDbType="TABLE">
+    <columns>
+      <column columnName="Key">
+        <datatype>integer</datatype>
+        <columnTitle>Key</columnTitle>
+        <nullable>false</nullable>
+        <isHidden>true</isHidden>
+        <isKeyField>true</isKeyField>
+        <isAutoInc>true</isAutoInc>
+      </column>
+      <column columnName="Reagent">
+        <datatype>varchar</datatype>
+        <columnTitle>Reagent</columnTitle>
+      </column>
+    </columns>
+    <pkColumnName>Key</pkColumnName>
+  </table>
+  <table tableName="Technicians" tableDbType="TABLE">
+    <columns>
+      <column columnName="Key">
+        <datatype>integer</datatype>
+        <columnTitle>Key</columnTitle>
+        <nullable>false</nullable>
+        <isHidden>true</isHidden>
+        <isKeyField>true</isKeyField>
+        <isAutoInc>true</isAutoInc>
+      </column>
+      <column columnName="FirstName">
+        <datatype>varchar</datatype>
+        <columnTitle>First Name</columnTitle>
+      </column>
+      <column columnName="LastName">
+        <datatype>varchar</datatype>
+        <columnTitle>Last Name</columnTitle>
+      </column>
+      <column columnName="ID">
+        <datatype>integer</datatype>
+        <columnTitle>ID</columnTitle>
+      </column>
+    </columns>
+    <pkColumnName>Key</pkColumnName>
+  </table>
+  <table tableName="safe list" tableDbType="TABLE">
+    <columns>
+      <column columnName="Fruit">
+        <datatype>varchar</datatype>
+        <columnTitle>Fruit</columnTitle>
+        <nullable>false</nullable>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="Color">
+        <datatype>varchar</datatype>
+        <columnTitle>Color</columnTitle>
+        <isMvEnabled>true</isMvEnabled>
+      </column>
+    </columns>
+    <pkColumnName>Fruit</pkColumnName>
+  </table>
+  <table tableName="Lab Machines" tableDbType="TABLE">
+    <columns>
+      <column columnName="InstrumentID">
+        <datatype>varchar</datatype>
+        <columnTitle>Instrument ID</columnTitle>
+        <nullable>false</nullable>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="Name">
+        <datatype>varchar</datatype>
+        <columnTitle>Name</columnTitle>
+      </column>
+      <column columnName="ContactPerson">
+        <datatype>varchar</datatype>
+        <columnTitle>Contact Person</columnTitle>
+      </column>
+    </columns>
+    <pkColumnName>InstrumentID</pkColumnName>
+  </table>
+</tables>

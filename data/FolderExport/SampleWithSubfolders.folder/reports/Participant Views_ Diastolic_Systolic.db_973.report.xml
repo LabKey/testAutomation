@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="chartDescriptor" reportName="Participant Views: Diastolic/Systolic" reportKey="study/Physical Exam" xmlns="http://labkey.org/query/xml">
+  <Properties>
+    <Prop name="descriptorType">chartDescriptor</Prop>
+    <Prop name="reportName">Participant Views: Diastolic/Systolic</Prop>
+    <Prop name="reportType">Study.chartQueryReport</Prop>
+    <Prop name="queryName">Physical Exam</Prop>
+    <Prop name="schemaName">study</Prop>
+    <Prop name="filterParam">participantId</Prop>
+    <Prop name="cached">false</Prop>
+    <Prop name="columnXName">DiastolicBloodPressure</Prop>
+    <Prop name="columnYName">SystolicBloodPressure</Prop>
+    <Prop name="chartType">1</Prop>
+    <Prop name="isLogX">false</Prop>
+    <Prop name="isLogY">false</Prop>
+    <Prop name="height">200</Prop>
+    <Prop name="width">640</Prop>
+    <Prop name="showMultipleYAxis">false</Prop>
+    <Prop name="showLines">false</Prop>
+    <Prop name="showMultipleCharts">false</Prop>
+    <Prop name="isVerticalOrientation">false</Prop>
+    <Prop name="datasetId">5004</Prop>
+    <Prop name="showWithDataset">5004</Prop>
+  </Properties>
+  <tags/>
+</ReportDescriptor>

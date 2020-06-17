@@ -1,0 +1,25 @@
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="PassFail2" tableDbType="NOT_IN_DB">
+    <tableUrl>query/executeQuery.view?schemaName=flow&amp;query.queryName=PassFailDetails2&amp;query.Key~eq=${Key}</tableUrl>
+    <titleColumn>Verdict</titleColumn>
+    <columns>
+      <column columnName="BKGRND_CD4_RESP">
+
+<formatString>#,##0.###</formatString>
+<datatype>DOUBLE</datatype>      </column>
+      <column columnName="BKGRND_CD8_RESP">
+<datatype>DOUBLE</datatype>
+<formatString>#,##0.###</formatString>
+      </column>
+
+      <column columnName="SEB_CD4_RESP">
+
+<formatString>#,##0.###</formatString>
+<datatype>DOUBLE</datatype>      </column>
+      <column columnName="SEB_CD8_RESP">
+<datatype>DOUBLE</datatype>
+<formatString>#,##0.###</formatString>
+      </column>
+    </columns>
+  </table>
+</tables>

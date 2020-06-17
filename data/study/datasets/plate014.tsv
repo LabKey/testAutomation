@@ -1,0 +1,7 @@
+# plate014																												
+QCStateLabel	dfvalid	dfraster	dfstudy	dfplate	visit	ptid	ursdsdt	ursdgluc	ursdglqc	ursdprot	ursdprqc	ursdhemo	ursdheqc	ursrbc	ursdoabn	ursdoabx	ursdover	ursdovqc	urscomx	bit4_014	bit3_014	bit2_014	bit1_014	formlang	sfdt_014	dfscreen	dfcreate	dfmodify
+clean	1	0549R01H3003	121	14	101	999320016	1/1/2005	Negative	0	Negative	0	Negative	0	0	No	0	normal	0	0	0	0	0	1	English	1	clean	12/8/2005 12:35	12/8/2005 12:35
+dirty	3	0602R00B7002	121	14	101	999320719	1/2/2006	Negative	0	Negative	0	Negative	0	0	No	0	normal	0	Testing!	0	0	0	1	English	0	dirty	1/9/2006 23:08	1/9/2006 23:08
+dirty	3	0602R00B5002	121	14	101	999321029	1/5/2006	Negative	0	Negative	0	Negative	0	0	No	0	normal	0	0	0	0	0	1	English	0	dirty	1/9/2006 21:36	1/9/2006 21:36
+dirty	3	0602R00B6003	121	14	101	999321033	1/6/2006	Negative	0	Negative	0	Negative	0	0	No	0	normal	0	0	0	0	0	1	English	0	dirty	1/9/2006 22:19	1/9/2006 22:19
+dirty	3	0602R00B6003	121	14	101	999321033	1/6/2006	Negative	0	Negative	0	Negative	0	0	No	0	normal	0	0	0	0	0	1	English	0	dirty	1/9/2006 22:19	1/9/2006 22:19

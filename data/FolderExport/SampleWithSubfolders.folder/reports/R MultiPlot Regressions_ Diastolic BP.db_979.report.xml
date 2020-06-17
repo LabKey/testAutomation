@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="rReportDescriptor" reportName="R MultiPlot Regressions: Diastolic BP" reportKey="study/Physical Exam" xmlns="http://labkey.org/query/xml">
+  <Properties>
+    <Prop name="descriptorType">rReportDescriptor</Prop>
+    <Prop name="reportName">R MultiPlot Regressions: Diastolic BP</Prop>
+    <Prop name="reportType">Study.rReport</Prop>
+    <Prop name="queryName">Physical Exam</Prop>
+    <Prop name="schemaName">study</Prop>
+    <Prop name="dataRegionName">Dataset</Prop>
+    <Prop name="cached">false</Prop>
+    <Prop name="script"><![CDATA[library(Cairo);
+data_means <- aggregate(labkey.data, list(ParticipantID = 
+ labkey.data$participantid), mean, na.rm = TRUE);
+Cairo(file="${imgout:multiplot.png}", type="png")
+op <- par(mfcol = c(2, 2)) # 2 x 2 pictures on one plot
+c11 <- plot(data_means$diastolicbloodpressure, data_means$weight_kg, , 
+ xlab="Diastolic Blood Pressure (mm Hg)", ylab="Weight (kg)",
+ mfg=c(1, 1))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$weight_kg))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$systolicbloodpressure, , 
+ xlab="Diastolic Blood Pressure (mm Hg)", 
+ ylab="Systolic Blood Pressure (mm Hg)", mfg= c(2, 1))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$systolicbloodpressure))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$pulse, , 
+ xlab="Diastolic Blood Pressure (mm Hg)", 
+ ylab="Pulse Rate (Beats/Minute)", mfg= c(1, 2))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$pulse))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$temp_c, , 
+ xlab="Diastolic Blood Pressure (mm Hg)", 
+ ylab="Temperature (Degrees C)", mfg= c(2, 2))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$temp_c))
+par(op); #Restore graphics parameters
+dev.off();]]></Prop>
+    <Prop name="runInBackground">false</Prop>
+    <Prop name="redirectUrl"><![CDATA[/study/home/Study/demo2/dataset.view?datasetId=5004&msg=Report%3A%20R%20Regression%3A%20Blood%20Pressure%3A%20All%20successfully%20saved&msg=Report%3A%20R%20Regression%3A%20Blood%20Pressure%3A%20Means%20successfully%20saved]]></Prop>
+  </Properties>
+  <tags/>
+</ReportDescriptor>

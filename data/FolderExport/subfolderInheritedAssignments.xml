@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/6%20Inheriting/begin.view by susanh@labkey.com on Thu Apr 23 20:39:59 PDT 2015-->
+<folder archiveVersion="15.1" label="6 Inheriting" type="normal" title="6 Inheriting" xmlns="http://labkey.org/folder/xml" xmlns:ns="http://labkey.org/study/xml">
+  <folderType name="None">
+    <defaultModule>Core</defaultModule>
+    <modules>
+      <moduleName>Core</moduleName>
+    </modules>
+  </folderType>
+  <searchable>true</searchable>
+  <pages file="pages.xml"/>
+  <moduleProperties/>
+  <roleAssignments inherited="true"/>
+  <wikis dir="wikis"/>
+  <notifications>
+    <messagesDefault id="2" label="My conversations"/>
+    <filesDefault id="512" label="No Email"/>
+  </notifications>
+  <missingValueIndicators>
+    <ns:missingValueIndicator indicator="Q" label="Data currently under quality control review."/>
+    <ns:missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'."/>
+  </missingValueIndicators>
+</folder>
