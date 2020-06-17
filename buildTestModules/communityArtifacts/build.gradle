@@ -1,5 +1,5 @@
-import org.labkey.gradle.util.BuildUtils
-
+apply plugin: 'java'
+apply plugin: 'org.labkey.module'
 
 dependencies { 
     // add dependencies on community modules, not including those that come through from transitive dependencies:
@@ -8,8 +8,7 @@ dependencies {
     modules "org.labkey.module:internal:${labkeyVersion}@module"
     modules "org.labkey.module:audit:${labkeyVersion}@module"
     modules "org.labkey.module:core:${labkeyVersion}@module"
-    modules "org.labkey.module:filecontent:${labkeyVersion}@module" 
-//    modules "org.labkey.module:announcements:${labkeyVersion}@module"
+    modules "org.labkey.module:filecontent:${labkeyVersion}@module"
     modules "org.labkey.module:bigiron:${labkeyVersion}@module"
     modules "org.labkey.module:elisa:${labkeyVersion}@module"
     modules "org.labkey.module:elispotassay:${labkeyVersion}@module"
@@ -18,7 +17,6 @@ dependencies {
     modules "org.labkey.module:issues:${labkeyVersion}@module"
     modules "org.labkey.module:luminex:${labkeyVersion}@module"
     modules "org.labkey.module:microarray:${labkeyVersion}@module"
-//    modules "org.labkey.module:ms2:${labkeyVersion}@module"
     modules "org.labkey.module:nab:${labkeyVersion}@module"
     modules "org.labkey.module:study:${labkeyVersion}@module"
     modules "org.labkey.module:survey:${labkeyVersion}@module"
