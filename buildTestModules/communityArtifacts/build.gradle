@@ -4,25 +4,63 @@ apply plugin: 'org.labkey.module'
 dependencies { 
     // add dependencies on community modules, not including those that come through from transitive dependencies:
     //   assay, list, experiment, search, pipeline, ms2, announcements
-    modules "org.labkey.module:api:${labkeyVersion}@module"
-    modules "org.labkey.module:internal:${labkeyVersion}@module"
-    modules "org.labkey.module:audit:${labkeyVersion}@module"
-    modules "org.labkey.module:core:${labkeyVersion}@module"
-    modules "org.labkey.module:filecontent:${labkeyVersion}@module"
-    modules "org.labkey.module:bigiron:${labkeyVersion}@module"
-    modules "org.labkey.module:elisa:${labkeyVersion}@module"
-    modules "org.labkey.module:elispotassay:${labkeyVersion}@module"
-    modules "org.labkey.module:fcsexpress:${labkeyVersion}@module"
-    modules "org.labkey.module:flow:${labkeyVersion}@module"
-    modules "org.labkey.module:issues:${labkeyVersion}@module"
-    modules "org.labkey.module:luminex:${labkeyVersion}@module"
-    modules "org.labkey.module:microarray:${labkeyVersion}@module"
-    modules "org.labkey.module:nab:${labkeyVersion}@module"
-    modules "org.labkey.module:study:${labkeyVersion}@module"
-    modules "org.labkey.module:survey:${labkeyVersion}@module"
-    modules "org.labkey.module:targetedms:${labkeyVersion}@module"
-    modules "org.labkey.module:visualization:${labkeyVersion}@module"
-    modules "org.labkey.module:wiki:${labkeyVersion}@module"
+    modules ("org.labkey.module:api:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:internal:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:audit:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:core:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:filecontent:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:bigiron:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:elisa:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:elispotassay:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:fcsexpress:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:flow:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:issues:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:luminex:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:microarray:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:nab:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:study:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:survey:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:targetedms:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:visualization:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:wiki:${labkeyVersion}@module") {
+        transitive = true
+    }
 
     // add dependencies on all community API artifacts
     implementation "org.labkey.api:core:${labkeyVersion}"
