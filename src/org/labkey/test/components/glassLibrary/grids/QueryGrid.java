@@ -7,18 +7,14 @@ package org.labkey.test.components.glassLibrary.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -28,9 +24,8 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
  * </p>
  * <p>The second component is the responsive grid which is the grid data.</p>
  */
-public class QueryGrid extends WebDriverComponent
+public class QueryGrid extends ResponsiveGrid<QueryGrid>
 {
-
     final private WebDriver _driver;
     final private WebElement _queryGridPanel;
     private GridBar _gridBar;
@@ -39,6 +34,7 @@ public class QueryGrid extends WebDriverComponent
 
     protected QueryGrid(WebElement element, WebDriver driver)
     {
+        super(element, driver);
         _queryGridPanel = element;
         _driver = driver;
 
@@ -62,38 +58,24 @@ public class QueryGrid extends WebDriverComponent
     // get rowMaps
 
     /**
-     * Where possible, use text
-     * @param rowIndex
-     * @return
-     */
-    @Deprecated
-    public Map<String, String> getRowMap(int rowIndex)
-    {
-        return getGrid().getRowMap(rowIndex);
-    }
-
-    /**
      * Returns the first row with a column text equivalent to the supplied text
      * @param text
      * @return
      */
     public Map<String, String> getRowMap(String text)
     {
-        GridRow row = getGrid().getRow(text).orElseThrow(()->
-                new NotFoundException("No row was found with value ["+ text +"]"));
-        return row.getRowMap();
+        return getRow(text).getRowMap();
     }
 
     /**
      * Returns the first row with the supplied text in the specified column
-     * @param text
      * @param column    The text in the column header cell
+     * @param text
      * @return
      */
-    public Map<String, String> getRowMap(String text, String column)
+    public Map<String, String> getRowMap(String column, String text)
     {
-        GridRow row = getGrid().getRow(text, column).orElseThrow(()->
-                new NotFoundException("No row was found with value ["+ text +"] in column ["+ column +"]"));
+        GridRow row = getRow(column, text);
         return row.getRowMap();
     }
 
@@ -104,9 +86,7 @@ public class QueryGrid extends WebDriverComponent
      */
     public Map<String, String> getRowMap(Map<String, String> partialMap)
     {
-        return  getGrid().getRow(partialMap)
-                .orElseThrow(()-> new NotFoundException("No row with matching parameters was present: ["+partialMap+"]"))
-                .getRowMap();
+        return getRow(partialMap).getRowMap();
     }
 
     /**
@@ -116,55 +96,22 @@ public class QueryGrid extends WebDriverComponent
      */
     public Map<String, String> getRowMap(Locator.XPathLocator containing)
     {
-        return getGrid().getRow(containing).orElseThrow(()->
-                new NotFoundException("No row was found with  ["+ containing +"]")).getRowMap();
-    }
-
-    /**
-     * Returns a list of current rows, as maps
-     * @return
-     */
-    public List<Map<String, String>> getRowMaps()
-    {
-        return getGrid().getRowMaps();
+        return getRow(containing).getRowMap();
     }
 
     // row selection
 
     /**
-     * Tests should find ways to identify rows without relying on indexes, such as
-     * text/column combination
-     * @param index
-     * @param checked
-     * @return
-     */
-    @Deprecated
-    public QueryGrid selectRow(int index, boolean checked)
-    {
-        assertTrue("Grid must have a select column to select rows", getGrid().hasSelectColumn());
-        getGrid().getRows().get(index).select(checked);
-        return this;
-    }
-
-    /**
      * Selects or un-selects the first row with the specified text in the specified column
-     * @param text
      * @param column
+     * @param text
      * @param checked   whether or not to check the box
      * @return
      */
-    public QueryGrid selectRow(String text, String column, boolean checked)
+    public QueryGrid selectRow(String column, String text, boolean checked)
     {
-        assertTrue("Grid must have a select column to select rows", getGrid().hasSelectColumn());
-        getGrid().getRow(text, column).orElseThrow(()->
-                new NotFoundException("No row was found with value ["+ text +"] in column ["+ column +"]"))
-                .select(checked);
+        getRow(column, text).select(checked);
         return this;
-    }
-
-    public List<String> getColumnNames()
-    {
-        return getGrid().getColumnNames();
     }
 
     public boolean hasTabs() { return _gridTabBar.isPresent(); }
@@ -197,12 +144,6 @@ public class QueryGrid extends WebDriverComponent
 
     // subcomponent getters
 
-    public ResponsiveGrid getGrid()
-    {
-        _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).find(_queryGridPanel);
-        return _responsiveGrid;
-    }
-
     public GridBar getGridBar()
     {
         return _gridBar;
@@ -234,30 +175,52 @@ public class QueryGrid extends WebDriverComponent
 
     // search, sort and filter methods
 
+    /**
+     * searches the grid, from the omnibox and waits for the grid to refresh
+     * @param searchTerm
+     * @return
+     */
     public QueryGrid search(String searchTerm)
     {
-        getGrid().doAndWaitForUpdate(()->
+        doAndWaitForUpdate(()->
                 getGridBar().getOmniBox().setSearch(searchTerm));
         return this;
     }
 
+    /**
+     * Applies a sort to the grid via the omnibox and waits for the grid to refresh
+     * @param column
+     * @param direction
+     * @return
+     */
     public QueryGrid sortOn(String column, SortDirection direction)
     {
-        getGrid().doAndWaitForUpdate(()->
+        doAndWaitForUpdate(()->
                 getGridBar().getOmniBox().setSort(column, direction));
         return this;
     }
 
+    /**
+     * adds a filter expression to the table via the omnibox, and waits for the grid to update
+     * @param columnName
+     * @param operator
+     * @param value
+     * @return
+     */
     public QueryGrid filterOn(String columnName, String operator, String value)
     {
-        getGrid().doAndWaitForUpdate(()->
+        doAndWaitForUpdate(()->
                 getGridBar().getOmniBox().setFilter(columnName, operator, value));
         return this;
     }
 
+    /**
+     * clears search, sort, and filter expressions via the omnibox
+     * @return
+     */
     public QueryGrid clearSortsAndFilters()
     {
-        getGrid().doAndWaitForUpdate(()->
+        doAndWaitForUpdate(()->
                 getGridBar().getOmniBox().clearAll());
         return this;
     }
@@ -265,7 +228,7 @@ public class QueryGrid extends WebDriverComponent
     // select view
     public QueryGrid selectView(String viewName)
     {
-        getGrid().doAndWaitForUpdate(()->
+        doAndWaitForUpdate(()->
                 getGridBar().doMenuAction("Grid Views", Arrays.asList(viewName)));
         return this;
     }
@@ -282,13 +245,15 @@ public class QueryGrid extends WebDriverComponent
         public QueryGridFinder(WebDriver driver)
         {
             super(driver);
-            _locator= Locator.tagWithClass("div", "panel-body");
+            _locator= Locator.tagWithClass("div", "panel-body")
+                    .withDescendant(ResponsiveGrid.Locators.responsiveGrid());
         }
 
         public QueryGridFinder inPanelWithHeaderText(String panelHeading)
         {
             _locator = Locator.tagWithClass("div", "panel")
                     .withChild(Locator.tagWithClass("div", "panel-heading").withText(panelHeading))
+                    .withDescendant(ResponsiveGrid.Locators.responsiveGrid())
                     .child(Locator.tagWithClass("div", "panel-body"));
             return this;
         }

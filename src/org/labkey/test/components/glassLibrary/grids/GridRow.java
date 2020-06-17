@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.util.TestLogger.log;
 
 public class GridRow extends WebDriverComponent<GridRow.ElementCache>
@@ -24,7 +25,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     final ResponsiveGrid _grid;
     private Map<String, String> _rowMap = null;
 
-    public GridRow(ResponsiveGrid grid, WebElement element, WebDriver driver)
+    protected GridRow(ResponsiveGrid grid, WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
@@ -33,7 +34,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     /**
      * indicates whether or not the row has a column containing a select checkbox
-     * @return
+     * @return whether or not the row has a selector column
      */
     public boolean hasSelectColumn()
     {
@@ -42,7 +43,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     /**
      * Returns the selected state of the row selector checkbox, if one is present
-     * @return
+     * @return true if the select checkbox is checked.
      */
     public boolean isSelected()
     {
@@ -51,8 +52,8 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     /**
      * Sets the state of the row selector checkbox
-     * @param checked
-     * @return
+     * @param checked the desired state of the checkbox
+     * @return  the current instance
      */
     public GridRow select(boolean checked)
     {
@@ -62,9 +63,15 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return this;
     }
 
+    public boolean hasTextInColumn(String column, String text)
+    {
+        return getRowMap().get(column).equals(text);
+    }
+
     /**
      * gets the cell at the specified index
      * use columnHeader, which computes the appropriate index
+     * This method is intended for short-term use, until we can offload usages in the heatmap to its own component
      * @param colIndex
      * @return
      */
@@ -82,16 +89,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     public WebElement getCell(String columnHeader)
     {
         return getCell(_grid.getColumnIndex(columnHeader));
-    }
-
-    /**
-     * Returns whether or not the current instance contains an element matching the supplied locator
-     * @param loc
-     * @return
-     */
-    public boolean contains(Locator loc)
-    {
-        return loc.existsIn(this);
     }
 
     /**
@@ -119,7 +116,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     public void clickLink(String text)
     {
         log("seeking link with text [" + text + "]");
-        WebElement link = Locator.linkWithText(text).findElement(getComponentElement());
+        WebElement link = Locator.linkWithText(text).waitForElement(getComponentElement(), WAIT_FOR_JAVASCRIPT);
         log("found element with text [" + link.getText() + "]");
         String href = link.getAttribute("href");
         link.click();
@@ -194,7 +191,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
                 .findOptionalElement(getComponentElement());
         public ReactCheckBox selectCheckbox = new ReactCheckBox(Locator.tagWithAttribute("input", "type", "checkbox")
             .findWhenNeeded(this));
-        public WebElement column = Locator.tag("tr").findWhenNeeded(getComponentElement());
     }
 
     public static class GridRowFinder extends WebDriverComponentFinder<GridRow, GridRowFinder>
