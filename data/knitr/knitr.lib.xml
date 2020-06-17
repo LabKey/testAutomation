@@ -1,0 +1,8 @@
+<libraries xmlns="http://labkey.org/clientLibrary/xml/">
+    <library compileInProductionMode="false"/>
+    <dependencies>
+        <dependency path="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"/>
+        <dependency path="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"/>
+    </dependencies>
+</libraries>
+

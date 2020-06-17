@@ -1,0 +1,2 @@
+Vial Id	Sample Id	Date	visit_value	ParticipantId	Volume	Units	Specimen Type	derivative_type	Additive Type
+xyzzy	sample1	9/9/2009	4	160450533	20000000	CEL			

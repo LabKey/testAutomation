@@ -1,0 +1,5363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="DEM-1" tableDbType="TABLE">
+    <tableTitle>DEM-1: Demographics</tableTitle>
+    <description>This is the demographics dataset, dammit. Here are some ‘special symbols’ - they help test that we're roundtripping in UTF-8.</description>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="DEMdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Contact Date</columnTitle>
+      </column>
+      <column columnName="DEMbdt">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Date of Birth</columnTitle>
+      </column>
+      <column columnName="DEMsex">
+        <datatype>varchar</datatype>
+        <columnTitle>2.What is your sex?</columnTitle>
+      </column>
+      <column columnName="DEMhisp">
+        <datatype>varchar</datatype>
+        <columnTitle>3.Latino/a or Hispanic?</columnTitle>
+      </column>
+      <column columnName="DEMnatam">
+        <datatype>varchar</datatype>
+        <columnTitle>4a.Amer Indian/Alaska</columnTitle>
+      </column>
+      <column columnName="DEMasian">
+        <datatype>varchar</datatype>
+        <columnTitle>4b.Asian</columnTitle>
+      </column>
+      <column columnName="DEMblack">
+        <datatype>varchar</datatype>
+        <columnTitle>4c.African American/Black</columnTitle>
+      </column>
+      <column columnName="DEMhawpi">
+        <datatype>varchar</datatype>
+        <columnTitle>4d.Hawaiian/Pacific Islnd</columnTitle>
+      </column>
+      <column columnName="DEMwhite">
+        <datatype>varchar</datatype>
+        <columnTitle>4e.White</columnTitle>
+      </column>
+      <column columnName="DEMraco">
+        <datatype>varchar</datatype>
+        <columnTitle>4f.Other specify</columnTitle>
+      </column>
+      <column columnName="DEMracox">
+        <datatype>varchar</datatype>
+        <columnTitle>4f. Other, specify text</columnTitle>
+      </column>
+      <column columnName="DEMsexor">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Sexual orientation</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_001">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="TYP" tableDbType="TABLE">
+    <tableTitle>Types</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="boolean">
+        <datatype>boolean</datatype>
+        <columnTitle>Boolean</columnTitle>
+      </column>
+      <column columnName="dbl">
+        <datatype>double</datatype>
+        <columnTitle>Double</columnTitle>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+      </column>
+      <column columnName="integer">
+        <datatype>integer</datatype>
+        <columnTitle>Integer</columnTitle>
+      </column>
+      <column columnName="string">
+        <datatype>varchar</datatype>
+        <columnTitle>String</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="PRE-1" tableDbType="TABLE">
+    <tableTitle>PRE-1: Pre-Existing Conditions</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="PREdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Form Completion Date</columnTitle>
+      </column>
+      <column columnName="PREnopre">
+        <datatype>varchar</datatype>
+        <columnTitle>No pre-existing condition</columnTitle>
+      </column>
+      <column columnName="PRE1desc">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Description</columnTitle>
+      </column>
+      <column columnName="PRE1dsmy">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Date Diagnosis/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE1dsdt">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Date Dx/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE1qc">
+        <datatype>varchar</datatype>
+        <columnTitle>Condition 1</columnTitle>
+      </column>
+      <column columnName="PRE1com">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Comments</columnTitle>
+      </column>
+      <column columnName="PRE1ongo">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Is condition ongoing?</columnTitle>
+      </column>
+      <column columnName="PRE1init">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Staff Initials/Date</columnTitle>
+      </column>
+      <column columnName="PRE2desc">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Description</columnTitle>
+      </column>
+      <column columnName="PRE2dsmy">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Date Diagnosis/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE2dsdt">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Date Dx/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE2qc">
+        <datatype>varchar</datatype>
+        <columnTitle>Condition 2</columnTitle>
+      </column>
+      <column columnName="PRE2com">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Comments</columnTitle>
+      </column>
+      <column columnName="PRE2ongo">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Is condition ongoing?</columnTitle>
+      </column>
+      <column columnName="PRE2init">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Staff Initials/Date</columnTitle>
+      </column>
+      <column columnName="PRE3desc">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Description</columnTitle>
+      </column>
+      <column columnName="PRE3dsmy">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Date Diagnosis/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE3dsdt">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Date Dx/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE3qc">
+        <datatype>varchar</datatype>
+        <columnTitle>Condition 3</columnTitle>
+      </column>
+      <column columnName="PRE3com">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Comments</columnTitle>
+      </column>
+      <column columnName="PRE3ongo">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Is condition ongoing?</columnTitle>
+      </column>
+      <column columnName="PRE3init">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Staff Initials/Date</columnTitle>
+      </column>
+      <column columnName="PRE4desc">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Description</columnTitle>
+      </column>
+      <column columnName="PRE4dsmy">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Date Diagnosis/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE4dsdt">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Date Dx/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE4qc">
+        <datatype>varchar</datatype>
+        <columnTitle>Condition 4</columnTitle>
+      </column>
+      <column columnName="PRE4com">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Comments</columnTitle>
+      </column>
+      <column columnName="PRE4ongo">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Is condition ongoing?</columnTitle>
+      </column>
+      <column columnName="PRE4init">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Staff Initials/Date</columnTitle>
+      </column>
+      <column columnName="PRE5desc">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Description</columnTitle>
+      </column>
+      <column columnName="PRE5dsmy">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Date Diagnosis/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE5dsdt">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Date Dx/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE5qc">
+        <datatype>varchar</datatype>
+        <columnTitle>Condition 5</columnTitle>
+      </column>
+      <column columnName="PRE5com">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Comments</columnTitle>
+      </column>
+      <column columnName="PRE5ongo">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Is condition ongoing?</columnTitle>
+      </column>
+      <column columnName="PRE5init">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Staff Initials/Date</columnTitle>
+      </column>
+      <column columnName="PRE6desc">
+        <datatype>varchar</datatype>
+        <columnTitle>6. Description</columnTitle>
+      </column>
+      <column columnName="PRE6dsmy">
+        <datatype>varchar</datatype>
+        <columnTitle>6. Date Diagnosis/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE6dsdt">
+        <datatype>varchar</datatype>
+        <columnTitle>6. Date Dx/Surgery</columnTitle>
+      </column>
+      <column columnName="PRE6qc">
+        <datatype>varchar</datatype>
+        <columnTitle>Condition 6</columnTitle>
+      </column>
+      <column columnName="PRE6com">
+        <datatype>varchar</datatype>
+        <columnTitle>6. Comments</columnTitle>
+      </column>
+      <column columnName="PRE6ongo">
+        <datatype>varchar</datatype>
+        <columnTitle>6. Is condition ongoing?</columnTitle>
+      </column>
+      <column columnName="PRE6init">
+        <datatype>varchar</datatype>
+        <columnTitle>6. Staff Initials/Date</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="URS-1" tableDbType="TABLE">
+    <tableTitle>URS-1: Screening Urinalysis</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="URSdsdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1.Dipstick Coll. Date</columnTitle>
+      </column>
+      <column columnName="URSdgluc">
+        <datatype>varchar</datatype>
+        <columnTitle>2a.Glucose</columnTitle>
+      </column>
+      <column columnName="URSdglqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Glucose</columnTitle>
+      </column>
+      <column columnName="URSdprot">
+        <datatype>varchar</datatype>
+        <columnTitle>2b.Protein</columnTitle>
+      </column>
+      <column columnName="URSdprqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Protein</columnTitle>
+      </column>
+      <column columnName="URSdhemo">
+        <datatype>varchar</datatype>
+        <columnTitle>2c.Hemoglobin</columnTitle>
+      </column>
+      <column columnName="URSdheqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Hemoglobin</columnTitle>
+      </column>
+      <column columnName="URSrbc">
+        <datatype>varchar</datatype>
+        <columnTitle>2c1.RBCs within range?</columnTitle>
+      </column>
+      <column columnName="URSdoabn">
+        <datatype>varchar</datatype>
+        <columnTitle>2d.Other abnorm findings?</columnTitle>
+      </column>
+      <column columnName="URSdoabx">
+        <datatype>varchar</datatype>
+        <columnTitle>2d1.Specify abnormality</columnTitle>
+      </column>
+      <column columnName="URSdover">
+        <datatype>varchar</datatype>
+        <columnTitle>3.U/A-Dip Overall result</columnTitle>
+      </column>
+      <column columnName="URSdovqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Dipstick overall result</columnTitle>
+      </column>
+      <column columnName="URScomx">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_014">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+      <column columnName="autokey">
+        <datatype>integer</datatype>
+        <columnTitle>Autokey</columnTitle>
+        <isKeyField>true</isKeyField>
+        <isAutoInc>true</isAutoInc>
+      </column>
+    </columns>
+  </table>
+  <table tableName="LLS-1" tableDbType="TABLE">
+    <tableTitle>LLS-1: Screening Local Lab Results (Page 1)</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="LLSdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Initial Specimen Coll Dt</columnTitle>
+      </column>
+      <column columnName="LLShbdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1.Alt Hepatitis Coll Date</columnTitle>
+      </column>
+      <column columnName="LLShb">
+        <datatype>varchar</datatype>
+        <columnTitle>1a. Hepatitis B Surf. Ant</columnTitle>
+      </column>
+      <column columnName="LLShc">
+        <datatype>varchar</datatype>
+        <columnTitle>1b. Hepatitis C Antibody</columnTitle>
+      </column>
+      <column columnName="LLShcv">
+        <datatype>varchar</datatype>
+        <columnTitle>1b1. HCV PCR</columnTitle>
+      </column>
+      <column columnName="LLSstidt">
+        <datatype>timestamp</datatype>
+        <columnTitle>2. Alt STI Sero Coll Dt</columnTitle>
+      </column>
+      <column columnName="LLSsyps">
+        <datatype>varchar</datatype>
+        <columnTitle>2a. Syphilis screen test</columnTitle>
+      </column>
+      <column columnName="LLSsypc">
+        <datatype>varchar</datatype>
+        <columnTitle>2b. Syphilis confirm test</columnTitle>
+      </column>
+      <column columnName="LLShivdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>3. Alt HIV Test Coll Dt</columnTitle>
+      </column>
+      <column columnName="LLShiv">
+        <datatype>varchar</datatype>
+        <columnTitle>3. HIV Test Results</columnTitle>
+      </column>
+      <column columnName="LLSco1x">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_016">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="LLS-2" tableDbType="TABLE">
+    <tableTitle>LLS-2: Screening Local Lab Results (Page 2)</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="LLShemdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>4. Alt Hemogram Coll Date</columnTitle>
+      </column>
+      <column columnName="LLSwbc">
+        <datatype>double</datatype>
+        <columnTitle>4a. WBC</columnTitle>
+        <formatString>##0.0</formatString>
+      </column>
+      <column columnName="LLSwbcqc">
+        <datatype>varchar</datatype>
+        <columnTitle>WBC</columnTitle>
+      </column>
+      <column columnName="LLShgb">
+        <datatype>double</datatype>
+        <columnTitle>4b. Hemoglobin</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLShgbqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Hemoglobin</columnTitle>
+      </column>
+      <column columnName="LLShct">
+        <datatype>double</datatype>
+        <columnTitle>4c. Hematocrit</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLShctqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Hematocrit</columnTitle>
+      </column>
+      <column columnName="LLSmcv">
+        <datatype>integer</datatype>
+        <columnTitle>4d. MCV</columnTitle>
+        <formatString>##0.0</formatString>
+      </column>
+      <column columnName="LLSmcvqc">
+        <datatype>varchar</datatype>
+        <columnTitle>MCV</columnTitle>
+      </column>
+      <column columnName="LLSplt">
+        <datatype>integer</datatype>
+        <columnTitle>4e. Platelet Count</columnTitle>
+      </column>
+      <column columnName="LLSpltqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Platelet Count</columnTitle>
+      </column>
+      <column columnName="LLSdifdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>5. Alt Diff Coll Date</columnTitle>
+      </column>
+      <column columnName="LLSneup">
+        <datatype>integer</datatype>
+        <columnTitle>5a. Neutrophils %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLSneu">
+        <datatype>integer</datatype>
+        <columnTitle>5a. Neutrophils cells/mm3</columnTitle>
+      </column>
+      <column columnName="LLSneuqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Neutrophils</columnTitle>
+      </column>
+      <column columnName="LLSlym">
+        <datatype>integer</datatype>
+        <columnTitle>5b. Lymphs cells/mm3</columnTitle>
+      </column>
+      <column columnName="LLSlymqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Lymphs</columnTitle>
+      </column>
+      <column columnName="LLSmonn">
+        <datatype>varchar</datatype>
+        <columnTitle>5c.Monocytes not reported</columnTitle>
+      </column>
+      <column columnName="LLSmonp">
+        <datatype>integer</datatype>
+        <columnTitle>5c. Monocytes %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLSmon">
+        <datatype>integer</datatype>
+        <columnTitle>5c. Monocytes cells/mm3</columnTitle>
+      </column>
+      <column columnName="LLSmonqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Monocytes</columnTitle>
+      </column>
+      <column columnName="LLSeosn">
+        <datatype>varchar</datatype>
+        <columnTitle>5d.Eosinophils not report</columnTitle>
+      </column>
+      <column columnName="LLSeosp">
+        <datatype>double</datatype>
+        <columnTitle>5d. Eosinophils %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLSeos">
+        <datatype>integer</datatype>
+        <columnTitle>5d. Eosinophils cells/mm3</columnTitle>
+      </column>
+      <column columnName="LLSeosqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Eosinophils</columnTitle>
+      </column>
+      <column columnName="LLSbasn">
+        <datatype>varchar</datatype>
+        <columnTitle>5e. Basophils not report</columnTitle>
+      </column>
+      <column columnName="LLSbasp">
+        <datatype>double</datatype>
+        <columnTitle>5e. Basophils %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLSbas">
+        <datatype>integer</datatype>
+        <columnTitle>5e. Basophils cells/mm3</columnTitle>
+      </column>
+      <column columnName="LLSbasqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Basophils</columnTitle>
+      </column>
+      <column columnName="LLSbann">
+        <datatype>varchar</datatype>
+        <columnTitle>5f. Bands not reported</columnTitle>
+      </column>
+      <column columnName="LLSbanp">
+        <datatype>double</datatype>
+        <columnTitle>5f. Bands %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLSban">
+        <datatype>integer</datatype>
+        <columnTitle>5f. Bands cells/mm3</columnTitle>
+      </column>
+      <column columnName="LLSbanqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Bands</columnTitle>
+      </column>
+      <column columnName="LLSatyn">
+        <datatype>varchar</datatype>
+        <columnTitle>5g. Atyp lymph not report</columnTitle>
+      </column>
+      <column columnName="LLSatyp">
+        <datatype>double</datatype>
+        <columnTitle>5g.Atypical Lymphocytes %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLSaty">
+        <datatype>integer</datatype>
+        <columnTitle>5g.Atyp Lympho. cells/mm3</columnTitle>
+      </column>
+      <column columnName="LLSatyqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Atypical Lymphocytes</columnTitle>
+      </column>
+      <column columnName="LLSodn">
+        <datatype>varchar</datatype>
+        <columnTitle>5h. Other, not reported</columnTitle>
+      </column>
+      <column columnName="LLSodp">
+        <datatype>integer</datatype>
+        <columnTitle>5h. Other %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLSod">
+        <datatype>integer</datatype>
+        <columnTitle>5h. Other cells/mm3</columnTitle>
+      </column>
+      <column columnName="LLSodqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Other WBC</columnTitle>
+      </column>
+      <column columnName="LLSodx">
+        <datatype>varchar</datatype>
+        <columnTitle>5h. Other, specify text</columnTitle>
+      </column>
+      <column columnName="LLSdnorm">
+        <datatype>varchar</datatype>
+        <columnTitle>5i. Differential normal?</columnTitle>
+      </column>
+      <column columnName="LLSdifap">
+        <datatype>varchar</datatype>
+        <columnTitle>5j. Investigator approve?</columnTitle>
+      </column>
+      <column columnName="LLSco2x">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_017">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="CPS-1" tableDbType="TABLE">
+    <tableTitle>CPS-1: Screening Chemistry Panel</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="CPSdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Initial Spec Collect Date</columnTitle>
+      </column>
+      <column columnName="CPSaltdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1a.Alter ALT Coll Date</columnTitle>
+      </column>
+      <column columnName="CPSalt">
+        <datatype>integer</datatype>
+        <columnTitle>1a. ALT (SGPT)</columnTitle>
+      </column>
+      <column columnName="CPSaltqc">
+        <datatype>varchar</datatype>
+        <columnTitle>ALT (SGPT)</columnTitle>
+      </column>
+      <column columnName="CPScredt">
+        <datatype>timestamp</datatype>
+        <columnTitle>2a.Alt Creat Coll Date</columnTitle>
+      </column>
+      <column columnName="CPScre">
+        <datatype>double</datatype>
+        <columnTitle>2a. Creatinine</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="CPScreqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Creatinine</columnTitle>
+      </column>
+      <column columnName="CPScomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_019">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="ECI-1" tableDbType="TABLE">
+    <tableTitle>ECI-1: Eligibility Criteria</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="ECIdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Form Completion Date</columnTitle>
+      </column>
+      <column columnName="ECIelig">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Meet eligible criteria?</columnTitle>
+      </column>
+      <column columnName="ECIpsign">
+        <datatype>varchar</datatype>
+        <columnTitle>1a.PI Signature/Date</columnTitle>
+      </column>
+      <column columnName="ECIssign">
+        <datatype>varchar</datatype>
+        <columnTitle>1b.Second Signature/Date</columnTitle>
+      </column>
+      <column columnName="ECIcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_023">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="EPX-1" tableDbType="TABLE">
+    <tableTitle>EPX-1: Enrollment Abbreviated Physical Exam</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="EPXdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Exam Date</columnTitle>
+      </column>
+      <column columnName="EPXhtcm">
+        <datatype>integer</datatype>
+        <columnTitle>1. Height in cm</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="EPXwtkg">
+        <datatype>integer</datatype>
+        <columnTitle>2. Weight in kg</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="EPXwtqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Weight</columnTitle>
+      </column>
+      <column columnName="EPXtempc">
+        <datatype>double</datatype>
+        <columnTitle>3. Body Temp</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="EPXbpsys">
+        <datatype>integer</datatype>
+        <columnTitle>4. BP systolic xxx/</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="EPXbpdia">
+        <datatype>integer</datatype>
+        <columnTitle>4. BP diastolic /xxx</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="EPXbpqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Blood Pressure</columnTitle>
+      </column>
+      <column columnName="EPXpulse">
+        <datatype>integer</datatype>
+        <columnTitle>5. Pulse</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="EPXresp">
+        <datatype>integer</datatype>
+        <columnTitle>6. Respirations</columnTitle>
+        <formatString>#0</formatString>
+      </column>
+      <column columnName="EPXheent">
+        <datatype>varchar</datatype>
+        <columnTitle>7. HEENT</columnTitle>
+      </column>
+      <column columnName="EPXheenx">
+        <datatype>varchar</datatype>
+        <columnTitle>7. HEENT Notes</columnTitle>
+      </column>
+      <column columnName="EPXneck">
+        <datatype>varchar</datatype>
+        <columnTitle>8. Neck</columnTitle>
+      </column>
+      <column columnName="EPXneckx">
+        <datatype>varchar</datatype>
+        <columnTitle>8. Neck Notes</columnTitle>
+      </column>
+      <column columnName="EPXlymph">
+        <datatype>varchar</datatype>
+        <columnTitle>9. Lymph Nodes</columnTitle>
+      </column>
+      <column columnName="EPXlympx">
+        <datatype>varchar</datatype>
+        <columnTitle>9. Lymph Nodes Notes</columnTitle>
+      </column>
+      <column columnName="EPXheart">
+        <datatype>varchar</datatype>
+        <columnTitle>10. Heart</columnTitle>
+      </column>
+      <column columnName="EPXhrtx">
+        <datatype>varchar</datatype>
+        <columnTitle>10. Heart Notes</columnTitle>
+      </column>
+      <column columnName="EPXchest">
+        <datatype>varchar</datatype>
+        <columnTitle>11. Chest</columnTitle>
+      </column>
+      <column columnName="EPXchstx">
+        <datatype>varchar</datatype>
+        <columnTitle>11. Chest Notes</columnTitle>
+      </column>
+      <column columnName="EPXabdom">
+        <datatype>varchar</datatype>
+        <columnTitle>12. Abdomen</columnTitle>
+      </column>
+      <column columnName="EPXabdox">
+        <datatype>varchar</datatype>
+        <columnTitle>12. Abdomen Notes</columnTitle>
+      </column>
+      <column columnName="EPXextrm">
+        <datatype>varchar</datatype>
+        <columnTitle>13. Extremities</columnTitle>
+      </column>
+      <column columnName="EPXextrx">
+        <datatype>varchar</datatype>
+        <columnTitle>13. Extremities Notes</columnTitle>
+      </column>
+      <column columnName="EPXneuro">
+        <datatype>varchar</datatype>
+        <columnTitle>14. Neurological</columnTitle>
+      </column>
+      <column columnName="EPXneurx">
+        <datatype>varchar</datatype>
+        <columnTitle>14. Neurological Notes</columnTitle>
+      </column>
+      <column columnName="EPXskin">
+        <datatype>varchar</datatype>
+        <columnTitle>15. Skin</columnTitle>
+      </column>
+      <column columnName="EPXskinx">
+        <datatype>varchar</datatype>
+        <columnTitle>15. Skin Notes</columnTitle>
+      </column>
+      <column columnName="EPXother">
+        <datatype>varchar</datatype>
+        <columnTitle>16. Other</columnTitle>
+      </column>
+      <column columnName="EPXothex">
+        <datatype>varchar</datatype>
+        <columnTitle>16. Other Notes</columnTitle>
+      </column>
+      <column columnName="EPXcemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Sx-directed eval deemed</columnTitle>
+      </column>
+      <column columnName="EPXcemh">
+        <datatype>varchar</datatype>
+        <columnTitle>17. Evaluation Summary</columnTitle>
+      </column>
+      <column columnName="EPXsign">
+        <datatype>varchar</datatype>
+        <columnTitle>Clinical signature/date</columnTitle>
+      </column>
+      <column columnName="EPXprdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>18. Date preg test done</columnTitle>
+      </column>
+      <column columnName="EPXpregt">
+        <datatype>varchar</datatype>
+        <columnTitle>18a. Preg. test result</columnTitle>
+      </column>
+      <column columnName="EPXcom">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_122">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="ENR-1" tableDbType="TABLE">
+    <tableTitle>ENR-1: Enrollment</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="ENRdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Form Completion Date</columnTitle>
+      </column>
+      <column columnName="ENRsclab">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Screening ID used?</columnTitle>
+      </column>
+      <column columnName="scrnptid">
+        <datatype>varchar</datatype>
+        <columnTitle>1a.SCHARP Screening ID</columnTitle>
+      </column>
+      <column columnName="protptid">
+        <datatype>varchar</datatype>
+        <columnTitle>1a.Other HVTN Prot. ID</columnTitle>
+      </column>
+      <column columnName="ENRcouns">
+        <datatype>varchar</datatype>
+        <columnTitle>2a.Free counseling</columnTitle>
+      </column>
+      <column columnName="ENRhivt">
+        <datatype>varchar</datatype>
+        <columnTitle>2b.Free HIV tests</columnTitle>
+      </column>
+      <column columnName="ENRothrt">
+        <datatype>varchar</datatype>
+        <columnTitle>2c.Other tests/medical</columnTitle>
+      </column>
+      <column columnName="ENRfindv">
+        <datatype>varchar</datatype>
+        <columnTitle>2d.Help find vaccine</columnTitle>
+      </column>
+      <column columnName="ENRhprot">
+        <datatype>varchar</datatype>
+        <columnTitle>2e.Vaccine might protect</columnTitle>
+      </column>
+      <column columnName="ENRcomp">
+        <datatype>varchar</datatype>
+        <columnTitle>2f.Paid</columnTitle>
+      </column>
+      <column columnName="ENRhrsch">
+        <datatype>varchar</datatype>
+        <columnTitle>2g.Informed of research</columnTitle>
+      </column>
+      <column columnName="ENRbehav">
+        <datatype>varchar</datatype>
+        <columnTitle>2h.Avoid high-risk beh.</columnTitle>
+      </column>
+      <column columnName="ENRhlpcm">
+        <datatype>varchar</datatype>
+        <columnTitle>2i.Helping community</columnTitle>
+      </column>
+      <column columnName="ENRknow">
+        <datatype>varchar</datatype>
+        <columnTitle>2j.Know someone/HIV</columnTitle>
+      </column>
+      <column columnName="ENReffct">
+        <datatype>varchar</datatype>
+        <columnTitle>3.How effective vaccine?</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_124">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="EVC-1" tableDbType="TABLE">
+    <tableTitle>EVC-1: Enrollment Vaccination</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="EVCdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1. Date of vaccination</columnTitle>
+      </column>
+      <column columnName="EVCgroup">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Enrollment group</columnTitle>
+      </column>
+      <column columnName="EVCloc">
+        <datatype>varchar</datatype>
+        <columnTitle>3a. Location of injection</columnTitle>
+      </column>
+      <column columnName="EVCtm">
+        <datatype>varchar</datatype>
+        <columnTitle>3b. Time of injection</columnTitle>
+      </column>
+      <column columnName="EVCadm">
+        <datatype>varchar</datatype>
+        <columnTitle>Injection administered by</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_125">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="VAC-1" tableDbType="TABLE">
+    <tableTitle>VAC-1: Post-enrollment Vaccination</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="VACgiven">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Was vaccination given?</columnTitle>
+      </column>
+      <column columnName="VACdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>2. Date of today's vacc.</columnTitle>
+      </column>
+      <column columnName="VACdelt">
+        <datatype>varchar</datatype>
+        <columnTitle>3a. Location of injection</columnTitle>
+      </column>
+      <column columnName="VACtm">
+        <datatype>varchar</datatype>
+        <columnTitle>3b.Time of injection</columnTitle>
+      </column>
+      <column columnName="VACadmby">
+        <datatype>varchar</datatype>
+        <columnTitle>Injection administered by</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_135">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="APX-1" tableDbType="TABLE">
+    <tableTitle>APX-1: Abbreviated Physical Exam</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="APXdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Exam Date</columnTitle>
+      </column>
+      <column columnName="APXwtkg">
+        <datatype>double</datatype>
+        <columnTitle>1. Weight</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="APXwtqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Weight QC</columnTitle>
+      </column>
+      <column columnName="APXtempc">
+        <datatype>double</datatype>
+        <columnTitle>2. Body Temp</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="APXtemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Body Temp QC</columnTitle>
+      </column>
+      <column columnName="APXbpsys">
+        <datatype>integer</datatype>
+        <columnTitle>3. BP systolic xxx/</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="APXbpdia">
+        <datatype>integer</datatype>
+        <columnTitle>3. BP diastolic /xxx</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="APXbpqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Blood Pressure QC</columnTitle>
+      </column>
+      <column columnName="APXpulse">
+        <datatype>integer</datatype>
+        <columnTitle>4. Pulse</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="APXresp">
+        <datatype>integer</datatype>
+        <columnTitle>5. Respirations</columnTitle>
+        <formatString>#0</formatString>
+      </column>
+      <column columnName="APXheent">
+        <datatype>varchar</datatype>
+        <columnTitle>6. HEENT</columnTitle>
+      </column>
+      <column columnName="APXheenx">
+        <datatype>varchar</datatype>
+        <columnTitle>6. HEENT Notes</columnTitle>
+      </column>
+      <column columnName="APXneck">
+        <datatype>varchar</datatype>
+        <columnTitle>7. Neck</columnTitle>
+      </column>
+      <column columnName="APXneckx">
+        <datatype>varchar</datatype>
+        <columnTitle>7. Neck Notes</columnTitle>
+      </column>
+      <column columnName="APXlymph">
+        <datatype>varchar</datatype>
+        <columnTitle>8. Lymph Nodes</columnTitle>
+      </column>
+      <column columnName="APXlympx">
+        <datatype>varchar</datatype>
+        <columnTitle>8. Lymph Nodes Notes</columnTitle>
+      </column>
+      <column columnName="APXheart">
+        <datatype>varchar</datatype>
+        <columnTitle>9. Heart</columnTitle>
+      </column>
+      <column columnName="APXhrtx">
+        <datatype>varchar</datatype>
+        <columnTitle>9. Heart Notes</columnTitle>
+      </column>
+      <column columnName="APXchest">
+        <datatype>varchar</datatype>
+        <columnTitle>10. Chest</columnTitle>
+      </column>
+      <column columnName="APXchstx">
+        <datatype>varchar</datatype>
+        <columnTitle>10. Chest Notes</columnTitle>
+      </column>
+      <column columnName="APXabdom">
+        <datatype>varchar</datatype>
+        <columnTitle>11. Abdomen</columnTitle>
+      </column>
+      <column columnName="APXabdox">
+        <datatype>varchar</datatype>
+        <columnTitle>11. Abdomen Notes</columnTitle>
+      </column>
+      <column columnName="APXextrm">
+        <datatype>varchar</datatype>
+        <columnTitle>12. Extremities</columnTitle>
+      </column>
+      <column columnName="APXextrx">
+        <datatype>varchar</datatype>
+        <columnTitle>12. Extremities Notes</columnTitle>
+      </column>
+      <column columnName="APXneuro">
+        <datatype>varchar</datatype>
+        <columnTitle>13. Neurological</columnTitle>
+      </column>
+      <column columnName="APXneurx">
+        <datatype>varchar</datatype>
+        <columnTitle>13. Neurological Notes</columnTitle>
+      </column>
+      <column columnName="APXskin">
+        <datatype>varchar</datatype>
+        <columnTitle>14. Skin</columnTitle>
+      </column>
+      <column columnName="APXskinx">
+        <datatype>varchar</datatype>
+        <columnTitle>14. Skin Notes</columnTitle>
+      </column>
+      <column columnName="APXother">
+        <datatype>varchar</datatype>
+        <columnTitle>15. Other</columnTitle>
+      </column>
+      <column columnName="APXothex">
+        <datatype>varchar</datatype>
+        <columnTitle>15. Other Notes</columnTitle>
+      </column>
+      <column columnName="APXcemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Sx-directed eval deemed</columnTitle>
+      </column>
+      <column columnName="APXcemh">
+        <datatype>varchar</datatype>
+        <columnTitle>16. Evaluation Summary</columnTitle>
+      </column>
+      <column columnName="APXsign">
+        <datatype>varchar</datatype>
+        <columnTitle>Clinician signature/date</columnTitle>
+      </column>
+      <column columnName="APXprdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>17. Date Pregnancy test</columnTitle>
+      </column>
+      <column columnName="APXprtna">
+        <datatype>varchar</datatype>
+        <columnTitle>17. Pregnancy test N/A</columnTitle>
+      </column>
+      <column columnName="APXpregt">
+        <datatype>varchar</datatype>
+        <columnTitle>17a. Preg. test result</columnTitle>
+      </column>
+      <column columnName="APXco1x">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_136">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="URF-1" tableDbType="TABLE">
+    <tableTitle>URF-1: Follow-up Urinalysis (Page 1)</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="URFmenst">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Menstruation occurring</columnTitle>
+      </column>
+      <column columnName="URFddone">
+        <datatype>varchar</datatype>
+        <columnTitle>2.Dipstick exam done?</columnTitle>
+      </column>
+      <column columnName="URFdsdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>2a.Dipstick Coll. Date</columnTitle>
+      </column>
+      <column columnName="URFdsloc">
+        <datatype>varchar</datatype>
+        <columnTitle>2b.Dipstick performed by</columnTitle>
+      </column>
+      <column columnName="URFdprot">
+        <datatype>varchar</datatype>
+        <columnTitle>3a.Protein</columnTitle>
+      </column>
+      <column columnName="URFdprqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Protein</columnTitle>
+      </column>
+      <column columnName="URFdhemo">
+        <datatype>varchar</datatype>
+        <columnTitle>3b.Hemoglobin</columnTitle>
+      </column>
+      <column columnName="URFdheqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Hemoglobin</columnTitle>
+      </column>
+      <column columnName="URFdoabn">
+        <datatype>varchar</datatype>
+        <columnTitle>3c.Othr abnml findings?</columnTitle>
+      </column>
+      <column columnName="URFdotqc">
+        <datatype>varchar</datatype>
+        <columnTitle>macroscopic findings</columnTitle>
+      </column>
+      <column columnName="URFdoabx">
+        <datatype>varchar</datatype>
+        <columnTitle>3c1.Specify abnormality</columnTitle>
+      </column>
+      <column columnName="URFdover">
+        <datatype>varchar</datatype>
+        <columnTitle>4.Dipstick overall result</columnTitle>
+      </column>
+      <column columnName="URFdovqc">
+        <datatype>varchar</datatype>
+        <columnTitle>dipstick overall result</columnTitle>
+      </column>
+      <column columnName="URFmei">
+        <datatype>varchar</datatype>
+        <columnTitle>5.Micro exam indicated</columnTitle>
+      </column>
+      <column columnName="URFmedn">
+        <datatype>varchar</datatype>
+        <columnTitle>5a.Micro exam done?</columnTitle>
+      </column>
+      <column columnName="URFco1x">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_140">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="URF-2" tableDbType="TABLE">
+    <tableTitle>URF-2: Follow-up Urinalysis (Page 2)</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="URFmidt">
+        <datatype>timestamp</datatype>
+        <columnTitle>6.Micro Spec. Coll. Date</columnTitle>
+      </column>
+      <column columnName="URFmiloc">
+        <datatype>varchar</datatype>
+        <columnTitle>6a.Micro exam performed:</columnTitle>
+      </column>
+      <column columnName="URFmrbcp">
+        <datatype>varchar</datatype>
+        <columnTitle>7a.RBC present?</columnTitle>
+      </column>
+      <column columnName="URFmrbcl">
+        <datatype>integer</datatype>
+        <columnTitle>7a.RBC #/hpf (low)</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="URFmrbch">
+        <datatype>integer</datatype>
+        <columnTitle>7a.RBC #/hpf (high)</columnTitle>
+      </column>
+      <column columnName="URFrtntc">
+        <datatype>varchar</datatype>
+        <columnTitle>7a.RBC too numerous</columnTitle>
+      </column>
+      <column columnName="URFmrbqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Microscopic RBC</columnTitle>
+      </column>
+      <column columnName="URFmwbcp">
+        <datatype>varchar</datatype>
+        <columnTitle>7b.WBC present?</columnTitle>
+      </column>
+      <column columnName="URFmwbcl">
+        <datatype>integer</datatype>
+        <columnTitle>7b.WBC #/hpf (low)</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="URFmwbch">
+        <datatype>integer</datatype>
+        <columnTitle>7b.WBC #/hpf (high)</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="URFwtntc">
+        <datatype>varchar</datatype>
+        <columnTitle>7b.WBC too numerous</columnTitle>
+      </column>
+      <column columnName="URFmwbqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Microscopic WBC</columnTitle>
+      </column>
+      <column columnName="URFmoth">
+        <datatype>varchar</datatype>
+        <columnTitle>7c.Other abn.findings?</columnTitle>
+      </column>
+      <column columnName="URFmotqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Other</columnTitle>
+      </column>
+      <column columnName="URFmothx">
+        <datatype>varchar</datatype>
+        <columnTitle>7c1.Specify abnormality</columnTitle>
+      </column>
+      <column columnName="URFuover">
+        <datatype>varchar</datatype>
+        <columnTitle>7d.Microscopic overall</columnTitle>
+      </column>
+      <column columnName="URFuovqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Urinalysis overall</columnTitle>
+      </column>
+      <column columnName="URFco2x">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_141">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="LLF-1" tableDbType="TABLE">
+    <tableTitle>LLF-1: Follow-up Local Lab Results (Page 1)</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="LLFdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Initial Spec. Coll. Date</columnTitle>
+      </column>
+      <column columnName="LLFhemn">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Hem Not Done/Not Collec</columnTitle>
+      </column>
+      <column columnName="LLFhemdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1.Hemo. Alt. Coll. Date</columnTitle>
+      </column>
+      <column columnName="LLFwbcn">
+        <datatype>varchar</datatype>
+        <columnTitle>1a. WBC not reported</columnTitle>
+      </column>
+      <column columnName="LLFwbc">
+        <datatype>double</datatype>
+        <columnTitle>1a. WBC</columnTitle>
+        <formatString>##0.0</formatString>
+      </column>
+      <column columnName="LLFwbcgr">
+        <datatype>integer</datatype>
+        <columnTitle>1a. WBC AE Severity Grade</columnTitle>
+      </column>
+      <column columnName="LLFwbcpg">
+        <datatype>integer</datatype>
+        <columnTitle>1a. WBC AE Log Page #</columnTitle>
+      </column>
+      <column columnName="LLFwbcqc">
+        <datatype>varchar</datatype>
+        <columnTitle>WBC</columnTitle>
+      </column>
+      <column columnName="LLFhgbn">
+        <datatype>varchar</datatype>
+        <columnTitle>1b. Hemoglobin not report</columnTitle>
+      </column>
+      <column columnName="LLFhgb">
+        <datatype>double</datatype>
+        <columnTitle>1b. Hemoglobin</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLFhgbgr">
+        <datatype>integer</datatype>
+        <columnTitle>1b.HgB AE Severity Grade</columnTitle>
+      </column>
+      <column columnName="LLFhgbpg">
+        <datatype>integer</datatype>
+        <columnTitle>1b.HgB AE Log Page #</columnTitle>
+      </column>
+      <column columnName="LLFhgbqc">
+        <datatype>varchar</datatype>
+        <columnTitle>HgB</columnTitle>
+      </column>
+      <column columnName="LLFhctn">
+        <datatype>varchar</datatype>
+        <columnTitle>1c.Hematocrit not done</columnTitle>
+      </column>
+      <column columnName="LLFhct">
+        <datatype>double</datatype>
+        <columnTitle>1c.Hematocrit</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLFhctqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Hct</columnTitle>
+      </column>
+      <column columnName="LLFmcvn">
+        <datatype>varchar</datatype>
+        <columnTitle>1d.MCV not done</columnTitle>
+      </column>
+      <column columnName="LLFmcv">
+        <datatype>integer</datatype>
+        <columnTitle>1d. MCV</columnTitle>
+        <formatString>##0.0</formatString>
+      </column>
+      <column columnName="LLFmcvqc">
+        <datatype>varchar</datatype>
+        <columnTitle>MCV</columnTitle>
+      </column>
+      <column columnName="LLFpltn">
+        <datatype>varchar</datatype>
+        <columnTitle>1e.Platelets not done</columnTitle>
+      </column>
+      <column columnName="LLFplt">
+        <datatype>integer</datatype>
+        <columnTitle>1e. Platelets</columnTitle>
+        <formatString>######0</formatString>
+      </column>
+      <column columnName="LLFpltgr">
+        <datatype>integer</datatype>
+        <columnTitle>1e.Plt AE Severity Grade</columnTitle>
+      </column>
+      <column columnName="LLFpltpg">
+        <datatype>integer</datatype>
+        <columnTitle>1e. Plate. AE Log Page #</columnTitle>
+      </column>
+      <column columnName="LLFpltqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Platelets</columnTitle>
+      </column>
+      <column columnName="LLFdifn">
+        <datatype>varchar</datatype>
+        <columnTitle>2.Diff Not Done/Not Coll</columnTitle>
+      </column>
+      <column columnName="LLFdifdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>2. Diff. Alt Coll Date</columnTitle>
+      </column>
+      <column columnName="LLFneun">
+        <datatype>varchar</datatype>
+        <columnTitle>2a.Neuts Not Reported</columnTitle>
+      </column>
+      <column columnName="LLFneup">
+        <datatype>double</datatype>
+        <columnTitle>2a.Neutrophils %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLFneu">
+        <datatype>integer</datatype>
+        <columnTitle>2a.Neutrophils cells/mm3</columnTitle>
+        <formatString>####0</formatString>
+      </column>
+      <column columnName="LLFneugr">
+        <datatype>integer</datatype>
+        <columnTitle>2a.Neut. AE Sever. Grade</columnTitle>
+      </column>
+      <column columnName="LLFneupg">
+        <datatype>integer</datatype>
+        <columnTitle>2a.Neut. AE Log Page #</columnTitle>
+      </column>
+      <column columnName="LLFneuqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Neutrophils</columnTitle>
+      </column>
+      <column columnName="LLFlymn">
+        <datatype>varchar</datatype>
+        <columnTitle>2b.Lymphs Not Reported</columnTitle>
+      </column>
+      <column columnName="LLFlymp">
+        <datatype>double</datatype>
+        <columnTitle>2b.Lymphocites %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLFlym">
+        <datatype>integer</datatype>
+        <columnTitle>2b.Lymphs cells/mm3</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="LLFlymgr">
+        <datatype>integer</datatype>
+        <columnTitle>2b.Lymph AE Sever. Grade</columnTitle>
+      </column>
+      <column columnName="LLFlympg">
+        <datatype>integer</datatype>
+        <columnTitle>2b.Lymph AE Log Page #</columnTitle>
+      </column>
+      <column columnName="LLFlymqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Lymphocites</columnTitle>
+      </column>
+      <column columnName="LLFmonn">
+        <datatype>varchar</datatype>
+        <columnTitle>2c.Monocytes Not Reported</columnTitle>
+      </column>
+      <column columnName="LLFmonp">
+        <datatype>double</datatype>
+        <columnTitle>2c.Monocytes %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLFmon">
+        <datatype>integer</datatype>
+        <columnTitle>2c.Monocytes cells/mm3</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="LLFmonqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Monocytes</columnTitle>
+      </column>
+      <column columnName="LLFeosn">
+        <datatype>varchar</datatype>
+        <columnTitle>2d.Eosinophils Not Rprtd.</columnTitle>
+      </column>
+      <column columnName="LLFeosp">
+        <datatype>double</datatype>
+        <columnTitle>2d.Eosinophils %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLFeos">
+        <datatype>integer</datatype>
+        <columnTitle>2d.Eosinophils cells/mm3</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="LLFeosqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Eosinophils</columnTitle>
+      </column>
+      <column columnName="LLFbasn">
+        <datatype>varchar</datatype>
+        <columnTitle>2e.Basophils Not Reprtd.</columnTitle>
+      </column>
+      <column columnName="LLFbasp">
+        <datatype>double</datatype>
+        <columnTitle>2e.Basophils %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLFbas">
+        <datatype>integer</datatype>
+        <columnTitle>2e.Basophils cells/mm3</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="LLFbasqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Basophils</columnTitle>
+      </column>
+      <column columnName="LLFbann">
+        <datatype>varchar</datatype>
+        <columnTitle>2f.Bands Not Reported</columnTitle>
+      </column>
+      <column columnName="LLFbanp">
+        <datatype>integer</datatype>
+        <columnTitle>2f.Bands %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLFban">
+        <datatype>integer</datatype>
+        <columnTitle>2f.Bands cells/mm3</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="LLFbanqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Bands</columnTitle>
+      </column>
+      <column columnName="LLFatyn">
+        <datatype>varchar</datatype>
+        <columnTitle>2g.Atypic lymph Nt Reprtd</columnTitle>
+      </column>
+      <column columnName="LLFatyp">
+        <datatype>integer</datatype>
+        <columnTitle>2g.Atypical lymphocytes %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLFaty">
+        <datatype>integer</datatype>
+        <columnTitle>2g.Atyp Lymphs cells/mm3</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="LLFatyqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Atypical lymphocyte</columnTitle>
+      </column>
+      <column columnName="LLFodn">
+        <datatype>varchar</datatype>
+        <columnTitle>2h.Other Not Reported</columnTitle>
+      </column>
+      <column columnName="LLFodp">
+        <datatype>integer</datatype>
+        <columnTitle>2h.Other %</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="LLFod">
+        <datatype>integer</datatype>
+        <columnTitle>2h.Other cells/mm3</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="LLFodqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Other Differential</columnTitle>
+      </column>
+      <column columnName="LLFodx">
+        <datatype>varchar</datatype>
+        <columnTitle>2h.Other, specify text</columnTitle>
+      </column>
+      <column columnName="LLFco2x">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_143">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="CPF-1" tableDbType="TABLE">
+    <tableTitle>CPF-1: Follow-up Chemistry Panel</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="CPFdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Initial Spec Coll Date</columnTitle>
+      </column>
+      <column columnName="CPFaltn">
+        <datatype>varchar</datatype>
+        <columnTitle>1a. ALT Not Done/Not Coll</columnTitle>
+      </column>
+      <column columnName="CPFaltdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1a. ALT Alternate Coll Dt</columnTitle>
+      </column>
+      <column columnName="CPFalt">
+        <datatype>integer</datatype>
+        <columnTitle>1a. ALT (SGPT)</columnTitle>
+        <formatString>###0</formatString>
+      </column>
+      <column columnName="CPFaltgr">
+        <datatype>integer</datatype>
+        <columnTitle>1a.ALT AE Severity Grade</columnTitle>
+      </column>
+      <column columnName="CPFaltpg">
+        <datatype>integer</datatype>
+        <columnTitle>1a. ALT AE Log Page #</columnTitle>
+      </column>
+      <column columnName="CPFaltqc">
+        <datatype>varchar</datatype>
+        <columnTitle>ALT (SGPT)</columnTitle>
+      </column>
+      <column columnName="CPFcren">
+        <datatype>varchar</datatype>
+        <columnTitle>2a.Crea Not Done/Not Coll</columnTitle>
+      </column>
+      <column columnName="CPFcredt">
+        <datatype>timestamp</datatype>
+        <columnTitle>2a.Creat. Alter. Coll Dt</columnTitle>
+      </column>
+      <column columnName="CPFcre">
+        <datatype>double</datatype>
+        <columnTitle>2a. Creatinine</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="CPFcregr">
+        <datatype>integer</datatype>
+        <columnTitle>2a.Creat. AE Sever. Grade</columnTitle>
+      </column>
+      <column columnName="CPFcrepg">
+        <datatype>integer</datatype>
+        <columnTitle>2a. Creat. AE Log Page #</columnTitle>
+      </column>
+      <column columnName="CPFcreqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Creatinine</columnTitle>
+      </column>
+      <column columnName="CPFcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_144">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="SIA-1" tableDbType="TABLE">
+    <tableTitle>SIA-1: Social Impact Assessment</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SIAdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Contact Date</columnTitle>
+      </column>
+      <column columnName="SIAfamly">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Negative experiences</columnTitle>
+      </column>
+      <column columnName="SIAtravl">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Travel problems</columnTitle>
+      </column>
+      <column columnName="SIAwork">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Job/work problems</columnTitle>
+      </column>
+      <column columnName="SIAeduc">
+        <datatype>varchar</datatype>
+        <columnTitle>1. School/educ. problems</columnTitle>
+      </column>
+      <column columnName="SIAmedic">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Refused medical tx</columnTitle>
+      </column>
+      <column columnName="SIAhthin">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Health insur problems</columnTitle>
+      </column>
+      <column columnName="SIAlifin">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Life insurance problems</columnTitle>
+      </column>
+      <column columnName="SIAhouse">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Housing problems</columnTitle>
+      </column>
+      <column columnName="SIAmilit">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Military/govt. problem</columnTitle>
+      </column>
+      <column columnName="SIAother">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Other problems</columnTitle>
+      </column>
+      <column columnName="SIAothrx">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Other, specify text</columnTitle>
+      </column>
+      <column columnName="SIAttlim">
+        <datatype>integer</datatype>
+        <columnTitle>1.Total number of impacts</columnTitle>
+        <formatString>#0</formatString>
+      </column>
+      <column columnName="SIAbenef">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Beneficial impact?</columnTitle>
+      </column>
+      <column columnName="SIAcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>2a.Describe benef. impact</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_150">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="SIL-1" tableDbType="TABLE">
+    <tableTitle>SIL-1: Social Impact Log</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SILsumx">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Describe social impact</columnTitle>
+      </column>
+      <column columnName="SILondt">
+        <datatype>varchar</datatype>
+        <columnTitle>2.Onset Date</columnTitle>
+      </column>
+      <column columnName="SILatvis">
+        <datatype>integer</datatype>
+        <columnTitle>3.Reported at Visit</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="SILcode">
+        <datatype>integer</datatype>
+        <columnTitle>4.Social Impact Code</columnTitle>
+        <formatString>#0</formatString>
+      </column>
+      <column columnName="SILtpdis">
+        <datatype>varchar</datatype>
+        <columnTitle>5.Participation known?</columnTitle>
+      </column>
+      <column columnName="SILtpdsm">
+        <datatype>varchar</datatype>
+        <columnTitle>5a.Disclosure Summary</columnTitle>
+      </column>
+      <column columnName="SILtpdox">
+        <datatype>varchar</datatype>
+        <columnTitle>5a.Other, specify:</columnTitle>
+      </column>
+      <column columnName="SILhivts">
+        <datatype>varchar</datatype>
+        <columnTitle>6.HIV testing an issue?</columnTitle>
+      </column>
+      <column columnName="SILhivpf">
+        <datatype>varchar</datatype>
+        <columnTitle>6a.HIV testing performed?</columnTitle>
+      </column>
+      <column columnName="SILqol">
+        <datatype>varchar</datatype>
+        <columnTitle>7.Situation impact</columnTitle>
+      </column>
+      <column columnName="SILrspx">
+        <datatype>varchar</datatype>
+        <columnTitle>8a.Participant response</columnTitle>
+      </column>
+      <column columnName="SILrssx">
+        <datatype>varchar</datatype>
+        <columnTitle>8b.Staff response</columnTitle>
+      </column>
+      <column columnName="SILoutcm">
+        <datatype>varchar</datatype>
+        <columnTitle>9. Current status</columnTitle>
+      </column>
+      <column columnName="SILresdt">
+        <datatype>varchar</datatype>
+        <columnTitle>9.Closure Date</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_151">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="BRA-1" tableDbType="TABLE">
+    <tableTitle>BRA-1: Behavioral Risk Assessment (Page 1)</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="BRAdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Assessment Date</columnTitle>
+      </column>
+      <column columnName="BRAprt">
+        <datatype>integer</datatype>
+        <columnTitle>1. Total# of sex partners</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="BRAuprt">
+        <datatype>integer</datatype>
+        <columnTitle>2.Total unprotect partner</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="BRAmprt">
+        <datatype>integer</datatype>
+        <columnTitle>3a. Total # male partners</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="BRAmvprt">
+        <datatype>varchar</datatype>
+        <columnTitle>3a1. Unprotected vag sex?</columnTitle>
+      </column>
+      <column columnName="BRAmaprt">
+        <datatype>varchar</datatype>
+        <columnTitle>3a2. Unprotected anal sex</columnTitle>
+      </column>
+      <column columnName="BRAfprt">
+        <datatype>integer</datatype>
+        <columnTitle>3b. Total # female part</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="BRAfvprt">
+        <datatype>varchar</datatype>
+        <columnTitle>3b1. Unprotect vag sex?</columnTitle>
+      </column>
+      <column columnName="BRAfaprt">
+        <datatype>varchar</datatype>
+        <columnTitle>3b2. Unprotect anal sex?</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_171">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="BRA-2" tableDbType="TABLE">
+    <tableTitle>BRA-2: Behavioral Risk Assessment (Page 2)</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="BRAdprt">
+        <datatype>varchar</datatype>
+        <columnTitle>4a. Injection drug users?</columnTitle>
+      </column>
+      <column columnName="BRAhprt">
+        <datatype>varchar</datatype>
+        <columnTitle>4b. HIV-infected?</columnTitle>
+      </column>
+      <column columnName="BRAbuzz">
+        <datatype>varchar</datatype>
+        <columnTitle>5a. Vag/anal sex drunk?</columnTitle>
+      </column>
+      <column columnName="BRAcsw">
+        <datatype>varchar</datatype>
+        <columnTitle>5b. Xchng. vag/anal sex?</columnTitle>
+      </column>
+      <column columnName="BRAcswb">
+        <datatype>varchar</datatype>
+        <columnTitle>6. Sex for money, etc.?</columnTitle>
+      </column>
+      <column columnName="BRApcsw">
+        <datatype>varchar</datatype>
+        <columnTitle>7. Partner sex w/others?</columnTitle>
+      </column>
+      <column columnName="BRAivdrg">
+        <datatype>varchar</datatype>
+        <columnTitle>8a. Injected drugs?</columnTitle>
+      </column>
+      <column columnName="BRAstd">
+        <datatype>varchar</datatype>
+        <columnTitle>8b. Diagnosed/treated STD</columnTitle>
+      </column>
+      <column columnName="BRAhsv">
+        <datatype>varchar</datatype>
+        <columnTitle>8c. Genital sores/ulcers?</columnTitle>
+      </column>
+      <column columnName="BRAgd">
+        <datatype>varchar</datatype>
+        <columnTitle>8d.Discharge/clinic visit</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_172">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="OTB-1" tableDbType="TABLE">
+    <tableTitle>OTB-1: Outside Testing/Belief</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="OTBdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Contact Date</columnTitle>
+      </column>
+      <column columnName="OTBhivt">
+        <datatype>varchar</datatype>
+        <columnTitle>1.HIV test outside study?</columnTitle>
+      </column>
+      <column columnName="OTBhivtn">
+        <datatype>integer</datatype>
+        <columnTitle>1a.# times tested</columnTitle>
+        <formatString>#0</formatString>
+      </column>
+      <column columnName="OTBhors">
+        <datatype>varchar</datatype>
+        <columnTitle>1b1.Req. by other study</columnTitle>
+      </column>
+      <column columnName="OTBmed">
+        <datatype>varchar</datatype>
+        <columnTitle>1b2.Req. by med provider</columnTitle>
+      </column>
+      <column columnName="OTBhins">
+        <datatype>varchar</datatype>
+        <columnTitle>1b3.Req. for insurance</columnTitle>
+      </column>
+      <column columnName="OTBhtrvl">
+        <datatype>varchar</datatype>
+        <columnTitle>1b4.Req. for travel/imm.</columnTitle>
+      </column>
+      <column columnName="OTBhjail">
+        <datatype>varchar</datatype>
+        <columnTitle>1b5.Req. by jail/drug tx</columnTitle>
+      </column>
+      <column columnName="OTBhblod">
+        <datatype>varchar</datatype>
+        <columnTitle>1b6.Sold or donated blood</columnTitle>
+      </column>
+      <column columnName="OTBhhrsk">
+        <datatype>varchar</datatype>
+        <columnTitle>1b7.Poss. hi-risk expos.</columnTitle>
+      </column>
+      <column columnName="OTBant">
+        <datatype>varchar</datatype>
+        <columnTitle>1b8.Antibodies to vaccine</columnTitle>
+      </column>
+      <column columnName="OTBhothr">
+        <datatype>varchar</datatype>
+        <columnTitle>1b9.Other reason</columnTitle>
+      </column>
+      <column columnName="OTBspe">
+        <datatype>varchar</datatype>
+        <columnTitle>1b9.Other, specify text</columnTitle>
+      </column>
+      <column columnName="OTBvacpl">
+        <datatype>varchar</datatype>
+        <columnTitle>2.Vaccine or Placebo?</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_173">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="RCB-1" tableDbType="TABLE">
+    <tableTitle>RCB-1: Reactogenicity-Baseline</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="RCBdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Assessment Date</columnTitle>
+      </column>
+      <column columnName="RCBassdn">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Was assessment done?</columnTitle>
+      </column>
+      <column columnName="RCBextm">
+        <datatype>varchar</datatype>
+        <columnTitle>2.Time</columnTitle>
+      </column>
+      <column columnName="RCBtempc">
+        <datatype>double</datatype>
+        <columnTitle>3.Body temperature</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCBtemqc">
+        <datatype>double</datatype>
+        <columnTitle>3.Body Temp</columnTitle>
+      </column>
+      <column columnName="RCBrdelt">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Right Deltoid</columnTitle>
+      </column>
+      <column columnName="RCBrles">
+        <datatype>varchar</datatype>
+        <columnTitle>4a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCBreryx">
+        <datatype>integer</datatype>
+        <columnTitle>4b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCBreryy">
+        <datatype>integer</datatype>
+        <columnTitle>4b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCBrerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>4b.Right Erythema</columnTitle>
+      </column>
+      <column columnName="RCBrindx">
+        <datatype>integer</datatype>
+        <columnTitle>4b.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCBrindy">
+        <datatype>integer</datatype>
+        <columnTitle>4b.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCBrinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>4b.Right Induration</columnTitle>
+      </column>
+      <column columnName="RCBldelt">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Left Deltoid</columnTitle>
+      </column>
+      <column columnName="RCBlles">
+        <datatype>varchar</datatype>
+        <columnTitle>5a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCBleryx">
+        <datatype>double</datatype>
+        <columnTitle>5b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCBleryy">
+        <datatype>double</datatype>
+        <columnTitle>5b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCBlerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>5b.Left Erythema</columnTitle>
+      </column>
+      <column columnName="RCBlindx">
+        <datatype>double</datatype>
+        <columnTitle>5b.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCBlindy">
+        <datatype>double</datatype>
+        <columnTitle>5b.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCBlinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>5b.Left Induration</columnTitle>
+      </column>
+      <column columnName="RCBlnanp">
+        <datatype>varchar</datatype>
+        <columnTitle>6.AxillaryLymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCBlnaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>6.Lymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCBmf">
+        <datatype>varchar</datatype>
+        <columnTitle>7a.Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCBmfqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCBmyal">
+        <datatype>varchar</datatype>
+        <columnTitle>7b.Myalgia</columnTitle>
+      </column>
+      <column columnName="RCBmyaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Myalgia</columnTitle>
+      </column>
+      <column columnName="RCBhead">
+        <datatype>varchar</datatype>
+        <columnTitle>7c.Headache</columnTitle>
+      </column>
+      <column columnName="RCBheaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Headache</columnTitle>
+      </column>
+      <column columnName="RCBnaus">
+        <datatype>varchar</datatype>
+        <columnTitle>7d.Nausea</columnTitle>
+      </column>
+      <column columnName="RCBnauqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Nausea</columnTitle>
+      </column>
+      <column columnName="RCBvom">
+        <datatype>varchar</datatype>
+        <columnTitle>7e.Vomiting</columnTitle>
+      </column>
+      <column columnName="RCBvomqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Vomiting</columnTitle>
+      </column>
+      <column columnName="RCBchill">
+        <datatype>varchar</datatype>
+        <columnTitle>7f.Chills</columnTitle>
+      </column>
+      <column columnName="RCBchiqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Chills</columnTitle>
+      </column>
+      <column columnName="RCBarth">
+        <datatype>varchar</datatype>
+        <columnTitle>7g.Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCBartqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCBlpr">
+        <datatype>varchar</datatype>
+        <columnTitle>8a.Pain (R deltoid)</columnTitle>
+      </column>
+      <column columnName="RCBlprqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (right)</columnTitle>
+      </column>
+      <column columnName="RCBtr">
+        <datatype>varchar</datatype>
+        <columnTitle>8b.Tenderness (R deltoid)</columnTitle>
+      </column>
+      <column columnName="RCBtrqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local tenderness (rt)</columnTitle>
+      </column>
+      <column columnName="RCBlpl">
+        <datatype>varchar</datatype>
+        <columnTitle>8c.Pain (L deltoid)</columnTitle>
+      </column>
+      <column columnName="RCBlplqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (left)</columnTitle>
+      </column>
+      <column columnName="RCBtl">
+        <datatype>varchar</datatype>
+        <columnTitle>8d.Tenderness (L deltoid)</columnTitle>
+      </column>
+      <column columnName="RCBtlqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local tenderness (lft)</columnTitle>
+      </column>
+      <column columnName="RCBcomx">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_180">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="RCM-1" tableDbType="TABLE">
+    <tableTitle>RCM-1: Reactogenicity-Early Assessment</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="RCMdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Assessment Date</columnTitle>
+      </column>
+      <column columnName="RCMassdn">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Was assessment done?</columnTitle>
+      </column>
+      <column columnName="RCMextm">
+        <datatype>varchar</datatype>
+        <columnTitle>2.Time</columnTitle>
+      </column>
+      <column columnName="RCMtempc">
+        <datatype>double</datatype>
+        <columnTitle>3.Body temperature</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCMtemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Body Temp</columnTitle>
+      </column>
+      <column columnName="RCMrdelt">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Right Deltoid</columnTitle>
+      </column>
+      <column columnName="RCMrles">
+        <datatype>varchar</datatype>
+        <columnTitle>4a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCMreryx">
+        <datatype>integer</datatype>
+        <columnTitle>4b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCMreryy">
+        <datatype>integer</datatype>
+        <columnTitle>4b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCMrerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>4b.Right Erythema</columnTitle>
+      </column>
+      <column columnName="RCMrindx">
+        <datatype>integer</datatype>
+        <columnTitle>4c.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCMrindy">
+        <datatype>integer</datatype>
+        <columnTitle>4c.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCMrinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>4b.Right Induration</columnTitle>
+      </column>
+      <column columnName="RCMldelt">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Left Deltoid</columnTitle>
+      </column>
+      <column columnName="RCMlles">
+        <datatype>varchar</datatype>
+        <columnTitle>5a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCMleryx">
+        <datatype>double</datatype>
+        <columnTitle>5b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCMleryy">
+        <datatype>double</datatype>
+        <columnTitle>5b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCMlerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>5b.Left Erythema</columnTitle>
+      </column>
+      <column columnName="RCMlindx">
+        <datatype>double</datatype>
+        <columnTitle>5c.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCMlindy">
+        <datatype>double</datatype>
+        <columnTitle>5c.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCMlinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>5c.Left Induration</columnTitle>
+      </column>
+      <column columnName="RCMlnanp">
+        <datatype>varchar</datatype>
+        <columnTitle>6.AxillaryLymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCMlnaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>6.Lymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCMmf">
+        <datatype>varchar</datatype>
+        <columnTitle>7a.Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCMmfqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCMmyal">
+        <datatype>varchar</datatype>
+        <columnTitle>7b.Myalgia</columnTitle>
+      </column>
+      <column columnName="RCMmyaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Myalgia</columnTitle>
+      </column>
+      <column columnName="RCMhead">
+        <datatype>varchar</datatype>
+        <columnTitle>7c.Headache</columnTitle>
+      </column>
+      <column columnName="RCMheaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Headache</columnTitle>
+      </column>
+      <column columnName="RCMnaus">
+        <datatype>varchar</datatype>
+        <columnTitle>7d.Nausea</columnTitle>
+      </column>
+      <column columnName="RCMnauqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Nausea</columnTitle>
+      </column>
+      <column columnName="RCMvom">
+        <datatype>varchar</datatype>
+        <columnTitle>7e.Vomiting</columnTitle>
+      </column>
+      <column columnName="RCMvomqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Vomiting</columnTitle>
+      </column>
+      <column columnName="RCMchill">
+        <datatype>varchar</datatype>
+        <columnTitle>7f.Chills</columnTitle>
+      </column>
+      <column columnName="RCMchiqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Chills</columnTitle>
+      </column>
+      <column columnName="RCMarth">
+        <datatype>varchar</datatype>
+        <columnTitle>7g.Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCMartqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCMlpr">
+        <datatype>varchar</datatype>
+        <columnTitle>8a.Pain (R Deltoid)</columnTitle>
+      </column>
+      <column columnName="RCMlprqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (right)</columnTitle>
+      </column>
+      <column columnName="RCMtr">
+        <datatype>varchar</datatype>
+        <columnTitle>8b.Tenderness (R Deltoid)</columnTitle>
+      </column>
+      <column columnName="RCMtrqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Tenderness (R Deltoid)</columnTitle>
+      </column>
+      <column columnName="RCMlpl">
+        <datatype>varchar</datatype>
+        <columnTitle>8c.Pain (L Deltoid)</columnTitle>
+      </column>
+      <column columnName="RCMlplqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (left)</columnTitle>
+      </column>
+      <column columnName="RCMtl">
+        <datatype>varchar</datatype>
+        <columnTitle>8d.Tenderness (L Deltoid)</columnTitle>
+      </column>
+      <column columnName="RCMtlqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Tenderness (L Deltoid)</columnTitle>
+      </column>
+      <column columnName="RCMcomx">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_182">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="RCE-1" tableDbType="TABLE">
+    <tableTitle>RCE-1: Reactogenicity-Day 0</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="RCEdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Assessment Date</columnTitle>
+      </column>
+      <column columnName="RCEassdn">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Was assessment done?</columnTitle>
+      </column>
+      <column columnName="RCEtempc">
+        <datatype>double</datatype>
+        <columnTitle>2.Body temperature</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCEtemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Body Temp</columnTitle>
+      </column>
+      <column columnName="RCErdelt">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Right Deltoid</columnTitle>
+      </column>
+      <column columnName="RCErles">
+        <datatype>varchar</datatype>
+        <columnTitle>3a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCEreryx">
+        <datatype>double</datatype>
+        <columnTitle>3b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCEreryy">
+        <datatype>double</datatype>
+        <columnTitle>3b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCErerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Right Erythema</columnTitle>
+      </column>
+      <column columnName="RCErindx">
+        <datatype>double</datatype>
+        <columnTitle>3c.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCErindy">
+        <datatype>double</datatype>
+        <columnTitle>3c.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCErinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Right Induration</columnTitle>
+      </column>
+      <column columnName="RCEldelt">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Left Deltoid</columnTitle>
+      </column>
+      <column columnName="RCElles">
+        <datatype>varchar</datatype>
+        <columnTitle>4a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCEleryx">
+        <datatype>double</datatype>
+        <columnTitle>4b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCEleryy">
+        <datatype>double</datatype>
+        <columnTitle>4b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCElerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Left Erythema</columnTitle>
+      </column>
+      <column columnName="RCElindx">
+        <datatype>integer</datatype>
+        <columnTitle>4c.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCElindy">
+        <datatype>integer</datatype>
+        <columnTitle>4c.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCElinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Left Induration</columnTitle>
+      </column>
+      <column columnName="RCElnanp">
+        <datatype>varchar</datatype>
+        <columnTitle>5.AxillaryLymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCElnaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Lymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCEmfqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCEmf">
+        <datatype>varchar</datatype>
+        <columnTitle>6a.Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCEmyal">
+        <datatype>varchar</datatype>
+        <columnTitle>6b.Myalgia</columnTitle>
+      </column>
+      <column columnName="RCEmyaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Myalgia</columnTitle>
+      </column>
+      <column columnName="RCEhead">
+        <datatype>varchar</datatype>
+        <columnTitle>6c.Headache</columnTitle>
+      </column>
+      <column columnName="RCEheaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Headache</columnTitle>
+      </column>
+      <column columnName="RCEnaus">
+        <datatype>varchar</datatype>
+        <columnTitle>6d.Nausea</columnTitle>
+      </column>
+      <column columnName="RCEnauqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Nausea</columnTitle>
+      </column>
+      <column columnName="RCEvom">
+        <datatype>varchar</datatype>
+        <columnTitle>6e.Vomiting</columnTitle>
+      </column>
+      <column columnName="RCEvomqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Vomiting</columnTitle>
+      </column>
+      <column columnName="RCEchill">
+        <datatype>varchar</datatype>
+        <columnTitle>6f.Chills</columnTitle>
+      </column>
+      <column columnName="RCEchiqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Chills</columnTitle>
+      </column>
+      <column columnName="RCEarth">
+        <datatype>varchar</datatype>
+        <columnTitle>6g.Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCEartqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCElpr">
+        <datatype>varchar</datatype>
+        <columnTitle>7a.Pain (R deltoid)</columnTitle>
+      </column>
+      <column columnName="RCElprqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (right)</columnTitle>
+      </column>
+      <column columnName="RCEtr">
+        <datatype>varchar</datatype>
+        <columnTitle>7b.Tenderness (R deltoid)</columnTitle>
+      </column>
+      <column columnName="RCEtrqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local tenderness (right)</columnTitle>
+      </column>
+      <column columnName="RCElpl">
+        <datatype>varchar</datatype>
+        <columnTitle>7c.Pain (L deltoid)</columnTitle>
+      </column>
+      <column columnName="RCElplqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (left)</columnTitle>
+      </column>
+      <column columnName="RCEtl">
+        <datatype>varchar</datatype>
+        <columnTitle>7d.Tenderness (L deltoid)</columnTitle>
+      </column>
+      <column columnName="RCEtlqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local tenderness (left)</columnTitle>
+      </column>
+      <column columnName="RCEcomx">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_184">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="RCH-1" tableDbType="TABLE">
+    <tableTitle>RCH-1: Reactogenicity-Day 1</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="RCHdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Assessment Date</columnTitle>
+      </column>
+      <column columnName="RCHassdn">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Was assessment done?</columnTitle>
+      </column>
+      <column columnName="RCHtempc">
+        <datatype>double</datatype>
+        <columnTitle>2.Body temperature</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCHtemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Body Temp</columnTitle>
+      </column>
+      <column columnName="RCHrdelt">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Right Deltoid</columnTitle>
+      </column>
+      <column columnName="RCHrles">
+        <datatype>varchar</datatype>
+        <columnTitle>3a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCHreryx">
+        <datatype>integer</datatype>
+        <columnTitle>3b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCHreryy">
+        <datatype>integer</datatype>
+        <columnTitle>3b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCHrerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Right Erythema</columnTitle>
+      </column>
+      <column columnName="RCHrindx">
+        <datatype>integer</datatype>
+        <columnTitle>3c.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCHrindy">
+        <datatype>integer</datatype>
+        <columnTitle>3c.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCHrinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Right Induration</columnTitle>
+      </column>
+      <column columnName="RCHldelt">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Left Deltoid</columnTitle>
+      </column>
+      <column columnName="RCHlles">
+        <datatype>varchar</datatype>
+        <columnTitle>4a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCHleryx">
+        <datatype>double</datatype>
+        <columnTitle>4b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCHleryy">
+        <datatype>double</datatype>
+        <columnTitle>4b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCHlerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Left Erythema</columnTitle>
+      </column>
+      <column columnName="RCHlindx">
+        <datatype>double</datatype>
+        <columnTitle>4c.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCHlindy">
+        <datatype>double</datatype>
+        <columnTitle>4c.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCHlinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Left Induration</columnTitle>
+      </column>
+      <column columnName="RCHlnanp">
+        <datatype>varchar</datatype>
+        <columnTitle>5.AxillaryLymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCHlnaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Lymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCHmf">
+        <datatype>varchar</datatype>
+        <columnTitle>6a.Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCHmfqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCHmyal">
+        <datatype>varchar</datatype>
+        <columnTitle>6b.Myalgia</columnTitle>
+      </column>
+      <column columnName="RCHmyaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Myalgia</columnTitle>
+      </column>
+      <column columnName="RCHhead">
+        <datatype>varchar</datatype>
+        <columnTitle>6c.Headache</columnTitle>
+      </column>
+      <column columnName="RCHheaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Headache</columnTitle>
+      </column>
+      <column columnName="RCHnaus">
+        <datatype>varchar</datatype>
+        <columnTitle>6d.Nausea</columnTitle>
+      </column>
+      <column columnName="RCHnauqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Nausea</columnTitle>
+      </column>
+      <column columnName="RCHvom">
+        <datatype>varchar</datatype>
+        <columnTitle>6e.Vomiting</columnTitle>
+      </column>
+      <column columnName="RCHvomqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Vomiting</columnTitle>
+      </column>
+      <column columnName="RCHchill">
+        <datatype>varchar</datatype>
+        <columnTitle>6f.Chills</columnTitle>
+      </column>
+      <column columnName="RCHchiqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Chills</columnTitle>
+      </column>
+      <column columnName="RCHarth">
+        <datatype>varchar</datatype>
+        <columnTitle>6g.Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCHartqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCHlpr">
+        <datatype>varchar</datatype>
+        <columnTitle>7a.Pain (R deltoid)</columnTitle>
+      </column>
+      <column columnName="RCHlprqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (right)</columnTitle>
+      </column>
+      <column columnName="RCHtr">
+        <datatype>varchar</datatype>
+        <columnTitle>7b.Tenderness (R deltoid)</columnTitle>
+      </column>
+      <column columnName="RCHtrqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local tenderness (right)</columnTitle>
+      </column>
+      <column columnName="RCHlpl">
+        <datatype>varchar</datatype>
+        <columnTitle>7c.Pain (L deltoid)</columnTitle>
+      </column>
+      <column columnName="RCHlplqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (left)</columnTitle>
+      </column>
+      <column columnName="RCHtl">
+        <datatype>varchar</datatype>
+        <columnTitle>7d.Tenderness (L deltoid)</columnTitle>
+      </column>
+      <column columnName="RCHtlqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local tenderness (left)</columnTitle>
+      </column>
+      <column columnName="RCHcomx">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_186">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="RCF-1" tableDbType="TABLE">
+    <tableTitle>RCF-1: Reactogenicity-Day 2</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="RCFdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Assessment Date</columnTitle>
+      </column>
+      <column columnName="RCFassdn">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Was assessment done?</columnTitle>
+      </column>
+      <column columnName="RCFtempc">
+        <datatype>double</datatype>
+        <columnTitle>2.Body temperature</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCFtemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Body Temp</columnTitle>
+      </column>
+      <column columnName="RCFrdelt">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Right Deltoid</columnTitle>
+      </column>
+      <column columnName="RCFrles">
+        <datatype>varchar</datatype>
+        <columnTitle>3a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCFreryx">
+        <datatype>integer</datatype>
+        <columnTitle>3b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCFreryy">
+        <datatype>integer</datatype>
+        <columnTitle>3b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCFrerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Right Erythema</columnTitle>
+      </column>
+      <column columnName="RCFrindx">
+        <datatype>integer</datatype>
+        <columnTitle>3c.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCFrindy">
+        <datatype>integer</datatype>
+        <columnTitle>3c.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCFrinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Right Induration</columnTitle>
+      </column>
+      <column columnName="RCFldelt">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Left Deltoid</columnTitle>
+      </column>
+      <column columnName="RCFlles">
+        <datatype>varchar</datatype>
+        <columnTitle>4a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCFleryx">
+        <datatype>double</datatype>
+        <columnTitle>4b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCFleryy">
+        <datatype>double</datatype>
+        <columnTitle>4b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCFlerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Left Erythema</columnTitle>
+      </column>
+      <column columnName="RCFlindx">
+        <datatype>double</datatype>
+        <columnTitle>4c.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCFlindy">
+        <datatype>double</datatype>
+        <columnTitle>4c.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCFlinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Left Induration</columnTitle>
+      </column>
+      <column columnName="RCFlnanp">
+        <datatype>varchar</datatype>
+        <columnTitle>5.AxillaryLymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCFlnaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Lymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCFmf">
+        <datatype>varchar</datatype>
+        <columnTitle>6a.Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCFmfqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCFmyal">
+        <datatype>varchar</datatype>
+        <columnTitle>6b.Myalgia</columnTitle>
+      </column>
+      <column columnName="RCFmyaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Myalgia</columnTitle>
+      </column>
+      <column columnName="RCFhead">
+        <datatype>varchar</datatype>
+        <columnTitle>6c.Headache</columnTitle>
+      </column>
+      <column columnName="RCFheaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Headache</columnTitle>
+      </column>
+      <column columnName="RCFnaus">
+        <datatype>varchar</datatype>
+        <columnTitle>6d.Nausea</columnTitle>
+      </column>
+      <column columnName="RCFnauqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Nausea</columnTitle>
+      </column>
+      <column columnName="RCFvom">
+        <datatype>varchar</datatype>
+        <columnTitle>6e.Vomiting</columnTitle>
+      </column>
+      <column columnName="RCFvomqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Vomiting</columnTitle>
+      </column>
+      <column columnName="RCFchill">
+        <datatype>varchar</datatype>
+        <columnTitle>6f.Chills</columnTitle>
+      </column>
+      <column columnName="RCFchiqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Chills</columnTitle>
+      </column>
+      <column columnName="RCFarth">
+        <datatype>varchar</datatype>
+        <columnTitle>6g.Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCFartqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCFlpr">
+        <datatype>varchar</datatype>
+        <columnTitle>7a.Pain (R deltoid)</columnTitle>
+      </column>
+      <column columnName="RCFlprqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (right)</columnTitle>
+      </column>
+      <column columnName="RCFtr">
+        <datatype>varchar</datatype>
+        <columnTitle>7b.Tenderness (R deltoid)</columnTitle>
+      </column>
+      <column columnName="RCFtrqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local tenderness (right)</columnTitle>
+      </column>
+      <column columnName="RCFlpl">
+        <datatype>varchar</datatype>
+        <columnTitle>7c.Pain (L deltoid)</columnTitle>
+      </column>
+      <column columnName="RCFlplqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (left)</columnTitle>
+      </column>
+      <column columnName="RCFtl">
+        <datatype>varchar</datatype>
+        <columnTitle>7d.Tenderness (L deltoid)</columnTitle>
+      </column>
+      <column columnName="RCFtlqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local tenderness (left)</columnTitle>
+      </column>
+      <column columnName="RCFcomx">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_188">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="RCT-1" tableDbType="TABLE">
+    <tableTitle>RCT-1: Reactogenicity-Day 3</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="RCTdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Assessment Date</columnTitle>
+      </column>
+      <column columnName="RCTassdn">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Was assessment done?</columnTitle>
+      </column>
+      <column columnName="RCTtempc">
+        <datatype>double</datatype>
+        <columnTitle>2.Body temperature</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCTtemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Body Temp</columnTitle>
+      </column>
+      <column columnName="RCTrdelt">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Right Deltoid</columnTitle>
+      </column>
+      <column columnName="RCTrles">
+        <datatype>varchar</datatype>
+        <columnTitle>3a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCTreryx">
+        <datatype>integer</datatype>
+        <columnTitle>3b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCTreryy">
+        <datatype>integer</datatype>
+        <columnTitle>3b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCTrerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Right Erythema</columnTitle>
+      </column>
+      <column columnName="RCTrindx">
+        <datatype>integer</datatype>
+        <columnTitle>3c.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCTrindy">
+        <datatype>integer</datatype>
+        <columnTitle>3c.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCTrinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Right Induration</columnTitle>
+      </column>
+      <column columnName="RCTldelt">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Left Deltoid</columnTitle>
+      </column>
+      <column columnName="RCTlles">
+        <datatype>varchar</datatype>
+        <columnTitle>4a.Vaccine-related lesion</columnTitle>
+      </column>
+      <column columnName="RCTleryx">
+        <datatype>double</datatype>
+        <columnTitle>4b.Erythema 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCTleryy">
+        <datatype>double</datatype>
+        <columnTitle>4b.Erythema 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCTlerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Left Erythema</columnTitle>
+      </column>
+      <column columnName="RCTlindx">
+        <datatype>double</datatype>
+        <columnTitle>4c.Induration 1st measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCTlindy">
+        <datatype>double</datatype>
+        <columnTitle>4c.Induration 2nd measure</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCTlinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Left Induration</columnTitle>
+      </column>
+      <column columnName="RCTlnanp">
+        <datatype>varchar</datatype>
+        <columnTitle>5.AxillaryLymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCTlnaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Lymphadenopathy</columnTitle>
+      </column>
+      <column columnName="RCTmf">
+        <datatype>varchar</datatype>
+        <columnTitle>6a.Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCTmfqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Malaise/Fatigue</columnTitle>
+      </column>
+      <column columnName="RCTmyal">
+        <datatype>varchar</datatype>
+        <columnTitle>6b.Myalgia</columnTitle>
+      </column>
+      <column columnName="RCTmyaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Myalgia</columnTitle>
+      </column>
+      <column columnName="RCThead">
+        <datatype>varchar</datatype>
+        <columnTitle>6c.Headache</columnTitle>
+      </column>
+      <column columnName="RCTheaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Headache</columnTitle>
+      </column>
+      <column columnName="RCTnaus">
+        <datatype>varchar</datatype>
+        <columnTitle>6d.Nausea</columnTitle>
+      </column>
+      <column columnName="RCTnauqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Nausea</columnTitle>
+      </column>
+      <column columnName="RCTvom">
+        <datatype>varchar</datatype>
+        <columnTitle>6e.Vomiting</columnTitle>
+      </column>
+      <column columnName="RCTvomqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Vomiting</columnTitle>
+      </column>
+      <column columnName="RCTchill">
+        <datatype>varchar</datatype>
+        <columnTitle>6f.Chills</columnTitle>
+      </column>
+      <column columnName="RCTchiqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Chills</columnTitle>
+      </column>
+      <column columnName="RCTarth">
+        <datatype>varchar</datatype>
+        <columnTitle>6g.Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCTartqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCTlpr">
+        <datatype>varchar</datatype>
+        <columnTitle>7a.Pain (R deltoid)</columnTitle>
+      </column>
+      <column columnName="RCTlprqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (right)</columnTitle>
+      </column>
+      <column columnName="RCTtr">
+        <datatype>varchar</datatype>
+        <columnTitle>7b.Tenderness (R deltoid)</columnTitle>
+      </column>
+      <column columnName="RCTtrqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local tenderness (right)</columnTitle>
+      </column>
+      <column columnName="RCTlpl">
+        <datatype>varchar</datatype>
+        <columnTitle>7c.Pain (L deltoid)</columnTitle>
+      </column>
+      <column columnName="RCTlplqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (left)</columnTitle>
+      </column>
+      <column columnName="RCTtl">
+        <datatype>varchar</datatype>
+        <columnTitle>7d.Tenderness (L deltoid)</columnTitle>
+      </column>
+      <column columnName="RCTtlqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local tenderness (left)</columnTitle>
+      </column>
+      <column columnName="RCTany72">
+        <datatype>varchar</datatype>
+        <columnTitle>8.Continuing Reacto Symps</columnTitle>
+      </column>
+      <column columnName="RCTcomx">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_190">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="RCP-1" tableDbType="TABLE">
+    <tableTitle>RCP-1: Reactogenicity-Resolution</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="RCPtecna">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Body Temp. N/A</columnTitle>
+      </column>
+      <column columnName="RCPtempc">
+        <datatype>double</datatype>
+        <columnTitle>1. Body Temperature</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCPtemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Body Temp</columnTitle>
+      </column>
+      <column columnName="RCPterdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1. Body Temp. resolution</columnTitle>
+      </column>
+      <column columnName="RCPrerna">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Erythema N/A (Right)</columnTitle>
+      </column>
+      <column columnName="RCPreryx">
+        <datatype>integer</datatype>
+        <columnTitle>2. Erythema 1st measure-R</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCPreryy">
+        <datatype>integer</datatype>
+        <columnTitle>2. Erythema 2nd measure-R</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCPrerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Erythema (Right deltoid)</columnTitle>
+      </column>
+      <column columnName="RCPrrrdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>2. Erythema date of res-R</columnTitle>
+      </column>
+      <column columnName="RCPrinna">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Induration N/A (Right)</columnTitle>
+      </column>
+      <column columnName="RCPrindx">
+        <datatype>integer</datatype>
+        <columnTitle>3.Induration 1st meas.(R)</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCPrindy">
+        <datatype>integer</datatype>
+        <columnTitle>3.Induration 2nd meas.(R)</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCPrinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Induration (Right)</columnTitle>
+      </column>
+      <column columnName="RCPrirdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>3. Induration res.(Right)</columnTitle>
+      </column>
+      <column columnName="RCPlerna">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Erythema N/A (Left)</columnTitle>
+      </column>
+      <column columnName="RCPleryx">
+        <datatype>double</datatype>
+        <columnTitle>4. Erythema 1st measure-L</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCPleryy">
+        <datatype>double</datatype>
+        <columnTitle>4. Erythema 2nd measure-L</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCPlerqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Erythema (Left deltoid)</columnTitle>
+      </column>
+      <column columnName="RCPlrrdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>4. Erythema date of res-L</columnTitle>
+      </column>
+      <column columnName="RCPlinna">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Induration N/A (Left)</columnTitle>
+      </column>
+      <column columnName="RCPlindx">
+        <datatype>double</datatype>
+        <columnTitle>5.Induration 1st meas.(L)</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCPlindy">
+        <datatype>double</datatype>
+        <columnTitle>5.Induration 2nd meas.(L)</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="RCPlinqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Induration (Left)</columnTitle>
+      </column>
+      <column columnName="RCPlirdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>5. Induration res.(Left)</columnTitle>
+      </column>
+      <column columnName="RCPmfna">
+        <datatype>varchar</datatype>
+        <columnTitle>6a. Malaise/Fatigue N/A</columnTitle>
+      </column>
+      <column columnName="RCPmf">
+        <datatype>varchar</datatype>
+        <columnTitle>6a. Malaise/Fatigue Sever</columnTitle>
+      </column>
+      <column columnName="RCPmfqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Malaise/fatigue</columnTitle>
+      </column>
+      <column columnName="RCPmfrdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>6a. Mal/Fat date of res.</columnTitle>
+      </column>
+      <column columnName="RCPmyana">
+        <datatype>varchar</datatype>
+        <columnTitle>6b. Myalgia N/A</columnTitle>
+      </column>
+      <column columnName="RCPmyal">
+        <datatype>varchar</datatype>
+        <columnTitle>6b. Myalgia severity</columnTitle>
+      </column>
+      <column columnName="RCPmyaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Myalgia</columnTitle>
+      </column>
+      <column columnName="RCPmyrdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>6b. Myalgia date of res.</columnTitle>
+      </column>
+      <column columnName="RCPheana">
+        <datatype>varchar</datatype>
+        <columnTitle>6c. Headache N/A</columnTitle>
+      </column>
+      <column columnName="RCPhead">
+        <datatype>varchar</datatype>
+        <columnTitle>6c. Headache severity</columnTitle>
+      </column>
+      <column columnName="RCPheaqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Headache</columnTitle>
+      </column>
+      <column columnName="RCPherdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>6c. Headache date of res.</columnTitle>
+      </column>
+      <column columnName="RCPnauna">
+        <datatype>varchar</datatype>
+        <columnTitle>6d. Nausea N/A</columnTitle>
+      </column>
+      <column columnName="RCPnaus">
+        <datatype>varchar</datatype>
+        <columnTitle>6d. Nausea severity</columnTitle>
+      </column>
+      <column columnName="RCPnauqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Nausea</columnTitle>
+      </column>
+      <column columnName="RCPnardt">
+        <datatype>timestamp</datatype>
+        <columnTitle>6d. Nausea date of res.</columnTitle>
+      </column>
+      <column columnName="RCPvomna">
+        <datatype>varchar</datatype>
+        <columnTitle>6e. Vomiting N/A</columnTitle>
+      </column>
+      <column columnName="RCPvom">
+        <datatype>varchar</datatype>
+        <columnTitle>6e. Vomiting severity</columnTitle>
+      </column>
+      <column columnName="RCPvomqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Vomiting</columnTitle>
+      </column>
+      <column columnName="RCPvordt">
+        <datatype>timestamp</datatype>
+        <columnTitle>6e. Vomiting date of res.</columnTitle>
+      </column>
+      <column columnName="RCPchina">
+        <datatype>varchar</datatype>
+        <columnTitle>6f. Chills N/A</columnTitle>
+      </column>
+      <column columnName="RCPchill">
+        <datatype>varchar</datatype>
+        <columnTitle>6f. Chills severity</columnTitle>
+      </column>
+      <column columnName="RCPchiqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Chills</columnTitle>
+      </column>
+      <column columnName="RCPchrdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>6f. Chills date of res.</columnTitle>
+      </column>
+      <column columnName="RCPartna">
+        <datatype>varchar</datatype>
+        <columnTitle>6g. Arthralgia N/A</columnTitle>
+      </column>
+      <column columnName="RCParth">
+        <datatype>varchar</datatype>
+        <columnTitle>6g. Arthralgia severity</columnTitle>
+      </column>
+      <column columnName="RCPartqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Arthralgia</columnTitle>
+      </column>
+      <column columnName="RCParrdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>6g. Arthr. date of res.</columnTitle>
+      </column>
+      <column columnName="RCPlprna">
+        <datatype>varchar</datatype>
+        <columnTitle>7a. Pain N/A (Right)</columnTitle>
+      </column>
+      <column columnName="RCPlpr">
+        <datatype>varchar</datatype>
+        <columnTitle>7a. Pain severity (Right)</columnTitle>
+      </column>
+      <column columnName="RCPlprqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain  (Right)</columnTitle>
+      </column>
+      <column columnName="RCPlprdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>7a. Pain date/res.(Right)</columnTitle>
+      </column>
+      <column columnName="RCPtrna">
+        <datatype>varchar</datatype>
+        <columnTitle>7b. Tenderness N/A (R)</columnTitle>
+      </column>
+      <column columnName="RCPtr">
+        <datatype>varchar</datatype>
+        <columnTitle>7b. Tenderness sever (R)</columnTitle>
+      </column>
+      <column columnName="RCPtrqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Tenderness (Right)</columnTitle>
+      </column>
+      <column columnName="RCPtrdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>7b.Tendrnss date/res. (R)</columnTitle>
+      </column>
+      <column columnName="RCPlplna">
+        <datatype>varchar</datatype>
+        <columnTitle>7c. Pain N/A (Left)</columnTitle>
+      </column>
+      <column columnName="RCPlpl">
+        <datatype>varchar</datatype>
+        <columnTitle>7c. Pain severity (Left)</columnTitle>
+      </column>
+      <column columnName="RCPlplqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Local pain (Left)</columnTitle>
+      </column>
+      <column columnName="RCPlpldt">
+        <datatype>timestamp</datatype>
+        <columnTitle>7c. Pain date/res.(Left)</columnTitle>
+      </column>
+      <column columnName="RCPtlna">
+        <datatype>varchar</datatype>
+        <columnTitle>7d. Tenderness N/A (L)</columnTitle>
+      </column>
+      <column columnName="RCPtl">
+        <datatype>varchar</datatype>
+        <columnTitle>7d. Tenderness sever (L)</columnTitle>
+      </column>
+      <column columnName="RCPtlqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Tenderness (Left)</columnTitle>
+      </column>
+      <column columnName="RCPtldt">
+        <datatype>timestamp</datatype>
+        <columnTitle>7d.Tendrnss date/res. (L)</columnTitle>
+      </column>
+      <column columnName="RCPcomx">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_192">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="FPX-1" tableDbType="TABLE">
+    <tableTitle>FPX-1: Final Complete Physical Exam</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="FPXdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Exam Date</columnTitle>
+      </column>
+      <column columnName="FPXwtkg">
+        <datatype>integer</datatype>
+        <columnTitle>1. Weight</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="FPXwtqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Weight</columnTitle>
+      </column>
+      <column columnName="FPXtempc">
+        <datatype>double</datatype>
+        <columnTitle>2. Body Temp</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="FPXtemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Body Temp</columnTitle>
+      </column>
+      <column columnName="FPXbpsys">
+        <datatype>integer</datatype>
+        <columnTitle>3. BP systolic xxx/</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="FPXbpdia">
+        <datatype>integer</datatype>
+        <columnTitle>3. BP diastolic /xxx</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="FPXbpqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Blood Pressure</columnTitle>
+      </column>
+      <column columnName="FPXpulse">
+        <datatype>integer</datatype>
+        <columnTitle>4. Pulse</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="FPXresp">
+        <datatype>integer</datatype>
+        <columnTitle>5. Respirations</columnTitle>
+        <formatString>#0</formatString>
+      </column>
+      <column columnName="FPXheent">
+        <datatype>varchar</datatype>
+        <columnTitle>6. HEENT</columnTitle>
+      </column>
+      <column columnName="FPXheenx">
+        <datatype>varchar</datatype>
+        <columnTitle>6. HEENT Notes</columnTitle>
+      </column>
+      <column columnName="FPXneck">
+        <datatype>varchar</datatype>
+        <columnTitle>7. Neck</columnTitle>
+      </column>
+      <column columnName="FPXneckx">
+        <datatype>varchar</datatype>
+        <columnTitle>7. Neck Notes</columnTitle>
+      </column>
+      <column columnName="FPXlymph">
+        <datatype>varchar</datatype>
+        <columnTitle>8. Lymph Nodes</columnTitle>
+      </column>
+      <column columnName="FPXlympx">
+        <datatype>varchar</datatype>
+        <columnTitle>8. Lymph Nodes Notes</columnTitle>
+      </column>
+      <column columnName="FPXheart">
+        <datatype>varchar</datatype>
+        <columnTitle>9. Heart</columnTitle>
+      </column>
+      <column columnName="FPXhrtx">
+        <datatype>varchar</datatype>
+        <columnTitle>9. Heart Notes</columnTitle>
+      </column>
+      <column columnName="FPXchest">
+        <datatype>varchar</datatype>
+        <columnTitle>10. Chest</columnTitle>
+      </column>
+      <column columnName="FPXchstx">
+        <datatype>varchar</datatype>
+        <columnTitle>10. Chest Notes</columnTitle>
+      </column>
+      <column columnName="FPXabdom">
+        <datatype>varchar</datatype>
+        <columnTitle>11. Abdomen</columnTitle>
+      </column>
+      <column columnName="FPXabdox">
+        <datatype>varchar</datatype>
+        <columnTitle>11. Abdomen Notes</columnTitle>
+      </column>
+      <column columnName="FPXextrm">
+        <datatype>varchar</datatype>
+        <columnTitle>12. Extremities</columnTitle>
+      </column>
+      <column columnName="FPXextrx">
+        <datatype>varchar</datatype>
+        <columnTitle>12. Extremities Notes</columnTitle>
+      </column>
+      <column columnName="FPXneuro">
+        <datatype>varchar</datatype>
+        <columnTitle>13. Neurological</columnTitle>
+      </column>
+      <column columnName="FPXneurx">
+        <datatype>varchar</datatype>
+        <columnTitle>13. Neurological Notes</columnTitle>
+      </column>
+      <column columnName="FPXskin">
+        <datatype>varchar</datatype>
+        <columnTitle>14. Skin</columnTitle>
+      </column>
+      <column columnName="FPXskinx">
+        <datatype>varchar</datatype>
+        <columnTitle>14. Skin Notes</columnTitle>
+      </column>
+      <column columnName="FPXother">
+        <datatype>varchar</datatype>
+        <columnTitle>15. Other</columnTitle>
+      </column>
+      <column columnName="FPXothex">
+        <datatype>varchar</datatype>
+        <columnTitle>15. Other Notes</columnTitle>
+      </column>
+      <column columnName="FPXcemqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Sx-directed eval deemed</columnTitle>
+      </column>
+      <column columnName="FPXcemh">
+        <datatype>varchar</datatype>
+        <columnTitle>16. Evaluation Summary</columnTitle>
+      </column>
+      <column columnName="FPXsign">
+        <datatype>varchar</datatype>
+        <columnTitle>Clinician signature/date</columnTitle>
+      </column>
+      <column columnName="FPXcom">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_200">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="DOV-1" tableDbType="TABLE">
+    <tableTitle>DOV-1: Discontinuation of Vaccination</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="DOVdcdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date of Discontinuation</columnTitle>
+      </column>
+      <column columnName="DOVlvdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1. Date last vaccination</columnTitle>
+      </column>
+      <column columnName="DOVcqc">
+        <datatype>varchar</datatype>
+        <columnTitle>Reason Vacc Disconinued</columnTitle>
+      </column>
+      <column columnName="DOVreas">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Reason discontinued</columnTitle>
+      </column>
+      <column columnName="DOVunsrx">
+        <datatype>varchar</datatype>
+        <columnTitle>2d. Schedule specify</columnTitle>
+      </column>
+      <column columnName="DOVclaed">
+        <datatype>varchar</datatype>
+        <columnTitle>2f. AE/Clinician discont</columnTitle>
+      </column>
+      <column columnName="DOVptaed">
+        <datatype>varchar</datatype>
+        <columnTitle>2f. AE/Ppt discontinue</columnTitle>
+      </column>
+      <column columnName="DOVresym">
+        <datatype>varchar</datatype>
+        <columnTitle>2g. Specify symptoms</columnTitle>
+      </column>
+      <column columnName="DOVclred">
+        <datatype>varchar</datatype>
+        <columnTitle>2g. Clinician decision</columnTitle>
+      </column>
+      <column columnName="DOVptred">
+        <datatype>varchar</datatype>
+        <columnTitle>2g. Ppt. decision</columnTitle>
+      </column>
+      <column columnName="DOVptorx">
+        <datatype>varchar</datatype>
+        <columnTitle>2j.Other refuse, specif</columnTitle>
+      </column>
+      <column columnName="DOVblorx">
+        <datatype>varchar</datatype>
+        <columnTitle>2k. Blood prod., specify</columnTitle>
+      </column>
+      <column columnName="DOVothrx">
+        <datatype>varchar</datatype>
+        <columnTitle>2l. Other reason specify</columnTitle>
+      </column>
+      <column columnName="DOVflwup">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Follow-up visits</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_300">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="SP-1" tableDbType="TABLE">
+    <tableTitle>SP-1: Study Product Admin. Error</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SPdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Form Completion Date</columnTitle>
+      </column>
+      <column columnName="SPerdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1. Date error occurred</columnTitle>
+      </column>
+      <column columnName="SPersite">
+        <datatype>varchar</datatype>
+        <columnTitle>2a. Incorrect admin site</columnTitle>
+      </column>
+      <column columnName="SPersitx">
+        <datatype>varchar</datatype>
+        <columnTitle>2a. specify (TEXT)</columnTitle>
+      </column>
+      <column columnName="SPerprod">
+        <datatype>varchar</datatype>
+        <columnTitle>2b. Incorrect prod admin</columnTitle>
+      </column>
+      <column columnName="SPerdose">
+        <datatype>varchar</datatype>
+        <columnTitle>2c. Incorrect dose admin.</columnTitle>
+      </column>
+      <column columnName="SPnovia">
+        <datatype>varchar</datatype>
+        <columnTitle>2d. Adm. beyond viability</columnTitle>
+      </column>
+      <column columnName="SPoutsd">
+        <datatype>varchar</datatype>
+        <columnTitle>2e. Admin outside window</columnTitle>
+      </column>
+      <column columnName="SPerothr">
+        <datatype>varchar</datatype>
+        <columnTitle>2f. Other</columnTitle>
+      </column>
+      <column columnName="SPerothx">
+        <datatype>varchar</datatype>
+        <columnTitle>2f. specify (TEXT)</columnTitle>
+      </column>
+      <column columnName="SPaction">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Outcome</columnTitle>
+      </column>
+      <column columnName="SPactox">
+        <datatype>varchar</datatype>
+        <columnTitle>3. specify (TEXT)</columnTitle>
+      </column>
+      <column columnName="SPcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments (TEXT)</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_310">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="IV-1" tableDbType="TABLE">
+    <tableTitle>IV-1:Interim Visit</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="IVdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Form Completion Date</columnTitle>
+      </column>
+      <column columnName="IVrmakup">
+        <datatype>varchar</datatype>
+        <columnTitle>1a. Visit missed</columnTitle>
+      </column>
+      <column columnName="IVvisit">
+        <datatype>integer</datatype>
+        <columnTitle>1a1. Visit complte/replce</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="IVrae">
+        <datatype>varchar</datatype>
+        <columnTitle>1b. Ppt reported AE</columnTitle>
+      </column>
+      <column columnName="IVrspec">
+        <datatype>varchar</datatype>
+        <columnTitle>1c. Repeat spec. coll.</columnTitle>
+      </column>
+      <column columnName="IVrfupae">
+        <datatype>varchar</datatype>
+        <columnTitle>1d. F/U abnormal safety</columnTitle>
+      </column>
+      <column columnName="IVriht">
+        <datatype>varchar</datatype>
+        <columnTitle>1e. Interim HIV testing</columnTitle>
+      </column>
+      <column columnName="IVroth">
+        <datatype>varchar</datatype>
+        <columnTitle>1f. Other, specify</columnTitle>
+      </column>
+      <column columnName="IVrothx">
+        <datatype>varchar</datatype>
+        <columnTitle>1f. Specify text</columnTitle>
+      </column>
+      <column columnName="IVpapx">
+        <datatype>varchar</datatype>
+        <columnTitle>2a. Abbrev. phys. exam</columnTitle>
+      </column>
+      <column columnName="IVpsia">
+        <datatype>varchar</datatype>
+        <columnTitle>2b. Social impact</columnTitle>
+      </column>
+      <column columnName="IVpotb">
+        <datatype>varchar</datatype>
+        <columnTitle>2c. OTB questionnaire</columnTitle>
+      </column>
+      <column columnName="IVpiht">
+        <datatype>varchar</datatype>
+        <columnTitle>2d. HIV infection</columnTitle>
+      </column>
+      <column columnName="IVpllf">
+        <datatype>varchar</datatype>
+        <columnTitle>2e. Local Lab</columnTitle>
+      </column>
+      <column columnName="IVpcpf">
+        <datatype>varchar</datatype>
+        <columnTitle>2f. Chemistry panel</columnTitle>
+      </column>
+      <column columnName="IVpurf">
+        <datatype>varchar</datatype>
+        <columnTitle>2g. Urine dip/micro exam</columnTitle>
+      </column>
+      <column columnName="IVpoth">
+        <datatype>varchar</datatype>
+        <columnTitle>2h. Other, specify</columnTitle>
+      </column>
+      <column columnName="IVpothx">
+        <datatype>varchar</datatype>
+        <columnTitle>2h. Specify text</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_350">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="IHT-1" tableDbType="TABLE">
+    <tableTitle>IHT-1:  Interim HIV Test</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="IHTdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Contact Date</columnTitle>
+      </column>
+      <column columnName="IHTreq">
+        <datatype>varchar</datatype>
+        <columnTitle>Ppt / Clinician Request</columnTitle>
+      </column>
+      <column columnName="IHTsympt">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Recent or current sx?</columnTitle>
+      </column>
+      <column columnName="IHTsympx">
+        <datatype>varchar</datatype>
+        <columnTitle>1a.Describe symptoms</columnTitle>
+      </column>
+      <column columnName="IHTexp">
+        <datatype>varchar</datatype>
+        <columnTitle>2.Reason poss. exposure?</columnTitle>
+      </column>
+      <column columnName="IHTex1dt">
+        <datatype>varchar</datatype>
+        <columnTitle>2a.1st date of poss.expos</columnTitle>
+      </column>
+      <column columnName="IHTex2dt">
+        <datatype>varchar</datatype>
+        <columnTitle>2a.2nd date of poss.expos</columnTitle>
+      </column>
+      <column columnName="IHTex3dt">
+        <datatype>varchar</datatype>
+        <columnTitle>2a.3rd date of poss.expos</columnTitle>
+      </column>
+      <column columnName="IHTex4dt">
+        <datatype>varchar</datatype>
+        <columnTitle>2a.4th date of poss.expos</columnTitle>
+      </column>
+      <column columnName="IHTex5dt">
+        <datatype>varchar</datatype>
+        <columnTitle>2a.5th date of poss.expos</columnTitle>
+      </column>
+      <column columnName="IHTuskp">
+        <datatype>varchar</datatype>
+        <columnTitle>2b1.Sex w/known HIV+</columnTitle>
+      </column>
+      <column columnName="IHTusunk">
+        <datatype>varchar</datatype>
+        <columnTitle>2b2.Sex w/unknown HIV?</columnTitle>
+      </column>
+      <column columnName="IHTsnkp">
+        <datatype>varchar</datatype>
+        <columnTitle>2b3.Shared needle w/HIV+</columnTitle>
+      </column>
+      <column columnName="IHTsnunk">
+        <datatype>varchar</datatype>
+        <columnTitle>2b4.Shared needle w/HIV?</columnTitle>
+      </column>
+      <column columnName="IHTothr">
+        <datatype>varchar</datatype>
+        <columnTitle>2b5.Other</columnTitle>
+      </column>
+      <column columnName="IHTothrx">
+        <datatype>varchar</datatype>
+        <columnTitle>2b5.other (text)</columnTitle>
+      </column>
+      <column columnName="IHTorea">
+        <datatype>varchar</datatype>
+        <columnTitle>3.Other reason HIV test</columnTitle>
+      </column>
+      <column columnName="IHToreax">
+        <datatype>varchar</datatype>
+        <columnTitle>3.Yes, specify reason</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_360">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="AE-1" tableDbType="TABLE">
+    <tableTitle>AE-1:(VTN) AE Log</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="AEsubsum">
+        <datatype>varchar</datatype>
+        <columnTitle>AE subsumed</columnTitle>
+      </column>
+      <column columnName="AErptdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date Reported to Site</columnTitle>
+      </column>
+      <column columnName="AEsaeno">
+        <datatype>integer</datatype>
+        <columnTitle>SAE number</columnTitle>
+      </column>
+      <column columnName="AEfver">
+        <datatype>varchar</datatype>
+        <columnTitle>MedDRA flagversion</columnTitle>
+      </column>
+      <column columnName="AEmdra">
+        <datatype>varchar</datatype>
+        <columnTitle>MedDRA text</columnTitle>
+      </column>
+      <column columnName="AEdiag">
+        <datatype>varchar</datatype>
+        <columnTitle>1.Adverse Experience (AE)</columnTitle>
+      </column>
+      <column columnName="AEcodeq">
+        <datatype>varchar</datatype>
+        <columnTitle>Coding Query</columnTitle>
+      </column>
+      <column columnName="AEondt">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Onset Date</columnTitle>
+      </column>
+      <column columnName="AEseveqc">
+        <datatype>varchar</datatype>
+        <columnTitle>CQC - Illness/AE log</columnTitle>
+      </column>
+      <column columnName="AEseve">
+        <datatype>varchar</datatype>
+        <columnTitle>3. Severity</columnTitle>
+      </column>
+      <column columnName="AErelpro">
+        <datatype>varchar</datatype>
+        <columnTitle>4.Relation to Study Prod.</columnTitle>
+      </column>
+      <column columnName="AEdrad">
+        <datatype>varchar</datatype>
+        <columnTitle>5. Study Product Admin.</columnTitle>
+      </column>
+      <column columnName="AEoutc">
+        <datatype>varchar</datatype>
+        <columnTitle>6. Status/Outcome</columnTitle>
+      </column>
+      <column columnName="AEocdt">
+        <datatype>varchar</datatype>
+        <columnTitle>6a. Status/Outcome Date</columnTitle>
+      </column>
+      <column columnName="AEtrno">
+        <datatype>varchar</datatype>
+        <columnTitle>7. None</columnTitle>
+      </column>
+      <column columnName="AEtrrx">
+        <datatype>varchar</datatype>
+        <columnTitle>7. Medication(s)</columnTitle>
+      </column>
+      <column columnName="AEtrho">
+        <datatype>varchar</datatype>
+        <columnTitle>7. New/Prolonged hosp.</columnTitle>
+      </column>
+      <column columnName="AEtrpr">
+        <datatype>varchar</datatype>
+        <columnTitle>7. Procedure/Surgery</columnTitle>
+      </column>
+      <column columnName="AEtrot">
+        <datatype>varchar</datatype>
+        <columnTitle>7. Other</columnTitle>
+      </column>
+      <column columnName="AEich">
+        <datatype>varchar</datatype>
+        <columnTitle>8. AE serious per ICH?</columnTitle>
+      </column>
+      <column columnName="AEdaids">
+        <datatype>varchar</datatype>
+        <columnTitle>9. Reported to DAIDS</columnTitle>
+      </column>
+      <column columnName="AEsaerct">
+        <datatype>varchar</datatype>
+        <columnTitle>10.SAE on Reactogenicity?</columnTitle>
+      </column>
+      <column columnName="AEvisit">
+        <datatype>integer</datatype>
+        <columnTitle>9. Visit Code reported</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="AEcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_420">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="CM-1" tableDbType="TABLE">
+    <tableTitle>CM-1:(Ph I/II) Concomitant Medications Log</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="CMnone">
+        <datatype>varchar</datatype>
+        <columnTitle>No meds @ Screen/Enroll.</columnTitle>
+      </column>
+      <column columnName="sfdt_423">
+        <datatype>varchar</datatype>
+        <columnTitle>No Meds - Staff Init/Date</columnTitle>
+      </column>
+      <column columnName="CMnomeds">
+        <datatype>varchar</datatype>
+        <columnTitle>No Meds taken thru study</columnTitle>
+      </column>
+      <column columnName="CMsfdtno">
+        <datatype>varchar</datatype>
+        <columnTitle>No Meds(study)-Init/Date</columnTitle>
+      </column>
+      <column columnName="CM1med">
+        <datatype>varchar</datatype>
+        <columnTitle>Medication Name #1</columnTitle>
+      </column>
+      <column columnName="CM1mdsce">
+        <datatype>varchar</datatype>
+        <columnTitle>#1 Clinically Significant</columnTitle>
+      </column>
+      <column columnName="CM1medqc">
+        <datatype>varchar</datatype>
+        <columnTitle>CQC- 1st Con Med</columnTitle>
+      </column>
+      <column columnName="CM1ind">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #1: Indication</columnTitle>
+      </column>
+      <column columnName="CM1init">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #1: Initials/Log Date</columnTitle>
+      </column>
+      <column columnName="CM1stdt">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #1: Date Started</columnTitle>
+      </column>
+      <column columnName="CM1spdt">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #1: Date Stopped</columnTitle>
+      </column>
+      <column columnName="CM1cont">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #1: Continuing at end</columnTitle>
+      </column>
+      <column columnName="CM1ae">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #1: Taken for AE?</columnTitle>
+      </column>
+      <column columnName="CM1ae1p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#1: First AE Page #</columnTitle>
+      </column>
+      <column columnName="CM1ae2p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#1: Second AE Page #</columnTitle>
+      </column>
+      <column columnName="CM1ae3p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#1: Third AE Page #</columnTitle>
+      </column>
+      <column columnName="CM1ae4p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#1: Fourth AE Page #</columnTitle>
+      </column>
+      <column columnName="CM1dose">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #1: Dose/Units</columnTitle>
+      </column>
+      <column columnName="CM1rte">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #1: Route</columnTitle>
+      </column>
+      <column columnName="CM1rtoth">
+        <datatype>varchar</datatype>
+        <columnTitle>Med#1:Route Other,specify</columnTitle>
+      </column>
+      <column columnName="CM1freq">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #1: Frequency</columnTitle>
+      </column>
+      <column columnName="CM1hr">
+        <datatype>integer</datatype>
+        <columnTitle>Med #1: qxh hrs</columnTitle>
+      </column>
+      <column columnName="CM1fqoth">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #1:Freq Other,specify</columnTitle>
+      </column>
+      <column columnName="CM2med">
+        <datatype>varchar</datatype>
+        <columnTitle>Medication Name #2</columnTitle>
+      </column>
+      <column columnName="CM2mdsce">
+        <datatype>varchar</datatype>
+        <columnTitle>#2 Clinically Significant</columnTitle>
+      </column>
+      <column columnName="CM2medqc">
+        <datatype>varchar</datatype>
+        <columnTitle>CQC- 2nd Con Med</columnTitle>
+      </column>
+      <column columnName="CM2ind">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #2: Indication</columnTitle>
+      </column>
+      <column columnName="CM2init">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #2: Initials/Log Date</columnTitle>
+      </column>
+      <column columnName="CM2stdt">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #2: Date Started</columnTitle>
+      </column>
+      <column columnName="CM2spdt">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #2: Date Stopped</columnTitle>
+      </column>
+      <column columnName="CM2cont">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #2: Continuing at end</columnTitle>
+      </column>
+      <column columnName="CM2ae">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #2: Taken for AE?</columnTitle>
+      </column>
+      <column columnName="CM2ae1p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#2: First AE Page #</columnTitle>
+      </column>
+      <column columnName="CM2ae2p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#2: Second AE Page #</columnTitle>
+      </column>
+      <column columnName="CM2ae3p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#2: Third AE Page #</columnTitle>
+      </column>
+      <column columnName="CM2ae4p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#2: Fourth AE Page #</columnTitle>
+      </column>
+      <column columnName="CM2dose">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #2: Dose/Units</columnTitle>
+      </column>
+      <column columnName="CM2rte">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #2: Route</columnTitle>
+      </column>
+      <column columnName="CM2rtoth">
+        <datatype>varchar</datatype>
+        <columnTitle>Med#2:Route Other,specify</columnTitle>
+      </column>
+      <column columnName="CM2freq">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #2: Frequency</columnTitle>
+      </column>
+      <column columnName="CM2hr">
+        <datatype>integer</datatype>
+        <columnTitle>Med #2: qxh hrs</columnTitle>
+      </column>
+      <column columnName="CM2fqoth">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #2:Freq Other,specify</columnTitle>
+      </column>
+      <column columnName="CM3med">
+        <datatype>varchar</datatype>
+        <columnTitle>Medication Name #3</columnTitle>
+      </column>
+      <column columnName="CM3mdsce">
+        <datatype>varchar</datatype>
+        <columnTitle>#3 Clinically Significant</columnTitle>
+      </column>
+      <column columnName="CM3medqc">
+        <datatype>varchar</datatype>
+        <columnTitle>CQC- 3rd Con Med</columnTitle>
+      </column>
+      <column columnName="CM3ind">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #3: Indication</columnTitle>
+      </column>
+      <column columnName="CM3init">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #3: Initials/Log Date</columnTitle>
+      </column>
+      <column columnName="CM3stdt">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #3: Date Started</columnTitle>
+      </column>
+      <column columnName="CM3spdt">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #3: Date Stopped</columnTitle>
+      </column>
+      <column columnName="CM3cont">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #3: Continuing at end</columnTitle>
+      </column>
+      <column columnName="CM3ae">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #3: Taken for AE?</columnTitle>
+      </column>
+      <column columnName="CM3ae1p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#3: First AE Page #</columnTitle>
+      </column>
+      <column columnName="CM3ae2p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#3: Second AE Page #</columnTitle>
+      </column>
+      <column columnName="CM3ae3p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#3: Third AE Page #</columnTitle>
+      </column>
+      <column columnName="CM3ae4p">
+        <datatype>integer</datatype>
+        <columnTitle>Med#3: Fourth AE Page #</columnTitle>
+      </column>
+      <column columnName="CM3dose">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #3: Dose/Units</columnTitle>
+      </column>
+      <column columnName="CM3rte">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #3: Route</columnTitle>
+      </column>
+      <column columnName="CM3rtoth">
+        <datatype>varchar</datatype>
+        <columnTitle>Med#3:Route Other,specify</columnTitle>
+      </column>
+      <column columnName="CM3freq">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #3: Frequency</columnTitle>
+      </column>
+      <column columnName="CM3hr">
+        <datatype>integer</datatype>
+        <columnTitle>Med #3: qxh hrs</columnTitle>
+      </column>
+      <column columnName="CM3fqoth">
+        <datatype>varchar</datatype>
+        <columnTitle>Med #3:Freq Other,specify</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="PR-1" tableDbType="TABLE">
+    <tableTitle>PR-1: Pregnancy Report and History</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="PRqc">
+        <datatype>varchar</datatype>
+        <columnTitle>PR-1 CQC</columnTitle>
+      </column>
+      <column columnName="PRlmpdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1. Dt. of last menses</columnTitle>
+      </column>
+      <column columnName="PRdlvdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>2. Estimated Delivery dt.</columnTitle>
+      </column>
+      <column columnName="PRevrprg">
+        <datatype>varchar</datatype>
+        <columnTitle>3.Pregnant before?</columnTitle>
+      </column>
+      <column columnName="PRfstprg">
+        <datatype>varchar</datatype>
+        <columnTitle>3a. 1st preg since enroll</columnTitle>
+      </column>
+      <column columnName="PRftmbth">
+        <datatype>integer</datatype>
+        <columnTitle>3b. Number of full term</columnTitle>
+      </column>
+      <column columnName="PRprmbth">
+        <datatype>integer</datatype>
+        <columnTitle>3c. Number of premature</columnTitle>
+      </column>
+      <column columnName="PRstlbth">
+        <datatype>integer</datatype>
+        <columnTitle>3d. Nbr spontaneous deat</columnTitle>
+      </column>
+      <column columnName="PRmscrg">
+        <datatype>integer</datatype>
+        <columnTitle>3e. Nbr spontaneous abor</columnTitle>
+      </column>
+      <column columnName="PRabort">
+        <datatype>integer</datatype>
+        <columnTitle>3f. Nbr elective abortio</columnTitle>
+      </column>
+      <column columnName="PRectprg">
+        <datatype>integer</datatype>
+        <columnTitle>3g. Nbr ectopic pregnanc</columnTitle>
+      </column>
+      <column columnName="PRhxcom">
+        <datatype>varchar</datatype>
+        <columnTitle>4. Hist complications be</columnTitle>
+      </column>
+      <column columnName="PRcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_440">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="PO-1" tableDbType="TABLE">
+    <tableTitle>PO-1: Pregnancy Outcome</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="POunk">
+        <datatype>varchar</datatype>
+        <columnTitle>Outcome unknown study end</columnTitle>
+      </column>
+      <column columnName="POinit">
+        <datatype>varchar</datatype>
+        <columnTitle>Outcome Staff Init/Date</columnTitle>
+      </column>
+      <column columnName="POqc">
+        <datatype>varchar</datatype>
+        <columnTitle>PO-1 CQC</columnTitle>
+      </column>
+      <column columnName="POoutcm">
+        <datatype>integer</datatype>
+        <columnTitle>1. How many outcomes?</columnTitle>
+      </column>
+      <column columnName="PO1outdt">
+        <datatype>varchar</datatype>
+        <columnTitle>2a. Outcome Date #1</columnTitle>
+      </column>
+      <column columnName="PO1outcm">
+        <datatype>varchar</datatype>
+        <columnTitle>2b. Pregnancy outcome #1</columnTitle>
+      </column>
+      <column columnName="PO1mthd">
+        <datatype>varchar</datatype>
+        <columnTitle>2b1. Method</columnTitle>
+      </column>
+      <column columnName="PO1anom">
+        <datatype>varchar</datatype>
+        <columnTitle>2c. Anomalies identified?</columnTitle>
+      </column>
+      <column columnName="PO2outdt">
+        <datatype>varchar</datatype>
+        <columnTitle>3a. Outcome Date #2</columnTitle>
+      </column>
+      <column columnName="PO2outcm">
+        <datatype>varchar</datatype>
+        <columnTitle>3b. Pregnancy outcome #2</columnTitle>
+      </column>
+      <column columnName="PO2mthd">
+        <datatype>varchar</datatype>
+        <columnTitle>3b1. Method</columnTitle>
+      </column>
+      <column columnName="PO2anom">
+        <datatype>varchar</datatype>
+        <columnTitle>3c. Anomalies identified?</columnTitle>
+      </column>
+      <column columnName="POcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_441">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="SCL-1" tableDbType="TABLE">
+    <tableTitle>SCL-1: Specimen Collection</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SCLdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Visit Date</columnTitle>
+      </column>
+      <column columnName="SCLcoll">
+        <datatype>varchar</datatype>
+        <columnTitle>No spec coll/Spec coll</columnTitle>
+      </column>
+      <column columnName="SCLscdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Specimen Collection Date</columnTitle>
+      </column>
+      <column columnName="SCLsctm">
+        <datatype>varchar</datatype>
+        <columnTitle>Collection Time</columnTitle>
+      </column>
+      <column columnName="SCLcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_449">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="MV-1" tableDbType="TABLE">
+    <tableTitle>MV-1: Missed Visit</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="MVfcdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Form Completion Date</columnTitle>
+      </column>
+      <column columnName="MVcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_463">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="PT-1" tableDbType="TABLE">
+    <tableTitle>PT-1: Participant Transfer</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="PTdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Form Completion Date</columnTitle>
+      </column>
+      <column columnName="PTtsite">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Transferring site name</columnTitle>
+      </column>
+      <column columnName="PTtuid">
+        <datatype>integer</datatype>
+        <columnTitle>Transferring site Unit ID</columnTitle>
+      </column>
+      <column columnName="PTrsite">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Receiving Site Name</columnTitle>
+      </column>
+      <column columnName="PTruid">
+        <datatype>integer</datatype>
+        <columnTitle>Receiving site Unit ID</columnTitle>
+      </column>
+      <column columnName="PTvisit">
+        <datatype>integer</datatype>
+        <columnTitle>3. Visit of last contact</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="PTsentdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>4. Date records sent</columnTitle>
+      </column>
+      <column columnName="PTcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_465">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="PRC-1" tableDbType="TABLE">
+    <tableTitle>PRC-1: Participant Receipt</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="PRCdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Form Completion Date</columnTitle>
+      </column>
+      <column columnName="PRCrsite">
+        <datatype>varchar</datatype>
+        <columnTitle>1. Receiving site name</columnTitle>
+      </column>
+      <column columnName="PRCruid">
+        <datatype>integer</datatype>
+        <columnTitle>Receiving site Unit ID</columnTitle>
+      </column>
+      <column columnName="PRCtsite">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Transferring site name</columnTitle>
+      </column>
+      <column columnName="PRCtuid">
+        <datatype>integer</datatype>
+        <columnTitle>Transferring site Unit ID</columnTitle>
+      </column>
+      <column columnName="PRCrecdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>3.Consent Date at rcvg.</columnTitle>
+      </column>
+      <column columnName="PRCcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_466">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="PIL-1" tableDbType="TABLE">
+    <tableTitle>PIL-1: Participant Incident Log</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="PILfcdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Form Completion Date</columnTitle>
+      </column>
+      <column columnName="PILstaff">
+        <datatype>varchar</datatype>
+        <columnTitle>SC Staff Name</columnTitle>
+      </column>
+      <column columnName="PILsourc">
+        <datatype>varchar</datatype>
+        <columnTitle>Source of Information</columnTitle>
+      </column>
+      <column columnName="PILplate">
+        <datatype>integer</datatype>
+        <columnTitle>Plate # if applicable</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="PILvisit">
+        <datatype>integer</datatype>
+        <columnTitle>Visit # if applicable</columnTitle>
+      </column>
+      <column columnName="PILforms">
+        <datatype>varchar</datatype>
+        <columnTitle>Subject: forms</columnTitle>
+      </column>
+      <column columnName="PILprot">
+        <datatype>varchar</datatype>
+        <columnTitle>Subject: protocol</columnTitle>
+      </column>
+      <column columnName="PILdata">
+        <datatype>varchar</datatype>
+        <columnTitle>Subject: data</columnTitle>
+      </column>
+      <column columnName="PILlab">
+        <datatype>varchar</datatype>
+        <columnTitle>Subject: lab</columnTitle>
+      </column>
+      <column columnName="PILenrol">
+        <datatype>varchar</datatype>
+        <columnTitle>Subject: enrollment</columnTitle>
+      </column>
+      <column columnName="PILrand">
+        <datatype>varchar</datatype>
+        <columnTitle>Subject: randomization</columnTitle>
+      </column>
+      <column columnName="PILsubo">
+        <datatype>varchar</datatype>
+        <columnTitle>Subject: other</columnTitle>
+      </column>
+      <column columnName="PILsubox">
+        <datatype>varchar</datatype>
+        <columnTitle>Subject: other, specify</columnTitle>
+      </column>
+      <column columnName="PILevnt">
+        <datatype>varchar</datatype>
+        <columnTitle>Event and details</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="ESI-1" tableDbType="TABLE">
+    <tableTitle>ESI-1: End of Study Inventory</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="ESIdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>Form Completion Date</columnTitle>
+      </column>
+      <column columnName="ESIhvis">
+        <datatype>integer</datatype>
+        <columnTitle>1. Highest Visit Code</columnTitle>
+        <formatString>#0.0</formatString>
+      </column>
+      <column columnName="ESIivis">
+        <datatype>integer</datatype>
+        <columnTitle>2.How many interim visits</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="ESIaepg">
+        <datatype>integer</datatype>
+        <columnTitle>3a. Highest AE Log Page</columnTitle>
+        <formatString>##0</formatString>
+      </column>
+      <column columnName="ESIaepgn">
+        <datatype>varchar</datatype>
+        <columnTitle>3a.No AE pages submitted</columnTitle>
+      </column>
+      <column columnName="ESIcmpg">
+        <datatype>integer</datatype>
+        <columnTitle>3b.Highest Con. Med Page</columnTitle>
+        <formatString>#0</formatString>
+      </column>
+      <column columnName="ESIprepg">
+        <datatype>integer</datatype>
+        <columnTitle>3c. Highest Pre-Exst Cond</columnTitle>
+        <formatString>#0</formatString>
+      </column>
+      <column columnName="ESIsipg">
+        <datatype>integer</datatype>
+        <columnTitle>3d. Highest Social Impact</columnTitle>
+        <formatString>#0</formatString>
+      </column>
+      <column columnName="ESIsipgn">
+        <datatype>varchar</datatype>
+        <columnTitle>3d. No Social Impact</columnTitle>
+      </column>
+      <column columnName="ESI">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_489">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="TM-1" tableDbType="TABLE">
+    <tableTitle>TM-1: Termination</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="TMtmdt">
+        <datatype>timestamp</datatype>
+        <columnTitle>1. Termination Date</columnTitle>
+      </column>
+      <column columnName="TMtrmrsn">
+        <datatype>varchar</datatype>
+        <columnTitle>2. Reason for termination</columnTitle>
+      </column>
+      <column columnName="TMddt">
+        <datatype>varchar</datatype>
+        <columnTitle>2b1. Date of Death</columnTitle>
+      </column>
+      <column columnName="TMddun">
+        <datatype>varchar</datatype>
+        <columnTitle>2b1. Date of Death Unk</columnTitle>
+      </column>
+      <column columnName="TMdcau">
+        <datatype>varchar</datatype>
+        <columnTitle>2b2. Cause of Death</columnTitle>
+      </column>
+      <column columnName="TMdcun">
+        <datatype>varchar</datatype>
+        <columnTitle>2b2. Cause of Death Unk.</columnTitle>
+      </column>
+      <column columnName="TMrefrx">
+        <datatype>varchar</datatype>
+        <columnTitle>2c. Ppt. refused, specify</columnTitle>
+      </column>
+      <column columnName="TMinvdx">
+        <datatype>varchar</datatype>
+        <columnTitle>2f. Inv.decision, specify</columnTitle>
+      </column>
+      <column columnName="TMtrmox">
+        <datatype>varchar</datatype>
+        <columnTitle>2k. Other, specify</columnTitle>
+      </column>
+      <column columnName="TMae">
+        <datatype>varchar</datatype>
+        <columnTitle>3a. Adverse Experience?</columnTitle>
+      </column>
+      <column columnName="TMae1p">
+        <datatype>integer</datatype>
+        <columnTitle>3a. First AE Log page #</columnTitle>
+      </column>
+      <column columnName="TMreact">
+        <datatype>varchar</datatype>
+        <columnTitle>3b. Reactogenicity?</columnTitle>
+      </column>
+      <column columnName="TMreacx">
+        <datatype>varchar</datatype>
+        <columnTitle>3b. Reacto, specify</columnTitle>
+      </column>
+      <column columnName="TMcomm">
+        <datatype>varchar</datatype>
+        <columnTitle>Comments</columnTitle>
+      </column>
+      <column columnName="formlang">
+        <datatype>varchar</datatype>
+        <columnTitle>Form Language</columnTitle>
+      </column>
+      <column columnName="sfdt_490">
+        <datatype>varchar</datatype>
+        <columnTitle>Staff Initials/Date</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="QC" tableDbType="TABLE">
+    <tableTitle>Quality Control Report</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="QCREP_ID">
+        <datatype>integer</datatype>
+        <columnTitle>Quality Control Report #</columnTitle>
+      </column>
+    </columns>
+  </table>
+  <table tableName="verifyAssay" tableDbType="TABLE">
+    <tableTitle>verifyAssay</tableTitle>
+    <columns>
+      <column columnName="participantid">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Participant identifier</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="SampleId">
+        <datatype>varchar</datatype>
+        <columnTitle>Sample Id</columnTitle>
+        <description>string</description>
+        <nullable>false</nullable>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="DateField">
+        <datatype>timestamp</datatype>
+        <columnTitle>DateField</columnTitle>
+        <description>This is a date field</description>
+      </column>
+      <column columnName="NumberField">
+        <datatype>double</datatype>
+        <columnTitle>NumberField</columnTitle>
+        <description>This is a number</description>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="TextField">
+        <datatype>varchar</datatype>
+        <columnTitle>TextField</columnTitle>
+        <description>This is a text field</description>
+      </column>
+    </columns>
+  </table>
+</tables>

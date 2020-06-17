@@ -1,0 +1,2213 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE MAGE-ML SYSTEM "1.0/MAGE-ML.dtd">
+<MAGE-ML identifier="Agilent.BRS:MAGE-ML:1">
+	<Descriptions_assnlist>
+		<Description>
+			<Annotations_assnlist>
+				<OntologyEntry value="Agilent Feature Extraction Software" category="Producer"/>
+				<OntologyEntry value="8.1.1.1" category="Version"/>
+			</Annotations_assnlist>
+		</Description>
+	</Descriptions_assnlist>
+	<AuditTrail_assnlist>
+		<Audit date="2006-03-14 14:17:35" action="creation">
+			<Performer_assnref>
+				<Person_ref identifier="Local:Person:proll"/>
+			</Performer_assnref>
+		</Audit>
+	</AuditTrail_assnlist>
+	<Array_package>
+		<ArrayGroup_assnlist>
+			<ArrayGroup barcode="251379110137" identifier="Agilent.BRS:ArrayGroup:251379110137">
+				<Arrays_assnreflist>
+					<Array_ref identifier="Agilent.BRS:A:251379110137_A01"/>
+				</Arrays_assnreflist>
+			</ArrayGroup>
+		</ArrayGroup_assnlist>
+		<Array_assnlist>
+			<Array identifier="Agilent.BRS:A:251379110137_A01">
+				<ArrayDesign_assnref>
+					<ArrayDesign_ref identifier="Agilent.BRS:ArrayDesign:013791_D_20050920"/>
+				</ArrayDesign_assnref>
+				<Information_assnref>
+					<ArrayManufacture_ref identifier="Agilent.BRS:ArrayManufacture:n/a"/>
+				</Information_assnref>
+				<ArrayGroup_assnref>
+					<ArrayGroup_ref identifier="Agilent.BRS:ArrayGroup:251379110137"/>
+				</ArrayGroup_assnref>
+			</Array>
+		</Array_assnlist>
+	</Array_package>
+	<BioAssay_package>
+		<BioAssay_assnlist>
+			<PhysicalBioAssay identifier="Agilent.BRS:PhysicalBioAssay:251379110137_A01..1">
+				<PhysicalBioAssayData_assnlist>
+					<Image URI="US23502338_251379110137_S01_A01_22k_.15.jpg" identifier="Local:Image:1">
+						<Descriptions_assnlist>
+							<Description text="Please note that all quantitations are performed on a tif image and not a JPEG.  The Image positions reported in this MAGE document refer to positions on the original tif. If a JPEG is supplied with this MAGE document then the position must be divided by the down sampling factor supplied in the Feature Extraction Application Protocol."/>
+						</Descriptions_assnlist>
+						<Channels_assnreflist>
+							<Channel_ref identifier="Local:Channel:Red"/>
+							<Channel_ref identifier="Local:Channel:Green"/>
+						</Channels_assnreflist>
+						<Format_assn>
+							<OntologyEntry value="jpg" category="image"/>
+						</Format_assn>
+					</Image>
+				</PhysicalBioAssayData_assnlist>
+				<BioAssayCreation_assn>
+					<Hybridization identifier="Agilent.BRS:Hybridization:251379110137_A01..1">
+						<Array_assnref>
+							<Array_ref identifier="Agilent.BRS:A:251379110137_A01"/>
+						</Array_assnref>
+					</Hybridization>
+				</BioAssayCreation_assn>
+				<BioAssayTreatments_assnlist>
+					<ImageAcquisition identifier="Agilent.BRS:ImageAcquisition:251379110137_A01..1">
+						<Descriptions_assnlist>
+							<Description text="Warning: The laser power does not fall within expected thresholds. Please contact an Agilent representative.
+Description: PMT calibration lost! Using factory default settings.  Contact your local Agilent support center immediately.Scan successful.
+"/>
+						</Descriptions_assnlist>
+						<ProtocolApplications_assnlist>
+							<ProtocolApplication activityDate="2006-03-14 10:32:02">
+								<HardwareApplications_assnlist>
+									<HardwareApplication serialNumber="US23502338">
+										<ParameterValues_assnlist>
+											<ParameterValue value="ANA2101">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DeviceName"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="Agilent Technologies Scanner">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:ScannerMake"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="G2505B">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:ScannerModel"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="US23502338">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:ScannerSerialNumber"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="unknown">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Operator"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:ScanNumber"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Red.LASER_POWER_VALUE"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Green.LASER_POWER_VALUE"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="477">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Red.PMT_GAIN_VALUE"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="419">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Green.PMT_GAIN_VALUE"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="65236">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Red.Saturation_Value"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="65170">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Green.Saturation_Value"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="10">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:MICRONS_PER_PIXEL_X"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="10">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:MICRONS_PER_PIXEL_Y"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="625.338">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GlassThickness"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="21.563">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Red.DarkOffsetAverage"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="21.563">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Green.DarkOffsetAverage"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:PercentAutoFocusHold"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="true">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DarkOffsetSubtracted"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="unknown">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Description"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+										</ParameterValues_assnlist>
+										<Hardware_assnref>
+											<Hardware_ref identifier="Agilent.BRS:Hardware:US23502338"/>
+										</Hardware_assnref>
+									</HardwareApplication>
+								</HardwareApplications_assnlist>
+								<Performers_assnreflist>
+									<Person_ref identifier="Local:Person:unknown"/>
+								</Performers_assnreflist>
+								<Protocol_assnref>
+									<Protocol_ref identifier="Local:Protocol:Agilent_Scan"/>
+								</Protocol_assnref>
+							</ProtocolApplication>
+						</ProtocolApplications_assnlist>
+						<Target_assnref>
+							<PhysicalBioAssay_ref identifier="Agilent.BRS:PhysicalBioAssay:251379110137_A01..1"/>
+						</Target_assnref>
+					</ImageAcquisition>
+				</BioAssayTreatments_assnlist>
+			</PhysicalBioAssay>
+			<MeasuredBioAssay name="US23502338_251379110137_S01_A01_22k_.15" identifier="Agilent.BRS:MeasuredBioAssay:251379110137_A01..1">
+				<Channels_assnreflist>
+					<Channel_ref identifier="Local:Channel:Red"/>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channels_assnreflist>
+				<FeatureExtraction_assn>
+					<FeatureExtraction identifier="251379110137_A01..1">
+						<ProtocolApplications_assnlist>
+							<ProtocolApplication activityDate="2006-03-14 14:17:35">
+								<SoftwareApplications_assnlist>
+									<SoftwareApplication version="8.1.1.1" releaseDate="2005-04-26 19:41:36">
+										<ParameterValues_assnlist>
+											<ParameterValue value="22k_.15 (Read Only)">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Protocol_Name"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="04-Nov-2005 14:41">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Protocol_date"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="03-14-2006 10:32:02">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Scan_Date"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="Agilent Technologies Scanner G2505B US23502338">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Scan_ScannerName"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="2">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Scan_NumChannels"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="10">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Scan_MicronsPerPixelX"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="10">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Scan_MicronsPerPixelY"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="5e63815d-d175-49a8-86fc-5cc67894c690">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Scan_OriginalGUID"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="013791_D_20050920">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Grid_Name"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="20-Sep-2005 00:00">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Grid_Date"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Grid_NumSubGridRows"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Grid_NumSubGridCols"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="105">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Grid_NumRows"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="215">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Grid_NumCols"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Grid_OffsetX"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Grid_OffsetY"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="135">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Grid_NomSpotWidth"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="135">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Grid_NomSpotHeight"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="251379110137_A01">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:FeatureExtractor_Barcode"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="C:\Input\US23502338_251379110137_S01_A01.tif">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:FeatureExtractor_ScanFileName"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="US23502338_251379110137_S01_A01">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:FeatureExtractor_ArrayName"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="013791_D_20050920.xml">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:FeatureExtractor_DesignFileName"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="013791_D_20050920">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:FeatureExtractor_PatternName"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="proll">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:FeatureExtractor_UserName"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="GRAPHICS-XP">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:FeatureExtractor_ComputerName"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="e67dc934-6eed-4013-a5b7-a5ae2c3202be">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:FeatureExtractor_ScanFileGUID"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="8.1.1.1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_Version"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_placementMode"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_ptsPerSide"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="7">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_minPeakSpacing"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.666667">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_blocksizeAllowance"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="6">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_initialFilterWidth"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_coarseFilterWidth"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="3">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_fineFilterWidth"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="6">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_lineHalfWidth"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="2">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_halfDepth"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.015">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_maximumSlope"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_gridWithChannel"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1.5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:GridPlacement_thinOutCoeff"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="8.1.1.1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_Version"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="10">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_weakthresh"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_RegionOfInterestMultiplier"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.001">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_convergence_factor"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_max_em_iter"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.75">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_max_reject_ratio"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.45">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_kmeans_rad_reject_factor"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1.5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_kmeans_cen_reject_factor"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="2.5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_kmeans_moi_reject_factor"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_isspot_factor"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="3">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_isweakspot_factor"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1.5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_BackgroundThreshold"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_UseNominalDiameterFromGT"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="3">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_RejectMethod"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1.42">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_StatBoundFeat"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1.42">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_StatBoundBG"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_SpotStatsMethod"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.65">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_CookiePercentage"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1.2">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_ExclusionZonePercentage"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:SpotAnalysis_EstimateLocalRadius"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="8.1.1.1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_Version"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_NonUnifOLOn"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.0081">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_FeatATerm"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="320">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_FeatBTerm"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="600">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_FeatCTerm"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.0225">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_BGATerm"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="320">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_BGBTerm"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="600">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_BGCTerm"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_PopnOLOn"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="10">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_MinPopulation"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1.42">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:OutlierFlagger_IQRatio"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="8.1.1.1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_Version"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="7">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_BGSubMethod"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.01">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_MaxPVal"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="2.6">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_WellAboveMulti"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_BackgroundCorrectionOn"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_CalculateSurfaceMetricsOn"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_SpatialDetrendOn"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_DetrendLowPassFilter"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_DetrendLowPassPercentage"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="10">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_DetrendLowPassWindow"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_DetrendLowPassIncrement"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_AdditiveDetrendFeatureSet"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.2">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:BGSubtractor_DetrendNeighborhoodSize"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="8.1.1.1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DyeNorm_Version"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="6">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DyeNorm_SelectMethod"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DyeNorm_ArePosNegCtrlsOK"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DyeNorm_SignalCharacteristics"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DyeNorm_CorrMethod"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.25">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DyeNorm_LOWESSSmoothFactor"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="2">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DyeNorm_LOWESSNumSteps"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.05">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DyeNorm_RankTolerance"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:DyeNorm_IsBGPopnOLOn"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="8.1.1.1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Ratio_Version"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="4">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Ratio_PegLogRatioValue"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.15">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Red.MULTIPLICATIVE_ERROR"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.15">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Green.MULTIPLICATIVE_ERROR"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Ratio_UseSurrogates"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Ratio_AutoEstimateAddErrorRed"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Ratio_AutoEstimateAddErrorGreen"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Ratio_MultNcAutoEstimate"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="4">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Ratio_MultRMSAutoEstimate"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:QCMetrics_UseSpikeIns"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:QCMetrics_minReplicatePopulation"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.01">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:QCMetrics_differentialExpressionPValue"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="0.5">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:QCMetrics_MaxEdgeDefectThreshold"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="8.1.1.1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:FeatureExtractor_Version"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="1">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:FeatureExtractor_SingleTextFileOutput"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="4">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:JPEG_DownSampling_Factor"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="72.721394">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Red.ADDITIVE_ERROR"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+											<ParameterValue value="307.606136">
+												<ParameterType_assnref>
+													<Parameter_ref identifier="Agilent.BRS:Parameter:Green.ADDITIVE_ERROR"/>
+												</ParameterType_assnref>
+											</ParameterValue>
+										</ParameterValues_assnlist>
+										<Software_assnref>
+											<Software_ref identifier="Agilent.BRS:Software:version"/>
+										</Software_assnref>
+									</SoftwareApplication>
+								</SoftwareApplications_assnlist>
+								<Performers_assnreflist>
+									<Person_ref identifier="Local:Person:proll"/>
+								</Performers_assnreflist>
+								<Protocol_assnref>
+									<Protocol_ref identifier="Local:Protocol:22k_.15 (Read Only)"/>
+								</Protocol_assnref>
+							</ProtocolApplication>
+						</ProtocolApplications_assnlist>
+						<PhysicalBioAssaySource_assnref>
+							<PhysicalBioAssay_ref identifier="Agilent.BRS:PhysicalBioAssay:251379110137_A01..1"/>
+						</PhysicalBioAssaySource_assnref>
+					</FeatureExtraction>
+				</FeatureExtraction_assn>
+				<MeasuredBioAssayData_assnreflist>
+					<MeasuredBioAssayData_ref identifier="Agilent.BRS:MeasuredBioAssayData: 251379110137_A01..1"/>
+				</MeasuredBioAssayData_assnreflist>
+			</MeasuredBioAssay>
+		</BioAssay_assnlist>
+	</BioAssay_package>
+	<QuantitationType_package>
+		<QuantitationType_assnlist>
+			<SpecializedQuantitationType name="PositionX" identifier="Local:QT:X_IMAGE_POSITION" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Found X coordinate of the feature centroid currently reported in Pixels"/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="PositionY" identifier="Local:QT:Y_IMAGE_POSITION" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Found Y coordinate of the feature centroid currently reported in Pixels"/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<Ratio name="LogRatio" identifier="Local:QT:LogRatio" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="log(REDsignal/GREENsignal) per feature. Signals in both channels are post dye normalization If SURROGATES are disabled, then this value will be set to: -2 if DyeNormRedSig &lt;= 0.0 &amp;DyeNormGreenSig > 0.0; 2 if DyeNormRedSig > 0.0 &amp; DyeNormGreenSig &lt;= 0.0; and 0 if DyeNormRedSig &lt;= 0.0 &amp; DyeNormGreenSig &lt;= 0.0"/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="log" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</Ratio>
+			<Error name="LogRatioError" identifier="Local:QT:LogRatioError" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="LogRatioError = error of the log ratio calculated according to the error model chosen. If SURROGATES are disabled, then this value will be set to if DyeNormRedSig &lt;= 0.0 OR DyeNormGreenSig &lt;= 0.0"/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="log" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<Ratio_ref identifier="Local:QT:LogRatio"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<PValue name="PValueLogRatio" identifier="Local:QT:PValueLogRatio" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Significance level of the Log Ratio computed for a feature"/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="percent" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<Ratio_ref identifier="Local:QT:LogRatio"/>
+				</TargetQuantitationType_assnref>
+			</PValue>
+			<SpecializedQuantitationType name="gSurrogateUsed" identifier="Local:QT:gSurrogateUsed" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="The green surrogate value used. "/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rSurrogateUsed" identifier="Local:QT:rSurrogateUsed" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="The red surrogate value used."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gIsFound" identifier="Local:QT:gIsFound" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="A boolean used to flag found (strong) features. The flag is applied independently in each channel.  A feature is considered found if the found spot centroid is within the bounds of the spot deviation limit with respect to corresponding nominal centroid. NOTE: IsFound was previously termed IsStrong."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rIsFound" identifier="Local:QT:rIsFound" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="A boolean used to flag found (strong) features. The flag is applied independently in each channel.  A feature is considered found if the found spot centroid is within the bounds of the spot deviation limit with respect to corresponding nominal centroid. NOTE: IsFound was previously termed IsStrong."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<DerivedSignal name="gProcessedSignal" identifier="Local:QT:Green.DerivedSignal" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="The propagated feature signal, per channel, used for computation of log ratio"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</DerivedSignal>
+			<DerivedSignal name="rProcessedSignal" identifier="Local:QT:Red.DerivedSignal" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="The propagated feature signal, per channel, used for computation of log ratio"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</DerivedSignal>
+			<Error name="gProcessedSigError" identifier="Local:QT:Green.ProcessedSigError" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Standard error of propagated feature signal, per channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<DerivedSignal_ref identifier="Local:QT:Green.DerivedSignal"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<Error name="rProcessedSigError" identifier="Local:QT:Red.ProcessedSigError" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Standard error of propagated feature signal, per channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<DerivedSignal_ref identifier="Local:QT:Red.DerivedSignal"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<SpecializedQuantitationType name="gNumPixOLHi" identifier="Local:QT:gNumPixOLHi" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Number of outlier pixels per feature with intensity > upper threshold set via the pixel outlier rejection method. The number is computed independently in each channel. These pixels are omitted from all subsequent calculations."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rNumPixOLHi" identifier="Local:QT:rNumPixOLHi" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Number of outlier pixels per feature with intensity > upper threshold set via the pixel outlier rejection method. The number is computed independently in each channel. These pixels are omitted from all subsequent calculations."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gNumPixOLLo" identifier="Local:QT:gNumPixOLLo" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Number of outlier pixels per feature with intensity &lt; lower threshold set via the pixel outlier rejection method. The number is computed independently in each channel. NOTE: The pixel outlier method is the ONLY step that removes data in Feature Extraction."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rNumPixOLLo" identifier="Local:QT:rNumPixOLLo" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Number of outlier pixels per feature with intensity &lt; lower threshold set via the pixel outlier rejection method. The number is computed independently in each channel. NOTE: The pixel outlier method is the ONLY step that removes data in Feature Extraction."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gNumPix" identifier="Local:QT:gNumPix" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Total number of pixels used to compute feature statistics; ie. total number of inlier pixels/per spot, computed independently in each channel. The number of inlier pixels are the same in both channels."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rNumPix" identifier="Local:QT:rNumPix" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Total number of pixels used to compute feature statistics; ie. total number of inlier pixels/per spot, computed independently in each channel. The number of inlier pixels are the same in both channels."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<MeasuredSignal name="gMeanSignal" identifier="Local:QT:Green.MeasuredSignal" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Raw mean signal of feature in green channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</MeasuredSignal>
+			<MeasuredSignal name="rMeanSignal" identifier="Local:QT:Red.MeasuredSignal" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Raw mean signal of feature in red channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</MeasuredSignal>
+			<SpecializedQuantitationType name="gMedianSignal" identifier="Local:QT:gMedianSignal" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Raw median signal of feature in green channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rMedianSignal" identifier="Local:QT:rMedianSignal" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Raw median signal of feature in red channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<Error name="gPixSDev" identifier="Local:QT:Green.PixSDev" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Standard deviation of all inlier pixels per feature; this is computed independently in each channel."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<MeasuredSignal_ref identifier="Local:QT:Green.MeasuredSignal"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<Error name="rPixSDev" identifier="Local:QT:Red.PixSDev" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Standard deviation of all inlier pixels per feature; this is computed independently in each channel."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<MeasuredSignal_ref identifier="Local:QT:Red.MeasuredSignal"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<SpecializedQuantitationType name="gBGNumPix" identifier="Local:QT:gBGNumPix" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Total Number of pixels used to compute Local BG statistics per spot; ie. Total number of BG inlier pixels. This number is computed independently in each channel."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rBGNumPix" identifier="Local:QT:rBGNumPix" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Total Number of pixels used to compute Local BG statistics per spot; ie. Total number of BG inlier pixels. This number is computed independently in each channel."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<MeasuredSignal name="gBGMeanSignal" identifier="Local:QT:Green.Background" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Mean local background signal (local to corresponding feature) computed per channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</MeasuredSignal>
+			<MeasuredSignal name="rBGMeanSignal" identifier="Local:QT:Red.Background" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Mean local background signal (local to corresponding feature) computed per channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</MeasuredSignal>
+			<SpecializedQuantitationType name="gBGMedianSignal" identifier="Local:QT:gBGMedianSignal" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Median local background signal (local to corresponding feature) computed per channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rBGMedianSignal" identifier="Local:QT:rBGMedianSignal" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Median local background signal (local to corresponding feature) computed per channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<Error name="gBGPixSDev" identifier="Local:QT:Green.BGPixSDev" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Standard deviation of all inlier pixels per Local BG of each feature, computed independently in each channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<MeasuredSignal_ref identifier="Local:QT:Green.Background"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<Error name="rBGPixSDev" identifier="Local:QT:Red.BGPixSDev" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Standard deviation of all inlier pixels per Local BG of each feature, computed independently in each channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<MeasuredSignal_ref identifier="Local:QT:Red.Background"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<SpecializedQuantitationType name="gNumSatPix" identifier="Local:QT:gNumSatPix" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Total number of saturated pixels per feature, computed per channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rNumSatPix" identifier="Local:QT:rNumSatPix" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Total number of saturated pixels per feature, computed per channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gIsSaturated" identifier="Local:QT:gIsSaturated" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a feature is saturated or not. A feature is saturated if 50% of the pixels in a feature are above the saturation threshold. A value of 1 means saturated."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rIsSaturated" identifier="Local:QT:rIsSaturated" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a feature is saturated or not. A feature is saturated if 50% of the pixels in a feature are above the saturation threshold. A value of 1 means saturated."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="PixCorrelation" identifier="Local:QT:PixCorrelation" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Ratio of estimated feature covariance in RedGreen space to product of feature Standard Deviation in Red Green space. The covariance of two features measures their tendency to vary together, i.e., to co-vary. In this case, it is a cumulative quantitation of the tendency of pixels belonging to a particular feature in Red and Green spaces to co-vary."/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="BGPixCorrelation" identifier="Local:QT:BGPixCorrelation" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Ratio of estimated feature covariance in RedGreen space to product of feature Standard Deviation in Red Green space. The covariance of two features measures their tendency to vary together, i.e., to co-vary. In this case, it is a cumulative quantitation of the tendency of pixels belonging to a particular feature in Red and Green spaces to co-vary."/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gIsFeatNonUnifOL" identifier="Local:QT:gIsFeatNonUnifOL" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a feature is a NonUniformity Outlier or not. A feature is non-uniform if the pixel noise of feature exceeds a threshold established for a 'uniform' feature. A 1 indicates Feature is a non-uniformity outlier."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rIsFeatNonUnifOL" identifier="Local:QT:rIsFeatNonUnifOL" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a feature is a NonUniformity Outlier or not. A feature is non-uniform if the pixel noise of feature exceeds a threshold established for a 'uniform' feature. A 1 indicates Feature is a non-uniformity outlier."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gIsBGNonUnifOL" identifier="Local:QT:gIsBGNonUnifOL" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a background is a NonUniformity Outlier or not. A feature is non-uniform if the pixel noise of feature exceeds a threshold established for a 'uniform' feature. A 1 indicates Feature is a non-uniformity outlier."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rIsBGNonUnifOL" identifier="Local:QT:rIsBGNonUnifOL" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a background is a NonUniformity Outlier or not. A feature is non-uniform if the pixel noise of feature exceeds a threshold established for a 'uniform' feature. A 1 indicates Feature is a non-uniformity outlier."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gIsFeatPopnOL" identifier="Local:QT:gIsFeatPopnOL" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a feature is a Population Outlier or not. Probes with replicate features on a microarray are examined using population statistics. A feature is a population outlier if its signal is less than a lower threshold or exceeds an upper threshold determined using the interquartile range (i.e., IQR) of the population. A 1 indicates Feature is a population outlier"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rIsFeatPopnOL" identifier="Local:QT:rIsFeatPopnOL" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a feature is a Population Outlier or not. Probes with replicate features on a microarray are examined using population statistics. A feature is a population outlier if its signal is less than a lower threshold or exceeds an upper threshold determined using the interquartile range (i.e., IQR) of the population. A 1 indicates Feature is a population outlier"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gIsBGPopnOL" identifier="Local:QT:gIsBGPopnOL" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a background is a Population Outlier or not. Probes with replicate features on a microarray are examined using population statistics. A feature is a population outlier if its signal is less than a lower threshold or exceeds an upper threshold determined using the interquartile range (i.e., IQR) of the population. A 1 indicates background is a population outlier"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rIsBGPopnOL" identifier="Local:QT:rIsBGPopnOL" isBackground="true">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a background is a Population Outlier or not. Probes with replicate features on a microarray are examined using population statistics. A feature is a population outlier if its signal is less than a lower threshold or exceeds an upper threshold determined using the interquartile range (i.e., IQR) of the population. A 1 indicates background is a population outlier"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="IsManualFlag" identifier="Local:QT:IsManualFlag" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="If a feature has been moved manually this flag will be set to 1"/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gBGSubSignal" identifier="Local:QT:gBGSubSignal" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="The net green signal following the subtraction of the background from the raw mean green signal"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rBGSubSignal" identifier="Local:QT:rBGSubSignal" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="The net red signal following the subtraction of the background from the raw mean red signal"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<Error name="gBGSubSigError" identifier="Local:QT:gBGSubSigError" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Propagated standard error as computed on net green background subtracted signal"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gBGSubSignal"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<Error name="rBGSubSigError" identifier="Local:QT:rBGSubSigError" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Propagated standard error as computed on net red background subtracted signal"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rBGSubSignal"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<SpecializedQuantitationType name="BGSubSigCorrelation" identifier="Local:QT:BGSubSigCorrelation" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Ratio of estimated background subtracted feature signal covariance in RG space to product of background subtracted feature Standard Deviation in RG space"/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gIsPosAndSignif" identifier="Local:QT:gIsPosAndSignif" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if the mean signal of a feature is greater than the corresponding background and if this difference is significant. Significance is established via a 2-sided t-test against the user-settable maximum p-value. A 1 indicates Feature is positive and significant above background."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rIsPosAndSignif" identifier="Local:QT:rIsPosAndSignif" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if the mean signal of a feature is greater than the corresponding background and if this difference is significant. Significance is established via a 2-sided t-test against the user-settable maximum p-value. A 1 indicates Feature is positive and significant above background."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gPValFeatEqBG" identifier="Local:QT:gPValFeatEqBG" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="P-value from t-test of significance between green Mean signal and green background"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rPValFeatEqBG" identifier="Local:QT:rPValFeatEqBG" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="P-value from t-test of significance between red Mean signal and red background"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gNumBGUsed" identifier="Local:QT:gNumBGUsed" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="A count of the number of background pixels used in the Green Channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rNumBGUsed" identifier="Local:QT:rNumBGUsed" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="A Count of the number of background pixels used in the Red channel."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gIsWellAboveBG" identifier="Local:QT:gIsWellAboveBG" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a feature is WellAbove Background or not. A feature must be gIsPosAndSignif and additionally the gBGSubSignal must be greater than 2.6*g(r)BG_SD. A 1 indicates a feature IsWellAboveBG"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rIsWellAboveBG" identifier="Local:QT:rIsWellAboveBG" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Boolean flag indicating if a feature is WellAbove Background or not. A feature must be gIsPosAndSignif and additionally the gBGSubSignal must be greater than 2.6*g(r)BG_SD. A 1 indicates a feature IsWellAboveBG"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gBGUsed" identifier="Local:QT:gBGUsed" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Background value subtracted from the raw mean signal to generate the BG subtracted signal; this value is computed per channel. If global BG subtraction is used the column is identical for every feature in a given channel."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rBGUsed" identifier="Local:QT:rBGUsed" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Background value subtracted from the raw mean signal to generate the BG subtracted signal; this value is computed per channel. If global BG subtraction is used the column is identical for every feature in a given channel."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<Error name="gBGSDUsed" identifier="Local:QT:gBGSDUsed" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Standard deviation of background used in green channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gBGUsed"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<Error name="rBGSDUsed" identifier="Local:QT:rBGSDUsed" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Standard deviation of background used in red channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rBGUsed"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<SpecializedQuantitationType name="IsNormalization" identifier="Local:QT:IsNormalization" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="A boolean flag which indicates if a feature is used to measure dye bias. A 1 incidates the value was used"/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gDyeNormSignal" identifier="Local:QT:Green.DyeNormSignal" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="The dye normalized signal in the indicated channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rDyeNormSignal" identifier="Local:QT:Red.DyeNormSignal" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="The dye normalized signal in the indicated channel"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<Error name="gDyeNormError" identifier="Local:QT:Green.DyeNormError" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="The standard error associated with the dye normalized signal."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<SpecializedQuantitationType_ref identifier="Local:QT:Red.DyeNormSignal"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<Error name="rDyeNormError" identifier="Local:QT:Red.DyeNormError" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="The standard error associated with the dye normalized signal."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+				<TargetQuantitationType_assnref>
+					<Error_ref identifier="Local:QT:Red.DyeNormError"/>
+				</TargetQuantitationType_assnref>
+			</Error>
+			<SpecializedQuantitationType name="DyeNormCorrelation" identifier="Local:QT:DyeNormCorrelation" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Dye normalized red and green pixel correlation"/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="ErrorModel" identifier="Local:QT:ErrorModel" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="ErrorModel Indicates the error model that the user chose for feature extraction. A 0 indicates use of the Propagated Error Model. A 1 indicates use of the Universal Error Model."/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="integer" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="xDev" identifier="Local:QT:xDev" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Used to Compute the Log Ratio PValue"/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="log" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gSpatialDetrendIsInFilteredSet" identifier="Local:QT:gSpatialDetrendIsInFilteredSet" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Set to true for a given feature if it is part of the filtered set used to fit the surface measuring the spatial trend across the microarray. This feature is considered part of the locally weighted x% of the features."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rSpatialDetrendIsInFilteredSet" identifier="Local:QT:rSpatialDetrendIsInFilteredSet" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Set to true for a given feature if it is part of the filtered set used to fit the surface measuring the spatial trend across the microarray. This feature is considered part of the locally weighted x% of the features."/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="gSpatialDetrendSurfaceValue" identifier="Local:QT:gSpatialDetrendSurfaceValue" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Value of the smoothed surface derived from the set of features that are part of SpatialDetrendIsInFilteredSet"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Green"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="rSpatialDetrendSurfaceValue" identifier="Local:QT:rSpatialDetrendSurfaceValue" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Value of the smoothed surface derived from the set of features that are part of SpatialDetrendIsInFilteredSet"/>
+				</Descriptions_assnlist>
+				<Channel_assnref>
+					<Channel_ref identifier="Local:Channel:Red"/>
+				</Channel_assnref>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<SpecializedQuantitationType name="IsUsedBGAdjust" identifier="Local:QT:IsUsedBGAdjust" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="A boolean used to flag features used for computation of global BG offset. A 1 indicates the feature was used."/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="float" category="DataType"/>
+				</DataType_assn>
+			</SpecializedQuantitationType>
+			<Failed name="Failed" identifier="Local:QT:Failed" isBackground="false">
+				<Descriptions_assnlist>
+					<Description text="Set to one if the quantitation values of a feature are considered bad enough to thrown out in the higher level analysis. Features are thrown out if both channels are saturated or if either channel is a non-uniform outlier.  A feature can be failed from outside of feature extraction via setting this flag when loading the design or grid."/>
+				</Descriptions_assnlist>
+				<Scale_assn>
+					<OntologyEntry value="linear" category="Scale"/>
+				</Scale_assn>
+				<DataType_assn>
+					<OntologyEntry value="boolean" category="DataType"/>
+				</DataType_assn>
+			</Failed>
+		</QuantitationType_assnlist>
+	</QuantitationType_package>
+	<BioAssayData_package>
+		<BioAssayDimension_assnlist>
+			<BioAssayDimension identifier="Agilent.BRS:BioAssayDimension:1">
+				<BioAssays_assnreflist>
+					<MeasuredBioAssay_ref identifier="Agilent.BRS:MeasuredBioAssay:251379110137_A01..1"/>
+				</BioAssays_assnreflist>
+			</BioAssayDimension>
+		</BioAssayDimension_assnlist>
+		<DesignElementDimension_assnlist>
+			<FeatureDimension identifier="Agilent.BRS:FeatureDimension:1">
+				<ContainedFeatures_assnreflist>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.1"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.2"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.3"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.4"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.5"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.6"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.7"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.8"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.9"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.10"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.11"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.12"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.13"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.14"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.15"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.16"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.17"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.18"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.19"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.20"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.21"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.22"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.23"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.24"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.25"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.26"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.27"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.28"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.29"/>
+					<Feature_ref identifier="Agilent.BRS:F:013791_D_20050920.30"/>
+				</ContainedFeatures_assnreflist>
+			</FeatureDimension>
+		</DesignElementDimension_assnlist>
+		<QuantitationTypeDimension_assnlist>
+			<QuantitationTypeDimension identifier="Agilent.BRS:QuantitationTypeDimension:1">
+				<QuantitationTypes_assnreflist>
+					<SpecializedQuantitationType_ref identifier="Local:QT:X_IMAGE_POSITION"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:Y_IMAGE_POSITION"/>
+					<Ratio_ref identifier="Local:QT:LogRatio"/>
+					<Error_ref identifier="Local:QT:LogRatioError"/>
+					<PValue_ref identifier="Local:QT:PValueLogRatio"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gSurrogateUsed"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rSurrogateUsed"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gIsFound"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rIsFound"/>
+					<DerivedSignal_ref identifier="Local:QT:Green.DerivedSignal"/>
+					<DerivedSignal_ref identifier="Local:QT:Red.DerivedSignal"/>
+					<Error_ref identifier="Local:QT:Green.ProcessedSigError"/>
+					<Error_ref identifier="Local:QT:Red.ProcessedSigError"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gNumPixOLHi"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rNumPixOLHi"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gNumPixOLLo"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rNumPixOLLo"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gNumPix"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rNumPix"/>
+					<MeasuredSignal_ref identifier="Local:QT:Green.MeasuredSignal"/>
+					<MeasuredSignal_ref identifier="Local:QT:Red.MeasuredSignal"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gMedianSignal"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rMedianSignal"/>
+					<Error_ref identifier="Local:QT:Green.PixSDev"/>
+					<Error_ref identifier="Local:QT:Red.PixSDev"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gBGNumPix"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rBGNumPix"/>
+					<MeasuredSignal_ref identifier="Local:QT:Green.Background"/>
+					<MeasuredSignal_ref identifier="Local:QT:Red.Background"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gBGMedianSignal"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rBGMedianSignal"/>
+					<Error_ref identifier="Local:QT:Green.BGPixSDev"/>
+					<Error_ref identifier="Local:QT:Red.BGPixSDev"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gNumSatPix"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rNumSatPix"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gIsSaturated"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rIsSaturated"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:PixCorrelation"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:BGPixCorrelation"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gIsFeatNonUnifOL"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rIsFeatNonUnifOL"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gIsBGNonUnifOL"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rIsBGNonUnifOL"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gIsFeatPopnOL"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rIsFeatPopnOL"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gIsBGPopnOL"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rIsBGPopnOL"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:IsManualFlag"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gBGSubSignal"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rBGSubSignal"/>
+					<Error_ref identifier="Local:QT:gBGSubSigError"/>
+					<Error_ref identifier="Local:QT:rBGSubSigError"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:BGSubSigCorrelation"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gIsPosAndSignif"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rIsPosAndSignif"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gPValFeatEqBG"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rPValFeatEqBG"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gNumBGUsed"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rNumBGUsed"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gIsWellAboveBG"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rIsWellAboveBG"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gBGUsed"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rBGUsed"/>
+					<Error_ref identifier="Local:QT:gBGSDUsed"/>
+					<Error_ref identifier="Local:QT:rBGSDUsed"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:IsNormalization"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:Green.DyeNormSignal"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:Red.DyeNormSignal"/>
+					<Error_ref identifier="Local:QT:Green.DyeNormError"/>
+					<Error_ref identifier="Local:QT:Red.DyeNormError"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:DyeNormCorrelation"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:ErrorModel"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:xDev"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gSpatialDetrendIsInFilteredSet"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rSpatialDetrendIsInFilteredSet"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:gSpatialDetrendSurfaceValue"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:rSpatialDetrendSurfaceValue"/>
+					<SpecializedQuantitationType_ref identifier="Local:QT:IsUsedBGAdjust"/>
+					<Failed_ref identifier="Local:QT:Failed"/>
+				</QuantitationTypes_assnreflist>
+			</QuantitationTypeDimension>
+		</QuantitationTypeDimension_assnlist>
+		<BioAssayData_assnlist>
+			<MeasuredBioAssayData name="US23502338_251379110137_S01_A01_22k_.15" identifier="Agilent.BRS:MeasuredBioAssayData: 251379110137_A01..1">
+				<SummaryStatistics_assnlist>
+					<NameValueType name="gDarkOffsetAverage" type="float" value="21.915"/>
+					<NameValueType name="rDarkOffsetAverage" type="float" value="21.563"/>
+					<NameValueType name="gDarkOffsetMedian" type="float" value="22"/>
+					<NameValueType name="rDarkOffsetMedian" type="float" value="21"/>
+					<NameValueType name="gDarkOffsetStdDev" type="float" value="5.0288"/>
+					<NameValueType name="rDarkOffsetStdDev" type="float" value="6.46249"/>
+					<NameValueType name="gDarkOffsetNumPts" type="integer" value="1000"/>
+					<NameValueType name="rDarkOffsetNumPts" type="integer" value="1000"/>
+					<NameValueType name="gAvgSig2BkgE1A" type="float" value="1.15578"/>
+					<NameValueType name="rAvgSig2BkgE1A" type="float" value="1.26454"/>
+					<NameValueType name="gAvgSig2BkgNegCtrl" type="float" value="1.08663"/>
+					<NameValueType name="rAvgSig2BkgNegCtrl" type="float" value="1.03053"/>
+					<NameValueType name="gRatioSig2BkgE1a_NegCtrl" type="float" value="1.06364"/>
+					<NameValueType name="rRatioSig2BkgE1a_NegCtrl" type="float" value="1.22707"/>
+					<NameValueType name="gNumSatFeat" type="integer" value="1"/>
+					<NameValueType name="rNumSatFeat" type="integer" value="10"/>
+					<NameValueType name="gLocalBGInlierNetAve" type="float" value="19.7777"/>
+					<NameValueType name="rLocalBGInlierNetAve" type="float" value="27.2243"/>
+					<NameValueType name="gLocalBGInlierAve" type="float" value="41.6927"/>
+					<NameValueType name="rLocalBGInlierAve" type="float" value="48.7873"/>
+					<NameValueType name="gLocalBGInlierSDev" type="float" value="1.44108"/>
+					<NameValueType name="rLocalBGInlierSDev" type="float" value="0.832475"/>
+					<NameValueType name="gLocalBGInlierNum" type="integer" value="18843"/>
+					<NameValueType name="rLocalBGInlierNum" type="integer" value="20935"/>
+					<NameValueType name="gGlobalBGInlierAve" type="float" value="41.6927"/>
+					<NameValueType name="rGlobalBGInlierAve" type="float" value="48.7873"/>
+					<NameValueType name="gGlobalBGInlierSDev" type="float" value="1.44108"/>
+					<NameValueType name="rGlobalBGInlierSDev" type="float" value="0.832475"/>
+					<NameValueType name="gGlobalBGInlierNum" type="integer" value="18843"/>
+					<NameValueType name="rGlobalBGInlierNum" type="integer" value="20935"/>
+					<NameValueType name="gNumFeatureNonUnifOL" type="integer" value="32"/>
+					<NameValueType name="rNumFeatureNonUnifOL" type="integer" value="12"/>
+					<NameValueType name="gNumPopnOL" type="integer" value="41"/>
+					<NameValueType name="rNumPopnOL" type="integer" value="26"/>
+					<NameValueType name="gNumNonUnifBGOL" type="integer" value="0"/>
+					<NameValueType name="rNumNonUnifBGOL" type="integer" value="2"/>
+					<NameValueType name="gNumPopnBGOL" type="integer" value="2572"/>
+					<NameValueType name="rNumPopnBGOL" type="integer" value="480"/>
+					<NameValueType name="gOffsetUsed" type="float" value="35.3863"/>
+					<NameValueType name="rOffsetUsed" type="float" value="45.0299"/>
+					<NameValueType name="gGlobalFeatInlierAve" type="float" value="437.948"/>
+					<NameValueType name="rGlobalFeatInlierAve" type="float" value="795.859"/>
+					<NameValueType name="gGlobalFeatInlierSDev" type="float" value="1197.36"/>
+					<NameValueType name="rGlobalFeatInlierSDev" type="float" value="2932.53"/>
+					<NameValueType name="gGlobalFeatInlierNum" type="integer" value="21345"/>
+					<NameValueType name="rGlobalFeatInlierNum" type="integer" value="21377"/>
+					<NameValueType name="AllColorPrcntSat" type="float" value="0.00466962"/>
+					<NameValueType name="AnyColorPrcntSat" type="float" value="0.0466962"/>
+					<NameValueType name="AnyColorPrcntFeatNonUnifOL" type="float" value="0.200794"/>
+					<NameValueType name="AnyColorPrcntBGNonUnifOL" type="float" value="0.00933925"/>
+					<NameValueType name="AnyColorPrcntFeatPopnOL" type="float" value="0.261499"/>
+					<NameValueType name="AnyColorPrcntBGPopnOL" type="float" value="12.2204"/>
+					<NameValueType name="TotalPrcntFeatOL" type="float" value="0.0835997"/>
+					<NameValueType name="gNumNegBGSubFeat" type="integer" value="499"/>
+					<NameValueType name="rNumNegBGSubFeat" type="integer" value="401"/>
+					<NameValueType name="gNonCtrlNumNegFeatBGSubSig" type="integer" value="461"/>
+					<NameValueType name="rNonCtrlNumNegFeatBGSubSig" type="integer" value="224"/>
+					<NameValueType name="gLinearDyeNormFactor" type="float" value="10.6865"/>
+					<NameValueType name="rLinearDyeNormFactor" type="float" value="3.48378"/>
+					<NameValueType name="gRMSLowessDNF" type="float" value="36.0871"/>
+					<NameValueType name="rRMSLowessDNF" type="float" value="56.4822"/>
+					<NameValueType name="DyeNormDimensionlessRMS" type="float" value="0.482406"/>
+					<NameValueType name="DyeNormUnitWeightedRMS" type="float" value="0.44289"/>
+					<NameValueType name="gSpatialDetrendRMSFit" type="float" value="7.08634"/>
+					<NameValueType name="rSpatialDetrendRMSFit" type="float" value="4.61546"/>
+					<NameValueType name="gSpatialDetrendRMSFilteredMinusFit" type="float" value="5.69046"/>
+					<NameValueType name="rSpatialDetrendRMSFilteredMinusFit" type="float" value="4.63858"/>
+					<NameValueType name="gSpatialDetrendSurfaceArea" type="float" value="1.17938"/>
+					<NameValueType name="rSpatialDetrendSurfaceArea" type="float" value="1.03528"/>
+					<NameValueType name="gSpatialDetrendVolume" type="float" value="14.2818"/>
+					<NameValueType name="rSpatialDetrendVolume" type="float" value="11.7314"/>
+					<NameValueType name="gSpatialDetrendAveFit" type="float" value="169.754"/>
+					<NameValueType name="rSpatialDetrendAveFit" type="float" value="121.992"/>
+					<NameValueType name="gNonCtrlNumSatFeat" type="integer" value="1"/>
+					<NameValueType name="rNonCtrlNumSatFeat" type="integer" value="10"/>
+					<NameValueType name="gNonCtrl99PrcntNetSig" type="float" value="2483.5"/>
+					<NameValueType name="rNonCtrl99PrcntNetSig" type="float" value="9439.27"/>
+					<NameValueType name="gNonCtrl50PrcntNetSig" type="float" value="189.593"/>
+					<NameValueType name="rNonCtrl50PrcntNetSig" type="float" value="212.368"/>
+					<NameValueType name="gNonCtrl1PrcntNetSig" type="float" value="139.24"/>
+					<NameValueType name="rNonCtrl1PrcntNetSig" type="float" value="97.506"/>
+					<NameValueType name="gNonCtrlMedPrcntCVBGSubSig" type="float" value="33.1689"/>
+					<NameValueType name="rNonCtrlMedPrcntCVBGSubSig" type="float" value="21.6902"/>
+					<NameValueType name="gCtrlE1aNumSatFeat" type="integer" value="0"/>
+					<NameValueType name="rCtrlE1aNumSatFeat" type="integer" value="0"/>
+					<NameValueType name="gCtrlE1a99PrcntNetSig" type="float" value="231.797"/>
+					<NameValueType name="rCtrlE1a99PrcntNetSig" type="float" value="268.166"/>
+					<NameValueType name="gCtrlE1a50PrcntNetSig" type="float" value="164.299"/>
+					<NameValueType name="rCtrlE1a50PrcntNetSig" type="float" value="114.906"/>
+					<NameValueType name="gCtrlE1a1PrcntNetSig" type="float" value="133.385"/>
+					<NameValueType name="rCtrlE1a1PrcntNetSig" type="float" value="85.5749"/>
+					<NameValueType name="gE1aMedPrcntCVBGSubSig" type="float" value="31.7845"/>
+					<NameValueType name="rE1aMedPrcntCVBGSubSig" type="float" value="30.1495"/>
+					<NameValueType name="gE1aSig2BkgLow1" type="float" value="1.1565"/>
+					<NameValueType name="rE1aSig2BkgLow1" type="float" value="1.19038"/>
+					<NameValueType name="gE1aSig2BkgLow2" type="float" value="1.00287"/>
+					<NameValueType name="rE1aSig2BkgLow2" type="float" value="0.940448"/>
+					<NameValueType name="gNegCtrlNumInliers" type="integer" value="162"/>
+					<NameValueType name="rNegCtrlNumInliers" type="integer" value="162"/>
+					<NameValueType name="gNegCtrlAveNetSig" type="float" value="162.017"/>
+					<NameValueType name="rNegCtrlAveNetSig" type="float" value="104.212"/>
+					<NameValueType name="gNegCtrlSDevNetSig" type="float" value="15.7282"/>
+					<NameValueType name="rNegCtrlSDevNetSig" type="float" value="9.18589"/>
+					<NameValueType name="gNegCtrlAveBGSubSig" type="float" value="13.0018"/>
+					<NameValueType name="rNegCtrlAveBGSubSig" type="float" value="3.16888"/>
+					<NameValueType name="gNegCtrlSDevBGSubSig" type="float" value="11.8523"/>
+					<NameValueType name="rNegCtrlSDevBGSubSig" type="float" value="6.18791"/>
+					<NameValueType name="gAveNumPixOLLo" type="float" value="0.453701"/>
+					<NameValueType name="rAveNumPixOLLo" type="float" value="0.340836"/>
+					<NameValueType name="gAveNumPixOLHi" type="float" value="0.540182"/>
+					<NameValueType name="rAveNumPixOLHi" type="float" value="0.617278"/>
+					<NameValueType name="gPixCVofHighSignalFeat" type="float" value="0.0560589"/>
+					<NameValueType name="rPixCVofHighSignalFeat" type="float" value="0.0536568"/>
+					<NameValueType name="gNumHighSignalFeat" type="integer" value="631"/>
+					<NameValueType name="rNumHighSignalFeat" type="integer" value="1110"/>
+					<NameValueType name="NonCtrlAbsAveLogRatio" type="float" value="0.161821"/>
+					<NameValueType name="NonCtrlSDevLogRatio" type="float" value="0.149133"/>
+					<NameValueType name="NonCtrlSNRLogRatio" type="float" value="2.37212"/>
+					<NameValueType name="E1aAbsAveLogRatio" type="float" value="0.164856"/>
+					<NameValueType name="E1aSDevLogRatio" type="float" value="0.129272"/>
+					<NameValueType name="E1aSNRLogRatio" type="float" value="1.54707"/>
+					<NameValueType name="AddErrorEstimateGreen" type="float" value="307.606"/>
+					<NameValueType name="AddErrorEstimateRed" type="float" value="72.7214"/>
+					<NameValueType name="TotalNumFeatures" type="integer" value="21415"/>
+					<NameValueType name="NonCtrlNumUpReg" type="integer" value="403"/>
+					<NameValueType name="NonCtrlNumDownReg" type="integer" value="406"/>
+					<NameValueType name="E1aObsVsExpLRSlope" type="float" value="-0.00824184"/>
+					<NameValueType name="E1aObsVsExpLRIntercept" type="float" value="-0.164856"/>
+					<NameValueType name="E1aObsVsExpCorr" type="float" value="0.00409609"/>
+					<NameValueType name="NumIsNorm" type="integer" value="8000"/>
+					<NameValueType name="ROIHeight" type="float" value="9.40246"/>
+					<NameValueType name="ROIWidth" type="float" value="10.5812"/>
+					<NameValueType name="CentroidDiffX" type="float" value="2.16008"/>
+					<NameValueType name="CentroidDiffY" type="float" value="4.66468"/>
+					<NameValueType name="NumFoundFeat" type="integer" value="21414"/>
+					<NameValueType name="MaxNonUnifEdges" type="float" value="0.0883721"/>
+					<NameValueType name="MaxSpotNotFoundEdges" type="float" value="0.104762"/>
+				</SummaryStatistics_assnlist>
+				<BioAssayDimension_assnref>
+					<BioAssayDimension_ref identifier="Agilent.BRS:BioAssayDimension:1"/>
+				</BioAssayDimension_assnref>
+				<DesignElementDimension_assnref>
+					<FeatureDimension_ref identifier="Agilent.BRS:FeatureDimension:1"/>
+				</DesignElementDimension_assnref>
+				<QuantitationTypeDimension_assnref>
+					<QuantitationTypeDimension_ref identifier="Agilent.BRS:QuantitationTypeDimension:1"/>
+				</QuantitationTypeDimension_assnref>
+				<BioDataValues_assn>
+					<BioDataCube>
+						<DataInternal_assn>
+							<DataInternal>
+43.1458	46.7361	-3.005568248e+000	4.516567101e-001	2.841848751e-011	0	0	1	1	5.162952e+004	5.097179e+001	1.195756e+003	6.398878e+000	0	0	1	0	61	61	4.259459e+003	1.372131e+002	4183	137	7.362686e+002	1.702754e+001	265	265	5.408302e+001	5.284528e+001	54	52	5.580056e+000	6.616857e+000	0	0	0	0	0.0494676	0.0448733	1	0	0	0	0	0	1	1	0	4070.31	17.3665	94.2695	2.18015	0	1	1	6.81543e-047	6.27143e-011	1	1	1	1	189.154	119.847	5.58006	6.61686	0	51629.5	50.9718	1195.76	6.39888	0	1	-6.654541338e+000	0	0	189.154	119.847	0	262144
+63.8496	46.2212	0.000000000e+000	4.025765887e+000	1.000000000e+000	19.6843	54.2934	1	1	1.968428e+001	5.429338e+001	1.428764e+001	1.702075e+001	0	0	0	0	63	63	1.752063e+002	1.162540e+002	182	117	2.605216e+001	1.579605e+001	264	264	5.674621e+001	5.361364e+001	56	53	4.522019e+000	6.348136e+000	0	0	0	0	0.700811	0.138562	0	0	0	0	0	0	1	1	0	-13.7712	-3.68221	3.28226	1.99011	0	0	0	9.15843e-005	0.073918	1	1	0	0	188.978	119.936	4.52202	6.34814	0	-59.9458	-31.4927	14.2876	17.0208	0	1	1.094517841e-001	1	1	188.978	119.936	0	0
+85.4815	48.2593	8.417042897e-001	1.400677909e+000	5.478890297e-001	32.1298	0	1	1	3.212980e+001	2.231579e+002	1.097184e+001	1.393760e+001	1	0	0	0	57	57	1.927018e+002	1.593860e+002	192	159	1.261372e+001	1.856144e+001	269	269	5.847584e+001	5.386245e+001	58	53	4.892537e+000	7.478305e+000	0	0	0	0	0.193999	-0.0102385	0	0	0	0	0	0	1	1	0	3.89045	39.3639	1.67073	2.45852	0	0	1	0.0254318	5.87641e-023	1	1	0	1	188.811	120.022	4.89254	7.4783	0	25.549	223.158	10.9718	13.9376	0	1	6.009263686e-001	0	0	188.811	120.022	0	0
+106.504	46.8908	2.264327368e-002	3.286050999e-001	9.450634478e-001	0	0	1	1	4.239756e+002	4.466672e+002	1.951197e+001	1.208837e+001	0	0	0	0	60	60	2.302000e+002	2.424667e+002	229	242.5	1.481845e+001	2.565248e+001	283	283	6.011661e+001	5.339929e+001	60	53	4.361807e+000	6.436234e+000	0	0	0	0	0.0673454	0.0839767	0	0	0	0	0	0	1	1	0	41.5687	122.369	1.91305	3.31172	0	1	1	3.01607e-030	4.29644e-043	1	1	1	1	188.631	120.098	4.36181	6.43623	1	423.976	446.667	19.512	12.0884	0	1	6.890724973e-002	0	0	188.631	120.098	0	0
+127.821	47.5	-3.517427526e-001	1.431606020e+000	8.059160115e-001	0	0	1	1	1.402750e+002	6.240761e+001	1.504030e+001	1.053579e+001	0	2	0	0	56	56	2.091250e+002	1.315357e+002	211.5	129.5	1.662316e+001	1.433871e+001	280	280	6.038929e+001	5.379643e+001	60	54	5.008440e+000	6.809596e+000	0	0	0	0	0.35663	-0.0306671	0	0	0	0	0	0	1	1	0	20.7178	11.3498	2.22136	1.91609	0	1	1	6.19276e-013	2.69798e-007	1	1	1	0	188.407	120.186	5.00844	6.8096	0	140.275	62.4076	15.0403	10.5358	0	1	-2.456980117e-001	0	0	188.407	120.186	0	0
+148.9	46.2417	0.000000000e+000	2.803433526e+000	1.000000000e+000	0	61.3955	1	1	3.838910e+001	6.139545e+001	8.722816e+000	1.539419e+001	1	1	0	1	60	60	1.970500e+002	1.192333e+002	198.5	119	1.552191e+001	1.394221e+001	286	286	6.022727e+001	5.411189e+001	60	54	4.794817e+000	7.178530e+000	0	0	0	0	0.24305	-0.00808112	0	0	0	0	0	0	1	1	0	8.81903	-1.04158	2.00387	1.79993	0	1	0	5.0929e-005	0.575197	1	1	0	0	188.231	120.275	4.79482	7.17853	0	38.3891	-8.90826	8.72282	15.3942	0	1	7.274231607e-002	0	0	188.231	120.275	0	0
+170.106	47.0423	-3.017899370e+000	4.535176440e-001	2.844087901e-011	0	0	1	1	5.028382e+004	4.825351e+001	1.035478e+003	6.340017e+000	4	0	1	0	57	57	4.164228e+003	1.367544e+002	4128	136	6.181796e+002	1.625937e+001	283	283	6.166784e+001	5.425795e+001	61	54	5.522609e+000	6.788646e+000	0	0	0	0	-0.12763	0.00664436	1	0	0	0	1	0	1	1	0	3976.17	16.391	81.8799	2.15361	0	1	1	1.82685e-047	3.78171e-010	1	1	1	0	188.062	120.363	5.52261	6.78865	0	50283.8	48.2535	1035.48	6.34002	0	1	-6.654425490e+000	0	0	188.062	120.363	0	262144
+191.73	46.113	-4.224831491e-001	1.285371450e+000	7.423933031e-001	0	0	1	1	1.676390e+002	6.337118e+001	1.199987e+001	1.020849e+001	0	0	0	0	62	62	2.122581e+002	1.321452e+002	211	132	1.373274e+001	1.485542e+001	290	290	6.240345e+001	5.484138e+001	63	54	5.314925e+000	7.182424e+000	0	0	0	0	0.338843	-0.0554228	0	0	0	0	0	0	1	1	0	24.3646	11.7117	1.74406	1.88664	0	1	1	6.58473e-021	6.96075e-008	1	1	1	0	187.893	120.433	5.31493	7.18242	0	167.639	63.3712	11.9999	10.2085	0	1	-3.286856489e-001	0	0	187.893	120.433	0	0
+212.551	46.8051	-4.602868047e-001	9.130223693e-001	6.141663042e-001	0	0	1	1	2.456929e+002	8.513455e+001	1.713974e+001	1.046674e+001	0	0	0	0	58	58	2.209310e+002	1.373793e+002	220	138	1.768125e+001	1.580676e+001	286	286	6.174825e+001	5.445105e+001	62	54	5.178862e+000	6.891341e+000	0	0	0	0	0.0584109	0.0072237	0	0	0	0	0	0	1	1	0	33.2803	16.882	2.32166	2.07553	0	1	1	1.04583e-020	4.50919e-011	1	1	1	0	187.651	120.497	5.17886	6.89134	0	245.693	85.1345	17.1397	10.4667	0	1	-5.041352986e-001	0	0	187.651	120.497	0	0
+233.729	47	-3.866886077e-001	1.379931459e+000	7.793063804e-001	0	0	1	1	1.507013e+002	6.186264e+001	1.576306e+001	1.037496e+001	0	0	0	1	62	62	2.095645e+002	1.318710e+002	212	129.5	1.823941e+001	1.493207e+001	262	262	6.070611e+001	5.333969e+001	61	53	4.975946e+000	6.952705e+000	0	0	0	0	0.514734	0.0466416	0	0	0	0	0	0	1	1	0	22.1458	11.3075	2.31641	1.89637	0	1	1	9.50827e-014	1.82508e-007	1	1	1	0	187.419	120.563	4.97595	6.9527	0	150.701	61.8626	15.7631	10.375	0	1	-2.802230540e-001	0	0	187.419	120.563	0	0
+254.658	46.7778	-1.483293410e-002	5.351025711e-001	9.778856349e-001	0	0	1	1	2.649014e+002	2.560067e+002	2.066943e+001	1.365248e+001	0	0	0	0	60	60	2.176000e+002	1.805667e+002	220.5	177.5	1.836651e+001	2.476148e+001	283	283	5.889753e+001	5.372438e+001	59	54	4.824593e+000	6.721539e+000	0	0	0	0	0.284606	0.00918623	0	0	0	0	0	0	1	1	0	30.3883	59.9433	2.37111	3.19669	0	1	1	8.78806e-019	8.47135e-027	1	1	1	1	187.212	120.623	4.82459	6.72154	1	264.901	256.007	20.6694	13.6525	0	1	-2.771979599e-002	0	0	187.212	120.623	0	0
+275.758	45.8906	-1.162637091e-001	4.443251461e-001	7.935808202e-001	0	0	1	1	3.602112e+002	2.756091e+002	1.580551e+001	1.000003e+001	0	1	1	0	61	61	2.259508e+002	1.891803e+002	226	190	1.334095e+001	1.941177e+001	280	280	5.678929e+001	5.405357e+001	57	54	4.659198e+000	7.522058e+000	0	0	0	0	0.249676	0.06956	0	0	0	0	0	0	1	1	0	38.9288	68.5003	1.70813	2.48542	0	1	1	7.17681e-032	8.5195e-037	1	1	1	1	187.022	120.68	4.6592	7.52206	0	360.211	275.609	15.8055	10	0	1	-2.616635816e-001	0	0	187.022	120.68	0	0
+297.414	47.1379	-3.580485982e-001	1.082702171e+000	7.408718072e-001	0	0	1	1	1.870265e+002	8.200770e+001	1.353464e+001	1.000155e+001	2	0	1	0	56	56	2.130536e+002	1.364643e+002	212	134.5	1.420553e+001	1.433364e+001	286	286	5.638811e+001	5.229720e+001	56	52	4.981340e+000	7.253732e+000	0	0	0	0	0.34973	-0.0189347	0	0	0	0	0	0	1	1	0	26.2313	15.7054	1.89829	1.91541	0	1	1	1.01237e-019	4.55508e-011	1	1	1	0	186.822	120.759	4.98134	7.25373	0	187.027	82.0077	13.5346	10.0015	0	1	-3.306990674e-001	0	0	186.822	120.759	0	0
+318.373	47.1972	-2.944440925e+000	4.425516366e-001	2.865398242e-011	0	0	1	1	5.063712e+004	5.754771e+001	8.362041e+002	6.880688e+000	2	0	0	0	58	58	4.163897e+003	1.405172e+002	4102	138.5	5.001991e+002	1.792014e+001	270	270	5.625185e+001	5.301852e+001	56	52	4.564643e+000	6.221711e+000	0	0	0	0	-0.271504	-0.0112911	0	0	0	0	1	0	1	1	0	3977.28	19.6799	65.6794	2.35303	0	1	1	1.96208e-053	1.78858e-011	1	1	1	1	186.621	120.837	4.56464	6.22171	0	50637.1	57.5477	836.204	6.88069	0	1	-6.653327390e+000	0	0	186.621	120.837	0	0
+338.871	47.2823	2.649902098e-001	8.650200148e-001	7.593458057e-001	0	0	1	1	1.159355e+002	2.134061e+002	1.890849e+001	1.241068e+001	0	0	1	0	61	61	2.018033e+002	1.641148e+002	204	162	1.959576e+001	1.962150e+001	288	288	5.440972e+001	5.233333e+001	54	52	4.269515e+000	6.873673e+000	0	0	0	0	0.135388	0.153119	0	0	0	0	0	0	1	1	0	15.3836	43.1995	2.50898	2.51228	0	1	1	7.82151e-008	3.21306e-025	1	1	1	1	186.42	120.915	4.26951	6.87367	0	115.936	213.406	18.9085	12.4107	0	1	3.063399751e-001	0	0	186.42	120.915	0	0
+360.372	46.1983	6.746505071e-002	1.641209610e-001	6.810218896e-001	0	0	1	1	9.363755e+002	1.093743e+003	2.462902e+001	1.730735e+001	0	2	0	0	58	58	2.630862e+002	4.788621e+002	262.5	484	1.539798e+001	4.312749e+001	289	289	5.244637e+001	5.196886e+001	52	52	4.164757e+000	6.617191e+000	0	0	0	0	0.235856	0.051785	0	0	0	0	0	0	1	1	0	76.8692	357.87	2.02185	5.66292	0	1	1	7.35975e-043	8.42582e-055	1	1	1	1	186.217	120.993	4.16476	6.61719	1	936.376	1093.74	24.629	17.3074	0	1	4.110690693e-001	0	0	186.217	120.993	0	0
+381.641	48.4872	-1.508635454e-001	1.890545398e+000	9.363971562e-001	0	0	1	1	8.605858e+001	6.080379e+001	1.521317e+001	9.791876e+000	0	0	0	0	58	58	1.991897e+002	1.317241e+002	198	133	1.773930e+001	1.308246e+001	260	260	5.123077e+001	5.120769e+001	51	51	4.154429e+000	5.395832e+000	0	0	0	0	0.242893	0.0379852	0	0	0	0	0	0	1	1	0	13.1764	10.6669	2.32928	1.71781	0	1	1	5.56118e-007	7.92635e-008	1	1	1	0	186.013	121.057	4.15443	5.39583	1	86.0586	60.8038	15.2132	9.79188	0	1	-7.979895405e-002	0	0	186.013	121.057	0	0
+402.727	47.6529	-9.643139776e-002	3.301327000e-001	7.702110096e-001	0	0	1	1	4.832887e+002	3.870573e+002	2.352030e+001	9.855370e+000	1	0	0	0	59	59	2.332881e+002	2.269661e+002	234	227	1.774440e+001	2.070230e+001	278	278	5.064029e+001	5.135612e+001	50	51	4.615164e+000	6.622831e+000	0	0	0	0	0.0234943	-0.0746919	0	0	0	0	0	0	1	1	0	47.4678	105.851	2.31012	2.69521	0	1	1	1.36452e-028	1.65194e-044	1	1	1	1	185.82	121.115	4.61516	6.62283	0	483.289	387.057	23.5203	9.85537	0	1	-2.920988977e-001	0	0	185.82	121.115	0	0
+423.774	47.6696	9.914370794e-002	1.228792166e+000	9.356933645e-001	0	0	1	1	9.973474e+001	1.253113e+002	1.558112e+001	1.177517e+001	0	0	1	0	59	59	1.999153e+002	1.446780e+002	201	145	1.713666e+001	1.696695e+001	288	288	4.961458e+001	5.210764e+001	49	52	4.257487e+000	6.540590e+000	0	0	0	0	0.388961	0.001495	0	0	0	0	0	0	1	1	0	14.2807	23.5072	2.231	2.20891	0	1	1	3.14038e-008	2.53391e-015	1	1	1	1	185.635	121.171	4.25749	6.54059	1	99.7347	125.311	15.5811	11.7752	0	1	8.068387047e-002	0	0	185.635	121.171	0	0
+445.308	47.9362	0.000000000e+000	4.072917259e+000	1.000000000e+000	18.4824	55.6439	1	1	1.848239e+001	5.564392e+001	1.251169e+001	1.494817e+001	0	2	0	0	58	58	1.845345e+002	1.189828e+002	186	118	2.188985e+001	1.331072e+001	281	281	4.897153e+001	5.137722e+001	49	51	4.245911e+000	6.506045e+000	0	0	0	0	0.398453	-0.02133	0	0	0	0	0	0	1	1	0	-0.912301	-2.25728	2.87428	1.74778	0	0	0	0.753006	0.21205	1	1	0	0	185.447	121.24	4.24591	6.50605	0	-3.97123	-19.3058	12.5117	14.9482	0	1	1.175225560e-001	1	1	185.447	121.24	0	0
+466.5	47.411	-3.007162399e+000	4.518602308e-001	2.831612755e-011	0	0	1	1	5.416839e+004	5.328237e+001	1.044668e+003	5.030545e+000	3	2	0	0	55	55	4.441364e+003	1.395273e+002	4271	138	6.087317e+002	1.275387e+001	288	288	4.890972e+001	5.182639e+001	49	52	4.711781e+000	7.166832e+000	0	0	0	0	-0.246858	-0.00624397	1	0	0	0	0	0	1	1	0	4256.11	18.215	82.0814	1.71973	0	1	1	9.5769e-048	6.38666e-015	1	1	1	0	185.258	121.312	4.71178	7.16683	0	54168.4	53.2824	1044.67	5.03055	0	1	-6.655072065e+000	0	0	185.258	121.312	0	262144
+487.417	46.5583	1.611316340e-001	1.633057546e-001	3.237962102e-001	0	0	1	1	8.523631e+002	1.235254e+003	3.067095e+001	2.005884e+001	0	1	1	0	56	56	2.549107e+002	5.262321e+002	258	524.5	1.881032e+001	4.919682e+001	283	283	4.809187e+001	5.074558e+001	48	51	4.036013e+000	6.681636e+000	0	0	0	0	0.0982989	0.0965996	0	0	0	0	0	0	1	0	0	69.8553	404.849	2.51364	6.5742	0	1	1	2.4047e-034	1.14337e-052	1	1	1	1	185.055	121.383	4.03601	6.68164	0	852.363	1235.25	30.671	20.0588	0	1	9.866868100e-001	0	0	185.055	121.383	0	0
+508.912	48.4602	2.427996277e-001	1.675290672e+000	8.847662575e-001	0	0	1	1	6.126341e+001	1.071521e+002	1.674164e+001	1.345084e+001	0	1	0	0	59	59	1.940508e+002	1.405085e+002	195	142	1.939999e+001	1.839544e+001	279	279	4.938710e+001	5.210753e+001	49	52	4.138864e+000	6.929962e+000	0	0	0	0	0.277337	0.0946101	0	0	0	0	0	0	1	1	0	9.24227	19.0781	2.52566	2.39488	0	1	1	0.000571351	7.58138e-011	1	1	0	1	184.809	121.43	4.13886	6.92996	0	61.2634	107.152	16.7416	13.4508	0	1	1.449298511e-001	1	0	184.809	121.43	0	0
+529.457	46.5431	3.193614851e-001	4.919023042e-001	5.161847944e-001	0	0	1	1	1.931242e+002	4.029008e+002	2.417091e+001	9.252879e+000	0	0	0	1	59	59	2.062542e+002	2.178814e+002	205	217	2.084391e+001	1.700414e+001	278	278	4.889209e+001	5.220144e+001	49	52	4.275175e+000	6.925264e+000	0	0	0	0	0.267002	-0.0130418	0	0	0	0	0	0	1	1	0	21.6819	96.394	2.71365	2.21375	0	1	1	6.50417e-011	8.03612e-048	1	1	1	1	184.572	121.487	4.27517	6.92526	0	193.124	402.901	24.1709	9.25288	0	1	6.492376279e-001	0	0	184.572	121.487	0	0
+550.896	48.0957	1.122672914e-001	2.413470536e-001	6.418100693e-001	0	0	1	1	5.405512e+002	7.000099e+002	2.748330e+001	1.185987e+001	0	1	0	0	62	62	2.327742e+002	3.313548e+002	232	328.5	1.939192e+001	2.799186e+001	267	267	5.011985e+001	5.232210e+001	50	52	4.346879e+000	6.948873e+000	0	0	0	0	-0.107153	-3.82234e-005	0	0	0	0	0	0	1	1	0	48.4387	209.826	2.46278	3.55497	0	1	1	2.59805e-028	1.64779e-056	1	1	1	1	184.335	121.528	4.34688	6.94887	0	540.551	700.01	27.4833	11.8599	0	1	4.651695134e-001	0	0	184.335	121.528	0	0
+572.054	46.6202	3.812554589e-002	1.828812168e-001	8.348607297e-001	0	0	1	1	8.317996e+002	9.081221e+002	2.722181e+001	1.058023e+001	0	0	1	2	58	58	2.538966e+002	4.123966e+002	255	411	1.738894e+001	2.580354e+001	285	285	4.911228e+001	5.125614e+001	49	51	4.379211e+000	6.473212e+000	0	0	0	0	0.156022	-0.0351766	0	0	0	0	0	0	1	1	0	69.7687	290.813	2.28328	3.38817	0	1	1	1.69906e-037	4.74419e-063	1	1	1	1	184.128	121.583	4.37921	6.47321	1	831.8	908.122	27.2218	10.5802	0	1	2.084716329e-001	0	0	184.128	121.583	0	0
+593.567	47.874	8.262446753e-002	2.737952576e-001	7.628238584e-001	0	0	1	1	4.838457e+002	5.852364e+002	2.224167e+001	1.246613e+001	1	2	0	1	56	56	2.288571e+002	2.909464e+002	229	291.5	1.545366e+001	2.698782e+001	284	284	4.905986e+001	5.146831e+001	49	51	4.079589e+000	6.238124e+000	0	0	0	0	0.112718	0.00875287	0	0	0	0	0	0	1	1	0	44.9238	169.306	2.06508	3.6064	0	1	1	5.39777e-029	1.23887e-046	1	1	1	1	183.933	121.64	4.07959	6.23812	1	483.846	585.236	22.2417	12.4661	0	1	3.017746481e-001	0	0	183.933	121.64	0	0
+614.589	47.5	-2.912516539e+000	4.376989338e-001	2.849323163e-011	0	0	1	1	5.825237e+004	7.125200e+001	1.376385e+003	5.476584e+000	2	0	0	0	58	58	4.705483e+003	1.463448e+002	4446.5	146	8.136641e+002	1.443260e+001	272	272	5.027206e+001	5.149265e+001	50	51	4.307321e+000	6.607048e+000	0	0	0	0	-0.217998	-0.00861687	1	0	0	0	0	0	1	1	0	4521.73	24.6557	106.839	1.89509	0	1	1	9.29752e-045	5.67519e-019	1	1	1	1	183.752	121.689	4.30732	6.60705	0	58252.4	71.252	1376.39	5.47658	0	1	-6.654154978e+000	0	0	183.752	121.689	0	262144
+635.944	47.5926	-2.403350576e-001	1.427244282e+000	8.662757069e-001	0	0	1	1	1.255317e+002	7.218022e+001	1.671255e+001	1.180296e+001	0	1	0	0	59	59	2.020508e+002	1.348644e+002	202	134	1.890851e+001	1.653258e+001	290	290	5.009310e+001	5.135517e+001	50	51	4.146323e+000	6.514933e+000	0	0	0	0	0.507215	-0.0109635	0	0	0	0	0	0	1	1	0	18.4902	13.1626	2.46168	2.15236	0	1	1	4.18906e-010	1.04015e-007	1	1	1	0	183.561	121.702	4.14632	6.51493	0	125.532	72.1802	16.7126	11.803	0	1	-1.683909760e-001	0	0	183.561	121.702	0	0
+656.936	47.5909	-2.092697079e-001	1.852222384e+000	9.100440046e-001	0	0	1	1	9.352484e+001	5.776400e+001	1.565430e+001	1.212203e+001	0	0	0	0	60	60	1.976000e+002	1.318833e+002	196.5	132	1.852822e+001	1.650587e+001	283	283	5.021201e+001	5.114488e+001	51	51	4.039380e+000	6.238482e+000	0	0	0	0	0.365514	-0.0915658	0	0	0	0	0	0	1	1	0	14.2906	10.1542	2.39198	2.1309	0	1	1	1.50628e-007	1.50056e-005	1	1	1	0	183.309	121.729	4.03938	6.23848	0	93.5248	57.764	15.6543	12.122	0	1	-1.129830358e-001	0	0	183.309	121.729	0	0
+							</DataInternal>
+						</DataInternal_assn>
+					</BioDataCube>
+				</BioDataValues_assn>
+			</MeasuredBioAssayData>
+		</BioAssayData_assnlist>
+	</BioAssayData_package>
+</MAGE-ML>
+
+

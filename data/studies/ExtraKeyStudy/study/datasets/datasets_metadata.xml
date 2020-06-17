@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="P_One" tableDbType="TABLE">
+    <description>Contains up to one row of P_One data for each Panda.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="Name">
+        <datatype>varchar</datatype>
+        <columnTitle>Name</columnTitle>
+      </column>
+      <column columnName="BirthDate">
+        <datatype>timestamp</datatype>
+        <columnTitle>Birth Date</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>P_One</tableTitle>
+  </table>
+  <table tableName="P_Two" tableDbType="TABLE">
+    <description>Contains up to one row of P_Two data for each Panda.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="Sex">
+        <datatype>varchar</datatype>
+        <columnTitle>Sex</columnTitle>
+      </column>
+      <column columnName="FavoriteFood">
+        <datatype>varchar</datatype>
+        <columnTitle>Favorite Food</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>P_Two</tableTitle>
+  </table>
+  <table tableName="PV_One" tableDbType="TABLE">
+    <description>Contains up to one row of PV_One data for each Panda/Date combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="Height">
+        <datatype>double</datatype>
+        <columnTitle>Height</columnTitle>
+      </column>
+      <column columnName="Weight">
+        <datatype>double</datatype>
+        <columnTitle>Weight</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>PV_One</tableTitle>
+  </table>
+  <table tableName="PV_Two" tableDbType="TABLE">
+    <description>Contains up to one row of PV_Two data for each Panda/Date combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="Happy?">
+        <datatype>boolean</datatype>
+        <columnTitle>Happy?</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>PV_Two</tableTitle>
+  </table>
+  <table tableName="PVInt_One" tableDbType="TABLE">
+    <description>Contains up to one row of PVInt_One data for each Panda/Date/ExtraInt combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="ExtraInt">
+        <datatype>integer</datatype>
+        <columnTitle>Extra Int</columnTitle>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="PVInt_One Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVInt_One</tableTitle>
+  </table>
+  <table tableName="PVInt_Two" tableDbType="TABLE">
+    <description>Contains up to one row of PVInt_Two data for each Panda/Date/ExtraInt combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="ExtraInt">
+        <datatype>integer</datatype>
+        <columnTitle>Extra Int</columnTitle>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="PVInt_Two Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVInt_Two</tableTitle>
+  </table>
+  <table tableName="PVInt_Three" tableDbType="TABLE">
+    <description>Contains up to one row of PVInt_Three data for each Panda/Date/OtherInt combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="OtherInt">
+        <datatype>integer</datatype>
+        <columnTitle>Other Int</columnTitle>
+        <description>NOTE: PVInt_One and PVInt_Two can't join to this dataset since the extra key names don't match (ExtraInt != OtherInt)</description>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="PVInt_Three Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVInt_Three</tableTitle>
+  </table>
+  <table tableName="PVString_One" tableDbType="TABLE">
+    <description>Contains up to one row of PVString_One data for each Panda/Date/ExtraString combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="ExtraString">
+        <datatype>varchar</datatype>
+        <columnTitle>Extra String</columnTitle>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="PVString_One Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVString_One</tableTitle>
+  </table>
+  <table tableName="PVString_Two" tableDbType="TABLE">
+    <description>Contains up to one row of PVString_Two data for each Panda/Date/ExtraString combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="ExtraString">
+        <datatype>varchar</datatype>
+        <columnTitle>Extra String</columnTitle>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="PVString_Two Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVString_Two</tableTitle>
+  </table>
+  <table tableName="PVDouble_One" tableDbType="TABLE">
+    <description>Contains up to one row of PVDouble_One data for each Panda/Date/ExtraDouble combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="ExtraDouble">
+        <datatype>double</datatype>
+        <columnTitle>Extra Double</columnTitle>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="PVDouble_One Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVDouble_One</tableTitle>
+  </table>
+  <table tableName="PVDouble_Two" tableDbType="TABLE">
+    <description>Contains up to one row of PVDouble_Two data for each Panda/Date/ExtraDouble combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="ExtraDouble">
+        <datatype>double</datatype>
+        <columnTitle>Extra Double</columnTitle>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="PVDouble_Two Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVDouble_Two</tableTitle>
+  </table>
+  <table tableName="PVDate_One" tableDbType="TABLE">
+    <description>Contains up to one row of PVDate_One data for each Panda/Date/ExtraDate combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="ExtraDate">
+        <datatype>timestamp</datatype>
+        <columnTitle>Extra Date</columnTitle>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="PVDate_One Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVDate_One</tableTitle>
+  </table>
+  <table tableName="PVDate_Two" tableDbType="TABLE">
+    <description>Contains up to one row of PVDate_Two data for each Panda/Date/ExtraDate combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="ExtraDate">
+        <datatype>timestamp</datatype>
+        <columnTitle>Extra Date</columnTitle>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="PVDate_Two Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVDate_Two</tableTitle>
+  </table>
+  <table tableName="PVCode_One" tableDbType="TABLE">
+    <description>Contains up to one row of PVCode_One data for each Panda/Date/ExtraCodeA combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="ExtraCodeA">
+        <datatype>varchar</datatype>
+        <columnTitle>Extra Code A</columnTitle>
+        <isKeyField>true</isKeyField>
+        <fk>
+          <fkDbSchema>lists</fkDbSchema>
+          <fkTable>CodeNames</fkTable>
+          <fkColumnName>Code</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="PVCode_One Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVCode_One</tableTitle>
+  </table>
+  <table tableName="PVCode_Two" tableDbType="TABLE">
+    <description>Contains up to one row of PVCode_Two data for each Panda/Date/ExtraCodeB combination.</description>
+    <columns>
+      <column columnName="PandaId">
+        <datatype>varchar</datatype>
+        <columnTitle>Panda Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Panda</fkTable>
+          <fkColumnName>PandaId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="ExtraCodeB">
+        <datatype>varchar</datatype>
+        <columnTitle>Extra Code B</columnTitle>
+        <isKeyField>true</isKeyField>
+        <fk>
+          <fkDbSchema>lists</fkDbSchema>
+          <fkTable>CodeNames</fkTable>
+          <fkColumnName>Code</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="PVCode_Two Datum">
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+    <tableTitle>PVCode_Two</tableTitle>
+  </table>
+</tables>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<visitMap xmlns="http://labkey.org/study/xml">
+  <visit label="Baseline" sequenceNum="0.0"/>
+  <visit label="Visit 1" sequenceNum="1.0" maxSequenceNum="1.99"/>
+  <visit label="Visit 2" sequenceNum="2.0" maxSequenceNum="2.99"/>
+  <visit label="Visit 3" sequenceNum="3.0" maxSequenceNum="3.99"/>
+  <visit label="Error" sequenceNum="9999.0" maxSequenceNum="9999.99"/>
+</visitMap>
+

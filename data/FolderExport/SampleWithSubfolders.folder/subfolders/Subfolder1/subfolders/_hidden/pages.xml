@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages xmlns="http://labkey.org/folder/xml">
+  <page index="0" name="portal.default" propertyString="">
+    <webpart>
+      <name>Lists</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>List - Single</name>
+      <index>2</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+      <properties>
+        <property key="listName" value="Hidden Folder List"/>
+      </properties>
+    </webpart>
+  </page>
+</pages>

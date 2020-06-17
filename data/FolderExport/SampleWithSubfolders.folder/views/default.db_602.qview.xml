@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customView name="" schema="lists" query="safe list" customIconUrl="/reports/icon_query_view.png" xmlns="http://labkey.org/data/xml/queryCustomView">
+  <columns>
+    <column name="Fruit"/>
+    <column name="Color"/>
+  </columns>
+  <filters>
+    <filter column="Color" operator="neqornull" value="yellow"/>
+  </filters>
+</customView>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="rReportDescriptor" reportName="safe report" reportKey="lists/safe list" xmlns="http://labkey.org/query/xml">
+  <Properties>
+    <Prop name="descriptorType">rReportDescriptor</Prop>
+    <Prop name="reportName">safe report</Prop>
+    <Prop name="version">11.3</Prop>
+    <Prop name="reportType">ReportService.rReport</Prop>
+    <Prop name="queryName">safe list</Prop>
+    <Prop name="schemaName">lists</Prop>
+    <Prop name="dataRegionName">query</Prop>
+    <Prop name="cached">false</Prop>
+    <Prop name="script"># This sample code returns the query data in tab-separated values format, which LabKey then
+# renders as HTML. Replace this code with your R script. See the Help tab for more details.
+write.table(labkey.data, file = "${tsvout:tsvfile}", sep = "\t", qmethod = "double", col.names=NA)</Prop>
+    <Prop name="redirectUrl">/labkey/list/FolderExportTest/Folder%201/grid.view?listId=1</Prop>
+    <Prop name="runInBackground">false</Prop>
+  </Properties>
+  <tags/>
+</ReportDescriptor>

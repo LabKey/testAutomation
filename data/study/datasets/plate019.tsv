@@ -1,0 +1,6 @@
+# plate019																							
+QCStateLabel	dfvalid	dfraster	dfstudy	dfplate	visit	ptid	cpsdt	cpsaltdt	cpsalt	cpsaltqc	cpscredt	cpscre	cpscreqc	cpscomm	bit4_019	bit3_019	bit2_019	bit1_019	formlang	sfdt_019	dfscreen	dfcreate	dfmodify
+dirty	1	0549R01H3006	121	19	101	999320016	1/1/2005	12:00:00	1111	0	1/1/2005	11.1	0	0	0	0	0	1	English	1	dirty	12/8/2005 12:38	12/8/2005 12:38
+dirty	3	0602R00B7005	121	19	101	999320719	1/2/2006	12:00:00	13	0	1/2/2006	0.6	0	CPS-1 test	0	0	0	1	English	0	dirty	1/9/2006 23:11	1/9/2006 23:11
+dirty	3	0602R00B5005	121	19	101	999321029	1/5/2006	12:00:00	13	0	1/5/2006	0.6	0	0	0	0	0	1	English	0	dirty	1/9/2006 21:39	1/9/2006 21:39
+dirty	3	0602R00B6006	121	19	101	999321033	1/6/2006	12:00:00	13	0	1/6/2006	0.6	0	0	0	0	0	1	English	0	dirty	1/9/2006 22:21	1/9/2006 22:21

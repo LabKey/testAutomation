@@ -1,0 +1,168 @@
+{"survey": {
+    "layout": "card",
+    "labelCaption": "Request Form",
+    "showCounts": true,
+    "headerWiki": {
+       "name": "header_wiki"
+    },
+    "footerWiki": {
+       "name": "footer_wiki"
+    },
+    "sections": [{
+        "title": "Section 1",
+        "collapsible": true,
+        "description": "Description for section 1",
+        "defaultLabelWidth": 350,
+        "header": true,        
+        "questions": [
+            {
+                "jsonType": "string",
+                "hidden": false,
+                "width": 800,
+                "inputType": "text",
+                "name": "txtfield",
+                "caption": "Txt Field",
+                "shortCaption": "Txt Field",
+                "required": true
+            },
+            {
+		    "extConfig": {
+			"width": 800,
+			"xtype": "displayfield",
+			"name": "dsplfield",
+			"hideLabel": true,
+			"value": "Display field text about the survey grid question."
+		    }
+            },            
+            {
+		 "extConfig": {
+		     "xtype": "surveygridquestion",
+		     "name": "txtareafield",
+		     "columns": {
+		       "items": [{
+			  "text": "Field 1", 
+			  "dataIndex": "field1", 
+			  "width": 350,
+			  "editor": {
+			     "xtype": "combo", 
+			     "queryMode": "local", 
+			     "displayField":"value",
+			     "valueField": "value", 
+			     "forceSelection": true,
+			     "store": {
+			       "fields": ["value"], 
+			       "data" : [{
+				 "value": "field1"
+			       }]
+			     }
+			  }
+			},
+			{
+			    "text": "Field 2", 
+			    "dataIndex": "field2", 
+			    "width": 200,
+			    "editor": {
+			      "xtype": "textfield"
+			    }
+			}]
+		    },
+		    "store": {
+			"xtype": "json",
+			"fields": [
+			    "field1",
+			    "field2"
+			]
+		    }
+		 }
+            }            
+        ]
+    },
+    {
+        "title": "Section 2",
+        "collapsible": true,
+        "description": "Description for section 2",
+        "defaultLabelWidth": 350,
+        "header": true,        
+        "questions": [
+            {
+                "jsonType": "boolean",
+                "hidden": false,
+                "width": 800,
+                "inputType": "checkbox",
+                "name": "boolfield",
+                "caption": "Bool Field",
+                "shortCaption": "Bool Field"
+            },
+            {
+                "jsonType": "int",
+                "hidden": false,
+                "width": 800,
+                "inputType": "text",
+                "name": "intfield",
+                "caption": "Int Field",
+                "shortCaption": "Int Field",
+                "required": true
+            },
+            {
+                "jsonType": "float",
+                "hidden": false,
+                "width": 800,
+                "inputType": "text",
+                "name": "dblfield",
+                "caption": "Dbl Field",
+                "shortCaption": "Dbl Field"
+            },
+            {
+                "jsonType": "date",
+                "hidden": false,
+                "width": 800,
+                "inputType": "text",
+                "name": "dtfield",
+                "caption": "Dt Field",
+                "shortCaption": "Dt Field"
+            },
+            {
+                "extConfig": {
+                    "width": 800,
+                    "xtype": "datetimefield",
+                    "name": "dttimefield",
+                    "fieldLabel": "DateTime Field"
+                }
+            },
+            {
+                "jsonType": "int",
+                "hidden": false,
+                "width": 800,
+                "inputType": "text",
+                "name": "lkfield",
+                "caption": "Lk Field",
+                "shortCaption": "Lk Field",
+                "lookup": {
+                    "keyColumn": "key",
+                    "schema": "lists",
+                    "displayColumn": "value",
+                    "schemaName": "lists",
+                    "queryName": "lookup",
+                    "table": "lookup",
+                    "isPublic": true,
+                    "public": true
+                }
+            },
+            {
+                "jsonType": "string",
+                "width": 800,
+                "inputType": "file",
+                "name": "attfield",
+                "caption": "Att Field",
+                "shortCaption": "Att Field",
+                "hidden": true,
+                "listeners" : {
+                     "change" : {
+                         "question" : "lkfield",
+                         "fn" : "function(me, cmp, newValue, oldValue){if (me) me.setVisible(newValue == 1);} "
+                     }
+                }
+            }            
+        ]    
+    }]
+}}

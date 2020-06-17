@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<visitMap xmlns="http://labkey.org/study/xml">
+  <visit label="Baseline" sequenceNum="0.0" sequenceNumHandling="normal"/>
+  <visit label="Month 1" sequenceNum="1.0" maxSequenceNum="31.0" sequenceNumHandling="normal"/>
+  <visit label="Month 2" sequenceNum="32.0" maxSequenceNum="60.0" sequenceNumHandling="normal"/>
+  <visit label="Month 3" sequenceNum="61.0" maxSequenceNum="91.0" sequenceNumHandling="normal"/>
+  <visit label="Month 4" sequenceNum="92.0" maxSequenceNum="121.0" sequenceNumHandling="normal"/>
+  <visit label="Month 5" sequenceNum="122.0" maxSequenceNum="152.0" sequenceNumHandling="normal"/>
+  <visit label="Month 6" sequenceNum="153.0" maxSequenceNum="182.0" sequenceNumHandling="normal"/>
+  <visit label="Month 7" sequenceNum="183.0" maxSequenceNum="213.0" sequenceNumHandling="normal"/>
+  <visit label="Month 8" sequenceNum="215.0" maxSequenceNum="244.0" sequenceNumHandling="normal"/>
+  <visit label="Month 9" sequenceNum="245.0" maxSequenceNum="274.0" sequenceNumHandling="normal"/>
+  <visit label="Month 10" sequenceNum="275.0" maxSequenceNum="305.0" sequenceNumHandling="normal"/>
+  <visit label="Month 11" sequenceNum="306.0" maxSequenceNum="335.0" sequenceNumHandling="normal"/>
+  <visit label="Month 12" sequenceNum="336.0" maxSequenceNum="366.0" sequenceNumHandling="normal"/>
+  <visit label="Month 13" sequenceNum="367.0" maxSequenceNum="397.0" sequenceNumHandling="normal"/>
+  <visit label="Month 14" sequenceNum="398.0" maxSequenceNum="425.0" sequenceNumHandling="normal"/>
+  <visit label="Month 15" sequenceNum="426.0" maxSequenceNum="456.0" sequenceNumHandling="normal"/>
+  <visit label="Month 16" sequenceNum="457.0" maxSequenceNum="486.0" sequenceNumHandling="normal"/>
+  <visit label="Month 17" sequenceNum="487.0" maxSequenceNum="517.0" sequenceNumHandling="normal"/>
+  <visit label="Month 18" sequenceNum="518.0" maxSequenceNum="547.0" sequenceNumHandling="normal"/>
+  <visit label="Month 19" sequenceNum="548.0" maxSequenceNum="578.0" sequenceNumHandling="normal"/>
+  <visit label="Month 20" sequenceNum="579.0" maxSequenceNum="609.0" sequenceNumHandling="normal"/>
+  <visit label="Month 21" sequenceNum="610.0" maxSequenceNum="639.0" sequenceNumHandling="normal"/>
+  <visit label="Month 22" sequenceNum="640.0" maxSequenceNum="670.0" sequenceNumHandling="normal"/>
+  <visit label="Month 23" sequenceNum="671.0" maxSequenceNum="700.0" sequenceNumHandling="normal"/>
+  <visit label="Month 24" sequenceNum="701.0" maxSequenceNum="731.0" sequenceNumHandling="normal"/>
+  <visit label="Day 743" sequenceNum="743.0" sequenceNumHandling="normal"/>
+</visitMap>

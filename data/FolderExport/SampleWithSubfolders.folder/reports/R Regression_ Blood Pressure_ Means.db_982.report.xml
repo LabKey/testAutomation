@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="rReportDescriptor" reportName="R Regression: Blood Pressure: Means" reportKey="study/Physical Exam" xmlns="http://labkey.org/query/xml">
+  <Properties>
+    <Prop name="descriptorType">rReportDescriptor</Prop>
+    <Prop name="reportName">R Regression: Blood Pressure: Means</Prop>
+    <Prop name="reportType">Study.rReport</Prop>
+    <Prop name="queryName">Physical Exam</Prop>
+    <Prop name="schemaName">study</Prop>
+    <Prop name="dataRegionName">Dataset</Prop>
+    <Prop name="cached">false</Prop>
+    <Prop name="script"><![CDATA[data_means <- aggregate(labkey.data, list(ParticipantID = 
+ labkey.data$participantid), mean, na.rm = TRUE);
+library(Cairo);
+Cairo(file="${imgout:diastol_v_systol_means_figure.png}", type="png");
+plot(data_means$diastolicbloodpressure, data_means$systolicbloodpressure, 
+ main="Diastolic vs. Systolic Pressures: Mean Value For Each Participant", 
+ ylab="Systolic (mm Hg)", xlab="Diastolic (mm Hg)", ylim =c(60, 200));
+abline(lsfit(data_means$diastolicbloodpressure, data_means$systolicbloodpressure));
+dev.off();]]></Prop>
+    <Prop name="runInBackground">false</Prop>
+    <Prop name="redirectUrl"><![CDATA[/study/home/Study/demo2/dataset.view?datasetId=5004&msg=Report%3A%20R%20Regression%3A%20Blood%20Pressure%3A%20All%20successfully%20saved]]></Prop>
+  </Properties>
+  <tags/>
+</ReportDescriptor>

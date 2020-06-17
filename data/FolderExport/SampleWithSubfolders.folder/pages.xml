@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages xmlns="http://labkey.org/folder/xml">
+  <page index="0" name="portal.default" propertyString="">
+    <webpart>
+      <name>Study Overview</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Data Pipeline</name>
+      <index>2</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Datasets</name>
+      <index>3</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Specimens</name>
+      <index>4</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Views</name>
+      <index>5</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Wiki</name>
+      <index>6</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+      <properties>
+        <property key="name" value="Test wiki"/>
+      </properties>
+    </webpart>
+    <webpart>
+      <name>Study Data Tools</name>
+      <index>7</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Lists</name>
+      <index>8</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Query</name>
+      <index>9</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+      <properties>
+        <property key="title" value="~!@#$%^&amp;*()_+query web part"/>
+        <property key="schemaName" value="announcement"/>
+        <property key="allowChooseQuery" value="false"/>
+        <property key="allowChooseView" value="true"/>
+        <property key="selectQuery" value="false"/>
+        <property key="buttonBarPosition" value="BOTH"/>
+      </properties>
+    </webpart>
+    <webpart>
+      <name>Report</name>
+      <index>10</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+      <properties>
+        <property key="title" value="Report web part"/>
+        <property key="reportKey" value="lists/safe list"/>
+        <property key="reportName" value="safe report"/>
+      </properties>
+    </webpart>
+    <webpart>
+      <name>Workbooks</name>
+      <index>11</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="1" name="Overview" propertyString="">
+    <webpart>
+      <name>Study Overview</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Data Pipeline</name>
+      <index>2</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Datasets</name>
+      <index>3</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Specimens</name>
+      <index>4</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Views</name>
+      <index>5</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Wiki</name>
+      <index>6</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+      <properties>
+        <property key="name" value="Test wiki"/>
+      </properties>
+    </webpart>
+    <webpart>
+      <name>Study Data Tools</name>
+      <index>7</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Lists</name>
+      <index>8</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Query</name>
+      <index>9</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+      <properties>
+        <property key="title" value="~!@#$%^&amp;*()_+query web part"/>
+        <property key="schemaName" value="announcement"/>
+        <property key="allowChooseQuery" value="false"/>
+        <property key="allowChooseView" value="true"/>
+        <property key="selectQuery" value="false"/>
+        <property key="buttonBarPosition" value="BOTH"/>
+      </properties>
+    </webpart>
+    <webpart>
+      <name>Report</name>
+      <index>10</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+      <properties>
+        <property key="title" value="Report web part"/>
+        <property key="reportKey" value="lists/safe list"/>
+        <property key="reportName" value="safe report"/>
+      </properties>
+    </webpart>
+    <webpart>
+      <name>Workbooks</name>
+      <index>11</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="2" name="study.PARTICIPANTS" propertyString="">
+    <webpart>
+      <name>Search</name>
+      <index>1</index>
+      <location>right</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Subject List</name>
+      <index>2</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="3" name="study.DATA_ANALYSIS" propertyString="">
+    <webpart>
+      <name>Data Views</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Study Data Tools</name>
+      <index>2</index>
+      <location>right</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="4" name="study.SPECIMENS" propertyString="">
+    <webpart>
+      <name>Specimen Search</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Specimens</name>
+      <index>2</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Specimen Tools</name>
+      <index>3</index>
+      <location>right</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="5" name="Manage" propertyString=""/>
+</pages>

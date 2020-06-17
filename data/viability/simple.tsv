@@ -1,0 +1,4 @@
+SampleNum	PoolID	Date	TotalCells	ViableCells	SpecimenIDs
+1	1235-5	9/9/2009	1000	900	""
+2	1234-5	9/9/2009	1000	900	"vial1,xyzzy"
+3	1234-7	9/10/2009	1100	900	"foobar,vial1,vial2"

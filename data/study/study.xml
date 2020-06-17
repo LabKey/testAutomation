@@ -1,0 +1,22 @@
+<study label="Study 001" 
+	dateBased="false" 
+	startDate="2009-08-17-07:00" 
+	securityType="BASIC_READ" 
+	subjectNounSingular="Mouse"
+	subjectNounPlural="Mice"
+	subjectColumnName="MouseId"
+	xmlns="http://labkey.org/study/xml"
+  archiveVersion="9.3"
+  testAttribute="nothing">  
+  <visits file="visit_map.xml"/>
+  <cohorts type="AUTOMATIC" datasetId="125" datasetProperty="EVCgroup"/>
+  <qcStates showPrivateDataByDefault="true"/>
+  <datasets dir="datasets" file="datasets_manifest.xml">
+    <definition file="Study001.dataset"/>
+  </datasets>
+  <missingValueIndicators>
+    <missingValueIndicator indicator="Q" label="Data currently under quality control review."/>
+    <missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'."/>
+  </missingValueIndicators>
+  <specimens repositoryType="ADVANCED"/>
+</study>
