@@ -1,5 +1,5 @@
 
-package org.labkey.test.components.glassLibrary.components;
+package org.labkey.test.components.react;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.WebDriverWrapper;
