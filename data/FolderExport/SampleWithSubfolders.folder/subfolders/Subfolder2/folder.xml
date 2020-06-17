@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/Folder%201/Subfolder2/begin.view by cnathe@labkey.com on Tue Oct 30 14:42:03 CDT 2012-->
+<folder archiveVersion="12.26" label="Subfolder2" type="normal" title="Subfolder2" xmlns="http://labkey.org/folder/xml">
+  <folderType name="Study">
+    <defaultModule>Core</defaultModule>
+    <modules>
+      <moduleName>Wiki</moduleName>
+      <moduleName>Experiment</moduleName>
+      <moduleName>Study</moduleName>
+      <moduleName>FileContent</moduleName>
+      <moduleName>Issues</moduleName>
+      <moduleName>Core</moduleName>
+      <moduleName>Pipeline</moduleName>
+      <moduleName>Announcements</moduleName>
+      <moduleName>Query</moduleName>
+    </modules>
+  </folderType>
+  <searchable>true</searchable>
+  <pages file="pages.xml"/>
+  <wikis dir="wikis"/>
+  <missingValueIndicators>
+    <ns:missingValueIndicator indicator="Q" label="Data currently under quality control review." xmlns:ns="http://labkey.org/study/xml"/>
+    <ns:missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'." xmlns:ns="http://labkey.org/study/xml"/>
+    <ns:missingValueIndicator indicator="UNK" label="Unknown" xmlns:ns="http://labkey.org/study/xml"/>
+  </missingValueIndicators>
+  <study dir="study"/>
+</folder>

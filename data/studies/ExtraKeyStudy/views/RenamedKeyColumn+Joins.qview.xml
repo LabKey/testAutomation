@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This query view is marked as hidden so the link crawler won't hit it.  Make it visible again once Issue 14840 is fixed.
+UNDONE: Issue 14840: fixup ForeignKey dependent columns on followed lookup columns
+-->
+<customView name="RenamedKeyColumn+Joins" schema="study" query="RenamedKeyColumn" hidden="true" xmlns="http://labkey.org/data/xml/queryCustomView">
+  <columns>
+    <column name="PandaId"/>
+    <column name="RENAMED_KEY"/>
+    <column name="EXTRA_KEY"/>
+    <column name="PVInt_One Datum"/>
+    <!-- join to PandaId -->
+    <column name="DataSets/P_Two/FavoriteFood"/>
+    <!-- join to PandaId/Visit -->
+    <column name="DataSets/PV_Two/Happy?"/>
+    <!-- join to PandaId/Visit/ExtraInt -->
+    <column name="DataSets/PVInt_Two/PVInt_Two Datum"/>
+    <!-- DOES NOT join to PandaId/Visit/OtherInt -->
+    <column name="DataSets/PVInt_Three/PVInt_Three Datum"/>
+    <!-- DOES NOT join to PandaId/Visit/ExtraString -->
+    <column name="DataSets/PVString_Two/PVString_Two Datum"/>
+  </columns>
+  <sorts>
+    <sort column="PandaId" descending="false"/>
+  </sorts>
+</customView>

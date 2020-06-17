@@ -1,0 +1,48 @@
+
+Basic assay information 
+Assay ID: ,,,,1221
+Assay Started: ,,,,7/15/2014 10:18:18 AM
+Assay Finished: ,,,,7/15/2014 10:43:00 AM
+Assay Exported: ,,,,7/15/2014 2:41:33 PM
+Protocol ID: ,,,,100111
+Protocol Name: ,,,,HIL Renilla Single Time Point  Variable Wells
+Serial#: ,,,,1040917
+
+
+
+Protocol information
+Instrument nickname,,,,Winston (EnVision)
+Instrument serial number,,,,1040917
+Assay started,,,,7/15/2014 10:18:18 AM
+User,,,,N/A
+Assay ID,,,,1221
+Protocol name,,,,HIL Renilla Single Time Point  Variable Wells
+Plate name,,,,96 OptiPlate
+
+Labels:
+Label name,,,,Renilla US LUM 96 (cps)
+ Aperture:
+ Aperture name,,,,96 Plate US Luminescence aperture
+
+Tip mounts:
+ Tip mount name,,,,Real Time + Pre96 Dual Tip
+
+
+
+Plate information 
+Plate,Repeat,Barcode,Measured height,Inside temperature at start,Inside temperature at end,Humidity at start,Humidity at end,Ambient temperature at start,Ambient temperature at end,Group,Label,ScanX,ScanY,Measinfo,Kinetics,Measurement date,
+1,1,,15.26,21.62,21.74,60.1,59.2,21.91,21.93,1,Renilla US LUM 96 (cps)(1),0,0,De=USLum Ex=N/A Em=N/A Wdw=N/A,0,7/15/2014 10:24:16 AM,
+
+Results for Renilla US LUM 96 (cps)(1) - channel 0 (CPS)
+,01,02,03,04,05,06,07,08,09,10,11,12,
+A,57770,77331,72054,46583,53932,47786,3097,3158,3298,,,,
+B,85258,83564,89217,17691,12354,20132,593,221,494,,,,
+C,57018,69978,71124,10974,3933,10926,50,79,18,,,,
+D,23691,35825,23694,480,402,949,12,11,471,,,,
+E,9294,12917,6296,310,726,44,14,12,12,,,,
+F,11711,11938,259,31,24,14,14,10,13,,,,
+G,1002,15,1138,92,15,10,13,12,11,,,,
+H,18,14,17,20,20,18,17,18,19,,,,
+
+
+Exported with EnVision Workstation version 1.12

@@ -1,0 +1,13 @@
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="PassFailDetails" tableDbType="NOT_IN_DB">
+    <titleColumn>key</titleColumn>
+    <columns>
+      <column columnName="RowId">
+<fk>
+<fkTable>FCSAnalyses</fkTable>
+<fkColumnName>RowId</fkColumnName>
+</fk>
+      </column>
+    </columns>
+  </table>
+</tables>

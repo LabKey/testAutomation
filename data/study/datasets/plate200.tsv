@@ -1,0 +1,4 @@
+# plate200																																																	
+dfstate	dfvalid	dfraster	dfstudy	dfplate	visit	ptid	fpxdt	fpxwtkg	fpxwtqc	fpxtempc	fpxtemqc	fpxbpsys	fpxbpdia	fpxbpqc	fpxpulse	fpxresp	fpxheent	fpxheenx	fpxneck	fpxneckx	fpxlymph	fpxlympx	fpxheart	fpxhrtx	fpxchest	fpxchstx	fpxabdom	fpxabdox	fpxextrm	fpxextrx	fpxneuro	fpxneurx	fpxskin	fpxskinx	fpxother	fpxothex	fpxcemqc	fpxcemh	fpxsign	fpxcom	bit4_200	bit3_200	bit2_200	bit1_200	formlang	sfdt_200	dfscreen	dfcreate	dfmodify
+dirty	1	0550R01ZT001	121	200	2001	999320485	12/16/2005	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	English	1	dirty	1/10/2006 16:58	1/10/2006 16:58
+dirty	1	0602R00B7143	121	200	2001	999320719	1/15/2007	51	0	36.3	0	111	69	0	65	15	Normal	0	Normal	0	Normal	0	Normal	0	Normal	0	Normal	0	Normal	0	Normal	0	Normal	0	Normal	0	0	normal	1	0	0	0	0	1	English	0	dirty	1/11/2006 12:43	1/11/2006 12:43

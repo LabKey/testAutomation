@@ -1,0 +1,3 @@
+ParticipantId	date	QCStateLabel	ObjectId	RunComments	RunCreatedBy	RunCreatedOn	RunName	RunProducer	RunProtocol_Name	RunRunPropertyWithoutXPath	RunVersion
+249320489	2008-12-03 00:00:00.0		26777		1807	2009-06-01 13:24:40.628	test1_MAGEML.xml	Agilent Feature Extraction Software	22k_.15 (Read Only)	1	8.1.1.1
+249320489	2008-12-03 00:00:00.0		26781		1807	2009-06-01 13:24:41.296	test2_MAGEML.xml	Agilent Feature Extraction Software	22k_.15 (Read Only)	2	8.1.1.1

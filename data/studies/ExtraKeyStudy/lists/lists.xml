@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="CodeNames" tableDbType="TABLE">
+    <columns>
+      <column columnName="Code">
+        <datatype>varchar</datatype>
+        <columnTitle>Code</columnTitle>
+        <nullable>false</nullable>
+        <isKeyField>true</isKeyField>
+      </column>
+    </columns>
+    <pkColumnName>Code</pkColumnName>
+  </table>
+</tables>

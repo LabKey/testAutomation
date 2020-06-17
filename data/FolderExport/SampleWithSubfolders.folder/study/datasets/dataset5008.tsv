@@ -1,0 +1,7 @@
+ParticipantId	date	QCStateLabel	StartDate	Height	Gender	Country	Group	Status	Comments	SequenceNum
+249318596	2008-05-17 00:00:00.0		2008-05-17 00:00:00.0	85	m	USA	Group 1: Accute HIV-1	confirmed		-1.0
+249320107	2008-06-04 00:00:00.0		2008-06-04 00:00:00.0	67	f	USA	Group 1: Accute HIV-1	confirmed		-1.0
+249320127	2008-07-30 00:00:00.0		2008-07-30 00:00:00.0	73	f	USA	Group 2: HIV-1 Negative	0	Latex allergy.	-1.0
+249320489	2008-07-30 00:00:00.0		2008-07-30 00:00:00.0	74	f	USA	Group 1: Accute HIV-1	confirmed		-1.0
+249320897	2008-05-01 00:00:00.0		2008-05-01 00:00:00.0	65	f	USA	Group 2: HIV-1 Negative	0		-1.0
+249325717	2008-04-27 00:00:00.0		2008-04-27 00:00:00.0	97	m	USA	Group 2: HIV-1 Negative	0		-1.0
