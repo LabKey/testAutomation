@@ -448,7 +448,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private boolean isInSelection(WebElement cell)  // 'in selection' shows as blue color, means it is part of one or many selected cells for copy/paste, etc
     {
         return Locator.tagWithClass("div", "cellular-display")
-                .findElement(getComponentElement())
+                .findElement(cell)
                 .getAttribute("class").contains("cell-selection");
     }
 
