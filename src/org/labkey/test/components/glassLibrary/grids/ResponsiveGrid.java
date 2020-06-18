@@ -422,7 +422,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      * @param columnHeader
      * @return
      */
-    @Deprecated
     public String getCellText(int rowIndex, String columnHeader)
     {
         return getRow(rowIndex).getText(columnHeader);
