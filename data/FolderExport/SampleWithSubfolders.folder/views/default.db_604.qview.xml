@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customView name="" schema="study" query="HIV Test Results" customIconUrl="/reports/icon_query_view.png" xmlns="http://labkey.org/data/xml/queryCustomView">
+  <columns>
+    <column name="ParticipantId"/>
+    <column name="sourcelsid"/>
+    <column name="Date"/>
+    <column name="Day"/>
+    <column name="HIVWestern"/>
+    <column name="HIVStdAntibody"/>
+    <column name="HIVLoadIneq"/>
+    <column name="HIVLoadQuant"/>
+    <column name="HIVLoadQual"/>
+    <column name="HIVRapidTest"/>
+    <column name="HIVSourceLab"/>
+    <column name="replace"/>
+  </columns>
+  <sorts>
+    <sort column="ParticipantId" descending="false"/>
+  </sorts>
+</customView>

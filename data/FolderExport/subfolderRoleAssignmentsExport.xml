@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/5%20Folder%20From%20Zip%20With%20Permissions/begin.view by susanh@labkey.com on Thu Apr 23 20:41:55 PDT 2015-->
+<folder archiveVersion="15.1" label="5 Folder From Zip With Permissions" type="normal" title="5 Folder From Zip With Permissions" xmlns="http://labkey.org/folder/xml" xmlns:rol="http://labkey.org/security/xml/roleAssignment" xmlns:ns="http://labkey.org/security/xml" xmlns:ns1="http://labkey.org/study/xml">
+  <folderType name="None">
+    <defaultModule>Core</defaultModule>
+    <modules>
+      <moduleName>Core</moduleName>
+    </modules>
+  </folderType>
+  <searchable>true</searchable>
+  <pages file="pages.xml"/>
+  <moduleProperties/>
+  <roleAssignments>
+    <rol:roleAssignment>
+      <rol:role name="org.labkey.api.security.roles.ReaderRole"/>
+      <rol:users>
+        <ns:user name="testuser1@test.me"/>
+      </rol:users>
+    </rol:roleAssignment>
+    <rol:roleAssignment>
+      <rol:role name="org.labkey.api.security.roles.FolderAdminRole"/>
+      <rol:users>
+        <ns:user name="USER_NAME"/>
+      </rol:users>
+    </rol:roleAssignment>
+  </roleAssignments>
+  <wikis dir="wikis"/>
+  <notifications>
+    <messagesDefault id="2" label="My conversations"/>
+    <filesDefault id="512" label="No Email"/>
+  </notifications>
+  <missingValueIndicators>
+    <ns1:missingValueIndicator indicator="Q" label="Data currently under quality control review."/>
+    <ns1:missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'."/>
+  </missingValueIndicators>
+</folder>

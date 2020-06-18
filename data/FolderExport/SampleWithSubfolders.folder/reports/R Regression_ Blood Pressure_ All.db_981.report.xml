@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="rReportDescriptor" reportName="R Regression: Blood Pressure: All" reportKey="study/Physical Exam" xmlns="http://labkey.org/query/xml">
+  <Properties>
+    <Prop name="descriptorType">rReportDescriptor</Prop>
+    <Prop name="reportName">R Regression: Blood Pressure: All</Prop>
+    <Prop name="reportType">Study.rReport</Prop>
+    <Prop name="queryName">Physical Exam</Prop>
+    <Prop name="schemaName">study</Prop>
+    <Prop name="dataRegionName">Dataset</Prop>
+    <Prop name="cached">false</Prop>
+    <Prop name="script">library(Cairo);
+Cairo(file="${imgout:diastol_v_systol_figure.png}", type="png");
+plot(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure, 
+ main="Diastolic vs. Systolic Pressures: All Visits", 
+ ylab="Systolic (mm Hg)", xlab="Diastolic (mm Hg)", ylim =c(60, 200));
+abline(lsfit(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure));
+dev.off();
+
+png(filename="${imgout:diastol_v_systol_figure2.png}");
+plot(labkey.data$diastolicbloodpressure, labkey.data$apxbpsys, 
+ main="Diastolic vs. Systolic Pressures: All Visits", 
+ ylab="Systolic (mm Hg)", xlab="Diastolic (mm Hg)", ylim =c(60, 200));
+abline(lsfit(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure));
+dev.off();</Prop>
+    <Prop name="runInBackground">false</Prop>
+    <Prop name="redirectUrl">/study/home/Study/demo2/dataset.view?datasetId=5004</Prop>
+  </Properties>
+  <tags/>
+</ReportDescriptor>

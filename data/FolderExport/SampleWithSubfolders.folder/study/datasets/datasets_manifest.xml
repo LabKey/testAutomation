@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasets metaDataFile="datasets_metadata.xml" xmlns="http://labkey.org/study/xml">
+  <categories>
+    <category>Assays</category>
+    <category>Consent</category>
+    <category>Exams</category>
+    <category>Status</category>
+    <category>Tests</category>
+  </categories>
+  <datasets>
+    <dataset name="GenericAssay" id="5010" category="Assays" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="ELISpotAssay" id="5012" category="Assays" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="NAbAssay" id="5013" category="Assays" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="LuminexAssay" id="5014" category="Assays" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="Microarray Test" id="5015" category="Assays" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="FileBasedAssay" id="5016" category="Assays" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="Participation and Genetic Consent" id="5017" category="Consent" demographicData="true" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="Physical Exam" id="5004" category="Exams" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="Demographics" id="5008" category="Exams" demographicData="true" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="Status Assessment" id="5009" category="Status" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="HIV Test Results" id="5006" category="Tests" type="Standard">
+      <tags/>
+    </dataset>
+    <dataset name="Lab Results" id="5007" category="Tests" type="Standard">
+      <tags/>
+    </dataset>
+  </datasets>
+</datasets>

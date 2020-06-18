@@ -1,0 +1,33 @@
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="COMP" tableDbType="NOT_IN_DB">
+    <columns>
+      <column columnName="First">
+        <datatype>string</datatype>
+        <url>flow-well/showWell.view?wellId=${FirstRowId}</url>
+      </column>
+      <column columnName="Second">
+        <datatype>string</datatype>
+        <url>flow-well/showWell.view?wellId=${SecondRowId}</url>
+      </column>
+      <column columnName="FirstRowId">
+        <datatype>string</datatype>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="SecondRowId">
+        <datatype>string</datatype>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="Statistic">
+        <datatype>string</datatype>
+      </column>
+      <column columnName="FirstValue">
+        <datatype>double</datatype>
+        <formatString>#,##0.###</formatString>
+      </column>
+      <column columnName="SecondValue">
+        <datatype>double</datatype>
+        <formatString>#,##0.###</formatString>
+      </column>
+    </columns>
+  </table>
+</tables>

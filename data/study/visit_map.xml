@@ -1,0 +1,496 @@
+<visitMap xmlns="http://labkey.org/study/xml">
+  <visit label="Screening Cycle" showByDefault="false" sequenceNum="0.0">
+    <datasets>
+      <dataset id="2" type="OPTIONAL"/>
+      <dataset id="12" type="REQUIRED"/>
+      <dataset id="16" type="OPTIONAL"/>
+      <dataset id="17" type="REQUIRED"/>
+      <dataset id="23" type="OPTIONAL"/>
+      <dataset id="122" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit sequenceNum="0.2"/>
+  <visit sequenceNum="0.21"/>
+  <visit label="Cycle 1" showByDefault="false" sequenceNum="1.0"/>
+  <visit sequenceNum="1.1"/>
+  <visit label="Cycle 2" sequenceNum="2.0"/>
+  <visit label="Cycle 3" sequenceNum="3.0"/>
+  <visit label="Cycle 4" sequenceNum="4.0"/>
+  <visit sequenceNum="4.1"/>
+  <visit label="Cycle 5" sequenceNum="5.0"/>
+  <visit sequenceNum="5.1"/>
+  <visit label="Cycle 6" sequenceNum="6.0"/>
+  <visit label="Cycle 7" sequenceNum="7.0"/>
+  <visit label="Cycle 8" sequenceNum="8.0"/>
+  <visit label="End Cycle" sequenceNum="9.0"/>
+  <visit sequenceNum="14.0"/>
+  <visit sequenceNum="14.1"/>
+  <visit sequenceNum="17.0"/>
+  <visit sequenceNum="17.1"/>
+  <visit label="Pre-exist Cond" typeCode="X" sequenceNum="51.0">
+    <datasets>
+      <dataset id="12" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Screening" typeCode="X" sequenceNum="101.0" visitDateDatasetId="1">
+    <datasets>
+      <dataset id="1" type="REQUIRED"/>
+      <dataset id="14" type="REQUIRED"/>
+      <dataset id="16" type="REQUIRED"/>
+      <dataset id="17" type="REQUIRED"/>
+      <dataset id="19" type="REQUIRED"/>
+      <dataset id="23" type="REQUIRED"/>
+      <dataset id="171" type="REQUIRED"/>
+      <dataset id="172" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Enroll/Vacc #1" typeCode="B" sequenceNum="201.0" visitDateDatasetId="125">
+    <datasets>
+      <dataset id="122" type="REQUIRED"/>
+      <dataset id="124" type="REQUIRED"/>
+      <dataset id="125" type="REQUIRED"/>
+      <dataset id="180" type="REQUIRED"/>
+      <dataset id="182" type="REQUIRED"/>
+      <dataset id="184" type="REQUIRED"/>
+      <dataset id="186" type="REQUIRED"/>
+      <dataset id="188" type="REQUIRED"/>
+      <dataset id="190" type="REQUIRED"/>
+      <dataset id="192" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="310" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="211.0" maxSequenceNum="291.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="1 week Post-V#1" typeCode="S" sequenceNum="301.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="311.0" maxSequenceNum="391.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="2 week Post-V#1" typeCode="T" sequenceNum="401.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="141" type="OPTIONAL"/>
+      <dataset id="143" type="REQUIRED"/>
+      <dataset id="144" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="411.0" maxSequenceNum="491.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="3 week Post-V#1" typeCode="B" sequenceNum="501.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="511.0" maxSequenceNum="591.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Grp1:F/U/Grp2:V#2" typeCode="B" sequenceNum="601.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="135" type="OPTIONAL"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="180" type="OPTIONAL"/>
+      <dataset id="182" type="OPTIONAL"/>
+      <dataset id="184" type="OPTIONAL"/>
+      <dataset id="186" type="OPTIONAL"/>
+      <dataset id="188" type="OPTIONAL"/>
+      <dataset id="190" type="OPTIONAL"/>
+      <dataset id="192" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="310" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="611.0" maxSequenceNum="691.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="1 week Post-V#2" typeCode="S" sequenceNum="701.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="711.0" maxSequenceNum="791.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="G1: 6wk/G2: 2wk" typeCode="S" sequenceNum="801.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="141" type="OPTIONAL"/>
+      <dataset id="143" type="OPTIONAL"/>
+      <dataset id="144" type="OPTIONAL"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="811.0" maxSequenceNum="891.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="3 week Post-V#2" typeCode="S" sequenceNum="901.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="911.0" maxSequenceNum="991.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="G1: F/U/G2: 4wk" typeCode="T" sequenceNum="1001.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="150" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="1011.0" maxSequenceNum="1091.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="6 week Post-V#2" typeCode="B" sequenceNum="1101.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="1111.0" maxSequenceNum="1191.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Day 140 F/U" typeCode="B" sequenceNum="1201.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="143" type="REQUIRED"/>
+      <dataset id="144" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="1211.0" maxSequenceNum="1291.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="G1: V#2/G2: V#3" typeCode="B" sequenceNum="1301.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="135" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="150" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="173" type="REQUIRED"/>
+      <dataset id="180" type="OPTIONAL"/>
+      <dataset id="182" type="OPTIONAL"/>
+      <dataset id="184" type="OPTIONAL"/>
+      <dataset id="186" type="OPTIONAL"/>
+      <dataset id="188" type="OPTIONAL"/>
+      <dataset id="190" type="OPTIONAL"/>
+      <dataset id="192" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="310" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="1311.0" maxSequenceNum="1391.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="1 wk Post-V#2/V#3" typeCode="S" sequenceNum="1401.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="1411.0" maxSequenceNum="1491.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="2 wk Post-V#2/V#3" typeCode="S" sequenceNum="1501.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="141" type="OPTIONAL"/>
+      <dataset id="143" type="REQUIRED"/>
+      <dataset id="144" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="1511.0" maxSequenceNum="1591.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="3 wk Post-V#2/V#3" typeCode="S" sequenceNum="1601.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="1611.0" maxSequenceNum="1691.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="4 wk Post-V#2/V#3" typeCode="S" sequenceNum="1701.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="1711.0" maxSequenceNum="1791.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="6 wk Post-V#2/V#3" typeCode="T" sequenceNum="1801.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="360" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="1811.0" maxSequenceNum="1891.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Day 273 F/U" typeCode="B" sequenceNum="1901.0" visitDateDatasetId="136">
+    <datasets>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="143" type="REQUIRED"/>
+      <dataset id="144" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="465" type="OPTIONAL"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="1911.0" maxSequenceNum="1991.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Day 364 Final F/U" typeCode="B" sequenceNum="2001.0" visitDateDatasetId="200">
+    <datasets>
+      <dataset id="143" type="REQUIRED"/>
+      <dataset id="144" type="REQUIRED"/>
+      <dataset id="150" type="REQUIRED"/>
+      <dataset id="151" type="OPTIONAL"/>
+      <dataset id="173" type="REQUIRED"/>
+      <dataset id="200" type="REQUIRED"/>
+      <dataset id="420" type="OPTIONAL"/>
+      <dataset id="423" type="OPTIONAL"/>
+      <dataset id="440" type="OPTIONAL"/>
+      <dataset id="441" type="OPTIONAL"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="466" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int. Vis. %{S.1.1} .%{S.2.1}" typeCode="O" sequenceNum="2011.0" maxSequenceNum="2091.0" visitDateDatasetId="350">
+    <datasets>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Soc Imp Log #%{S.3.2}" typeCode="O" sequenceNum="5001.0" maxSequenceNum="5999.0">
+    <datasets>
+      <dataset id="151" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="AE Log #%{S.3.2}" typeCode="O" sequenceNum="6001.0" maxSequenceNum="6999.0">
+    <datasets>
+      <dataset id="420" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Transfer/Receipt" typeCode="O" sequenceNum="7901.0">
+    <datasets>
+      <dataset id="465" type="REQUIRED"/>
+      <dataset id="466" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="ConMeds Log #%{S.3.2}" typeCode="O" sequenceNum="9001.0" maxSequenceNum="9998.0">
+    <datasets>
+      <dataset id="423" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Termination" typeCode="A" sequenceNum="9999.0" visitDateDatasetId="490">
+    <datasets>
+      <dataset id="489" type="REQUIRED"/>
+      <dataset id="490" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <importAliases>
+    <alias name="Cycle 10" sequenceNum="10.0"/>
+    <alias name="Vaccine 1" sequenceNum="201.0"/>
+    <alias name="Vaccination 1" sequenceNum="201.0"/>
+    <alias name="Soc Imp Log #%{S.3.2}" sequenceNum="5500.0"/>
+    <alias name="ConMeds Log #%{S.3.2}" sequenceNum="9002.0"/>
+    <alias name="All Done" sequenceNum="9999.0"/>
+  </importAliases>
+</visitMap>

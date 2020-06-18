@@ -1,0 +1,73 @@
+From: Al Williams <alwill@scharp.org>
+Topic: Files related to the Neutralization Dilution Assay of 
+       David Montefiori at Duke University (Immunology Lab)
+
+
+  
+The files are: 
+
+README_Files_AlW.txt (This file)
+
+Neutralization_Data_Model-2006FEB06.doc 
+   This is an attempt at defining a 'Data Model' along with
+   enough detail to understand ther relationship to the
+   assay plate template and resulting calculations by
+   the Excel macro. 
+
+TZM-bl External Proficiency Testing Study Plan_100305.doc* -
+   This is the Study plan sent to all investigators for doing the 
+   assay proficeiency study
+
+
+TZM-bl Assay SOP_July2005.doc* - This is the SOP for conducting the assay.
+   Useful reading in conjunction with the macro described below.
+
+
+LuminescenceMacroUserGuide.doc* - This is the guide to the Excel macro
+   that is used to calculate the 50% or 80% neutralization titer from
+   the dilution curve
+
+Luc5Samples02.xls* This is the Excel macro, described in the manual
+
+
+ScreenShot.doc* - This is an example of a screen shot after importing
+   in a 'raw' instrument output file into the macro
+
+
+m09020511;4007.xls* - This is an example instrument file that can be read
+                      into the macro. Try it to see what you get.
+m0902051;3997.xls*  - Same as above
+m0902053;3999.xls*  - Same as above
+m0902055;4001.xls*  - Same as above
+m0902057;4003.xls*  - Same as above
+m0902059;4005.xls*  - Same as above
+
+NAB_Format_CHAVI_DRAFT.doc - First draft of a File Format to send to SCHARP. 
+   This will probably have some modifications, particularly with respect to
+   the approach taken for a tool to keep track of what is a new record and
+   what is a duplicate that is intended to overwrite an existing record.
+   The tool will have much more control over that (after internal Lab
+   QA is completee) than if we are just depending on a raw tab-delimited
+   text file from the lab, which is what the HVTN file formats have
+   assumed.
+    
+-al
+
+
+
+======================================================
+Al Williams, Ph.D.
+Database Manager
+Statistical Center for HIV/AIDS 
+   Research and Prevention
+Fred Hutchinson Cancer Research Center
+
+Internet: alwill@scharp.fhcrc.org
+Phone:    (206) 667-5231
+Fax:      (206) 667-4812
+------------------------------------------------------
+CONFIDENTIALITY NOTICE: This e-mail message and any attachments may be 
+confidential and privileged. If you are not intended to receive this message, 
+please notify the sender and destroy the message. 
+Thank you.
+======================================================
