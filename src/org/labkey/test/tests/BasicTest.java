@@ -76,11 +76,10 @@ public class BasicTest extends BaseWebDriverTest
     @Test
     public void testSystemSettings()
     {
-        if (!TestProperties.isPrimaryUserAppAdmin())
-        {
-            // Disable scheduled system maintenance
-            setSystemMaintenance(false);
-        }
+        Assume.assumeFalse("Testing system settings require site admin.", TestProperties.isPrimaryUserAppAdmin());
+
+        // Disable scheduled system maintenance
+        setSystemMaintenance(false);
 
         goToAdminConsole().goToServerInformationSection();
         WebElement modeElement = Locator.tagWithText("td", "Mode").append("/../td[2]").findElement(getDriver());
