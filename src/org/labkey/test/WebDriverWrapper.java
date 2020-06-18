@@ -46,7 +46,6 @@ import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
@@ -1978,7 +1977,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         func.run();
 
         if (previousElement != null)
-            wait.until(ExpectedConditions.stalenessOf(previousElement));
+        {
+            try
+            {
+                wait.until(ExpectedConditions.stalenessOf(previousElement));
+            }
+            // Firefox sometimes throws the wrong exception.
+            catch (NoSuchElementException ignore) { } // "NoSuchElementException: Web element reference not seen before"
+        }
 
         return wait.until(wd -> elementFinder.get());
     }
