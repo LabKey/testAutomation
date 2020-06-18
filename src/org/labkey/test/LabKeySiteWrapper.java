@@ -835,8 +835,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 EntityUtils.consume(response.getEntity());
 
                 List<NameValuePair> logoutParams = new ArrayList<>();
-                Optional<Cookie> csrfToken = httpContext.getCookieStore().getCookies().stream().filter(c -> c.getName().equals("X-LABKEY-CSRF")).findAny();
-                csrfToken.ifPresent(cookie -> logoutParams.add(new BasicNameValuePair("X-LABKEY-CSRF", cookie.getValue())));
+                Optional<Cookie> csrfToken = httpContext.getCookieStore().getCookies().stream().filter(c -> c.getName().equals(Connection.X_LABKEY_CSRF)).findAny();
+                csrfToken.ifPresent(cookie -> logoutParams.add(new BasicNameValuePair(Connection.X_LABKEY_CSRF, cookie.getValue())));
                 // Logout to verify redirect
                 HttpPost logoutMethod = new HttpPost(getBaseURL() + "/login/logout.view");
                 logoutMethod.setEntity(new UrlEncodedFormEntity(logoutParams));
