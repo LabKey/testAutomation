@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages xmlns="http://labkey.org/folder/xml">
+  <page index="0" name="portal.default" propertyString="" hidden="false"/>
+  <page index="1" name="Tab1" propertyString="" hidden="true">
+    <webpart>
+      <name>Query</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+      <properties>
+        <property key="title" value="A customized web part"/>
+        <property key="schemaName" value="study"/>
+        <property key="queryName" value="StudyProperties"/>
+      </properties>
+    </webpart>
+    <webpart>
+      <name>Data Pipeline</name>
+      <index>2</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Experiment Runs</name>
+      <index>3</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Sample Sets</name>
+      <index>4</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Run Groups</name>
+      <index>5</index>
+      <location>right</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Assay List</name>
+      <index>6</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="2" name="Assay Container Tab 2" propertyString="" hidden="false"/>
+  <page index="3" name="Tab2" propertyString="" hidden="false">
+    <webpart>
+      <name>Query</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+      <properties>
+        <property key="title" value="A customized web part"/>
+        <property key="schemaName" value="study"/>
+        <property key="queryName" value="StudyProperties"/>
+      </properties>
+    </webpart>
+    <webpart>
+      <name>Experiment Runs</name>
+      <index>2</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Assay List</name>
+      <index>3</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="4" name="Study Container Tab" propertyString="" hidden="false"/>
+</pages>

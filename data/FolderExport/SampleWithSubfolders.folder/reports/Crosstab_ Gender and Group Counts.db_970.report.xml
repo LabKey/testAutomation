@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="crosstabDescriptor" reportName="Crosstab: Gender and Group Counts" reportKey="study/Demographics" xmlns="http://labkey.org/query/xml">
+  <Properties>
+    <Prop name="descriptorType">crosstabDescriptor</Prop>
+    <Prop name="stats">Count</Prop>
+    <Prop name="statField">Height</Prop>
+    <Prop name="reportName">Crosstab: Gender and Group Counts</Prop>
+    <Prop name="reportType">ReportService.crosstabReport</Prop>
+    <Prop name="version">9.23</Prop>
+    <Prop name="queryName">Demographics</Prop>
+    <Prop name="schemaName">study</Prop>
+    <Prop name="viewName">Grid View: Demographics + HIV</Prop>
+    <Prop name="filterParam">null</Prop>
+    <Prop name="cached">false</Prop>
+    <Prop name="rowField">Gender</Prop>
+    <Prop name="colField">Group</Prop>
+    <Prop name="showWithDataset">0</Prop>
+  </Properties>
+  <tags/>
+</ReportDescriptor>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages xmlns="http://labkey.org/folder/xml">
+  <page index="0" name="portal.default" propertyString=""/>
+  <page index="1" name="Overview" propertyString="">
+    <webpart>
+      <name>Study Overview</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="2" name="study.PARTICIPANTS" propertyString="">
+    <webpart>
+      <name>Search</name>
+      <index>1</index>
+      <location>right</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Subject List</name>
+      <index>2</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="3" name="study.DATA_ANALYSIS" propertyString="">
+    <webpart>
+      <name>Data Views</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Study Data Tools</name>
+      <index>2</index>
+      <location>right</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="4" name="study.SPECIMENS" propertyString="">
+    <webpart>
+      <name>Specimen Search</name>
+      <index>1</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Specimens</name>
+      <index>2</index>
+      <location>!content</location>
+      <permanent>false</permanent>
+    </webpart>
+    <webpart>
+      <name>Specimen Tools</name>
+      <index>3</index>
+      <location>right</location>
+      <permanent>false</permanent>
+    </webpart>
+  </page>
+  <page index="5" name="Manage" propertyString=""/>
+</pages>

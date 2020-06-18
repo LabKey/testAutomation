@@ -1,0 +1,6 @@
+# plate023																				
+QCStateLabel	dfvalid	dfraster	dfstudy	dfplate	visit	ptid	ecidt	ecielig	ecipsign	ecissign	ecicomm	bit4_023	bit3_023	bit2_023	bit1_023	formlang	sfdt_023	dfscreen	dfcreate	dfmodify
+dirty	1	0549R01H3007	121	23	101	999320016	2/1/2005	Yes	1a.PI Signature/Date	1b.Second Signature/Date	0	0	0	0	1	English	1	dirty	12/8/2005 12:38	12/8/2005 12:38
+dirty	3	0602R00B7006	121	23	101	999320719	1/3/2006	Yes	1a.PI Signature/Date	1b.Second Signature/Date	0	0	0	0	1	English	0	dirty	1/9/2006 23:12	1/9/2006 23:12
+dirty	3	0602R00B5006	121	23	101	999321029	1/5/2006	Yes	1a.PI Signature/Date	1b.Second Signature/Date	0	0	0	0	1	English	0	dirty	1/9/2006 21:39	1/9/2006 21:39
+dirty	3	0602R00B6007	121	23	101	999321033	1/6/2006	Yes	1a.PI Signature/Date	1b.Second Signature/Date	0	0	0	0	1	English	0	dirty	1/9/2006 22:21	1/9/2006 22:21

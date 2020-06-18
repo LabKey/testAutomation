@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="chartDescriptor" reportName="Participant Views: CD4, Virus vs. T" reportKey="study/Lab Results" xmlns="http://labkey.org/query/xml">
+  <Properties>
+    <Prop name="descriptorType">chartDescriptor</Prop>
+    <Prop name="reportName">Participant Views: CD4, Virus vs. T</Prop>
+    <Prop name="version">9.3</Prop>
+    <Prop name="reportType">Study.chartQueryReport</Prop>
+    <Prop name="queryName">Lab Results</Prop>
+    <Prop name="schemaName">study</Prop>
+    <Prop name="viewName">Grid View: All Lab Results</Prop>
+    <Prop name="filterParam">participantId</Prop>
+    <Prop name="cached">false</Prop>
+    <Prop name="columnXName">Date</Prop>
+    <Prop name="columnYName">CD4</Prop>
+    <Prop name="columnYName">P1583232749HIV_Test_Results_HIVLoadQuant</Prop>
+    <Prop name="chartType">2</Prop>
+    <Prop name="isLogX">false</Prop>
+    <Prop name="isLogY">false</Prop>
+    <Prop name="height">200</Prop>
+    <Prop name="width">640</Prop>
+    <Prop name="showMultipleYAxis">true</Prop>
+    <Prop name="showLines">true</Prop>
+    <Prop name="showMultipleCharts">false</Prop>
+    <Prop name="isVerticalOrientation">false</Prop>
+    <Prop name="datasetId">5007</Prop>
+    <Prop name="showWithDataset">5007</Prop>
+  </Properties>
+  <tags/>
+</ReportDescriptor>

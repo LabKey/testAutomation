@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query name="Physical Exam + TempDelta" schemaName="study" xmlns="http://labkey.org/data/xml/query">
+  <metadata>
+    <tables xmlns="http://labkey.org/data/xml">
+      <table tableName="Physical Exam + TempDelta" tableDbType="NOT_IN_DB">
+        <columns>
+          <column columnName="TempDelta">
+            <columnTitle>Temperature Diff From Average</columnTitle>
+          </column>
+        </columns>
+      </table>
+    </tables>
+  </metadata>
+</query>

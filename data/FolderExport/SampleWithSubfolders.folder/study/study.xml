@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/Folder%201/begin.view by cnathe@labkey.com on Tue Oct 30 14:41:59 CDT 2012-->
+<study archiveVersion="12.26" label="Demo Study" timepointType="DATE" subjectNounSingular="Participant" subjectNounPlural="Participants" subjectColumnName="ParticipantId" investigator="" grant="" alternateIdPrefix="" alternateIdDigits="6" defaultTimepointDuration="1" startDate="2008-01-01-06:00" securityType="ADVANCED_WRITE" xmlns="http://labkey.org/study/xml">
+  <cohorts type="AUTOMATIC" mode="SIMPLE" datasetId="5008" datasetProperty="Group" file="cohorts.xml"/>
+  <datasets dir="datasets" file="datasets_manifest.xml">
+    <definition file="DemoStudy.dataset"/>
+  </datasets>
+  <comments/>
+  <qcStates showPrivateDataByDefault="false"/>
+  <specimens repositoryType="ADVANCED" dir="specimens" file="DemoStudy.specimens"/>
+  <visits file="visit_map.xml"/>
+  <studyDescription rendererType="TEXT_WITH_LINKS">
+    <description xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+  </studyDescription>
+</study>

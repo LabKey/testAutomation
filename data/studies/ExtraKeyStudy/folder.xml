@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<folder archiveVersion="12.1" label="ExtraKeyStudy" xmlns="http://labkey.org/folder/xml">
+  <study dir="study"/>
+  <queries dir="queries"/>
+  <views dir="views"/>
+  <lists dir="lists"/>
+  <missingValueIndicators>
+    <ns:missingValueIndicator indicator="Q" label="Data currently under quality control review." xmlns:ns="http://labkey.org/study/xml"/>
+    <ns:missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'." xmlns:ns="http://labkey.org/study/xml"/>
+  </missingValueIndicators>
+</folder>
