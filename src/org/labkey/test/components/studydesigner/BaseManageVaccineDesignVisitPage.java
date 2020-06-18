@@ -82,7 +82,7 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
         SelectRowsResponse response;
         try
         {
-            response = command.execute(test.createDefaultConnection(true), folderPath);
+            response = command.execute(test.createDefaultConnection(), folderPath);
         }
         catch (IOException | CommandException e)
         {

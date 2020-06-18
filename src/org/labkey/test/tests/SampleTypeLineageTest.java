@@ -109,7 +109,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer),
                         TestDataGenerator.simpleFieldDef("stringData", FieldDefinition.ColumnType.String)
                 ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), "SampleSet");
         dgen.addRow(List.of("A", 12, dgen.randomString(15)));
         dgen.addRow(List.of("B", 13, dgen.randomString(15)));
         dgen.addRow(List.of("C", 15, dgen.randomString(15)));
@@ -120,7 +120,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "H", "data", 14, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "A,B,C"));
         dgen.addCustomRow(Map.of("name", "I", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "B,G"));
 
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         // get row 'B' after insert
         Map<String, Object> rowB = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("B"))
@@ -138,7 +138,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 .setChildren(true)
                 .setParents(false)
                 .setDepth(3).build();
-        LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(true), getCurrentContainerPath());
+        LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(), getCurrentContainerPath());
         List<LineageNode> nodeChildren = new ArrayList<>();
         for (LineageNode.Edge run : lineageResponse.getSeed().getChildren())
         {
@@ -150,14 +150,14 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         assertEquals(5, nodeChildren.size());
 
         // now delete row B
-        dgen.deleteRows(createDefaultConnection(true), List.of(rowB));
+        dgen.deleteRows(createDefaultConnection(), List.of(rowB));
 
         // get the lineage graph
         LineageCommand parents = new LineageCommand.Builder(rowH.get("lsid").toString())
                 .setChildren(false)
                 .setParents(true)
                 .setDepth(3).build();
-        LineageResponse parentResponse = parents.execute(createDefaultConnection(true), getCurrentContainerPath());
+        LineageResponse parentResponse = parents.execute(createDefaultConnection(), getCurrentContainerPath());
         List<LineageNode> nodeParents = new ArrayList<>();
         for (LineageNode.Edge run : parentResponse.getSeed().getParents())
         {
@@ -169,7 +169,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         assertEquals( "Issue 37466: Expect rowH to still derive from A and C",2, nodeParents.size());
 
         // only delete on success
-        dgen.deleteDomain(createDefaultConnection(true));
+        dgen.deleteDomain(createDefaultConnection());
     }
 
     @Test
@@ -601,7 +601,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             dgen.addCustomRow(sampleData);
         }
 
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
         // Refresh the page so the new sample type shows up in the UI.
         refresh();
         waitAndClickAndWait(Locator.linkWithText(sampleTypeName));
@@ -767,14 +767,14 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer)
                 ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), "SampleSet");
         dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
         dgen.addCustomRow(Map.of("name", "B", "data", 12,  "MaterialInputs/badLineageTest", "A"));   // derives from A
         dgen.addCustomRow(Map.of("name", "C", "data", 12,  "MaterialInputs/badLineageTest", "A"));
         dgen.addCustomRow(Map.of("name", "D", "data", 12,  "MaterialInputs/badLineageTest", "BOGUS")); //<--bad lineage here
         try
         {
-            dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+            dgen.insertRows(createDefaultConnection(), dgen.getRows());
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)
         {
@@ -796,14 +796,14 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer)
                 ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), "SampleSet");
         dgen.addCustomRow(Map.of("name", "A", "data", 12));     // no parent
         dgen.addCustomRow(Map.of("name", "B", "data", 13,  "MaterialInputs/badParentLineage", "A"));   // derives from A
         dgen.addCustomRow(Map.of("name", "C", "data", 14,  "MaterialInputs/badParentLineage", "B"));
         dgen.addCustomRow(Map.of("name", "D", "data", 15,  "MaterialInputs/badParentLineage", "BOGUS")); //<--bad lineage here
         try
         {
-            dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+            dgen.insertRows(createDefaultConnection(), dgen.getRows());
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)  // success looks like a CommandException with the expected message
         {
@@ -813,7 +813,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         }
 
         // clean up on success
-        dgen.deleteDomain(createDefaultConnection(true));
+        dgen.deleteDomain(createDefaultConnection());
     }
 
     /**
@@ -835,7 +835,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("age", FieldDefinition.ColumnType.Integer),
                         TestDataGenerator.simpleFieldDef("height", FieldDefinition.ColumnType.Integer)
                 ));
-        dgen.createDomain(createDefaultConnection(true), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), "SampleSet");
         dgen.addRow(List.of("A", 56, 60));
         dgen.addRow(List.of("B", 48, 50));
         dgen.addCustomRow(Map.of("name", "C", "age", 12, "height", 44, "MaterialInputs/Family", "A,B"));
@@ -845,7 +845,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "G", "age", 12, "height", 44, "MaterialInputs/Family", "C"));
         dgen.addCustomRow(Map.of("name", "H", "age", 12, "height", 44, "MaterialInputs/Family", "A,B,C"));
         dgen.addCustomRow(Map.of("name", "I", "age", 12, "height", 44, "MaterialInputs/Family", "G"));
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         // Refresh the page so the new sample type shows up in the UI.
         refresh();
@@ -866,13 +866,13 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 .setChildren(false)
                 .setParents(true)
                 .setDepth(1).build();
-        LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(true), getCurrentContainerPath());
+        LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(), getCurrentContainerPath());
         assertEquals("don't expect MaterialInput/tablename columns to persist records that have been deleted",
                 1, lineageResponse.getSeed().getParents().size());
 
         // delete rows A, B
-        dgen.deleteRows(createDefaultConnection(true), rowsToDelete);
-        SelectRowsResponse selectResponse = dgen.getRowsFromServer(createDefaultConnection(true),
+        dgen.deleteRows(createDefaultConnection(), rowsToDelete);
+        SelectRowsResponse selectResponse = dgen.getRowsFromServer(createDefaultConnection(),
                 List.of("rowId", "lsid", "name", "parent", "age", "height", "MaterialInputs/Family", "Inputs/First"));
         List<Map<String, Object>> remainingRows = selectResponse.getRows();
 
@@ -883,11 +883,11 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 .setChildren(false)
                 .setParents(true)
                 .setDepth(1).build();
-        LineageResponse linResponse = linCmd.execute(createDefaultConnection(true), getCurrentContainerPath());
+        LineageResponse linResponse = linCmd.execute(createDefaultConnection(), getCurrentContainerPath());
         assertEquals("don't expect MaterialInput/tablename columns to persist records that have been deleted",
                 0, linResponse.getSeed().getParents().size());
 
-        dgen.deleteDomain(createDefaultConnection(true));
+        dgen.deleteDomain(createDefaultConnection());
     }
 
     @Test
@@ -928,7 +928,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         sampleGenerator.addCustomRow(Map.of("name", sampleG, "strCol", "g-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
         sampleGenerator.addCustomRow(Map.of("name", sampleH, "strCol", "h-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
         sampleGenerator.addCustomRow(Map.of("name", sampleI, "strCol", "i-v1", sampleParentKey, sampleParents, dataParentKey, dataParents));
-        sampleGenerator.insertRows(createDefaultConnection(true), sampleGenerator.getRows());
+        sampleGenerator.insertRows(createDefaultConnection(), sampleGenerator.getRows());
 
         goToProjectHome();
 

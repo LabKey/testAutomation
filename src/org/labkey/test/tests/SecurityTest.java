@@ -112,7 +112,7 @@ public class SecurityTest extends BaseWebDriverTest
         _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER);
 
         // Make sure the feature is turned off.
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
     }
 
@@ -260,7 +260,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         try
         {
-            Connection cn = createDefaultConnection(false);
+            Connection cn = createDefaultConnection();
             command.execute(cn, null);
         }
         catch (CommandException e)
@@ -451,7 +451,7 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void disableGuestAccountTest()
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", true);
 
         goToHome();
@@ -801,7 +801,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertTextNotPresent("Choose a new password.");
 
         stopImpersonating();
-        DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection(true));
+        DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection());
     }
 
     @LogMethod

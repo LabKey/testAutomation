@@ -83,7 +83,7 @@ public class ListArchiveImportTest extends BaseWebDriverTest
         _listHelper.createList(getProjectName(), "Gender", ListHelper.ListColumnType.AutoInteger, "Key", genderTypeCol);
 
         InsertRowsCommand insertRowsCommand = new InsertRowsCommand("lists", "Gender");
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         Map<String, Object> row = new HashMap<>();
         row.put("GenderType", "Male");
         insertRowsCommand.addRow(row);
@@ -97,14 +97,14 @@ public class ListArchiveImportTest extends BaseWebDriverTest
         _listHelper.importListArchive(getProjectName(), LIST_ARCHIVE);
 
         log("Verify five rows were inserted successfully.");
-        cn = createDefaultConnection(false);
+        cn = createDefaultConnection();
         SelectRowsCommand selectCmd = new SelectRowsCommand("lists", "People");
         SelectRowsResponse rowsResponse = selectCmd.execute(cn, getProjectName());
         assertEquals("Expected 5 rows in list.People.", 5, rowsResponse.getRows().size());
 
         log("Insert sixth row in lists.People");
         InsertRowsCommand insertRowsCommand2 = new InsertRowsCommand("lists", "People");
-        cn = createDefaultConnection(false);
+        cn = createDefaultConnection();
         Map<String, Object> newRow = new HashMap<>();
         newRow.put("First", "Kitty");
         newRow.put("Last", "Schmitty");

@@ -470,7 +470,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         // Turn on server side logging of client errors.
         if (isScriptCheckEnabled())
         {
-            Connection cn = createDefaultConnection(true);
+            Connection cn = createDefaultConnection();
             ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", true);
         }
     }
@@ -481,7 +481,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         // Turn off server side logging of client errors.
         if (isScriptCheckEnabled())
         {
-            Connection cn = createDefaultConnection(true);
+            Connection cn = createDefaultConnection();
             ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", false);
         }
     }
@@ -489,14 +489,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     @LogMethod(quiet = true)
     public void enableUxDomainDesigner()
     {
-        Connection cn = createDefaultConnection(true);
+        Connection cn = createDefaultConnection();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", true);
     }
 
     @LogMethod(quiet = true)
     public void disableUxDomainDesigner()
     {
-        Connection cn = createDefaultConnection(true);
+        Connection cn = createDefaultConnection();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", false);
     }
 
@@ -982,31 +982,32 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @param reuseSession true to have the Java API connection "hijack" the session from the Selenium browser window
+     * Create a Java API connection, copying the session from the Selenium browser window
+     * Use {@link WebTestHelper#getRemoteApiConnection()} to get a connection using 'BasicAuth'.
      */
+    public Connection createDefaultConnection()
+    {
+        Connection connection = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
+        if (getDriver().manage().getCookieNamed(Connection.JSESSIONID) == null)
+        {
+            throw new IllegalStateException("No session cookie available to reuse.");
+        }
+
+        Set<Cookie> cookies = getDriver().manage().getCookies();
+        for (Cookie cookie : cookies)
+        {
+            connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
+        }
+        return connection;
+    }
+
+    /**
+     * @deprecated Copying the browser session is preferred unless tests have specific needs otherwise.
+     */
+    @Deprecated
     public Connection createDefaultConnection(boolean reuseSession)
     {
-        Connection connection;
-        if (reuseSession)
-        {
-            connection = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
-            if (getDriver().manage().getCookieNamed("JSESSIONID") == null)
-            {
-                throw new IllegalStateException("No session cookie available to reuse.");
-            }
-
-            Set<Cookie> cookies = getDriver().manage().getCookies();
-            for (Cookie cookie : cookies)
-            {
-                connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
-            }
-        }
-        else
-        {
-            connection = WebTestHelper.getRemoteApiConnection(false);
-        }
-
-        return connection;
+        return createDefaultConnection();
     }
 
     public long beginAt(String relativeURL)

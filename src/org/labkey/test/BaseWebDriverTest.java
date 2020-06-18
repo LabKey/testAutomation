@@ -1022,7 +1022,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private void waitForPendingRequests(int msWait)
     {
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
         MutableLong pendingRequestCount = new MutableLong(-1);
         waitFor(() -> {
             pendingRequestCount.setValue(getPendingRequestCount(connection));

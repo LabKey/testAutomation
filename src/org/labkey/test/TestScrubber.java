@@ -86,7 +86,7 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection(true));
+            DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection());
         }
         catch (RuntimeException e)
         {
@@ -96,7 +96,7 @@ public class TestScrubber extends ExtraSiteWrapper
         try
         {
             // disable any/all secondary auth configurations
-            AuthenticationAPIUtils.deleteConfigurations("TestSecondary", createDefaultConnection(true));
+            AuthenticationAPIUtils.deleteConfigurations("TestSecondary", createDefaultConnection());
         }
         catch (RuntimeException e)
         {

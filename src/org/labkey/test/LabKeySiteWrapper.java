@@ -274,7 +274,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             clickAndWait(Locator.input("TestSecondary"));
 
             // delete the current secondaryAuth configuration
-            deleteAuthenticationConfiguration(configId, createDefaultConnection(true));
+            deleteAuthenticationConfiguration(configId, createDefaultConnection());
         }
         catch (NoSuchElementException ignored)
         {
@@ -1040,7 +1040,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public boolean isMiniProfilerEnabled()
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         Command command = new Command("mini-profiler", "isEnabled");
         try
         {
@@ -1067,7 +1067,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     public void setMiniProfilerEnabled(boolean enabled)
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         PostCommand setEnabled = new PostCommand("mini-profiler", "enable");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("enabled", enabled);
@@ -1111,7 +1111,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void setAuthenticationProvider(String provider, boolean enabled)
     {
-        setAuthenticationProvider(provider, enabled, createDefaultConnection(true));
+        setAuthenticationProvider(provider, enabled, createDefaultConnection());
     }
 
     @LogMethod(quiet = true)
@@ -1316,7 +1316,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters)
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(containerFilter);

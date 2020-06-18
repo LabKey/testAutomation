@@ -403,7 +403,7 @@ public class DataViewsTest extends ParticipantListTest
 
         //capture the categories and subcategories via Java api
         GetCategoriesCommand cmd = new GetCategoriesCommand();
-        Connection conn = this.createDefaultConnection(false);
+        Connection conn = this.createDefaultConnection();
         GetCategoriesResponse response = cmd.execute(conn, getProjectName() + "/" + getFolderName());
         log("Categories present in query response:");
         for ( org.labkey.remoteapi.reports.Category cat : response.getCategoryList())

@@ -390,7 +390,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
     {
         log("** Selecting colors...");
 
-        Connection cn = createDefaultConnection(true);
+        Connection cn = createDefaultConnection();
         SelectRowsCommand cmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.addFilter("Name", StringUtils.join(names, ";"), Filter.Operator.IN);
         SelectRowsResponse response = cmd.execute(cn, getProjectName());
@@ -414,7 +414,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
             list.add(color.toMap());
 
         log("** Inserting colors...");
-        Connection cn = createDefaultConnection(true);
+        Connection cn = createDefaultConnection();
         InsertRowsCommand cmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.getRows().addAll(list);
         cmd.setExtraContext(extraContext);
@@ -439,7 +439,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
             list.add(color.toMap());
 
         log("** Updating colors...");
-        Connection cn = createDefaultConnection(true);
+        Connection cn = createDefaultConnection();
         UpdateRowsCommand cmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.getRows().addAll(list);
         cmd.setExtraContext(extraContext);
