@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/Folder%201/begin.view by cnathe@labkey.com on Tue Oct 30 14:42:03 CDT 2012-->
+<folder archiveVersion="12.26" label="Folder 1" type="normal" title="Folder 1" xmlns="http://labkey.org/folder/xml">
+  <folderType name="None">
+    <defaultModule>Portal</defaultModule>
+    <modules>
+      <moduleName>Portal</moduleName>
+    </modules>
+  </folderType>
+  <searchable>false</searchable>
+  <pages file="pages.xml"/>
+  <lists dir="lists"/>
+  <wikis dir="wikis"/>
+  <missingValueIndicators>
+    <ns:missingValueIndicator indicator="Q" label="Data currently under quality control review." xmlns:ns="http://labkey.org/study/xml"/>
+    <ns:missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'." xmlns:ns="http://labkey.org/study/xml"/>
+    <ns:missingValueIndicator indicator="UNK" label="Unknown" xmlns:ns="http://labkey.org/study/xml"/>
+  </missingValueIndicators>
+  <notifications>
+    <messagesDefault id="1" label="All conversations"/>
+    <filesDefault id="514" label="Daily digest"/>
+  </notifications>  
+  <study dir="study"/>
+  <queries dir="queries"/>
+  <views dir="views"/>
+  <reports dir="reports"/>
+  <subfolders dir="subfolders"/>
+</folder>

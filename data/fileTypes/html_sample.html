@@ -1,0 +1,29 @@
+<html>
+<head>
+  <title>Apache Tomcat 7 (7.0.62) - Changelog</title></head>
+<body bgcolor="#ffffff" text="#000000" link="#525D76" alink="#525D76" vlink="#525D76">
+    <h1><font face="arial,helvetica,sanserif">Apache Tomcat 7</font></h1>
+    <font face="arial,helvetica,sanserif">Version 7.0.62, May 7 2015</font>
+      <span><img alt="fix" class="icon" src="./images/fix.gif">
+        Align redeploy resource modification checking with reload modification
+        checking so that now, in both cases, a change in modification time
+        rather than an increase in modification time is used to determine if the
+        resource has changed. (markt)
+      </span>
+        <a href="http://bz.apache.org/bugzilla/show_bug.cgi?id=57845">57845</a>: Ensure that, if the same JSP is accessed directly and
+        via a <code>&lt;jsp-file&gt;</code> declaration in web.xml, updates to
+        the JSP are visible (subject to the normal rules on re-compilation)
+        regardless of how the JSP is accessed. (markt)
+        <a href="http://bz.apache.org/bugzilla/show_bug.cgi?id=57855">57855</a>: Explicitly handle the case where a
+        <code>MethodExpression</code> is invoked with null or the wrong number
+        of parameters. Rather than failing with an
+        <code>ArrayIndexOutOfBoundsException</code> or a
+        <code>NullPointerException</code> throw an
+        <code>IllegalArgumentException</code> with a useful error message.
+        (markt)
+      <p>
+        Add new attribute that send all actions for session across Tomcat
+        cluster nodes. (kfujino)
+      </p>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="Demographics" tableDbType="TABLE">
+    <description>Contains up to one row of Demographics data for each Monkey/Visit combination.</description>
+    <columns>
+      <column columnName="MonkeyId">
+        <datatype>varchar</datatype>
+        <columnTitle>Monkey Id</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Monkey</fkTable>
+          <fkColumnName>MonkeyId</fkColumnName>
+        </fk>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="Group">
+        <datatype>varchar</datatype>
+        <columnTitle>Group</columnTitle>
+      </column>
+    </columns>
+    <tableTitle>Demographics</tableTitle>
+  </table>
+</tables>

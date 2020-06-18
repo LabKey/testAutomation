@@ -1,0 +1,16 @@
+RowName	TextColumn
+Row Number 1	The quick brown fox jumps over a lazy dog
+Row Number 2	\backslash\
+Row Number 3	%percent%
+Row Number 4	_underscore_
+Row Number 5	[lbracket[
+Row Number 6	]rbracket]
+Row Number 7	@at@
+Row Number 8	^caret^
+Row Number 9	backslash\
+Row Number 10	percent%
+Row Number 11	underscore_
+Row Number 12	lbracket[
+Row Number 13	rbracket]
+Row Number 14	caret^
+Row Number 15	at@

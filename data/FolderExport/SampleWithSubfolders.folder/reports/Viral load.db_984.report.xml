@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="chartDescriptor" reportName="Viral load" reportKey="5006" xmlns="http://labkey.org/query/xml">
+  <Properties>
+    <Prop name="descriptorType">chartDescriptor</Prop>
+    <Prop name="reportName">Viral load</Prop>
+    <Prop name="version">10.3</Prop>
+    <Prop name="reportType">Study.chartQueryReport</Prop>
+    <Prop name="queryName">HIV Test Results</Prop>
+    <Prop name="schemaName">study</Prop>
+    <Prop name="filterParam">participantId</Prop>
+    <Prop name="cached">false</Prop>
+    <Prop name="columnXName">date</Prop>
+    <Prop name="columnYName">HIVLoadQuant</Prop>
+    <Prop name="chartType">2</Prop>
+    <Prop name="isLogX">false</Prop>
+    <Prop name="isLogY">true</Prop>
+    <Prop name="height">200</Prop>
+    <Prop name="width">640</Prop>
+    <Prop name="showMultipleYAxis">false</Prop>
+    <Prop name="showLines">true</Prop>
+    <Prop name="showMultipleCharts">false</Prop>
+    <Prop name="isVerticalOrientation">false</Prop>
+    <Prop name="datasetId">5006</Prop>
+    <Prop name="participantId">249320897</Prop>
+  </Properties>
+  <tags/>
+</ReportDescriptor>

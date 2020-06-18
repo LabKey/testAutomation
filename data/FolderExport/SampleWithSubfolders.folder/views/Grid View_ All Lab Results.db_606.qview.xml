@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customView name="Grid View: All Lab Results" schema="study" query="Lab Results" customIconUrl="/reports/icon_query_view.png" xmlns="http://labkey.org/data/xml/queryCustomView">
+  <columns>
+    <column name="ParticipantId"/>
+    <column name="sourcelsid"/>
+    <column name="Date"/>
+    <column name="Day"/>
+    <column name="CD4"/>
+    <column name="Lymphocytes"/>
+    <column name="Hemoglobin"/>
+    <column name="ParticipantVisit/Demographics/Group"/>
+    <column name="ParticipantVisit/Status Assessment/Cohort"/>
+    <column name="ParticipantVisit/HIV Test Results/HIVWestern"/>
+    <column name="ParticipantVisit/HIV Test Results/HIVStdAntibody"/>
+    <column name="ParticipantVisit/HIV Test Results/HIVLoadIneq"/>
+    <column name="ParticipantVisit/HIV Test Results/HIVLoadQuant"/>
+    <column name="ParticipantVisit/HIV Test Results/HIVLoadQual"/>
+    <column name="ParticipantVisit/HIV Test Results/HIVRapidTest"/>
+    <column name="ParticipantVisit/Demographics/Age"/>
+    <column name="ParticipantVisit/Demographics/Gender"/>
+    <column name="ParticipantVisit/Demographics/Height"/>
+    <column name="ParticipantVisit/Physical Exam/Weight_kg"/>
+    <column name="ParticipantVisit/Physical Exam/Temp_C"/>
+    <column name="ParticipantVisit/Physical Exam/SystolicBloodPressure"/>
+    <column name="ParticipantVisit/Physical Exam/DiastolicBloodPressure"/>
+    <column name="ParticipantVisit/Physical Exam/Pulse"/>
+    <column name="ParticipantVisit/Physical Exam/Respirations"/>
+    <column name="ParticipantVisit/Physical Exam/Pregnancy"/>
+  </columns>
+  <sorts>
+    <sort column="ParticipantId" descending="false"/>
+  </sorts>
+</customView>

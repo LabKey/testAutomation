@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<categories xmlns="http://labkey.org/study/xml/viewCategory">
+  <category label="Tests" displayOrder="0"/>
+  <category label="Exams" displayOrder="0"/>
+  <category label="Consent" displayOrder="0"/>
+  <category label="Assays" displayOrder="0"/>
+  <category label="Status" displayOrder="0"/>
+</categories>

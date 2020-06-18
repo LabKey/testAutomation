@@ -1,0 +1,26 @@
+# plate001																											
+QCStateLabel	dfvalid	dfraster	dfstudy	dfplate	visit	ptid	demdt	dembdt	demsex	demhisp	demnatam	demasian	demblack	demhawpi	demwhite	demraco	demracox	demsexor	bit4_001	bit3_001	bit2_001	bit1_001	formlang	sfdt_001	dfscreen	dfcreate	dfmodify
+clean	1	0549R01H3001	121	1	101	999320016	1/1/2005	3/6/1965	Female	No	0	0	0	0	White	0	Unknown	heterosexual	0	0	0	1	English	1	clean	12/8/2005 12:35	12/8/2005 12:35
+dirty	3	0601R00GN001	121	1	101	999320518	2/22/2006	10/11/1970	Male	No	0	0	0	0	White	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/4/2006 18:33	1/4/2006 18:33
+dirty	3	0601R00GQ001	121	1	101	999320529	2/1/2006	7/11/1969	Female	No	0	0	0	0	White	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/4/2006 20:32	1/4/2006 20:32
+dirty	3	0601R00GS001	121	1	101	999320541	3/1/2006	6/5/1960	Female	No	0	0	African American or Black	0	0	0	Unknown	bisexual	0	0	0	1	English	0	dirty	1/4/2006 21:28	1/4/2006 21:28
+dirty	3	0601R00GT001	121	1	101	999320557	2/27/2006	3/5/1960	Male	No	0	0	African American or Black	0	0	0	Unknown	bisexual	0	0	0	1	English	0	dirty	1/4/2006 21:35	1/4/2006 21:35
+dirty	3	0601R00GW001	121	1	101	999320565	3/10/2006	7/6/1960	Male	Yes	0	0	0	0	0	"Other, specify"	Brazilian	heterosexual	0	0	0	1	English	0	dirty	1/4/2006 22:00	1/4/2006 22:00
+dirty	3	0601R00GY001	121	1	101	999320576	2/1/2006	10/11/1968	Female	No	0	0	African American or Black	0	0	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/4/2006 22:25	1/4/2006 22:25
+dirty	3	0601R00H3001	121	1	101	999320582	2/11/2006	7/5/1968	Male	No	0	0	0	0	White	0	Unknown	homosexual 	0	0	0	1	English	0	dirty	1/4/2006 22:55	1/4/2006 22:55
+dirty	3	0601R00H7001	121	1	101	999320590	1/7/2006	2/28/1968	Female	No	0	0	African American or Black	0	0	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/4/2006 23:21	1/4/2006 23:21
+dirty	3	0601R00HC001	121	1	101	999320609	1/9/2006	9/15/1970	Male	No	American Indian/Alaska Native	0	0	0	0	0	Unknown	bisexual	0	0	0	1	English	0	dirty	1/4/2006 23:34	1/4/2006 23:34
+dirty	3	0601R00HH001	121	1	101	999320613	1/3/2006	10/18/1972	Female	No	0	0	0	0	White	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/4/2006 23:50	1/4/2006 23:50
+dirty	3	0601R00HK001	121	1	101	999320624	1/1/2006	12/21/1979	Male	No	0	0	African American or Black	0	0	0	Unknown	homosexual 	0	0	0	1	English	0	dirty	1/5/2006 0:01	1/5/2006 0:01
+dirty	3	0601R00HN001	121	1	101	999320638	2/3/2006	8/1/1980	Female	No	0	0	0	0	White	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/5/2006 0:10	1/5/2006 0:10
+dirty	3	0601R00HP001	121	1	101	999320646	1/2/2006	8/17/1974	Female	No	0	0	African American or Black	0	0	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/5/2006 0:16	1/5/2006 0:16
+dirty	3	0601R00HT001	121	1	101	999320660	2/1/2006	11/14/1969	Male	Yes	0	0	0	0	0	"Other, specify"	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/5/2006 0:32	1/5/2006 0:32
+dirty	3	0601R00J1001	121	1	101	999320671	1/15/2006	1/13/1965	Female	No	0	Asian	0	0	0	0	Unknown	bisexual	0	0	0	1	English	0	dirty	1/5/2006 0:53	1/5/2006 0:53
+dirty	3	0601R00J4001	121	1	101	999320687	1/14/2006	11/11/1970	Male	No	0	0	African American or Black	0	0	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/5/2006 1:02	1/5/2006 1:02
+dirty	3	0601R00T1001	121	1	101	999320703	1/11/2006	3/7/1979	Male	No	0	0	African American or Black	0	0	0	Unknown	homosexual 	0	0	0	1	English	1	dirty	1/5/2006 12:55	1/5/2006 12:55
+dirty	3	0602R00B7001	121	1	101	999320719	1/2/2006	1/2/1970	Male	No	0	0	0	Nat. Hawaiian/Pacific Island	0	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/9/2006 23:07	1/9/2006 23:07
+dirty	3	0602R00B5001	121	1	101	999321029	1/5/2006	5/27/1971	Male	No	0	0	0	0	White	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/9/2006 21:36	1/9/2006 21:36
+dirty	3	0602R00B6001	121	1	101	999321033	1/6/2006	1/5/1976	Male	No	0	Asian	0	0	0	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/9/2006 22:18	1/9/2006 22:18
+dirty	3	0601R00HS001	121	1	101	999320652	2/1/2006	7/11/1960	Male	No	0	0	0	Nat. Hawaiian/Pacific Island	0	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/5/2006 0:22	1/5/2006 0:22
+dirty	3	0601R00SV001	121	1	101	999320695	1/10/2006	12/9/1972	Female	No	0	0	0	0	White	0	Unknown	heterosexual	0	0	0	1	English	1	dirty	1/5/2006 12:44	1/5/2006 12:44
+dirty	3	0601R00GR001	121	1	101	999320533	3/1/2006	6/6/1961	Male	No	0	Asian	0	0	0	0	Unknown	heterosexual	0	0	0	1	English	0	dirty	1/4/2006 21:00	1/4/2006 21:00

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<folder archiveVersion="12.26" label="Subfolder1" type="normal" title="Subfolder1" xmlns="http://labkey.org/folder/xml">
+  <folderType name="My XML-defined Tabbed Folder Type">
+    <defaultModule>Core</defaultModule>
+    <modules>
+      <moduleName>Core</moduleName>
+      <moduleName>Wiki</moduleName>
+      <moduleName>Experiment</moduleName>
+      <moduleName>Pipeline</moduleName>
+      <moduleName>Query</moduleName>
+      <moduleName>simpletest</moduleName>
+      <moduleName>Study</moduleName>
+    </modules>
+  </folderType>
+  <lists dir="lists"/>
+  <searchable>true</searchable>
+  <pages file="pages.xml"/>
+  <wikis dir="wikis"/>
+  <missingValueIndicators>
+    <ns:missingValueIndicator indicator="Q" label="Data currently under quality control review." xmlns:ns="http://labkey.org/study/xml"/>
+    <ns:missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'." xmlns:ns="http://labkey.org/study/xml"/>
+    <ns:missingValueIndicator indicator="UNK" label="Unknown" xmlns:ns="http://labkey.org/study/xml"/>
+  </missingValueIndicators>
+  <subfolders dir="subfolders"/>
+</folder>
