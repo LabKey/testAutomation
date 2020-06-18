@@ -2,8 +2,8 @@ apply plugin: 'java'
 apply plugin: 'org.labkey.module'
 
 dependencies { 
-    // add dependencies on community modules, not including those that come through from transitive dependencies:
-    //   assay, list, experiment, search, pipeline, ms2, announcements
+    // add dependencies on starter modules, not including those that come through from transitive dependencies:
+    //   assay, list, experiment, search, pipeline, ms2, announcements, inventory
     // N.B.  The explicit setting of transitive = true is necessary here.
     // It seems that the default value is not transitive for non-jar extensions
     modules ("org.labkey.module:api:${labkeyVersion}@module") {
@@ -63,13 +63,40 @@ dependencies {
     modules ("org.labkey.module:wiki:${labkeyVersion}@module") {
         transitive = true
     }
+    modules ("org.labkey.module:sampleManagement:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:cas:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:assayRequest:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:dataintegration:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:duo:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:ldap:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:premium:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:saml:${labkeyVersion}@module") {
+        transitive = true
+    }
 
-    // add dependencies on all community API artifacts
+    // add dependencies on all starter API artifacts
     implementation "org.labkey.api:core:${labkeyVersion}"
     implementation "org.labkey.api:assay:${labkeyVersion}"
     implementation "org.labkey.api:issues:${labkeyVersion}"
     implementation "org.labkey.api:ms2:${labkeyVersion}"
     implementation "org.labkey.api:targetedms:${labkeyVersion}"
+    implementation "org.labkey.api:dataintegration:${labkeyVersion}"
+    implementation "org.labkey.api:premium:${labkeyVersion}"
+    implementation "org.labkey.api:inventory:${labkeyVersion}"
 
 }
 
