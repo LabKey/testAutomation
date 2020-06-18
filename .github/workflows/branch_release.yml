@@ -1,3 +1,4 @@
+---
 # Workflow to automate creation and updating of release branches
 name: Release Branching
 
@@ -12,13 +13,11 @@ jobs:
     if: github.event.created && github.event.sender.login == 'labkey-teamcity'
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Create branches and PRs
-      uses: LabKey/gitHubActions/branch-release@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create branches and PRs
+        uses: LabKey/gitHubActions/branch-release@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
