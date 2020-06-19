@@ -226,14 +226,16 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
-    private ElementCache _elementCache;
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
 
     @Override
     protected ElementCache elementCache()
     {
-        if (null == _elementCache)
-            _elementCache = new ElementCache();
-        return _elementCache;
+        return (ElementCache) super.elementCache();
     }
 
     protected class ElementCache extends ResponsiveGrid.ElementCache
