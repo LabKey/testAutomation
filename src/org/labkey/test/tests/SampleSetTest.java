@@ -78,8 +78,6 @@ public class SampleSetTest extends BaseWebDriverTest
     private static final String CASE_INSENSITIVE_SAMPLE_SET = "CaseInsensitiveSampleSet";
     private static final String LOWER_CASE_SAMPLE_SET = "caseinsensitivesampleset";
 
-    protected static final File PIPELINE_PATH = TestFileUtils.getSampleData("xarfiles/expVerify");
-
     @Override
     public List<String> getAssociatedModules()
     {
@@ -1301,7 +1299,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @Test
     public void testFileAttachment()
     {
-        File experimentFilePath = new File(PIPELINE_PATH, "experiment.xar.xml");
+        File experimentFilePath = TestFileUtils.getSampleData("fileTypes/xml_sample.xml");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
 
         String sampleSetName = "FileAttachmentSampleSet";
@@ -1328,11 +1326,11 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_FileAttachment"), experimentFilePath);
         clickButton("Submit");
         //a double upload causes the file to be appended with a count
-        assertTextPresent("experiment-1.xar.xml");
+        assertTextPresent("xml_sample-1.xml");
         int attachIndex = drt.getColumnIndex("File Attachment");
 
         // Added these last two test to check for regressions with exporting a grid with a file attachment column and deleting a file attachment column.
-        exportGridWithAttachment(3, expectedHeaders, attachIndex, "experiment-1.xar.xml", "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx");
+        exportGridWithAttachment(3, expectedHeaders, attachIndex, "xml_sample-1.xml", "xml_sample.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx");
 
         log("Remove the attachment columns and validate that everything still works.");
         clickFolder(FOLDER_NAME);
