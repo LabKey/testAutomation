@@ -259,12 +259,14 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public List<GridRow> getSelectedRows()
     {
+        elementCache().initColumnsAndIndices();     // force-initialize the element cache, wait for loaded
         return new GridRow.GridRowFinder(this).findAll(this)
                 .stream().filter(GridRow::isSelected).collect(Collectors.toList());
     }
 
     private GridRow getRow(int index)
     {
+        elementCache().initColumnsAndIndices();
         return new GridRow.GridRowFinder(this).index(index).find(this);
     }
 
