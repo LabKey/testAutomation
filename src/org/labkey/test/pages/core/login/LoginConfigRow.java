@@ -38,8 +38,8 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
     {
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().deleteButton));
         elementCache().deleteButton.click();
-        new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Warning")
-                .waitFor().dismiss("Yes");
+        new ModalDialog.ModalDialogFinder(getDriver()).withBodyTextContaining("Deletion cannot be undone.")
+                .waitFor().dismiss("Yes, delete");
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
         return new LoginConfigurePage(getDriver());
     }
