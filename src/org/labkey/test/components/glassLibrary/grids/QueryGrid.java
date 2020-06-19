@@ -28,19 +28,12 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 {
     final private WebDriver _driver;
     final private WebElement _queryGridPanel;
-    private GridBar _gridBar;
-    private ResponsiveGrid _responsiveGrid;
-    private Optional<GridTabBar> _gridTabBar;
 
     protected QueryGrid(WebElement element, WebDriver driver)
     {
         super(element, driver);
         _queryGridPanel = element;
         _driver = driver;
-
-        _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).find(_queryGridPanel);
-        _gridBar = new GridBar.GridBarFinder(_driver, _queryGridPanel, _responsiveGrid).find();
-        _gridTabBar = new GridTabBar.GridTabBarFinder(_driver, _responsiveGrid).findOptional(_queryGridPanel);
     }
 
     @Override
@@ -114,7 +107,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
-    public boolean hasTabs() { return _gridTabBar.isPresent(); }
+    public boolean hasTabs() { return elementCache().gridTabBar().isPresent(); }
 
     public boolean gridErrorMessagePresent()
     {
@@ -146,19 +139,19 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public GridBar getGridBar()
     {
-        return _gridBar;
+        return elementCache()._gridBar;
     }
 
     public GridTabBar getGridTabBar()
     {
-        return _gridTabBar.orElseThrow();
+        return elementCache().gridTabBar().orElseThrow();
     }
 
     // record count
 
     public int getRecordCount()
     {
-        return _gridBar.getRecordCount();
+        return elementCache()._gridBar.getRecordCount();
     }
 
     public QueryGrid waitForRecordCount(int expectedCount)
@@ -231,6 +224,26 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         doAndWaitForUpdate(()->
                 getGridBar().doMenuAction("Grid Views", Arrays.asList(viewName)));
         return this;
+    }
+
+    private ElementCache _elementCache;
+
+    @Override
+    protected ElementCache elementCache()
+    {
+        if (null == _elementCache)
+            _elementCache = new ElementCache();
+        return _elementCache;
+    }
+
+    protected class ElementCache extends ResponsiveGrid.ElementCache
+    {
+        ResponsiveGrid _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).findWhenNeeded(_queryGridPanel);
+        GridBar _gridBar = new GridBar.GridBarFinder(_driver, _queryGridPanel, _responsiveGrid).findWhenNeeded();
+        Optional<GridTabBar> gridTabBar()
+        {
+            return new GridTabBar.GridTabBarFinder(_driver, _responsiveGrid).findOptional(_queryGridPanel);
+        }
     }
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>

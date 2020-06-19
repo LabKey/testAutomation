@@ -55,7 +55,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                 Locator.tag("td").existsIn(this);
     }
 
-    private void waitForLoaded()
+    protected void waitForLoaded()
     {
         WebDriverWrapper.waitFor(this::isLoaded, "Grid still loading", 30000);
     }
@@ -266,8 +266,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     private GridRow getRow(int index)
     {
-        elementCache().initColumnsAndIndices();
-        return new GridRow.GridRowFinder(this).index(index).find(this);
+        return elementCache().getRow(index);
     }
 
     /**
@@ -277,7 +276,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public GridRow getRow(String text)
     {
-        return new GridRow.GridRowFinder(this).withCellWithText(text).find(this);
+        return elementCache().getRow(text);
     }
 
     /**
@@ -287,7 +286,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public Optional<GridRow> getOptionalRow(String text)
     {
-        return new GridRow.GridRowFinder(this).withCellWithText(text).findOptional(this);
+        return elementCache().getOptionalRow(text);
     }
 
     /**
@@ -298,10 +297,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public GridRow getRow(String columnHeader, String containsText)
     {
-        // try to normalize column index to start at 0, excluding row selector column
-        Integer columnIndex = getColumnIndex(columnHeader);
-        return new GridRow.GridRowFinder(this).withTextAtColumn(containsText, columnIndex)
-                .find(this);
+        return elementCache().getRow(columnHeader, containsText);
     }
 
     /**
@@ -312,10 +308,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public Optional<GridRow> getOptionalRow(String columnHeader, String containsText)
     {
-        // try to normalize column index to start at 0, excluding row selector column
-        Integer columnIndex = getColumnIndex(columnHeader);
-        return new GridRow.GridRowFinder(this).withTextAtColumn(containsText, columnIndex)
-                .findOptional(this);
+        return elementCache().getOptionalRow(columnHeader, containsText);
     }
 
     /**
@@ -325,9 +318,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public GridRow getRow(Map<String, String> partialMap)
     {
-        return getRows().stream().filter(a -> a.hasMatchingValues(partialMap))
-                .findFirst()
-                .orElseThrow(()-> new NotFoundException("No row with matching parameters was present: ["+partialMap+"]"));
+        return elementCache().getRow(partialMap);
     }
 
     /**
@@ -337,8 +328,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public GridRow getRow(Locator.XPathLocator containing)
     {
-        elementCache().initColumnsAndIndices();     // force waitForLoaded, if it already hasn't been done
-        return new GridRow.GridRowFinder(this).withDescendant(containing).find();
+        return elementCache().getRow(containing);
     }
 
     /**
@@ -347,8 +337,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public List<GridRow> getRows()
     {
-        elementCache().initColumnsAndIndices();     // force waitForLoaded, if it hasn't already been done
-        return new GridRow.GridRowFinder(this).findAll(getComponentElement());
+        return elementCache().getRows();
     }
 
     public List<String> getColumnDataAsText(String columnHeader)
@@ -570,6 +559,54 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                 rowMaps.add(row.getRowMap());
             }
             return rowMaps;
+        }
+
+        protected GridRow getRow(int index)
+        {
+            return new GridRow.GridRowFinder(ResponsiveGrid.this).index(index).find(this);
+        }
+
+        protected GridRow getRow(String text)
+        {
+            return new GridRow.GridRowFinder(ResponsiveGrid.this).withCellWithText(text).find(this);
+        }
+
+        protected Optional<GridRow> getOptionalRow(String text)
+        {
+            return new GridRow.GridRowFinder(ResponsiveGrid.this).withCellWithText(text).findOptional(this);
+        }
+
+        protected GridRow getRow(String columnHeader, String text)
+        {
+            // try to normalize column index to start at 0, excluding row selector column
+            Integer columnIndex = getColumnIndex(columnHeader);
+            return new GridRow.GridRowFinder(ResponsiveGrid.this).withTextAtColumn(text, columnIndex)
+                    .find(this);
+        }
+
+        protected Optional<GridRow> getOptionalRow(String columnHeader, String text)
+        {
+            // try to normalize column index to start at 0, excluding row selector column
+            Integer columnIndex = getColumnIndex(columnHeader);
+            return new GridRow.GridRowFinder(ResponsiveGrid.this).withTextAtColumn(text, columnIndex)
+                    .findOptional(this);
+        }
+
+        protected GridRow getRow(Map<String, String> partialMap)
+        {
+            return getRows().stream().filter(a -> a.hasMatchingValues(partialMap))
+                    .findFirst()
+                    .orElseThrow(()-> new NotFoundException("No row with matching parameters was present: ["+partialMap+"]"));
+        }
+
+        protected GridRow getRow(Locator.XPathLocator containing)
+        {
+            return new GridRow.GridRowFinder(ResponsiveGrid.this).withDescendant(containing).find();
+        }
+
+        protected List<GridRow> getRows()
+        {
+            return new GridRow.GridRowFinder(ResponsiveGrid.this).findAll(getComponentElement());
         }
     }
 
