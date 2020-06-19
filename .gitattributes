@@ -45,3 +45,6 @@
 *.tar           binary
 *.war           binary
 *.zip           binary
+
+# LuceneSearchServiceImpl.TikaTestCase depends on exact file sizes. Do not normalize these files on checkout.
+data/fileTypes/* -text
