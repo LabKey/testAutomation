@@ -335,11 +335,17 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public GridRow getRow(Locator.XPathLocator containing)
     {
+        elementCache().initColumnsAndIndices();     // force waitForLoaded, if it already hasn't been done
         return new GridRow.GridRowFinder(this).withDescendant(containing).find();
     }
 
+    /**
+     * gets a list of all rows currently in the grid, after waiting for it to be loaded
+     * @return
+     */
     public List<GridRow> getRows()
     {
+        elementCache().initColumnsAndIndices();     // force waitForLoaded, if it hasn't already been done
         return new GridRow.GridRowFinder(this).findAll(getComponentElement());
     }
 
