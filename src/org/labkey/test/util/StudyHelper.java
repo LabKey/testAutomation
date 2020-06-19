@@ -467,7 +467,7 @@ public class StudyHelper
 
     public static String getPipelinePath()
     {
-        return TestFileUtils.getLabKeyRoot() + "/sampledata/study/";
+        return getStudySampleData("study.xml").getParentFile().getAbsolutePath();
     }
 
     public static File getStudySampleData(String relativePath)
