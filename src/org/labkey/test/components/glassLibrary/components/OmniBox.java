@@ -6,6 +6,7 @@ package org.labkey.test.components.glassLibrary.components;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -175,9 +176,9 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         return this.setText("search \"" + searchTerm + "\"");
     }
 
-    public OmniBox setSort(String columnName, boolean descending)
+    public OmniBox setSort(String columnName, SortDirection direction)
     {
-        return this.setText("sort \"" + columnName + "\"" + (descending ? " desc" : ""));
+        return this.setText("sort \"" + columnName + "\"" + (direction.equals(SortDirection.DESC) ? " desc" : ""));
     }
 
     @Override
