@@ -45,7 +45,6 @@ import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
@@ -3155,6 +3154,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
             .perform();
     }
 
+    /**
+     *  puts the specified text into the clipboard, then pastes it into the specified element,
+     *  or whatever has focus at the moment.
+     * @param input
+     * @param text
+     */
     public void actionPaste(WebElement input, String text)
     {
         String osName = System.getProperty("os.name");
@@ -3164,11 +3169,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
         StringSelection sel = new StringSelection(text);
         c.setContents(sel, sel);
 
-        new Actions(getDriver())
-            .keyDown(cmdKey)
-            .sendKeys(input, "v")       // paste the contents of the clipboard into the input
-            .keyUp(cmdKey)
-            .perform();
+        if (input == null)
+        {
+            new Actions(getDriver())
+                    .keyDown(cmdKey)
+                    .sendKeys("v")       // paste the contents of the clipboard, without a target
+                    .keyUp(cmdKey)
+                    .perform();
+        }
+        else
+        {
+            new Actions(getDriver())
+                    .keyDown(cmdKey)
+                    .sendKeys(input, "v")       // paste the contents of the clipboard into the input
+                    .keyUp(cmdKey)
+                    .perform();
+        }
     }
 
     private static final List<String> html5InputTypes = Arrays.asList("color", "date", "datetime-local", "email", "month", "number", "range", "search", "tel", "time", "url", "week");
