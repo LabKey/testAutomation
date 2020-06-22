@@ -1,0 +1,7 @@
+Site Number	Site Name
+501	EARL (003)
+502	PCIA (Hamed)
+503	FREE (007)
+504	KART (Marcos)
+520	KART (Pawnee)
+535	FDAT (Stormy)

@@ -1,0 +1,51 @@
+<datasets metaDataFile="datasets_metadata.xml" xmlns="http://labkey.org/study/xml">
+  <datasets>
+    <dataset name="DEM-1" id="1" demographicData="true"/>
+    <dataset name="TYP" id="2"/>
+    <dataset name="PRE-1" id="12"/>
+    <dataset name="URS-1" id="14"/>
+    <dataset name="LLS-1" id="16"/>
+    <dataset name="LLS-2" id="17"/>
+    <dataset name="CPS-1" id="19"/>
+    <dataset name="ECI-1" id="23"/>
+    <dataset name="EPX-1" id="122"/>
+    <dataset name="ENR-1" id="124"/>
+    <dataset name="EVC-1" id="125"/>
+    <dataset name="VAC-1" id="135"/>
+    <dataset name="APX-1" id="136"/>
+    <dataset name="URF-1" id="140"/>
+    <dataset name="URF-2" id="141"/>
+    <dataset name="LLF-1" id="143"/>
+    <dataset name="CPF-1" id="144"/>
+    <dataset name="SIA-1" id="150"/>
+    <dataset name="SIL-1" id="151"/>
+    <dataset name="BRA-1" id="171"/>
+    <dataset name="BRA-2" id="172"/>
+    <dataset name="OTB-1" id="173"/>
+    <dataset name="RCB-1" id="180"/>
+    <dataset name="RCM-1" id="182"/>
+    <dataset name="RCE-1" id="184"/>
+    <dataset name="RCH-1" id="186"/>
+    <dataset name="RCF-1" id="188"/>
+    <dataset name="RCT-1" id="190"/>
+    <dataset name="RCP-1" id="192"/>
+    <dataset name="FPX-1" id="200"/>
+    <dataset name="DOV-1" id="300"/>
+    <dataset name="SP-1" id="310"/>
+    <dataset name="IV-1" id="350"/>
+    <dataset name="IHT-1" id="360"/>
+    <dataset name="AE-1" id="420"/>
+    <dataset name="CM-1" id="423"/>
+    <dataset name="PR-1" id="440"/>
+    <dataset name="PO-1" id="441"/>
+    <dataset name="SCL-1" id="449"/>
+    <dataset name="MV-1" id="463"/>
+    <dataset name="PT-1" id="465"/>
+    <dataset name="PRC-1" id="466"/>
+    <dataset name="PIL-1" id="487"/>
+    <dataset name="ESI-1" id="489"/>
+    <dataset name="TM-1" id="490"/>
+    <dataset name="QC" id="501"/>
+    <dataset name="verifyAssay" id="5001"/>
+  </datasets>
+</datasets>

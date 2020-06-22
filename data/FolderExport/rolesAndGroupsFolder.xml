@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/begin.view by susanh@labkey.com on Thu Apr 23 17:59:05 PDT 2015-->
+<folder archiveVersion="15.1" label="FolderExportTest" type="normal" title="FolderExportTest" xmlns="http://labkey.org/folder/xml" xmlns:ns="http://labkey.org/security/xml" xmlns:rol="http://labkey.org/security/xml/roleAssignment" xmlns:ns1="http://labkey.org/study/xml">
+  <folderType name="None">
+    <defaultModule>Core</defaultModule>
+    <modules>
+      <moduleName>Core</moduleName>
+    </modules>
+  </folderType>
+  <searchable>true</searchable>
+  <pages file="pages.xml"/>
+  <moduleProperties/>
+  <groups>
+    <ns:group name="Empty Group" type="project"/>
+    <ns:group name="Group Group" type="project">
+      <ns:groups>
+        <ns:group name="Empty Group" type="project"/>
+        <ns:group name="Submitters" type="project"/>
+      </ns:groups>
+    </ns:group>
+    <ns:group name="Parent Group" type="project">
+      <ns:groups>
+        <ns:group name="Super Testers" type="project"/>
+      </ns:groups>
+      <ns:users>
+        <ns:user name="testuser3@test.me"/>
+      </ns:users>
+    </ns:group>
+    <ns:group name="Submitters" type="project">
+      <ns:users>
+        <ns:user name="testuser1@test.me"/>
+      </ns:users>
+    </ns:group>
+    <ns:group name="Super Testers" type="project">
+      <ns:groups>
+        <ns:group name="Submitters" type="project"/>
+      </ns:groups>
+      <ns:users>
+        <ns:user name="testuser2@test.me"/>
+      </ns:users>
+    </ns:group>
+    <ns:group name="Users" type="project"/>
+  </groups>
+  <roleAssignments>
+    <rol:roleAssignment>
+      <rol:role name="org.labkey.api.security.roles.ReaderRole"/>
+      <rol:groups>
+        <ns:group name="Group Group" type="project"/>
+      </rol:groups>
+    </rol:roleAssignment>
+    <rol:roleAssignment>
+      <rol:role name="org.labkey.api.security.roles.ProjectAdminRole"/>
+      <rol:users>
+        <ns:user name="USER_NAME"/>
+        <ns:user name="testuser3@test.me"/>
+      </rol:users>
+    </rol:roleAssignment>
+    <rol:roleAssignment>
+      <rol:role name="org.labkey.api.security.roles.AuthorRole"/>
+      <rol:groups>
+        <ns:group name="Super Testers" type="project"/>
+        <ns:group name="Group Group" type="project"/>
+      </rol:groups>
+      <rol:users>
+        <ns:user name="testuser3@test.me"/>
+        <ns:user name="testuser4@test.me"/>
+      </rol:users>
+    </rol:roleAssignment>
+    <rol:roleAssignment>
+      <rol:role name="org.labkey.api.security.roles.SubmitterRole"/>
+      <rol:groups>
+        <ns:group name="Submitters" type="project"/>
+      </rol:groups>
+    </rol:roleAssignment>
+    <rol:roleAssignment>
+      <rol:role name="org.labkey.api.security.roles.EditorRole"/>
+      <rol:groups>
+        <ns:group name="Super Testers" type="project"/>
+        <ns:group name="Parent Group" type="project"/>
+      </rol:groups>
+      <rol:users>
+        <ns:user name="testuser2@test.me"/>
+      </rol:users>
+    </rol:roleAssignment>
+    <rol:roleAssignment>
+      <rol:role name="org.labkey.api.security.roles.FolderAdminRole"/>
+      <rol:users>
+        <ns:user name="USER_NAME"/>
+        <ns:user name="testuser1@test.me"/>
+        <ns:user name="testuser3@test.me"/>
+      </rol:users>
+    </rol:roleAssignment>
+  </roleAssignments>
+  <wikis dir="wikis"/>
+  <notifications>
+    <messagesDefault id="2" label="My conversations"/>
+    <filesDefault id="512" label="No Email"/>
+  </notifications>
+  <missingValueIndicators>
+    <ns1:missingValueIndicator indicator="Q" label="Data currently under quality control review."/>
+    <ns1:missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'."/>
+  </missingValueIndicators>
+</folder>

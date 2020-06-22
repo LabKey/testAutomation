@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="rReportDescriptor" reportName="R Participant Views: Physical Exam" reportKey="study/Physical Exam" xmlns="http://labkey.org/query/xml">
+  <Properties>
+    <Prop name="descriptorType">rReportDescriptor</Prop>
+    <Prop name="reportName">R Participant Views: Physical Exam</Prop>
+    <Prop name="reportType">Study.rReport</Prop>
+    <Prop name="queryName">Physical Exam</Prop>
+    <Prop name="schemaName">study</Prop>
+    <Prop name="dataRegionName">Dataset</Prop>
+    <Prop name="cached">false</Prop>
+    <Prop name="script">library(lattice);
+png(filename="${imgout:a}", width=900);
+plot.new();
+xyplot(systolicbloodpressure~ date| participantid, data=labkey.data,
+ type="a", scales=list(draw=FALSE));
+update(trellis.last.object(),
+ strip = strip.custom(strip.names = FALSE, strip.levels = TRUE),
+ main = "Systolic Pressure vs. Time, By Participant", 
+ ylab="Systolic Pressure", xlab="");
+dev.off();
+
+png(filename="${imgout:b}", width=900);
+plot.new();
+xyplot(weight_kg ~ date| participantid, data=labkey.data,
+ type="a", scales=list(draw=FALSE));
+update(trellis.last.object(),
+ strip = strip.custom(strip.names = FALSE, strip.levels = TRUE),
+ main = "Weight vs. Time, By Participant", 
+ ylab="Weight (kg)", xlab="");
+dev.off();</Prop>
+    <Prop name="runInBackground">false</Prop>
+    <Prop name="redirectUrl">/study/home/Study/demo2/dataset.view?datasetId=5004</Prop>
+  </Properties>
+  <tags/>
+</ReportDescriptor>

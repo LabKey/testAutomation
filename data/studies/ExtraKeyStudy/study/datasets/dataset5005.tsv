@@ -1,0 +1,7 @@
+PandaId	SequenceNum	Happy?
+1000	1.0	true
+1000	2.0	true
+1000	2.2	false
+1001	1.0	false
+1001	2.0	true
+1001	2.5	true

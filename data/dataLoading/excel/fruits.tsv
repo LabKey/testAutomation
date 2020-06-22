@@ -1,0 +1,10 @@
+Fruit	Color	BoolCol	IntCol	NumCol	DateCol
+apple	red	TRUE	1	1	1/1/1999
+banana	yellow	FALSE	2	2	1/2/1799
+orange	orange	FALSE	3	3	1/3/2010
+lemon	yellow	FALSE	4	4	1/4/1980
+lime	green	FALSE	5	5	1/5/2020
+grapefruit	yellow	FALSE	6	6	1/6/1990
+kiwi	brown	FALSE	7	7	1/7/1979
+persimmon	orange	FALSE	8	8	1/8/1998
+pomegranate	red	TRUE	9	9.1	1/9/1997

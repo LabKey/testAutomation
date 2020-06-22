@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="chartDescriptor" reportName="Weight over Time" reportKey="5004" xmlns="http://labkey.org/query/xml">
+  <Properties>
+    <Prop name="descriptorType">chartDescriptor</Prop>
+    <Prop name="reportName">Weight over Time</Prop>
+    <Prop name="version">10.3</Prop>
+    <Prop name="reportType">Study.chartQueryReport</Prop>
+    <Prop name="queryName">Physical Exam</Prop>
+    <Prop name="schemaName">study</Prop>
+    <Prop name="filterParam">participantId</Prop>
+    <Prop name="cached">false</Prop>
+    <Prop name="columnXName">date</Prop>
+    <Prop name="columnYName">Weight_kg</Prop>
+    <Prop name="chartType">2</Prop>
+    <Prop name="isLogX">false</Prop>
+    <Prop name="isLogY">false</Prop>
+    <Prop name="height">200</Prop>
+    <Prop name="width">640</Prop>
+    <Prop name="showMultipleYAxis">false</Prop>
+    <Prop name="showLines">true</Prop>
+    <Prop name="showMultipleCharts">false</Prop>
+    <Prop name="isVerticalOrientation">false</Prop>
+    <Prop name="datasetId">5004</Prop>
+    <Prop name="participantId">249318596</Prop>
+  </Properties>
+  <tags/>
+</ReportDescriptor>
