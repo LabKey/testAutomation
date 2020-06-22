@@ -91,7 +91,7 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
         Assert.assertTrue("Import Data button should be present when file root is @files and no pipeline override exists", isElementPresent(importDataBtn));
 
         log("Override pipeline root for project");
-        setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/");
+        setPipelineRoot(TestFileUtils.getSampleData("fileTypes").getAbsolutePath());
         goToProjectHome();
         Assert.assertTrue("Import Data button should not be present when file root is @files and pipeline override exists", !isElementPresent(importDataBtn));
 

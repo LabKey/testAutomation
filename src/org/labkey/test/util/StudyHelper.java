@@ -30,6 +30,7 @@ import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.pages.study.StudySecurityPage;
+import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.openqa.selenium.interactions.Actions;
 
 import java.io.File;
@@ -467,12 +468,22 @@ public class StudyHelper
 
     public static String getPipelinePath()
     {
-        return getStudySampleData("study.xml").getParentFile().getAbsolutePath();
+        return getSampleStudy().getAbsolutePath();
+    }
+
+    public static File getSampleStudy()
+    {
+        return TestFileUtils.getSampleData("study/study.xml").getParentFile();
     }
 
     public static File getStudySampleData(String relativePath)
     {
         return TestFileUtils.getSampleData("study/" + relativePath);
+    }
+
+    public static void uploadSampleStudy(String containerPath)
+    {
+        new WebDavUploadHelper(containerPath).uploadDirectory(getSampleStudy());
     }
 
     public enum TimepointType
