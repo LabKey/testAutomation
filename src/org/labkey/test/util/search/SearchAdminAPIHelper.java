@@ -25,6 +25,7 @@ import org.labkey.test.util.SimpleHttpResponse;
 import org.openqa.selenium.WebDriver;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,6 +39,14 @@ public abstract class SearchAdminAPIHelper
     {
         // Invoke a special server action that waits until all previous indexer tasks are complete
         int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("search", "waitForIndexer")).getResponseCode();
+        assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
+    }
+
+    @LogMethod(quiet = true)
+    public static void waitForIndexerBackground()
+    {
+        // Invoke a special server action that waits until all previous indexer tasks are complete, even wait for background indexing tasks to complete (e.g. deleteContainer)
+        int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("search", "waitForIndexer", Map.of("priority","background"))).getResponseCode();
         assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
     }
 
