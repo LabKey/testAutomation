@@ -1,5 +1,6 @@
 package org.labkey.test.components.glassLibrary.grids;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -9,7 +10,12 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.util.TestLogger.log;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 {
@@ -155,6 +162,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return getRows().get(index);
     }
 
+    private WebElement getCell(int row, String column)
+    {
+        int columnIndex = getColumnIndex(column);
+        WebElement gridCell = getRow(row).findElement(By.cssSelector("td:nth-of-type(" + columnIndex + ")"));
+        getWrapper().scrollIntoView(gridCell);
+        return gridCell;
+    }
+
     public int getRowCount()
     {
         return getRows().size();
@@ -214,12 +229,16 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
     }
 
+    /**
+     *
+     * @param row   index of the row
+     * @param columnName
+     * @param value If the cell is a lookup, value should be List.of(value(s))
+     */
     public void setCellValue(int row, String columnName, Object value)
     {
         // Get a reference to the cell.
-        int columnIndex = getColumnIndex(columnName);
-        WebElement gridCell = getRow(row).findElement(By.cssSelector("td:nth-of-type(" + columnIndex + ")"));
-        getWrapper().scrollIntoView(gridCell);
+        WebElement gridCell = getCell(row, columnName);
 
         // Double click to edit the cell.
         Actions actions = new Actions(getDriver());
@@ -253,9 +272,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         else
         {
             // Treat the object being sent in as a string.
-
             // Get the inputCell enter the text and then make the inputCell go away (hit RETURN).
+
             WebElement inputCell = elementCache().inputCell();
+            inputCell.clear();
 
             inputCell.sendKeys(Keys.END + value.toString() + Keys.RETURN); // Add the RETURN to close the inputCell.
             getWrapper().waitForElementToDisappear(Locators.inputCell, WAIT_FOR_JAVASCRIPT);
@@ -269,6 +289,200 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         }
 
+    }
+
+    /**
+     * pastes delimited text to the grid, from a single target.  The component is clever enough to target
+     * text into cells based on text delimiters; thus we can paste a square of data into the grid.
+     * @param row           index of the target cell
+     * @param columnName    column of the target cell
+     * @param pasteText     tab-delimited or csv or excel data
+     * @return
+     */
+    public EditableGrid pasteFromCell(int row, String columnName, String pasteText)
+    {
+        WebElement gridCell = getCell(row, columnName);
+        selectCell(gridCell);
+
+        getWrapper().actionPaste(null, pasteText);
+        return this;
+    }
+
+    /**
+     * pastes a single value into as many cells as are selected, or supports pasting a square shaped blob of data
+     * of the same shape as the prescribed selection.  If a single value is supplied, that value will be put into
+     * every cell in the selection.  If the data doesn't match the selection dimensions (e.g., has fewer or more columns)
+     * the grid should produce an error/alert.
+     * @param pasteText     The text to paste
+     * @param startRowIndex index of the starting row
+     * @param startColumn   text of the starting cell
+     * @param endRowIndex   index of the ending row
+     * @param endColumn     text of the ending cell
+     * @return  the current grid instance
+     */
+    public EditableGrid pasteMultipleCells(String pasteText, int startRowIndex, String startColumn, int endRowIndex, String endColumn)
+    {
+        WebElement startCell = getCell(startRowIndex, startColumn);
+        WebElement endCell = getCell(endRowIndex, endColumn);
+        selectCellRange(startCell, endCell);
+        getWrapper().actionPaste(null, pasteText);
+        return this;
+    }
+
+    /**
+     * Copies text from the grid, b
+     * @param startRowIndex Index of the top-left cell's row
+     * @param startColumn   Column header of the top-left cell
+     * @param endRowIndex   Index of the bottom-right cell's row
+     * @param endColumn     Column header of the bottom-right cell
+     * @return  the text contained in the prescribed selection
+     * @throws IOException
+     * @throws UnsupportedFlavorException
+     */
+    public String copyCellRange(int startRowIndex, String startColumn, int endRowIndex, String endColumn) throws IOException, UnsupportedFlavorException
+    {
+        WebElement startCell = getCell(startRowIndex, startColumn);
+        WebElement endCell = getCell(endRowIndex, endColumn);
+        selectCellRange(startCell, endCell);
+        return copyCurrentSelection();
+    }
+
+    /**
+     * Selects all cells in the table, then copies their contents into delimited text
+     * @return  delimited text content of the cells in the grid
+     * @throws IOException
+     * @throws UnsupportedFlavorException
+     */
+    public String copyAllCells() throws IOException, UnsupportedFlavorException
+    {
+        selectAllCells();
+        getWrapper().waitFor(()-> areAllInSelection(),
+                "expect all cells to be selected before copying grid values", 1500);
+
+        String selection = copyCurrentSelection();
+        if (selection.isEmpty())
+        {
+            log("initial attempt to copy current selection came up empty.  re-trying after 3000 msec");
+            new WebDriverWait(getDriver(), 3);
+            return copyCurrentSelection();
+        }
+        return selection;
+    }
+
+    private String copyCurrentSelection() throws IOException, UnsupportedFlavorException
+    {
+        // now copy the contents of the current selection to the clipboard
+        Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
+        Actions actions = new Actions(getDriver());
+        actions.keyDown(cmdKey)
+                .sendKeys( "c")
+                .keyUp(cmdKey)
+                .build()
+                .perform();
+
+        return  (String) Toolkit.getDefaultToolkit().getSystemClipboard()
+                .getData(DataFlavor.stringFlavor);
+    }
+
+    private EditableGrid selectCellRange(WebElement startCell, WebElement endCell)
+    {
+        selectCell(startCell);
+        getWrapper().scrollIntoView(endCell);
+        // now drag mouse from start to end cell
+        Actions selectRange = new Actions(getDriver());
+        selectRange.dragAndDrop(startCell, endCell)
+                .build()
+                .perform();
+
+        getWrapper().waitFor(()-> isInSelection(startCell) && isInSelection(endCell),
+                "Cell range did not become selected", 2000);
+        return this;
+    }
+
+    private void selectAllCells()
+    {
+        if (!areAllInSelection())
+        {
+            selectCell(getCell(0, getColumnNames().get(1)));    // forces the index cell into selected state
+                                                                // this resets the grid state to a known base condition
+            // use 'ctrl-a' to select the entire grid
+            Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
+            new Actions(getDriver()).keyDown(cmdKey).sendKeys("a").keyUp(cmdKey).build().perform();
+            getWrapper().waitFor(() -> areAllInSelection(),
+                    "the expected cells did not become selected", 3000);
+        }
+    }
+
+    /**
+     * puts the specified cell into a selected state, (appears as a dark-blue outline) with an active input present in it.
+     * @param cell
+     */
+    private void selectCell(WebElement cell)
+    {
+        if (!isCellSelected(cell))
+        {
+            cell.click();
+            getWrapper().waitFor(()->  isCellSelected(cell),
+                    "the target cell did not become selected", 4000);
+        }
+    }
+
+    /**
+     * tests the specified webElement to see if it is in 'cell-selected' state, which means it has an active/focused input in it
+     * @param cell
+     * @return True if the edit is present
+     */
+    private boolean isCellSelected(WebElement cell)
+    {
+        return Locator.tagWithClass("div", "cellular-display")
+                .findElement(cell)
+                .getAttribute("class").contains("cell-selected");
+    }
+
+    /**
+     *  tests the specified cell element to see if it is highlit as a single-or-multi-cell selection area.  this appears as
+     *  light-blue background, and is distinct from 'selected'
+     * @param cell
+     * @return
+     */
+    private boolean isInSelection(WebElement cell)  // 'in selection' shows as blue color, means it is part of one or many selected cells for copy/paste, etc
+    {
+        return Locator.tagWithClass("div", "cellular-display")
+                .findElement(cell)
+                .getAttribute("class").contains("cell-selection");
+    }
+
+    /**
+     * attempts to determine whether the entire grid is selected
+     * assumes that the first row is never selectable (it's either a selector row, or a row-number cell)
+     * @return  True if the top-left and bottom-right cells are 'in-selection', otherwise false
+     */
+    private boolean areAllInSelection()
+    {
+        List<String> columns = getColumnNames();
+        WebElement indexCell = getCell(0, columns.get(1));
+        WebElement endCell = getCell(getRows().size()-1, columns.get(columns.size()-1));
+        return (isInSelection(indexCell) && isInSelection(endCell));
+    }
+
+    private boolean cellHasWarning(WebElement cell)
+    {
+        return Locator.tagWithClass("div", "cell-warning").existsIn(cell);
+    }
+
+    public String getCellError(int row, String column)
+    {
+        WebElement gridCell = getCell(row, column);
+
+        if (! cellHasWarning(gridCell))
+            return null;
+        else
+            return Locator.tagWithClass("div", "cell-warning").findElement(gridCell).getText();
+    }
+
+    public List<WebElement> getCellErrors()
+    {
+        return Locator.tagWithClass("div", "cell-warning").findElements(this);
     }
 
     public boolean isDisplayed()
