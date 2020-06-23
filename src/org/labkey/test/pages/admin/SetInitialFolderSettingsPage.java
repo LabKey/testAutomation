@@ -47,6 +47,14 @@ public class SetInitialFolderSettingsPage extends LabKeyPage<SetInitialFolderSet
         return this;
     }
 
+    public SetInitialFolderSettingsPage useDefaultLocation()
+    {
+        elementCache().useDefaultRadioButton.click();
+        return this;
+    }
+
+
+
     public LabKeyPage clickFinish()
     {
         clickAndWait(elementCache().finishButton);
