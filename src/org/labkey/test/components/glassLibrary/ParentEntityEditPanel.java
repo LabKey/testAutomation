@@ -353,10 +353,40 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         if(found)
         {
            elementCache().removeButton(index + 1).click();
-           getWrapper().waitFor(()-> getAllTypeCombo().size() < typeCombos.size(),
-                   "The type '" + typeName + "' was not successfully removed.",
-                   1_000);
+
+           // Need to check if this is removing the last/only type.
+           if(typeCombos.size() > 1)
+           {
+               // If it is not removing the last one can simple check that the count of combos is as expected.
+               getWrapper().waitFor(() -> getAllTypeCombo().size() < typeCombos.size(),
+                       "The type '" + typeName + "' was not successfully removed.",
+                       1_000);
+           }
+           else
+           {
+               // If this is removing the last/only one the count of combos will still be 1, so need a different check.
+               ReactSelect rs = getAllTypeCombo().get(0);
+               rs.getSelections();
+               getWrapper().waitFor(() -> rs.getSelections().get(0).toLowerCase().contains("select a "),
+                       "The type '" + typeName + "' was not successfully removed.",
+                       1_000);
+           }
+
         }
+
+        return this;
+    }
+
+    protected ParentEntityEditPanel addParentId(int index, String id)
+    {
+
+        FilteringReactSelect parentIdCombo = getIdCombo(index);
+
+        getWrapper().scrollIntoView(parentIdCombo.getComponentElement());
+
+        int selCount = parentIdCombo.getSelections().size();
+        parentIdCombo.typeAheadSelect(id);
+        getWrapper().waitFor(()-> parentIdCombo.getSelections().size() > selCount, 500);
 
         return this;
     }
