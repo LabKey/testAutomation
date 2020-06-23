@@ -59,7 +59,7 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public static SampleTypeHelper beginAtSampleTypesList(WebDriverWrapper dWrapper, String containerPath)
     {
-        dWrapper.beginAt(WebTestHelper.buildURL("experiment", containerPath, "listMaterialSources"));
+        dWrapper.beginAt(WebTestHelper.buildURL("experiment", containerPath, "listSampleTypes"));
         return new SampleTypeHelper(dWrapper.getDriver());
     }
 

@@ -49,7 +49,7 @@ public class SampleTypeExportTest extends AbstractExportTest
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
 
-        initTest.beginAt("/" + initTest.getProjectName() + "/experiment-listMaterialSources.view");
+        initTest.beginAt("/" + initTest.getProjectName() + "/experiment-listSampleTypes.view");
         SampleTypeHelper sampleHelper = new SampleTypeHelper(initTest);
         sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME)
                 .setFields(List.of(new FieldDefinition("Barcode", FieldDefinition.ColumnType.String))),
@@ -131,7 +131,7 @@ public class SampleTypeExportTest extends AbstractExportTest
     @Override
     protected void goToDataRegionPage()
     {
-        beginAt("/" + getProjectName() + "/experiment-listMaterialSources.view");
+        beginAt("/" + getProjectName() + "/experiment-listSampleTypes.view");
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
     }
 

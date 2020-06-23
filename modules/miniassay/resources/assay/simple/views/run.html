@@ -27,7 +27,7 @@
 
       s += "<tr>";
       s += "<td class='labkey-form-label'>Sample Type</td>";
-      s += "<td>" + (material.sampleSet ?  "<a href='" + _url('experiment', 'showMaterialSource', c, {rowId: material.sampleSet.id}) + "'>" + material.sampleSet.name + "</a>" : "(Not a member of a sample type)") + "</td>"; s += "</tr>";
+      s += "<td>" + (material.sampleSet ?  "<a href='" + _url('experiment', 'showSampleType', c, {rowId: material.sampleSet.id}) + "'>" + material.sampleSet.name + "</a>" : "(Not a member of a sample type)") + "</td>"; s += "</tr>";
 
     }
 

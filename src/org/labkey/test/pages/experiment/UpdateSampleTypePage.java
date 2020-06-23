@@ -19,7 +19,7 @@ public class UpdateSampleTypePage extends CreateSampleTypePage
 
     public static UpdateSampleTypePage beginAt(WebDriverWrapper driver, String containerPath, Integer sampleTypeId)
     {
-        driver.beginAt(WebTestHelper.buildURL("experiment", containerPath, "editSampleSet", Maps.of("RowId", String.valueOf(sampleTypeId))));
+        driver.beginAt(WebTestHelper.buildURL("experiment", containerPath, "editSampleType", Maps.of("RowId", String.valueOf(sampleTypeId))));
         return new UpdateSampleTypePage(driver.getDriver());
     }
 }
