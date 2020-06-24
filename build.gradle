@@ -36,7 +36,7 @@ project.dependencies {
                 project: project,
                 config: "implementation",
                 depProjectPath: BuildUtils.getApiProjectPath(project.gradle),
-                depProjectConfig: "default",  // TODO this is deprecated so need to figure out the proper way to declare this
+                depProjectConfig: 'apiJarFile',
                 transitive: false
         )
     }
@@ -50,7 +50,7 @@ BuildUtils.addLabKeyDependency(
         project: project,
         config: 'uiTestImplementation',
         depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle),
-        depProjectConfig: 'default',
+        depProjectConfig: 'runtimeElements',
         depVersion: project.labkeyClientApiVersion)
 
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)

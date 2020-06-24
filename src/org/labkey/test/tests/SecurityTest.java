@@ -119,7 +119,10 @@ public class SecurityTest extends BaseWebDriverTest
     @Test
     public void testSteps() throws IOException
     {
-        enableEmailRecorder();
+        if (!isQuickTest())
+        {
+            enableEmailRecorder();
+        }
 
         clonePermissionsTest();
         displayNameTest();
@@ -132,16 +135,16 @@ public class SecurityTest extends BaseWebDriverTest
             addRemoveSiteAdminTest();
         }
 
-        log("Check welcome emails [6 new users]");
-        goToModule("Dumbster");
-
-        EmailRecordTable table = new EmailRecordTable(this);
-        assertEquals("Notification emails.", 12, table.getEmailCount());
-        // Once in the message itself, plus copies in the headers
-        assertTextPresent(": Welcome", 18);
-
         if (!isQuickTest())
         {
+            log("Check welcome emails [6 new users]");
+            goToModule("Dumbster");
+
+            EmailRecordTable table = new EmailRecordTable(this);
+            assertEquals("Notification emails.", 12, table.getEmailCount());
+            // Once in the message itself, plus copies in the headers
+            assertTextPresent(": Welcome", 18);
+
             cantReachAdminToolFromUserAccount();
             passwordStrengthTest();
             dumbsterTest();
