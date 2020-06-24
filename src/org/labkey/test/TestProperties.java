@@ -183,6 +183,11 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.primary.app.admin"));
     }
 
+    public static boolean isWithoutTestModules()
+    {
+        return "true".equals(System.getProperty("webtest.without.test.modules"));
+    }
+
     public static String ensureGeckodriverExeProperty()
     {
         final String key = GECKO_DRIVER_EXE_PROPERTY;
