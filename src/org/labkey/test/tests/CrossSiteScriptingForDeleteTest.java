@@ -2,9 +2,11 @@ package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.reports.ManageViewsPage;
@@ -12,6 +14,8 @@ import org.labkey.test.pages.reports.ManageViewsPage;
 import java.util.Collections;
 import java.util.List;
 
+@Category({DailyB.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class CrossSiteScriptingForDeleteTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "CrossSiteScriptingForDeleteTest";
