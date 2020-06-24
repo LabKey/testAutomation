@@ -71,4 +71,11 @@ public class ManageViewsPage extends LabKeyPage
         click(report);
     }
 
+    @LogMethod
+    public void selectReport(String reportName)
+    {
+        final Locator report = Locator.tag("tr").withClass("x4-grid-row").containing(reportName).childTag("td").position(3);
+        waitForElement(report, 10000);
+        click(report);
+    }
 }

@@ -8,7 +8,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.reports.ManageViewsPage;
 
 import java.util.Collections;
@@ -19,7 +18,7 @@ import java.util.List;
 public class CrossSiteScriptingForDeleteTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "CrossSiteScriptingForDeleteTest";
-    protected static final String REPORT_NAME = "<span onclick='alert(\"fooled you!\")'>mouseover me, it's totally safe</span>";
+    protected static final String REPORT_NAME = BaseWebDriverTest.INJECT_CHARS_1;
     private static final String LINK_REPORT_URL = "/project/home/begin.view";
 
     @BeforeClass
@@ -57,24 +56,19 @@ public class CrossSiteScriptingForDeleteTest extends BaseWebDriverTest
     public void verifyReportNameIsEncoded()
     {
         goToProjectHome();
-        goToManageViews();
-
         log("Adding the link report");
-        new BootstrapMenu.BootstrapMenuFinder(getDriver()).withButtonTextContaining("Add Report").find()
-                .clickSubMenu(true, "Link Report");
-
+        goToManageViews().clickAddReport("Link Report");
         setFormElement(Locator.name("viewName"), REPORT_NAME);
         setFormElement(Locator.name("linkUrl"), WebTestHelper.getContextPath() + LINK_REPORT_URL);
         clickButton("Save");
         waitForText("Manage Views");
 
         log("Clicking on the report - No XSS");
-        click(Locator.linkWithText(REPORT_NAME));
+        goToManageViews().selectReport(REPORT_NAME);
         switchToMainWindow();
         waitAndClick(Locator.linkContainingText("Delete Selected"));
         String deleteMsg = "Are you sure you want to delete the following?\n" +
-                "\n" +
-                "  <span onclick='alert(\"fooled you!\")'>mouseover me, it's totally safe</span>";
+                "\n  " + REPORT_NAME;
 
         log("Verifying the error message");
         confirmReportNameInMessage("Delete", deleteMsg, false);
@@ -84,7 +78,7 @@ public class CrossSiteScriptingForDeleteTest extends BaseWebDriverTest
         Window.Window(getDriver()).withTitle(REPORT_NAME)
                 .waitFor()
                 .clickButton("Delete", false);
-        deleteMsg = "Are you sure you want to delete \"<span onclick='alert(\"fooled you!\")'>mouseover me, it's totally safe</span>\"";
+        deleteMsg = "Are you sure you want to delete \"" + REPORT_NAME + "\"";
 
         log("Verifying the error message");
         confirmReportNameInMessage("Delete?", deleteMsg, true);
