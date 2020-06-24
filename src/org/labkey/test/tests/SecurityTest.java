@@ -717,12 +717,10 @@ public class SecurityTest extends BaseWebDriverTest
 
         impersonate(SITE_ADMIN_USER);
         String siteAdminDisplayName = getDisplayName(); // Use when checking audit log, below
-        ensureAdminMode();
         goToAdminConsole();  // Site admin should be able to get to the admin console
         new UIUserHelper(this).deleteUsers(true, TO_BE_DELETED_USER);
         stopImpersonating();
 
-        ensureAdminMode();
         goToAdminConsole().clickAuditLog();
 
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "User events"));
