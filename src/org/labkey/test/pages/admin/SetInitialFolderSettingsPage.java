@@ -43,10 +43,7 @@ public class SetInitialFolderSettingsPage extends LabKeyPage<SetInitialFolderSet
     @Override
     public void waitForPage()
     {
-        Locator activePane = Locator.tagWithClass("li", "active")
-                .withChild(Locator.linkWithText("Project Settings"));
-        waitFor(()-> activePane.existsIn(getDriver()),
-                "The page did not initialize in time", WAIT_FOR_PAGE);
+        waitFor(()-> isCurrentStepHighlit(), WAIT_FOR_JAVASCRIPT);
     }
 
     public SetInitialFolderSettingsPage setCustomFileRoot(String fileRoot)
@@ -71,6 +68,11 @@ public class SetInitialFolderSettingsPage extends LabKeyPage<SetInitialFolderSet
         return new LabKeyPage(getDriver());
     }
 
+    public boolean isCurrentStepHighlit()
+    {
+        return elementCache().activePane.existsIn(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -86,5 +88,7 @@ public class SetInitialFolderSettingsPage extends LabKeyPage<SetInitialFolderSet
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         final WebElement folderRootPathInput = Locator.input("folderRootPath")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        final Locator activePane = Locator.tagWithClass("li", "active")
+                .withChild(Locator.linkWithText("Project Settings"));
     }
 }

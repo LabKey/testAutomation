@@ -44,10 +44,7 @@ public class CreateProjectPage extends LabKeyPage<CreateProjectPage.ElementCache
     @Override
     public void waitForPage()
     {
-        Locator activePane = Locator.tagWithClass("li", "active")
-                .withChild(Locator.linkWithText("Create Project"));
-        waitFor(()-> activePane.existsIn(getDriver()),
-                "The page did not initialize in time", WAIT_FOR_PAGE);
+        waitFor(()-> isCurrentStepHighlit(), WAIT_FOR_PAGE);
     }
 
     public CreateProjectPage setProjectName(String projectName)
@@ -85,6 +82,11 @@ public class CreateProjectPage extends LabKeyPage<CreateProjectPage.ElementCache
         return new SetFolderPermissionsPage(getDriver());
     }
 
+    public boolean isCurrentStepHighlit()
+    {
+        return elementCache().activePane.existsIn(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -97,5 +99,7 @@ public class CreateProjectPage extends LabKeyPage<CreateProjectPage.ElementCache
         WebElement titleInput = Locator.input("title").findWhenNeeded(this).withTimeout(4000);;
         WebElement useNameAsDisplayTitleCheckBox = Locator.checkboxByLabel("Use name as display title", false)
                 .findWhenNeeded(this).withTimeout(4000);
+        Locator activePane = Locator.tagWithClass("li", "active")
+                .withChild(Locator.linkWithText("Create Project"));
     }
 }
