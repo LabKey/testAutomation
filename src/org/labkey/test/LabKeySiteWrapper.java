@@ -388,15 +388,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected String getPasswordResetUrl(String username)
     {
-        goToHome();
-        goToModule("Dumbster");
-        String emailSubject = "Reset Password Notification";
+        beginAt(WebTestHelper.buildURL("security", "showResetEmail", Map.of("email", username)));
 
-        EmailRecordTable emailRecordTable = new EmailRecordTable(getDriver());
-        WebElement email = Locator.xpath("//td[text() = '" + username + "']/..//a[starts-with(text(), '" + emailSubject + "')]").findElement(emailRecordTable);
-        email.click();
-
-        WebElement resetLink = Locator.xpath("//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]").findElement(emailRecordTable);
+        WebElement resetLink = Locator.xpath("//a[contains(@href, 'setPassword.view')]").findElement(getDriver());
         shortWait().until(ExpectedConditions.elementToBeClickable(resetLink));
         return resetLink.getText();
     }

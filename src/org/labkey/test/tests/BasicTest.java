@@ -106,7 +106,7 @@ public class BasicTest extends BaseWebDriverTest
     public void testFolderAndRole()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
-        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"Messages", "Wiki", "FileContent"});
+        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"FileContent"});
         _permissionsHelper.createPermissionsGroup("testers");
         _ext4Helper.clickTabContainingText("Permissions");
         _permissionsHelper.assertPermissionSetting("testers", "No Permissions");

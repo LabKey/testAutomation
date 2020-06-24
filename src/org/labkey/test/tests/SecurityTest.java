@@ -27,6 +27,7 @@ import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
@@ -119,7 +120,10 @@ public class SecurityTest extends BaseWebDriverTest
     @Test
     public void testSteps() throws IOException
     {
-        enableEmailRecorder();
+        if (!TestProperties.isWithoutTestModules())
+        {
+            enableEmailRecorder();
+        }
 
         clonePermissionsTest();
         displayNameTest();
@@ -132,13 +136,16 @@ public class SecurityTest extends BaseWebDriverTest
             addRemoveSiteAdminTest();
         }
 
-        log("Check welcome emails [6 new users]");
-        goToModule("Dumbster");
+        if (!TestProperties.isWithoutTestModules())
+        {
+            log("Check welcome emails [6 new users]");
+            goToModule("Dumbster");
 
-        EmailRecordTable table = new EmailRecordTable(this);
-        assertEquals("Notification emails.", 12, table.getEmailCount());
-        // Once in the message itself, plus copies in the headers
-        assertTextPresent(": Welcome", 18);
+            EmailRecordTable table = new EmailRecordTable(this);
+            assertEquals("Notification emails.", 12, table.getEmailCount());
+            // Once in the message itself, plus copies in the headers
+            assertTextPresent(": Welcome", 18);
+        }
 
         if (!isQuickTest())
         {
