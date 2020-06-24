@@ -310,6 +310,11 @@ public class WebTestHelper
                 }
                 else
                     System.out.println("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
+
+                if ("/".equals(_contextPath))
+                {
+                    _contextPath = "";
+                }
             }
             return _contextPath;
         }
