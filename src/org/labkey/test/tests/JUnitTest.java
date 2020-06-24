@@ -42,6 +42,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.UnitTests;
+import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.LogMethod;
@@ -362,6 +363,7 @@ public class JUnitTest extends TestSuite
             {
                 String timed_out = getLogTestString("timed out", startTime);
                 err(timed_out);
+                ArtifactCollector.dumpThreads();
                 throw new RuntimeException(timed_out, ste);
             }
             catch (IOException ioe)
