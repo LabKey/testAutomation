@@ -41,6 +41,15 @@ public class CreateProjectPage extends LabKeyPage<CreateProjectPage.ElementCache
         return new CreateProjectPage(driver.getDriver());
     }
 
+    @Override
+    public void waitForPage()
+    {
+        Locator activePane = Locator.tagWithClass("li", "active")
+                .withChild(Locator.linkWithText("Create Project"));
+        waitFor(()-> activePane.existsIn(getDriver()),
+                "The page did not initialize in time", WAIT_FOR_PAGE);
+    }
+
     public CreateProjectPage setProjectName(String projectName)
     {
         log("Creating project with name " + projectName);

@@ -33,9 +33,10 @@ public class SetFolderPermissionsPage extends LabKeyPage
     @Override
     protected void waitForPage()
     {
-        waitFor(()-> Locator.css(".labkey-nav-page-header").withText("Users / Permissions")
-                .findElementOrNull(getDriver()) != null,
-                WAIT_FOR_JAVASCRIPT);
+        Locator activePane = Locator.tagWithClass("li", "active")
+                .withChild(Locator.linkWithText("Users / Permissions"));
+        waitFor(()-> activePane.existsIn(getDriver()),
+                "The page did not initialize in time", WAIT_FOR_PAGE);
     }
 
     public SetInitialFolderSettingsPage clickNext()

@@ -40,6 +40,15 @@ public class SetInitialFolderSettingsPage extends LabKeyPage<SetInitialFolderSet
         return new SetInitialFolderSettingsPage(driver.getDriver());
     }
 
+    @Override
+    public void waitForPage()
+    {
+        Locator activePane = Locator.tagWithClass("li", "active")
+                .withChild(Locator.linkWithText("Project Settings"));
+        waitFor(()-> activePane.existsIn(getDriver()),
+                "The page did not initialize in time", WAIT_FOR_PAGE);
+    }
+
     public SetInitialFolderSettingsPage setCustomFileRoot(String fileRoot)
     {
         elementCache().customLocRadioButton.click();
