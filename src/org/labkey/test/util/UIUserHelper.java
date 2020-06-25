@@ -44,7 +44,10 @@ public class UIUserHelper extends AbstractUserHelper
         createUsers(Arrays.asList(userName), cloneUserName, sendEmail, getWrapper().goToSiteUsers());
 
         if (verifySuccess)
-            assertTrue("Failed to add user " + userName, getWrapper().isTextPresent(userName + " added as a new user to the system"));
+        {
+            assertTrue("Failed to add user " + userName,
+                    Locator.byClass("labkey-message").containing(userName).existsIn(getWrapper().getDriver()));
+        }
 
         WebElement resultEl = Locator.css(".labkey-error, .labkey-message").findElement(getWrapper().getDriver());
         String message = resultEl.getText();

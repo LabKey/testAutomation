@@ -23,7 +23,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
-public class SetFolderPermissionsPage extends LabKeyPage
+public class SetFolderPermissionsPage extends LabKeyPage<SetFolderPermissionsPage.ElementCache>
 {
     public SetFolderPermissionsPage(WebDriver test)
     {
@@ -33,9 +33,7 @@ public class SetFolderPermissionsPage extends LabKeyPage
     @Override
     protected void waitForPage()
     {
-        waitFor(()-> Locator.css(".labkey-nav-page-header").withText("Users / Permissions")
-                .findElementOrNull(getDriver()) != null,
-                WAIT_FOR_JAVASCRIPT);
+        waitFor(()-> isCurrentStepHighlit(), WAIT_FOR_JAVASCRIPT);
     }
 
     public SetInitialFolderSettingsPage clickNext()
@@ -101,17 +99,24 @@ public class SetFolderPermissionsPage extends LabKeyPage
         return new PermissionsPage(getDriver());
     }
 
-    @Override
-    protected Elements newElementCache()
+    public boolean isCurrentStepHighlit()
     {
-        return new Elements();
+        return elementCache().activePane.existsIn(getDriver());
     }
 
-    private class Elements extends LabKeyPage.ElementCache
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends LabKeyPage.ElementCache
     {
         final WebElement finishButton = Locator.lkButton("Finish").findWhenNeeded(this).withTimeout(4000);
         final WebElement nextButton = Locator.lkButton("Next").findWhenNeeded(this).withTimeout(4000);
 
+        final Locator activePane = Locator.tagWithClass("li", "active")
+                .withChild(Locator.linkWithText("Users / Permissions"));
 
         // See AbstractContainerHelper.createSubfolder for what it supports and replace it
     }
