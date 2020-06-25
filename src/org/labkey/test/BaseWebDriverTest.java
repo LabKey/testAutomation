@@ -121,10 +121,10 @@ import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.logToServer;
-import static org.labkey.test.params.FieldDefinition.PhiSelectType;
-import static org.labkey.test.params.FieldDefinition.PhiSelectType.NotPHI;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
+import static org.labkey.test.params.FieldDefinition.PhiSelectType;
+import static org.labkey.test.params.FieldDefinition.PhiSelectType.NotPHI;
 
 /**
  * This class should be used as the base for all functional test classes
@@ -810,7 +810,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 if (isTestRunningOnTeamCity())
                 {
-                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "sampledata"));
                     getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"));
                     getArtifactCollector().dumpPipelineFiles();
                 }
