@@ -305,6 +305,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "application/octet-stream," +
                                     "application/pdf," +
                                     "application/zip," +
+                                    "application/x-x509-ca-cert," + // .crt, .cer
                                     "application/x-gzip," +
                                     "application/x-zip-compressed," +
                                     "application/xml," +
