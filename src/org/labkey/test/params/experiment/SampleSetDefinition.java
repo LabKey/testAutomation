@@ -132,7 +132,7 @@ public class SampleSetDefinition extends DomainProps
     {
         Domain domain = new Domain(getName());
         ArrayList<PropertyDescriptor> fields = new ArrayList<>(getFields());
-        fields.add(0, new PropertyDescriptor("Name", null));
+        fields.add(0, new PropertyDescriptor("Name", "string"));
         domain.setFields(fields);
         domain.setDescription(getDescription());
         return domain;

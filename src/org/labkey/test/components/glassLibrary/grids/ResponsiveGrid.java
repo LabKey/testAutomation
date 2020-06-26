@@ -448,10 +448,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * locates the first link in the specified column, clicks it, and waits for the URL to update
-     * @param text  text for link to match
      * @param column    column in which to search
+     * @param text  text for link to match
      */
-    public void clickLink(String text, String column)
+    public void clickLink(String column, String text)
     {
         getRow(column, text).clickLink(text);
     }

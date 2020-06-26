@@ -218,6 +218,25 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    /**
+     *
+     * @return
+     */
+    public QueryGrid selectAllInSet()
+    {
+        doAndWaitForUpdate(()->
+                getGridBar().selectAllInSet());
+        return this;
+    }
+
+    public QueryGrid clearAllSelections()
+    {
+        doAndWaitForUpdate(()->
+                getGridBar().clearAllInSet());
+        return this;
+    }
+
+
     // select view
     public QueryGrid selectView(String viewName)
     {
