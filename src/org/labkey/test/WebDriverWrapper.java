@@ -248,6 +248,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     prefs.put("pdfjs.disabled", true); // Download PDFs
                     prefs.put("credentials_enable_service", false);
                     prefs.put("profile.password_manager_enabled", false);
+                    prefs.put("safebrowsing.enabled", false); // Disable "This type of file can harm your computer."
                     options.setExperimentalOption("prefs", prefs);
                     options.setExperimentalOption("detach", true); // Leaves browser window open after stopping the driver service
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
