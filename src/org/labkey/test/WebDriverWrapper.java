@@ -26,8 +26,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.GuestCredentialsProvider;
+import org.labkey.remoteapi.security.WhoAmICommand;
+import org.labkey.remoteapi.security.WhoAmIResponse;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
@@ -1122,9 +1125,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (String)executeScript("return LABKEY.container.path;");
     }
 
+    public WhoAmIResponse whoAmI()
+    {
+        try
+        {
+            return new WhoAmICommand().execute(createDefaultConnection(), "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to fetch current user info.", e);
+        }
+    }
+
     public String getCurrentUser()
     {
-        return (String)executeScript("return LABKEY.user.email;");
+        return whoAmI().getEmail();
     }
 
     public String getCurrentUserName()
@@ -1135,7 +1150,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     // Return display name for the current logged in user (or impersonated user)
     public String getDisplayName()
     {
-        return (String)executeScript("return LABKEY.user.displayName");
+        return whoAmI().getDisplayName();
     }
 
     public boolean onLabKeyPage()
@@ -1150,7 +1165,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public boolean isSignedIn()
     {
-        return (Boolean)executeScript("return LABKEY.user.isSignedIn;");
+        return whoAmI().getUserId().longValue() > 0;
     }
 
     public boolean isUserSystemAdmin()
@@ -1170,7 +1185,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public boolean isImpersonating()
     {
-        return (Boolean)executeScript("return LABKEY.impersonatingUser != undefined;");
+        return whoAmI().isImpersonated();
     }
 
     public void assertSignedInNotImpersonating()

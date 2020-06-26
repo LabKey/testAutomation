@@ -57,6 +57,9 @@ public class ImpersonationLoggingAspect
     @AfterReturning(value = "stopImpersonation()")
     public void afterImpersonation()
     {
+        if (_startTime == null)
+            return;
+
         String impersonating = _impersonating;
 
         String elapsedStr = TestLogger.formatElapsedTime(System.currentTimeMillis() - _startTime);

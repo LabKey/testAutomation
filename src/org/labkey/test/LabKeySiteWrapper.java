@@ -45,6 +45,8 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.security.LogoutCommand;
+import org.labkey.remoteapi.security.StopImpersonatingCommand;
 import org.labkey.test.components.api.ProjectMenu;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
@@ -201,16 +203,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void signOutHTTP()
     {
-        String logOutUrl = WebTestHelper.buildURL("login", "logout");
-        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(logOutUrl, "POST");
-        logOutRequest.copySession(getDriver());
-
         try
         {
-            SimpleHttpResponse response = logOutRequest.getResponse();
-            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+            LogoutCommand logoutCommand = new LogoutCommand();
+            logoutCommand.execute(createDefaultConnection(), "/");
         }
-        catch (IOException e)
+        catch (IOException | CommandException e)
         {
             throw new RuntimeException(e);
         }
@@ -218,16 +216,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void stopImpersonatingHTTP()
     {
-        String stopImpersonatingUrl = WebTestHelper.buildURL("login", "stopImpersonating.api");
-        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(stopImpersonatingUrl, "POST");
-        logOutRequest.copySession(getDriver());
-
         try
         {
-            SimpleHttpResponse response = logOutRequest.getResponse();
-            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+            StopImpersonatingCommand stopImpersonatingCommand = new StopImpersonatingCommand();
+            stopImpersonatingCommand.execute(createDefaultConnection(), "/");
         }
-        catch (IOException e)
+        catch (IOException | CommandException e)
         {
             throw new RuntimeException(e);
         }
@@ -236,23 +230,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     public void ensureSignedInAsPrimaryTestUser()
     {
-        if (!onLabKeyPage() || isOnServerErrorPage())
-            goToHome();
         if (isImpersonating())
         {
-            if (!onLabKeyClassicPage()) // Single-page apps don't have impersonation capabilities
-            {
-                goToHome();
-            }
-            stopImpersonating(false);
+            stopImpersonatingHTTP();
         }
         if (!isSignedInAsPrimaryTestUser())
         {
             if (isSignedIn())
-                signOut();
+                signOutHTTP();
             simpleSignIn();
         }
-        WebTestHelper.saveSession(PasswordUtil.getUsername(), getDriver());
     }
 
     @LogMethod
