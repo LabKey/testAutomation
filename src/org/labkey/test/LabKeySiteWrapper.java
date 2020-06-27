@@ -203,12 +203,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void signOutHTTP()
     {
+        String logOutUrl = WebTestHelper.buildURL("login", "logout");
+        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(logOutUrl, "POST");
+        logOutRequest.copySession(getDriver());
+
         try
         {
-            LogoutCommand logoutCommand = new LogoutCommand();
-            logoutCommand.execute(createDefaultConnection(), "/");
+            SimpleHttpResponse response = logOutRequest.getResponse();
+            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
         }
-        catch (IOException | CommandException e)
+        catch (IOException e)
         {
             throw new RuntimeException(e);
         }
@@ -216,12 +220,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void stopImpersonatingHTTP()
     {
+        String stopImpersonatingUrl = WebTestHelper.buildURL("login", "stopImpersonating.api");
+        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(stopImpersonatingUrl, "POST");
+        logOutRequest.copySession(getDriver());
+
         try
         {
-            StopImpersonatingCommand stopImpersonatingCommand = new StopImpersonatingCommand();
-            stopImpersonatingCommand.execute(createDefaultConnection(), "/");
+            SimpleHttpResponse response = logOutRequest.getResponse();
+            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
         }
-        catch (IOException | CommandException e)
+        catch (IOException e)
         {
             throw new RuntimeException(e);
         }
