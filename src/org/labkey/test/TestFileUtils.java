@@ -206,10 +206,6 @@ public abstract class TestFileUtils
             sampledataDirs.add(new File(getTestRoot(), "data"));
         }
 
-        //TODO: temp remove root/sampledata folder during move
-        sampledataDirs.remove(new File(getLabKeyRoot(), "sampledata"));
-
-
         File foundFile = null;
         for (File sampledataDir : sampledataDirs)
         {
