@@ -300,7 +300,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         drtSamples.checkAllOnPage();
         clickAndWait(Locator.lkButtonContainingText("Derive Sample"));
 
-        selectOptionByText(Locator.name("targetSampleSetId"), SAMPLE_TYPE_NAME + " in /" + PROJECT_NAME);
+        selectOptionByText(Locator.name("targetSampleTypeId"), SAMPLE_TYPE_NAME + " in /" + PROJECT_NAME);
         clickButtonContainingText("Next");
 
         // TODO: Should validate that the Derive Samples action shows the various fields as expected. That is the required and missing value fields should have the correct input type. Will be fixed in 19.2.
