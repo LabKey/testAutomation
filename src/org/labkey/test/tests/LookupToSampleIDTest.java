@@ -26,10 +26,10 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SampleSetHelper;
+import org.labkey.test.util.SampleTypeHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -41,9 +41,9 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
 {
     private static final String FOLDER_NAME = "TestingGPATAssay";
     private static final String FOLDER_TYPE_STUDY = "Study";
-    private static final File SAMPLE_SET = TestFileUtils.getSampleData("GPAT/SampleIDLookupSampleSetData.xlsx");
-    private static final File SAMPLE_SET_SUB_FOLDER = TestFileUtils.getSampleData("GPAT/SampleIDLookupSampleSetDataSubFolder.xlsx");
-    private static final String SAMPLE_SET_NAME = "SampleSet";
+    private static final File SAMPLE_TYPE = TestFileUtils.getSampleData("GPAT/SampleIDLookupSampleSetData.xlsx");
+    private static final File SAMPLE_TYPE_SUB_FOLDER = TestFileUtils.getSampleData("GPAT/SampleIDLookupSampleSetDataSubFolder.xlsx");
+    private static final String SAMPLE_TYPE_NAME = "SampleType";
     public static final String SAMPLE_ASSAY_IMPORT_DATA_FILE_NAME = "SampleIDLookupAssayImportData";
     private static final File ASSAY_IMPORT = TestFileUtils.getSampleData("GPAT/" + SAMPLE_ASSAY_IMPORT_DATA_FILE_NAME + ".xlsx");
     public static final String SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME = "SampleIDLookupAssayImportDataForSplitSampleSet";
@@ -51,10 +51,10 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     private static final String SAMPLE_ID_FIELD_NAME = "SampleID";
     private static final String SAMPLE_ID_FIELD_LABEL = "Sample ID";
 
-    private static final String SAMPLE_SET_ID_PROJECT_LEVEL_FOUND = "ID_123456";
-    private static final String SAMPLE_SET_ID_PROJECT_LEVEL_NOT_FOUND = "<ID_123456>";
-    private static final String SAMPLE_SET_ID_FOLDER_LEVEL_FOUND = "ID_123461";
-    private static final String SAMPLE_SET_ID_FOLDER_LEVEL_NOT_FOUND = "<ID_123461>";
+    private static final String SAMPLE_TYPE_ID_PROJECT_LEVEL_FOUND = "ID_123456";
+    private static final String SAMPLE_TYPE_ID_PROJECT_LEVEL_NOT_FOUND = "<ID_123456>";
+    private static final String SAMPLE_TYPE_ID_FOLDER_LEVEL_FOUND = "ID_123461";
+    private static final String SAMPLE_TYPE_ID_FOLDER_LEVEL_NOT_FOUND = "<ID_123461>";
     private final String _subfolder = "/" + getProjectName() + "/" + FOLDER_NAME;
     private final String _projectFolder = "/" + getProjectName();
 
@@ -69,24 +69,24 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        //add Sample Set webpart
+        //add Sample Type webpart
         PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
         portalHelper.addWebPart("Assay List");
 
-        //import a sample set
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME), SAMPLE_SET);
+        //import a sample type
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME), SAMPLE_TYPE);
 
         _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, FOLDER_TYPE_STUDY);
 
         clickFolder(FOLDER_NAME);
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
         portalHelper.addWebPart("Assay List");
 
-        //import more to sample set while in subfolder
-        sampleHelper.goToSampleSet(SAMPLE_SET_NAME);
-        sampleHelper.mergeImport(SAMPLE_SET_SUB_FOLDER);
+        //import more to sample type while in subfolder
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME);
+        sampleHelper.mergeImport(SAMPLE_TYPE_SUB_FOLDER);
     }
 
     @Before
@@ -100,72 +100,72 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     public void testSamplesSameContainerIntegerWarning()
     {
         String assayName = "LookupAssay_Integer_Same";
-        String sampleSetFolder = _subfolder;
+        String sampleTypeFolder = _subfolder;
 
-        createAssay(assayName, SAMPLE_SET_NAME, "Integer", sampleSetFolder);
+        createAssay(assayName, SAMPLE_TYPE_NAME, "Integer", sampleTypeFolder);
         importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
         waitForText("Failed to convert 'SampleID': Could not translate value: ID_123456");
 
         goToProjectHome();
         clickFolder(FOLDER_NAME);
         assayName = "LookupAssay_Integer_Same_Success";
-        sampleSetFolder = _projectFolder;
+        sampleTypeFolder = _projectFolder;
 
-        createAssay(assayName, SAMPLE_SET_NAME, "Integer", sampleSetFolder);
+        createAssay(assayName, SAMPLE_TYPE_NAME, "Integer", sampleTypeFolder);
         importDataInAssay(assayName, ASSAY_IMPORT); //import data into assay
 
         clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_NAME));
 
-        waitForText(SAMPLE_SET_ID_PROJECT_LEVEL_FOUND);
+        waitForText(SAMPLE_TYPE_ID_PROJECT_LEVEL_FOUND);
 
-        assertTextNotPresent(SAMPLE_SET_ID_PROJECT_LEVEL_NOT_FOUND);
+        assertTextNotPresent(SAMPLE_TYPE_ID_PROJECT_LEVEL_NOT_FOUND);
     }
 
     @Test
     public void testSamplesReferencedAcrossMultipleContainers()
     {
         String assayName = "LookupAssay_String_Same";
-        String sampleSetFolder = _subfolder;
+        String sampleTypeFolder = _subfolder;
 
-        createAssay(assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
+        createAssay(assayName, SAMPLE_TYPE_NAME, "String", sampleTypeFolder);
         importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
         clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME));
-        waitForText(SAMPLE_SET_ID_PROJECT_LEVEL_NOT_FOUND);
-        waitForText(SAMPLE_SET_ID_FOLDER_LEVEL_FOUND);
-        assertTextNotPresent(SAMPLE_SET_ID_FOLDER_LEVEL_NOT_FOUND);
+        waitForText(SAMPLE_TYPE_ID_PROJECT_LEVEL_NOT_FOUND);
+        waitForText(SAMPLE_TYPE_ID_FOLDER_LEVEL_FOUND);
+        assertTextNotPresent(SAMPLE_TYPE_ID_FOLDER_LEVEL_NOT_FOUND);
 
         goToProjectHome();
         clickFolder(FOLDER_NAME);
         assayName = "LookupAssay_String_Project";
-        sampleSetFolder = _projectFolder;
+        sampleTypeFolder = _projectFolder;
 
-        createAssay(assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
+        createAssay(assayName, SAMPLE_TYPE_NAME, "String", sampleTypeFolder);
         importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
         clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME));
-        waitForText(SAMPLE_SET_ID_PROJECT_LEVEL_FOUND);
-        assertTextNotPresent(SAMPLE_SET_ID_PROJECT_LEVEL_NOT_FOUND);
-        waitForText(SAMPLE_SET_ID_FOLDER_LEVEL_NOT_FOUND);
+        waitForText(SAMPLE_TYPE_ID_PROJECT_LEVEL_FOUND);
+        assertTextNotPresent(SAMPLE_TYPE_ID_PROJECT_LEVEL_NOT_FOUND);
+        waitForText(SAMPLE_TYPE_ID_FOLDER_LEVEL_NOT_FOUND);
 
         goToProjectHome();
         clickFolder(FOLDER_NAME);
         assayName = "LookupAssay_String_Default";
-        sampleSetFolder = null;//will leave as default or [current project]
+        sampleTypeFolder = null;//will leave as default or [current project]
 
-        createAssay(assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
+        createAssay(assayName, SAMPLE_TYPE_NAME, "String", sampleTypeFolder);
         importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
         clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME));
-        waitForText(SAMPLE_SET_ID_PROJECT_LEVEL_FOUND);
-        waitForText(SAMPLE_SET_ID_FOLDER_LEVEL_FOUND);
-        assertTextNotPresent(SAMPLE_SET_ID_FOLDER_LEVEL_NOT_FOUND);
+        waitForText(SAMPLE_TYPE_ID_PROJECT_LEVEL_FOUND);
+        waitForText(SAMPLE_TYPE_ID_FOLDER_LEVEL_FOUND);
+        assertTextNotPresent(SAMPLE_TYPE_ID_FOLDER_LEVEL_NOT_FOUND);
     }
 
     @Test
     public void testStringTableLookupValue()
     {
         String assayName = "LookupAssay_String";
-        String sampleSetFolder = "/LookupToSampleIDTest Project/TestingGPATAssay";
+        String sampleTypeFolder = "/LookupToSampleIDTest Project/TestingGPATAssay";
 
-        createAssay(assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
+        createAssay(assayName, SAMPLE_TYPE_NAME, "String", sampleTypeFolder);
         importDataInAssay(assayName, ASSAY_IMPORT); //import data into assay
         testAssay(assayName); //test links
     }
@@ -174,12 +174,12 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     public void testIntegerTableLookupValue()
     {
         String assayName = "LookupAssay_Integer";
-        String sampleSetFolder = "/LookupToSampleIDTest Project/TestingGPATAssay";
+        String sampleTypeFolder = "/LookupToSampleIDTest Project/TestingGPATAssay";
 
-        createAssay(assayName, SAMPLE_SET_NAME, "Integer", sampleSetFolder);
+        createAssay(assayName, SAMPLE_TYPE_NAME, "Integer", sampleTypeFolder);
     }
 
-    private void createAssay(String name, String lookupTableValue, String lookupTableType, String sampleSetFolder)
+    private void createAssay(String name, String lookupTableValue, String lookupTableType, String sampleTypeFolder)
     {
         ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", name);
 
@@ -188,7 +188,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
                 .addField(SAMPLE_ID_FIELD_NAME)
                 .setLabel(SAMPLE_ID_FIELD_LABEL)
                 .setType(FieldDefinition.ColumnType.Lookup)
-                .setFromFolder(sampleSetFolder)
+                .setFromFolder(sampleTypeFolder)
                 .setFromSchema("samples")
                 .setFromTargetTable(lookupTableValue + " (" + lookupTableType + ")");
 

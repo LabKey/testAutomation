@@ -117,7 +117,7 @@ public class ArtifactCollector
         publishArtifact(dumpDir, dumpDir.getName() + ".tar.gz");
     }
 
-    public void dumpThreads()
+    public static void dumpThreads()
     {
         if (!isLocalServer())
             return;

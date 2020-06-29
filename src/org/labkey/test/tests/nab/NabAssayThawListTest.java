@@ -267,7 +267,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
         final String LIST_NAME = "DataList";
         final File LIST_DATA = TestFileUtils.getSampleData("AssayBackgroundImport/assayTestList.xls");
 
-        // This test is to cover a testing gap identified in bug 26774 (Issues linking assay runs with sample sets).
+        // This test is to cover a testing gap identified in bug 26774 (Issues linking assay runs with sample types).
 
         log("Test a General assay background importing data from a list.");
 
