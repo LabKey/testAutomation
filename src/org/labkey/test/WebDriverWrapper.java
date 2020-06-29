@@ -1127,7 +1127,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         try
         {
-            return new WhoAmICommand().execute(createDefaultConnection(), "/");
+            return new WhoAmICommand().execute(createDefaultConnection(), getCurrentContainerPath());
         }
         catch (IOException | CommandException e)
         {
