@@ -466,7 +466,7 @@ public class SecurityTest extends BaseWebDriverTest
         // Validate that the user is shown a login screen.
         checker().withScreenshot("disableGuestAccountTest")
                 .verifyTrue("Should be on login page when guest account is disabled",
-                        !isElementPresent(Locator.tagWithName("form", "login")));
+                        isElementPresent(Locator.tagWithName("form", "login")));
 
         signIn();
         ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(), "disableGuestAccount", false);
