@@ -32,7 +32,7 @@
            </ft:requiredWebParts>
            <ft:preferredWebParts>
                <ft:webPart>
-                   <ft:name>Sample Sets</ft:name>
+                   <ft:name>Sample Types</ft:name>
                    <ft:location>body</ft:location>
                </ft:webPart>
                <ft:webPart>
