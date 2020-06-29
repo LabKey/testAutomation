@@ -31,11 +31,11 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SampleSetHelper;
+import org.labkey.test.util.SampleTypeHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -49,10 +49,10 @@ import java.util.List;
 import java.util.Map;
 
 @Category({DailyC.class})
-public class SampleSetFolderExportImportTest extends BaseWebDriverTest
+public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = "SampleSetExportFolderTest";
-    private static final String IMPORT_PROJECT_NAME = "SampleSetImportFolderTest";
+    private static final String PROJECT_NAME = "SampleTypeExportFolderTest";
+    private static final String IMPORT_PROJECT_NAME = "SampleTypeImportFolderTest";
 
     @Override
     public List<String> getAssociatedModules()
@@ -75,7 +75,7 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleSetFolderExportImportTest init = (SampleSetFolderExportImportTest) getCurrentTest();
+        SampleTypeFolderExportImportTest init = (SampleTypeFolderExportImportTest) getCurrentTest();
         init.doSetup();
     }
 
@@ -88,7 +88,7 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME);
 
         projectMenu().navigateToProject(PROJECT_NAME);
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
         portalHelper.addWebPart("Experiment Runs");
 
     }
@@ -139,13 +139,13 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
         return areEqual;
     }
 
-    protected List<Map<String, String>> getSampleDataFromDB(String folderPath, String sampleSetName, List<String> fields)
+    protected List<Map<String, String>> getSampleDataFromDB(String folderPath, String sampleTypeName, List<String> fields)
     {
         List<Map<String, String>> results = new ArrayList<>(6);
         Map<String, String> tempRow;
 
         Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleSetName);
+        SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleTypeName);
         cmd.setColumns(fields);
 
         try
@@ -197,7 +197,7 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
     @Test
     public void testExportAndImportWithMissingAndRequiredFields()
     {
-        final String SAMPLE_SET_NAME = "ExportMissingValues";
+        final String SAMPLE_TYPE_NAME = "ExportMissingValues";
 
         final String REQUIRED_FIELD_NAME = "field01";
         final String REQUIRED_FIELD_DISPLAY_NAME = "Field01";
@@ -214,7 +214,7 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
 
         StringBuilder errorLog = new StringBuilder();
 
-        log("Create a SampleSet that has missing values.");
+        log("Create a Sample Type that has missing values.");
 
         log("Create expected missing value indicators.");
         clickProject(PROJECT_NAME);
@@ -267,8 +267,8 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
         sampleData.add(Map.of("Name", sampleNames[7], REQUIRED_FIELD_NAME, "hh_mv01", MISSING_FIELD_NAME, "X", INDICATOR_FIELD_NAME, "X"));
         expectedValuesInDB.add(Map.of("Name", sampleNames[7], REQUIRED_FIELD_NAME, "hh_mv01", MISSING_FIELD_NAME, "", INDICATOR_FIELD_NAME, "X"));
 
-        log("Create the sample set named '" + SAMPLE_SET_NAME + "' and add the fields.");
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
+        log("Create the sample type named '" + SAMPLE_TYPE_NAME + "' and add the fields.");
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         List<FieldDefinition> fields = new ArrayList<>();
         fields.add(new FieldDefinition(REQUIRED_FIELD_NAME)
                 .setType(FieldDefinition.ColumnType.String)
@@ -278,17 +278,17 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
                 .setType(FieldDefinition.ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
-        SampleSetDefinition definition = new SampleSetDefinition(SAMPLE_SET_NAME).setFields(fields);
-        sampleHelper.createSampleSet(definition);
+        SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME).setFields(fields);
+        sampleHelper.createSampleType(definition);
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
-        sampleHelper = new SampleSetHelper(this);
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
+        sampleHelper = new SampleTypeHelper(this);
 
         log("Bulk import the samples.");
         sampleHelper.bulkImport(sampleData);
 
         log("Change the view so the missing value indicator is there and for the screen shot is useful on failure.");
-        sampleHelper = new SampleSetHelper(this);
+        sampleHelper = new SampleTypeHelper(this);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         CustomizeView cv = drtSamples.openCustomizeGrid();
         cv.showHiddenItems();
@@ -300,7 +300,7 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
         drtSamples.checkAllOnPage();
         clickAndWait(Locator.lkButtonContainingText("Derive Sample"));
 
-        selectOptionByText(Locator.name("targetSampleSetId"), SAMPLE_SET_NAME + " in /" + PROJECT_NAME);
+        selectOptionByText(Locator.name("targetSampleSetId"), SAMPLE_TYPE_NAME + " in /" + PROJECT_NAME);
         clickButtonContainingText("Next");
 
         // TODO: Should validate that the Derive Samples action shows the various fields as expected. That is the required and missing value fields should have the correct input type. Will be fixed in 19.2.
@@ -341,14 +341,14 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
 
         goToProjectHome(IMPORT_PROJECT_NAME);
 
-        log("Validate that the number of Sample Sets in the imported folder is the expected value. If not fail test.");
-        Assert.assertTrue("Does not look like the Sample Set has been imported.", isElementVisible(Locator.linkWithText(SAMPLE_SET_NAME)));
+        log("Validate that the number of Sample Types in the imported folder is the expected value. If not fail test.");
+        Assert.assertTrue("Does not look like the Sample Type has been imported.", isElementVisible(Locator.linkWithText(SAMPLE_TYPE_NAME)));
 
-        DataRegionTable sampleSetsDataRegion = new DataRegionTable("SampleSet", getWrappedDriver());
+        DataRegionTable sampleTypesDataRegion = new DataRegionTable("SampleType", getWrappedDriver());
 
-        Assert.assertEquals("Number of Sample Sets not as expected.", 1, sampleSetsDataRegion.getDataRowCount());
+        Assert.assertEquals("Number of Sample Types not as expected.", 1, sampleTypesDataRegion.getDataRowCount());
 
-        String sampleCount = sampleSetsDataRegion.getDataAsText(0, "SampleCount" );
+        String sampleCount = sampleTypesDataRegion.getDataAsText(0, "SampleCount" );
 
         log("Check some of the other expected value. If they are not just log an error but continue testing.");
         String errorMsg;
@@ -361,9 +361,9 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
             errorLog.append("\n");
         }
 
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
 
-        sampleHelper = new SampleSetHelper(this);
+        sampleHelper = new SampleTypeHelper(this);
         DataRegionTable samplesDataRegion = sampleHelper.getSamplesDataRegionTable();
 
         log("Validated that all of the fields are present in the UI.");
@@ -395,11 +395,11 @@ public class SampleSetFolderExportImportTest extends BaseWebDriverTest
 
         }
 
-        // TODO: Checking the field values in the DB will fail because export/import for SampleSets doesn't honor missing value fields. This will be fixed in 19.2.
+        // TODO: Checking the field values in the DB will fail because export/import for Sample Types doesn't honor missing value fields. This will be fixed in 19.2.
         /*
-        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/" + IMPORT_PROJECT_NAME, SAMPLE_SET_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/" + IMPORT_PROJECT_NAME, SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
-        Assert.assertTrue("Imported Sample Set data not as expected.", areDataListEqual(resultsFromDB, expectedValuesInDB));
+        Assert.assertTrue("Imported Sample Type data not as expected.", areDataListEqual(resultsFromDB, expectedValuesInDB));
         */
 
         if(errorLog.length() > 0)

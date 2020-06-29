@@ -178,7 +178,7 @@ public class Crawler
             new ControllerActionId("dumbster", "begin"),
             new ControllerActionId("experiment", "exportProtocols"),
             new ControllerActionId("experiment", "exportRunFiles"),
-            new ControllerActionId("experiment", "exportSampleSet"),
+            new ControllerActionId("experiment", "exportSampleType"),
             new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("filetransfer", "auth"), // redirects to external site
             new ControllerActionId("flow-compensation", "download"),
