@@ -269,7 +269,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("inputRole3"), "Add a new role...");
         setFormElement(Locator.id("customRole3"), "FourthRole");
         selectOptionByText(Locator.name("outputCount"), "2");
-        selectOptionByText(Locator.name("targetSampleSetId"), subFolderSampleType + " in /" + getProjectName() + "/" + SUB_FOLDER_NAME);
+        selectOptionByText(Locator.name("targetSampleTypeId"), subFolderSampleType + " in /" + getProjectName() + "/" + SUB_FOLDER_NAME);
         clickButton("Next");
 
         setFormElement(Locator.name("outputSample1_Name"), "SampleSetBVT15");
@@ -297,7 +297,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText("derive samples from this sample"));
 
         selectOptionByText(Locator.name("inputRole0"), "FirstRole");
-        selectOptionByText(Locator.name("targetSampleSetId"), parentFolderSampleType + " in /" + getProjectName());
+        selectOptionByText(Locator.name("targetSampleTypeId"), parentFolderSampleType + " in /" + getProjectName());
         clickButton("Next");
 
         String derivedSampleName = "Only_In_Sub_Folder";
