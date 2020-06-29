@@ -992,10 +992,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public Connection createDefaultConnection()
     {
         Connection connection = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
-        if (getDriver().manage().getCookieNamed(Connection.JSESSIONID) == null)
-        {
-            throw new IllegalStateException("No session cookie available to reuse.");
-        }
 
         Set<Cookie> cookies = getDriver().manage().getCookies();
         for (Cookie cookie : cookies)
