@@ -243,7 +243,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public T selectAllOnPage(boolean checked)
     {
         selectAllBox().set(checked);
-        Locator selectedText = Locator.xpath("//span[contains(text(),'Selected all ')]");
+        Locator selectedText = Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]");
 
         // If checked is false, so un-selecting a value, don't wait for a confirmation message.
         if(checked)

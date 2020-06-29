@@ -151,7 +151,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public int getRecordCount()
     {
-        return elementCache()._gridBar.getRecordCount();
+        return getGridBar().getRecordCount();
     }
 
     public QueryGrid waitForRecordCount(int expectedCount)

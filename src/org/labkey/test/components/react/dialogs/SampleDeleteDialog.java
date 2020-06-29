@@ -2,17 +2,17 @@ package org.labkey.test.components.react.dialogs;
 
 import org.labkey.test.components.experiment.DeleteConfirmationDialog;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.pages.samplemanagement.samples.SampleSetPage;
+import org.labkey.test.pages.samplemanagement.samples.SampleTypePage;
 
-public class SampleDeleteDialog<SourcePage extends LabKeyPage> extends DeleteConfirmationDialog<SourcePage, SampleSetPage>
+public class SampleDeleteDialog<SourcePage extends LabKeyPage> extends DeleteConfirmationDialog<SourcePage, SampleTypePage>
 {
     public SampleDeleteDialog(SourcePage sourcePage)
     {
         super(sourcePage, () -> {
-            if (sourcePage instanceof SampleSetPage)
-                return (SampleSetPage) sourcePage;
+            if (sourcePage instanceof SampleTypePage)
+                return (SampleTypePage) sourcePage;
             else
-                return new SampleSetPage(sourcePage);
+                return new SampleTypePage(sourcePage);
         });
     }
 }
