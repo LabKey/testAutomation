@@ -458,21 +458,18 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void disableGuestAccountTest()
     {
-        Connection cn = createDefaultConnection();
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", true);
+        ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(), "disableGuestAccount", true);
 
         goToHome();
         signOut();
 
         // Validate that the user is shown a login screen.
-        if(!isElementPresent(Locator.tagWithName("form", "login")))
-        {
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
-            Assert.fail("Should have seen the sign-in screen, it wasn't there.");
-        }
+        checker().withScreenshot("disableGuestAccountTest")
+                .verifyTrue("Should be on login page when guest account is disabled",
+                        !isElementPresent(Locator.tagWithName("form", "login")));
 
         signIn();
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(), "disableGuestAccount", false);
     }
 
     @LogMethod
