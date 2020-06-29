@@ -67,7 +67,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         portalHelper.enterAdminMode();
         portalHelper.addWebPart("Sample Types");
 
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", true);
     }
 
@@ -75,7 +75,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", false);
     }
 
@@ -96,8 +96,8 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
         dgen.addDataSupplier("label", () -> dgen.randomString(10))
                 .withGeneratedRows(10000);
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
+        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
         log("Successfully  inserted " + saveRowsResponse.getRowsAffected());
 
         log("Waiting for the sample data to get generated");
@@ -121,7 +121,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
                         .setTableType(FieldDefinition.ColumnType.Integer))
                 .setDescription("LookUp in same container with 10000 samples"));
 
-        listDef.getCreateCommand().execute(createDefaultConnection(true), getProjectName());
+        listDef.getCreateCommand().execute(createDefaultConnection(), getProjectName());
 
         log("Inserting the new row in the list with the newly created sample as lookup");
         goToProjectHome();
@@ -157,10 +157,10 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("testIndex", FieldDefinition.ColumnType.Integer)
                 ));
 
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
         Map indexRow = Map.of("name", "seed", "data", dgen.randomInt(3, 2000), "testIndex", 0); // create the first seed in the lineage
-        SaveRowsResponse seedInsert = dgen.insertRows(createDefaultConnection(true), List.of(indexRow));
-        SelectRowsResponse seedSelect = dgen.getRowsFromServer(createDefaultConnection(true),
+        SaveRowsResponse seedInsert = dgen.insertRows(createDefaultConnection(), List.of(indexRow));
+        SelectRowsResponse seedSelect = dgen.getRowsFromServer(createDefaultConnection(),
                 List.of("lsid", "name", "parent", "data", "testIndex"));
 
         // create a serial table of records; each derived from the former via parent:name column reference
@@ -176,8 +176,8 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
             previousName = name;
             testIndex++;
         }
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
-        dgen.getRowsFromServer(createDefaultConnection(true), List.of("name", "data", "testIndex"));
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
+        dgen.getRowsFromServer(createDefaultConnection(), List.of("name", "data", "testIndex"));
 
         goToProjectHome();      // the dataregion is helpful when debugging, not needed for testing
         DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).waitFor();
@@ -190,7 +190,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
                 .setChildren(true)
                 .setParents(false)
                 .setDepth(intendedGenerationDepth).build();
-        LineageResponse linResponse = linCmd.execute(createDefaultConnection(true), getCurrentContainerPath());
+        LineageResponse linResponse = linCmd.execute(createDefaultConnection(), getCurrentContainerPath());
         LineageNode node = linResponse.getSeed();
         int generationDepth = 0;
         while(node.getChildren().size()>0)  // walk the node depth until the end
@@ -201,7 +201,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         assertEquals("Expect lineage depth to be" +intendedGenerationDepth, intendedGenerationDepth, generationDepth);
 
         // clean up the sampleset on success
-        dgen.deleteDomain(createDefaultConnection(true));
+        dgen.deleteDomain(createDefaultConnection());
     }
 
 }
