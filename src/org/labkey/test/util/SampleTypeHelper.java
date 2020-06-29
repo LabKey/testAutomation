@@ -21,10 +21,10 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ImportDataPage;
-import org.labkey.test.pages.experiment.CreateSampleSetPage;
-import org.labkey.test.pages.experiment.UpdateSampleSetPage;
+import org.labkey.test.pages.experiment.CreateSampleTypePage;
+import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.openqa.selenium.WebDriver;
 
 import java.io.File;
@@ -36,30 +36,31 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DATA_REGION_NAME;
 
 /**
  * Helper methods for create Sample Types and import data into them through standard LabKey Server UI
  */
-public class SampleSetHelper extends WebDriverWrapper
+public class SampleTypeHelper extends WebDriverWrapper
 {
     private final WebDriver _driver;
     public static final String IMPORT_DATA_LABEL = "Insert";
     public static final String MERGE_DATA_LABEL = "Insert and Replace";
 
-    public SampleSetHelper(WebDriverWrapper driverWrapper)
+    public SampleTypeHelper(WebDriverWrapper driverWrapper)
     {
         this(driverWrapper.getDriver());
     }
 
-    public SampleSetHelper(WebDriver driver)
+    public SampleTypeHelper(WebDriver driver)
     {
         _driver = driver;
     }
 
-    public static SampleSetHelper beginAtSampleSetsList(WebDriverWrapper dWrapper, String containerPath)
+    public static SampleTypeHelper beginAtSampleTypesList(WebDriverWrapper dWrapper, String containerPath)
     {
-        dWrapper.beginAt(WebTestHelper.buildURL("experiment", containerPath, "listMaterialSources"));
-        return new SampleSetHelper(dWrapper.getDriver());
+        dWrapper.beginAt(WebTestHelper.buildURL("experiment", containerPath, "listSampleTypes"));
+        return new SampleTypeHelper(dWrapper.getDriver());
     }
 
     @Override
@@ -68,9 +69,9 @@ public class SampleSetHelper extends WebDriverWrapper
         return _driver;
     }
 
-    public void createSampleSet(SampleSetDefinition props)
+    public void createSampleType(SampleTypeDefinition props)
     {
-        CreateSampleSetPage createPage = goToCreateNewSampleSet();
+        CreateSampleTypePage createPage = goToCreateNewSampleType();
 
         createPage.setName(props.getName());
         if (props.getNameExpression() != null)
@@ -91,28 +92,28 @@ public class SampleSetHelper extends WebDriverWrapper
         createPage.clickSave();
     }
 
-    public void createSampleSet(SampleSetDefinition definition, File dataFile)
+    public void createSampleType(SampleTypeDefinition definition, File dataFile)
     {
-        createSampleSet(definition);
-        goToSampleSet(definition.getName()).bulkImport(dataFile);
+        createSampleType(definition);
+        goToSampleType(definition.getName()).bulkImport(dataFile);
     }
 
-    public void createSampleSet(SampleSetDefinition definition, String data)
+    public void createSampleType(SampleTypeDefinition definition, String data)
     {
-        createSampleSet(definition);
-        goToSampleSet(definition.getName()).bulkImport(data);
+        createSampleType(definition);
+        goToSampleType(definition.getName()).bulkImport(data);
     }
 
-    public void createSampleSet(SampleSetDefinition definition, List<Map<String, String>> data)
+    public void createSampleType(SampleTypeDefinition definition, List<Map<String, String>> data)
     {
-        createSampleSet(definition);
-        goToSampleSet(definition.getName()).bulkImport(data);
+        createSampleType(definition);
+        goToSampleType(definition.getName()).bulkImport(data);
     }
 
-    public CreateSampleSetPage goToCreateNewSampleSet()
+    public CreateSampleTypePage goToCreateNewSampleType()
     {
-        getSampleSetsList().clickHeaderButtonAndWait("New Sample Set");
-        return new CreateSampleSetPage(getDriver());
+        getSampleTypesList().clickHeaderButtonAndWait("New Sample Type");
+        return new CreateSampleTypePage(getDriver());
     }
 
     public void selectImportOption(String label, int index)
@@ -124,33 +125,33 @@ public class SampleSetHelper extends WebDriverWrapper
         executeScript(script);
     }
 
-    public SampleSetHelper goToSampleSet(String name)
+    public SampleTypeHelper goToSampleType(String name)
     {
-        TestLogger.log("Go to the sample set '" + name + "'");
+        TestLogger.log("Go to the sample type '" + name + "'");
         clickAndWait(Locator.linkWithText(name));
         return this;
     }
 
-    public UpdateSampleSetPage goToEditSampleSet(String name)
+    public UpdateSampleTypePage goToEditSampleType(String name)
     {
-        goToSampleSet(name);
-        waitAndClickAndWait(Locator.lkButton("Edit Set"));
-        return new UpdateSampleSetPage(getDriver());
+        goToSampleType(name);
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        return new UpdateSampleTypePage(getDriver());
     }
 
     public void verifyFields(List<FieldDefinition> _fields)
     {
-        TestLogger.log("Verify that the fields for the sample set are as expected");
-        Set<String> actualNames = new HashSet<>(getSampleSetFields());
+        TestLogger.log("Verify that the fields for the sample type are as expected");
+        Set<String> actualNames = new HashSet<>(getSampleTypeFields());
         Set<String> expectedNames = _fields.stream().map(FieldDefinition::getName).collect(Collectors.toSet());
         expectedNames.add("Name");
         expectedNames.add("Flag");
-        assertEquals("Fields in sample set.", expectedNames, actualNames);
+        assertEquals("Fields in sample type.", expectedNames, actualNames);
     }
 
-    public DataRegionTable getSampleSetsList()
+    public DataRegionTable getSampleTypesList()
     {
-        return new DataRegionTable.DataRegionFinder(getDriver()).withName("SampleSet").find();
+        return new DataRegionTable.DataRegionFinder(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).find();
     }
 
     public DataRegionTable getSamplesDataRegionTable()
@@ -163,7 +164,7 @@ public class SampleSetHelper extends WebDriverWrapper
         return getSamplesDataRegionTable().getDataRowCount();
     }
 
-    private List<String> getSampleSetFields()
+    private List<String> getSampleTypeFields()
     {
         return getSamplesDataRegionTable().getColumnNames();
     }
@@ -207,7 +208,7 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void mergeImport(String tsvData)
     {
-        startTsvImport(tsvData, SampleSetHelper.MERGE_DATA_LABEL)
+        startTsvImport(tsvData, SampleTypeHelper.MERGE_DATA_LABEL)
                 .submit();
     }
 
@@ -219,7 +220,7 @@ public class SampleSetHelper extends WebDriverWrapper
 
     public void mergeImport(List<Map<String, String>> data)
     {
-        startTsvImport(data, SampleSetHelper.MERGE_DATA_LABEL)
+        startTsvImport(data, SampleTypeHelper.MERGE_DATA_LABEL)
                 .submit();
     }
 

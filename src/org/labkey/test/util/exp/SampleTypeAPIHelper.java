@@ -7,7 +7,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.util.Arrays;
@@ -26,7 +26,7 @@ public class SampleTypeAPIHelper
      * @param def domain properties for the new sample type.
      * @return A TestDataGenerator for inserting rows into the created sample type.
      */
-    public static TestDataGenerator createEmptySampleType(String containerPath, SampleSetDefinition def)
+    public static TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition def)
     {
         try
         {

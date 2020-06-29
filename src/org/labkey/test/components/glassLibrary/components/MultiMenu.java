@@ -98,7 +98,7 @@ public class MultiMenu extends BootstrapMenu
             catch(StaleElementReferenceException staleExc)
             {
                 // This happens in the time between the change of the menu content from containing "loading"
-                // to having data (like "sample sets").
+                // to having data (like "sample types").
                 getComponentElement().isDisplayed(); // will throw an uncaught 'StaleReferenceException' if the entire menu went stale
                 stale = true;
             }

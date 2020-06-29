@@ -124,7 +124,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return  foundElement != null;
     }
 
-    /* waits until the 'value' (which can include the placeholder) of the select shows or contains the expected value */
+    /* waits until the currently selected 'value' (which can include the placeholder) equals or contains the specified string */
     public T expectValue(String value)
     {
         _wrapper.waitFor(()-> getValue().contains(value),
