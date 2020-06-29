@@ -458,7 +458,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickProject(getProjectName());
         PortalHelper portalHelper = new PortalHelper(this);
 
-        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Sets", "Assay List");
+        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Type", "Assay List");
         assertTextPresent("Run Groups");
         assertElementNotPresent(Locator.linkWithText("Create Run Group")); // Not in small Run Groups web-part.
         portalHelper.checkWebpartPermission("A customized web part", "Read", null);

@@ -93,8 +93,8 @@ public class FlowTest extends BaseFlowTest
     {
         analysisFilterTest();
         testChartMeasurePicker();
-        configureSampleSetAndMetadata();
-        sampleSetAndMetadataTest();
+        configureSampleTypeAndMetadata();
+        sampleTypeAndMetadataTest();
         customGraphQuery();
         positivityReportTest();
         qcReportTest();
@@ -494,9 +494,9 @@ public class FlowTest extends BaseFlowTest
         doAndWaitForPageToLoad(chartTypeDialog::clickCancel);
     }
 
-    // Test sample set and ICS metadata
+    // Test sample type and ICS metadata
     @LogMethod
-    protected void configureSampleSetAndMetadata()
+    protected void configureSampleTypeAndMetadata()
     {
         Map<String, FieldDefinition.ColumnType> fields = new HashMap<>();
         fields.put("Exp Name", FieldDefinition.ColumnType.String);
@@ -526,9 +526,9 @@ public class FlowTest extends BaseFlowTest
     }
 
     @LogMethod
-    public void sampleSetAndMetadataTest()
+    public void sampleTypeAndMetadataTest()
     {
-        // verify sample set and background values can be displayed in the FCSAnalysis grid
+        // verify sample type and background values can be displayed in the FCSAnalysis grid
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("29 FCS files"));
         new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
@@ -559,7 +559,7 @@ public class FlowTest extends BaseFlowTest
         _customizeViewsHelper.addColumn("Graph/Singlets$SL$SLive$S3+(<PE Cy55-A>:<FITC-A>)");
         _customizeViewsHelper.saveCustomView();
 
-        // check PTID value from sample set present
+        // check PTID value from sample type present
         assertTextPresent("P02034");
 
         // check no graph errors are present and the graphs have labels

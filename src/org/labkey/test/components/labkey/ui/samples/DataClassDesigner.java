@@ -20,9 +20,9 @@ public class DataClassDesigner extends EntityTypeDesigner<DataClassDesigner>
         return getThis();
     }
 
-    public DataClassDesigner setSampleSet(String value)
+    public DataClassDesigner setSampleType(String value)
     {
-        elementCache().sampleSetSelect.select(value);
+        elementCache().sampleTypeSelect.select(value);
         return getThis();
     }
 
@@ -47,6 +47,6 @@ public class DataClassDesigner extends EntityTypeDesigner<DataClassDesigner>
     protected class ElementCache extends EntityTypeDesigner.ElementCache
     {
         protected ReactSelect categorySelect = ReactSelect.finder(getDriver()).withId("entity-category").findWhenNeeded(this);
-        protected ReactSelect sampleSetSelect = ReactSelect.finder(getDriver()).withId("entity-sampleSet").findWhenNeeded(this);
+        protected ReactSelect sampleTypeSelect = ReactSelect.finder(getDriver()).withId("entity-sampleSet").findWhenNeeded(this);
     }
 }

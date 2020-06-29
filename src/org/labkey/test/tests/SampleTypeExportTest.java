@@ -21,18 +21,18 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
-import org.labkey.test.util.SampleSetHelper;
+import org.labkey.test.util.SampleTypeHelper;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
-public class SampleSetExportTest extends AbstractExportTest
+public class SampleTypeExportTest extends AbstractExportTest
 {
-    private static final String SAMPLE_SET_NAME = SampleSetExportTest.class.getSimpleName();
+    private static final String SAMPLE_TYPE_NAME = SampleTypeExportTest.class.getSimpleName();
 
     private static final String SAMPLE_DATA = "Name\tBarcode\n" +
             "Q\tabc123\n" +
@@ -45,13 +45,13 @@ public class SampleSetExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        SampleSetExportTest initTest = (SampleSetExportTest)getCurrentTest();
+        SampleTypeExportTest initTest = (SampleTypeExportTest)getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
 
-        initTest.beginAt("/" + initTest.getProjectName() + "/experiment-listMaterialSources.view");
-        SampleSetHelper sampleHelper = new SampleSetHelper(initTest);
-        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLE_SET_NAME)
+        initTest.beginAt("/" + initTest.getProjectName() + "/experiment-listSampleTypes.view");
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(initTest);
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME)
                 .setFields(List.of(new FieldDefinition("Barcode", FieldDefinition.ColumnType.String))),
                 SAMPLE_DATA);
     }
@@ -65,7 +65,7 @@ public class SampleSetExportTest extends AbstractExportTest
     @Override
     protected String getProjectName()
     {
-        return "SampleSet Download Test";
+        return "SampleType Download Test";
     }
 
     @Override
@@ -113,13 +113,13 @@ public class SampleSetExportTest extends AbstractExportTest
     @Override
     protected String getDataRegionQueryName()
     {
-        return SAMPLE_SET_NAME;
+        return SAMPLE_TYPE_NAME;
     }
 
     @Override
     protected String getExportedFilePrefixRegex()
     {
-        return SAMPLE_SET_NAME;
+        return SAMPLE_TYPE_NAME;
     }
 
     @Override
@@ -131,8 +131,8 @@ public class SampleSetExportTest extends AbstractExportTest
     @Override
     protected void goToDataRegionPage()
     {
-        beginAt("/" + getProjectName() + "/experiment-listMaterialSources.view");
-        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        beginAt("/" + getProjectName() + "/experiment-listSampleTypes.view");
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
     }
 
 

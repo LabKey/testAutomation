@@ -74,7 +74,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 
 @Category({BVT.class})
@@ -405,7 +404,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateStudyDatasetVisitDomainKindInDateBasedStudy()
     {
-        // make sure you can't use StudyDatasetVisit domain kind in a date based study
+        // make sure you can't use StudyDatasetVisit domain kind in a date-based study
         projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
@@ -425,7 +424,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateStudyDatasetDateDomainKindInVisitBasedStudy()
     {
-        // make sure you can't use StudyDatasetVisit domain kind in a date based study
+        // make sure you can't use StudyDatasetDate domain kind in a visit-based study
         projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +

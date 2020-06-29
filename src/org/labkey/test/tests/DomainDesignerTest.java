@@ -49,6 +49,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({BVT.class})
 public class DomainDesignerTest extends BaseWebDriverTest
@@ -70,7 +71,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        new PortalHelper(getDriver()).addBodyWebPart("Sample Sets");
+        new PortalHelper(getDriver()).addBodyWebPart("Sample Types");
         new PortalHelper(getDriver()).addBodyWebPart("Lists");
     }
 
@@ -146,8 +147,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void testSampleStringFields() throws Exception
     {
-        String sampleSet = "StringSampleSet";
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        String sampleType = "StringSampleType";
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
             .withColumns(List.of(
@@ -155,10 +156,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("stringField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("multilineField", FieldDefinition.ColumnType.MultiLine)
                 ));
-        dgen.createDomain(createDefaultConnection(), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.getField("stringField")
@@ -181,7 +182,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(sampleSet));
+        clickAndWait(Locator.linkWithText(sampleType));
         DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 
         Map<String, String> firstMap = samplesTable.getRowDataAsMap("Name", "first");
@@ -192,27 +193,27 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void testDeleteDomainField() throws Exception
     {
-        String sampleSet = "deleteColumnSampleSet";
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        String sampleType = "deleteColumnSampleType";
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("deleteMe", FieldDefinition.ColumnType.String)
                 ));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
         List<PropertyDescriptor> createdFields = createResponse.getDomain().getFields();
         assertTrue(createdFields.get(0).getName().equals("deleteMe"));
 
         // go to the new domain designer and do some work here
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.getField("deleteMe")
                 .clickRemoveField(true);
         domainDesignerPage.clickFinish();
 
-        GetDomainCommand domainCommand = new GetDomainCommand("exp.materials", sampleSet);
+        GetDomainCommand domainCommand = new GetDomainCommand("exp.materials", sampleType);
         DomainResponse afterResponse = domainCommand.execute(createDefaultConnection(), getProjectName());
         Domain domain = afterResponse.getDomain();
         assertEquals("expect only field in the domain to have been deleted", 0, domain.getFields().size());
@@ -233,16 +234,16 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void testAddDomainField() throws Exception
     {
-        String sampleSet = "addColumnSampleSet";
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        String sampleType = "addColumnSampleType";
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         domainFormPanel.addField("addedField")
@@ -263,7 +264,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(sampleSet));
+        clickAndWait(Locator.linkWithText(sampleType));
         DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 
         Map<String, String> charlieMap = samplesTable.getRowDataAsMap("Name", "charlie");
@@ -279,17 +280,17 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void testBlankNameFieldOnAddedField() throws Exception
     {
-        String sampleSet = "errorColumnSampleSet";
+        String sampleType = "errorColumnSampleType";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // add a new field, but leave the name field blank
@@ -316,17 +317,17 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void testDuplicateFieldName() throws Exception
     {
-        String sampleSet = "errorDuplicateFieldSampleset";
+        String sampleType = "errorDuplicateFieldSampleType";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // add a new field, but leave the name field blank
@@ -473,19 +474,19 @@ public class DomainDesignerTest extends BaseWebDriverTest
      * @throws Exception
      */
     @Test
-    public void testConfirmNameFieldFromSamplesetNotShown() throws Exception
+    public void testConfirmNameFieldFromSampleTypeNotShown() throws Exception
     {
-        String sampleSet = "hiddenNameFieldSampleset";
+        String sampleType = "hiddenNameFieldSampleType";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow nameField = domainFormPanel.getField("name");
@@ -496,17 +497,17 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void testFieldNameErrors() throws Exception
     {
-        String sampleSet = "fieldsWithReservedNamesSampleSet";
+        String sampleType = "fieldsWithReservedNamesSampleType";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow modifiedRow = domainFormPanel.addField("modified");
@@ -517,7 +518,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickSaveExpectingErrors();
         String expectedWarnMsg = "New Field. Warning: Field name contains special characters.";
         String blargErrMsg = "New Field. Error: The field name 'blarg' is already taken. Please provide a unique name for each field.";
-        String reservedErrMsg = "New Field. Error: 'modified' is a reserved field name in 'fieldsWithReservedNamesSampleSet'.";
+        String reservedErrMsg = "New Field. Error: 'modified' is a reserved field name in 'fieldsWithReservedNamesSampleType'.";
         String modRowDetailsMsg = modifiedRow.waitForError()
                 .detailsMessage();
         String blarg1DetailsMsg = blarg1.waitForError().detailsMessage();
@@ -545,18 +546,18 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void verifySavedFieldCannotBeRenamedReservedName() throws Exception
     {
-        String sampleSet = "renameColToReservedNameTest";
+        String sampleType = "renameColToReservedNameTest";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(), "SampleSet");
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow testCol = domainFormPanel.getField("testCol");
@@ -587,17 +588,17 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void showHideFieldOnDefaultGridView() throws Exception
     {
-        String sampleSet = "showFieldOnDefaultGridViewSampleSet";
+        String sampleType = "showFieldOnDefaultGridViewSampleType";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow defaultViewRow = domainFormPanel.addField("defaultViewField");
         defaultViewRow.showFieldOnDefaultView(false);
@@ -606,11 +607,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         domainDesignerPage.clickFinish();
 
-        // expect to arrive at project home, with a list of 'sampleSets'
-        clickAndWait(Locator.linkWithText(sampleSet));
+        // expect to arrive at project home, with a list of 'sample types'
+        clickAndWait(Locator.linkWithText(sampleType));
 
-        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
-        List<String> columnsInDefaultView = sampleSetTable.getColumnNames();
+        DataRegionTable sampleTypeTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        List<String> columnsInDefaultView = sampleTypeTable.getColumnNames();
         Assert.assertThat("Columns after delete", columnsInDefaultView,
                 CoreMatchers.allOf(hasItems("Name", "Flag", "extraField", "testCol"),
                         CoreMatchers.not(CoreMatchers.hasItem("defaultViewField"))));
@@ -619,17 +620,17 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void showHideFieldOnInsertGridView() throws Exception
     {
-        String sampleSet = "showFieldOnInsertGridViewSampleSet";
+        String sampleType = "showFieldOnInsertGridViewSampleType";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow hiddenRow = domainFormPanel.addField("hiddenField");
         hiddenRow.showFieldOnInsertView(false);
@@ -638,12 +639,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         domainDesignerPage.clickFinish();
 
-        // expect to arrive at project home, with a list of 'sampleSets'
-        waitForElement(Locator.linkWithText(sampleSet));
-        clickAndWait(Locator.linkWithText(sampleSet));
+        // expect to arrive at project home, with a list of 'sample types'
+        waitForElement(Locator.linkWithText(sampleType));
+        clickAndWait(Locator.linkWithText(sampleType));
 
-        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
-        sampleSetTable.clickInsertNewRow();
+        DataRegionTable sampleTypeTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        sampleTypeTable.clickInsertNewRow();
 
         waitForElement(Locator.input("quf_shownField"));
         assertElementNotPresent(Locator.input("quf_hiddenField"));
@@ -652,19 +653,19 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void showHideFieldOnUpdateForm() throws Exception
     {
-        String sampleSet = "showFieldOnUpdateForm";
+        String sampleType = "showFieldOnUpdateForm";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow hiddenRow = domainFormPanel.addField("hiddenField");
         hiddenRow.showFieldOnUpdateView(false);
@@ -672,12 +673,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
         shownRow.showFieldOnUpdateView(true);
 
         domainDesignerPage.clickFinish();
-        // expect to arrive at project home, with a list of 'sampleSets'
+        // expect to arrive at project home, with a list of 'sample types'
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
-        clickAndWait(Locator.linkWithText(sampleSet));
+        clickAndWait(Locator.linkWithText(sampleType));
 
-        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
-        sampleSetTable.clickEditRow(0);
+        DataRegionTable sampleTypeTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        sampleTypeTable.clickEditRow(0);
 
         waitForElement(Locator.input("quf_shownField"));
         assertElementNotPresent(Locator.input("quf_hiddenField"));
@@ -686,15 +687,15 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void setPhiLevel() throws Exception
     {
-        String sampleSet = "phiLevelSampleSet";
+        String sampleType = "phiLevelSampleType";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // create a little test data
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test",
@@ -702,7 +703,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "second", "extraField", "twelve", "testCol", "blah",
                 "notPHI", "notPHI", "limitedPHI", "limitedPHI", "fullPHI", "fullPHI", "restrictedPHI", "restrictedPHI"));
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow notPhi = domainFormPanel.addField("notPHI");
         notPhi.setPHILevel(FieldDefinition.PhiSelectType.NotPHI);
@@ -715,9 +716,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         domainDesignerPage.clickFinish();
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
-        clickAndWait(Locator.linkWithText(sampleSet));
+        clickAndWait(Locator.linkWithText(sampleType));
 
-        DataRegionTable sampleSetTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        DataRegionTable sampleTypeTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
 
         assertEquals("NotPHI", getColumn(domainResponse.getDomain(), "notPHI").getPHI());
@@ -729,19 +730,19 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void setMissingValue() throws Exception
     {
-        String sampleSet = "setMissingValueTest";
+        String sampleType = "setMissingValueTest";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow missingValueRow = domainFormPanel.addField("missingValue");
         missingValueRow.setMissingValuesEnabled(true);
@@ -758,17 +759,17 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void setFieldAsDimension() throws Exception
     {
-        String sampleSet = "setFieldAsDimension";
+        String sampleType = "setFieldAsDimension";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow dimensionField = domainFormPanel.addField("dimensionField");
         dimensionField.setDimension(true);
@@ -786,17 +787,17 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void setFieldAsMeasure() throws Exception
     {
-        String sampleSet = "setFieldAsMeasure";
+        String sampleType = "setFieldAsMeasure";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow measureField = domainFormPanel.addField("measureField");
         measureField.setMeasure(true);
@@ -815,17 +816,17 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void setFieldAsVariable() throws Exception
     {
-        String sampleSet = "setFieldAsVariable";
+        String sampleType = "setFieldAsVariable";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow variableField = domainFormPanel.addField("variableField");
         variableField.setRecommendedVariable(true);
@@ -841,9 +842,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testLookUpFieldSampleSet() throws IOException, CommandException
+    public void testLookUpFieldSampleType() throws IOException, CommandException
     {
-        String sampleSet = "setFieldAsLookup";
+        String sampleType = "setFieldAsLookup";
         String listName = "lookUpList1";
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
@@ -853,15 +854,15 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
-        FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSet);
+        FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo1)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSet);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
@@ -1072,16 +1073,16 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void testUserWarningOnRequiredFieldWithEmptyValues() throws Exception
     {
-        String sampleSetName = "hasRowsWithBlankValuesWarnSampleSet";
+        String sampleTypeName = "hasRowsWithBlankValuesWarnSampleType";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleTypeName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("color", FieldDefinition.ColumnType.String),
                         new FieldDefinition("manufacturer", FieldDefinition.ColumnType.String),
                         new FieldDefinition("volume", FieldDefinition.ColumnType.Decimal)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         dgen.addCustomRow(Map.of("name", "agar", "color", "green", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "stuff", "color", "clear", "manufacturer", "glaxo", "volume", 2.34));
@@ -1090,7 +1091,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "slurm", "color", "orange",                                  "volume", 2.34));  //<-- no value for manufacturer
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSetName);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleTypeName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // now attempt to mark 'manufacturer' field 'required'
@@ -1110,16 +1111,16 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @Test
     public void testMarkFieldRequired() throws Exception
     {
-        String sampleSetName = "testSampleSetWithRequiredField";
+        String sampleTypeName = "testSampleTypeWithRequiredField";
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleSetName);
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleTypeName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("color", FieldDefinition.ColumnType.String),
                         new FieldDefinition("manufacturer", FieldDefinition.ColumnType.String),
                         new FieldDefinition("volume", FieldDefinition.ColumnType.Decimal)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "SampleSet");
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         dgen.addCustomRow(Map.of("name", "agar", "color", "green", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "stuff", "color", "clear", "manufacturer", "glaxo", "volume", 2.34));
@@ -1128,7 +1129,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "slurm", "color", "orange","manufacturer", "slurmCo","volume", 2.34));
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleSetName);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleTypeName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         // now attempt to mark 'manufacturer' field 'required'
