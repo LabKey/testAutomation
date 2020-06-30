@@ -36,6 +36,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -344,7 +345,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         log("Validate that the number of Sample Types in the imported folder is the expected value. If not fail test.");
         Assert.assertTrue("Does not look like the Sample Type has been imported.", isElementVisible(Locator.linkWithText(SAMPLE_TYPE_NAME)));
 
-        DataRegionTable sampleTypesDataRegion = new DataRegionTable("SampleType", getWrappedDriver());
+        DataRegionTable sampleTypesDataRegion = new DataRegionTable(SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGION_NAME, getWrappedDriver());
 
         Assert.assertEquals("Number of Sample Types not as expected.", 1, sampleTypesDataRegion.getDataRowCount());
 

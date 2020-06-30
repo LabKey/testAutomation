@@ -19,6 +19,11 @@ import java.util.Set;
 
 public class SampleTypeAPIHelper
 {
+    // Global constants to ease migration from "Sample Set" to "Sample Type"
+    public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
+    public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";
+    public static final String SAMPLE_TYPE_COLUMN_NAME = "Sample Set";
+
     /**
      * Create a sample type in the specified container with the fields provided.
      *
@@ -85,5 +90,4 @@ public class SampleTypeAPIHelper
 
         return sampleIds;
     }
-
 }
