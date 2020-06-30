@@ -29,11 +29,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_COLUMN_NAME;
-import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_COLUMN_NAME;
+import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({DailyC.class})
-public class SampleSetParentColumnTest extends BaseWebDriverTest
+public class SampleTypeParentColumnTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleTypeParentAliasProject";
     private static final String SUB_FOLDER_NAME = "ParentAliasSubFolder";
@@ -80,7 +80,7 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleSetParentColumnTest init = (SampleSetParentColumnTest) getCurrentTest();
+        SampleTypeParentColumnTest init = (SampleTypeParentColumnTest) getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
@@ -105,7 +105,6 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
 
         createAndPopulateSampleType(SIBLING_SAMPLE_TYPE_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, "SIB_", "Use me as a parent (sub folder). ");
         createAndPopulateDataClass(SIBLING_DATA_CLASS_NAME, PROJECT_NAME + "/" + SUB_FOLDER_NAME, "DCSIB_", "DataClass Object parent (sub folder). ");
-
     }
 
     private void createAndPopulateSampleType(String sampleTypeName, String path, String namePrefix, String descriptionPrefix)
@@ -206,7 +205,6 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         {
             throw new RuntimeException(rethrow);
         }
-
     }
 
     private void checkAllRowsInDataRegion(String dataRegionName, String columnName, List<String> expectedValues)
@@ -463,7 +461,6 @@ public class SampleSetParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("parentMaterials", SAMPLE_TYPE_COLUMN_NAME, List.of(SAMPLE_TYPE_NAME, PARENT_CONTAINER_SAMPLE_TYPE_NAME));
 
         regexCheckRowInDataRegion("Runs", 0, "Name", "Derive sample from (?:S_11, SE_04|SE_04, S_11)");
-
     }
 
     /**

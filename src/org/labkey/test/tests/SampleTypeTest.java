@@ -70,7 +70,7 @@ import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
-public class SampleSetTest extends BaseWebDriverTest
+public class SampleTypeTest extends BaseWebDriverTest
 {
     // Global constants to ease migration from "Sample Set" to "Sample Type"
     public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
@@ -98,7 +98,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleSetTest init = (SampleSetTest) getCurrentTest();
+        SampleTypeTest init = (SampleTypeTest) getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on tests much easier.
         init.doSetup();
@@ -117,7 +117,6 @@ public class SampleSetTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(PROJECT_NAME, LOOKUP_FOLDER, "Collaboration");
         portalHelper.addWebPart("Sample Types");
         portalHelper.exitAdminMode();
-
     }
 
     @Override
@@ -261,7 +260,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Try to import overlapping data from file");
         drt.clickImportBulkData();
         click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
-        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleSet.xls"));
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
         clickButton("Submit", "duplicate key");
 
         log ("Switch to 'Insert and Replace'");
@@ -284,7 +283,6 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTrue("Should have a row with the third sample name", index >= 0);
         rowData = drt.getRowDataAsMap(index);
         assertEquals(fieldNames.get(0) + " for sample 'Name' not as expected", "Dee", rowData.get(fieldNames.get(0)));
-
     }
 
     // I don't think this test is doing what was intended. I'm unclear if this is intended to be a lineage test or a
@@ -297,7 +295,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @Ignore
     public void testSamplesWithLookups() throws IOException, CommandException
     {
-        // create a basic sampleset
+        // create a basic sample type
         navigateToFolder(getProjectName(), LOOKUP_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "sampleData", getCurrentContainerPath())
                 .withColumns(List.of(
@@ -312,7 +310,7 @@ public class SampleSetTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "C", "strData", "foofoo","intData", 8, "floatData", 4.5));
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
-        // create the lookup sampleset in a different folder- configured to look to the first one
+        // create the lookup sample type in a different folder- configured to look to the first one
         String lookupContainer = getProjectName() + "/" + LOOKUP_FOLDER;
         navigateToFolder(getProjectName(), FOLDER_NAME);
         // create another with a lookup to it
@@ -1199,7 +1197,7 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
-        // make sure we are case-sensitive when creating samplesets -- regression coverage for issue 33743
+        // make sure we are case-sensitive when creating sample types -- regression coverage for issue 33743
         clickProject(PROJECT_NAME);
         sampleHelper.createSampleType(new SampleTypeDefinition(CASE_INSENSITIVE_SAMPLE_TYPE));
 

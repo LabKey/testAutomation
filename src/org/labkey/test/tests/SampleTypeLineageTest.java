@@ -41,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
@@ -221,7 +221,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 new FieldDefinition("StringCol", FieldDefinition.ColumnType.String),
                 new FieldDefinition("DateCol", FieldDefinition.ColumnType.DateAndTime),
                 new FieldDefinition("BoolCol", FieldDefinition.ColumnType.Boolean));
-        File sampleTypeFile = TestFileUtils.getSampleData("sampleSet.xlsx");
+        File sampleTypeFile = TestFileUtils.getSampleData("sampleType.xlsx");
 
         clickProject(PROJECT_NAME);
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);

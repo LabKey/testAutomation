@@ -344,7 +344,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         log("Validate that the number of Sample Types in the imported folder is the expected value. If not fail test.");
         Assert.assertTrue("Does not look like the Sample Type has been imported.", isElementVisible(Locator.linkWithText(SAMPLE_TYPE_NAME)));
 
-        DataRegionTable sampleTypesDataRegion = new DataRegionTable("SampleType", getWrappedDriver());
+        DataRegionTable sampleTypesDataRegion = new DataRegionTable(SampleTypeTest.SAMPLE_TYPE_DATA_REGION_NAME, getWrappedDriver());
 
         Assert.assertEquals("Number of Sample Types not as expected.", 1, sampleTypesDataRegion.getDataRowCount());
 

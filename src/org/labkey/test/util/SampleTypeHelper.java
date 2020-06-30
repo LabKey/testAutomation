@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DATA_REGION_NAME;
+import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DATA_REGION_NAME;
 
 /**
  * Helper methods for create Sample Types and import data into them through standard LabKey Server UI
