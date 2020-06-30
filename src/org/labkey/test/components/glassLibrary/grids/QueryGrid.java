@@ -62,13 +62,13 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     /**
      * Returns the first row with the supplied text in the specified column
-     * @param column    The text in the column header cell
+     * @param columnLabel    The text in the column header cell
      * @param text
      * @return
      */
-    public Map<String, String> getRowMap(String column, String text)
+    public Map<String, String> getRowMap(String columnLabel, String text)
     {
-        GridRow row = getRow(column, text);
+        GridRow row = getRow(columnLabel, text);
         return row.getRowMap();
     }
 
@@ -96,14 +96,14 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     /**
      * Selects or un-selects the first row with the specified text in the specified column
-     * @param column
+     * @param columnLabel
      * @param text
      * @param checked   whether or not to check the box
      * @return
      */
-    public QueryGrid selectRow(String column, String text, boolean checked)
+    public QueryGrid selectRow(String columnLabel, String text, boolean checked)
     {
-        getRow(column, text).select(checked);
+        getRow(columnLabel, text).select(checked);
         return this;
     }
 
