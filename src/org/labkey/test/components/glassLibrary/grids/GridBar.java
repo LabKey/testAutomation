@@ -131,7 +131,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      *
      * @return This grid bar.
      */
-    public GridBar selectAllInSet()
+    public GridBar selectAllRows()
     {
         _responsiveGrid.selectAllOnPage(true);
 
@@ -153,7 +153,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      * Click the 'Clear All' button in the grid bar.
      * @return This grid bar.
      */
-    public GridBar clearAllInSet()
+    public GridBar clearAllSelections()
     {
         _responsiveGrid.selectAllOnPage(false);
 

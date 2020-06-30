@@ -219,20 +219,20 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
-     *
+     *  Selects all rows in the target domain, including those on other pages, if there are any
      * @return
      */
-    public QueryGrid selectAllInSet()
+    public QueryGrid selectAllRows()
     {
         doAndWaitForUpdate(()->
-                getGridBar().selectAllInSet());
+                getGridBar().selectAllRows());
         return this;
     }
 
     public QueryGrid clearAllSelections()
     {
         doAndWaitForUpdate(()->
-                getGridBar().clearAllInSet());
+                getGridBar().clearAllSelections());
         return this;
     }
 
