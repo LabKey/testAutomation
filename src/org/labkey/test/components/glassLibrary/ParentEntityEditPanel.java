@@ -357,7 +357,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
            // Need to check if this is removing the last/only type.
            if(typeCombos.size() > 1)
            {
-               // If it is not removing the last one can simple check that the count of combos is as expected.
+               // If it is not removing the last one can simply check that the count of combos is as expected.
                getWrapper().waitFor(() -> getAllTypeCombo().size() < typeCombos.size(),
                        "The type '" + typeName + "' was not successfully removed.",
                        1_000);
