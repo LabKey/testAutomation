@@ -15,9 +15,8 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.JavascriptException;
 
 public class CodeMirrorHelper
 {
@@ -30,6 +29,7 @@ public class CodeMirrorHelper
 
     public void setCodeMirrorValue(String id, String value)
     {
+        waitForCodeMirrorInstance(id);
         String script = getCodeMirrorPrefix() +
                 "getCodeMirrorInstance(arguments[0]).setValue(arguments[1]);";
         wrapper.executeScript(script, id, value);
@@ -37,6 +37,7 @@ public class CodeMirrorHelper
 
     public String getCodeMirrorValue(String id)
     {
+        waitForCodeMirrorInstance(id);
         String script = getCodeMirrorPrefix() +
                 "return getCodeMirrorInstance(arguments[0]).getValue();";
         return wrapper.executeScript(script, String.class, id);
@@ -44,10 +45,29 @@ public class CodeMirrorHelper
 
     public int getLineCount(String id)
     {
+        waitForCodeMirrorInstance(id);
         String script = getCodeMirrorPrefix() +
                 "var cm = getCodeMirrorInstance(arguments[0]);\n" +
                 "return cm.lineCount();";
         return wrapper.executeScript(script, Long.class, id).intValue();
+    }
+
+    private void waitForCodeMirrorInstance(String id)
+    {
+        String script = getCodeMirrorPrefix() +
+                "getCodeMirrorInstance(arguments[0]);";
+        //noinspection ResultOfMethodCallIgnored
+        WebDriverWrapper.waitFor(() -> {
+                try
+                {
+                    wrapper.executeScript(script, id);
+                    return true;
+                }
+                catch (JavascriptException retry)
+                {
+                    return false;
+                }
+        }, 10000); // No timout error. Let subsequent method throw error.
     }
 
     private String getCodeMirrorPrefix()
@@ -62,7 +82,7 @@ public class CodeMirrorHelper
                         "            throw 'Unable to find code mirror instance ' + id;\n" +
                         "        }\n" +
                         "    } catch (e) {\n" +
-                        "        throw 'Error attempting to get code mirror instance: ' + e.message;\n" +
+                        "        throw 'Error attempting to get code mirror instance: ' + e;\n" +
                         "    }\n" +
                         "};\n";
         return prefix;
