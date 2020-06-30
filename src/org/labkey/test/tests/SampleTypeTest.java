@@ -48,6 +48,7 @@ import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -70,13 +71,8 @@ import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
-public class SampleSetTest extends BaseWebDriverTest
+public class SampleTypeTest extends BaseWebDriverTest
 {
-    // Global constants to ease migration from "Sample Set" to "Sample Type"
-    public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
-    public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";
-    public static final String SAMPLE_TYPE_COLUMN_NAME = "Sample Set";
-
     private static final String PROJECT_NAME = "SampleTypeTestProject";
     private static final String FOLDER_NAME = "SampleTypeTestFolder";
     private static final String LOOKUP_FOLDER = "LookupSampleTypeFolder";
@@ -98,7 +94,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleSetTest init = (SampleSetTest) getCurrentTest();
+        SampleTypeTest init = (SampleTypeTest) getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on tests much easier.
         init.doSetup();
@@ -117,7 +113,6 @@ public class SampleSetTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(PROJECT_NAME, LOOKUP_FOLDER, "Collaboration");
         portalHelper.addWebPart("Sample Types");
         portalHelper.exitAdminMode();
-
     }
 
     @Override
@@ -261,7 +256,7 @@ public class SampleSetTest extends BaseWebDriverTest
         log("Try to import overlapping data from file");
         drt.clickImportBulkData();
         click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
-        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleSet.xls"));
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
         clickButton("Submit", "duplicate key");
 
         log ("Switch to 'Insert and Replace'");
@@ -284,7 +279,6 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTrue("Should have a row with the third sample name", index >= 0);
         rowData = drt.getRowDataAsMap(index);
         assertEquals(fieldNames.get(0) + " for sample 'Name' not as expected", "Dee", rowData.get(fieldNames.get(0)));
-
     }
 
     // I don't think this test is doing what was intended. I'm unclear if this is intended to be a lineage test or a
@@ -297,7 +291,7 @@ public class SampleSetTest extends BaseWebDriverTest
     @Ignore
     public void testSamplesWithLookups() throws IOException, CommandException
     {
-        // create a basic sampleset
+        // create a basic sample type
         navigateToFolder(getProjectName(), LOOKUP_FOLDER);
         TestDataGenerator dgen = new TestDataGenerator("exp.materials", "sampleData", getCurrentContainerPath())
                 .withColumns(List.of(
@@ -306,13 +300,13 @@ public class SampleSetTest extends BaseWebDriverTest
                         new FieldDefinition("intData", ColumnType.Integer),
                         new FieldDefinition("floatData", ColumnType.Decimal)
                 ));
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(true), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
         dgen.addCustomRow(Map.of("name", "A", "strData", "argy", "intData", 6, "floatData", 2.5));
         dgen.addCustomRow(Map.of("name", "B", "strData", "bargy","intData", 7, "floatData", 3.5));
         dgen.addCustomRow(Map.of("name", "C", "strData", "foofoo","intData", 8, "floatData", 4.5));
         dgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
-        // create the lookup sampleset in a different folder- configured to look to the first one
+        // create the lookup sample type in a different folder- configured to look to the first one
         String lookupContainer = getProjectName() + "/" + LOOKUP_FOLDER;
         navigateToFolder(getProjectName(), FOLDER_NAME);
         // create another with a lookup to it
@@ -326,7 +320,7 @@ public class SampleSetTest extends BaseWebDriverTest
                         new FieldDefinition("floatLooky", ColumnType.Decimal)
                                 .setLookup("exp.materials", "sampleData", lookupContainer)
                 ));
-        lookupDgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        lookupDgen.createDomain(createDefaultConnection(true), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
         lookupDgen.addCustomRow(Map.of("name", "B"));
 
         // If this is to be a look-up to another sample type I believe the values should be the row index and not the name.
@@ -336,7 +330,7 @@ public class SampleSetTest extends BaseWebDriverTest
         lookupDgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
         refresh();
-        DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DOMAIN_KIND).waitFor();
+        DataRegionTable.DataRegion(getDriver()).withName(SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND).waitFor();
         waitAndClick(Locator.linkWithText("sampleLookups"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 
@@ -1199,7 +1193,7 @@ public class SampleSetTest extends BaseWebDriverTest
     {
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
-        // make sure we are case-sensitive when creating samplesets -- regression coverage for issue 33743
+        // make sure we are case-sensitive when creating sample types -- regression coverage for issue 33743
         clickProject(PROJECT_NAME);
         sampleHelper.createSampleType(new SampleTypeDefinition(CASE_INSENSITIVE_SAMPLE_TYPE));
 
