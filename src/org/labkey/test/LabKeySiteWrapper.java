@@ -238,10 +238,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     public void ensureSignedInAsPrimaryTestUser()
     {
-        if (isImpersonating())
-        {
-            stopImpersonatingHTTP();
-        }
+        stopImpersonatingHTTP();
         if (!isSignedInAsPrimaryTestUser())
         {
             if (isSignedIn())
