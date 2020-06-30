@@ -248,6 +248,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 signOutHTTP();
             simpleSignIn();
         }
+        else if (!onLabKeyPage() || isOnServerErrorPage())
+        {
+            goToHome();
+        }
     }
 
     @LogMethod
