@@ -25,6 +25,7 @@ import org.labkey.remoteapi.security.DeleteUserCommand;
 import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -124,6 +125,11 @@ public class APIUserHelper extends AbstractUserHelper
         GetUsersCommand command = new GetUsersCommand();
         command.setIncludeDeactivated(includeDeactivated);
         Connection connection = getWrapper().createDefaultConnection();
+        if (getWrapper().isImpersonating())
+        {
+            // Don't use browser session. Tests often call 'getDisplayNameForEmail' while impersonating non-admins.
+            connection = WebTestHelper.getRemoteApiConnection(false);
+        }
 
         try
         {
