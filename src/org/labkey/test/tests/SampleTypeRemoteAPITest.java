@@ -65,8 +65,8 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DATA_REGION_NAME;
-import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGION_NAME;
+import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)

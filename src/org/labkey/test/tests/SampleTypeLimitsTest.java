@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DATA_REGION_NAME;
-import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGION_NAME;
+import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
 /**
  * Test cases that use large amounts of data or in other ways stress the system. If they fail they can interfere with

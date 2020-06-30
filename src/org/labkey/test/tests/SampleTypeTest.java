@@ -48,6 +48,7 @@ import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -72,11 +73,6 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class SampleTypeTest extends BaseWebDriverTest
 {
-    // Global constants to ease migration from "Sample Set" to "Sample Type"
-    public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
-    public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";
-    public static final String SAMPLE_TYPE_COLUMN_NAME = "Sample Set";
-
     private static final String PROJECT_NAME = "SampleTypeTestProject";
     private static final String FOLDER_NAME = "SampleTypeTestFolder";
     private static final String LOOKUP_FOLDER = "LookupSampleTypeFolder";
@@ -304,7 +300,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                         new FieldDefinition("intData", ColumnType.Integer),
                         new FieldDefinition("floatData", ColumnType.Decimal)
                 ));
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(true), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
         dgen.addCustomRow(Map.of("name", "A", "strData", "argy", "intData", 6, "floatData", 2.5));
         dgen.addCustomRow(Map.of("name", "B", "strData", "bargy","intData", 7, "floatData", 3.5));
         dgen.addCustomRow(Map.of("name", "C", "strData", "foofoo","intData", 8, "floatData", 4.5));
@@ -324,7 +320,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                         new FieldDefinition("floatLooky", ColumnType.Decimal)
                                 .setLookup("exp.materials", "sampleData", lookupContainer)
                 ));
-        lookupDgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        lookupDgen.createDomain(createDefaultConnection(true), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
         lookupDgen.addCustomRow(Map.of("name", "B"));
 
         // If this is to be a look-up to another sample type I believe the values should be the row index and not the name.
@@ -334,7 +330,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         lookupDgen.insertRows(createDefaultConnection(true), dgen.getRows());
 
         refresh();
-        DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DOMAIN_KIND).waitFor();
+        DataRegionTable.DataRegion(getDriver()).withName(SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND).waitFor();
         waitAndClick(Locator.linkWithText("sampleLookups"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 

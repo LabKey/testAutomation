@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_COLUMN_NAME;
-import static org.labkey.test.tests.SampleTypeTest.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_COLUMN_NAME;
+import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({DailyC.class})
 public class SampleTypeParentColumnTest extends BaseWebDriverTest
