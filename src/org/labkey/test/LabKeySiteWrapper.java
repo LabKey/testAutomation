@@ -45,8 +45,6 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.remoteapi.security.LogoutCommand;
-import org.labkey.remoteapi.security.StopImpersonatingCommand;
 import org.labkey.test.components.api.ProjectMenu;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
@@ -227,7 +225,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         try
         {
             SimpleHttpResponse response = logOutRequest.getResponse();
-            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+            if (HttpStatus.SC_OK != response.getResponseCode() && HttpStatus.SC_UNAUTHORIZED != response.getResponseCode())
+            {
+                fail("Failed to stop impersonating. " + response.getResponseCode());
+            }
         }
         catch (IOException e)
         {
