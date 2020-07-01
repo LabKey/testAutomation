@@ -331,7 +331,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void signIn(String email, String password)
     {
         attemptSignIn(email, password);
-        waitForElementToDisappear(Locator.lkButton("Sign In"));
+        waitForElementToDisappear(Locator.id("password"));
         Assert.assertEquals("Logged in as wrong user", email, getCurrentUser());
         WebTestHelper.saveSession(email, getDriver());
     }
