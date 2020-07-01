@@ -239,6 +239,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     public void ensureSignedInAsPrimaryTestUser()
     {
+        boolean wasImpersonating = isImpersonating(); // To make sure browser isn't in an apparent impersonation state
         stopImpersonatingHTTP();
         if (!isSignedInAsPrimaryTestUser())
         {
@@ -246,7 +247,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 signOutHTTP();
             simpleSignIn();
         }
-        else if (!onLabKeyPage() || isOnServerErrorPage())
+        else if (wasImpersonating || !onLabKeyPage() || isOnServerErrorPage())
         {
             goToHome();
         }
