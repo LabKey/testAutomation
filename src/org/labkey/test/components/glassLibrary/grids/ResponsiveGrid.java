@@ -87,32 +87,32 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * Sorts from the grid header menu (rather than from the omnibox)
-     * @param columnName column header for
+     * @param columnLabel column header for
      * @return
      */
-    public ResponsiveGrid sortColumnAscending(String columnName)
+    public ResponsiveGrid sortColumnAscending(String columnLabel)
     {
         doAndWaitForUpdate(()->
-            sortColumn(columnName, SortDirection.ASC));
+            sortColumn(columnLabel, SortDirection.ASC));
         return getThis();
     }
 
     /**
      * Sorts from the grid header menu (rather than from the omnibox)
-     * @param columnName
+     * @param columnLabel
      * @return
      */
-    public ResponsiveGrid sortColumnDescending(String columnName)
+    public ResponsiveGrid sortColumnDescending(String columnLabel)
     {
         doAndWaitForUpdate(()->
-            sortColumn(columnName, SortDirection.DESC));
+            sortColumn(columnLabel, SortDirection.DESC));
         return getThis();
     }
 
-    private void sortColumn(String columnName, SortDirection direction)
+    private void sortColumn(String columnLabel, SortDirection direction)
     {
         String sortCls = "fa-sort-amount-" + (direction.equals(SortDirection.DESC) ? "desc" : "asc");
-        WebElement headerCell = elementCache().getColumnHeaderCell(columnName);
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
         Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell)
                 .click();
@@ -138,17 +138,17 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * Finds the first row with the specified text in the specified column and sets its checkbox
-     * @param columnName    header text of the specified column
+     * @param columnLabel    header text of the specified column
      * @param text          Text to be found in the specified column
      * @param checked       true for checked, false for unchecked
      * @return
      */
-    public ResponsiveGrid selectRow(String columnName, String text, boolean checked)
+    public ResponsiveGrid selectRow(String columnLabel, String text, boolean checked)
     {
         Locator selectedCheckboxes = Locator.css("tr td input:checked[type='checkbox']");
         int initialCount = selectedCheckboxes.findElements(this).size();
         int increment = 0;
-        GridRow row = getRow(columnName, text);
+        GridRow row = getRow(columnLabel, text);
 
         if (checked && !row.isSelected())
             increment++;
@@ -160,22 +160,22 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         int finalIncrement = increment;
         int subsequentCount = selectedCheckboxes.findElements(this).size();
         waitFor(()-> subsequentCount == initialCount + finalIncrement, 1000);
-        getWrapper().log("Row at column ["+columnName+"] with text ["+text+"] selection state set to + ["+row.isSelected()+"]");
+        getWrapper().log("Row at column ["+columnLabel+"] with text ["+text+"] selection state set to + ["+row.isSelected()+"]");
         return getThis();
     }
 
     /**
      * Sets the specified rows' selector checkboxes to the requested select state
+     * @param columnLabel    Header text of the column to search
      * @param texts         Text to search for in the specified column
-     * @param columnName    Header text of the column to search
      * @param checked       True for checked, false for unchecked
      * @return
      */
-    public ResponsiveGrid selectRows(List<String> texts, String columnName, boolean checked)
+    public ResponsiveGrid selectRows(String columnLabel, List<String> texts, boolean checked)
     {
         for (String text : texts)
         {
-            selectRow(columnName, text, checked);
+            selectRow(columnLabel, text, checked);
         }
         return getThis();
     }
@@ -205,13 +205,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * finds the first row containing the specified text in the specified column and returns the checked state
+     * @param columnLabel    the text in the column to search
      * @param text  the value in the row to find
-     * @param column    the text in the column to search
      * @return  true if the checkbox is checked, otherwise false
      */
-    public boolean isRowSelected(String text, String column)
+    public boolean isRowSelected(String columnLabel, String text)
     {
-        return new GridRow.GridRowFinder(this).withTextAtColumn(text, getColumnIndex(column))
+        return new GridRow.GridRowFinder(this).withTextAtColumn(text, getColumnIndex(columnLabel))
                 .find(this).isSelected();
     }
 
@@ -243,7 +243,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public T selectAllOnPage(boolean checked)
     {
         selectAllBox().set(checked);
-        Locator selectedText = Locator.xpath("//span[contains(text(),'Selected all ')]");
+        Locator selectedText = Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]");
 
         // If checked is false, so un-selecting a value, don't wait for a confirmation message.
         if(checked)
@@ -291,24 +291,24 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * Returns the first row with matching text in the specified column
-     * @param columnHeader The exact text of the column header
-     * @param containsText The full text of the cell to match
+     * @param columnLabel The exact text of the column header
+     * @param text The full text of the cell to match
      * @return  the first row that matches
      */
-    public GridRow getRow(String columnHeader, String containsText)
+    public GridRow getRow(String columnLabel, String text)
     {
-        return elementCache().getRow(columnHeader, containsText);
+        return elementCache().getRow(columnLabel, text);
     }
 
     /**
      * Returns the first row with matching text in the specified column
-     * @param columnHeader  the column to search
-     * @param containsText  exact text to match in that column
+     * @param columnLabel  the column to search
+     * @param text  exact text to match in that column
      * @return  the first row matching the search criteria
      */
-    public Optional<GridRow> getOptionalRow(String columnHeader, String containsText)
+    public Optional<GridRow> getOptionalRow(String columnLabel, String text)
     {
-        return elementCache().getOptionalRow(columnHeader, containsText);
+        return elementCache().getOptionalRow(columnLabel, text);
     }
 
     /**
@@ -340,12 +340,12 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return elementCache().getRows();
     }
 
-    public List<String> getColumnDataAsText(String columnHeader)
+    public List<String> getColumnDataAsText(String columnLabel)
     {
         List<String> columnData = new ArrayList<>();
         for (GridRow row : getRows())
         {
-            columnData.add(row.getText(columnHeader));
+            columnData.add(row.getText(columnLabel));
         }
         return columnData;
     }
@@ -364,15 +364,15 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      * To get the normalized index (which excludes selector rows if present) use
      * elementCache().indexes.get(column).getNormalizedIndex()
      */
-    protected Integer getColumnIndex(String columnHeader)
+    protected Integer getColumnIndex(String columnLabel)
     {
         if (elementCache().indexes == null)
         {
             getColumnNames();
         }
 
-        if (elementCache().indexes.containsKey(columnHeader))
-            return ((ColumnIndex)elementCache().indexes.get(columnHeader)).getRawIndex();
+        if (elementCache().indexes.containsKey(columnLabel))
+            return ((ColumnIndex)elementCache().indexes.get(columnLabel)).getRawIndex();
         else
             return -1;
     }
@@ -416,12 +416,12 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     /**
      * Where possible, avoid using row index in test code; use text/column or other means to get a GridRow
      * @param rowIndex  the
-     * @param columnHeader
+     * @param columnLabel
      * @return
      */
-    public String getCellText(int rowIndex, String columnHeader)
+    public String getCellText(int rowIndex, String columnLabel)
     {
-        return getRow(rowIndex).getText(columnHeader);
+        return getRow(rowIndex).getText(columnLabel);
     }
 
     /**
@@ -448,12 +448,12 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * locates the first link in the specified column, clicks it, and waits for the URL to update
+     * @param columnLabel    column in which to search
      * @param text  text for link to match
-     * @param column    column in which to search
      */
-    public void clickLink(String text, String column)
+    public void clickLink(String columnLabel, String text)
     {
-        getRow(column, text).clickLink(text);
+        getRow(columnLabel, text).clickLink(text);
     }
 
     public boolean gridMessagePresent()
@@ -510,7 +510,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
         public WebElement button = Locator.xpath("//button[contains(@class,'dropdown-toggle')]").findWhenNeeded(this);
 
-        // TODO I don't think Responsive grids have a checkbox need to verify with dev. If not this should be moved to QueryGrid (or what ever it will be called).
         public Optional<WebElement> selectColumn = Locator.xpath("//th/input[@type='checkbox']").findOptionalElement(getComponentElement());
         ReactCheckBox selectAllCheckbox = new ReactCheckBox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(this));
 

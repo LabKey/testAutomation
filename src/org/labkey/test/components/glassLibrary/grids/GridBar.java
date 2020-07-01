@@ -131,12 +131,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      *
      * @return This grid bar.
      */
-    public GridBar selectAllInSet()
+    public GridBar selectAllRows()
     {
         _responsiveGrid.selectAllOnPage(true);
 
         Locator selectBtn = Locator.xpath("//button[contains(text(), 'Select all')]");      // Select all n
-        Locator selectedText = Locator.xpath("//span[contains(text(),'Selected all ')]");   // Selected all n on this page
+        Locator selectedText = Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]");   // n of n
         Locator allSelected = Locator.xpath("//span[contains(text(), 'All ')]");            // All n selected
         WebElement btn = selectBtn.waitForElement(this, 5_000);
         btn.click();
@@ -153,7 +153,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      * Click the 'Clear All' button in the grid bar.
      * @return This grid bar.
      */
-    public GridBar clearAllInSet()
+    public GridBar clearAllSelections()
     {
         _responsiveGrid.selectAllOnPage(false);
 
