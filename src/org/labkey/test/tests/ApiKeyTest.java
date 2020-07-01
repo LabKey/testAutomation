@@ -279,14 +279,14 @@ public class ApiKeyTest extends BaseWebDriverTest
 
     private String generateSessionKey()
     {
-        goToAPIKeyPage();
+        goToExternalToolPage();
         clickButton("Generate session key", "session|");
         return Locator.inputById("session-token").findElement(getDriver()).getAttribute("value");
     }
 
     private String generateAPIKey(List<Map<String, Object>> _generatedApiKeys) throws IOException
     {
-        goToAPIKeyPage();
+        goToExternalToolPage();
         clickButton("Generate API key", "apikey|");
         String apiKey = Locator.inputById("apikey-token").findElement(getDriver()).getAttribute("value");
         // get record
@@ -321,13 +321,6 @@ public class ApiKeyTest extends BaseWebDriverTest
         newRow.put(keyField, rowId);
 
         return newRow;
-    }
-
-
-    private void goToAPIKeyPage()
-    {
-        clickUserMenuItem("API Keys");
-        waitForText("API keys are used to authorize");
     }
 
     @Override
