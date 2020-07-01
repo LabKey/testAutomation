@@ -21,7 +21,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -30,7 +29,6 @@ import org.openqa.selenium.interactions.Actions;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -271,6 +269,13 @@ public class Ext4GridRef extends Ext4CmpRef
             {
                 grid = Locator.id(_id).findElement(_test.getDriver());
                 cell = cellLoc.waitForElement(grid, 10000);
+                try
+                {
+                    // Clicking the 'td' doesn't work for some grids on certain browsers. Use nested <div> if it exists.
+                    // Specifically, 'laboratory-prepareExptRun.view' was having problems
+                    cell = Locator.tag("div").findElement(cell);
+                }
+                catch (NoSuchElementException ignore) {}
             }
             catch (NoSuchElementException e)
             {
