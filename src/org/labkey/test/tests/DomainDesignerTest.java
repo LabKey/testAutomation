@@ -49,7 +49,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({BVT.class})
 public class DomainDesignerTest extends BaseWebDriverTest

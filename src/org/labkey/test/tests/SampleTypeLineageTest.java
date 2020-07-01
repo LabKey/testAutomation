@@ -41,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.tests.SampleSetTest.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
@@ -221,7 +221,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 new FieldDefinition("StringCol", FieldDefinition.ColumnType.String),
                 new FieldDefinition("DateCol", FieldDefinition.ColumnType.DateAndTime),
                 new FieldDefinition("BoolCol", FieldDefinition.ColumnType.Boolean));
-        File sampleTypeFile = TestFileUtils.getSampleData("sampleSet.xlsx");
+        File sampleTypeFile = TestFileUtils.getSampleData("sampleType.xlsx");
 
         clickProject(PROJECT_NAME);
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
@@ -269,7 +269,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("inputRole3"), "Add a new role...");
         setFormElement(Locator.id("customRole3"), "FourthRole");
         selectOptionByText(Locator.name("outputCount"), "2");
-        selectOptionByText(Locator.name("targetSampleSetId"), subFolderSampleType + " in /" + getProjectName() + "/" + SUB_FOLDER_NAME);
+        selectOptionByText(Locator.name("targetSampleTypeId"), subFolderSampleType + " in /" + getProjectName() + "/" + SUB_FOLDER_NAME);
         clickButton("Next");
 
         setFormElement(Locator.name("outputSample1_Name"), "SampleSetBVT15");
@@ -297,7 +297,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText("derive samples from this sample"));
 
         selectOptionByText(Locator.name("inputRole0"), "FirstRole");
-        selectOptionByText(Locator.name("targetSampleSetId"), parentFolderSampleType + " in /" + getProjectName());
+        selectOptionByText(Locator.name("targetSampleTypeId"), parentFolderSampleType + " in /" + getProjectName());
         clickButton("Next");
 
         String derivedSampleName = "Only_In_Sub_Folder";
