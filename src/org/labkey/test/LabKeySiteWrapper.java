@@ -1011,6 +1011,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return new PipelineStatusTable(this);
     }
 
+    public void goToExternalToolPage()
+    {
+        clickUserMenuItem("External Tool Settings");
+        waitForText("API keys are used to authorize");
+    }
+
     protected WebElement openMenu(String menuText)
     {
         WebElement menu = Locator.menuBarItem(menuText).findElement(getDriver());
