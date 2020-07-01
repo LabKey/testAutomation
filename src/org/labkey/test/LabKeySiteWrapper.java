@@ -331,7 +331,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void signIn(String email, String password)
     {
         attemptSignIn(email, password);
-        waitForElementToDisappear(Locator.id("password"));
         Assert.assertEquals("Logged in as wrong user", email, getCurrentUser());
         WebTestHelper.saveSession(email, getDriver());
     }
@@ -359,7 +358,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertElementPresent(Locator.tagWithName("form", "login"));
         setFormElement(Locator.id("email"), email);
         setFormElement(Locator.id("password"), password);
+        WebElement signInButton = Locator.lkButton("Sign In").findElement(getDriver());
         clickButton("Sign In", 0);
+        shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));
+        shortWait().until(ExpectedConditions.or(
+                ExpectedConditions.stalenessOf(signInButton), // Successful login
+                ExpectedConditions.presenceOfElementLocated(Locators.labkeyError.withText()))); // Error during sign-in
     }
 
     public void signInShouldFail(String email, String password, String... expectedMessages)
