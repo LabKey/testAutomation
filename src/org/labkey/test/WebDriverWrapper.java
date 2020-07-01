@@ -1151,6 +1151,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return whoAmI().getDisplayName();
     }
 
+    public String getCurrentDateFormatString()
+    {
+        return (String)executeScript("return LABKEY.container.formats.dateTimeFormat");
+    }
+
     public boolean onLabKeyPage()
     {
         return (Boolean)executeScript("return window.LABKEY != undefined;");

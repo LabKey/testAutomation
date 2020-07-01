@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -26,8 +27,6 @@ import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
-import org.labkey.remoteapi.query.GetQueriesCommand;
-import org.labkey.remoteapi.query.GetQueriesResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -224,6 +223,10 @@ public class TestDataGenerator
                 return () -> randomFloat(0, 20);
             case "double":
                 return () -> randomDouble(0, 20);
+            case "boolean":
+                return () -> randomBoolean();
+            case "date":
+                return () -> randomDateString(DateUtils.addWeeks(new Date(), -39), new Date());
             default:
                 throw new IllegalArgumentException("ColumnType " + columnType + " isn't implemented yet");
         }
@@ -265,14 +268,24 @@ public class TestDataGenerator
         return  min + r.nextDouble() * (max - min);
     }
 
+    public String randomDateString(Date min, Date max)
+    {
+        return randomDateString("yyyy-MM-dd HH:mm", min, max);
+    }
+
     /*
-    * simple way to get a dateformat:  (String)executeScript("return LABKEY.container.formats.dateTimeFormat");
-    * */
+     * simple way to get a dateformat:  (String)executeScript("return LABKEY.container.formats.dateTimeFormat");
+     * */
     public String randomDateString(String dateFormat, Date min, Date max)
     {
         long random = ThreadLocalRandom.current().nextLong(min.getTime(), max.getTime());
         Date date = new Date(random);
         return new SimpleDateFormat(dateFormat).format(date);
+    }
+
+    public boolean randomBoolean()
+    {
+        return ThreadLocalRandom.current().nextBoolean();
     }
 
     public String writeTsvContents()
