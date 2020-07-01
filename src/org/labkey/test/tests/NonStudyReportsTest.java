@@ -43,16 +43,16 @@ public class NonStudyReportsTest extends ReportTest
     protected final PortalHelper portalHelper = new PortalHelper(this);
     protected static final String ATTACHMENT_USER = "attachment_user1@report.test";
 
-    private static final String ATTACHMENT_REPORT_NAME = "Attachment Report1";
-    private static final String ATTACHMENT_REPORT_DESCRIPTION = "This attachment report uploads a file";
+    private static final String ATTACHMENT_REPORT_NAME = BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String ATTACHMENT_REPORT_DESCRIPTION = BaseWebDriverTest.INJECT_CHARS_1;
     private static final File ATTACHMENT_REPORT_FILE = TestFileUtils.getSampleData("Microarray/test1.jpg"); // arbitrary image file
 
 
-    private static final String ATTACHMENT_REPORT2_NAME = "Attachment Report2";
+    private static final String ATTACHMENT_REPORT2_NAME = BaseWebDriverTest.INJECT_CHARS_2;
     private static final String ATTACHMENT_REPORT3_NAME = "Attachment Report3";
     private static final String UPDATE_ATTACHMENT_REPORT = "Update Attachment Report";
 
-    private static final String ATTACHMENT_REPORT2_DESCRIPTION= "This attachment report points at a file on the server.";
+    private static final String ATTACHMENT_REPORT2_DESCRIPTION= BaseWebDriverTest.INJECT_CHARS_2;
     private static final File ATTACHMENT_REPORT2_FILE = TestFileUtils.getSampleData("Microarray/test2.jpg"); // arbitrary image file
 
 
