@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.security.CreateUserResponse;
+import org.labkey.remoteapi.security.WhoAmIResponse;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 
@@ -48,7 +49,8 @@ public abstract class AbstractUserHelper
 
     public static void saveCurrentDisplayName(WebDriverWrapper wrapper)
     {
-        usersAndDisplayNames.put(wrapper.getCurrentUser(), wrapper.getCurrentUserName());
+        WhoAmIResponse whoAmIResponse = wrapper.whoAmI();
+        usersAndDisplayNames.put(whoAmIResponse.getEmail(), whoAmIResponse.getDisplayName());
     }
 
     // assumes there are not collisions in the database causing unique numbers to be appended

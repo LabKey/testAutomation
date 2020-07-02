@@ -251,6 +251,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             goToHome();
         }
+        WebTestHelper.saveSession(getCurrentUser(), getDriver()); // In case a test signed in without using a helper
     }
 
     @LogMethod
