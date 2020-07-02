@@ -471,37 +471,24 @@ public abstract class WebDriverWrapper implements WrapsDriver
     @LogMethod(quiet = true)
     public void resumeJsErrorChecker()
     {
-        // Turn on server side logging of client errors.
-        if (isScriptCheckEnabled())
-        {
-            Connection cn = createDefaultConnection();
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", true);
-        }
+        setJsErrorLogging(true);
     }
 
     @LogMethod(quiet = true)
     public void pauseJsErrorChecker()
     {
-        // Turn off server side logging of client errors.
+        setJsErrorLogging(false);
+    }
+
+    private void setJsErrorLogging(boolean b)
+    {
+        // Enable/disable server side logging of client errors.
         if (isScriptCheckEnabled())
         {
-            Connection cn = createDefaultConnection();
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", false);
+            // Don't use browser session. Some tests need to pause briefly, while impersonating.
+            Connection cn = WebTestHelper.getRemoteApiConnection(false);
+            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", b);
         }
-    }
-
-    @LogMethod(quiet = true)
-    public void enableUxDomainDesigner()
-    {
-        Connection cn = createDefaultConnection();
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", true);
-    }
-
-    @LogMethod(quiet = true)
-    public void disableUxDomainDesigner()
-    {
-        Connection cn = createDefaultConnection();
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", false);
     }
 
     public enum BrowserType
