@@ -40,27 +40,26 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class NonStudyReportsTest extends ReportTest
 {
-    protected final PortalHelper portalHelper = new PortalHelper(this);
     protected static final String ATTACHMENT_USER = "attachment_user1@report.test";
-
-    private static final String ATTACHMENT_REPORT_NAME = BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String ATTACHMENT_REPORT_NAME = "<script>alert(\"XSS-1!\")</script>";
     private static final String ATTACHMENT_REPORT_DESCRIPTION = BaseWebDriverTest.INJECT_CHARS_1;
     private static final File ATTACHMENT_REPORT_FILE = TestFileUtils.getSampleData("Microarray/test1.jpg"); // arbitrary image file
-
-
     private static final String ATTACHMENT_REPORT2_NAME = BaseWebDriverTest.INJECT_CHARS_2;
-    private static final String ATTACHMENT_REPORT3_NAME = "Attachment Report3";
+    private static final String ATTACHMENT_REPORT3_NAME = "<script>alert(\"XSS-attachment report 3\")</script>";
     private static final String UPDATE_ATTACHMENT_REPORT = "Update Attachment Report";
-
-    private static final String ATTACHMENT_REPORT2_DESCRIPTION= BaseWebDriverTest.INJECT_CHARS_2;
+    private static final String ATTACHMENT_REPORT2_DESCRIPTION = BaseWebDriverTest.INJECT_CHARS_2;
     private static final File ATTACHMENT_REPORT2_FILE = TestFileUtils.getSampleData("Microarray/test2.jpg"); // arbitrary image file
-
-
     private static final String DISCUSSED_REPORT = "Blank R Report";
     private static final String DISCUSSION_BODY_1 = "Starting a discussion";
     private static final String DISCUSSION_TITLE_1 = "Discussion about R report";
     private static final String DISCUSSION_BODY_2 = "Responding to a discussion";
     private static final String DISCUSSION_BODY_3 = "Editing a discussion response";
+    private static final String LINK_REPORT1_NAME = "<script>alert(\"XSS-link report 1\")</script>";
+    private static final String LINK_REPORT1_DESCRIPTION = "This link report points links to an internal page.";
+    private static final String LINK_REPORT1_URL = "/project/home/begin.view";
+    private static final String LINK_REPORT2_NAME = "Link Report2<script>alert(\"XSS-link report 2!\")</script>";
+    private static final String LINK_REPORT2_DESCRIPTION = "This link report points links to an external page.";
+    protected final PortalHelper portalHelper = new PortalHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -96,11 +95,11 @@ public class NonStudyReportsTest extends ReportTest
     {
         clickProject(getProjectName());
         goToManageViews();
-        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Attachment Report");
+        BootstrapMenu.find(getDriver(), "Add Report").clickSubMenu(true, "Attachment Report");
         clickButton("Cancel");
 
-        BootstrapMenu.find(getDriver(),"Add Report")
-                .clickSubMenu(true,"Attachment Report");
+        BootstrapMenu.find(getDriver(), "Add Report")
+                .clickSubMenu(true, "Attachment Report");
         setFormElement(Locator.name("viewName"), ATTACHMENT_REPORT_NAME);
         setFormElement(Locator.name("description"), ATTACHMENT_REPORT_DESCRIPTION);
         setFormElement(Locator.id("uploadFile-button-fileInputEl"), ATTACHMENT_REPORT_FILE);
@@ -262,20 +261,20 @@ public class NonStudyReportsTest extends ReportTest
         clickProject(getProjectName());
 
         goToManageViews();
-        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"R Report");
+        BootstrapMenu.find(getDriver(), "Add Report").clickSubMenu(true, "R Report");
         RReportHelper RReportHelper = new RReportHelper(this);
         RReportHelper.executeScript("# Placeholder script for discussion", "");
         click(Locator.linkWithText("Source"));
         RReportHelper.saveReport(DISCUSSED_REPORT);
         clickReportGridLink(DISCUSSED_REPORT);
 
-        clickMenuButton(true, Locator.tagWithClass("div", "discussion-toggle").findElement(getDriver()),false,"Start new discussion");
+        clickMenuButton(true, Locator.tagWithClass("div", "discussion-toggle").findElement(getDriver()), false, "Start new discussion");
         waitForElement(Locator.id("title"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("title"), DISCUSSION_TITLE_1);
         setFormElement(Locator.id("body"), DISCUSSION_BODY_1);
         clickButton("Submit");
 
-        clickMenuButton(true, Locator.tagWithClass("div", "discussion-toggle").findElement(getDriver()),false,DISCUSSION_TITLE_1);
+        clickMenuButton(true, Locator.tagWithClass("div", "discussion-toggle").findElement(getDriver()), false, DISCUSSION_TITLE_1);
         waitForText(DISCUSSION_TITLE_1);
         assertTextPresent(DISCUSSION_BODY_1);
 
@@ -294,20 +293,13 @@ public class NonStudyReportsTest extends ReportTest
         assertTextPresent(DISCUSSION_BODY_3);
     }
 
-    private static final String LINK_REPORT1_NAME = "Link Report1";
-    private static final String LINK_REPORT1_DESCRIPTION= "This link report points links to an internal page.";
-    private static final String LINK_REPORT1_URL = "/project/home/begin.view";
-
-    private static final String LINK_REPORT2_NAME = "Link Report2";
-    private static final String LINK_REPORT2_DESCRIPTION= "This link report points links to an external page.";
-
     @LogMethod
     private void doLinkReportTest()
     {
         clickProject(getProjectName());
         goToManageViews();
 
-        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Link Report");
+        BootstrapMenu.find(getDriver(), "Add Report").clickSubMenu(true, "Link Report");
         waitForElement(Locator.tag("li").containing("URL must be absolute"));
         assertElementPresent(Locator.tag("li").containing("This field is required"), 2);
         setFormElement(Locator.name("viewName"), LINK_REPORT1_NAME);
@@ -329,7 +321,7 @@ public class NonStudyReportsTest extends ReportTest
         portalHelper.clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
         setFormElement(Locator.name("viewName"), LINK_REPORT2_NAME);
         setFormElement(Locator.name("description"), LINK_REPORT2_DESCRIPTION);
-        setFormElement(Locator.name("linkUrl"), getBaseURL() + LINK_REPORT1_URL);
+        setFormElement(Locator.name("linkUrl"), WebTestHelper.getBaseURL() + LINK_REPORT1_URL);
         waitForElementToDisappear(Locator.tag("li").containing("URL must be absolute"));
         assertTrue("Expected targetNewWindow checkbox to be checked", _ext4Helper.isChecked("Open link report in new window?"));
         clickButton("Save");
