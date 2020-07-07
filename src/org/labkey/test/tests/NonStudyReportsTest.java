@@ -41,11 +41,11 @@ import static org.junit.Assert.assertTrue;
 public class NonStudyReportsTest extends ReportTest
 {
     protected static final String ATTACHMENT_USER = "attachment_user1@report.test";
-    private static final String ATTACHMENT_REPORT_NAME = "<script>alert(\"XSS-1!\")</script>";
+    private static final String ATTACHMENT_REPORT_NAME = "Attachment report 1" + BaseWebDriverTest.INJECT_CHARS_1;
     private static final String ATTACHMENT_REPORT_DESCRIPTION = BaseWebDriverTest.INJECT_CHARS_1;
     private static final File ATTACHMENT_REPORT_FILE = TestFileUtils.getSampleData("Microarray/test1.jpg"); // arbitrary image file
-    private static final String ATTACHMENT_REPORT2_NAME = BaseWebDriverTest.INJECT_CHARS_2;
-    private static final String ATTACHMENT_REPORT3_NAME = "<script>alert(\"XSS-attachment report 3\")</script>";
+    private static final String ATTACHMENT_REPORT2_NAME = "Attachment report 2" + BaseWebDriverTest.INJECT_CHARS_2;
+    private static final String ATTACHMENT_REPORT3_NAME = "Attachment report 3" + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String UPDATE_ATTACHMENT_REPORT = "Update Attachment Report";
     private static final String ATTACHMENT_REPORT2_DESCRIPTION = BaseWebDriverTest.INJECT_CHARS_2;
     private static final File ATTACHMENT_REPORT2_FILE = TestFileUtils.getSampleData("Microarray/test2.jpg"); // arbitrary image file
@@ -54,10 +54,10 @@ public class NonStudyReportsTest extends ReportTest
     private static final String DISCUSSION_TITLE_1 = "Discussion about R report";
     private static final String DISCUSSION_BODY_2 = "Responding to a discussion";
     private static final String DISCUSSION_BODY_3 = "Editing a discussion response";
-    private static final String LINK_REPORT1_NAME = "<script>alert(\"XSS-link report 1\")</script>";
-    private static final String LINK_REPORT1_DESCRIPTION = "This link report points links to an internal page.";
+    private static final String LINK_REPORT1_NAME = "Link report 1" + BaseWebDriverTest.INJECT_CHARS_2;
+    private static final String LINK_REPORT1_DESCRIPTION = "Link report 1" + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String LINK_REPORT1_URL = "/project/home/begin.view";
-    private static final String LINK_REPORT2_NAME = "Link Report2<script>alert(\"XSS-link report 2!\")</script>";
+    private static final String LINK_REPORT2_NAME = "Link report 2" + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String LINK_REPORT2_DESCRIPTION = "This link report points links to an external page.";
     protected final PortalHelper portalHelper = new PortalHelper(this);
 
