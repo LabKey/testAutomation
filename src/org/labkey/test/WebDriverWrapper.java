@@ -164,7 +164,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         // Eliminate noise from org.openqa.selenium.remote.ProtocolHandshake and org.openqa.selenium.interactions.Actions
         if (!isWebDriverLoggingEnabled())
-            Logger.getLogger("org.openqa.selenium").setLevel(Level.WARNING);
+            LogManager.getLogger("org.openqa.selenium").setLevel(Level.WARNING);
     }
 
     public WebDriverWrapper()
