@@ -14,13 +14,13 @@ import java.util.Map;
 
 // This is the same component (collection of atomic elements) used in insertAssay and createSamples.
 
-public class SampleCRUDPanel extends WebDriverComponent<SampleCRUDPanel.ElementCache>
+public class InsertEntitiesPanel extends WebDriverComponent<InsertEntitiesPanel.ElementCache>
 {
 
     private final WebDriver _driver;
     private final WebElement _editingDiv;
 
-    public SampleCRUDPanel(WebElement element, WebDriver driver)
+    public InsertEntitiesPanel(WebElement element, WebDriver driver)
     {
         _driver = driver;
         _editingDiv = element;
@@ -38,7 +38,7 @@ public class SampleCRUDPanel extends WebDriverComponent<SampleCRUDPanel.ElementC
         return _driver;
     }
 
-    public SampleCRUDPanel addRecords(List<Map<String, Object>> records)
+    public InsertEntitiesPanel addRecords(List<Map<String, Object>> records)
     {
         getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(records.size()));
         elementCache().addRowsButton.click();
@@ -61,13 +61,13 @@ public class SampleCRUDPanel extends WebDriverComponent<SampleCRUDPanel.ElementC
         return this;
     }
 
-    public SampleCRUDPanel setRecordValues(Map<String, Object> columnValues)
+    public InsertEntitiesPanel setRecordValues(Map<String, Object> columnValues)
     {
         int insertRowIndex = elementCache().grid.listOfnotPopulatedRows().get(0);
         return setRecordValues(columnValues, insertRowIndex);
     }
 
-    public SampleCRUDPanel setRecordValues(Map<String, Object> columnValues, int row)
+    public InsertEntitiesPanel setRecordValues(Map<String, Object> columnValues, int row)
     {
         for(String columnName : columnValues.keySet())
         {
@@ -97,13 +97,13 @@ public class SampleCRUDPanel extends WebDriverComponent<SampleCRUDPanel.ElementC
         return elementCache().grid.isDisplayed();
     }
 
-    public SampleCRUDPanel setAddRows(int numOfRows)
+    public InsertEntitiesPanel setAddRows(int numOfRows)
     {
         getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(numOfRows));
         return this;
     }
 
-    public SampleCRUDPanel clickAddRows()
+    public InsertEntitiesPanel clickAddRows()
     {
         elementCache().addRowsButton.click();
         return this;
@@ -165,7 +165,7 @@ public class SampleCRUDPanel extends WebDriverComponent<SampleCRUDPanel.ElementC
         WebElement addRowsButton = Locator.buttonContainingText("Add").findWhenNeeded(_driver);
     }
 
-    public static class InsertRecordFinder extends WebDriverComponent.WebDriverComponentFinder<SampleCRUDPanel, InsertRecordFinder>
+    public static class InsertRecordFinder extends WebDriverComponent.WebDriverComponentFinder<InsertEntitiesPanel, InsertRecordFinder>
     {
 
         private Locator _locator;
@@ -177,9 +177,9 @@ public class SampleCRUDPanel extends WebDriverComponent<SampleCRUDPanel.ElementC
         }
 
         @Override
-        protected SampleCRUDPanel construct(WebElement element, WebDriver driver)
+        protected InsertEntitiesPanel construct(WebElement element, WebDriver driver)
         {
-            return new SampleCRUDPanel(element, driver);
+            return new InsertEntitiesPanel(element, driver);
         }
 
         @Override
