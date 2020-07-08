@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.util.TestLogger.log;
@@ -155,6 +156,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
 
         return gridData;
+    }
+
+    public List<String> getColumnData(String columnLabel)
+    {
+        return getGridData().stream().map(a-> a.get(columnLabel)).collect(Collectors.toList());
     }
 
     private WebElement getRow(int index)
