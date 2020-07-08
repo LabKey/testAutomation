@@ -443,7 +443,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     {
         assertTrue("Script is missing SelectRowsCommand", javaScript.contains("SelectRowsCommand cmd = new SelectRowsCommand(\"" + getDataRegionSchemaName() + "\", \"" + getDataRegionQueryName() + "\");"));
         if (null != filterColumn)
-            assertTrue("Script is missing addFilter()", javaScript.contains("cmd.addFilter(\"" + filterColumn + "\", \"foo\", Filter.Operator.EQUAL);"));
+            assertTrue("Script is missing addFilter()", javaScript.contains("cmd.addFilter(\"" + filterColumn + "\", \"foo\", Filter.Operator.getOperator(\"EQUAL\"));"));
     }
 
     protected final void assertJavaScriptScriptContents(String javaScriptScript, String filterColumn)
