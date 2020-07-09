@@ -1984,7 +1984,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         mouseOver(Locator.byClass(".x4-tab-button")); // Move away from schema tree to dismiss tooltip
         queryLink.click();
-        waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
+        waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWithIgnoreCase(schemaName + "." + queryName), 30000);
     }
 
     public void clickFkExpando(String schemaName, String queryName, String columnName)

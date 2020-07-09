@@ -1207,6 +1207,11 @@ public abstract class Locator extends By
             return this.withPredicate("starts-with(normalize-space(), "+xq(text)+")");
         }
 
+        public XPathLocator startsWithIgnoreCase(String text)
+        {
+            return this.withPredicate("starts-with(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(text.toLowerCase())+")");
+        }
+
         @Override
         public XPathLocator index(Integer index)
         {
