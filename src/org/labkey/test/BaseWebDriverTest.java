@@ -590,7 +590,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             enableEmailRecorder();
         }
-        catch (AssumptionViolatedException ignore) { } // Tests should, generally, enable dumbster if they need it
+        catch (AssumptionViolatedException | AssertionError ignore) { } // Tests should, generally, enable dumbster if they need it
         reenableMiniProfiler = disableMiniProfiler();
 
         if (isSystemMaintenanceDisabled())
@@ -1021,7 +1021,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private void waitForPendingRequests(int msWait)
     {
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
         MutableLong pendingRequestCount = new MutableLong(-1);
         waitFor(() -> {
             pendingRequestCount.setValue(getPendingRequestCount(connection));

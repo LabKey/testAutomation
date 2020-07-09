@@ -1362,10 +1362,12 @@ public class ClientAPITest extends BaseWebDriverTest
     }
 
     private static final String AUTOCOMPLETE_USER = "autocomplete1@clientapi.test";
+    private String _autocompleteUserDisplayName = null;
 
     @Test
     public void usernameAutocompleteValuesTest()
     {
+        _autocompleteUserDisplayName = _userHelper.getDisplayNameForEmail(AUTOCOMPLETE_USER);
         Connection cn = getConnection(true);
         verifyAutocompletionResponse(cn, "security", "completeUser", false, true);
         verifyAutocompletionResponse(cn, "security", "completeUserRead", false, true);
@@ -1405,7 +1407,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @LogMethod
     private void verifyAutocompletionResponse(Connection cn, String controller, String action, boolean displayNameOnly, boolean actionAllowed)
     {
-        Command command = new Command(controller, action);
+        Command<?> command = new Command<>(controller, action);
         Map<String, Object> completionValues;
         String errMsg = "for controller " + controller + ", displayNameOnly == " + Boolean.toString(displayNameOnly);
         try
@@ -1424,14 +1426,14 @@ public class ClientAPITest extends BaseWebDriverTest
         JSONArray entries = (JSONArray)completionValues.get("completions");
         assertTrue("No autocompletion entries returned" + errMsg, entries.size() > 0);
         boolean testPassed = false;
-        String displayName = _userHelper.getDisplayNameForEmail(AUTOCOMPLETE_USER);
+
         for (JSONObject entry : (List<JSONObject>)entries)
         {
             // The order in the response isn't guaranteed. Loop to find one we know should be in the list.
             String responseValue = (String)entry.get("value");
-            if (StringUtils.startsWith(responseValue, displayName))
+            if (StringUtils.startsWith(responseValue, _autocompleteUserDisplayName))
             {
-                String correctValue = displayNameOnly ? displayName : AUTOCOMPLETE_USER + " (" + displayName + ")";
+                String correctValue = displayNameOnly ? _autocompleteUserDisplayName : AUTOCOMPLETE_USER + " (" + _autocompleteUserDisplayName + ")";
                 assertEquals("Incorrect autocomplete value from for user " + AUTOCOMPLETE_USER + errMsg, correctValue, responseValue);
                 testPassed = true;
                 break;

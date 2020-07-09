@@ -138,6 +138,8 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     @Test
     public void testUserVisibilityViaLookup()
     {
+        final String displayName = _userHelper.getDisplayNameForEmail(CHECKED_USER);
+
         createHiddenEmailList();
 
         impersonate(IMPERSONATED_USER);
@@ -146,9 +148,9 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         log("Verify that emails cannot be seen in list via lookup");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
         DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
-        assertTextPresent(_userHelper.getDisplayNameForEmail(CHECKED_USER));
+        assertTextPresent(displayName);
         // This user does not have permission to see user details, so no link
-        assertElementNotPresent(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CHECKED_USER)));
+        assertElementNotPresent(Locator.linkWithText(displayName));
         assertTextNotPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
 
         stopImpersonating();
@@ -164,6 +166,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     @Test
     public void testUserVisibilityViaQuery()
     {
+        final String displayName = _userHelper.getDisplayNameForEmail(CHECKED_USER);
         createUsersTableView();
 
         impersonate(IMPERSONATED_USER);
@@ -171,7 +174,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         log("Verify that emails cannot be seen in query webpart");
         DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
-        assertElementPresent(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CHECKED_USER)));
+        assertElementPresent(Locator.linkWithText(displayName));
         assertTextNotPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
 
         stopImpersonating();
@@ -186,14 +189,16 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     @Test
     public void testUserVisibilityViaContactsWebPart()
     {
+        final String displayName = _userHelper.getDisplayNameForEmail(CHECKED_USER);
+
         goToProjectHome();
 
         new PortalHelper(this).addBodyWebPart("Contacts");
 
         impersonate(IMPERSONATED_USER);
 
-        log("Verify that user infor cannot be seen in contacts webpart");
-        assertElementPresent(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CHECKED_USER)));
+        log("Verify that user information cannot be seen in contacts webpart");
+        assertElementPresent(Locator.linkWithText(displayName));
         assertTextNotPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING, TEST_GROUP);
 
         stopImpersonating();

@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.core.admin.logger.ManagerPage;
 
@@ -36,6 +37,9 @@ public abstract class Log4jUtils
     @LogMethod(quiet = true)
     public static void setLogLevel(@LoggedParam String name, @LoggedParam ManagerPage.LoggingLevel level)
     {
+        if (TestProperties.isPrimaryUserAppAdmin())
+            return;
+
         Connection connection = WebTestHelper.getRemoteApiConnection();
         PostCommand<?> command = new PostCommand<>("logger", "update");
         Map<String, Object> params = new HashMap<>();
@@ -64,6 +68,9 @@ public abstract class Log4jUtils
     @LogMethod(quiet = true)
     public static void resetAllLogLevels()
     {
+        if (TestProperties.isPrimaryUserAppAdmin())
+            return;
+
         Connection connection = WebTestHelper.getRemoteApiConnection();
         PostCommand<?> command = new PostCommand<>("logger", "reset");
         try

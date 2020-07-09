@@ -389,7 +389,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         selectRows.setColumns(Arrays.asList("RowId", "SampleId", "HiddenData"));
         selectRows.setFilters(Arrays.asList(new Filter("run/rowId", runId)));
 
-        SelectRowsResponse selectResp = selectRows.execute(createDefaultConnection(true), PROJECT_NAME);
+        SelectRowsResponse selectResp = selectRows.execute(createDefaultConnection(), PROJECT_NAME);
         List<Map<String, Object>> rows = selectResp.getRows();
         log("rows:\n" + rows);
         assertEquals("Expected single data row", 1, rows.size());

@@ -91,7 +91,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("Number", FieldDefinition.ColumnType.Integer)
                 ));
-        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
@@ -124,7 +124,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("Number", 3, "integerField", 123456789, "decimalField", 12345.678));
         dgen.addCustomRow(Map.of("Number", 4, "integerField", 98765432, "decimalField", 1234.56789));
         dgen.addCustomRow(Map.of("Number", 5, "integerField", 4, "decimalField", 5.654));
-        SaveRowsResponse response = dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        SaveRowsResponse response = dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));
@@ -156,7 +156,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("stringField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("multilineField", FieldDefinition.ColumnType.MultiLine)
                 ));
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -179,7 +179,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "second", "stringField", "basic string heeeeere", "multiLineField", "multi\nline\nfield with extra"));
         dgen.addCustomRow(Map.of("name", "third", "stringField", "basic string here", "multiLineField", "multi\nline\nfield and so much more"));
         dgen.addCustomRow(Map.of("name", "fourth", "stringField", "basic string here", "multiLineField", "multi\nline\nfield this is silly"));
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(sampleType));
@@ -201,7 +201,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("deleteMe", FieldDefinition.ColumnType.String)
                 ));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
         List<PropertyDescriptor> createdFields = createResponse.getDomain().getFields();
         assertTrue(createdFields.get(0).getName().equals("deleteMe"));
 
@@ -214,12 +214,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
 
         GetDomainCommand domainCommand = new GetDomainCommand("exp.materials", sampleType);
-        DomainResponse afterResponse = domainCommand.execute(createDefaultConnection(true), getProjectName());
+        DomainResponse afterResponse = domainCommand.execute(createDefaultConnection(), getProjectName());
         Domain domain = afterResponse.getDomain();
         assertEquals("expect only field in the domain to have been deleted", 0, domain.getFields().size());
 
         // double-check to ensure the column has been deleted
-        SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection(true));
+        SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection());
         List<String> columnsAfterDelete = rowsResponse.getColumnModel().stream().map(col -> (String) col.get("dataIndex")).collect(Collectors.toList());
         Assert.assertThat("Columns after delete", columnsAfterDelete, CoreMatchers.allOf(CoreMatchers.hasItem("Name"), CoreMatchers.not(CoreMatchers.hasItem("deleteMe"))));
 
@@ -240,7 +240,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -261,7 +261,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "billy", "addedField", "05-15-2017 23:25"));
         dgen.addCustomRow(Map.of("name", "william", "addedField", "07-25-2007 11:25"));
         dgen.addCustomRow(Map.of("name", "charlie", "addedField", "11-15-1997 13:25"));
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(sampleType));
@@ -287,7 +287,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -324,7 +324,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -364,7 +364,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
@@ -388,12 +388,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         dgen.addCustomRow(Map.of("name", "first", "color", "orange"));
         dgen.addCustomRow(Map.of("name", "second", "color", "green"));
         dgen.addCustomRow(Map.of("name", "third", "color", "blue"));
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
@@ -426,12 +426,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)
                             .setRequired(true),                                                                 // <-- marked 'required'
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         dgen.addCustomRow(Map.of("name", "first", "color", "orange"));
         dgen.addCustomRow(Map.of("name", "second", "color", "green"));
         dgen.addCustomRow(Map.of("name", "third", "color", "blue"));
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
@@ -453,7 +453,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // create the list with no fields to start
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo);
-        dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", list);
@@ -483,7 +483,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -504,7 +504,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -554,7 +554,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -571,7 +571,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 error.contains(expectedError));
 
         // double-check to ensure the column has not been altered on the server side
-        SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection(true));
+        SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection());
         List<String> columnsAfterSaveAttempt = rowsResponse.getColumnModel().stream().map(col -> (String) col.get("dataIndex")).collect(Collectors.toList());
         Assert.assertThat("Columns after delete", columnsAfterSaveAttempt,
                 CoreMatchers.allOf(hasItems("Name", "testCol", "extraField"),
@@ -596,7 +596,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -628,7 +628,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -661,7 +661,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
 
@@ -674,7 +674,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         domainDesignerPage.clickFinish();
         // expect to arrive at project home, with a list of 'sample types'
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
         clickAndWait(Locator.linkWithText(sampleType));
 
         DataRegionTable sampleTypeTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
@@ -695,7 +695,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // create a little test data
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test",
@@ -715,11 +715,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
         restrictedPHI.setPHILevel(FieldDefinition.PhiSelectType.Restricted);
 
         domainDesignerPage.clickFinish();
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
         clickAndWait(Locator.linkWithText(sampleType));
 
         DataRegionTable sampleTypeTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
-        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
 
         assertEquals("NotPHI", getColumn(domainResponse.getDomain(), "notPHI").getPHI());
         assertEquals("Limited", getColumn(domainResponse.getDomain(), "limitedPHI").getPHI());
@@ -738,7 +738,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
 
@@ -751,7 +751,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         extraFieldRow.setMissingValuesEnabled(false);
 
         domainDesignerPage.clickFinish();
-        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
         assertEquals("expect column to have MissingValue enabled", true, getColumn(domainResponse.getDomain(), "missingValue").getAllProperties().get("mvEnabled"));
         assertEquals("expect column not to have MissingValue enabled", false, getColumn(domainResponse.getDomain(), "extraField").getAllProperties().get("mvEnabled"));
     }
@@ -767,7 +767,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -779,7 +779,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         domainDesignerPage.clickFinish();
 
-        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
         assertEquals("dimensionField should have dimension marked true", true, getColumn(domainResponse.getDomain(), "dimensionField").getDimension());
         assertEquals("extraField should not have dimension marked true", false, getColumn(domainResponse.getDomain(), "extraField").getDimension());
     }
@@ -795,7 +795,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -807,7 +807,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         domainDesignerPage.clickFinish();
 
-        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
 
         assertEquals("measureField should have dimension marked true", true, getColumn(domainResponse.getDomain(), "measureField").getMeasure());
         assertEquals("extraField should not have dimension marked true", false, getColumn(domainResponse.getDomain(), "extraField").getMeasure());
@@ -824,7 +824,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -836,7 +836,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         domainDesignerPage.clickFinish();
 
-        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
         assertEquals("variableField should have recommendedVariable marked true", true, getColumn(domainResponse.getDomain(), "variableField").getAllProperties().get("recommendedVariable"));
         assertEquals("extraField should not have recommendedVariable marked true", false, getColumn(domainResponse.getDomain(), "extraField").getAllProperties().get("recommendedVariable"));
     }
@@ -852,7 +852,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo1)
@@ -860,7 +860,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -878,7 +878,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         domainDesignerPage.clickFinish();
 
-        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor lookupFieldDescriptor = getColumn(domainResponse.getDomain(), "lookUpField");
         assertEquals("lookUpField from folder is incorrect", null, lookupFieldDescriptor.getAllProperties().get("lookupContainer"));
         assertEquals("lookUpField schema name is incorrect", "lists", lookupFieldDescriptor.getAllProperties().get("lookupSchema"));
@@ -897,14 +897,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "lists", mainListName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo1)
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse1 = dgen.createDomain(createDefaultConnection(true), "VarList", Map.of("keyName", "id"));
+        DomainResponse createResponse1 = dgen.createDomain(createDefaultConnection(), "VarList", Map.of("keyName", "id"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", mainListName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -921,7 +921,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertEquals("Incorrect detail message", "Current Folder > lists > lookUpList", lookUpRow.detailsMessage());
         domainDesignerPage.clickFinish();
 
-        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor lookupColumn = getColumn(domainResponse.getDomain(), "lookUpField"); // getColumn asserts the column is non-null
 
         assertEquals("lookUpField schema name should be present", "lists", lookupColumn.getAllProperties().get("lookupSchema"));
@@ -938,7 +938,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
         String listName1 = "lookupValidatorLookupList";         // this list will contain lookup values
         String lookupList1Item = listName1 + " (Integer)";
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName1);
@@ -946,11 +946,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse1 = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        DomainResponse createResponse1 = dgen1.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
         dgen1.addCustomRow(Map.of("name", "joey", "color", "green"));
         dgen1.addCustomRow(Map.of("name", "billy", "color", "red"));
         dgen1.addCustomRow(Map.of("name", "eddie", "color", "blue"));
-        dgen1.insertRows(createDefaultConnection(true), dgen1.getRows());
+        dgen1.insertRows(createDefaultConnection(), dgen1.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -966,7 +966,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
 
         // now make sure the validator is set
-        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor lookupColumn = getColumn(domainResponse.getDomain(), "looky");
         Map<String, Object> propertyValidator = getPropertyValidator(lookupColumn, "Lookup Validator");
     }
@@ -980,7 +980,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -992,7 +992,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
 
         // now make sure the validator is not yet set
-        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor colorCol = getColumn(domainResponse.getDomain(), "color");
         assertNull("expect default value to not be set yet", colorCol.getAllProperties().get("defaultValue"));
 
@@ -1005,7 +1005,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         setFormElement(Locator.input("color"), "green");
         clickButton("Save Defaults");
 
-        DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor updatedColor = getColumn(updatedResponse.getDomain(), "color");
         assertEquals("expect default value to be green", "green", updatedColor.getAllProperties().get("defaultValue"));
     }
@@ -1024,7 +1024,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
                         TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
@@ -1058,7 +1058,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         domainDesignerPage.clickCancelWithUnsavedChanges().saveChanges(); // this should save the changes
 
-        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse response = dgen.getDomain(createDefaultConnection());
 
         PropertyDescriptor faveSnackRow = getColumn(response.getDomain(), "favoriteSnack");
         PropertyDescriptor newFieldRow = getColumn(response.getDomain(), "newField");
@@ -1082,14 +1082,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         new FieldDefinition("color", FieldDefinition.ColumnType.String),
                         new FieldDefinition("manufacturer", FieldDefinition.ColumnType.String),
                         new FieldDefinition("volume", FieldDefinition.ColumnType.Decimal)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         dgen.addCustomRow(Map.of("name", "agar", "color", "green", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "stuff", "color", "clear", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "icecream", "color", "blue", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "pbs", "color", "yellow", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "slurm", "color", "orange",                                  "volume", 2.34));  //<-- no value for manufacturer
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleTypeName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -1120,14 +1120,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         new FieldDefinition("color", FieldDefinition.ColumnType.String),
                         new FieldDefinition("manufacturer", FieldDefinition.ColumnType.String),
                         new FieldDefinition("volume", FieldDefinition.ColumnType.Decimal)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         dgen.addCustomRow(Map.of("name", "agar", "color", "green", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "stuff", "color", "clear", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "icecream", "color", "blue", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "pbs", "color", "yellow", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "slurm", "color", "orange","manufacturer", "slurmCo","volume", 2.34));
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleTypeName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -1137,7 +1137,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setRequiredField(true);
         domainDesignerPage.clickFinish();
 
-        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse response = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor manufacturerRow = getColumn(response.getDomain(), "manufacturer");
         assertEquals("expect row to be marked 'required'", true, manufacturerRow.getRequired());
     }
@@ -1157,7 +1157,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
                         new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "id"));
+        DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
@@ -1181,7 +1181,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
                         new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String),
                         new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
@@ -1193,7 +1193,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
 
         // now verify the expected validator is formed and added to the field's validator array
-        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse response = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor sizeCol = getColumn(response.getDomain(), "size");
         Map<String, Object> validator = getPropertyValidator(sizeCol, "midsize");
         assertEquals("expect expression to be ", "~gte=2&~lte=3", validator.get("expression"));
@@ -1216,13 +1216,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
                         new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String),
                         new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         dgen.addCustomRow(Map.of("name", "billy", "favoriteIceCream", "vanilla", "favoriteSnack", "apple", "size", 12));
         dgen.addCustomRow(Map.of("name", "jeffy", "favoriteIceCream", "chocolate", "favoriteSnack", "almond brittle", "size", 12));
         dgen.addCustomRow(Map.of("name", "alex", "favoriteIceCream", "strawberry", "favoriteSnack", "peanuts", "size", 12));
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows()); // insert test data into the list
+        dgen.insertRows(createDefaultConnection(), dgen.getRows()); // insert test data into the list
 
         DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
         ConditionalFormatDialog formatDlg = favoriteSnack.clickConditionalFormatButton();
@@ -1234,7 +1234,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
 
         // now verify the expected validator is formed and added to the field's validator array
-        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse response = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor faveSnackCol = getColumn(response.getDomain(), "favoriteSnack");
         Map<String, Object> validator = getConditionalFormats(faveSnackCol, "format.column~doesnotcontain=almond");
         assertEquals("expect italics to be set", true, validator.get("italic"));
@@ -1254,7 +1254,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
                         new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String),
                         new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
@@ -1271,7 +1271,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
 
         // now verify the expected validator is formed and added to the field's validator array
-        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse response = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor faveSnackCol = getColumn(response.getDomain(), "favoriteSnack");
         Map<String, Object> specialCharsValidator = getPropertyValidator(faveSnackCol, "neverTwizzlers");
         assertEquals("validator we just created should be new", true, specialCharsValidator.get("new"));
@@ -1294,7 +1294,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
@@ -1324,7 +1324,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
 
         // now verify the expected validator is formed and added to the field's validator array
-        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse response = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor faveSnackCol = getColumn(response.getDomain(), "favoriteSnack");
         Map<String, Object> specialCharsValidator = getPropertyValidator(faveSnackCol, "specialChars");
         assertEquals("validator we just created should be new", true, specialCharsValidator.get("new"));
@@ -1351,7 +1351,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
 
         // now confirm 2 validators on the field
-        DomainResponse newResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse newResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor snackField = getColumn(newResponse.getDomain(), "favoriteSnack");
         List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)snackField.getAllProperties().get("propertyValidators");
 
@@ -1379,7 +1379,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow size = domainFormPanel.getField("size");
@@ -1399,7 +1399,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
 
         // now verify we have 3 formats on the size field
-        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse response = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor sizeCol = getColumn(response.getDomain(), "size");
         Map<String, Object> lte2 = getPropertyValidator(sizeCol, "lte2");
         Map<String, Object> equals3 = getPropertyValidator(sizeCol, "equals3");
@@ -1422,7 +1422,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
 
         // now verify we have 2 formats on the size field
-        DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor updatedSizeCol = getColumn(updatedResponse.getDomain(), "size");
         List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)updatedSizeCol.getAllProperties().get("propertyValidators");
         assertEquals("expect only 2 validators on the field",2, validators.size());
@@ -1443,7 +1443,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("superHero", FieldDefinition.ColumnType.String)));
-        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(true), "IntList", Map.of("keyName", "Key"));
+        DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "Key"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow superHero = domainFormPanel.getField("superHero");
@@ -1465,7 +1465,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
 
         // now verify we have 3
-        DomainResponse response = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse response = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor heroCol = getColumn(response.getDomain(), "superHero");
         Map<String, Object> thorMap = getConditionalFormats(heroCol, "format.column~eq=Thor");
         Map<String, Object> aquaMap = getConditionalFormats(heroCol, "format.column~eq=Aquaman");
@@ -1484,7 +1484,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dlg.clickApply();
         domainDesignerPage.clickFinish();
 
-        DomainResponse validationResponse = dgen.getDomain(createDefaultConnection(true));
+        DomainResponse validationResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor editedHeroCol = getColumn(validationResponse.getDomain(), "superHero");
 
         List<Map<String, Object>> formats = (ArrayList<Map<String, Object>>)editedHeroCol.getAllProperties().get("conditionalFormats");

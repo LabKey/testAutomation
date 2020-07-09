@@ -310,6 +310,11 @@ public class WebTestHelper
                 }
                 else
                     System.out.println("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
+
+                if ("/".equals(_contextPath))
+                {
+                    _contextPath = "";
+                }
             }
             return _contextPath;
         }
@@ -389,27 +394,26 @@ public class WebTestHelper
 
     public static Connection getRemoteApiConnection()
     {
-        return getRemoteApiConnection(false);
+        return getRemoteApiConnection(true);
     }
 
-    public static Connection getRemoteApiConnection(boolean includeCookies)
+    public static Connection getRemoteApiConnection(boolean includeCookiesFromPrimaryUser)
     {
         String username = PasswordUtil.getUsername();
         Connection connection = new Connection(getBaseURL(), username, PasswordUtil.getPassword());
 
-        if (includeCookies)
+        if (includeCookiesFromPrimaryUser)
             addCachedCookies(connection, username);
 
         return connection;
     }
 
-    private static Connection addCachedCookies(Connection connection, String username)
+    private static void addCachedCookies(Connection connection, String username)
     {
         for (Cookie cookie : getCookies(username).values())
         {
             connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
         }
-        return connection;
     }
 
     public static void logToServer(String message)
@@ -431,7 +435,7 @@ public class WebTestHelper
             return;
         }
 
-        PostCommand command = new PostCommand("admin", "log");
+        PostCommand<?> command = new PostCommand<>("admin", "log");
         Map<String, Object> params = new HashMap<>();
         params.put("message", message);
         command.setParameters(params);
@@ -751,49 +755,6 @@ public class WebTestHelper
         @Override
         public int hashCode() {
             return (41 * (41 + getProjectName().hashCode()) + getFolderName().hashCode());
-        }
-    }
-
-    public static class MapArea
-    {
-        private String _shape;
-        private String _href;
-        private String _title;
-        private String _alt;
-        private String _coords;
-
-        public MapArea(String shape, String href, String title, String alt, String coords)
-        {
-            _shape = shape;
-            _href = href;
-            _title = title;
-            _alt = alt;
-            _coords = coords;
-        }
-
-        public String getAlt()
-        {
-            return _alt;
-        }
-
-        public String getCoords()
-        {
-            return _coords;
-        }
-
-        public String getHref()
-        {
-            return _href;
-        }
-
-        public String getShape()
-        {
-            return _shape;
-        }
-
-        public String getTitle()
-        {
-            return _title;
         }
     }
 }

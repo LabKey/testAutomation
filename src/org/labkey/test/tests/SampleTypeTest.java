@@ -300,11 +300,11 @@ public class SampleTypeTest extends BaseWebDriverTest
                         new FieldDefinition("intData", ColumnType.Integer),
                         new FieldDefinition("floatData", ColumnType.Decimal)
                 ));
-        dgen.createDomain(createDefaultConnection(true), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
         dgen.addCustomRow(Map.of("name", "A", "strData", "argy", "intData", 6, "floatData", 2.5));
         dgen.addCustomRow(Map.of("name", "B", "strData", "bargy","intData", 7, "floatData", 3.5));
         dgen.addCustomRow(Map.of("name", "C", "strData", "foofoo","intData", 8, "floatData", 4.5));
-        dgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         // create the lookup sample type in a different folder- configured to look to the first one
         String lookupContainer = getProjectName() + "/" + LOOKUP_FOLDER;
@@ -320,14 +320,14 @@ public class SampleTypeTest extends BaseWebDriverTest
                         new FieldDefinition("floatLooky", ColumnType.Decimal)
                                 .setLookup("exp.materials", "sampleData", lookupContainer)
                 ));
-        lookupDgen.createDomain(createDefaultConnection(true), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
+        lookupDgen.createDomain(createDefaultConnection(), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
         lookupDgen.addCustomRow(Map.of("name", "B"));
 
         // If this is to be a look-up to another sample type I believe the values should be the row index and not the name.
         lookupDgen.addCustomRow(Map.of("strLookup", "B"));
         lookupDgen.addCustomRow(Map.of("intLookup", "B"));
         lookupDgen.addCustomRow(Map.of("floatLooky", "B"));
-        lookupDgen.insertRows(createDefaultConnection(true), dgen.getRows());
+        lookupDgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         refresh();
         DataRegionTable.DataRegion(getDriver()).withName(SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND).waitFor();
@@ -338,8 +338,8 @@ public class SampleTypeTest extends BaseWebDriverTest
         assertEquals(3, materialsList.getDataRowCount());
 
         // Not sure why this is being deleted, it makes the test hard to debug.
-        lookupDgen.deleteDomain(createDefaultConnection(true));
-        dgen.deleteDomain(createDefaultConnection(true));
+        lookupDgen.deleteDomain(createDefaultConnection());
+        dgen.deleteDomain(createDefaultConnection());
     }
 
     @Test
