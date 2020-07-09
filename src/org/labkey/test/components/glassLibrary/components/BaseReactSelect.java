@@ -90,6 +90,18 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return Locators.loadingSpinner.findElementOrNull(getComponentElement()) != null;
     }
 
+    public boolean isLoaded()
+    {
+        return !isLoading() && !getOptions().contains("Loading...");
+    }
+
+    public T waitForLoaded(int waitMsec)
+    {
+        _wrapper.waitFor(()-> isLoaded(),
+                "Took too long for to become loaded", waitMsec);
+        return (T) this;
+    }
+
     public String getValue()
     {
         return getWrapper().shortWait().withMessage(() -> "Select stuck loading. [" + getComponentElement().getText() + "]").until(ignored -> {

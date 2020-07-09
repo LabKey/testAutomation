@@ -4,12 +4,13 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
-import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public class BulkCreateSamplesDialog extends ModalDialog
 {
@@ -64,7 +65,7 @@ public class BulkCreateSamplesDialog extends ModalDialog
         return getWrapper().getFormElement(Locator.tagWithId("input", forField));
     }
 
-    private boolean waitForReactSelectReady(ReactSelect select)
+    private boolean waitForReactSelectReady(FilteringReactSelect select)
     {
         getWrapper().waitFor(()->!select.getSelections().contains("Loading..."), "The reactSelect field did not populate in time.", 1_000);
         return true;
@@ -73,15 +74,15 @@ public class BulkCreateSamplesDialog extends ModalDialog
     public BulkCreateSamplesDialog setSelectionField(String fieldCaption, List<String> selectValues)
     {
         FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
-        getWrapper().waitFor(()-> reactSelect.isInteractive(), 5000);
+        reactSelect.waitForLoaded(WAIT_FOR_JAVASCRIPT);
         selectValues.forEach(s -> {reactSelect.typeAheadSelect(s);});
         return this;
     }
 
     public List<String> getSelectionField(String fieldCaption)
     {
-        ReactSelect reactSelect = ReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
-        waitForReactSelectReady(reactSelect);
+        FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
+        reactSelect.waitForLoaded(WAIT_FOR_JAVASCRIPT);
         return reactSelect.getSelections();
     }
 
