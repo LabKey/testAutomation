@@ -36,7 +36,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
     @Override
     public void doCreateSteps()
     {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "CreateSpecimenStudy");
+        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(), "CreateSpecimenStudy");
         importStudy();
         startSpecimenImport(2);
         waitForPipelineJobsToComplete(2, "study import", false);

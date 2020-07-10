@@ -702,7 +702,7 @@ public class ListTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(info)
                 .withColumns(cols);
-        DomainResponse createResponse = dgen.createList(createDefaultConnection(true), "key");
+        DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
         List<PropertyDescriptor> listFields = createResponse.getDomain().getFields();
         listFields.add(new FieldDefinition("volume", FieldDefinition.ColumnType.Decimal));
@@ -711,7 +711,7 @@ public class ListTest extends BaseWebDriverTest
         // now save with an extra field
         SaveDomainCommand saveCmd = new SaveDomainCommand(info.getSchema(), info.getTable());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(true), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
 
         // now verify
         assertEquals(listFields.size(), saveResponse.getDomain().getFields().size());
@@ -737,7 +737,7 @@ public class ListTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(info)
                 .withColumns(cols);
-        DomainResponse createResponse = dgen.createList(createDefaultConnection(true), "key");
+        DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
         List<PropertyDescriptor> listFields = createResponse.getDomain().getFields();
         listFields.removeIf(a-> a.getName().equals("removeMe"));
@@ -745,7 +745,7 @@ public class ListTest extends BaseWebDriverTest
 
         SaveDomainCommand saveCmd = new SaveDomainCommand(info.getSchema(), info.getTable());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(true), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
 
         checker().verifyFalse("'removeMe' field was not deleted.",
                 saveResponse.getDomain().getFields().stream()
@@ -765,13 +765,13 @@ public class ListTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(info)
                 .withColumns(cols);
-        DomainResponse createResponse = dgen.createList(createDefaultConnection(true), "key");
+        DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
         listDomain.setName("remoteAPIAfterRename");
 
         SaveDomainCommand saveCmd = new SaveDomainCommand(listDomain.getDomainId());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(true), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
 
         assertEquals("remoteAPIAfterRename", saveResponse.getDomain().getName());
     }

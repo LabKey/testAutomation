@@ -213,7 +213,7 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .setAllowApiKeys(false)
                 .setAllowSessionKeys(true)
                 .save();
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         PostCommand generateAPIKeyCommand = new PostCommand("security", "createApiKey");
         generateAPIKeyCommand.setParameters(new HashMap<>(Maps.of("type", "apikey")));
         try
@@ -238,7 +238,7 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .setAllowApiKeys(true)
                 .setAllowSessionKeys(false)
                 .save();
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         PostCommand generateAPIKeyCommand = new PostCommand("security", "createApiKey");
         generateAPIKeyCommand.setParameters(new HashMap<>(Maps.of("type", "session")));
         try

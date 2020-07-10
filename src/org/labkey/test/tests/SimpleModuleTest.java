@@ -360,7 +360,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Map<String, Object> rowMapM = new HashMap<>();
         rowMapM.put("Name", "TestManufacturer");
         insertCmdM.addRow(rowMapM);
-        SaveRowsResponse respM = insertCmdM.execute(createDefaultConnection(false), getProjectName());
+        SaveRowsResponse respM = insertCmdM.execute(createDefaultConnection(), getProjectName());
         Object manufacturerId = respM.getRows().get(0).get("RowId");
 
         //This table has one validator defined in the schema XML and one in query XML.  First do insert that should fail schema validator:
@@ -388,7 +388,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         rowMap.put("ManufacturerId", manufacturerId);
         rowMap.put("InitialReleaseYear", 2000);
         insertCmd.addRow(rowMap);
-        SaveRowsResponse resp = insertCmd.execute(createDefaultConnection(false), getProjectName());
+        SaveRowsResponse resp = insertCmd.execute(createDefaultConnection(), getProjectName());
         Object rowId = resp.getRows().get(0).get("RowId");
 
         //now try to update it:
@@ -414,27 +414,27 @@ public class SimpleModuleTest extends BaseWebDriverTest
         rowMap.put("Name", "Model2");
         rowMap.put("InitialReleaseYear", 2000);
         updateCmd.addRow(rowMap);
-        updateCmd.execute(createDefaultConnection(false), getProjectName());
+        updateCmd.execute(createDefaultConnection(), getProjectName());
 
         //clean:
         DeleteRowsCommand deleteCmd = new DeleteRowsCommand("vehicle", "Models");
         rowMap = new HashMap<>();
         rowMap.put("RowId", rowId);
         deleteCmd.addRow(rowMap);
-        deleteCmd.execute(createDefaultConnection(false), getProjectName());
+        deleteCmd.execute(createDefaultConnection(), getProjectName());
 
         deleteCmd = new DeleteRowsCommand("vehicle", "Manufacturers");
         rowMap = new HashMap<>();
         rowMap.put("RowId", manufacturerId);
         deleteCmd.addRow(rowMap);
-        deleteCmd.execute(createDefaultConnection(false), getProjectName());
+        deleteCmd.execute(createDefaultConnection(), getProjectName());
     }
 
     private void submitAndTestExpectedFailure(Command cmd, String expectedError) throws Exception
     {
         try
         {
-            cmd.execute(createDefaultConnection(false), getProjectName());
+            cmd.execute(createDefaultConnection(), getProjectName());
 
             throw new Exception("This should have failed");
         }
@@ -1086,7 +1086,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
                         TestDataGenerator.simpleFieldDef("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
                 ));
-        dgen.createList(createDefaultConnection(true), "Key");
+        dgen.createList(createDefaultConnection(), "Key");
         goToManageLists();
         _listHelper.goToList(LIST_NAME);
     }
@@ -1107,7 +1107,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
                         TestDataGenerator.simpleFieldDef("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
                 ));
-        dgen.createList(createDefaultConnection(true), "Key");
+        dgen.createList(createDefaultConnection(), "Key");
         refresh();
     }
 
