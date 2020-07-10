@@ -280,6 +280,7 @@ public class ApiKeyTest extends BaseWebDriverTest
     private String generateSessionKey()
     {
         goToExternalToolPage();
+        waitForText("API keys are used to authorize");
         clickButton("Generate session key", "session|");
         return Locator.inputById("session-token").findElement(getDriver()).getAttribute("value");
     }
