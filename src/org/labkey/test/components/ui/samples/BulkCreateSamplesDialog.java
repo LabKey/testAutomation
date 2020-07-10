@@ -1,23 +1,23 @@
-package org.labkey.test.components.react.dialogs;
+package org.labkey.test.components.ui.samples;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
+import org.labkey.test.components.ui.EntityInsertPanel;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-
 public class BulkCreateSamplesDialog extends ModalDialog
 {
+    private EntityInsertPanel _panel;
 
-    public BulkCreateSamplesDialog(WebDriver driver)
+    public BulkCreateSamplesDialog(EntityInsertPanel panel)
     {
-        this(new ModalDialogFinder(driver).withTitle("Bulk Creation of Samples"));
+        this(new ModalDialogFinder(panel.getDriver()).withTitle("Bulk Creation of Samples"));
+        _panel = panel;
     }
 
     private BulkCreateSamplesDialog(ModalDialogFinder finder)
@@ -65,24 +65,16 @@ public class BulkCreateSamplesDialog extends ModalDialog
         return getWrapper().getFormElement(Locator.tagWithId("input", forField));
     }
 
-    private boolean waitForReactSelectReady(FilteringReactSelect select)
-    {
-        getWrapper().waitFor(()->!select.getSelections().contains("Loading..."), "The reactSelect field did not populate in time.", 1_000);
-        return true;
-    }
-
     public BulkCreateSamplesDialog setSelectionField(String fieldCaption, List<String> selectValues)
     {
         FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
-        reactSelect.waitForLoaded(WAIT_FOR_JAVASCRIPT);
-        selectValues.forEach(s -> {reactSelect.typeAheadSelect(s);});
+        selectValues.forEach(s -> {reactSelect.filterSelect(s);});
         return this;
     }
 
     public List<String> getSelectionField(String fieldCaption)
     {
         FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
-        reactSelect.waitForLoaded(WAIT_FOR_JAVASCRIPT);
         return reactSelect.getSelections();
     }
 
@@ -100,6 +92,9 @@ public class BulkCreateSamplesDialog extends ModalDialog
     public void clickAddRows()
     {
         elementCache().addRowsButton.click();
+        waitForClose();
+
+        // todo: maybe wait for the grid in the entityinsertPanel to update
 
         try
         {
@@ -115,6 +110,7 @@ public class BulkCreateSamplesDialog extends ModalDialog
     public void clickCancel()
     {
         elementCache().cancelButton.click();
+        waitForClose();
 
         try
         {
@@ -131,13 +127,12 @@ public class BulkCreateSamplesDialog extends ModalDialog
     @Override
     protected ElementCache newElementCache()
     {
-        return (ElementCache) super.elementCache();
+        return new ElementCache();
     }
-
     @Override
     protected ElementCache elementCache()
     {
-        return new ElementCache();
+        return (ElementCache) super.elementCache();
     }
 
     protected class ElementCache extends ModalDialog.ElementCache

@@ -1,10 +1,10 @@
-package org.labkey.test.components.glassLibrary.components;
+package org.labkey.test.components.ui;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.glassLibrary.grids.EditableGrid;
-import org.labkey.test.components.react.dialogs.BulkCreateSamplesDialog;
+import org.labkey.test.components.ui.samples.BulkCreateSamplesDialog;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -12,15 +12,17 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 import java.util.Map;
 
-// This is the same component (collection of atomic elements) used in insertAssay and createSamples.
-
-public class InsertEntitiesPanel extends WebDriverComponent<InsertEntitiesPanel.ElementCache>
+/**
+ * This class automates the UI component defined in <a href="https://github.com/LabKey/labkey-ui-components/blob/master/packages/components/src/components/entities/EntityInsertPanel.tsx">components/entities/EntityInsertPanel.tsx</a>
+ * This is the same component (collection of atomic elements) used in insertAssay and createSamples.
+ */
+public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.ElementCache>
 {
 
     private final WebDriver _driver;
     private final WebElement _editingDiv;
 
-    public InsertEntitiesPanel(WebElement element, WebDriver driver)
+    public EntityInsertPanel(WebElement element, WebDriver driver)
     {
         _driver = driver;
         _editingDiv = element;
@@ -33,12 +35,12 @@ public class InsertEntitiesPanel extends WebDriverComponent<InsertEntitiesPanel.
     }
 
     @Override
-    protected WebDriver getDriver()
+    public WebDriver getDriver()
     {
         return _driver;
     }
 
-    public InsertEntitiesPanel addRecords(List<Map<String, Object>> records)
+    public EntityInsertPanel addRecords(List<Map<String, Object>> records)
     {
         getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(records.size()));
         elementCache().addRowsButton.click();
@@ -61,13 +63,13 @@ public class InsertEntitiesPanel extends WebDriverComponent<InsertEntitiesPanel.
         return this;
     }
 
-    public InsertEntitiesPanel setRecordValues(Map<String, Object> columnValues)
+    public EntityInsertPanel setRecordValues(Map<String, Object> columnValues)
     {
         int insertRowIndex = elementCache().grid.listOfnotPopulatedRows().get(0);
         return setRecordValues(columnValues, insertRowIndex);
     }
 
-    public InsertEntitiesPanel setRecordValues(Map<String, Object> columnValues, int row)
+    public EntityInsertPanel setRecordValues(Map<String, Object> columnValues, int row)
     {
         for(String columnName : columnValues.keySet())
         {
@@ -97,13 +99,13 @@ public class InsertEntitiesPanel extends WebDriverComponent<InsertEntitiesPanel.
         return elementCache().grid.isDisplayed();
     }
 
-    public InsertEntitiesPanel setAddRows(int numOfRows)
+    public EntityInsertPanel setAddRows(int numOfRows)
     {
         getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(numOfRows));
         return this;
     }
 
-    public InsertEntitiesPanel clickAddRows()
+    public EntityInsertPanel clickAddRows()
     {
         elementCache().addRowsButton.click();
         return this;
@@ -112,7 +114,7 @@ public class InsertEntitiesPanel extends WebDriverComponent<InsertEntitiesPanel.
     public BulkCreateSamplesDialog clickBulkInsert()
     {
         elementCache().bulkInsert.click();
-        return new BulkCreateSamplesDialog(getDriver());
+        return new BulkCreateSamplesDialog(this);
     }
 
     public boolean isBulkInsertVisible()
@@ -165,7 +167,7 @@ public class InsertEntitiesPanel extends WebDriverComponent<InsertEntitiesPanel.
         WebElement addRowsButton = Locator.buttonContainingText("Add").findWhenNeeded(_driver);
     }
 
-    public static class InsertRecordFinder extends WebDriverComponent.WebDriverComponentFinder<InsertEntitiesPanel, InsertRecordFinder>
+    public static class InsertRecordFinder extends WebDriverComponent.WebDriverComponentFinder<EntityInsertPanel, InsertRecordFinder>
     {
 
         private Locator _locator;
@@ -177,9 +179,9 @@ public class InsertEntitiesPanel extends WebDriverComponent<InsertEntitiesPanel.
         }
 
         @Override
-        protected InsertEntitiesPanel construct(WebElement element, WebDriver driver)
+        protected EntityInsertPanel construct(WebElement element, WebDriver driver)
         {
-            return new InsertEntitiesPanel(element, driver);
+            return new EntityInsertPanel(element, driver);
         }
 
         @Override

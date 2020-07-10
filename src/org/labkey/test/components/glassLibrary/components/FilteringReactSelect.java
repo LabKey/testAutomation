@@ -44,6 +44,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
     public FilteringReactSelect typeAheadSelect(String value, Locator elementToClick, Locator elementToWaitFor)
     {
+        waitForLoaded();
         scrollIntoView();
         open();
 
@@ -118,6 +119,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
        unless type-ahead filter information is keyed in first */
     public FilteringReactSelect filterSelect(String value, Locator elementToWaitFor)
     {
+        waitForLoaded();
         scrollIntoView();
         WebElement success = null;
         int tryCount = 0;
