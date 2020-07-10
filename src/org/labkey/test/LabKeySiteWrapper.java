@@ -1013,8 +1013,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void goToExternalToolPage()
     {
-        clickUserMenuItem("External Tool Settings");
-        waitForText("API keys are used to authorize");
+        clickUserMenuItem("External Tool Access");
     }
 
     protected WebElement openMenu(String menuText)
