@@ -30,6 +30,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     final WebElement _componentElement;
     final WebDriver _driver;
     final WebDriverWrapper _wrapper;
+    private final String LOADING_TEXT = "loading...";
 
     public BaseReactSelect(WebElement selectOrParent, WebDriver driver)
     {
@@ -87,7 +88,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     {
         // if either are present, we're loading options
         return Locators.loadingSpinner.existsIn(getComponentElement()) ||
-                getComponentElement().getText().equals("Loading...");
+                getComponentElement().getText().toLowerCase().equals(LOADING_TEXT);
     }
 
     protected T waitForLoaded()
@@ -102,7 +103,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         waitForLoaded();
 
         String val = getComponentElement().getText();
-        if (val.equals("Loading..."))
+        if (val.toLowerCase().equals(LOADING_TEXT))
             return null;
         else
             return val;

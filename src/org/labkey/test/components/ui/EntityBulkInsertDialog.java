@@ -1,36 +1,35 @@
-package org.labkey.test.components.ui.samples;
+package org.labkey.test.components.ui;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
-import org.labkey.test.components.ui.EntityInsertPanel;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class BulkCreateSamplesDialog extends ModalDialog
+public class EntityBulkInsertDialog extends ModalDialog
 {
     private EntityInsertPanel _panel;
 
-    public BulkCreateSamplesDialog(EntityInsertPanel panel)
+    public EntityBulkInsertDialog(EntityInsertPanel panel)
     {
-        this(new ModalDialogFinder(panel.getDriver()).withTitle("Bulk Creation of Samples"));
+        this(new ModalDialogFinder(panel.getDriver()).withTitle("Bulk Creation of"));
         _panel = panel;
     }
 
-    private BulkCreateSamplesDialog(ModalDialogFinder finder)
+    private EntityBulkInsertDialog(ModalDialogFinder finder)
     {
         super(finder);
     }
 
-    public BulkCreateSamplesDialog setQuantity(int quantity)
+    public EntityBulkInsertDialog setQuantity(int quantity)
     {
         return setQuantity(Integer.toString(quantity));
     }
 
-    public BulkCreateSamplesDialog setQuantity(String quantity)
+    public EntityBulkInsertDialog setQuantity(String quantity)
     {
         getWrapper().setFormElement(elementCache().quantity, quantity);
         return this;
@@ -41,7 +40,7 @@ public class BulkCreateSamplesDialog extends ModalDialog
         return getWrapper().getFormElement(elementCache().quantity);
     }
 
-    public BulkCreateSamplesDialog setDescription(String description)
+    public EntityBulkInsertDialog setDescription(String description)
     {
         getWrapper().setFormElement(elementCache().description, description);
         return this;
@@ -52,7 +51,7 @@ public class BulkCreateSamplesDialog extends ModalDialog
         return getWrapper().getFormElement(elementCache().description);
     }
 
-    public BulkCreateSamplesDialog setTextField(String fieldCaption, String value)
+    public EntityBulkInsertDialog setTextField(String fieldCaption, String value)
     {
         String forField = Locator.xpath("//div[@class='modal-body']//label[./span[contains(text(), '" + fieldCaption + "')]]").findElement(getComponentElement()).getAttribute("for");
         getWrapper().setFormElement(Locator.tagWithId("input", forField), value);
@@ -65,7 +64,7 @@ public class BulkCreateSamplesDialog extends ModalDialog
         return getWrapper().getFormElement(Locator.tagWithId("input", forField));
     }
 
-    public BulkCreateSamplesDialog setSelectionField(String fieldCaption, List<String> selectValues)
+    public EntityBulkInsertDialog setSelectionField(String fieldCaption, List<String> selectValues)
     {
         FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
         selectValues.forEach(s -> {reactSelect.filterSelect(s);});
@@ -78,7 +77,7 @@ public class BulkCreateSamplesDialog extends ModalDialog
         return reactSelect.getSelections();
     }
 
-    public BulkCreateSamplesDialog setFieldWithId(String id, String value)
+    public EntityBulkInsertDialog setFieldWithId(String id, String value)
     {
         getWrapper().setFormElement(Locator.tagWithId("input", id), value);
         return this;

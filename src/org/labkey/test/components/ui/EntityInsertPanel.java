@@ -4,7 +4,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.glassLibrary.grids.EditableGrid;
-import org.labkey.test.components.ui.samples.BulkCreateSamplesDialog;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -111,10 +110,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
-    public BulkCreateSamplesDialog clickBulkInsert()
+    public EntityBulkInsertDialog clickBulkInsert()
     {
         elementCache().bulkInsert.click();
-        return new BulkCreateSamplesDialog(this);
+        return new EntityBulkInsertDialog(this);
     }
 
     public boolean isBulkInsertVisible()
