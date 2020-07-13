@@ -1,0 +1,1413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <Workspace version="20.0"  modDate="Fri Jun 05 14:17:52 PDT 2020"  clientTimestamp="1591391872570"  flowJoVersion="10.6.2"  drawRowBorders="1"  drawColumnBorders="1"  hideCompNodes="1"  curGroup="Test with trucount beads"  groupPaneHeight="533"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xmlns:gating="http://www.isac-net.org/std/Gating-ML/v2.0/gating"  xmlns:transforms="http://www.isac-net.org/std/Gating-ML/v2.0/transformations"  xmlns:data-type="http://www.isac-net.org/std/Gating-ML/v2.0/datatypes"  xsi:schemaLocation="http://www.isac-net.org/std/Gating-ML/v2.0/gating http://www.isac-net.org/std/Gating-ML/v2.0/gating/Gating-ML.v2.0.xsd http://www.isac-net.org/std/Gating-ML/v2.0/transformations http://www.isac-net.org/std/Gating-ML/v2.0/gating/Transformations.v2.0.xsd http://www.isac-net.org/std/Gating-ML/v2.0/datatypes http://www.isac-net.org/std/Gating-ML/v2.0/gating/DataTypes.v2.0.xsd " >
+
+   <SampleList>
+     <Sample>
+       <DataSet uri="file:/test_114-01-002%20C01D01%20FMO_035.fcs"  sampleID="1" />
+       <transforms:spilloverMatrix spectral="1"  prefix="Comp-"  name="Comp_P21C_20190903"  editable="0"  color="#cc9999"  version="FlowJo-10.6.2"  status="FINALIZED"  transforms:id="10b64339-87a2-41a3-a9ef-75dd5d1e4757"  suffix="" >
+         <data-type:parameters>
+           <data-type:parameter data-type:name="BB515-A"  userProvidedCompInfix="Comp-BB515-A" />
+           <data-type:parameter data-type:name="BB700-A"  userProvidedCompInfix="Comp-BB700-A" />
+           <data-type:parameter data-type:name="Alexa Fluor 647-A"  userProvidedCompInfix="Comp-Alexa Fluor 647-A" />
+           <data-type:parameter data-type:name="Alexa Fluor 700-A"  userProvidedCompInfix="Comp-Alexa Fluor 700-A" />
+           <data-type:parameter data-type:name="APC-Cy7-A"  userProvidedCompInfix="Comp-APC-Cy7-A" />
+           <data-type:parameter data-type:name="BV421-A"  userProvidedCompInfix="Comp-BV421-A" />
+           <data-type:parameter data-type:name="BV510-A"  userProvidedCompInfix="Comp-BV510-A" />
+           <data-type:parameter data-type:name="BV570-A"  userProvidedCompInfix="Comp-BV570-A" />
+           <data-type:parameter data-type:name="BV605-A"  userProvidedCompInfix="Comp-BV605-A" />
+           <data-type:parameter data-type:name="BV650-A"  userProvidedCompInfix="Comp-BV650-A" />
+           <data-type:parameter data-type:name="BV786-A"  userProvidedCompInfix="Comp-BV786-A" />
+           <data-type:parameter data-type:name="BUV395-A"  userProvidedCompInfix="Comp-BUV395-A" />
+           <data-type:parameter data-type:name="BUV496-A"  userProvidedCompInfix="Comp-BUV496-A" />
+           <data-type:parameter data-type:name="BUV563-A"  userProvidedCompInfix="Comp-BUV563-A" />
+           <data-type:parameter data-type:name="BUV661-A"  userProvidedCompInfix="Comp-BUV661-A" />
+           <data-type:parameter data-type:name="BUV737-A"  userProvidedCompInfix="Comp-BUV737-A" />
+           <data-type:parameter data-type:name="BUV805-A"  userProvidedCompInfix="Comp-BUV805-A" />
+           <data-type:parameter data-type:name="PE-A"  userProvidedCompInfix="Comp-PE-A" />
+           <data-type:parameter data-type:name="PE-Alexa 594-A"  userProvidedCompInfix="Comp-PE-Alexa 594-A" />
+           <data-type:parameter data-type:name="PE-Cy5-A"  userProvidedCompInfix="Comp-PE-Cy5-A" />
+           <data-type:parameter data-type:name="PE-Cy7-A"  userProvidedCompInfix="Comp-PE-Cy7-A" />
+         </data-type:parameters>
+         <transforms:spillover data-type:parameter="BB515-A"  userProvidedCompInfix="Comp-BB515-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0041645351" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0004479547" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0020310786" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0017127061" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0008301278" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.028195225" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0030800269" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0021488365" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.00073009" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0004312946" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0007135044" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.025241899" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0044644499" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0007466991" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0016292667" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0009128566" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0032680224" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0035759221" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0011623024" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0005142723" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.001212309" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0267212294" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0007135044" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0009294795" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0012955168" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0001658591" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0074196889" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BB700-A"  userProvidedCompInfix="Comp-BB700-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0078650632" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.956619047" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.3607806215" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.6608728098" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.3828634147" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.000245732" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0235381392" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.027763333" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0348738199" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.3527370454" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.3734548178" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0000150299" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0006593909" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0031241044" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0658025267" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0696594673" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0384604031" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0004316981" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0008838099" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0301945366" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0383832623" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.7219056061" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0255874612" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0728483635" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.3707135559" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0000100199" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.3121137963" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="Alexa Fluor 647-A"  userProvidedCompInfix="Comp-Alexa Fluor 647-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0009647326" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0081894095" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.435920513" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.2152852229" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0020016256" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.011076431" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.003814304" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.003462577" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0080900688" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0041193647" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0070869658" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0015162667" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0007804132" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0066158052" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0033920994" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0015621614" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0013091225" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0031822241" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0738793073" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0178954539" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0087573193" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.001309009" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0105103175" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0404608388" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.003368369" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0016083043" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0068374903" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="Alexa Fluor 700-A"  userProvidedCompInfix="Comp-Alexa Fluor 700-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0021824313" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0201996732" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.057285762" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.6869600678" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0097416847" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0133708468" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0032327778" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0044467259" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0076923325" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0739994269" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0042036553" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0113694655" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0017774783" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0061486507" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0437198269" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0223416766" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0039609816" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0140857657" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0103847273" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0677960083" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.2323969452" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0039606884" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0832294368" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.1052311316" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0103018539" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0013734402" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0029091123" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="APC-Cy7-A"  userProvidedCompInfix="Comp-APC-Cy7-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0005842895" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0031810268" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0277149493" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0195618832" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0014262857" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0023850554" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0006570817" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0008397776" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0038015805" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0894500178" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0003649641" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0003102151" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0001824675" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0015720503" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0048330304" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0482548529" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0006570998" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0008580241" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0117200609" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.1473373735" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0109462673" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0002737086" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0028276051" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0074618645" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0116308156" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0001459737" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0051434578" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BV421-A"  userProvidedCompInfix="Comp-BV421-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0001141844" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0001868188" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0002388307" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0001920215" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0012536406" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.1354288185" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0072892539" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0038103501" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0011239505" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0014127078" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0001712504" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0204791473" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0013741775" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.00022318" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0001193378" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0003219529" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0004940392" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0009045889" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0004208792" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.003416978" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0010379833" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0002803459" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0009898376" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0002855452" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0014234109" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0575472689" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0002075968" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BV510-A"  userProvidedCompInfix="Comp-BV510-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0002537702" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="-0.000062956" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0003789868" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0000944591" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0000629761" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0234039504" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.2868476905" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.2135015665" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0703294683" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0139230116" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="-0.0001574997" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0884416855" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.054085836" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0131751335" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0036669543" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0014805626" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0000629982" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0000314874" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0000314823" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0370698975" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0000629493" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0495598093" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0000629786" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="-0.0000314756" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BV570-A"  userProvidedCompInfix="Comp-BV570-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0005494472" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0135428606" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0134177892" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0232453931" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0211316084" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.2510581556" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.1097560103" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.7575447989" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.2570259933" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0555189089" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0010438881" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0058383361" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.1656864516" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0435762473" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.013076247" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0066672013" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.4752269915" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.3109259239" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0988308052" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0265631644" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.1409336176" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.036614648" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.1889492563" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0591617276" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0049570746" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0088713336" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0219232881" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BV605-A"  userProvidedCompInfix="Comp-BV605-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0002009746" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0122278782" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0236126726" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0105630497" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0070376923" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0953546879" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0148226307" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.3804564967" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.5115771341" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.1270292537" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0001674192" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.001344557" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0841594204" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.1049238625" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.036454666" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0171596876" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.1577363216" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.3625222228" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.1626283461" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0614205885" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.3339733997" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0253634463" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.3513378577" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0981930847" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0104131431" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0033383495" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0194428051" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BV650-A"  userProvidedCompInfix="Comp-BV650-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0001629672" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0059359391" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.4593906616" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.2167722445" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0923243949" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.1083977316" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0173889064" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0069204059" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.1759688977" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.2112102896" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0003367696" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0015727091" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.001231241" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.182321472" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0583280486" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0228643959" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0011437405" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0175649401" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0811752842" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0220334485" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.5992676204" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0014951205" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.7881574645" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.054175373" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0019602696" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0037460616" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0080367201" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BV786-A"  userProvidedCompInfix="Comp-BV786-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0002307627" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0040108046" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0066935824" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0054559907" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.1286666723" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0926014364" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0155406944" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0018083596" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0016978141" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0043899092" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0003339651" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0015629002" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0002792518" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0011451468" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0233271496" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.1707158811" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0004009152" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0003278707" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0125875625" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0304325001" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.1650291619" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0001213601" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.006006175" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0073512394" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0218791544" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0033582702" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0065912937" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BUV395-A"  userProvidedCompInfix="Comp-BUV395-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0007570769" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0082861382" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0041191522" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0061466363" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0037393361" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0040968769" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0032177342" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0016989216" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0020675481" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0043038665" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0034359016" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0595256036" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0043975912" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0032024361" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0025757445" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0014916558" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0009403573" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0029466944" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0013307299" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0005961445" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0065619686" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.001514654" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0086484351" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0011928733" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0034354901" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.2333427954" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0039273946" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BUV496-A"  userProvidedCompInfix="Comp-BUV496-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0516039155" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.001445731" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0028950718" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0014457666" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0047766341" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0307755446" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.4632422731" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0455764564" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0267211975" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0078932285" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0021268475" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.2094062496" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.1399638923" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0218548196" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0063704457" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0041759839" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0027236093" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0078920339" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0029794157" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.001445731" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0045191736" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0047762153" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0056800834" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0018712983" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0005951686" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0444235512" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0022119507" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BUV563-A"  userProvidedCompInfix="Comp-BUV563-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0010455863" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0096560323" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0011106341" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.003273453" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0032405483" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0029137885" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0227055686" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0483909528" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0308368991" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0083032979" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0022554788" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.1637610946" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0159174176" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.6621079691" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0979682672" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0264121507" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0116196121" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.5310181032" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.1098469698" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0230133805" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0057272587" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0454768512" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0063977203" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0604163087" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0032074037" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0330656295" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.015390199" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BUV661-A"  userProvidedCompInfix="Comp-BUV661-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0003837922" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0085818271" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.4551622744" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.2006986828" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0015752325" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0019410306" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0006396073" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0030365828" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0859008871" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0181529669" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0880656887" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0062423994" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0015740542" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.6631115543" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.2218355123" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0878130414" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0012437727" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0085891144" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.1463705341" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0382904757" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.054591125" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0013353248" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0625281121" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0928683779" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0028306712" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0193827755" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0130823242" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BUV737-A"  userProvidedCompInfix="Comp-BUV737-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.00024028" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0612152639" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.010307431" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.3307054985" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.4754944535" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0023013076" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0028286749" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0047317781" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0041445842" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0029842946" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.1200045748" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.1453104894" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0087428428" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0017277847" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0127964882" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.5385524725" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0027410703" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0046855821" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0022552178" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0386687075" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.2821110531" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0011581483" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0285830389" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0265260966" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.1116320196" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0297519102" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0013989663" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="BUV805-A"  userProvidedCompInfix="Comp-BUV805-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0002708883" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.00058684" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0004966126" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0006094404" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.1416485029" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0020820437" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0022966295" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.000609453" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0010160992" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0004739754" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0414735995" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.2350947704" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0137889654" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0019444964" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0009030449" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0064355119" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0015817914" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0055254748" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0018536138" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0162720605" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0009708318" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0016042729" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0004288265" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0011290539" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0060733712" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0503460291" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0008126808" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="PE-A"  userProvidedCompInfix="Comp-PE-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0007471422" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0284606306" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0040117229" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0023654059" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0218125993" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0013826975" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0050490186" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.1014525644" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0483359222" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0129598724" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0088057561" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.000194708" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0002758497" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0456612329" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0058825112" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0018065725" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0025964532" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.3951469872" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0887232172" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0226151367" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0071982418" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.1210752867" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0100605017" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0517502846" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0081534193" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0000973515" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0442973442" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="PE-Alexa 594-A"  userProvidedCompInfix="Comp-PE-Alexa 594-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0007958545" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.0869103167" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.011022951" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0051852432" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0043911563" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0016917498" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0018421879" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0204208647" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.1161649063" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0409627941" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0095651251" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0000808064" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0001885576" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0090353404" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0177753168" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0047763992" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0024031096" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.2034697176" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.3017081754" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.0822236803" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0202556185" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.2896892894" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0307405447" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.1743317708" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.0320566401" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0000942745" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.1411435998" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="PE-Cy5-A"  userProvidedCompInfix="Comp-PE-Cy5-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0004840122" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.303518964" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.3769266159" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.1617098052" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.0799578243" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0007609796" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0021026498" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.001854586" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0018073651" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.1170851201" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.0264345405" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0001957295" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0002072472" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0005644458" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.0496304029" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0168526981" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0059991201" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0158736845" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0104243379" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="0.248198871" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.0768068016" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.0035536867" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0792456576" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.5572778572" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.1123504494" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0000805904" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.5204987749" />
+         </transforms:spillover>
+         <transforms:spillover data-type:parameter="PE-Cy7-A"  userProvidedCompInfix="Comp-PE-Cy7-A" >
+           <transforms:coefficient data-type:parameter="BB515-A"  transforms:value="0.0006052707" />
+           <transforms:coefficient data-type:parameter="BB700-A"  transforms:value="0.002601466" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 647-A"  transforms:value="0.0021670189" />
+           <transforms:coefficient data-type:parameter="Alexa Fluor 700-A"  transforms:value="0.0023906" />
+           <transforms:coefficient data-type:parameter="APC-Cy7-A"  transforms:value="0.1044873746" />
+           <transforms:coefficient data-type:parameter="BV421-A"  transforms:value="0.0009602404" />
+           <transforms:coefficient data-type:parameter="BV510-A"  transforms:value="0.0018953861" />
+           <transforms:coefficient data-type:parameter="BV570-A"  transforms:value="0.0017318955" />
+           <transforms:coefficient data-type:parameter="BV605-A"  transforms:value="0.0013895193" />
+           <transforms:coefficient data-type:parameter="BV650-A"  transforms:value="0.0009596872" />
+           <transforms:coefficient data-type:parameter="BV786-A"  transforms:value="0.105443715" />
+           <transforms:coefficient data-type:parameter="BUV395-A"  transforms:value="0.0001769908" />
+           <transforms:coefficient data-type:parameter="BUV496-A"  transforms:value="0.0002064941" />
+           <transforms:coefficient data-type:parameter="BUV563-A"  transforms:value="0.0005754001" />
+           <transforms:coefficient data-type:parameter="BUV661-A"  transforms:value="0.000324505" />
+           <transforms:coefficient data-type:parameter="BUV737-A"  transforms:value="0.0048249635" />
+           <transforms:coefficient data-type:parameter="BUV805-A"  transforms:value="0.0369527654" />
+           <transforms:coefficient data-type:parameter="PE-A"  transforms:value="0.0150504752" />
+           <transforms:coefficient data-type:parameter="PE-Alexa 594-A"  transforms:value="0.0090057649" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-A"  transforms:value="0.0036412934" />
+           <transforms:coefficient data-type:parameter="PE-Cy7-A"  transforms:value="1" />
+           <transforms:coefficient data-type:parameter="BV750-A"  transforms:value="0.013163823" />
+           <transforms:coefficient data-type:parameter="BB630-A"  transforms:value="0.002813954" />
+           <transforms:coefficient data-type:parameter="BV711-A"  transforms:value="0.0010336341" />
+           <transforms:coefficient data-type:parameter="PE-Cy5-5-A"  transforms:value="0.0112729893" />
+           <transforms:coefficient data-type:parameter="BB790-A"  transforms:value="0.4178803007" />
+           <transforms:coefficient data-type:parameter="DAPI-A"  transforms:value="0.0000737441" />
+           <transforms:coefficient data-type:parameter="BB660-A"  transforms:value="0.0018509192" />
+         </transforms:spillover>
+         <SSM isCalculated="1" >
+           <Parameters>
+             <Parameter name="Comp-APC-Cy7-A"  description=""  index="0" />
+             <Parameter name="Comp-Alexa Fluor 647-A"  description=""  index="1" />
+             <Parameter name="Comp-Alexa Fluor 700-A"  description=""  index="2" />
+             <Parameter name="Comp-BB515-A"  description=""  index="3" />
+             <Parameter name="Comp-BB700-A"  description=""  index="4" />
+             <Parameter name="Comp-BUV395-A"  description=""  index="5" />
+             <Parameter name="Comp-BUV496-A"  description=""  index="6" />
+             <Parameter name="Comp-BUV563-A"  description=""  index="7" />
+             <Parameter name="Comp-BUV661-A"  description=""  index="8" />
+             <Parameter name="Comp-BUV737-A"  description=""  index="9" />
+             <Parameter name="Comp-BUV805-A"  description=""  index="10" />
+             <Parameter name="Comp-BV421-A"  description=""  index="11" />
+             <Parameter name="Comp-BV510-A"  description=""  index="12" />
+             <Parameter name="Comp-BV570-A"  description=""  index="13" />
+             <Parameter name="Comp-BV605-A"  description=""  index="14" />
+             <Parameter name="Comp-BV650-A"  description=""  index="15" />
+             <Parameter name="Comp-BV786-A"  description=""  index="16" />
+             <Parameter name="Comp-PE-A"  description=""  index="17" />
+             <Parameter name="Comp-PE-Alexa 594-A"  description=""  index="18" />
+             <Parameter name="Comp-PE-Cy5-A"  description=""  index="19" />
+             <Parameter name="Comp-PE-Cy7-A"  description=""  index="20" />
+           </Parameters>
+           <Coefficients>
+             <coeff row="0"  col="0"  value="0" />
+             <coeff row="0"  col="1"  value="0.564914" />
+             <coeff row="0"  col="2"  value="0.275629" />
+             <coeff row="0"  col="3"  value="0.0820391" />
+             <coeff row="0"  col="4"  value="0.206943" />
+             <coeff row="0"  col="5"  value="0.267651" />
+             <coeff row="0"  col="6"  value="0.0586741" />
+             <coeff row="0"  col="7"  value="0.0562357" />
+             <coeff row="0"  col="8"  value="0.147477" />
+             <coeff row="0"  col="9"  value="0.163729" />
+             <coeff row="0"  col="10"  value="1.26859" />
+             <coeff row="0"  col="11"  value="0.134299" />
+             <coeff row="0"  col="12"  value="0" />
+             <coeff row="0"  col="13"  value="0.073694" />
+             <coeff row="0"  col="14"  value="0.122482" />
+             <coeff row="0"  col="15"  value="0.218726" />
+             <coeff row="0"  col="16"  value="1.70734" />
+             <coeff row="0"  col="17"  value="0.092622" />
+             <coeff row="0"  col="18"  value="0.0820062" />
+             <coeff row="0"  col="19"  value="0.35952" />
+             <coeff row="0"  col="20"  value="1.75178" />
+             <coeff row="1"  col="0"  value="1.24673" />
+             <coeff row="1"  col="1"  value="0" />
+             <coeff row="1"  col="2"  value="1.23424" />
+             <coeff row="1"  col="3"  value="0.143703" />
+             <coeff row="1"  col="4"  value="0.418028" />
+             <coeff row="1"  col="5"  value="0.300136" />
+             <coeff row="1"  col="6"  value="0.0542732" />
+             <coeff row="1"  col="7"  value="0.102569" />
+             <coeff row="1"  col="8"  value="0.255886" />
+             <coeff row="1"  col="9"  value="0.162862" />
+             <coeff row="1"  col="10"  value="0.164236" />
+             <coeff row="1"  col="11"  value="0.0933206" />
+             <coeff row="1"  col="12"  value="0.243277" />
+             <coeff row="1"  col="13"  value="0.118938" />
+             <coeff row="1"  col="14"  value="0.193902" />
+             <coeff row="1"  col="15"  value="0.212837" />
+             <coeff row="1"  col="16"  value="0.177678" />
+             <coeff row="1"  col="17"  value="0.145046" />
+             <coeff row="1"  col="18"  value="0.282355" />
+             <coeff row="1"  col="19"  value="0.723354" />
+             <coeff row="1"  col="20"  value="0.326505" />
+             <coeff row="2"  col="0"  value="2.20844" />
+             <coeff row="2"  col="1"  value="0.581841" />
+             <coeff row="2"  col="2"  value="0" />
+             <coeff row="2"  col="3"  value="0.104389" />
+             <coeff row="2"  col="4"  value="0.375241" />
+             <coeff row="2"  col="5"  value="0.167973" />
+             <coeff row="2"  col="6"  value="0.300039" />
+             <coeff row="2"  col="7"  value="0.159442" />
+             <coeff row="2"  col="8"  value="0.39395" />
+             <coeff row="2"  col="9"  value="0.618313" />
+             <coeff row="2"  col="10"  value="0.549359" />
+             <coeff row="2"  col="11"  value="0.281028" />
+             <coeff row="2"  col="12"  value="0" />
+             <coeff row="2"  col="13"  value="0.246411" />
+             <coeff row="2"  col="14"  value="0.286755" />
+             <coeff row="2"  col="15"  value="0.525989" />
+             <coeff row="2"  col="16"  value="0.736597" />
+             <coeff row="2"  col="17"  value="0.194937" />
+             <coeff row="2"  col="18"  value="0.409108" />
+             <coeff row="2"  col="19"  value="0.275173" />
+             <coeff row="2"  col="20"  value="0.662599" />
+             <coeff row="3"  col="0"  value="0.0739619" />
+             <coeff row="3"  col="1"  value="0.10449" />
+             <coeff row="3"  col="2"  value="0.110753" />
+             <coeff row="3"  col="3"  value="0" />
+             <coeff row="3"  col="4"  value="0.084581" />
+             <coeff row="3"  col="5"  value="0.101113" />
+             <coeff row="3"  col="6"  value="0.425736" />
+             <coeff row="3"  col="7"  value="0.194498" />
+             <coeff row="3"  col="8"  value="0.0988759" />
+             <coeff row="3"  col="9"  value="0.125196" />
+             <coeff row="3"  col="10"  value="0.117482" />
+             <coeff row="3"  col="11"  value="0.0593163" />
+             <coeff row="3"  col="12"  value="0.295295" />
+             <coeff row="3"  col="13"  value="0.161197" />
+             <coeff row="3"  col="14"  value="0.150667" />
+             <coeff row="3"  col="15"  value="0.0904469" />
+             <coeff row="3"  col="16"  value="0.0659081" />
+             <coeff row="3"  col="17"  value="0.186129" />
+             <coeff row="3"  col="18"  value="0.225249" />
+             <coeff row="3"  col="19"  value="0.0804636" />
+             <coeff row="3"  col="20"  value="0.0781802" />
+             <coeff row="4"  col="0"  value="1.98471" />
+             <coeff row="4"  col="1"  value="7.93491" />
+             <coeff row="4"  col="2"  value="9.67098" />
+             <coeff row="4"  col="3"  value="0.237096" />
+             <coeff row="4"  col="4"  value="0" />
+             <coeff row="4"  col="5"  value="0.504778" />
+             <coeff row="4"  col="6"  value="0.1126" />
+             <coeff row="4"  col="7"  value="0.379627" />
+             <coeff row="4"  col="8"  value="3.0859" />
+             <coeff row="4"  col="9"  value="2.08002" />
+             <coeff row="4"  col="10"  value="0.977279" />
+             <coeff row="4"  col="11"  value="0.724876" />
+             <coeff row="4"  col="12"  value="0.713635" />
+             <coeff row="4"  col="13"  value="0.951669" />
+             <coeff row="4"  col="14"  value="1.06429" />
+             <coeff row="4"  col="15"  value="4.60377" />
+             <coeff row="4"  col="16"  value="4.6092" />
+             <coeff row="4"  col="17"  value="0.326996" />
+             <coeff row="4"  col="18"  value="0.319242" />
+             <coeff row="4"  col="19"  value="0.931206" />
+             <coeff row="4"  col="20"  value="0.950503" />
+             <coeff row="5"  col="0"  value="0.107643" />
+             <coeff row="5"  col="1"  value="0.218376" />
+             <coeff row="5"  col="2"  value="0.150085" />
+             <coeff row="5"  col="3"  value="0.101846" />
+             <coeff row="5"  col="4"  value="0.322103" />
+             <coeff row="5"  col="5"  value="0" />
+             <coeff row="5"  col="6"  value="0.502329" />
+             <coeff row="5"  col="7"  value="0.164149" />
+             <coeff row="5"  col="8"  value="0.213055" />
+             <coeff row="5"  col="9"  value="0.134662" />
+             <coeff row="5"  col="10"  value="0.143169" />
+             <coeff row="5"  col="11"  value="0.0916671" />
+             <coeff row="5"  col="12"  value="0.0946675" />
+             <coeff row="5"  col="13"  value="0.102457" />
+             <coeff row="5"  col="14"  value="0.162557" />
+             <coeff row="5"  col="15"  value="0.155878" />
+             <coeff row="5"  col="16"  value="0.143964" />
+             <coeff row="5"  col="17"  value="0.178625" />
+             <coeff row="5"  col="18"  value="0.241571" />
+             <coeff row="5"  col="19"  value="0.0651181" />
+             <coeff row="5"  col="20"  value="0.0795573" />
+             <coeff row="6"  col="0"  value="0.312307" />
+             <coeff row="6"  col="1"  value="0.34959" />
+             <coeff row="6"  col="2"  value="0.117231" />
+             <coeff row="6"  col="3"  value="0.584382" />
+             <coeff row="6"  col="4"  value="0.10313" />
+             <coeff row="6"  col="5"  value="2.02321" />
+             <coeff row="6"  col="6"  value="0" />
+             <coeff row="6"  col="7"  value="0.675948" />
+             <coeff row="6"  col="8"  value="0.331806" />
+             <coeff row="6"  col="9"  value="0.1833" />
+             <coeff row="6"  col="10"  value="0.219758" />
+             <coeff row="6"  col="11"  value="0.475995" />
+             <coeff row="6"  col="12"  value="4.69827" />
+             <coeff row="6"  col="13"  value="0.978097" />
+             <coeff row="6"  col="14"  value="0.49234" />
+             <coeff row="6"  col="15"  value="0.212169" />
+             <coeff row="6"  col="16"  value="0.134759" />
+             <coeff row="6"  col="17"  value="0.860104" />
+             <coeff row="6"  col="18"  value="0.440845" />
+             <coeff row="6"  col="19"  value="0.0898399" />
+             <coeff row="6"  col="20"  value="0.117235" />
+             <coeff row="7"  col="0"  value="0.294213" />
+             <coeff row="7"  col="1"  value="0.801663" />
+             <coeff row="7"  col="2"  value="0.26003" />
+             <coeff row="7"  col="3"  value="0.0549662" />
+             <coeff row="7"  col="4"  value="0.276839" />
+             <coeff row="7"  col="5"  value="1.62276" />
+             <coeff row="7"  col="6"  value="0.146621" />
+             <coeff row="7"  col="7"  value="0" />
+             <coeff row="7"  col="8"  value="0.760904" />
+             <coeff row="7"  col="9"  value="0.352426" />
+             <coeff row="7"  col="10"  value="0.349251" />
+             <coeff row="7"  col="11"  value="0.197073" />
+             <coeff row="7"  col="12"  value="0.324135" />
+             <coeff row="7"  col="13"  value="0.899745" />
+             <coeff row="7"  col="14"  value="0.644894" />
+             <coeff row="7"  col="15"  value="0.296824" />
+             <coeff row="7"  col="16"  value="0.134095" />
+             <coeff row="7"  col="17"  value="9.99307" />
+             <coeff row="7"  col="18"  value="1.71934" />
+             <coeff row="7"  col="19"  value="0.579687" />
+             <coeff row="7"  col="20"  value="0.34809" />
+             <coeff row="8"  col="0"  value="1.39559" />
+             <coeff row="8"  col="1"  value="9.62284" />
+             <coeff row="8"  col="2"  value="1.51478" />
+             <coeff row="8"  col="3"  value="0.0411027" />
+             <coeff row="8"  col="4"  value="0.551366" />
+             <coeff row="8"  col="5"  value="0.909738" />
+             <coeff row="8"  col="6"  value="0.100634" />
+             <coeff row="8"  col="7"  value="0.129518" />
+             <coeff row="8"  col="8"  value="0" />
+             <coeff row="8"  col="9"  value="1.17835" />
+             <coeff row="8"  col="10"  value="0.959385" />
+             <coeff row="8"  col="11"  value="0.164614" />
+             <coeff row="8"  col="12"  value="0.255167" />
+             <coeff row="8"  col="13"  value="0.132055" />
+             <coeff row="8"  col="14"  value="0.333361" />
+             <coeff row="8"  col="15"  value="1.57085" />
+             <coeff row="8"  col="16"  value="0.301486" />
+             <coeff row="8"  col="17"  value="0.186581" />
+             <coeff row="8"  col="18"  value="0.331733" />
+             <coeff row="8"  col="19"  value="1.73424" />
+             <coeff row="8"  col="20"  value="0.464784" />
+             <coeff row="9"  col="0"  value="3.6057" />
+             <coeff row="9"  col="1"  value="0.399237" />
+             <coeff row="9"  col="2"  value="4.69454" />
+             <coeff row="9"  col="3"  value="0.0436861" />
+             <coeff row="9"  col="4"  value="1.26636" />
+             <coeff row="9"  col="5"  value="1.38755" />
+             <coeff row="9"  col="6"  value="0.11206" />
+             <coeff row="9"  col="7"  value="0.130257" />
+             <coeff row="9"  col="8"  value="0.543283" />
+             <coeff row="9"  col="9"  value="0" />
+             <coeff row="9"  col="10"  value="2.64505" />
+             <coeff row="9"  col="11"  value="0.134125" />
+             <coeff row="9"  col="12"  value="0" />
+             <coeff row="9"  col="13"  value="0.427711" />
+             <coeff row="9"  col="14"  value="0.573079" />
+             <coeff row="9"  col="15"  value="0.585002" />
+             <coeff row="9"  col="16"  value="1.36123" />
+             <coeff row="9"  col="17"  value="0.189488" />
+             <coeff row="9"  col="18"  value="0.286692" />
+             <coeff row="9"  col="19"  value="0.249039" />
+             <coeff row="9"  col="20"  value="0.664245" />
+             <coeff row="10"  col="0"  value="2.32478" />
+             <coeff row="10"  col="1"  value="0.121904" />
+             <coeff row="10"  col="2"  value="0.0854497" />
+             <coeff row="10"  col="3"  value="0.0318558" />
+             <coeff row="10"  col="4"  value="0.0833898" />
+             <coeff row="10"  col="5"  value="2.57252" />
+             <coeff row="10"  col="6"  value="0.1827" />
+             <coeff row="10"  col="7"  value="0.117587" />
+             <coeff row="10"  col="8"  value="0.115332" />
+             <coeff row="10"  col="9"  value="0.158238" />
+             <coeff row="10"  col="10"  value="0" />
+             <coeff row="10"  col="11"  value="0.103761" />
+             <coeff row="10"  col="12"  value="0" />
+             <coeff row="10"  col="13"  value="0.0576754" />
+             <coeff row="10"  col="14"  value="0.119912" />
+             <coeff row="10"  col="15"  value="0.0874709" />
+             <coeff row="10"  col="16"  value="0.590286" />
+             <coeff row="10"  col="17"  value="0.150598" />
+             <coeff row="10"  col="18"  value="0.291367" />
+             <coeff row="10"  col="19"  value="0.0807675" />
+             <coeff row="10"  col="20"  value="0.337091" />
+             <coeff row="11"  col="0"  value="0.118967" />
+             <coeff row="11"  col="1"  value="0.0701201" />
+             <coeff row="11"  col="2"  value="0.0369498" />
+             <coeff row="11"  col="3"  value="0.0399974" />
+             <coeff row="11"  col="4"  value="0.0473099" />
+             <coeff row="11"  col="5"  value="0.258733" />
+             <coeff row="11"  col="6"  value="0.52269" />
+             <coeff row="11"  col="7"  value="0.0968898" />
+             <coeff row="11"  col="8"  value="0.0657072" />
+             <coeff row="11"  col="9"  value="0.0437976" />
+             <coeff row="11"  col="10"  value="0.0599841" />
+             <coeff row="11"  col="11"  value="0" />
+             <coeff row="11"  col="12"  value="0.694663" />
+             <coeff row="11"  col="13"  value="0.229163" />
+             <coeff row="11"  col="14"  value="0.192776" />
+             <coeff row="11"  col="15"  value="0.0834136" />
+             <coeff row="11"  col="16"  value="0.0873124" />
+             <coeff row="11"  col="17"  value="0.150818" />
+             <coeff row="11"  col="18"  value="0.126921" />
+             <coeff row="11"  col="19"  value="0.0387248" />
+             <coeff row="11"  col="20"  value="0.226875" />
+             <coeff row="12"  col="0"  value="0" />
+             <coeff row="12"  col="1"  value="0.355324" />
+             <coeff row="12"  col="2"  value="0.110105" />
+             <coeff row="12"  col="3"  value="0.051331" />
+             <coeff row="12"  col="4"  value="0.221013" />
+             <coeff row="12"  col="5"  value="0.418204" />
+             <coeff row="12"  col="6"  value="1.32678" />
+             <coeff row="12"  col="7"  value="1.00339" />
+             <coeff row="12"  col="8"  value="0.279929" />
+             <coeff row="12"  col="9"  value="0.16693" />
+             <coeff row="12"  col="10"  value="0.158324" />
+             <coeff row="12"  col="11"  value="0" />
+             <coeff row="12"  col="12"  value="0" />
+             <coeff row="12"  col="13"  value="1.15448" />
+             <coeff row="12"  col="14"  value="1.24807" />
+             <coeff row="12"  col="15"  value="0.591588" />
+             <coeff row="12"  col="16"  value="0.277031" />
+             <coeff row="12"  col="17"  value="1.14787" />
+             <coeff row="12"  col="18"  value="0.304348" />
+             <coeff row="12"  col="19"  value="0.0979624" />
+             <coeff row="12"  col="20"  value="0.0407062" />
+             <coeff row="13"  col="0"  value="0.951765" />
+             <coeff row="13"  col="1"  value="0.751756" />
+             <coeff row="13"  col="2"  value="1.7673" />
+             <coeff row="13"  col="3"  value="0.062538" />
+             <coeff row="13"  col="4"  value="0.452556" />
+             <coeff row="13"  col="5"  value="0.528412" />
+             <coeff row="13"  col="6"  value="0.167075" />
+             <coeff row="13"  col="7"  value="3.03683" />
+             <coeff row="13"  col="8"  value="0.656825" />
+             <coeff row="13"  col="9"  value="0.281147" />
+             <coeff row="13"  col="10"  value="0.29674" />
+             <coeff row="13"  col="11"  value="2.03627" />
+             <coeff row="13"  col="12"  value="0.721027" />
+             <coeff row="13"  col="13"  value="0" />
+             <coeff row="13"  col="14"  value="2.42018" />
+             <coeff row="13"  col="15"  value="1.13461" />
+             <coeff row="13"  col="16"  value="0.565447" />
+             <coeff row="13"  col="17"  value="3.14034" />
+             <coeff row="13"  col="18"  value="1.27106" />
+             <coeff row="13"  col="19"  value="0.914104" />
+             <coeff row="13"  col="20"  value="0.36539" />
+             <coeff row="14"  col="0"  value="0.35688" />
+             <coeff row="14"  col="1"  value="2.35088" />
+             <coeff row="14"  col="2"  value="0.352259" />
+             <coeff row="14"  col="3"  value="0.0409641" />
+             <coeff row="14"  col="4"  value="0.646907" />
+             <coeff row="14"  col="5"  value="0.569607" />
+             <coeff row="14"  col="6"  value="0.0668563" />
+             <coeff row="14"  col="7"  value="2.51396" />
+             <coeff row="14"  col="8"  value="3.02592" />
+             <coeff row="14"  col="9"  value="0.48828" />
+             <coeff row="14"  col="10"  value="0.47689" />
+             <coeff row="14"  col="11"  value="1.03953" />
+             <coeff row="14"  col="12"  value="0.270649" />
+             <coeff row="14"  col="13"  value="2.13915" />
+             <coeff row="14"  col="14"  value="0" />
+             <coeff row="14"  col="15"  value="1.57501" />
+             <coeff row="14"  col="16"  value="1.12816" />
+             <coeff row="14"  col="17"  value="2.19178" />
+             <coeff row="14"  col="18"  value="2.13489" />
+             <coeff row="14"  col="19"  value="0.673573" />
+             <coeff row="14"  col="20"  value="1.68819" />
+             <coeff row="15"  col="0"  value="0.973076" />
+             <coeff row="15"  col="1"  value="8.12112" />
+             <coeff row="15"  col="2"  value="1.01409" />
+             <coeff row="15"  col="3"  value="0.0460618" />
+             <coeff row="15"  col="4"  value="0.908262" />
+             <coeff row="15"  col="5"  value="0.408834" />
+             <coeff row="15"  col="6"  value="0.076155" />
+             <coeff row="15"  col="7"  value="0.138008" />
+             <coeff row="15"  col="8"  value="5.37443" />
+             <coeff row="15"  col="9"  value="0.642229" />
+             <coeff row="15"  col="10"  value="0.672506" />
+             <coeff row="15"  col="11"  value="2.71043" />
+             <coeff row="15"  col="12"  value="0.355341" />
+             <coeff row="15"  col="13"  value="0.537851" />
+             <coeff row="15"  col="14"  value="1.30941" />
+             <coeff row="15"  col="15"  value="0" />
+             <coeff row="15"  col="16"  value="1.83257" />
+             <coeff row="15"  col="17"  value="0.220724" />
+             <coeff row="15"  col="18"  value="0.397106" />
+             <coeff row="15"  col="19"  value="0.810228" />
+             <coeff row="15"  col="20"  value="0.35834" />
+             <coeff row="16"  col="0"  value="3.20286" />
+             <coeff row="16"  col="1"  value="0.253415" />
+             <coeff row="16"  col="2"  value="0.302901" />
+             <coeff row="16"  col="3"  value="0.0473048" />
+             <coeff row="16"  col="4"  value="0.269313" />
+             <coeff row="16"  col="5"  value="0.893048" />
+             <coeff row="16"  col="6"  value="0.0672117" />
+             <coeff row="16"  col="7"  value="0.0648731" />
+             <coeff row="16"  col="8"  value="0.284771" />
+             <coeff row="16"  col="9"  value="0.557918" />
+             <coeff row="16"  col="10"  value="4.8618" />
+             <coeff row="16"  col="11"  value="3.27387" />
+             <coeff row="16"  col="12"  value="0.282922" />
+             <coeff row="16"  col="13"  value="0.208687" />
+             <coeff row="16"  col="14"  value="0.232272" />
+             <coeff row="16"  col="15"  value="0.381219" />
+             <coeff row="16"  col="16"  value="0" />
+             <coeff row="16"  col="17"  value="0.0947814" />
+             <coeff row="16"  col="18"  value="0.0853837" />
+             <coeff row="16"  col="19"  value="1.02338" />
+             <coeff row="16"  col="20"  value="0.504082" />
+             <coeff row="17"  col="0"  value="2.41864" />
+             <coeff row="17"  col="1"  value="0.319379" />
+             <coeff row="17"  col="2"  value="0.178302" />
+             <coeff row="17"  col="3"  value="0.056298" />
+             <coeff row="17"  col="4"  value="0.264851" />
+             <coeff row="17"  col="5"  value="0.213084" />
+             <coeff row="17"  col="6"  value="0.0564599" />
+             <coeff row="17"  col="7"  value="1.21596" />
+             <coeff row="17"  col="8"  value="0.197137" />
+             <coeff row="17"  col="9"  value="0.118607" />
+             <coeff row="17"  col="10"  value="0.173997" />
+             <coeff row="17"  col="11"  value="0.202905" />
+             <coeff row="17"  col="12"  value="0.129896" />
+             <coeff row="17"  col="13"  value="1.0697" />
+             <coeff row="17"  col="14"  value="0.76114" />
+             <coeff row="17"  col="15"  value="0.343473" />
+             <coeff row="17"  col="16"  value="0.387152" />
+             <coeff row="17"  col="17"  value="0" />
+             <coeff row="17"  col="18"  value="1.40699" />
+             <coeff row="17"  col="19"  value="0.54103" />
+             <coeff row="17"  col="20"  value="0.429506" />
+             <coeff row="18"  col="0"  value="0.175899" />
+             <coeff row="18"  col="1"  value="0.754186" />
+             <coeff row="18"  col="2"  value="0.320195" />
+             <coeff row="18"  col="3"  value="0.0628248" />
+             <coeff row="18"  col="4"  value="0.55471" />
+             <coeff row="18"  col="5"  value="0.126912" />
+             <coeff row="18"  col="6"  value="0.0493706" />
+             <coeff row="18"  col="7"  value="0.565507" />
+             <coeff row="18"  col="8"  value="0.547876" />
+             <coeff row="18"  col="9"  value="0.164712" />
+             <coeff row="18"  col="10"  value="0.16331" />
+             <coeff row="18"  col="11"  value="0.13626" />
+             <coeff row="18"  col="12"  value="0.208966" />
+             <coeff row="18"  col="13"  value="0.456208" />
+             <coeff row="18"  col="14"  value="1.14737" />
+             <coeff row="18"  col="15"  value="0.591253" />
+             <coeff row="18"  col="16"  value="0.246034" />
+             <coeff row="18"  col="17"  value="1.23881" />
+             <coeff row="18"  col="18"  value="0" />
+             <coeff row="18"  col="19"  value="1.15456" />
+             <coeff row="18"  col="20"  value="1.0158" />
+             <coeff row="19"  col="0"  value="0.802938" />
+             <coeff row="19"  col="1"  value="6.60549" />
+             <coeff row="19"  col="2"  value="1.01047" />
+             <coeff row="19"  col="3"  value="0.0580754" />
+             <coeff row="19"  col="4"  value="1.56955" />
+             <coeff row="19"  col="5"  value="0.165702" />
+             <coeff row="19"  col="6"  value="0.0269086" />
+             <coeff row="19"  col="7"  value="0.176989" />
+             <coeff row="19"  col="8"  value="1.70645" />
+             <coeff row="19"  col="9"  value="0.333086" />
+             <coeff row="19"  col="10"  value="0.290015" />
+             <coeff row="19"  col="11"  value="0.166741" />
+             <coeff row="19"  col="12"  value="0" />
+             <coeff row="19"  col="13"  value="0.169144" />
+             <coeff row="19"  col="14"  value="0.285579" />
+             <coeff row="19"  col="15"  value="1.08627" />
+             <coeff row="19"  col="16"  value="0.505421" />
+             <coeff row="19"  col="17"  value="0.374036" />
+             <coeff row="19"  col="18"  value="0.365916" />
+             <coeff row="19"  col="19"  value="0" />
+             <coeff row="19"  col="20"  value="1.29403" />
+             <coeff row="20"  col="0"  value="2.08092" />
+             <coeff row="20"  col="1"  value="0.190935" />
+             <coeff row="20"  col="2"  value="0.396661" />
+             <coeff row="20"  col="3"  value="0.0536726" />
+             <coeff row="20"  col="4"  value="0.494397" />
+             <coeff row="20"  col="5"  value="0.222617" />
+             <coeff row="20"  col="6"  value="0.0426304" />
+             <coeff row="20"  col="7"  value="0.0932306" />
+             <coeff row="20"  col="8"  value="0.0932389" />
+             <coeff row="20"  col="9"  value="0.229161" />
+             <coeff row="20"  col="10"  value="0.943419" />
+             <coeff row="20"  col="11"  value="0.0970408" />
+             <coeff row="20"  col="12"  value="0" />
+             <coeff row="20"  col="13"  value="0.116839" />
+             <coeff row="20"  col="14"  value="0.1534" />
+             <coeff row="20"  col="15"  value="0.467246" />
+             <coeff row="20"  col="16"  value="1.14689" />
+             <coeff row="20"  col="17"  value="0.369092" />
+             <coeff row="20"  col="18"  value="0.3116" />
+             <coeff row="20"  col="19"  value="0.183026" />
+             <coeff row="20"  col="20"  value="0" />
+           </Coefficients>
+         </SSM>
+       </transforms:spilloverMatrix>
+       <Transformations>
+         <transforms:linear transforms:minRange="0"  transforms:maxRange="262144"  gain="1" >
+           <data-type:parameter data-type:name="FSC-A" />
+         </transforms:linear>
+         <transforms:linear transforms:minRange="0"  transforms:maxRange="262144"  gain="1" >
+           <data-type:parameter data-type:name="FSC-H" />
+         </transforms:linear>
+         <transforms:linear transforms:minRange="0"  transforms:maxRange="262144"  gain="1" >
+           <data-type:parameter data-type:name="SSC-A" />
+         </transforms:linear>
+         <transforms:linear transforms:minRange="0"  transforms:maxRange="262144"  gain="1" >
+           <data-type:parameter data-type:name="SSC-H" />
+         </transforms:linear>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BB515-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BB630-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BB660-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BB700-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BB790-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Alexa Fluor 647-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Alexa Fluor 700-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="APC-Cy7-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BV421-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BV510-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BV570-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BV605-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BV650-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BV711-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BV750-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BV786-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BUV395-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="DAPI-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BUV496-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BUV563-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BUV661-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BUV737-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="BUV805-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="PE-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="PE-Alexa 594-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="PE-Cy5-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="PE-Cy5-5-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="PE-Cy7-A" />
+         </transforms:biex>
+         <transforms:linear transforms:minRange="0.5225075021"  transforms:maxRange="196"  gain="0.0100567307" >
+           <data-type:parameter data-type:name="Time" />
+         </transforms:linear>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BB515-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BB700-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-Alexa Fluor 647-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-Alexa Fluor 700-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-APC-Cy7-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BV421-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BV510-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BV570-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BV605-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BV650-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BV786-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BUV395-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BUV496-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BUV563-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BUV661-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BUV737-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-BUV805-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-PE-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-PE-Alexa 594-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-PE-Cy5-A" />
+         </transforms:biex>
+         <transforms:biex transforms:length="256"  transforms:maxRange="262144.0000291775"  transforms:neg="0"  transforms:width="-100"  transforms:pos="4.418539922" >
+           <data-type:parameter data-type:name="Comp-PE-Cy7-A" />
+         </transforms:biex>
+       </Transformations>
+       <Keywords>
+       </Keywords>
+       <SampleNode name="test_114_035.fcs"  annotation=""  owningGroup=""  expanded="0"  sortPriority="10"  count="50009"  sampleID="1" >
+         <Subpopulations>
+           <Population name="trucount beads+"  annotation=""  owningGroup="Test with trucount beads"  expanded="0"  sortPriority="10"  count="25" >
+             <Gate gating:id="ID1646366375" >
+               <gating:RectangleGate eventsInside="1"  annoOffsetX="-23"  annoOffsetY="-64"  tint="#000000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  percentX="0"  percentY="0" >
+                 <gating:dimension gating:min="149164.32918058857"  gating:max="573391.7143355261" >
+                   <data-type:fcs-dimension data-type:name="Alexa Fluor 647-A" />
+                 </gating:dimension>
+                 <gating:dimension gating:min="77232.22662889518"  gating:max="293333.93767705385" >
+                   <data-type:fcs-dimension data-type:name="SSC-A" />
+                 </gating:dimension>
+               </gating:RectangleGate>
+             </Gate>
+           </Population>
+           <NotNode name="trucount beads-"  annotation=""  owningGroup="Test with trucount beads"  expanded="0"  sortPriority="13"  count="49984" >
+             <Gate gating:id="ID1429328721" >
+               <gating:RectangleGate eventsInside="1"  annoOffsetX="-23"  annoOffsetY="-64"  tint="#000000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  percentX="0"  percentY="0" >
+                 <gating:dimension gating:min="135697.09307404511"  gating:max="510083.8197258808" >
+                   <data-type:fcs-dimension data-type:name="Alexa Fluor 647-A" />
+                 </gating:dimension>
+                 <gating:dimension gating:min="77974.84419263455"  gating:max="294076.5552407932" >
+                   <data-type:fcs-dimension data-type:name="SSC-A" />
+                 </gating:dimension>
+               </gating:RectangleGate>
+             </Gate>
+             <Subpopulations>
+               <Population name="CD45+, less debris"  annotation=""  owningGroup="Test with trucount beads"  expanded="0"  sortPriority="10"  count="43991" >
+                 <Gate gating:id="ID1453017422"  gating:parent_id="ID1429328721" >
+                   <gating:PolygonGate eventsInside="1"  annoOffsetX="0"  annoOffsetY="0"  tint="#000000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  quadId="-1"  gateResolution="256" >
+                     <gating:dimension>
+                       <data-type:fcs-dimension data-type:name="Comp-BUV395-A" />
+                     </gating:dimension>
+                     <gating:dimension>
+                       <data-type:fcs-dimension data-type:name="SSC-A" />
+                     </gating:dimension>
+                     <gating:vertex>
+                       <gating:coordinate data-type:value="-1546.1031503357" />
+                       <gating:coordinate data-type:value="136641.6317280453" />
+                     </gating:vertex>
+                     <gating:vertex>
+                       <gating:coordinate data-type:value="1935.745084474" />
+                       <gating:coordinate data-type:value="71291.2861189802" />
+                     </gating:vertex>
+                     <gating:vertex>
+                       <gating:coordinate data-type:value="2801.8044235948" />
+                       <gating:coordinate data-type:value="2227.8526912181" />
+                     </gating:vertex>
+                     <gating:vertex>
+                       <gating:coordinate data-type:value="232169.5743782269" />
+                       <gating:coordinate data-type:value="742.6175637394" />
+                     </gating:vertex>
+                     <gating:vertex>
+                       <gating:coordinate data-type:value="255295.5554499142" />
+                       <gating:coordinate data-type:value="259916.1473087819" />
+                     </gating:vertex>
+                     <gating:vertex>
+                       <gating:coordinate data-type:value="58160.4918914551" />
+                       <gating:coordinate data-type:value="261401.3824362606" />
+                     </gating:vertex>
+                     <gating:vertex>
+                       <gating:coordinate data-type:value="-1337.3838639072" />
+                       <gating:coordinate data-type:value="259173.5297450425" />
+                     </gating:vertex>
+                   </gating:PolygonGate>
+                 </Gate>
+                 <Subpopulations>
+                   <Population name="Singlets"  annotation=""  owningGroup=""  expanded="0"  sortPriority="10"  count="42979" >
+                     <Gate gating:id="ID1451772413"  gating:parent_id="ID1453017422" >
+                       <gating:PolygonGate eventsInside="1"  annoOffsetX="0"  annoOffsetY="0"  tint="#000000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  quadId="-1"  gateResolution="256" >
+                         <gating:dimension>
+                           <data-type:fcs-dimension data-type:name="FSC-A" />
+                         </gating:dimension>
+                         <gating:dimension>
+                           <data-type:fcs-dimension data-type:name="FSC-H" />
+                         </gating:dimension>
+                         <gating:vertex>
+                           <gating:coordinate data-type:value="33026.0157480315" />
+                           <gating:coordinate data-type:value="37981.0909090909" />
+                         </gating:vertex>
+                         <gating:vertex>
+                           <gating:coordinate data-type:value="49539.0236220472" />
+                           <gating:coordinate data-type:value="70004.3636363636" />
+                         </gating:vertex>
+                         <gating:vertex>
+                           <gating:coordinate data-type:value="197124.031496063" />
+                           <gating:coordinate data-type:value="218949.8181818182" />
+                         </gating:vertex>
+                         <gating:vertex>
+                           <gating:coordinate data-type:value="261111.937007874" />
+                           <gating:coordinate data-type:value="259165.0909090909" />
+                         </gating:vertex>
+                         <gating:vertex>
+                           <gating:coordinate data-type:value="266272.2519685039" />
+                           <gating:coordinate data-type:value="163095.2727272727" />
+                         </gating:vertex>
+                         <gating:vertex>
+                           <gating:coordinate data-type:value="126943.7480314961" />
+                           <gating:coordinate data-type:value="60322.9090909091" />
+                         </gating:vertex>
+                         <gating:vertex>
+                           <gating:coordinate data-type:value="49539.0236220472" />
+                           <gating:coordinate data-type:value="32023.2727272727" />
+                         </gating:vertex>
+                       </gating:PolygonGate>
+                     </Gate>
+                   </Population>
+                 </Subpopulations>
+               </Population>
+             </Subpopulations>
+             <Dependents>
+               <Dependent name="trucount beads+" />
+             </Dependents>
+           </NotNode>
+         </Subpopulations>
+       </SampleNode>
+     </Sample>
+   </SampleList>
+  </Workspace>
