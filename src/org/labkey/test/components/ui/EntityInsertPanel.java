@@ -3,6 +3,7 @@ package org.labkey.test.components.ui;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.glassLibrary.grids.EditableGrid;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -37,6 +38,36 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     public WebDriver getDriver()
     {
         return _driver;
+    }
+
+    public ReactSelect getEntityTypeSelect(String labelText)
+    {
+        return ReactSelect.finder(getDriver()).followingLabelWithSpan(labelText).waitFor();
+    }
+
+    public EntityInsertPanel addParent(String label, String parentType)
+    {
+        elementCache().addParent.click();
+        getEntityTypeSelect(label).select(parentType);
+        return this;
+    }
+
+    public EntityInsertPanel clearParents()
+    {
+        Locator loc = Locator.tagWithClass("span", "container--action-button")
+                .withChild(Locator.tagWithClass("i", "container--removal-icon")).withText("Remove Parent 1");
+
+        getWrapper().waitFor(()-> loc.findElementOrNull(getDriver()) != null, 1500);  // it's okay if it isn't there
+
+        while (loc.findElementOrNull(getDriver()) != null)      // click the top one until they are all gone
+        {
+            WebElement parentBtn = loc.findElement(getDriver());
+            getWrapper().log("removing parent " + parentBtn.getText());
+            parentBtn.click();
+            getWrapper().sleep(500);
+        }
+
+        return this;
     }
 
     public EntityInsertPanel addRecords(List<Map<String, Object>> records)
@@ -164,6 +195,9 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).findWhenNeeded();
         WebElement addRowsTxtBox = Locator.tagWithName("input", "addCount").findWhenNeeded(_driver);
         WebElement addRowsButton = Locator.buttonContainingText("Add").findWhenNeeded(_driver);
+
+        WebElement addParent = Locator.tagWithClass("span", "container--action-button")
+                .containing("Parent").findWhenNeeded(getDriver());
     }
 
     public static class InsertRecordFinder extends WebDriverComponent.WebDriverComponentFinder<EntityInsertPanel, InsertRecordFinder>
