@@ -30,6 +30,7 @@ import org.apache.xmlbeans.XmlException;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
+import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 
@@ -198,9 +199,12 @@ public class APITestHelper
 
     public static void injectCookies(@NotNull String username, HttpUriRequest method)
     {
-        org.openqa.selenium.Cookie csrf = WebTestHelper.getCookies(username).get("X-LABKEY-CSRF");
+        org.openqa.selenium.Cookie csrf = WebTestHelper.getCookies(username).get(Connection.X_LABKEY_CSRF);
         if (csrf != null)
             method.setHeader(csrf.getName(), csrf.getValue());
+        org.openqa.selenium.Cookie session = WebTestHelper.getCookies(username).get(Connection.JSESSIONID);
+        if (session != null)
+            method.setHeader(session.getName(), session.getValue());
     }
 
     public static class ApiTestCase

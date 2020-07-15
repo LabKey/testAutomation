@@ -26,7 +26,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.GuestCredentialsProvider;
+import org.labkey.remoteapi.security.WhoAmICommand;
+import org.labkey.remoteapi.security.WhoAmIResponse;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
@@ -467,37 +471,24 @@ public abstract class WebDriverWrapper implements WrapsDriver
     @LogMethod(quiet = true)
     public void resumeJsErrorChecker()
     {
-        // Turn on server side logging of client errors.
-        if (isScriptCheckEnabled())
-        {
-            Connection cn = createDefaultConnection(false);
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", true);
-        }
+        setJsErrorLogging(true);
     }
 
     @LogMethod(quiet = true)
     public void pauseJsErrorChecker()
     {
-        // Turn off server side logging of client errors.
+        setJsErrorLogging(false);
+    }
+
+    private void setJsErrorLogging(boolean b)
+    {
+        // Enable/disable server side logging of client errors.
         if (isScriptCheckEnabled())
         {
-            Connection cn = createDefaultConnection(false);
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", false);
+            // Don't use browser session. Some tests need to pause briefly, while impersonating.
+            Connection cn = WebTestHelper.getRemoteApiConnection(false);
+            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", b);
         }
-    }
-
-    @LogMethod(quiet = true)
-    public void enableUxDomainDesigner()
-    {
-        Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", true);
-    }
-
-    @LogMethod(quiet = true)
-    public void disableUxDomainDesigner()
-    {
-        Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", false);
     }
 
     public enum BrowserType
@@ -982,23 +973,28 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @param reuseSession true to have the Java API connection "hijack" the session from the Selenium browser window
+     * Create a Java API connection, copying the session from the Selenium browser window
+     * Use {@link WebTestHelper#getRemoteApiConnection()} to get a connection using 'BasicAuth'.
      */
-    public Connection createDefaultConnection(boolean reuseSession)
+    public Connection createDefaultConnection()
     {
-        Connection connection = WebTestHelper.getRemoteApiConnection();
-        if (reuseSession)
-        {
-            Cookie cookie = getDriver().manage().getCookieNamed("JSESSIONID");
-            if (cookie == null)
-            {
-                throw new IllegalStateException("No session cookie available to reuse.");
-            }
+        Connection connection = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
 
+        Set<Cookie> cookies = getDriver().manage().getCookies();
+        for (Cookie cookie : cookies)
+        {
             connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
         }
-
         return connection;
+    }
+
+    /**
+     * @deprecated Copying the browser session is preferred unless tests have specific needs otherwise.
+     */
+    @Deprecated
+    public Connection createDefaultConnection(boolean reuseSession)
+    {
+        return createDefaultConnection();
     }
 
     public long beginAt(String relativeURL)
@@ -1114,9 +1110,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (String)executeScript("return LABKEY.container.path;");
     }
 
+    public WhoAmIResponse whoAmI()
+    {
+        try
+        {
+            return new WhoAmICommand().execute(createDefaultConnection(), "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to fetch current user info.", e);
+        }
+    }
+
     public String getCurrentUser()
     {
-        return (String)executeScript("return LABKEY.user.email;");
+        return whoAmI().getEmail();
     }
 
     public String getCurrentUserName()
@@ -1127,7 +1135,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     // Return display name for the current logged in user (or impersonated user)
     public String getDisplayName()
     {
-        return (String)executeScript("return LABKEY.user.displayName");
+        return whoAmI().getDisplayName();
     }
 
     public String getCurrentDateFormatString()
@@ -1147,7 +1155,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public boolean isSignedIn()
     {
-        return (Boolean)executeScript("return LABKEY.user.isSignedIn;");
+        return whoAmI().getUserId().longValue() > 0;
     }
 
     public boolean isUserSystemAdmin()
@@ -1167,7 +1175,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public boolean isImpersonating()
     {
-        return (Boolean)executeScript("return LABKEY.impersonatingUser != undefined;");
+        return whoAmI().isImpersonated();
     }
 
     public void assertSignedInNotImpersonating()
@@ -1974,7 +1982,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         func.run();
 
         if (previousElement != null)
-            wait.until(ExpectedConditions.stalenessOf(previousElement));
+        {
+            try
+            {
+                wait.until(ExpectedConditions.stalenessOf(previousElement));
+            }
+            // Firefox sometimes throws the wrong exception.
+            catch (NoSuchElementException ignore) { } // "NoSuchElementException: Web element reference not seen before"
+        }
 
         return wait.until(wd -> elementFinder.get());
     }

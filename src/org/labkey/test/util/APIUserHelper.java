@@ -25,6 +25,7 @@ import org.labkey.remoteapi.security.DeleteUserCommand;
 import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -92,7 +93,7 @@ public class APIUserHelper extends AbstractUserHelper
             }
         };
         command.setSendEmail(sendEmail);
-        Connection connection = getWrapper().createDefaultConnection(false);
+        Connection connection = getWrapper().createDefaultConnection();
         try
         {
             CreateUserResponse response = command.execute(connection, "");
@@ -123,7 +124,12 @@ public class APIUserHelper extends AbstractUserHelper
     {
         GetUsersCommand command = new GetUsersCommand();
         command.setIncludeDeactivated(includeDeactivated);
-        Connection connection = getWrapper().createDefaultConnection(false);
+        Connection connection = getWrapper().createDefaultConnection();
+        if (getWrapper().isImpersonating())
+        {
+            // Don't use browser session. Tests often call 'getDisplayNameForEmail' while impersonating non-admins.
+            connection = WebTestHelper.getRemoteApiConnection(false);
+        }
 
         try
         {
@@ -165,7 +171,7 @@ public class APIUserHelper extends AbstractUserHelper
 
     private void deleteUser(@NotNull Integer userId)
     {
-        Connection connection = getWrapper().createDefaultConnection(false);
+        Connection connection = getWrapper().createDefaultConnection();
         DeleteUserCommand command = new DeleteUserCommand(userId);
         try
         {

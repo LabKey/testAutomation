@@ -163,7 +163,7 @@ public class FlowJoQueryTest extends BaseFlowTest
                 "FROM CompensationMatrices cm";
         ExecuteSqlCommand cmd = new ExecuteSqlCommand("flow", sql);
 
-        Connection conn = createDefaultConnection(true);
+        Connection conn = createDefaultConnection();
         SelectRowsResponse r;
         try
         {

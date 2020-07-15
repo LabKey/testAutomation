@@ -34,7 +34,7 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
 
     private boolean isExpanded()
     {
-        return elementCache().rowToggle.getAttribute("class").contains("container-expandable-child__inactive");
+        return elementCache().rowContainer.getAttribute("class").contains("container-expandable-child__inactive");
     }
 
     public String getTitle()
@@ -91,7 +91,8 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
 
     protected class ElementCache extends WebDriverComponent<RoleRow.ElementCache>.ElementCache
     {
-        final WebElement rowToggle = Locator.byClass("container-expandable-detail").findWhenNeeded(this);
+        final WebElement rowContainer = Locator.byClass("container-expandable-icononly").findWhenNeeded(this);
+        final WebElement rowToggle = Locator.byClass("container-expandable-child__chevron").findWhenNeeded(this);
         final WebElement assignmentsRow = Locator.byClass("permissions-assignments-row").findWhenNeeded(this);
         final ReactSelect memberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this)
                 .setOptionLocator(ReactSelect.Locators.option::startsWith);

@@ -48,13 +48,13 @@ public class DataReportsTest extends ReportTest
 
     protected static final String AUTHOR_REPORT = "Author report";
 
-    private static final String QUERY_REPORT_NAME = "First Test Query Report";
-    private static final String QUERY_REPORT_DESCRIPTION = "Description for the first query report.";
+    private static final String QUERY_REPORT_NAME = BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String QUERY_REPORT_DESCRIPTION = BaseWebDriverTest.INJECT_CHARS_1;
     private static final String QUERY_REPORT_SCHEMA_NAME = "study";
     private static final String QUERY_REPORT_QUERY_NAME = "Mouse";
 
-    private static final String QUERY_REPORT_NAME_2 = "Second Test Query Report";
-    private static final String QUERY_REPORT_DESCRIPTION_2 = "Description for the first query report.";
+    private static final String QUERY_REPORT_NAME_2 = BaseWebDriverTest.INJECT_CHARS_2;
+    private static final String QUERY_REPORT_DESCRIPTION_2 = BaseWebDriverTest.INJECT_CHARS_2;
     private static final String QUERY_REPORT_SCHEMA_NAME_2 = "study";
     private static final String QUERY_REPORT_QUERY_NAME_2 = "AE-1 (AE-1:(VTN) AE Log)";
     private static final String QUERY_REPORT_VIEW_NAME_2 = "Limited PTIDS";
@@ -468,8 +468,8 @@ public class DataReportsTest extends ReportTest
         log("Check that edit worked");
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[1]);
-
         waitAndClick(Locator.lkButton("Start Job"));
+
         WebElement pipelineLink = waitForElement(Locator.linkWithText("click here"));
         waitForElement(Locator.byClass("x4-window").containing("Start Pipeline Job").hidden());
         clickAndWait(pipelineLink);

@@ -56,7 +56,7 @@ public class StudyHelper
 
     public boolean doesStudyExist(String containerPath)
     {
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _test.createDefaultConnection();
         SelectRowsCommand command = new SelectRowsCommand("study", "Datasets");
         try
         {

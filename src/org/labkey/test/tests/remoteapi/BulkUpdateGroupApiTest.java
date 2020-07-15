@@ -111,7 +111,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(groupName);
         command.addMemberUser(email);
-        Connection connection = createDefaultConnection(false);
+        Connection connection = createDefaultConnection();
 
         try
         {
@@ -135,7 +135,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand("");
         command.setGroupName(null);
         command.addMemberUser(email);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         try
         {
@@ -157,7 +157,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(0);
         command.addMemberUser(email);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         try
         {
@@ -179,7 +179,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(group2Id + 100);
         command.addMemberUser(email);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         try
         {
@@ -206,7 +206,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(groupName);
         command.addMemberUser(email);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         try
         {
@@ -228,7 +228,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand("nopunctu@tion,allowed");
         command.addMemberUser(email);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         try
         {
@@ -248,7 +248,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     {
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(group1Id);
         command.addMemberUser(group2Id + 101);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
         List<String> errors = collectErrors(response);
@@ -265,7 +265,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(systemGroupId);
         command.addMemberUser(USER1);
         command.addMemberGroup(group1Id);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
 
@@ -286,7 +286,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         command.setCreateGroup(true);
         command.addMemberUser(user1Id);
         command.addMemberGroup(group2Id);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
         List<String> errors = collectErrors(response);
@@ -305,7 +305,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         command.setCreateGroup(true);
         command.addMemberUser(USER1);
         command.addMemberGroup(group2Id);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         BulkUpdateGroupResponse response = command.execute(connection, "/");
         List<String> errors = collectErrors(response);
@@ -324,7 +324,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         Integer id1 = _permissionsHelper.createProjectGroup(cGroup1, getProjectName());
 
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(cGroup2);
         command.setCreateGroup(true);
@@ -358,7 +358,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         command.setMethod(BulkUpdateGroupCommand.Method.delete);
         command.addMemberUser(USER1);
         command.addMemberGroup(group1Id);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
 
@@ -384,7 +384,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         command.setMethod(BulkUpdateGroupCommand.Method.replace);
         command.addMemberUser(USER1);
         command.addMemberGroup(group1Id);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
 
@@ -413,7 +413,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         command.addMemberGroup(user2Id);
         command.addMemberUser(group2Id);
         //}errors
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
 
@@ -435,7 +435,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         command.setCreateGroup(false);
         command.addMemberUser(user1Id);
         command.addMemberUser(newUser);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         try
         {
@@ -467,7 +467,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(group1Id);
         command.addMemberUser(newUser, userProps);
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
 
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
 
@@ -487,7 +487,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(groupName);
         command.addMemberUser(email);
-        command.addMemberGroup(group1Id);        Connection connection = createDefaultConnection(true);
+        command.addMemberGroup(group1Id);        Connection connection = createDefaultConnection();
 
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
         List<String> errors = collectErrors(response);

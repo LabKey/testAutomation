@@ -225,7 +225,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         try
         {
             SimpleHttpResponse response = logOutRequest.getResponse();
-            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+            if (HttpStatus.SC_OK != response.getResponseCode() && HttpStatus.SC_UNAUTHORIZED != response.getResponseCode())
+            {
+                fail("Failed to stop impersonating. " + response.getResponseCode());
+            }
         }
         catch (IOException e)
         {
@@ -236,23 +239,19 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     public void ensureSignedInAsPrimaryTestUser()
     {
-        if (!onLabKeyPage() || isOnServerErrorPage())
-            goToHome();
-        if (isImpersonating())
-        {
-            if (!onLabKeyClassicPage()) // Single-page apps don't have impersonation capabilities
-            {
-                goToHome();
-            }
-            stopImpersonating(false);
-        }
+        boolean wasImpersonating = isImpersonating(); // To make sure browser isn't in an apparent impersonation state
+        stopImpersonatingHTTP();
         if (!isSignedInAsPrimaryTestUser())
         {
             if (isSignedIn())
-                signOut();
+                signOutHTTP();
             simpleSignIn();
         }
-        WebTestHelper.saveSession(PasswordUtil.getUsername(), getDriver());
+        else if (wasImpersonating || !onLabKeyPage() || isOnServerErrorPage())
+        {
+            goToHome();
+        }
+        WebTestHelper.saveSession(getCurrentUser(), getDriver()); // In case a test signed in without using a helper
     }
 
     @LogMethod
@@ -274,7 +273,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             clickAndWait(Locator.input("TestSecondary"));
 
             // delete the current secondaryAuth configuration
-            deleteAuthenticationConfiguration(configId, createDefaultConnection(true));
+            deleteAuthenticationConfiguration(configId, createDefaultConnection());
         }
         catch (NoSuchElementException ignored)
         {
@@ -324,7 +323,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         simpleSignOut();
         checkForUpgrade();
         simpleSignIn();
-        ensureAdminMode();
+        assertEquals("Signed in as wrong user.", PasswordUtil.getUsername(), getCurrentUser());
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -392,15 +391,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected String getPasswordResetUrl(String username)
     {
-        goToHome();
-        goToModule("Dumbster");
-        String emailSubject = "Reset Password Notification";
+        beginAt(WebTestHelper.buildURL("security", "showResetEmail", Map.of("email", username)));
 
-        EmailRecordTable emailRecordTable = new EmailRecordTable(getDriver());
-        WebElement email = Locator.xpath("//td[text() = '" + username + "']/..//a[starts-with(text(), '" + emailSubject + "')]").findElement(emailRecordTable);
-        email.click();
-
-        WebElement resetLink = Locator.xpath("//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]").findElement(emailRecordTable);
+        WebElement resetLink = Locator.xpath("//a[contains(@href, 'setPassword.view')]").findElement(getDriver());
         shortWait().until(ExpectedConditions.elementToBeClickable(resetLink));
         return resetLink.getText();
     }
@@ -839,8 +832,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 EntityUtils.consume(response.getEntity());
 
                 List<NameValuePair> logoutParams = new ArrayList<>();
-                Optional<Cookie> csrfToken = httpContext.getCookieStore().getCookies().stream().filter(c -> c.getName().equals("X-LABKEY-CSRF")).findAny();
-                csrfToken.ifPresent(cookie -> logoutParams.add(new BasicNameValuePair("X-LABKEY-CSRF", cookie.getValue())));
+                Optional<Cookie> csrfToken = httpContext.getCookieStore().getCookies().stream().filter(c -> c.getName().equals(Connection.X_LABKEY_CSRF)).findAny();
+                csrfToken.ifPresent(cookie -> logoutParams.add(new BasicNameValuePair(Connection.X_LABKEY_CSRF, cookie.getValue())));
                 // Logout to verify redirect
                 HttpPost logoutMethod = new HttpPost(getBaseURL() + "/login/logout.view");
                 logoutMethod.setEntity(new UrlEncodedFormEntity(logoutParams));
@@ -916,7 +909,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void resetErrors()
     {
-        if (isGuestModeTest())
+        if (isGuestModeTest() || TestProperties.isPrimaryUserAppAdmin())
             return;
 
         invokeApiAction(null, "admin", "resetErrorMark", "Failed to reset server errors");
@@ -1013,8 +1006,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void goToExternalToolPage()
     {
-        clickUserMenuItem("External Tool Settings");
-        waitForText("API keys are used to authorize");
+        clickUserMenuItem("External Tool Access");
     }
 
     protected WebElement openMenu(String menuText)
@@ -1050,7 +1042,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public boolean isMiniProfilerEnabled()
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         Command command = new Command("mini-profiler", "isEnabled");
         try
         {
@@ -1077,7 +1069,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     public void setMiniProfilerEnabled(boolean enabled)
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         PostCommand setEnabled = new PostCommand("mini-profiler", "enable");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("enabled", enabled);
@@ -1121,7 +1113,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void setAuthenticationProvider(String provider, boolean enabled)
     {
-        setAuthenticationProvider(provider, enabled, createDefaultConnection(true));
+        setAuthenticationProvider(provider, enabled, createDefaultConnection());
     }
 
     @LogMethod(quiet = true)
@@ -1326,7 +1318,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters)
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(containerFilter);

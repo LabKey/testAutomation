@@ -37,6 +37,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
@@ -176,6 +177,11 @@ public class JUnitTest extends TestSuite
 
     private static TestSuite _suite(Predicate<Map<String,Object>> accept, final int attempt, final int upgradeAttempts) throws Exception
     {
+        if (TestProperties.isPrimaryUserAppAdmin())
+        {
+            return new TestSuite(); // server-side tests require site admin
+        }
+
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
         try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())

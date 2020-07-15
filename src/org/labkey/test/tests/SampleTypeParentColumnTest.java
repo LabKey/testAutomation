@@ -177,7 +177,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
 
         try
         {
-            dgen.createDomain(createDefaultConnection(true), domainKind);
+            dgen.createDomain(createDefaultConnection(), domainKind);
         }
         catch (IOException | CommandException rethrow)
         {
@@ -199,7 +199,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
 
         try
         {
-            dataGen.insertRows(createDefaultConnection(true), preDefinedSamples);
+            dataGen.insertRows(createDefaultConnection(), preDefinedSamples);
         }
         catch (IOException | CommandException rethrow)
         {

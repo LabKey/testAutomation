@@ -20,6 +20,7 @@ import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.LabKeySiteWrapper;
+import org.labkey.test.TestProperties;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class ExperimentalFeaturesHelper
 
         TestLogger.log("Setting experimental flags for duration of the test:");
 
-        Connection cn = test.createDefaultConnection(false);
+        Connection cn = test.createDefaultConnection();
         for (Map.Entry<String, Boolean> flag : flags.entrySet())
         {
             setFeature(cn, flag.getKey(), flag.getValue());
@@ -65,7 +66,7 @@ public class ExperimentalFeaturesHelper
 
         TestLogger.log("Resetting experimental flags to their original value:");
 
-        Connection cn = test.createDefaultConnection(false);
+        Connection cn = test.createDefaultConnection();
         for (Map.Entry<String, Boolean> features : _originalFeatureFlags.entrySet())
         {
             setExperimentalFeature(cn, features.getKey(), features.getValue());
@@ -76,6 +77,9 @@ public class ExperimentalFeaturesHelper
 
     private static void setFeature(Connection cn, String feature, boolean enable)
     {
+        if (TestProperties.isPrimaryUserAppAdmin())
+            return; // App admin can't enable/disable experimental features
+
         TestLogger.log((enable ? "Enabling" : "Disabling") + " experimental feature " + feature);
 
         Map<String, Object> parameters = new HashMap<>();
