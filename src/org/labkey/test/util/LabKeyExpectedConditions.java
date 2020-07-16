@@ -26,8 +26,15 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public abstract class LabKeyExpectedConditions
+import java.util.List;
+
+public class LabKeyExpectedConditions
 {
+    private LabKeyExpectedConditions()
+    {
+        // Utility class
+    }
+
     /**
      * An expectation for checking that an element has stopped moving
      *
@@ -157,4 +164,41 @@ public abstract class LabKeyExpectedConditions
             }
         };
     }
+
+    /**
+     * Wraps {@link ExpectedConditions#visibilityOfAllElements(List)}.
+     * This expectations accounts for the behavior of LabKey WebElement wrappers, which will throw if you attempt to
+     * inspect them before the element has appeared.
+     *
+     * @param elements list of WebElements
+     * @return the list of WebElements once they are located
+     * @see org.labkey.test.selenium.LazyWebElement
+     */
+    public static ExpectedCondition<List<WebElement>> visibilityOfAllElements(List<WebElement> elements)
+    {
+        return new ExpectedCondition<>()
+        {
+            final ExpectedCondition<List<WebElement>> wrapped = ExpectedConditions.visibilityOfAllElements(elements);
+
+            @Override
+            public List<WebElement> apply(WebDriver driver)
+            {
+                try
+                {
+                    return wrapped.apply(driver);
+                }
+                catch (StaleElementReferenceException | NoSuchElementException ignore)
+                {
+                    return null;
+                }
+            }
+
+            @Override
+            public String toString()
+            {
+                return wrapped.toString();
+            }
+        };
+    }
+
 }
