@@ -166,7 +166,7 @@ public class LabKeyExpectedConditions
     }
 
     /**
-     * Wraps {@link ExpectedConditions#visibilityOfAllElements(List)}.
+     * Wraps {@link ExpectedConditions#visibilityOfAllElements(WebElement...)}
      * This expectations accounts for the behavior of LabKey WebElement wrappers, which will throw if you attempt to
      * inspect them before the element has appeared.
      *
@@ -174,7 +174,7 @@ public class LabKeyExpectedConditions
      * @return the list of WebElements once they are located
      * @see org.labkey.test.selenium.LazyWebElement
      */
-    public static ExpectedCondition<List<WebElement>> visibilityOfAllElements(List<WebElement> elements)
+    public static ExpectedCondition<List<WebElement>> visibilityOfAllElements(WebElement... elements)
     {
         return new ExpectedCondition<>()
         {
