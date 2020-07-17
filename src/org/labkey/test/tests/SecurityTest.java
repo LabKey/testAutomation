@@ -623,6 +623,7 @@ public class SecurityTest extends BaseWebDriverTest
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertFailureAuthenticationToken(xml);
 
+        // #40884 - Verify that while impersonating, token authentication still resolves to admin user
         impersonate(NORMAL_USER);
 
         beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
@@ -630,10 +631,10 @@ public class SecurityTest extends BaseWebDriverTest
         assertEquals("Redirected to wrong URL", homePageUrl, removeUrlParameters(getURL().toString()));
 
         email = getUrlParam("labkeyEmail", true);
-        assertEquals("Wrong email", NORMAL_USER, email);
+        assertEquals("Wrong email", userName, email);
         token = getUrlParam("labkeyToken", true);
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
-        assertSuccessAuthenticationToken(xml, token, email, 15);
+        assertSuccessAuthenticationToken(xml, token, email, 32783);
 
         // Back to the admin user
         stopImpersonating();
