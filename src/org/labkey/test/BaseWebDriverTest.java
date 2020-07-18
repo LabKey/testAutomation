@@ -2004,13 +2004,25 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public DataRegionTable viewQueryData(String schemaName, String queryName)
     {
-        return viewQueryData(schemaName, queryName, null);
+        return viewQueryData(schemaName, queryName, null, null);
     }
 
     public DataRegionTable viewQueryData(String schemaName, String queryName, @Nullable String moduleName)
     {
-        selectQuery(schemaName, queryName);
-        Locator loc = Locator.xpath("//div[contains(@class,'lk-qd-name')]//a[contains(text(),'" + schemaName + "." + queryName + "')]");
+        return viewQueryData(schemaName, queryName, moduleName, null);
+    }
+
+    public DataRegionTable viewQueryData(String schemaName, String queryName, @Nullable String moduleName, @Nullable String publicName)
+    {
+        if (publicName != null)
+        {
+            selectQuery(schemaName, queryName, publicName);
+        }
+        else
+        {
+            selectQuery(schemaName, queryName);
+        }
+        Locator loc = Locator.xpath("//div[contains(@class,'lk-qd-name')]//a[contains(text(),'" + schemaName + "." + (publicName != null?publicName:queryName) + "')]");
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
         if (moduleName != null) // 12474
