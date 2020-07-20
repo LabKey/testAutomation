@@ -351,13 +351,23 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         binary.addCommandLineOptions("--headless");
                     }
                     capabilities.setCapability(FirefoxDriver.BINARY, binary);
+                    FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
                     try
                     {
-                        newWebDriver = new FirefoxDriver(new FirefoxOptions(capabilities));
+                        newWebDriver = new FirefoxDriver(firefoxOptions);
                     }
-                    catch (WebDriverException rethrow)
+                    catch (WebDriverException retry)
                     {
-                        throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. Ensure that you are using Firefox 62 or newer.", rethrow);
+                        try
+                        {
+                            retry.printStackTrace(System.err);
+                            sleep(10000);
+                            newWebDriver = new FirefoxDriver(firefoxOptions);
+                        }
+                        catch (WebDriverException rethrow)
+                        {
+                            throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. Ensure that you are using Firefox 62 or newer.", rethrow);
+                        }
                     }
                 }
                 break;
