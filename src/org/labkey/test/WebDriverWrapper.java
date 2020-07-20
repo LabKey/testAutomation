@@ -1011,15 +1011,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return connection;
     }
 
-    /**
-     * @deprecated Copying the browser session is preferred unless tests have specific needs otherwise.
-     */
-    @Deprecated
-    public Connection createDefaultConnection(boolean reuseSession)
-    {
-        return createDefaultConnection();
-    }
-
     public long beginAt(String relativeURL)
     {
         return beginAt(relativeURL, defaultWaitForPage);
