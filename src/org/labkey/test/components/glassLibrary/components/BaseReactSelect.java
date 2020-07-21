@@ -30,6 +30,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     final WebElement _componentElement;
     final WebDriver _driver;
     final WebDriverWrapper _wrapper;
+    private final String LOADING_TEXT = "loading...";
 
     public BaseReactSelect(WebElement selectOrParent, WebDriver driver)
     {
@@ -45,9 +46,8 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         {
             WebElement selectMenuElement = Locators.selectMenu.findElementOrNull(getComponentElement());
 
-            if((selectMenuElement != null && selectMenuElement.isDisplayed()) && selectMenuElement.getText().toLowerCase().contains("loading"))
-                waitFor(()-> !selectMenuElement.getText().toLowerCase().contains("loading"),
-                        "React Select is stuck loading.", WAIT_FOR_JAVASCRIPT);
+            if((selectMenuElement != null && selectMenuElement.isDisplayed()) && isLoading())
+                waitForLoaded();
 
             return (selectMenuElement != null && selectMenuElement.isDisplayed()) || hasClass("is-open");
         }
@@ -86,19 +86,27 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
     public boolean isLoading()
     {
-        // if it's present, we're loading dropdown options
-        return Locators.loadingSpinner.findElementOrNull(getComponentElement()) != null;
+        // if either are present, we're loading options
+        return Locators.loadingSpinner.existsIn(getComponentElement()) ||
+                getComponentElement().getText().toLowerCase().equals(LOADING_TEXT);
+    }
+
+    protected T waitForLoaded()
+    {
+        _wrapper.waitFor(()-> !isLoading(),
+                "Took too long for to become loaded", WAIT_FOR_JAVASCRIPT);
+        return (T) this;
     }
 
     public String getValue()
     {
-        return getWrapper().shortWait().withMessage(() -> "Select stuck loading. [" + getComponentElement().getText() + "]").until(ignored -> {
-            String val = getComponentElement().getText();
-            if (val.equals("Loading..."))
-                return null;
-            else
-                return val;
-        });
+        waitForLoaded();
+
+        String val = getComponentElement().getText();
+        if (val.toLowerCase().equals(LOADING_TEXT))
+            return null;
+        else
+            return val;
     }
 
     public boolean hasOption(String value)
@@ -231,7 +239,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
     public List<String> getSelections()
     {
-
+        waitForLoaded();
         try
         {
             // Wait for at least one of the elements to be visible.
