@@ -12,6 +12,7 @@ import org.labkey.test.components.glassLibrary.components.MultiMenu;
 import org.labkey.test.components.glassLibrary.components.OmniBox;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -69,7 +70,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         {
             return Integer.parseInt(Locators.pagingCountsSpan.findElement(this).getAttribute("data-total"));
         }
-        catch(NoSuchElementException nse)
+        catch(NoSuchElementException | StaleElementReferenceException nse)
         {
             // If the paging count isn't present return the number of rows in the grid.
             return _responsiveGrid.getRows().size();
