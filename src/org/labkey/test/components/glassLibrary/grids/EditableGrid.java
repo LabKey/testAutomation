@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.util.TestLogger.log;
@@ -155,6 +156,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
 
         return gridData;
+    }
+
+    public List<String> getColumnData(String columnLabel)
+    {
+        return getGridData().stream().map(a-> a.get(columnLabel)).collect(Collectors.toList());
     }
 
     private WebElement getRow(int index)
@@ -403,7 +409,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         if (!areAllInSelection())
         {
-            selectCell(getCell(0, getColumnNames().get(1)));    // forces the index cell into selected state
+            int indexOffset = hasSelectColumn() ? 1 : 0;
+            selectCell(getCell(0, getColumnNames().get(1 + indexOffset)));    // forces the index cell into selected state
                                                                 // this resets the grid state to a known base condition
             // use 'ctrl-a' to select the entire grid
             Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
@@ -460,7 +467,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private boolean areAllInSelection()
     {
         List<String> columns = getColumnNames();
-        WebElement indexCell = getCell(0, columns.get(1));
+        int selectIndexOffset = hasSelectColumn() ? 1 : 0;
+        WebElement indexCell = getCell(0, columns.get(1 + selectIndexOffset));
         WebElement endCell = getCell(getRows().size()-1, columns.get(columns.size()-1));
         return (isInSelection(indexCell) && isInSelection(endCell));
     }
