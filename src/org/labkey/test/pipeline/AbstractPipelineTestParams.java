@@ -23,14 +23,14 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PipelineStatusTable;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -304,7 +304,9 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         validateEmail("COMPLETE", getDirStatusDesciption(), _mailSettings.isNotifyOnSuccess(),
                 _mailSettings.getNotifyUsersOnSuccess());
 
-        if (_test.isButtonPresent("Data"))
+        // Data button will be hidden if the pipeline job isn't complete yet
+        WebElement el = _test.findButton("Data");
+        if (el.isDisplayed())
         {
             validateExperiment();
         }
