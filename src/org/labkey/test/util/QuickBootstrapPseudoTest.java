@@ -1,5 +1,6 @@
 package org.labkey.test.util;
 
+import org.json.simple.JSONObject;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Command;
@@ -9,16 +10,22 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.GuestCredentialsProvider;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Bootstrap a server without the initial user validation done by {@link LabKeySiteWrapper#signIn()}
+ * Not actually a test. Just piggy-backing on the test harness to make it easier to run.
+ * TODO: Make this class extend {@link LabKeySiteWrapper} so that we don't open a browser.
+ * Requires that we are able to create the initial user via API.
+ */
 @Category({})
 public class QuickBootstrapPseudoTest extends BaseWebDriverTest
 {
@@ -51,12 +58,23 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
         Exception lastException = null;
 
         Timer timer = new Timer(Duration.ofMinutes(5));
+        Duration timeOfLastLog = null;
         do
         {
+            if (timeOfLastLog == null || timer.elapsed().minus(timeOfLastLog).compareTo(Duration.ofSeconds(10)) > 0)
+            {
+                timeOfLastLog = timer.elapsed();
+                StringBuilder msg = new StringBuilder("Waiting for server to finish starting up.");
+                if (lastException != null)
+                {
+                    msg.append(" [").append(lastException.getMessage()).append("]");
+                }
+                TestLogger.log(msg.toString());
+            }
             try
             {
                 CommandResponse response = command.execute(cn, null);
-                if (Boolean.TRUE.equals(response.getParsedData().get("healthy")))
+                if ((Boolean) response.getParsedData().getOrDefault("healthy", false))
                 {
                     return;
                 }
@@ -67,7 +85,7 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
             }
         } while (!timer.isTimedOut());
 
-        throw new RuntimeException("Server not responsive.", lastException);
+        throw new RuntimeException("Server not done starting up.", lastException);
     }
 
     @LogMethod
@@ -98,20 +116,33 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
         }
     }
 
-    @LogMethod
     private void createInitialUser()
     {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
-        PostCommand<?> command = new PostCommand<>("login", "initialUser");
-        Map<String, Object> params = new HashMap<>();
+        beginAt(WebTestHelper.buildURL("login", "initialUser"));
+        setFormElement(Locator.id("email"), PasswordUtil.getUsername());
+        setFormElement(Locator.id("password"), PasswordUtil.getPassword());
+        setFormElement(Locator.id("password2"), PasswordUtil.getPassword());
+        clickAndWait(Locator.lkButton("Next"));
+    }
+
+    /**
+     * TODO: Make this work so that we don't have to open a browser.
+     * The POST just ends up redirecting to the normal initial user view.
+     */
+    @LogMethod
+    private void createInitialUser_API()
+    {
+        Connection cn = createDefaultConnection();
+        PostCommand<?> initialUserCommand = new PostCommand<>("login", "initialUser");
+        JSONObject params = new JSONObject();
         params.put("email", PasswordUtil.getUsername());
         params.put("password", PasswordUtil.getPassword());
         params.put("password2", PasswordUtil.getPassword());
-        command.setParameters(params);
+        initialUserCommand.setJsonObject(params);
 
         try
         {
-            command.execute(cn, null);
+            initialUserCommand.execute(cn, null);
         }
         catch (IOException | CommandException e)
         {
@@ -132,6 +163,10 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
             try
             {
                 CommandResponse response = command.execute(cn, null);
+                if ((Boolean) response.getParsedData().getOrDefault("startupComplete", false))
+                {
+                    return;
+                }
             }
             catch (CommandException | IOException e)
             {
@@ -139,16 +174,13 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
             }
         } while (!timer.isTimedOut());
 
-        if (lastException != null)
-        {
-            throw new RuntimeException("Server didn't finish starting.", lastException);
-        }
+        throw new RuntimeException("Server didn't finish starting.", lastException);
     }
 
     @Test
     public void testNothing()
     {
-        // Do nothing
+        TestLogger.log(whoAmI().getParsedData().toString());
     }
 
     @Override
