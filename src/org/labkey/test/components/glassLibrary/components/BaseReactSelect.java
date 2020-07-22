@@ -79,6 +79,11 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return hasClass("is-clearable");
     }
 
+    public boolean isDisabled()
+    {
+        return hasClass("is-disabled");
+    }
+
     public boolean hasValue()
     {
         return hasClass("has-value");
