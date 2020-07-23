@@ -172,9 +172,8 @@ public class Crawler
             new ControllerActionId("admin-sql", "saveReorderedScript"),
             new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
-            new ControllerActionId("assay", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("assay", "template"),
-            new ControllerActionId("core", "downloadFileLink"),
+            new ControllerActionId("cds", "exportTourDefinitions"), // Download action
             new ControllerActionId("dumbster", "begin"),
             new ControllerActionId("experiment", "exportProtocols"),
             new ControllerActionId("experiment", "exportRunFiles"),
@@ -186,6 +185,8 @@ public class Crawler
             new ControllerActionId("flow-run", "download"),
             new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
+            new ControllerActionId("harvest", "formatInvoice"),
+            new ControllerActionId("harvest", "sickSafeTime"),
             new ControllerActionId("issues", "download"),
             new ControllerActionId("list", "download"),
             new ControllerActionId("login", "logout"),
@@ -199,6 +200,7 @@ public class Crawler
             new ControllerActionId("ms2", "showParamsFile"),
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "showPeptide"),
+            new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
             new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
@@ -232,12 +234,9 @@ public class Crawler
             new ControllerActionId("study-samples", "getSpecimenExcel"),
             new ControllerActionId("study-samples", "download"),
             new ControllerActionId("targetedms", "downloadChromLibrary"),
-            new ControllerActionId("test", "npe"),
-            new ControllerActionId("nabassay", "downloadDatafile"),
-            new ControllerActionId("wiki", "download"),
-            new ControllerActionId("harvest", "sickSafeTime"),
-            new ControllerActionId("harvest", "formatInvoice"),
             new ControllerActionId("targetedms", "downloadDocument"),
+            new ControllerActionId("test", "npe"),
+            new ControllerActionId("wiki", "download"),
 
                 // Disable crawler for single-page apps until we make `beginAt` work with them
                 new ControllerActionId("biologics", "app"),
