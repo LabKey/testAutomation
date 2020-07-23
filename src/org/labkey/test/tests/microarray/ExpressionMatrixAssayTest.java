@@ -98,7 +98,7 @@ public class ExpressionMatrixAssayTest extends BaseExpressionMatrixTest
                 resultTable.getColumnDataAsText("Run"));
 
         goToSchemaBrowser();
-        selectQuery("assay.ExpressionMatrix." + ASSAY_NAME, "FeatureDataBySample");
+        selectQuery("assay.ExpressionMatrix." + ASSAY_NAME, "FeatureDataBySample", "ctq");
     }
 
     @Test
@@ -135,7 +135,7 @@ public class ExpressionMatrixAssayTest extends BaseExpressionMatrixTest
         assertEquals(0, resultTable.getDataRowCount());
 
         goToSchemaBrowser();
-        selectQuery("assay.ExpressionMatrix." + ASSAY_NAME, "FeatureDataBySample");
+        selectQuery("assay.ExpressionMatrix." + ASSAY_NAME, "FeatureDataBySample", "ctq");
     }
 
     @Test
