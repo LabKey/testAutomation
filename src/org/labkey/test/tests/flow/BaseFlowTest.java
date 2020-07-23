@@ -28,8 +28,9 @@ import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PipelineStatusTable;
+import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -142,20 +143,39 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         }
     }
 
-    protected void waitForPipelineError(String containerPath)
+    protected void waitForPipelineError(List<String> expectedErrors)
     {
-        PipelineStatusTable.viewJobsForContainer(this, containerPath);
-        waitForRunningPipelineJobs(true, MAX_WAIT_SECONDS * 1000);
+        waitForPipelineStatus("ERROR");
+
+        log("Checking for errors after importing");
+        String logText = Locator.id("log-data").findElement(getDriver()).getText();
+        assertTextPresent(new TextSearcher(logText), expectedErrors.toArray(new String[0]));
     }
 
-    protected void waitForPipeline(String containerPath)
+    protected void waitForPipelineComplete()
     {
-        pushLocation();
+        // flow signals it would like to redirect when COMPLETED by using a URL parameter.
+        boolean expectRedirect = getUrlParam("redirect") != null;
+        if (expectRedirect)
+            log("Expecting redirect when complete");
 
-        PipelineStatusTable.viewJobsForContainer(this, containerPath);
-        waitForRunningPipelineJobs(false, MAX_WAIT_SECONDS * 1000);
+        waitForPipelineStatus("COMPLETE");
 
-        popLocation(longWaitForPage);
+        if (expectRedirect)
+        {
+            // The click does nothing, but we want to wait for the redirect before continuing
+            clickAndWait(Locator.id("status-text"));
+            log("Redirected on success as expected");
+        }
+
+        log("Checking for errors after importing");
+        checkErrors();
+    }
+
+    @LogMethod
+    private void waitForPipelineStatus(String status)
+    {
+        waitForElementText(Locator.id("status-text"), status, MAX_WAIT_SECONDS * 1000);
     }
 
     @Override
@@ -312,7 +332,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         _fileBrowserHelper.selectFileBrowserItem("flowjoquery/microFCS");
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         clickButton("Import Selected Runs", defaultWaitForPage * 2);
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
     }
 
     protected void importExternalAnalysis(String containerPath, String analysisZipPath)
@@ -328,7 +348,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         // UNDONE: use importAnalysis_confim step
         clickButton("Finish");
 
-        waitForPipeline(containerPath);
+        waitForPipelineComplete();
     }
 
     protected void importAnalysis(String containerPath, String workspacePath, SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs, String analysisName, boolean existingAnalysisFolder, boolean viaPipeline)
@@ -364,9 +384,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 options.getSelectedGroupNames(),
                 options.getSelectedSampleIds(),
                 options.getAnalysisName(),
-                options.isExistingAnalysisFolder());
-
-        importAnalysis_checkErrors(options.getExpectedErrors());
+                options.isExistingAnalysisFolder(),
+                options.getExpectedErrors());
     }
 
     @LogMethod
@@ -488,7 +507,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 selectFCSFilesOption, keywordDirs,
                 Arrays.asList("All Samples"),
                 null,
-                analysisFolder, existingAnalysisFolder);
+                analysisFolder, existingAnalysisFolder,
+                null);
     }
 
     @LogMethod
@@ -498,7 +518,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                                           List<String> selectedGroupNames,
                                           List<String> selectedSampleIds,
                                           String analysisFolder,
-                                          boolean existingAnalysisFolder)
+                                          boolean existingAnalysisFolder,
+                                          List<String> expectedErrors)
     {
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
 
@@ -514,32 +535,13 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             assertElementPresent(Locator.tag("li").withText("FCS File Path: none set"));
 
         clickButton("Finish");
-        waitForPipeline(containerPath);
+        if (expectedErrors == null || expectedErrors.isEmpty())
+            waitForPipelineComplete();
+        else
+            waitForPipelineError(expectedErrors);
         log("finished import analysis wizard");
     }
 
-    protected void importAnalysis_checkErrors(List<String> expectedErrors)
-    {
-        log("Checking for errors after importing");
-        pushLocation();
-        if (expectedErrors == null || expectedErrors.isEmpty())
-        {
-            checkErrors();
-        }
-        else
-        {
-            goToFlowDashboard();
-            clickAndWait(Locator.linkContainingText("Show Jobs"));
-            clickAndWait(Locator.linkWithText("ERROR"));
-
-            for (String errorText : expectedErrors)
-                assertTextPresent(errorText);
-
-            int errorCount = countText("ERROR");
-            checkExpectedErrors(errorCount);
-        }
-        popLocation();
-    }
 
     protected enum SelectFCSFileOption { None, Included, Previous, Browse }
 
