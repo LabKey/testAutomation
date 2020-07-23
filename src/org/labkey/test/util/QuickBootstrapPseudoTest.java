@@ -99,13 +99,9 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
             command.execute(cn, null);
             return false; // ConfigurationSummaryAction is accessible by guest only before initial user is created.
         }
-        catch (IOException e)
+        catch (IOException | CommandException e)
         {
-            throw new RuntimeException(e);
-        }
-        catch (CommandException e)
-        {
-            if (e.getStatusCode() == 403)
+            if (e instanceof CommandException && ((CommandException)e).getStatusCode() == 401)
             {
                 return true;
             }
