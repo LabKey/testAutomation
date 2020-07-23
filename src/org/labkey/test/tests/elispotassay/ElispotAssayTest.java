@@ -483,6 +483,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         catch (NoSuchElementException ignore) {}
     }
 
+    @LogMethod
     protected void runTransformTest()
     {
         // add the transform script to the assay
@@ -510,6 +511,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkContainingText("transformed assayId"));
     }
 
+    @LogMethod
     protected void doBackgroundSubtractionTest()
     {
         removeTransformScript();
@@ -543,7 +545,8 @@ public class ElispotAssayTest extends AbstractAssayTest
         runTable.checkAllOnPage();
         clickButton("Subtract Background");
 
-        waitForTextWithRefresh(WAIT_FOR_PAGE, "COMPLETE");
+        // status should be updated on page without having to refresh
+        waitForText(WAIT_FOR_PAGE, "COMPLETE");
 
         // Check well counts for TEST_ASSAY_ELISPOT_FILE4
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
@@ -615,6 +618,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         assertEquals(Arrays.asList("10.0","9.0","6.0","10.0","18.0","7.0","11.0","244.0","0.0","0.0","0.0","0.0"), plateSummary.getRowValues(E));
     }
 
+    @LogMethod
     private void testTNTCdata()
     {
         clickProject(TEST_ASSAY_PRJ_ELISPOT);

@@ -23,14 +23,14 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PipelineStatusTable;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -304,7 +304,9 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         validateEmail("COMPLETE", getDirStatusDesciption(), _mailSettings.isNotifyOnSuccess(),
                 _mailSettings.getNotifyUsersOnSuccess());
 
-        if (_test.isButtonPresent("Data"))
+        // Data button will be hidden if the pipeline job isn't complete yet
+        WebElement el = _test.findButton("Data");
+        if (el.isDisplayed())
         {
             validateExperiment();
         }
@@ -385,31 +387,4 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         return false;
     }
 
-    @Override
-    public void validateEmailEscalation(int sampleIndex)
-    {
-        assertNotNull("Email validation requires mail settings", _mailSettings);
-
-        String escalateEmail = _mailSettings.getEscalateUsers()[0];
-        String messageText = "I have no idea why this job failed.  Please help me.";
-
-        String sampleExp = getExperimentLinks()[sampleIndex];
-
-        _test.log("Escalate an error");
-        EmailRecordTable emailTable = new EmailRecordTable(_test);
-        PipelineStatusTable statusTable = new PipelineStatusTable(_test);
-        _test.pushLocation();
-        statusTable.clickStatusLink(sampleExp);
-        _test.clickButton("Escalate Job Failure");
-        _test.selectOptionByTextContaining(Locator.id("escalateUser").findElement(_test.getDriver()), escalateEmail);
-        _test.setFormElement(Locator.id("escalationMessage"), messageText);
-        // DetailsView adds a useless form.
-        //test.submit();
-        _test.clickButton("Send");
-        _test.popLocation();
-
-        EmailRecordTable.EmailMessage message = emailTable.getMessageWithSubjectContaining(sampleExp);
-        assertNotNull("Escalation message not sent", message);
-        assertEquals("Escalation not sent to " + escalateEmail, escalateEmail, message.getTo()[0]);
-    }
 }

@@ -285,7 +285,7 @@ public class FlowTest extends BaseFlowTest
                 "Current Directory (25 fcs files)");
         assertTextNotPresent(FCS_FILE_2);
         clickButton("Import Selected Runs");
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
         goToFlowDashboard();
 
         // Drill into the run, and see that it was uploaded, and keywords were read.
@@ -357,7 +357,7 @@ public class FlowTest extends BaseFlowTest
         clickButton("Analyze selected runs");
         setFormElement(Locator.name("ff_analysisName"), "FlowExperiment2");
         clickButton("Analyze runs");
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("FlowExperiment2"));
         URL urlBase = getURL();
@@ -422,7 +422,7 @@ public class FlowTest extends BaseFlowTest
         assertTextNotPresent(FCS_FILE_1);
         assertTextPresent(FCS_FILE_2);
         clickButton("Import Selected Runs");
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
 
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
@@ -623,7 +623,7 @@ public class FlowTest extends BaseFlowTest
 
         updatePositivityReportFilter(reportName);
         executeReport(reportName);
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
         verifyReport(reportName);
 
         deleteReport(reportName);
@@ -777,8 +777,7 @@ public class FlowTest extends BaseFlowTest
     private void verifyReportError(@LoggedParam String reportName, String errorText)
     {
         executeReport(reportName);
-        waitForPipelineError(getContainerPath());
-        clickAndWait(Locator.linkWithText("ERROR"));
+        waitForPipelineError(List.of(errorText));
 
         assertTitleContains(reportName);
         assertTextPresent(errorText);
