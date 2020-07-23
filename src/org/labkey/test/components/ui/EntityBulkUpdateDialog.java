@@ -83,7 +83,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public EntityBulkUpdateDialog setTextField(String fieldKey, String value)
     {
-        Input input = textField(fieldKey);
+        Input input = elementCache().textInput(fieldKey);
         setEditableState(fieldKey, true);
         getWrapper().waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
                 "the input did not become enabled in time", 2000);
@@ -93,32 +93,31 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public String getTextField(String fieldKey)
     {
-        return textField(fieldKey).get();
+        return elementCache().textInput(fieldKey).get();
     }
 
-    private Input textField(String fieldKey)
+    public EntityBulkUpdateDialog setNumericField(String fieldKey, String value)
     {
-        WebElement inputEl = elementCache().textInputLoc
-                .findElement(elementCache().formRow(fieldKey));
-        return new Input(inputEl, getDriver());
-    }
-
-    public EntityBulkUpdateDialog setFieldWithId(String id, String value)
-    {
-        getWrapper().setFormElement(Locator.id(id), value);
+        Input input = elementCache().numericInput(fieldKey);
+        setEditableState(fieldKey, true);
+        getWrapper().waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
+                "the input did not become enabled in time", 2000);
+        input.set(value);
         return this;
     }
 
-    public String getFieldWithId(String id)
+    public String getNumericField(String fieldKey)
     {
-        return getWrapper().getFormElement(Locator.id(id));
+        return elementCache().numericInput(fieldKey).get();
     }
-
 
     public EntityBulkUpdateDialog setBooleanField(String fieldKey, boolean checked)
     {
         setEditableState(fieldKey, true);
-        getCheckBox(fieldKey).set(checked);
+        Checkbox box = getCheckBox(fieldKey);
+        getWrapper().waitFor(()-> box.getComponentElement().getAttribute("disabled")==null,
+                "the checkbox did not become enabled in time", 2000);
+        box.set(checked);
         return this;
     }
 
@@ -183,7 +182,20 @@ public class EntityBulkUpdateDialog extends ModalDialog
             return FilteringReactSelect.finder(getDriver()).find(formRow(fieldKey));
         }
 
+        public Input textInput(String fieldKey)
+        {
+            WebElement inputEl = textInputLoc.findElement(elementCache().formRow(fieldKey));
+            return new Input(inputEl, getDriver());
+        }
+
+        public Input numericInput(String fieldKey)
+        {
+            WebElement inputEl = numberInputLoc.findElement(elementCache().formRow(fieldKey));
+            return new Input(inputEl, getDriver());
+        }
+
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
+        final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
 
         Locator updateSamplesButton = Locator.tagWithClass("button", "test-loc-submit-button")
