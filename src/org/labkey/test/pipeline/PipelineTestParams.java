@@ -56,8 +56,6 @@ public interface PipelineTestParams
 
     void validateTrue(String message, boolean condition);
 
-    void validateEmailEscalation(int sampleIndex);
-
     boolean isValid();
 
     void verifyClean(File rootDir);
