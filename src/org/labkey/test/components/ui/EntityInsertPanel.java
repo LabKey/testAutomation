@@ -72,7 +72,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EntityInsertPanel addRecords(List<Map<String, Object>> records)
     {
-        getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(records.size()));
+        // Need to subtract one from the length. The grid already has one row, clicking add will add the set number of rows
+        // to the existing row. So for example if a list of 3 records is passed int, setting the txt box to 3 and clicking
+        // add will result in the gird having 4 rows.
+        getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(records.size() - 1));
         elementCache().addRowsButton.click();
 
         List<Integer> rowIndices = elementCache().grid.listOfnotPopulatedRows();
