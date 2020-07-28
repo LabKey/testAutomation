@@ -230,6 +230,13 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
         return "ERROR".equalsIgnoreCase(getStatus());
     }
 
+    /** Return true if the log status file was found (the log data element is present.) */
+    public PipelineStatusDetailsPage waitForLogPresent()
+    {
+        waitForElement(elementCache().logDataId);
+        return this;
+    }
+
     public boolean isShowingLogSummary()
     {
         String details = elementCache().showFullLogLink.getAttribute("data-details");
@@ -237,17 +244,21 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
         return "false".equals(details);
     }
 
+    @LogMethod
     public PipelineStatusDetailsPage showLogSummary()
     {
         if (!isShowingLogSummary())
             elementCache().showFullLogLink.click();
+        waitForElement(Locator.linkWithText("Show full log file"));
         return this;
     }
 
+    @LogMethod
     public PipelineStatusDetailsPage showLogDetails()
     {
         if (isShowingLogSummary())
             elementCache().showFullLogLink.click();
+        waitForElement(Locator.linkWithText("Show summary"));
         return this;
     }
 
@@ -415,6 +426,8 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
         protected WebElement retryButton = Locator.id("retry-btn").findWhenNeeded(this);
 
         protected WebElement showFullLogLink = Locator.id("show-full-log").findWhenNeeded(this);
-        protected WebElement logData = Locator.id("log-data").findWhenNeeded(this);
+        protected WebElement logContainer = Locator.id("log-container").findWhenNeeded(this);
+        protected Locator logDataId = Locator.id("log-data");
+        protected WebElement logData = logDataId.findWhenNeeded(this);
     }
 }
