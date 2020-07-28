@@ -9,6 +9,7 @@ import org.labkey.test.components.html.ToggleButton;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -16,7 +17,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 {
     public EntityBulkUpdateDialog(WebDriver driver)
     {
-        this(new ModalDialogFinder(driver).withTitle("samples selected from"));
+        this(new ModalDialogFinder(driver).withTitle(" selected from "));
     }
 
     private EntityBulkUpdateDialog(ModalDialogFinder finder)
@@ -132,6 +133,15 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return new Checkbox(elementCache().checkBoxLoc.findElement(row));
     }
 
+    public List<String> getColumns()
+    {
+        List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
+                .findElements(this);
+        List<String> columns = new ArrayList<>();
+        labels.stream().forEach(a -> columns.add(a.getAttribute("for")));
+        return columns;
+    }
+
     // dismiss the dialog
 
     public void clickEditWithGrid()
@@ -150,6 +160,11 @@ public class EntityBulkUpdateDialog extends ModalDialog
         if (!isUpdateSamplesButtonEnabled())
             getWrapper().log("the [Update Samples] button cannot be clicked, it is disabled");
         dismiss("Update Samples");
+    }
+
+    public void clickCancel()
+    {
+        dismiss("Cancel");
     }
 
     @Override
