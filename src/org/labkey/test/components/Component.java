@@ -31,6 +31,12 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     public abstract WebElement getComponentElement();
 
     @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + "[" + getComponentElement() + "]";
+    }
+
+    @Override
     public WebElement findElement(By by)
     {
         return getComponentElement().findElement(by);
@@ -73,6 +79,12 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         public WebElement findElement(By by)
         {
             return getComponentElement().findElement(by);
+        }
+
+        @Override
+        public String toString()
+        {
+            return Component.this.toString();
         }
     }
 
