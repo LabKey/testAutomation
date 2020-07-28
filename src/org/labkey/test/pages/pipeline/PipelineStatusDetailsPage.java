@@ -3,7 +3,6 @@ package org.labkey.test.pages.pipeline;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.collections.CaseInsensitiveHashSet;
-import org.labkey.api.pipeline.PipelineJob;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -200,7 +199,7 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
 
     /**
      * Returns true if the job is in the queue waiting to run or is running.
-     * See <code>{@link PipelineJob.TaskStatus#isActive()}</code>
+     * See <code>{@link org.labkey.api.pipeline.PipelineJob.TaskStatus#isActive()}</code>
      */
     public boolean isActive()
     {
@@ -405,29 +404,29 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        protected WebElement errorList = Locator.id("error-list").findWhenNeeded(this);
-        protected WebElement created = Locator.id("created").findWhenNeeded(this);
-        protected WebElement modified = Locator.id("modified").findWhenNeeded(this);
-        protected WebElement email = Locator.id("email").findWhenNeeded(this);
-        protected WebElement statusSpinner = Locator.id("status-spinner").findWhenNeeded(this);
-        protected WebElement statusText = Locator.id("status-text").findWhenNeeded(this);
-        protected WebElement info = Locator.id("info").findWhenNeeded(this);
-        protected WebElement description = Locator.id("description").findWhenNeeded(this);
-        protected WebElement filePath = Locator.id("file-path").findWhenNeeded(this);
-        protected WebElement filesList = Locator.id("files-list").findWhenNeeded(this);
-        protected WebElement parentJobTableBody = Locator.id("parent-job-table-body").findWhenNeeded(this);
-        protected WebElement splitJobsTableBody = Locator.id("split-jobs-table-body").findWhenNeeded(this);
-        protected WebElement runsList = Locator.id("runs-list").findWhenNeeded(this);
+        protected final WebElement errorList = Locator.id("error-list").findWhenNeeded(this);
+        protected final WebElement created = Locator.id("created").findWhenNeeded(this);
+        protected final WebElement modified = Locator.id("modified").findWhenNeeded(this);
+        protected final WebElement email = Locator.id("email").findWhenNeeded(this);
+        protected final WebElement statusSpinner = Locator.id("status-spinner").findWhenNeeded(this);
+        protected final WebElement statusText = Locator.id("status-text").findWhenNeeded(this);
+        protected final WebElement info = Locator.id("info").findWhenNeeded(this);
+        protected final WebElement description = Locator.id("description").findWhenNeeded(this);
+        protected final WebElement filePath = Locator.id("file-path").findWhenNeeded(this);
+        protected final WebElement filesList = Locator.id("files-list").findWhenNeeded(this);
+        protected final WebElement parentJobTableBody = Locator.id("parent-job-table-body").findWhenNeeded(this);
+        protected final WebElement splitJobsTableBody = Locator.id("split-jobs-table-body").findWhenNeeded(this);
+        protected final WebElement runsList = Locator.id("runs-list").findWhenNeeded(this);
 
-        protected WebElement showGridButton = Locator.lkButton("Show Grid").findWhenNeeded(this);
-        protected WebElement showDataButton = Locator.id("show-data-btn").findWhenNeeded(this);
-        protected WebElement browseFilesButton = Locator.lkButton("Browse Files").findWhenNeeded(this);
-        protected WebElement cancelButton = Locator.id("cancel-btn").findWhenNeeded(this);
-        protected WebElement retryButton = Locator.id("retry-btn").findWhenNeeded(this);
+        protected final WebElement showGridButton = Locator.lkButton("Show Grid").findWhenNeeded(this);
+        protected final WebElement showDataButton = Locator.id("show-data-btn").findWhenNeeded(this);
+        protected final WebElement browseFilesButton = Locator.lkButton("Browse Files").findWhenNeeded(this);
+        protected final WebElement cancelButton = Locator.id("cancel-btn").findWhenNeeded(this);
+        protected final WebElement retryButton = Locator.id("retry-btn").findWhenNeeded(this);
 
-        protected WebElement showFullLogLink = Locator.id("show-full-log").findWhenNeeded(this);
-        protected WebElement logContainer = Locator.id("log-container").findWhenNeeded(this);
-        protected Locator logDataId = Locator.id("log-data");
-        protected WebElement logData = logDataId.findWhenNeeded(this);
+        protected final WebElement showFullLogLink = Locator.id("show-full-log").findWhenNeeded(this);
+        protected final WebElement logContainer = Locator.id("log-container").findWhenNeeded(this);
+        protected final Locator logDataId = Locator.id("log-data");
+        protected final WebElement logData = logDataId.findWhenNeeded(this);
     }
 }
