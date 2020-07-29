@@ -38,7 +38,6 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
@@ -82,9 +81,8 @@ public class RReportHelper
     private static final String REMOTE_R_SERVE ="Remote R Scripting Engine";
 
     private static final String INSTALL_RLABKEY = "install.packages(\"Rlabkey\", repos=\"http://cran.r-project.org\")";
-    private static final String INSTALL_LOCAL_RLABKEY = "install.packages(\"%s\", repos=NULL)";
 
-    public File getRLibraryPath()
+    public static File getRLibraryPath()
     {
         String libPath = System.getenv("R_LIBS_USER");
         if (libPath != null)
@@ -179,33 +177,6 @@ public class RReportHelper
         }
 
         return false;
-    }
-
-    /**
-     * Installs the latest version of the Rlabkey package that is either built or checked into the ../remoteapi/r/latest
-     * directory. In order to install any dependent packages: (httr, rjson), an installation from the CRAN repository
-     * is performed first, then if the local flag has been set, the local package is installed over the top.
-     */
-    @LogMethod
-    public void installRlabkey(boolean local)
-    {
-        if (executeScript(INSTALL_RLABKEY, null, true))
-        {
-            if (local)
-            {
-                File rPackage = new File(getRLibraryPath(), "Rlabkey.zip");
-
-                if (!rPackage.exists())
-                    fail("Unable to locate the local Rlabkey package: " + rPackage.getName());
-
-                String cmd = String.format(INSTALL_LOCAL_RLABKEY, rPackage.getAbsolutePath());
-                cmd = cmd.replaceAll("\\\\", "/");
-                if (!executeScript(cmd, null, true))
-                    fail("Unable to install the local Rlabkey package.");
-            }
-        }
-        else
-            fail("Unable to install the base Rlabkey package and dependencies.");
     }
 
     public String ensureRConfig()

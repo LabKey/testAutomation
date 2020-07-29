@@ -28,6 +28,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Git;
 import org.labkey.test.io.Grep;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
@@ -61,10 +62,9 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         click(Locator.linkWithText("Validate"));
 
         PipelineStatusTable statusTable = new PipelineStatusTable(this);
-        statusTable.clickStatusLink(0);
-
-        waitForTextWithRefresh(300000, "Check complete");
-        assertTextPresent("Check complete, 0 errors found");
+        statusTable.clickStatusLink(0)
+                .waitForComplete(300_000)
+                .assertLogTextContains("Check complete, 0 errors found");
     }
 
     @Test

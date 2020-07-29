@@ -139,7 +139,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickButton("Analyze selected runs");
         setFormElement(Locator.name("ff_analysisName"), "LabKeyAnalysis");
         clickButton("Analyze runs");
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("LabKeyAnalysis"));
         new DataRegionTable("query", getDriver()).clickHeaderMenu("Query", "Comparison");
