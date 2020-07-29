@@ -129,6 +129,11 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
         return Locators.menuItem().findElements(context);
     }
 
+    public List<String> getMenuItemTexts(@LoggedParam String ... subMenuLabels)
+    {
+        return getWrapper().getTexts(getMenuItemsAt(subMenuLabels));
+    }
+
     private WebElement getRootMenu()
     {
         return Locator.tagWithClass("ul", "dropdown-menu")
@@ -153,7 +158,6 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
         {
             getWrapper().log("attempting to expand menu item [" + itemText + "]");
             item.click();
-            sleep(1000);
         }
 
         getWrapper().waitFor(()-> menuItemIsExpanded(item), "menu item ["+itemText+"] failed to open", 2000);

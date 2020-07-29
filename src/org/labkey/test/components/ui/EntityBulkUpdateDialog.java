@@ -12,7 +12,9 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Automates product component src/components/forms/QueryInfoForms, with BulkUpdateForm.d.ts
+ */
 public class EntityBulkUpdateDialog extends ModalDialog
 {
     public EntityBulkUpdateDialog(WebDriver driver)
@@ -44,7 +46,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         setEditableState(columnTitle, true);
         FilteringReactSelect reactSelect = elementCache().getSelect(columnTitle);
-        getWrapper().waitFor(()-> !reactSelect.isDisabled(),
+        getWrapper().waitFor(()-> reactSelect.isEnabled(),
                 "the ["+columnTitle+"] reactSelect did not become enabled in time", 2000);
         selectValues.forEach(s -> {reactSelect.filterSelect(s);});
         return this;
@@ -55,29 +57,19 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return elementCache().getSelect(fieldKey).getSelections();
     }
 
-    public EntityBulkUpdateDialog setAliases(List<String> aliases)
-    {
-        return setSelectionField("Alias", aliases);
-    }
-
-    public List<String> getAliases()
-    {
-        return  getSelectionFieldValues("Alias");
-    }
-
-    public EntityBulkUpdateDialog setDescription(String description)
+    public EntityBulkUpdateDialog setTextArea(String fieldKey, String text)
     {
         setEditableState("Description", true);
-        Input input = new Input(Locator.textarea("Description").findElement(this), getDriver());
+        Input input = elementCache().textArea(fieldKey);
         getWrapper().waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
                 "the input did not become enabled in time", 2000);
-        input.set(description);
+        input.set(text);
         return this;
     }
 
-    public String getDescription()
+    public String getTextArea(String fieldKey)
     {
-        return getWrapper().getFormElement(Locator.id("Description"));
+        return elementCache().textArea(fieldKey).get();
     }
 
     // get/set text fields with ID
@@ -200,6 +192,12 @@ public class EntityBulkUpdateDialog extends ModalDialog
         public Input textInput(String fieldKey)
         {
             WebElement inputEl = textInputLoc.findElement(elementCache().formRow(fieldKey));
+            return new Input(inputEl, getDriver());
+        }
+
+        public Input textArea(String fieldKey)
+        {
+            WebElement inputEl = Locator.textarea(fieldKey).findElement(elementCache().formRow(fieldKey));
             return new Input(inputEl, getDriver());
         }
 

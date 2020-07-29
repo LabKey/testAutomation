@@ -79,9 +79,9 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return hasClass("is-clearable");
     }
 
-    public boolean isDisabled()
+    public boolean isEnabled()
     {
-        return hasClass("is-disabled");
+        return !hasClass("is-disabled");
     }
 
     public boolean hasValue()
@@ -285,12 +285,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     public String getName()
     {
         return elementCache().input.getAttribute("name");
-    }
-
-    public boolean isEnabled()
-    {
-        // If the class attribute does not contain 'is-disabled' the component is enabled.
-        return !getComponentElement().getAttribute("class").toLowerCase().contains("is-disabled");
     }
 
     protected T scrollIntoView()
