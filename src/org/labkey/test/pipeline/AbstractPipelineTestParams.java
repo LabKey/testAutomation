@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PasswordUtil;
 import org.openqa.selenium.NoSuchElementException;
@@ -292,7 +293,6 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     
     private void validateExperiment()
     {
-        _test.clickButton("Data");
         ExperimentGraph graph = new ExperimentGraph(_test);
         graph.validate(this);
     }
@@ -304,23 +304,18 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         validateEmail("COMPLETE", getDirStatusDesciption(), _mailSettings.isNotifyOnSuccess(),
                 _mailSettings.getNotifyUsersOnSuccess());
 
-        // Data button will be hidden if the pipeline job isn't complete yet
-        WebElement el = _test.findButton("Data");
-        if (el.isDisplayed())
+        // Data button will be hidden if the pipeline job isn't complete yet or there is no dataUrl
+        PipelineStatusDetailsPage detailsPage = new PipelineStatusDetailsPage(_test.getDriver());
+        if (detailsPage.clickDataLink())
         {
             validateExperiment();
         }
         else
         {
-            int split = 1;
-            while (_test.isElementPresent(Locator.linkWithText("COMPLETE").index(split)))
-            {
-                _test.pushLocation();
-                Integer index = split++;
-                _test.clickAndWait(Locator.linkWithText("COMPLETE").index(index));
+            detailsPage.forEachSplitJobLink(splitDetailsPage -> {
+                splitDetailsPage.clickDataLink();
                 validateExperiment();
-                _test.popLocation();
-            }
+            });
         }
     }
 
