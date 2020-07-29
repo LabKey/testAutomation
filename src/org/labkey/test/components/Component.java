@@ -33,7 +33,7 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     @Override
     public String toString()
     {
-        return getClass().getSimpleName() + "[" + getComponentElement() + "]";
+        return getClass().getSimpleName() + " " + getComponentElement();
     }
 
     @Override
