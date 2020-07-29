@@ -217,7 +217,7 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
 
         public static Locator.XPathLocator menuItem(String text)
         {
-            return menuItem().withChild(Locator.linkWithText(text)).notHidden();
+            return menuItem().withChild(menuAnchor(text)).notHidden();
         }
         public static Locator.XPathLocator menuAnchor(String text)
         {
