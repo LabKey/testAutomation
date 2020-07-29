@@ -202,11 +202,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     }
 
-    public OmniBox getOmniBox()
-    {
-        return elementCache().omniBox;
-    }
-
     public void doMenuAction(String buttonText, List<String> menuActions)
     {
         MultiMenu multiMenu = null;
@@ -295,7 +290,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     protected class ElementCache extends Component<?>.ElementCache
     {
 
-        public OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver).findWhenNeeded(this);
         private final Map<String, MultiMenu> menus = new HashMap<>();
         protected MultiMenu findMenu(String buttonText)
         {
