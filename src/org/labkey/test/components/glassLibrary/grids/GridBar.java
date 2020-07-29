@@ -60,7 +60,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         downloadBtn.click();
 
-        WebElement exportButton = Locator.css("li > a > span").withClass(exportType.buttonCssClass()).findElement(this);
+        // QueryGridPanel (deprecated)
+        Locator.CssLocator queryGridButton = Locator.css("li > a > span").withClass(exportType.buttonCssClass());
+        // GridPanel
+        Locator.CssLocator gridPanelButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass());
+        WebElement exportButton = Locator.CssLocator.union(queryGridButton, gridPanelButton).findElement(this);
         return getWrapper().doAndWaitForDownload(()->exportButton.click());
     }
 
