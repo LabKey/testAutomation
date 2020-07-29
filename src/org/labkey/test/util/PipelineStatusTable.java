@@ -19,6 +19,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -36,6 +37,11 @@ public class PipelineStatusTable extends DataRegionTable
     public PipelineStatusTable(WebDriverWrapper test)
     {
         super(REGION_NAME, test);
+    }
+
+    public PipelineStatusTable(WebDriver driver)
+    {
+        super(REGION_NAME, driver);
     }
 
     private PipelineStatusTable(WebElement el, WebDriver driver)
@@ -153,14 +159,15 @@ public class PipelineStatusTable extends DataRegionTable
         return getDataAsText(row, getDescriptionColumnIndex());
     }
 
-    public void clickStatusLink(String description)
+    public PipelineStatusDetailsPage clickStatusLink(String description)
     {
-        clickStatusLink(getExpectedJobRow(description));
+        return clickStatusLink(getExpectedJobRow(description));
     }
 
-    public void clickStatusLink(int row)
+    public PipelineStatusDetailsPage clickStatusLink(int row)
     {
         getWrapper().clickAndWait(link(row, getStatusColumnIndex()));
+        return new PipelineStatusDetailsPage(getDriver());
     }
 
     public LabKeyPage clickSetup()
