@@ -7,6 +7,7 @@ package org.labkey.test.components.glassLibrary.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.glassLibrary.components.OmniBox;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -142,6 +143,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return elementCache()._gridBar;
     }
 
+    public OmniBox getOmniBox()
+    {
+        return elementCache().omniBox;
+    }
+
     public GridTabBar getGridTabBar()
     {
         return elementCache().gridTabBar().orElseThrow();
@@ -175,8 +181,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid search(String searchTerm)
     {
-        doAndWaitForUpdate(()->
-                getGridBar().getOmniBox().setSearch(searchTerm));
+        doAndWaitForUpdate(()-> getOmniBox().setSearch(searchTerm));
         return this;
     }
 
@@ -188,8 +193,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid sortOn(String column, SortDirection direction)
     {
-        doAndWaitForUpdate(()->
-                getGridBar().getOmniBox().setSort(column, direction));
+        doAndWaitForUpdate(()-> getOmniBox().setSort(column, direction));
         return this;
     }
 
@@ -202,8 +206,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid filterOn(String columnName, String operator, String value)
     {
-        doAndWaitForUpdate(()->
-                getGridBar().getOmniBox().setFilter(columnName, operator, value));
+        doAndWaitForUpdate(()-> getOmniBox().setFilter(columnName, operator, value));
         return this;
     }
 
@@ -213,8 +216,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid clearSortsAndFilters()
     {
-        doAndWaitForUpdate(()->
-                getGridBar().getOmniBox().clearAll());
+        doAndWaitForUpdate(()-> getOmniBox().clearAll());
         return this;
     }
 
@@ -261,6 +263,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         ResponsiveGrid _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).findWhenNeeded(_queryGridPanel);
         GridBar _gridBar = new GridBar.GridBarFinder(_driver, _queryGridPanel, _responsiveGrid).findWhenNeeded();
+        OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver).findWhenNeeded(this);
         Optional<GridTabBar> gridTabBar()
         {
             return new GridTabBar.GridTabBarFinder(_driver, _responsiveGrid).findOptional(_queryGridPanel);
