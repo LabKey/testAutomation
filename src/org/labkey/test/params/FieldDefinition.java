@@ -22,7 +22,7 @@ import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.components.html.OptionSelect;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FieldDefinition extends PropertyDescriptor
@@ -178,9 +178,16 @@ public class FieldDefinition extends PropertyDescriptor
         return _validators;
     }
 
-    public FieldDefinition setValidator(FieldValidator<?>... validator)
+    public FieldDefinition setValidators(List<FieldValidator<?>> validators)
     {
-        _validators = Arrays.asList(validator);
+        _validators = validators;
+        return this;
+    }
+    public FieldDefinition addValidator(FieldValidator<?> validator)
+    {
+        if (_validators == null)
+            _validators = new ArrayList<>();
+        _validators.add(validator);
         return this;
     }
 

@@ -83,7 +83,7 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
             else
                 openToggle.click();
             return false;
-        }, 4000);
+        }, 1500);
         return this;
     }
 
