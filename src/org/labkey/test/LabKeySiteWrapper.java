@@ -1016,18 +1016,60 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return menu;
     }
 
-    // enable/disable the flags specified by the test properties
-    @LogMethod()
-    public void setExperimentalFlags()
+    private static Map<String, Boolean> _originalFeatureFlags = new HashMap<>();
+
+    /**
+     * Enable/disable the experimental features specified by the test properties. Intended for use by base tests only.
+     * Currently only {@link BaseWebDriverTest}.
+     */
+    protected void setExperimentalFlags()
     {
-        Map<String, Boolean> flagsToSet = TestProperties.getExperimentalFeatures();
-        ExperimentalFeaturesHelper.setFeatures(this, flagsToSet);
+        Map<String, Boolean> flags = TestProperties.getExperimentalFeatures();
+
+        if (flags.isEmpty())
+            return;
+
+        TestLogger.log("Setting experimental flags for duration of the test:");
+        TestLogger.increaseIndent();
+
+        Connection cn = createDefaultConnection();
+        for (Map.Entry<String, Boolean> flag : flags.entrySet())
+        {
+            String feature = flag.getKey();
+            Boolean value = flag.getValue();
+            Boolean previouslyEnabled = ExperimentalFeaturesHelper.setExperimentalFeature(cn, feature, value);
+
+            // When setting a feature flag the first time, remember the previous setting
+            if (!_originalFeatureFlags.containsKey(feature))
+            {
+                _originalFeatureFlags.put(feature, previouslyEnabled.booleanValue());
+            }
+        }
+        TestLogger.decreaseIndent();
     }
 
-    @LogMethod()
-    public void resetExperimentalFlags()
+    /**
+     * Reset the experimental features specified by the test properties. Intended for use by base tests only.
+     * Currently only {@link BaseWebDriverTest}.
+     */
+    protected void resetExperimentalFlags()
     {
-        ExperimentalFeaturesHelper.resetFeatures(this);
+        if (_originalFeatureFlags.isEmpty() || TestProperties.isTestRunningOnTeamCity())
+        {
+            return;
+        }
+
+        TestLogger.log("Resetting experimental flags to their original value:");
+
+        TestLogger.increaseIndent();
+        Connection cn = createDefaultConnection();
+        for (Map.Entry<String, Boolean> features : _originalFeatureFlags.entrySet())
+        {
+            ExperimentalFeaturesHelper.setExperimentalFeature(cn, features.getKey(), features.getValue());
+        }
+        TestLogger.decreaseIndent();
+
+        _originalFeatureFlags = new HashMap<>();
     }
 
     @LogMethod(quiet = true)

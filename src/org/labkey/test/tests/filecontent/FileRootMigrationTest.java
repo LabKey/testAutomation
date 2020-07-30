@@ -27,9 +27,11 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.admin.FileRootsManagementPage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TextSearcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
@@ -128,16 +131,19 @@ public class FileRootMigrationTest extends BaseWebDriverTest
                 .saveAndMoveFiles();
         pipelineStatusTable.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS);
         waitForPipelineJobsToComplete(1, "Copy Files for File Root Change", false);
-        clickAndWait(Locator.linkWithText("COMPLETE"));
 
-        assertTextPresent("Container: /" + getProjectName() + "/" + FOLDER,
-                projFile1.getName(),
-                projFile2.getName(),
-                folderFile1.getName(),
-                folderFile2.getName());
-        boolean hasUploadLogs = isTextPresent(".upload.log");
-        assertTextPresent("Copying file", hasUploadLogs ? 6 : 4);
-        assertTextPresent("Copying directory", 4);
+        PipelineStatusDetailsPage detailsPage = new PipelineStatusTable(getDriver())
+                .clickStatusLink(0)
+                .assertLogTextContains("Container: /" + getProjectName() + "/" + FOLDER,
+                        projFile1.getName(),
+                        projFile2.getName(),
+                        folderFile1.getName(),
+                        folderFile2.getName());
+
+        String logText = detailsPage.getLogText();
+        boolean hasUploadLogs = logText.contains(".upload.log");
+        assertTextPresent(new TextSearcher(logText), "Copying file", hasUploadLogs ? 6 : 4);
+        assertTextPresent(new TextSearcher(logText), "Copying directory", 4);
 
         log("Verify that all files are still present");
         clickProject(getProjectName());
@@ -189,16 +195,19 @@ public class FileRootMigrationTest extends BaseWebDriverTest
                 .saveAndCopyFiles();
         pipelineStatusTable.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS);
         waitForPipelineJobsToComplete(1, "Copy Files for File Root Change", false);
-        clickAndWait(Locator.linkWithText("COMPLETE"));
 
-        assertTextPresent("Container: /" + getProjectName() + "/" + FOLDER,
-                projFile1.getName(),
-                projFile2.getName(),
-                folderFile1.getName(),
-                folderFile2.getName());
-        boolean hasUploadLogs = isTextPresent(".upload.log");
-        assertTextPresent("Copying file", hasUploadLogs ? 6 : 4);
-        assertTextPresent("Copying directory", 4);
+        PipelineStatusDetailsPage detailsPage = new PipelineStatusTable(getDriver())
+                .clickStatusLink(0)
+                .assertLogTextContains("Container: /" + getProjectName() + "/" + FOLDER,
+                        projFile1.getName(),
+                        projFile2.getName(),
+                        folderFile1.getName(),
+                        folderFile2.getName());
+
+        String logText = detailsPage.getLogText();
+        boolean hasUploadLogs = logText.contains(".upload.log");
+        assertTextPresent(new TextSearcher(logText), "Copying file", hasUploadLogs ? 6 : 4);
+        assertTextPresent(new TextSearcher(logText), "Copying directory", 4);
 
         log("Verify that all files are still present");
         clickProject(getProjectName());

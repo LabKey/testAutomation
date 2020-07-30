@@ -60,7 +60,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         downloadBtn.click();
 
-        WebElement exportButton = Locator.css("li > a > span").withClass(exportType.buttonCssClass()).findElement(this);
+        // QueryGridPanel (deprecated)
+        Locator.CssLocator queryGridButton = Locator.css("li > a > span").withClass(exportType.buttonCssClass());
+        // GridPanel
+        Locator.CssLocator gridPanelButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass());
+        WebElement exportButton = Locator.CssLocator.union(queryGridButton, gridPanelButton).findElement(this);
         return getWrapper().doAndWaitForDownload(()->exportButton.click());
     }
 
@@ -198,11 +202,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     }
 
-    public OmniBox getOmniBox()
-    {
-        return elementCache().omniBox;
-    }
-
     public void doMenuAction(String buttonText, List<String> menuActions)
     {
         MultiMenu multiMenu = null;
@@ -291,7 +290,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     protected class ElementCache extends Component<?>.ElementCache
     {
 
-        public OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver).findWhenNeeded(this);
         private final Map<String, MultiMenu> menus = new HashMap<>();
         protected MultiMenu findMenu(String buttonText)
         {
@@ -306,15 +304,22 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     {
         static public Locator.XPathLocator gridBar()
         {
-            return Locator.tagWithClass("div", "query-grid-bar");
+            // QueryGridModel grid uses query-grid-bar, QueryModel grid uses grid-panel__button-bar
+            return Locator.XPathLocator.union(Locator.tagWithClassContaining("div", "query-grid-bar"),
+                    Locator.tagWithClassContaining("div", "grid-panel__button-bar"));
         }
 
-        static final Locator pgRightButton = Locator.tagWithClassContaining("span", "paging")
+        // QueryGridModel grid uses class names with the word "paging", QueryModel version uses class names with the
+        // word "pagination", so selectors look for class names containing "pagin".
+        static final Locator pgRightButton = Locator.tagWithClassContaining("span", "pagin")
                 .descendant(Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-right")));
-        static final Locator pgLeftButton =Locator.tagWithClassContaining("span", "paging")
+        static final Locator pgLeftButton =Locator.tagWithClassContaining("span", "pagin")
                 .descendant(Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-left")));
 
-        static final Locator pagingCountsSpan = Locator.xpath("//span[contains(@class, 'paging')]/span[@data-min]");
+        static final Locator.XPathLocator queryGridModelPagingCounts = Locator.xpath("//span[contains(@class, 'paging')]/span[@data-min]");
+        static final Locator.XPathLocator queryModelPagingCounts = Locator.xpath("//span[contains(@class, 'pagination-info')]");
+        static final Locator pagingCountsSpan = Locator.XPathLocator.union(queryGridModelPagingCounts, queryModelPagingCounts);
+
         static final Locator.XPathLocator viewSelectorButtonGroup = Locator.tagWithClass("div", "dropdown")
                 .withChild(Locator.button("Grid Views"));
         static final Locator.XPathLocator viewSelectorToggleButton = Locator.button("Grid Views");
