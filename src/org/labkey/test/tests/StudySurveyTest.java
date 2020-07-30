@@ -66,6 +66,7 @@ public class StudySurveyTest extends BaseWebDriverTest
     @Test
     public void testUpdateSurveyDatasetDate()
     {
+        goToProjectHome();
         String surveyLabel = "Study Survey";
 
         log("Creating a new dataset");
