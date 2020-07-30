@@ -34,6 +34,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -64,6 +65,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({DailyA.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -243,7 +245,14 @@ public class AuditLogTest extends BaseWebDriverTest
                         .append("\n");
         }
 
-        assertTrue(stringBuilder.toString(), pass);
+        if (!pass)
+        {
+            File dumpDir = new File(getArtifactCollector().ensureDumpDir(), "audit_logs");
+            dumpDir.mkdir();
+            TestFileUtils.saveFile(dumpDir, "audit_log_before.log", String.join("\n", auditLogBefore));
+            TestFileUtils.saveFile(dumpDir, "audit_log_after.log", String.join("\n", auditLogAfter));
+            fail(stringBuilder.toString());
+        }
     }
 
     protected void userAuditTest() throws IOException
