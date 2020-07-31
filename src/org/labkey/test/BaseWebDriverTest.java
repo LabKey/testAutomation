@@ -577,6 +577,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
+
+        // Only do this as part of test startup if we haven't already checked. Since we do this as the last
+        // step in the test, there's no reason to bother doing it again at the beginning of the next test
+        if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
+        {
+            checker().withScreenshot("startupErrors").wrapAssertion(this::checkErrors);
+            checker().withScreenshot("startupLeaks").wrapAssertion(this::checkLeaks);
+            _checkedLeaksAndErrors = true;
+        }
+
         setServerDebugLogging();
         setExperimentalFlags();
 
@@ -597,13 +607,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             // Disable scheduled system maintenance to prevent timeouts during nightly tests.
             disableMaintenance();
-        }
-
-        // Only do this as part of test startup if we haven't already checked. Since we do this as the last
-        // step in the test, there's no reason to bother doing it again at the beginning of the next test
-        if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
-        {
-            checkLeaksAndErrors();
         }
 
         cleanup(false);
@@ -937,6 +940,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 log("Unable to dump screenshots");
                 System.err.println(e.getMessage());
             }
+            // Reset errors before next test and make it easier to view server-side errors that may have happened during the test.
+            checker().withScreenshot("serverErrors").wrapAssertion(this::checkErrors);
         }
         finally
         {
@@ -1010,7 +1015,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
         {
-            checkLeaksAndErrors();
+            checkErrors();
+            checkLeaks();
         }
 
         if (reenableMiniProfiler)
@@ -1095,16 +1101,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static File getDownloadDir()
     {
         return SingletonWebDriver.getInstance().getDownloadDir();
-    }
-
-    @LogMethod
-    private void checkLeaksAndErrors()
-    {
-        if ( isGuestModeTest() )
-            return;
-        checkErrors();
-        checkLeaks();
-        _checkedLeaksAndErrors = true;
     }
 
     protected void checkLeaks()
