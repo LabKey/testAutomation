@@ -12,6 +12,10 @@ public class UpdateSampleTypePage extends CreateSampleTypePage
         super(driver);
     }
 
+    // TODO: Add a waitForLoad, or some other appropriate check, that the page is loaded. If not here then in one of
+    //  the parent classes.
+    // Issue 41038: Add a waitForPageLoad in org.labkey.test.pages.experiment.UpdateSampleTypePage
+
     public static UpdateSampleTypePage beginAt(WebDriverWrapper driver, Integer sampleTypeId)
     {
         return beginAt(driver, driver.getCurrentContainerPath(), sampleTypeId);
