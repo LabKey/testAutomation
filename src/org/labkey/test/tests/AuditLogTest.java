@@ -51,6 +51,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.UIUserHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -261,9 +262,10 @@ public class AuditLogTest extends BaseWebDriverTest
         ArrayList<String> auditLogAfter;
 
         auditLogBefore = getAuditLogFromFile();
-
+        // Use UI helper to avoid unexpected events from API authentication
+        UIUserHelper userHelper = new UIUserHelper(this);
         log("testing user audit events");
-        _userHelper.createUser(AUDIT_TEST_USER);
+        userHelper.createUser(AUDIT_TEST_USER);
         impersonate(AUDIT_TEST_USER);
         stopImpersonating();
         impersonateRoles(PROJECT_ADMIN_ROLE, AUTHOR_ROLE);
@@ -275,7 +277,7 @@ public class AuditLogTest extends BaseWebDriverTest
         signInShouldFail(AUDIT_TEST_USER, "asdf"); // Bad login.  Existing User
         signInShouldFail(AUDIT_TEST_USER + "fail", "asdf"); // Bad login.  Non-existent User
         simpleSignIn();
-        _userHelper.deleteUsers(true, AUDIT_TEST_USER);
+        userHelper.deleteUsers(true, AUDIT_TEST_USER);
 
         ArrayList<String> expectedLogValues = new ArrayList<>();
         expectedLogValues.add(AUDIT_TEST_USER + " was added to the system and the administrator chose not to send a verification email.");
