@@ -37,7 +37,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.serverapi.reader.Readers;
@@ -93,6 +95,7 @@ public class WebTestHelper
     public static final int GC_ATTEMPT_LIMIT = 6;
     private static boolean USE_CONTAINER_RELATIVE_URL = true;
     private static final Map<String, Map<String, Cookie>> savedCookies = new HashMap<>();
+    private static final Map<String, String> savedSessionKeys = new HashMap<>();
 
     public static void setUseContainerRelativeUrl(boolean useContainerRelativeUrl)
     {
@@ -112,6 +115,31 @@ public class WebTestHelper
     public static Map<String, Cookie> getCookies(String user)
     {
         return savedCookies.getOrDefault(user, Collections.emptyMap());
+    }
+
+    public static String getSessionKey(String user)
+    {
+        Connection connection = getRemoteApiConnection(user, true);
+        PostCommand<?> command = new PostCommand<>("security", "createApiKey");
+        JSONObject json = new JSONObject();
+        json.put("type", "session");
+        command.setJsonObject(json);
+
+        try
+        {
+            CommandResponse response = command.execute(connection, "/");
+            Object apikey = response.getParsedData().get("apikey");
+            if (apikey == null)
+            {
+                TestLogger.error(response.getText());
+                throw new RuntimeException("Failed to generate session key");
+            }
+            return (String) apikey;
+        }
+        catch (CommandException | IOException e)
+        {
+            throw new RuntimeException("Unable to generate session key", e);
+        }
     }
 
     public static boolean isUseContainerRelativeUrl()
@@ -403,6 +431,16 @@ public class WebTestHelper
         Connection connection = new Connection(getBaseURL(), username, PasswordUtil.getPassword());
 
         if (includeCookiesFromPrimaryUser)
+            addCachedCookies(connection, username);
+
+        return connection;
+    }
+
+    public static Connection getRemoteApiConnection(String username, boolean includeCookies)
+    {
+        Connection connection = new Connection(getBaseURL(), username, PasswordUtil.getPassword());
+
+        if (includeCookies)
             addCachedCookies(connection, username);
 
         return connection;
