@@ -218,7 +218,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Creating list with lookup to viscstudies.studies");
         ListHelper.ListColumn[] cols = {
-            new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "Study Lookup", new ListHelper.LookupInfo(null, "viscstudies", "studies").setTableType(FieldDefinition.ColumnType.String)),
+            new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "Study Lookup", new ListHelper.LookupInfo(null, "viscstudies", "Study").setTableType(FieldDefinition.ColumnType.String)),
         };
         _listHelper.createList(getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
 
