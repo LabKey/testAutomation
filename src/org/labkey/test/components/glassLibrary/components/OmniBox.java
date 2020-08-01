@@ -195,7 +195,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     private static abstract class Locators
     {
-        static final Locator.XPathLocator omniBoxControl = Locator.tagWithClass("div", "OmniBox-control");
+        static final Locator.CssLocator omniBoxControl = Locator.css("div.OmniBox-control");
         static final Locator.CssLocator omniBoxInput = Locator.css("div.OmniBox-input > input");
         static final Locator.XPathLocator values = Locator.tagWithClass("div", "OmniBox-value").childTag("span");
         static final Locator.XPathLocator editingValue = Locator.tagWithClass("div", "OmniBox-input")
