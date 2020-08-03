@@ -84,6 +84,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -158,7 +159,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected static boolean _testFailed = false;
     protected static boolean _anyTestFailed = false;
     private final ArtifactCollector _artifactCollector;
-    private DeferredErrorCollector _errorCollector;
+    private final DeferredErrorCollector _errorCollector;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public final CustomizeView _customizeViewsHelper;
@@ -198,6 +199,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public BaseWebDriverTest()
     {
         _artifactCollector = new ArtifactCollector(this);
+        _errorCollector = new DeferredErrorCollector(_artifactCollector);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeView(this);
 
@@ -289,10 +291,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public final DeferredErrorCollector checker()
     {
-        if (_errorCollector == null)
-        {
-            throw new IllegalStateException("Default error collector only available within '@Test' methods.");
-        }
         return _errorCollector;
     }
 
@@ -379,9 +377,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 try
                 {
-                    currentTest = (BaseWebDriverTest) description.getTestClass().newInstance();
+                    currentTest = (BaseWebDriverTest) description.getTestClass().getConstructor().newInstance();
                 }
-                catch (InstantiationException | IllegalAccessException e)
+                catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
                 {
                     currentTest = null; // Make sure previous instance is cleared
                     throw new RuntimeException(e);
@@ -404,6 +402,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void succeeded(Description description)
             {
+                getCurrentTest().checker().recordResults();
                 if (!_anyTestFailed)
                     getCurrentTest().doPostamble();
                 else
@@ -673,7 +672,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (_testFailed)
                     resetErrors(); // Clear errors from a previously failed test
                 _testFailed = false;
-                _errorCollector = new DeferredErrorCollector(getArtifactCollector());
             }
 
             @Override

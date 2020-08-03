@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
-import com.github.sardine.SardineFactory;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -112,7 +111,7 @@ public class WebDavTest extends BaseWebDriverTest
         assertTextNotPresent("testfile");
         assertElementPresent(Locator.linkWithText("_webdav/"));
 
-        Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Sardine sardine = WebDavUtils.beginSardine(PasswordUtil.getUsername());
         List<String> names = _listNames(sardine, testURL);
         assertEquals("Initial webdav listing", expectedFiles, new HashSet<>(names));
 
@@ -164,7 +163,7 @@ public class WebDavTest extends BaseWebDriverTest
         WebFilesHtmlViewPage.beginAt(this, getProjectName());
         assertElementPresent(Locator.linkWithText("_webfiles/"));
 
-        Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Sardine sardine = WebDavUtils.beginSardine(PasswordUtil.getUsername());
         Set<String> names = new HashSet<>(_listNames(sardine, testURL));
         assertEquals("_webfiles for project should be empty (with just a self-reference)", expectedWebFiles, names);
 

@@ -16,10 +16,13 @@
 package org.labkey.test.util.core.webdav;
 
 import com.github.sardine.Sardine;
+import com.github.sardine.SardineFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
@@ -28,6 +31,30 @@ import java.util.Random;
 public class WebDavUtils
 {
     private static final Random random = new Random();
+
+    private WebDavUtils()
+    {
+        /* Utility class */
+    }
+
+    /**
+     * Create a Sardine WebDav connection. Use a session key
+     * @param user User email
+     * @return
+     */
+    public static Sardine beginSardine(String user)
+    {
+        if (TestProperties.isServerSsoOnly())
+        {
+            String sessionKey = WebTestHelper.getSessionKey(user);
+            return SardineFactory.begin(WebTestHelper.API_KEY, sessionKey);
+        }
+        else
+        {
+            return SardineFactory.begin(user, PasswordUtil.getPassword());
+        }
+    }
+
     /**
      * @param containerPath e.g. "Test Project/subfolder"
      * @param webDavDir e.g. "@files" or "@pipeline"
@@ -71,29 +98,5 @@ public class WebDavUtils
         byte[] fileBytes = new byte[fileSize];
         random.nextBytes(fileBytes);
         sardine.put(fullDavUrl, fileBytes);
-    }
-
-    /**
-     * @deprecated Moved to {@link org.labkey.test.util.core.webdav.WebDavUrlFactory}
-     * TODO: remove in 19.2
-     */
-    @Deprecated(forRemoval = true)
-    public static class WebDavUrlFactory extends org.labkey.test.util.core.webdav.WebDavUrlFactory
-    {
-        protected WebDavUrlFactory(String baseUrl)
-        {
-            super(baseUrl);
-        }
-    }
-
-    /**
-     * @deprecated Moved to {@link org.labkey.test.util.core.webdav.WebDavUrlFactory#webDavUrlFactory(String)}
-     * Leave in place to ease merges from panoramaweb18.3
-     * TODO: remove in 19.2
-     */
-    @Deprecated(forRemoval = true)
-    public static WebDavUrlFactory webDavUrlFactory(String containerPath)
-    {
-        return new WebDavUrlFactory(buildBaseWebDavUrl(containerPath, "@files"));
     }
 }

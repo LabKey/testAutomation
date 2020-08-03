@@ -84,6 +84,7 @@ import java.util.Random;
 public class WebTestHelper
 {
     public static final Random RANDOM = new Random();
+    public static final String API_KEY = "apikey"; // Username for api/session key authentication
 
     private static final String DEFAULT_CONTEXT_PATH = "";
     private static final Integer DEFAULT_WEB_PORT = 8080;
@@ -119,27 +120,38 @@ public class WebTestHelper
 
     public static String getSessionKey(String user)
     {
-        Connection connection = getRemoteApiConnection(user, true);
-        PostCommand<?> command = new PostCommand<>("security", "createApiKey");
-        JSONObject json = new JSONObject();
-        json.put("type", "session");
-        command.setJsonObject(json);
+        Cookie sessionCookie = getCookies(user).get(Connection.JSESSIONID);
+        if (sessionCookie == null)
+        {
+            throw new IllegalStateException("No saved session for user: " + user);
+        }
+        String sessionId = sessionCookie.getValue();
 
-        try
+        if (!savedSessionKeys.containsKey(sessionId))
         {
-            CommandResponse response = command.execute(connection, "/");
-            Object apikey = response.getParsedData().get("apikey");
-            if (apikey == null)
+            Connection connection = getRemoteApiConnection(user, true);
+            PostCommand<?> command = new PostCommand<>("security", "createApiKey");
+            JSONObject json = new JSONObject();
+            json.put("type", "session");
+            command.setJsonObject(json);
+
+            try
             {
-                TestLogger.error(response.getText());
-                throw new RuntimeException("Failed to generate session key");
+                CommandResponse response = command.execute(connection, "/");
+                Object apikey = response.getParsedData().get("apikey");
+                if (apikey == null)
+                {
+                    TestLogger.error(response.getText());
+                    throw new RuntimeException("Failed to generate session key");
+                }
+                savedSessionKeys.put(sessionId, (String) apikey);
             }
-            return (String) apikey;
+            catch (CommandException | IOException e)
+            {
+                throw new RuntimeException("Unable to generate session key", e);
+            }
         }
-        catch (CommandException | IOException e)
-        {
-            throw new RuntimeException("Unable to generate session key", e);
-        }
+        return savedSessionKeys.get(sessionId);
     }
 
     public static boolean isUseContainerRelativeUrl()

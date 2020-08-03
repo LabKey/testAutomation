@@ -188,6 +188,11 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.without.test.modules"));
     }
 
+    public static boolean isServerSsoOnly()
+    {
+        return "true".equals(System.getProperty("webtest.server.sso.only"));
+    }
+
     public static String ensureGeckodriverExeProperty()
     {
         final String key = GECKO_DRIVER_EXE_PROPERTY;
