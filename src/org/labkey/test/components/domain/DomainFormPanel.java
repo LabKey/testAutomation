@@ -76,15 +76,36 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         if (fieldDefinition.getLookupValidatorEnabled() != null)
             fieldRow.setLookupValidatorEnabled(fieldDefinition.getLookupValidatorEnabled());
 
-        if (fieldDefinition.getValidator() != null)
+        if (fieldDefinition.getValidators() != null && !fieldDefinition.getValidators().isEmpty())
         {
-            FieldDefinition.FieldValidator validator = fieldDefinition.getValidator();
-            if (validator instanceof FieldDefinition.RegExValidator)
-                fieldRow.setRegExValidators(List.of((FieldDefinition.RegExValidator)validator));
-            else if (validator instanceof FieldDefinition.RangeValidator)
-                fieldRow.setRangeValidators(List.of((FieldDefinition.RangeValidator)validator));
-            else
-                throw new IllegalArgumentException("Validators are not yet supported");
+            List<FieldDefinition.RegExValidator> regexValidators = new ArrayList<>();
+            List<FieldDefinition.RangeValidator> rangeValidators = new ArrayList<>();
+
+            List<FieldDefinition.FieldValidator<?>> validators = fieldDefinition.getValidators();
+            for (FieldDefinition.FieldValidator<?> validator : validators)
+            {
+                if (validator instanceof FieldDefinition.RegExValidator)
+                {
+                    regexValidators.add((FieldDefinition.RegExValidator) validator);
+                }
+                else if (validator instanceof FieldDefinition.RangeValidator)
+                {
+                    rangeValidators.add((FieldDefinition.RangeValidator) validator);
+                }
+                else
+                {
+                    throw new IllegalArgumentException("Validator not supported: " + validator.getClass().getName());
+                }
+            }
+
+            if (!regexValidators.isEmpty())
+            {
+                fieldRow.setRegExValidators(regexValidators);
+            }
+            if (!rangeValidators.isEmpty())
+            {
+                fieldRow.setRangeValidators(rangeValidators);
+            }
         }
 
         fieldRow.collapse();

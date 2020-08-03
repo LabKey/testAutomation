@@ -1983,16 +1983,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
     }
 
-    public void selectQuery(String schemaName, String queryName, String publicName)
-    {
-        log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
-        selectSchema(schemaName);
-        WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        mouseOver(Locator.byClass(".x4-tab-button")); // Move away from schema tree to dismiss tooltip
-        queryLink.click();
-        waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + publicName), 30000);
-    }
-
     public void clickFkExpando(String schemaName, String queryName, String columnName)
     {
         click(Locator.tagWithClass("img", "lk-qd-expando").withAttribute("lkqdfieldkey", columnName));
@@ -2000,25 +1990,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public DataRegionTable viewQueryData(String schemaName, String queryName)
     {
-        return viewQueryData(schemaName, queryName, null, null);
+        return viewQueryData(schemaName, queryName, null);
     }
 
     public DataRegionTable viewQueryData(String schemaName, String queryName, @Nullable String moduleName)
     {
-        return viewQueryData(schemaName, queryName, moduleName, null);
-    }
-
-    public DataRegionTable viewQueryData(String schemaName, String queryName, @Nullable String moduleName, @Nullable String publicName)
-    {
-        if (publicName != null)
-        {
-            selectQuery(schemaName, queryName, publicName);
-        }
-        else
-        {
-            selectQuery(schemaName, queryName);
-        }
-        Locator loc = Locator.xpath("//div[contains(@class,'lk-qd-name')]//a[contains(text(),'" + schemaName + "." + (publicName != null?publicName:queryName) + "')]");
+        selectQuery(schemaName, queryName);
+        Locator loc = Locator.xpath("//div[contains(@class,'lk-qd-name')]//a[contains(text(),'" + schemaName + "." + queryName + "')]");
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
         if (moduleName != null) // 12474
