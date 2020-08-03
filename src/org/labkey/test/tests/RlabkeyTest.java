@@ -173,7 +173,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     public void testRlabkeyQueryApi() throws Exception
     {
         log("Import Lists");
-        File listArchive = new File(_rReportHelper.getRLibraryPath(), "/listArchive.zip");
+        File listArchive = new File(RReportHelper.getRLibraryPath(), "/listArchive.zip");
         goToProjectHome();
         _listHelper.importListArchive(listArchive);
 
@@ -248,7 +248,7 @@ public class RlabkeyTest extends BaseWebDriverTest
             List<String> errors = new ArrayList<>();
 
             // we want to load the Rlabkey package from the override location
-            File libPath = _rReportHelper.getRLibraryPath();
+            File libPath = RReportHelper.getRLibraryPath();
             String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
 
             for (APITestHelper.ApiTestCase test : tests)

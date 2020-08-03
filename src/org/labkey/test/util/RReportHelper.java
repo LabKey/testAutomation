@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -210,6 +211,12 @@ public class RReportHelper
         else
         {
             _test.refresh(); // Avoid menu alignment issue on TeamCity
+
+            if (TestProperties.isServerRemote())
+            {
+                Assert.assertTrue("R engine not present. Unable to configure on remote server.", scripts.isEnginePresentForLanguage("R"));
+                TestLogger.log("R engine present. Using existing engine for remote server.");
+            }
 
             if (scripts.isEnginePresent(localEngineName))
             {
