@@ -3,6 +3,7 @@ package org.labkey.test.pages.pipeline;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.collections.CaseInsensitiveHashSet;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -26,7 +27,8 @@ import static org.junit.Assert.assertNotNull;
 
 public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsPage.ElementCache>
 {
-    private final Set<String> FINISHED_STATES = new CaseInsensitiveHashSet("COMPLETE", "ERROR", "CANCELLED");
+    private static final Set<String> FINISHED_STATES = new CaseInsensitiveHashSet("COMPLETE", "ERROR", "CANCELLED");
+    private static final int DEFAULT_PIPELINE_WAIT = BaseWebDriverTest.MAX_WAIT_SECONDS * 1000;
 
     public static PipelineStatusDetailsPage beginAt(WebDriverWrapper driver, int rowId)
     {
@@ -109,7 +111,7 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
     @LogMethod
     public PipelineStatusDetailsPage waitForStatus(String status)
     {
-        return waitForStatus(status, defaultWaitForPage);
+        return waitForStatus(status, DEFAULT_PIPELINE_WAIT);
     }
 
     @LogMethod
@@ -135,7 +137,7 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
      */
     public PipelineStatusDetailsPage waitForFinish()
     {
-        waitForStatus(FINISHED_STATES, defaultWaitForPage);
+        waitForStatus(FINISHED_STATES, DEFAULT_PIPELINE_WAIT);
         return this;
     }
 
@@ -149,7 +151,7 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
     /** Wait for COMPLETE job status */
     public PipelineStatusDetailsPage waitForComplete()
     {
-        return waitForComplete(defaultWaitForPage);
+        return waitForComplete(DEFAULT_PIPELINE_WAIT);
     }
 
     /** Wait for COMPLETE job status */
