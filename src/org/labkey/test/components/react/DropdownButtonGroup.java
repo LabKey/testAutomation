@@ -19,7 +19,6 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
 {
     final WebElement _el;
     final WebDriver _driver;
-    private Integer _expandRetries = 1;
 
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
     public DropdownButtonGroup(WebDriver driver, WebElement componentElement)
@@ -43,12 +42,6 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
     public WebDriver getDriver()
     {
         return _driver;
-    }
-
-    public DropdownButtonGroup withExpandRetries(Integer expandRetries)
-    {
-        _expandRetries = expandRetries;
-        return this;
     }
 
     public boolean isExpanded()
