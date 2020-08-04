@@ -428,7 +428,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      *
      * @return a list of Map<String, String> containing keys and values for each row
      */
-    public List getRowMaps()
+    public List<Map<String, String>> getRowMaps()
     {
         if(null == elementCache().mapList)
         {

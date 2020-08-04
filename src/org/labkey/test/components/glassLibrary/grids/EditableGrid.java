@@ -176,6 +176,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return gridCell;
     }
 
+    public boolean isCellReadOnly(int row, String column)
+    {
+        WebElement div = Locator.tag("div").findElement(getCell(row, column));
+        String cellClass = div.getAttribute("class");
+        return cellClass != null && cellClass.contains("cell-read-only");
+    }
+
     public int getRowCount()
     {
         return getRows().size();

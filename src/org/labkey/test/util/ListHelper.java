@@ -511,7 +511,8 @@ public class ListHelper extends LabKeySiteWrapper
             setDescription(description);
             setFormat(format);
             setLookup(lookup);
-            setValidator(validator);
+            if (validator != null)
+                setValidators(List.of(validator));
             setURL(url);
             setScale(scale);
         }
