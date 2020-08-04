@@ -128,10 +128,7 @@ public class Crawler
         if (projects.isEmpty())
         {
             _startingUrls.add(new UrlToCheck(null, "/admin-showAdmin.view#links", 0));
-            if (!TestProperties.isPrimaryUserAppAdmin()) // App admin can't visit 'SpiderAction'
-            {
-                _startingUrls.add(new UrlToCheck(null, "/admin-spider.view", 2));
-            }
+            _startingUrls.add(new UrlToCheck(null, "/admin-spider.view", 2));
         }
         if (injectionTest)
         {
@@ -618,6 +615,9 @@ public class Crawler
             if (getDepth() >= getMaxDepth() && _actionsVisited.contains(getActionId()))
                 return false;
 
+            if (spiderAction.equals(getActionId()) && TestProperties.isPrimaryUserAppAdmin())
+                return false; // SpiderAction is inaccessible to app admin
+
             // Don't let a single bad action fail multiple tests
             if (_actionsWithErrors.contains(getActionId()))
                 return false;
@@ -1031,9 +1031,14 @@ public class Crawler
                     String message = relativeURL + "\nproduced response code " + code + originMessage;
                     if (code == 403 && TestProperties.isPrimaryUserAppAdmin())
                     {
+                        // Crawling as app admin is likely to hit numerous 403s. Don't fail immediately.
                         _test.checker().wrapAssertion(() -> fail(message));
                     }
-                    fail(message);
+                    else
+                    {
+                        fail(message);
+                    }
+
                 }
                 List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
                 if (!serverError.isEmpty())
