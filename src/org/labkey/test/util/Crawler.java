@@ -149,7 +149,8 @@ public class Crawler
     protected List<ControllerActionId> getDefaultExcludedActions()
     {
         List<ControllerActionId> list = new ArrayList<>();
-        Collections.addAll(list,
+        Collections.addAll(
+            list,
             new ControllerActionId("admin", "resetErrorMark"),
             new ControllerActionId("admin", "doCheck"),
             new ControllerActionId("admin", "runSystemMaintenance"),
@@ -172,6 +173,7 @@ public class Crawler
             new ControllerActionId("admin-sql", "saveReorderedScript"),
             new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
+            new ControllerActionId("assay", "downloadSampleQCData"),
             new ControllerActionId("assay", "template"),
             new ControllerActionId("cds", "exportTourDefinitions"), // Download action
             new ControllerActionId("dumbster", "begin"),

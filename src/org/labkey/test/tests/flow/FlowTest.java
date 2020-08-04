@@ -31,6 +31,7 @@ import org.labkey.test.components.flow.FlowReportsWebpart;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.flow.reports.QCReportEditorPage;
 import org.labkey.test.pages.flow.reports.ReportEditorPage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.DataRegion;
@@ -706,6 +707,7 @@ public class FlowTest extends BaseFlowTest
         clickButton("Next");
         waitForText("Import Analysis: Confirm");
         clickButton("Finish");
+        new PipelineStatusDetailsPage(getDriver()).waitForComplete();
         waitForElement(Locator.tagWithClass("div", "alert alert-warning").containing("Ignoring filter/sort"), defaultWaitForPage);
         DataRegionTable query = new DataRegionTable("query", getDriver());
         List<String> names = query.getColumnDataAsText("Name");

@@ -25,12 +25,11 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -145,37 +144,15 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
     protected void waitForPipelineError(List<String> expectedErrors)
     {
-        waitForPipelineStatus("ERROR");
-
-        log("Checking for errors after importing");
-        String logText = Locator.id("log-data").findElement(getDriver()).getText();
-        assertTextPresent(new TextSearcher(logText), expectedErrors.toArray(new String[0]));
+        new PipelineStatusDetailsPage(getDriver()).waitForError(expectedErrors);
     }
 
     protected void waitForPipelineComplete()
     {
-        // flow signals it would like to redirect when COMPLETED by using a URL parameter.
-        boolean expectRedirect = getUrlParam("redirect") != null;
-        if (expectRedirect)
-            log("Expecting redirect when complete");
-
-        waitForPipelineStatus("COMPLETE");
-
-        if (expectRedirect)
-        {
-            // The click does nothing, but we want to wait for the redirect before continuing
-            clickAndWait(Locator.id("status-text"));
-            log("Redirected on success as expected");
-        }
+        new PipelineStatusDetailsPage(getDriver()).waitForComplete();
 
         log("Checking for errors after importing");
         checkErrors();
-    }
-
-    @LogMethod
-    private void waitForPipelineStatus(String status)
-    {
-        waitForElementText(Locator.id("status-text"), status, MAX_WAIT_SECONDS * 1000);
     }
 
     @Override

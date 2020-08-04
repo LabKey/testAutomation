@@ -32,9 +32,11 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.openqa.selenium.NoSuchElementException;
@@ -545,8 +547,9 @@ public class ElispotAssayTest extends AbstractAssayTest
         runTable.checkAllOnPage();
         clickButton("Subtract Background");
 
-        // status should be updated on page without having to refresh
-        waitForText(WAIT_FOR_PAGE, "COMPLETE");
+        new PipelineStatusTable(getDriver())
+                .clickStatusLink(0)
+                .waitForComplete();
 
         // Check well counts for TEST_ASSAY_ELISPOT_FILE4
         clickProject(TEST_ASSAY_PRJ_ELISPOT);

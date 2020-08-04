@@ -20,6 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.PipelineStatusTable;
 
 import java.io.File;
@@ -44,14 +45,7 @@ public class PipelineCancelTest  extends BaseWebDriverTest
         startImportStudyFromZip(STUDY_ZIP);
 
         log("Cancel import");
-        PipelineStatusTable pipelineStatusTable = new PipelineStatusTable(this);
-        pipelineStatusTable.clickStatusLink(0);
-        clickButton("Cancel");
-
-        log("Verify cancel succeeded");
-        waitForText("Attempting to cancel");
-        // status should be updated on page without having to refresh
-        waitForText(defaultWaitForPage, "CANCELLED");
+        new PipelineStatusTable(this).clickStatusLink(0).clickCancel();
 
         goToProjectHome();
         assertTextPresent("This folder does not contain a study."); //part of the import will be done, but it shouldn't have gotten to participants.

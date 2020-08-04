@@ -511,7 +511,7 @@ public class NabAssayTest extends AbstractAssayTest
         navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         goToSchemaBrowser();
-        selectQuery("assay.NAb.TestAssayNab", "Data", "NAbSpecimen");
+        selectQuery("assay.NAb.TestAssayNab", QUERY_NAME);
         createNewQuery("assay.NAb.TestAssayNab");
         setFormElement(Locator.name("ff_newQueryName"), "New NabQuery");
         clickAndWait(Locator.lkButton("Create and Edit Source"));

@@ -286,9 +286,10 @@ public abstract class TestProperties
                     ? (Boolean)entry.getValue()
                     : Boolean.valueOf(String.valueOf(entry.getValue()));
 
-            if (key.startsWith("experimental.") && value != null)
+            String prefix = "webtest.experimental.";
+            if (key.startsWith(prefix))
             {
-                String feature = key.substring("experimental.".length());
+                String feature = key.substring(prefix.length());
                 features.put(feature, value);
             }
         }

@@ -73,6 +73,12 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
         waitForPage();
     }
 
+    @Override
+    public String toString()
+    {
+        return getClass().getName();
+    }
+
     protected EC elementCache()
     {
         if (null == _elementCache)
@@ -97,6 +103,12 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
         public WebElement findElement(By by)
         {
             return getDriver().findElement(by);
+        }
+
+        @Override
+        public String toString()
+        {
+            return LabKeyPage.this.toString();
         }
 
         public WebElement headerBlock = Locators.headerContainer().findWhenNeeded(this);
