@@ -34,6 +34,7 @@ import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
@@ -341,7 +342,7 @@ public class JUnitTest extends TestSuite
             long startTime = System.currentTimeMillis();
             try
             {
-                Command command = new Command("junit", "go");
+                Command<CommandResponse> command = new PostCommand<>("junit", "go");
                 Map<String, Object> params = new HashMap<>();
                 params.put("testCase", _remoteClass);
                 command.setParameters(params);
@@ -379,7 +380,6 @@ public class JUnitTest extends TestSuite
                 err(dump(ce.getResponseText(), false));
                 fail(("remote junit failed (HTTP status code " + ce.getStatusCode() + "): " + _remoteClass) + "\n" + dump(ce.getResponseText(), true));
             }
-
         }
 
         private String getLogTestString(String message, long startTime)
