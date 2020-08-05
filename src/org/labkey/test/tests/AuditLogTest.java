@@ -34,6 +34,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -50,6 +51,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.UIUserHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -64,6 +66,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({DailyA.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -243,7 +246,14 @@ public class AuditLogTest extends BaseWebDriverTest
                         .append("\n");
         }
 
-        assertTrue(stringBuilder.toString(), pass);
+        if (!pass)
+        {
+            File dumpDir = new File(getArtifactCollector().ensureDumpDir(), "audit_logs");
+            dumpDir.mkdir();
+            TestFileUtils.saveFile(dumpDir, "audit_log_before.log", String.join("\n", auditLogBefore));
+            TestFileUtils.saveFile(dumpDir, "audit_log_after.log", String.join("\n", auditLogAfter));
+            fail(stringBuilder.toString());
+        }
     }
 
     protected void userAuditTest() throws IOException
@@ -252,9 +262,10 @@ public class AuditLogTest extends BaseWebDriverTest
         ArrayList<String> auditLogAfter;
 
         auditLogBefore = getAuditLogFromFile();
-
+        // Use UI helper to avoid unexpected events from API authentication
+        UIUserHelper userHelper = new UIUserHelper(this);
         log("testing user audit events");
-        _userHelper.createUser(AUDIT_TEST_USER);
+        userHelper.createUser(AUDIT_TEST_USER);
         impersonate(AUDIT_TEST_USER);
         stopImpersonating();
         impersonateRoles(PROJECT_ADMIN_ROLE, AUTHOR_ROLE);
@@ -266,7 +277,7 @@ public class AuditLogTest extends BaseWebDriverTest
         signInShouldFail(AUDIT_TEST_USER, "asdf"); // Bad login.  Existing User
         signInShouldFail(AUDIT_TEST_USER + "fail", "asdf"); // Bad login.  Non-existent User
         simpleSignIn();
-        _userHelper.deleteUsers(true, AUDIT_TEST_USER);
+        userHelper.deleteUsers(true, AUDIT_TEST_USER);
 
         ArrayList<String> expectedLogValues = new ArrayList<>();
         expectedLogValues.add(AUDIT_TEST_USER + " was added to the system and the administrator chose not to send a verification email.");
