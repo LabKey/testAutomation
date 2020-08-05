@@ -126,8 +126,7 @@ public abstract class TestProperties
 
     public static boolean isHeapDumpCollectionEnabled()
     {
-        // TODO log4j : change before merge
-        return true;
+        return "true".equals(System.getProperty("enable.heap.dump"));
     }
 
     public static boolean isRunWebDriverHeadless()
