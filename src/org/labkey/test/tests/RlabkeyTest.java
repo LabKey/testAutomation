@@ -126,6 +126,13 @@ public class RlabkeyTest extends BaseWebDriverTest
         issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_2));
     }
 
+    private void setupAssays()
+    {
+        log("Create a GPAT assay design");
+        goToManageAssays();
+        _assayHelper.createAssayDesign("General", "Rlabkey GPAT Test").clickFinish();
+    }
+
     /**
      * Create a new issues list and override the default assigned to group
      */
@@ -153,6 +160,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         // Dummy files for saveBatch API test
         _fileBrowserHelper.createFolder("data.tsv");
         _fileBrowserHelper.createFolder("result.txt");
+        setupAssays();
 
         doRLabkeyTest(RLABKEY_API_EXPERIMENT);
     }
