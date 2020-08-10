@@ -1382,7 +1382,7 @@ public class DataRegionTable extends DataRegion
 
         public static Locator.XPathLocator columnHeader(String regionName, String fieldName)
         {
-            return Locator.tagWithAttribute("th", "column-name", regionName + ":" + fieldName);
+            return Locator.tagWithAttribute("th", "column-name", regionName + ":" + fieldName).childTag("div");
         }
 
         public static Locator.XPathLocator floatingHeader()
