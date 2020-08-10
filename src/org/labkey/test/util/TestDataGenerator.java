@@ -27,6 +27,7 @@ import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -370,14 +371,26 @@ public class TestDataGenerator
 
     public SelectRowsResponse getRowsFromServer(Connection cn) throws IOException, CommandException
     {
-        return getRowsFromServer(cn, null);
+        return getRowsFromServer(cn, null, null);
     }
 
     public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns) throws IOException, CommandException
     {
+        return getRowsFromServer(cn, intendedColumns, null);
+    }
+
+    public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns, List<Filter> filters) throws IOException, CommandException
+    {
         SelectRowsCommand cmd = new SelectRowsCommand(getSchema(), getQueryName());
+
+        for(Filter filter : filters)
+        {
+            cmd.addFilter(filter);
+        }
+
         if (intendedColumns!=null)
             cmd.setColumns(intendedColumns);
+
         return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
