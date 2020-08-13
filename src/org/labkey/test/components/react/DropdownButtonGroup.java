@@ -67,6 +67,11 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
         return  this;
     }
 
+    public String getButtonText()
+    {
+        return elementCache().toggleAnchor.getText();
+    }
+
     public DropdownButtonGroup closeVisibleSubmenus()
     {
         getWrapper().waitFor(()-> {
