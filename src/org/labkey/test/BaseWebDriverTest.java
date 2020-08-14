@@ -581,8 +581,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         // step in the test, there's no reason to bother doing it again at the beginning of the next test
         if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
         {
+            checker().addRecordableErrorType(WebDriverException.class);
             checker().withScreenshot("startupErrors").wrapAssertion(this::checkErrors);
             checker().withScreenshot("startupLeaks").wrapAssertion(this::checkLeaks);
+            checker().resetErrorTypes();
             _checkedLeaksAndErrors = true;
         }
 
@@ -592,7 +594,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         // Start logging JS errors.
         resumeJsErrorChecker();
 
-        resetErrors();
         assertModulesAvailable(getAssociatedModules());
         deleteSiteWideTermsOfUsePage();
         try
@@ -992,7 +993,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (!isTestCleanupSkipped())
         {
-            goToHome();
             cleanup(true);
 
             if (getDownloadDir().exists())
@@ -1053,6 +1053,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private void cleanup(boolean afterTest)
     {
+        ensureSignedInAsPrimaryTestUser();
+
         if (!ClassUtils.getAllInterfaces(getClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
         {
             if (afterTest)

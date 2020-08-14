@@ -463,6 +463,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
+    /**
+     * @deprecated This method is mostly unnecessary and the end state is
+     * inconsistent. It may or may not navigate and may or may not stop
+     * impersonating.
+     */
+    @Deprecated
     public void ensureAdminMode()
     {
         if (!onLabKeyPage())
