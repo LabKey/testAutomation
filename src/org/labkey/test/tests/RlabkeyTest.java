@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -22,6 +23,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.reports.SaveCategoriesCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
@@ -213,6 +215,8 @@ public class RlabkeyTest extends BaseWebDriverTest
     @Test
     public void testRlabkeyWebDavApi() throws Exception
     {
+        Assume.assumeFalse("Skipping webdav API test on remote server.", TestProperties.isServerRemote());
+
         Map<String, String> scriptReplacements = new HashMap<>();
 
         WebDavUploadHelper webDav = new WebDavUploadHelper(getProjectName());
@@ -257,7 +261,9 @@ public class RlabkeyTest extends BaseWebDriverTest
 
             // we want to load the Rlabkey package from the override location
             File libPath = RReportHelper.getRLibraryPath();
-            String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
+            String pathCmd = TestProperties.isServerRemote()
+                ? ""
+                : String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
 
             for (APITestHelper.ApiTestCase test : tests)
             {
