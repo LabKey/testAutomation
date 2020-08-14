@@ -1,2 +1,3 @@
 BasicTest
 RLabKeyTest
+KnitrReportTest

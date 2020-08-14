@@ -17,11 +17,13 @@ package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
@@ -55,10 +57,13 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     {
         super.doCleanup(afterTest);
 
-        if (afterTest)
-            revertLibXml();
-        else
-            deleteLibXml();
+        if (!TestProperties.isServerRemote())
+        {
+            if (afterTest)
+                revertLibXml();
+            else
+                deleteLibXml();
+        }
     }
 
     @Test
@@ -96,7 +101,10 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     @Test
     public void testAdhocReportDependenciesString()
     {
-        deleteLibXml();
+        if (!TestProperties.isServerRemote())
+        {
+            deleteLibXml();
+        }
         verifyAdhocReportDependencies("Strings",
                 "https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js;" +
                 "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js;\r\n" +
@@ -107,6 +115,8 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     @Test
     public void testAdhocReportDependenciesLib()
     {
+        Assume.assumeFalse("Unable to add dependencies to remote webapp root.", TestProperties.isServerRemote());
+
         copyLibXml();
 
         verifyAdhocReportDependencies("ClientLib", "knitr");

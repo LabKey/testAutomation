@@ -193,9 +193,16 @@ public class RReportHelper
     @LogMethod
     public String ensureRConfig(boolean useDocker)
     {
-        _test.ensureAdminMode();
-
         ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
+
+        if (TestProperties.isServerRemote() || TestProperties.isPrimaryUserAppAdmin())
+        {
+            Assert.assertTrue("R engine not present. Unable to configure " + (TestProperties.isPrimaryUserAppAdmin()
+                    ? "as app admin." : "on remote server."),
+                scripts.isEnginePresentForLanguage("R"));
+            TestLogger.log("R engine present. Using existing engine for remote server.");
+            return null; // TODO: Log some info about default R engine
+        }
 
         _test.log("Check if R already is configured");
 
@@ -211,12 +218,6 @@ public class RReportHelper
         else
         {
             _test.refresh(); // Avoid menu alignment issue on TeamCity
-
-            if (TestProperties.isServerRemote())
-            {
-                Assert.assertTrue("R engine not present. Unable to configure on remote server.", scripts.isEnginePresentForLanguage("R"));
-                TestLogger.log("R engine present. Using existing engine for remote server.");
-            }
 
             if (scripts.isEnginePresent(localEngineName))
             {
@@ -329,12 +330,12 @@ public class RReportHelper
 
     public void setPandocEnabled(Boolean enabled)
     {
-        _test.goToProjectHome();
-        _test.ensureAdminMode();
-
-        _test.log("Check if R already is configured");
-        _test.goToAdminConsole().clickViewsAndScripting();
-        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
+        if (TestProperties.isPrimaryUserAppAdmin())
+        {
+            TestLogger.warn("Test is running as app admin. Unable to modify R engine.");
+            return;
+        }
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
         String defaultScriptName = "R Scripting Engine";
         assertTrue("R Engine not setup", scripts.isEnginePresentForLanguage("R"));

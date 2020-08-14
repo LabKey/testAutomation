@@ -15,11 +15,13 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.TestProperties;
+import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -71,7 +73,10 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         _rReportHelper.ensureRConfig(isDocker());
 
         _containerHelper.createProject(getProjectName(), "Collaboration");
-        _containerHelper.enableModule(getProjectName(), "scriptpad");
+        if (!TestProperties.isWithoutTestModules())
+        {
+            _containerHelper.enableModule(getProjectName(), "scriptpad");
+        }
 
         new PortalHelper(this).doInAdminMode(portalHelper -> {
             portalHelper.removeAllWebParts();
@@ -89,9 +94,9 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         String reportSource = readReport(reportSourcePath);
 
         goToProjectHome();
-        goToManageViews();
+        ManageViewsPage manageViewsPage = goToManageViews();
 
-        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"R Report");
+        manageViewsPage.clickAddReport("R Report");
         _rReportHelper.selectOption(knitrOption);
         setCodeEditorValue("script-report-editor", reportSource);
         return reportSource;
@@ -179,6 +184,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
 
     protected void moduleReportDependencies()
     {
+        Assume.assumeFalse("Test modules not installed.", TestProperties.isWithoutTestModules());
         //
         // Checks that the dependencies can be loaded from the included kable report's metadata file.
         // If the dependencies did not load correctly then the test will fail with an
