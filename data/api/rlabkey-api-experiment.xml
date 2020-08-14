@@ -53,4 +53,27 @@
             ]]>
         </response>
     </test>
+    <test name="labkey.saveBatch for assay with space in name" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.saveBatch(baseUrl="%baseUrl%", folderPath="%projectName%", "Rlabkey GPAT Test", data.frame(SpecimenID=c(1,2,3)))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $batch$runs[[1]]$dataRows[[1]]$SpecimenID
+                [1] "1"
+
+                $batch$runs[[1]]$dataRows[[2]]$SpecimenID
+                [1] "2"
+
+                $batch$runs[[1]]$dataRows[[3]]$SpecimenID
+                [1] "3"
+
+                $batch$runs[[1]]$schemaName
+                [1] "assay.General.Rlabkey GPAT Test"
+            ]]>
+        </response>
+    </test>
 </ApiTests>

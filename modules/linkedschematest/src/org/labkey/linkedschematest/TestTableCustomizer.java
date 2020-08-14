@@ -17,7 +17,8 @@ package org.labkey.linkedschematest;
 
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.labkey.api.data.TableCustomizer;
 import org.labkey.api.data.TableInfo;
 
@@ -26,7 +27,7 @@ import java.util.List;
 
 public class TestTableCustomizer implements TableCustomizer
 {
-    private static final Logger _log = Logger.getLogger(TestTableCustomizer.class);
+    private static final Logger _log = LogManager.getLogger(TestTableCustomizer.class);
 
     public TestTableCustomizer()
     {
