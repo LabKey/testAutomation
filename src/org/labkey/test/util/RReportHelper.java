@@ -76,6 +76,7 @@ public class RReportHelper
 
     private static File rExecutable = null;
     private static File rScriptExecutable = null;
+    private static String defaultEngineVersion = null;
 
     private static final String localEngineName = "R Scripting Engine";
     public static final String R_DOCKER_SCRIPTING_ENGINE = "R Docker Scripting Engine";
@@ -197,11 +198,21 @@ public class RReportHelper
 
         if (TestProperties.isServerRemote() || TestProperties.isPrimaryUserAppAdmin())
         {
-            Assert.assertTrue("R engine not present. Unable to configure " + (TestProperties.isPrimaryUserAppAdmin()
-                    ? "as app admin." : "on remote server."),
+            String reason = "Unable to configure script engines " + (TestProperties.isServerRemote()
+                ? "on remote server."
+                : "as app admin.");
+            Assert.assertTrue("R engine not present. " + reason,
                 scripts.isEnginePresentForLanguage("R"));
-            TestLogger.log("R engine present. Using existing engine for remote server.");
-            return null; // TODO: Log some info about default R engine
+            TestLogger.log(reason + " Using existing engine.");
+            if (defaultEngineVersion == null)
+            {
+                ConfigureReportsAndScriptsPage.EditEngineWindow editEngineWindow =
+                    scripts.editDefaultEngine("R");
+                defaultEngineVersion = editEngineWindow.getLanguageVersion();
+                _test.getArtifactCollector().dumpPageSnapshot("R_engine_config", null);
+            }
+            TestLogger.log("R engine version: " + defaultEngineVersion);
+            return defaultEngineVersion;
         }
 
         _test.log("Check if R already is configured");
