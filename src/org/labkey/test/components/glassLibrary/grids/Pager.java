@@ -79,20 +79,56 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public int start()
     {
-        String value = elementCache().counts.getAttribute("data-min");
-        return Integer.parseInt(value);
+        // note: the 'old' element here and in end() and total() are here to support the pager used in
+        // biologicsReportTest.testReportListPaging.  Hopefully, we can consolidate dom between that pager
+        // and the ones we now have in QueryGrid
+
+        WebElement oldStart = Locator.tagWithClass("span", "pagination-info__start")
+                .findElementOrNull(this);
+        if (oldStart != null)
+            return Integer.parseInt(oldStart.getText());
+        else
+        {
+            String value = elementCache().counts.getAttribute("data-min");
+            return Integer.parseInt(value);
+        }
     }
 
     public int end()
     {
-        String value = elementCache().counts.getAttribute("data-max");
-        return Integer.parseInt(value);
+        WebElement oldEnd = Locator.tagWithClass("span", "pagination-info__end")
+                .findElementOrNull(this);
+        if (oldEnd != null)
+            return Integer.parseInt(oldEnd.getText());
+        else
+        {
+            String value = elementCache().counts.getAttribute("data-max");
+            return Integer.parseInt(value);
+        }
     }
 
     public int total()
     {
-        String value = elementCache().counts.getAttribute("data-total");
-        return Integer.parseInt(value);
+        WebElement oldTotal = Locator.tagWithClass("span", "pagination-info__total")
+                .findElementOrNull(this);
+        if (oldTotal != null)
+            return Integer.parseInt(oldTotal.getText());
+        else
+        {
+            String value = elementCache().counts.getAttribute("data-total");
+            return Integer.parseInt(value);
+        }
+    }
+
+    /**
+     * if the pager does not show a total, it indicates that there are no more to the set than are shown on the current page.
+     * use this to understand whether or not there are more pages of information (which
+     * could be the whole set, or a filtered range of it, or both).
+     * @return
+     */
+    public boolean hasTotal()
+    {
+        return elementCache().counts.getAttribute("data-total") != null;
     }
 
     @Override
@@ -129,6 +165,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     public static class PagerFinder extends WebDriverComponentFinder<Pager, PagerFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.XPathLocator.union(
+                Locator.tagWithClass("div", "pagination-buttons"),  // used in biologics report list
                 Locator.tagWithClass("span", "paging"),             // used in QueryGridPanel, here for backwards-support
                 Locator.tagWithClass("div", "lk-pagination"));      // used in GridPanel
 
