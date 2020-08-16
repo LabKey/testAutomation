@@ -69,7 +69,6 @@ public class ReactCheckBox extends Checkbox
     @Override
     public void set(@NotNull Boolean checked)
     {
-        // TODO: Move indeterminate state check into base Checkbox class (in trunk)
         if (isIndeterminate())
         {
             toggle();
@@ -78,6 +77,10 @@ public class ReactCheckBox extends Checkbox
 
         if (checked != isChecked())
             toggle();
-        WebDriverWrapper.waitFor(() -> checked == isChecked(), "Failed to " + (checked ? "check" : "uncheck") + " checkbox", 1000);
+
+        // Sometimes (like when the box has a ternary state, as the 'select all' box in grids)
+        // checking the box won't result in a checked state- it will instead land on 'indeterminate'.
+        WebDriverWrapper.waitFor(() -> checked == isChecked() || checked == isIndeterminate(),
+                "Failed to " + (checked ? "check" : "uncheck") + " checkbox", 1000);
     }
 }
