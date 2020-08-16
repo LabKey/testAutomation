@@ -236,14 +236,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
-     * sets the 'select all' checkbox to gthe desired state
+     * sets the 'select all' checkbox to the desired state, or indeterminate if not possible
      * @param checked   true to check the box, false to uncheck it
      * @return  the current instance
      */
     public T selectAllOnPage(boolean checked)
     {
         selectAllBox().set(checked);
-        Locator selectedText = Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]");
+        Locator selectedText = Locator.XPathLocator.union(
+                Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]"),
+                Locator.tagWithClass("span", "selection-status__count").containing("selected"));
 
         // If checked is false, so un-selecting a value, don't wait for a confirmation message.
         if(checked)

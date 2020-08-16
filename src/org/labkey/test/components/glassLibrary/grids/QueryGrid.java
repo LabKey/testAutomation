@@ -226,14 +226,36 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid selectAllRows()
     {
-        doAndWaitForUpdate(()->
-                getGridBar().selectAllRows());
+        if (isGridPanel())
+        {
+            if (elementCache().selectAllBtn.existsIn(this))
+                doAndWaitForUpdate(()->
+                        elementCache().selectAllN_Btn().click());
+            else
+                doAndWaitForUpdate(()->
+                        selectAllOnPage(true));
+        }
+        else
+            doAndWaitForUpdate(()->
+                    getGridBar().selectAllRows());
+
         return this;
+    }
+
+    public String getSelectionStatusCount()
+    {   // note: this element is only present when some number of rows in the set are selected
+        WebElement selectionStatus = Locator.tagWithClass("span", "selection-status__count")
+                .waitForElement(this, 4000);
+        return selectionStatus.getText();
     }
 
     public QueryGrid clearAllSelections()
     {
-        doAndWaitForUpdate(()->
+        if (isGridPanel())
+            doAndWaitForUpdate(()->
+                    elementCache().clearAllSelectionStatusBtn().click());
+        else
+            doAndWaitForUpdate(()->
                 getGridBar().clearAllSelections());
         return this;
     }
@@ -245,6 +267,16 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         doAndWaitForUpdate(()->
                 getGridBar().doMenuAction("Grid Views", Arrays.asList(viewName)));
         return this;
+    }
+
+    /**
+     * possible this is either a GridPanel, or a QueryGridPanel (QGP is to be deprecated).
+     * use this to test which one so we can fork behavior until QGP is gone
+     * @return
+     */
+    private boolean isGridPanel()
+    {
+        return elementCache().selectionStatusContainerLoc.existsIn(this);
     }
 
     @Override
@@ -267,6 +299,24 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         Optional<GridTabBar> gridTabBar()
         {
             return new GridTabBar.GridTabBarFinder(_driver, _responsiveGrid).findOptional(_queryGridPanel);
+        }
+
+        Locator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
+        Locator selectAllBtn = Locator.tagWithClass("span", "selection-status__select-all")
+                .child(Locator.buttonContainingText("Select all"));
+
+        WebElement selectionStatusContainer()
+        {
+            return selectionStatusContainerLoc.findElement(this);
+        }
+        WebElement clearAllSelectionStatusBtn()
+        {
+            return Locator.tagWithClass("span", "selection-status__clear-all")
+                    .child(Locator.button("Clear all")).findElement(selectionStatusContainer());
+        }
+        WebElement selectAllN_Btn()
+        {
+            return selectAllBtn.findElement(selectionStatusContainer());
         }
     }
 

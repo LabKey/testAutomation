@@ -27,12 +27,14 @@ import static org.labkey.test.WebDriverWrapper.sleep;
 public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 {
     final private WebElement _gridBarElement;
+    final private WebElement _containerElement;
     final private WebDriver _driver;
     private final ResponsiveGrid _responsiveGrid;
 
     protected GridBar(WebDriver driver, WebElement container, ResponsiveGrid responsiveGrid)
     {
         _gridBarElement = Locators.gridBar().findWhenNeeded(container);
+        _containerElement = container;
         _responsiveGrid = responsiveGrid;  // The responsive grid that is associated with this bar.
         _driver = driver;
     }
@@ -146,12 +148,10 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public GridBar selectAllRows()
     {
-        _responsiveGrid.selectAllOnPage(true);
-
         Locator selectBtn = Locator.xpath("//button[contains(text(), 'Select all')]");      // Select all n
         Locator selectedText = Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]");   // n of n
         Locator allSelected = Locator.xpath("//span[contains(text(), 'All ')]");            // All n selected
-        WebElement btn = selectBtn.waitForElement(this, 5_000);
+        WebElement btn = selectBtn.waitForElement(_containerElement, 5_000);
         btn.click();
 
         getWrapper().waitFor(() -> allSelected.findOptionalElement(this).isPresent() ||
@@ -168,20 +168,16 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public GridBar clearAllSelections()
     {
-        _responsiveGrid.selectAllOnPage(false);
-
         // Clear button can have text values of 'Clear', 'Clear both' or 'Clear all ' so just look for clear.
         Locator clearBtn = Locator.xpath("//button[contains(text(), 'Clear')]");
 
         if(!clearBtn.findOptionalElement(this).isEmpty())
         {
-
             WebElement btn = clearBtn.waitForElement(this, 5_000);
             btn.click();
 
             getWrapper().waitFor(() -> clearBtn.findOptionalElement(this).isEmpty(),
                     WAIT_FOR_JAVASCRIPT);
-
         }
 
         return this;
