@@ -16,6 +16,7 @@ import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -111,6 +112,123 @@ public class QueryGridTest extends BaseWebDriverTest
         assertThat(grid.getGridBar().pager().start(), is(1));
         assertThat(grid.getGridBar().pager().end(), is(20));
         assertThat(grid.getGridBar().pager().total(), is(200));
+
+        // clean up domain after on success
+        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
+    }
+
+    /**
+     * regression coverage for issue 39011
+     * @throws Exception
+     */
+    @Test
+    public void testOmniboxFilterSelections() throws Exception
+    {
+        // create a sampleType domain to use in this case
+        SampleTypeDefinition props = new SampleTypeDefinition("filtered_grid_selection_samples").setFields(standardTestSampleFields());
+        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator.generateRows(100);
+        for (int i=0; i < 16; i++)  // add some rows with a description we can filter on
+        {
+            sampleSetDataGenerator.addCustomRow(
+                    Map.of("Name", sampleSetDataGenerator.randomString(25),
+                            "Description", "used to test issue 39011",
+                            "intColumn", i,
+                            "stringColumn", "filtered_x" + sampleSetDataGenerator.randomString(20)));
+        }
+        sampleSetDataGenerator.insertRows();
+
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        QueryGrid grid = testPage.getQueryGrid("samples", "filtered_grid_selection_samples");
+
+        // confirm that selectAll is limited to just the records in a filtered set
+        grid.filterOn("Description", "=", "used to test issue 39011");
+        grid.selectAllRows();
+        grid.clearSortsAndFilters();
+        assertThat(grid.getSelectedRows().size(), is(16));
+
+        grid.clearAllSelections();
+        assertThat(grid.getSelectedRows().size(), is(0));
+
+        // confirm that search behaves the same way as a filter does
+        grid.search("filtered_x");
+        grid.selectAllRows();
+        grid.clearSortsAndFilters();
+        assertThat(grid.getSelectedRows().size(), is(16));
+
+        // clean up domain after on success
+        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
+    }
+
+    /**
+     * Tests select-all behavior for a sampletype that does not involve paging.
+     * The component does not show the same set of controls if paging isn't necessary; this ensures that
+     * the test-compontent wrapper handles that pathway appropriately
+     * @throws Exception
+     */
+    @Test
+    public void testSelectAllOnSinglePageSet() throws Exception
+    {
+        // create a sampleType domain to use in this case
+        SampleTypeDefinition props = new SampleTypeDefinition("tiny_sampleset").setFields(standardTestSampleFields());
+        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator.generateRows(5);
+        for (int i=0; i < 5; i++)  // add some rows with a description we can filter on
+        {
+            sampleSetDataGenerator.addCustomRow(
+                    Map.of("Name", sampleSetDataGenerator.randomString(25),
+                            "Description", "used to test single-page filter selection",
+                            "intColumn", i,
+                            "stringColumn", "filtered_x" + sampleSetDataGenerator.randomString(20)));
+        }
+        sampleSetDataGenerator.insertRows();
+
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        QueryGrid grid = testPage.getQueryGrid("samples", "tiny_sampleset");
+
+        grid.filterOn("description", "=", "used to test single-page filter selection");
+        grid.selectAllRows();
+
+        assertThat(grid.getSelectionStatusCount(), is ("5 of 5 selected"));
+
+        // clean up domain after on success
+        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
+    }
+
+    @Test
+    public void testOmniboxFilterInMultiPageSelectionSet() throws Exception
+    {
+        // create a sampleType domain to use in this case
+        SampleTypeDefinition props = new SampleTypeDefinition("filtered_grid_multipageselection_samples").setFields(standardTestSampleFields());
+        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator.generateRows(60);
+        for (int i=0; i < 64; i++)  // add some rows with a description we can filter on
+        {
+            sampleSetDataGenerator.addCustomRow(
+                    Map.of("Name", sampleSetDataGenerator.randomString(25),
+                            "Description", "used to test issue 39011",
+                            "intColumn", i,
+                            "stringColumn", "filtered_x" + sampleSetDataGenerator.randomString(20)));
+        }
+        sampleSetDataGenerator.insertRows();
+
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        QueryGrid grid = testPage.getQueryGrid("samples", "filtered_grid_multipageselection_samples");
+
+        // confirm that selectAll is limited to just the records in a filtered set
+        grid.filterOn("Description", "=", "used to test issue 39011");
+        grid.selectAllRows();
+        grid.clearSortsAndFilters();
+        assertThat(grid.getSelectionStatusCount(), is("64 of 124 selected"));
+
+        grid.clearAllSelections();
+        assertThat(grid.getSelectedRows().size(), is(0));
+
+        // confirm that search behaves the same way as a filter does
+        grid.search("filtered_x");
+        grid.selectAllRows();
+        grid.clearSortsAndFilters();
+        assertThat(grid.getSelectionStatusCount(), is("64 of 124 selected"));
 
         // clean up domain after on success
         sampleSetDataGenerator.deleteDomain(createDefaultConnection());
