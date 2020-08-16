@@ -49,6 +49,24 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
     }
 
     /**
+     * This is here to support comparative testing of QueryGrid:QueryGridPanel components, until the latter is
+     * no longer in use.-
+     * @param schema
+     * @param query
+     * @return
+     */
+    @Deprecated
+    public QueryGrid getQueryGridPanel(String schema, String query)
+    {
+        getComponentSelect().select("QueryGridPanel");       // note: we use GridPanel now, not QueryGridPanel- this is here for backward compat testing only
+        Input.Input(Locator.input("schemaNameField"), getDriver()).waitFor().set(schema);
+        Input.Input(Locator.input("queryNameField"), getDriver()).waitFor().set(query);
+        Locator.button("Apply").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
+
+        return new QueryGrid.QueryGridFinder(getDriver()).inPanelWithHeaderText("QueryGridPanel").waitFor();
+    }
+
+    /**
      * clears the selected component, if there is one, so that the current page can be re-used
      * to test a different component
      * @return
