@@ -52,6 +52,10 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
             sendClearValue();
         }
 
+        // dismiss any filter/search/sort dropdown prompts
+        if (isOpen())
+            close();
+
         new WebDriverWait(_driver, 1).until(
                 ExpectedConditions.numberOfElementsToBe(Locators.values, 0));
 
@@ -116,6 +120,24 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         WebDriverWrapper.waitFor(()-> isEditing(), "did not begin editing", 1500);
         getWrapper().setFormElement(editingValueElement(), newValue);
         stopEditing();
+        return this;
+    }
+
+    /**
+     * 'open' checks to see if 'is-open' is on the class of the component element
+     * it is concerned with whether or not the ul.Omnibox-autocomplete list is expanded
+     * @return
+     */
+    private boolean isOpen()
+    {
+        return getComponentElement().getAttribute("class").contains("is-open") ||
+                Locator.tagWithClass("ul", "OmniBox-autocomplete").existsIn(getDriver());
+    }
+
+    private OmniBox close()
+    {
+        elementCache().input.sendKeys(Keys.ESCAPE);
+        getWrapper().waitFor(()-> !isOpen(), 500);
         return this;
     }
 
