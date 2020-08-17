@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class SuiteBuilder
 {
@@ -204,7 +205,8 @@ public class SuiteBuilder
             for (File suiteFile : suiteFiles)
             {
                 String suiteName = suiteFile.getName().split("\\.")[0]; // drop file extension
-                String[] testList = TestFileUtils.getFileContents(suiteFile).trim().split("\\s+");
+                List<String> testList = Arrays.stream(TestFileUtils.getFileContents(suiteFile).trim().split("\\s+"))
+                    .filter(testName -> !testName.startsWith("#")).collect(Collectors.toList());
                 for (String testName : testList)
                 {
                     Class<?> testClass = _testsByName.get(testName);

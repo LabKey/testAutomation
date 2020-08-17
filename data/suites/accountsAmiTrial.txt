@@ -1,3 +1,4 @@
 BasicTest
-RLabKeyTest
-KnitrReportTest
+#RLabKeyTest
+#KnitrReportTest
+EvaluationContentTest
