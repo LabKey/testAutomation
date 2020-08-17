@@ -1,4 +1,5 @@
 BasicTest
-#RLabKeyTest
 KnitrReportTest
 EvaluationContentTest
+WebDavTest
+DataReportsTest
