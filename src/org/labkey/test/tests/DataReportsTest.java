@@ -25,9 +25,12 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -36,8 +39,10 @@ import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Reports.class})
@@ -294,7 +299,21 @@ public class DataReportsTest extends ReportTest
     public void doAdvancedViewTest()
     {
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
-        DataRegionTable.DataRegion(getDriver()).find().goToReport( "Create Advanced Report");
+        DataRegionTable dataRegion = DataRegionTable.DataRegion(getDriver()).find();
+        String create_advanced_report = "Create Advanced Report";
+
+        if (TestProperties.isPrimaryUserAppAdmin())
+        {
+            BootstrapMenu reportMenu = dataRegion.getReportMenu();
+            reportMenu.expand();
+            List<String> menuItems = getTexts(reportMenu.findVisibleMenuItems());
+            assertFalse("App admin shouldn't be able to create an advanced report.", menuItems.contains(create_advanced_report));
+            assertFalse("Sanity check failed. Check menu text for advanced report.", menuItems.contains("Create Chart"));
+            beginAt(WebTestHelper.buildURL("study-reports", getCurrentContainerPath(), "externalReport"));
+            assertEquals("App admin shouldn't be able to create an advanced report.", 403, getResponseCode());
+        }
+
+        dataRegion.goToReport(create_advanced_report);
 
         log("Verify txt report");
         selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
