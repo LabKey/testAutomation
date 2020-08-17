@@ -2,6 +2,7 @@ package org.labkey.test.tests.component;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -231,6 +232,41 @@ public class QueryGridTest extends BaseWebDriverTest
         assertThat(grid.getSelectionStatusCount(), is("64 of 124 selected"));
 
         // clean up domain after on success
+        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
+    }
+
+    @Ignore // re-enable or delete after https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41161 is resolved
+    @Test
+    public void testSearchOnColumnNotInView() throws Exception
+    {
+        // create a sampleType domain to use in this case
+        SampleTypeDefinition props = new SampleTypeDefinition("search_for_description_expression").setFields(standardTestSampleFields());
+        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator.generateRows(30);
+        for (int i=0; i < 5; i++)  // add some rows with a description we can filter on
+        {
+            sampleSetDataGenerator.addCustomRow(
+                    Map.of("Name", sampleSetDataGenerator.randomString(25),
+                            "Description", "used to search for off-view data",
+                            "intColumn", i,
+                            "stringColumn", "filtered_x" + sampleSetDataGenerator.randomString(20)));
+        }
+        sampleSetDataGenerator.insertRows();
+
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        QueryGrid grid = testPage.getQueryGrid("samples", "search_for_description_expression");
+
+        // prove we can filter on this criteria
+        grid.filterOn("Description", "contains", "off-view");
+        assertThat(grid.getGridBar().pager().summary(), is ("1 - 5"));
+        grid.clearSortsAndFilters();
+
+        // search on the same we were able to filter on
+        grid.search("off-view");
+        assertThat("Search fails to find what filter finds in off-view field " +
+                        "https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41161",
+                grid.getGridBar().pager().summary(), is ("1 - 5"));
+
         sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
