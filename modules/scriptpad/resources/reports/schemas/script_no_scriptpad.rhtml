@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A minimal knitr example in HTML</title>
+</head>
+<body>
+
+<!--begin.rcode echo=FALSE
+  opts_chunk$set(fig.width=5, fig.height=5)
+  end.rcode-->
+
+<p>This is a minimal example which shows <strong>knitr</strong>
+    working with HTML
+    pages in LabKey.</p>
+
+
+<!--begin.rcode demo-scatter, warning=FALSE, message=FALSE, echo=FALSE, fig.align='center'
+
+xvals <- c(0,1,2,3,4,5,6,7,8,9,10)
+yvals <- c(0,2,4,9,16,25,36,49,64,81,100)
+plot(xvals, yvals,
+main="Simple Plot",
+ylab="Y", xlab="X");
+abline(lsfit(xvals, yvals));
+
+end.rcode -->
+
+<p>Errors, messages and warnings can be put into <code>div</code>'s
+    with different <code>class</code>es:</p>
+
+<!--begin.rcode
+    sqrt(-1)  # warning
+    message('knitr says hello to HTML!')
+    1+'a'  # mission impossible
+    end.rcode-->
+
+<p>Well, everything seems to be working. Let's ask R what is the
+    value of &pi;? Of course it is <!--rinline pi -->.</p>
+
+</body>
+</html>
