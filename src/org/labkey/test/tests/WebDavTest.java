@@ -19,12 +19,14 @@ package org.labkey.test.tests;
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
 import org.apache.http.HttpStatus;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
@@ -150,8 +152,8 @@ public class WebDavTest extends BaseWebDriverTest
     @Test
     public void testWebfiles() throws Exception
     {
-        if (isCloudTest())
-            return;         // Don't test webfiles for S3
+        Assume.assumeFalse("App admin is unable to enable WebFiles", TestProperties.isPrimaryUserAppAdmin());
+        Assume.assumeFalse("Don't test webfiles for S3", isCloudTest());
 
         setEnableWebfiles(true);
 
@@ -232,6 +234,8 @@ public class WebDavTest extends BaseWebDriverTest
     @Test // 35730: WebDav: newly created project not showing up in _webfiles
     public void testWebfilesCaching()
     {
+        Assume.assumeFalse("App admin is unable to enable WebFiles", TestProperties.isPrimaryUserAppAdmin());
+
         setEnableWebfiles(true);
 
         log("Visit WebDav and WebFiles to initialize cache");
