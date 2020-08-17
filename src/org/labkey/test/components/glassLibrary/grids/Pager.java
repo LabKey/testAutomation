@@ -131,6 +131,11 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         return elementCache().counts.getAttribute("data-total") != null;
     }
 
+    public String summary()
+    {
+        return elementCache().counts.getText();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
