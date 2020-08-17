@@ -228,7 +228,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         if (isGridPanel())
         {
-            if (elementCache().selectAllBtn.existsIn(this))
+            if (elementCache().selectAllBtnLoc.existsIn(this))
                 doAndWaitForUpdate(()->
                         elementCache().selectAllN_Btn().click());
             else
@@ -252,8 +252,14 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryGrid clearAllSelections()
     {
         if (isGridPanel())
-            doAndWaitForUpdate(()->
-                    elementCache().clearAllSelectionStatusBtn().click());
+        {
+            if (elementCache().clearAllBtnLoc.existsIn(this))
+                doAndWaitForUpdate(() ->
+                        elementCache().clearAllSelectionStatusBtn().click());
+            else
+                doAndWaitForUpdate(()->
+                        selectAllOnPage(false));
+        }
         else
             doAndWaitForUpdate(()->
                 getGridBar().clearAllSelections());
@@ -302,8 +308,10 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         }
 
         Locator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
-        Locator selectAllBtn = Locator.tagWithClass("span", "selection-status__select-all")
+        Locator selectAllBtnLoc = Locator.tagWithClass("span", "selection-status__select-all")
                 .child(Locator.buttonContainingText("Select all"));
+        Locator clearAllBtnLoc = Locator.tagWithClass("span", "selection-status__clear-all")
+                .child(Locator.button("Clear all"));
 
         WebElement selectionStatusContainer()
         {
@@ -311,12 +319,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         }
         WebElement clearAllSelectionStatusBtn()
         {
-            return Locator.tagWithClass("span", "selection-status__clear-all")
-                    .child(Locator.button("Clear all")).findElement(selectionStatusContainer());
+            return clearAllBtnLoc.findElement(selectionStatusContainer());
         }
         WebElement selectAllN_Btn()
         {
-            return selectAllBtn.findElement(selectionStatusContainer());
+            return selectAllBtnLoc.findElement(selectionStatusContainer());
         }
     }
 
