@@ -190,12 +190,7 @@ public abstract class TestProperties
 
     public static boolean isTrialServer()
     {
-        return "true".equals(System.getProperty("webtest.trial.server"));
-    }
-
-    public static boolean isServerSsoOnly()
-    {
-        return "true".equals(System.getProperty("webtest.server.sso.only"));
+        return "true".equals(System.getProperty("webtest.server.trial"));
     }
 
     public static String ensureGeckodriverExeProperty()

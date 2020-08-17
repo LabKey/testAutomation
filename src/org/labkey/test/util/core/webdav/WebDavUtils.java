@@ -44,7 +44,7 @@ public class WebDavUtils
      */
     public static Sardine beginSardine(String user)
     {
-        if (TestProperties.isServerSsoOnly())
+        if (TestProperties.isTrialServer())
         {
             String sessionKey = WebTestHelper.getSessionKey(user);
             return SardineFactory.begin(WebTestHelper.API_KEY, sessionKey);
