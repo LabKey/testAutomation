@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests.wiki;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -23,6 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.pages.wiki.EditPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
@@ -36,11 +38,12 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class WikiTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES +  "WikiVerifyProject";
+    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifyProject";
 
-    private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
+    private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML " + BaseWebDriverTest.INJECT_CHARS_1;
     private static final String WIKI_PAGE_WEBPART_ID = "qwp999";
-    private static final String WIKI_PAGE_TITLE = "_Test Wiki";
+    private static final String WIKI_PAGE_TITLE = "_Test Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE_NAME = "_Test Wiki Name " + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String WIKI_PAGE_CONTENT =
             "<b>Some HTML content</b>\n" +
                     "<b>${labkey.webPart(partName='Query', title='My Users', schemaName='core', " +
@@ -50,7 +53,7 @@ public class WikiTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        WikiTest init = (WikiTest)getCurrentTest();
+        WikiTest init = (WikiTest) getCurrentTest();
         init.doSetup();
     }
 
@@ -60,6 +63,13 @@ public class WikiTest extends BaseWebDriverTest
         _containerHelper.enableModules(Arrays.asList("Wiki"));
 
         SearchAdminAPIHelper.pauseCrawler(getDriver());
+
+        goToProjectHome();
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addBodyWebPart("Wiki");
+        portalHelper.addBodyWebPart("Search");
+        portalHelper.addSideWebPart("Wiki Table of Contents");
+
     }
 
     @Override
@@ -76,21 +86,14 @@ public class WikiTest extends BaseWebDriverTest
 
     protected String getSubfolderName()
     {
-          return "Subfolder";
+        return "Subfolder";
     }
 
     @Test
     public void testSteps()
     {
-        PortalHelper portalHelper = new PortalHelper(this);
-        WikiHelper wikiHelper = new WikiHelper(this);
-
-        goToProjectHome();
-        portalHelper.addBodyWebPart("Wiki");
-        portalHelper.addBodyWebPart("Search");
-        portalHelper.addSideWebPart("Wiki Table of Contents");
-
         log("test create new html page with a webpart");
+        WikiHelper wikiHelper = new WikiHelper(this);
         wikiHelper.createNewWikiPage("HTML");
 
         setFormElement(Locator.name("name"), WIKI_PAGE_TITLE);
@@ -109,7 +112,7 @@ public class WikiTest extends BaseWebDriverTest
         assertElementPresent(wikiTitleLink);
         impersonateRole("Reader");
         assertElementNotPresent(wikiTitleLink);
-        stopImpersonatingRole();
+        stopImpersonating();
 
         log("test search wiki");
         searchFor(PROJECT_NAME, "Wiki", 1, WIKI_PAGE_TITLE);
@@ -119,7 +122,7 @@ public class WikiTest extends BaseWebDriverTest
         setFormElement(Locator.name("title"), WIKI_PAGE_ALTTITLE);
         String wikiPageContentEdited =
                 "<b>Some HTML content</b><br>\n" +
-                "<b>" + WIKI_CHECK_CONTENT + "</b><br>\n";
+                        "<b>" + WIKI_CHECK_CONTENT + "</b><br>\n";
         wikiHelper.setWikiBody(wikiPageContentEdited);
         wikiHelper.switchWikiToVisualView();
         wikiHelper.saveWikiPage();
@@ -129,10 +132,10 @@ public class WikiTest extends BaseWebDriverTest
 
         log("Verify fix for issue 13937: NotFoundException when attempting to display a wiki from a different folder which has been deleted");
         _containerHelper.createSubfolder(getProjectName(), getSubfolderName(), new String[]{});
+        PortalHelper portalHelper = new PortalHelper(getDriver());
         portalHelper.addWebPart("Wiki");
         portalHelper.clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/" + getProjectName());
-        waitForElement(Locator.xpath("//option[@value='_Test Wiki']"));
         clickButton("Submit");
         verifyWikiPagePresent();
 
@@ -147,6 +150,25 @@ public class WikiTest extends BaseWebDriverTest
         log("verify second wiki part pointing to first handled delete well");
         clickFolder(getSubfolderName());
         assertTextPresent("This folder does not currently contain any wiki pages to display");
+    }
+
+    @Test
+    public void testShowPageTreeForWiki()
+    {
+        goToProjectHome();
+        log("Creating the wiki");
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createNewWikiPage("HTML");
+        setFormElement(Locator.name("name"), WIKI_PAGE_NAME);
+        setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
+        wikiHelper.setWikiBody(WIKI_CHECK_CONTENT);
+        wikiHelper.saveWikiPage();
+
+        log("Verifying the tree is displayed correctly");
+        goToProjectHome();
+        EditPage editWikiPage = wikiHelper.editWikiPage(WIKI_PAGE_NAME);
+        editWikiPage.clickShowPageTree();
+        assertElementPresent(Locator.linkContainingText(WIKI_PAGE_TITLE + " (" + WIKI_PAGE_NAME + ")"));
     }
 
     protected void verifyWikiPagePresent()
