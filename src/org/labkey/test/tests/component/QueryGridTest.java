@@ -312,6 +312,108 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
+    @Test
+    public void testDeselectOnePageWhenAllAreSelected() throws Exception
+    {
+        // create a sampleType domain to use in this case
+        SampleTypeDefinition props = new SampleTypeDefinition("deselect_one_page_set").setFields(standardTestSampleFields());
+        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator.generateRows(35);
+        sampleSetDataGenerator.insertRows();
+
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        QueryGrid grid = testPage.getQueryGrid("samples", "deselect_one_page_set");
+
+        grid.selectAllRows();
+        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 35"));
+        assertThat(grid.getSelectionStatusCount(), is("35 of 35 selected"));
+
+        grid.getGridBar().jumpToPage("Last Page");
+        grid.selectAllOnPage(false); // uncheck the checkbox
+        assertThat(grid.getSelectionStatusCount(), is("20 of 35 selected"));
+
+        grid.getGridBar().jumpToPage("First Page");
+        assertThat(grid.getSelectionStatusCount(), is("20 of 35 selected"));
+
+        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
+    }
+
+    @Test
+    public void testRemoveFilterWithSelections() throws Exception
+    {
+        // create a sampleType domain to use in this case
+        SampleTypeDefinition props = new SampleTypeDefinition("remove_filters_with_selections_set").setFields(standardTestSampleFields());
+        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator.generateRows(30);
+        for (int i=0; i < 5; i++)  // add some rows with a description we can filter on
+        {
+            sampleSetDataGenerator.addCustomRow(
+                    Map.of("Name", sampleSetDataGenerator.randomString(6),
+                            "Description", "used to verify selector counts",
+                            "stringColumn", "filtered_y" + sampleSetDataGenerator.randomString(20)));
+        }
+        sampleSetDataGenerator.insertRows();
+
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        QueryGrid grid = testPage.getQueryGrid("samples", "remove_filters_with_selections_set");
+
+        grid.filterOn("Int Column", "is not blank", null);
+
+        grid.selectAllRows();
+        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+        assertThat(grid.getSelectionStatusCount(), is("30 of 30 selected"));
+
+        grid.getGridBar().jumpToPage("Last Page");
+        grid.selectAllOnPage(false); // uncheck the checkbox
+        assertThat(grid.getSelectionStatusCount(), is("20 of 30 selected"));
+
+        grid.getGridBar().jumpToPage("First Page");
+        assertThat(grid.getSelectionStatusCount(), is("20 of 30 selected"));
+
+        grid.clearSortsAndFilters();
+        assertThat(grid.getSelectionStatusCount(), is("20 of 35 selected"));
+
+        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
+    }
+
+    @Ignore // https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41171
+    @Test
+    public void testDeselectRecordsWithFilter() throws Exception
+    {
+        // create a sampleType domain to use in this case
+        SampleTypeDefinition props = new SampleTypeDefinition("deselect_with_filter").setFields(standardTestSampleFields());
+        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator.generateRows(30);
+        for (int i=0; i < 5; i++)  // add some rows with a description we can filter on
+        {
+            sampleSetDataGenerator.addCustomRow(
+                    Map.of("Name", sampleSetDataGenerator.randomString(6),
+                            "Description", "used to verify selector counts",
+                            "stringColumn", "filtered_y" + sampleSetDataGenerator.randomString(20)));
+        }
+        sampleSetDataGenerator.insertRows();
+
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        QueryGrid grid = testPage.getQueryGrid("samples", "deselect_with_filter");
+
+        grid.selectAllRows();
+        grid.filterOn("String Column", "does not contain", "filtered_y");
+
+        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+        assertThat(grid.getSelectionStatusCount(), is("30 of 30 selected"));
+
+        grid.selectAllOnPage(false);
+        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+        assertThat(grid.getSelectionStatusCount(), is("10 of 30 selected"));
+
+        grid.clearSortsAndFilters();
+        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 35"));
+        assertThat("https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41171",
+                grid.getSelectionStatusCount(), is("15 of 35 selected"));
+
+        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
+    }
+
     protected List<FieldDefinition> standardTestSampleFields()
     {
         return Arrays.asList(
