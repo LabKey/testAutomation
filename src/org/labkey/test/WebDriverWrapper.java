@@ -1997,12 +1997,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (previousElement != null)
         {
-            try
-            {
-                wait.until(ExpectedConditions.stalenessOf(previousElement));
-            }
-            // Firefox sometimes throws the wrong exception.
-            catch (NoSuchElementException ignore) { } // "NoSuchElementException: Web element reference not seen before"
+            wait.until(LabKeyExpectedConditions.stalenessOf(previousElement));
         }
 
         return wait.until(wd -> elementFinder.get());
