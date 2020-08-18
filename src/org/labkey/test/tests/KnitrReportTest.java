@@ -101,7 +101,11 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     @Test
     public void testAdhocReportDependenciesString()
     {
-        if (!TestProperties.isServerRemote())
+        if (TestProperties.isServerRemote())
+        {
+            Assume.assumeTrue("Unable to modify remote webapp. Skipping test.", TestProperties.isWithoutTestModules());
+        }
+        else
         {
             deleteLibXml();
         }
