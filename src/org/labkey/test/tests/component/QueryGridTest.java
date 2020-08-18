@@ -235,9 +235,8 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
-    @Ignore // re-enable or delete after https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41161 is resolved
     @Test
-    public void testSearchOnColumnNotInView() throws Exception
+    public void testFilterOnColumnNotInView() throws Exception
     {
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("search_for_description_expression").setFields(standardTestSampleFields());
@@ -261,11 +260,54 @@ public class QueryGridTest extends BaseWebDriverTest
         assertThat(grid.getGridBar().pager().summary(), is ("1 - 5"));
         grid.clearSortsAndFilters();
 
-        // search on the same we were able to filter on
-        grid.search("off-view");
-        assertThat("Search fails to find what filter finds in off-view field " +
-                        "https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41161",
-                grid.getGridBar().pager().summary(), is ("1 - 5"));
+        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
+    }
+
+    @Ignore // until https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41169 is resolved
+    @Test
+    public void testEmptyNotEmptyFilter() throws Exception
+    {
+        // create a sampleType domain to use in this case
+        SampleTypeDefinition props = new SampleTypeDefinition("empty_filter_test_set").setFields(standardTestSampleFields());
+        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator.generateRows(30);
+        for (int i=0; i < 5; i++)  // add some rows with a description we can filter on
+        {
+            sampleSetDataGenerator.addCustomRow(
+                    Map.of("Name", sampleSetDataGenerator.randomString(6),
+                            "Description", "used to filter non-empty",
+                            "stringColumn", "filtered_x" + sampleSetDataGenerator.randomString(20)));
+        }
+        sampleSetDataGenerator.insertRows();
+
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        QueryGrid grid = testPage.getQueryGrid("samples", "empty_filter_test_set");
+
+        grid.filterOn("Description", "is blank", null);
+        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+        grid.clearSortsAndFilters();
+
+        grid.filterOn("String Column", "contains",  "filtered_x");
+        assertThat(grid.getGridBar().pager().summary(), is("1 - 5"));
+        grid.clearSortsAndFilters();
+
+        grid.filterOn("String Column", "does not contain", "filtered_x");
+        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+        grid.clearSortsAndFilters();
+
+        grid.filterOn("Sample Date", "is not blank", null);
+        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+        grid.clearSortsAndFilters();
+
+        grid.filterOn("Sample Date", "is blank", null);
+        assertThat(grid.getGridBar().pager().summary(), is("1 - 5"));
+        grid.clearSortsAndFilters();
+
+        grid.filterOn("Int Column", "has any value", null);
+        assertThat("[has any value] filter does not work as expected " +
+                "https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41169",
+                grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+        grid.clearSortsAndFilters();
 
         sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
