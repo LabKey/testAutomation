@@ -41,8 +41,10 @@ import org.openqa.selenium.WebElement;
 import java.io.File;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Reports.class})
@@ -307,8 +309,8 @@ public class DataReportsTest extends ReportTest
             BootstrapMenu reportMenu = dataRegion.getReportMenu();
             reportMenu.expand();
             List<String> menuItems = getTexts(reportMenu.findVisibleMenuItems());
-            assertFalse("App admin shouldn't be able to create an advanced report.", menuItems.contains(create_advanced_report));
-            assertFalse("Sanity check failed. Check menu text for advanced report.", menuItems.contains("Create Chart"));
+            assertThat("App admin shouldn't be able to create an advanced report.", menuItems, not(hasItem(create_advanced_report)));
+            assertThat("Sanity check failed. Check menu text for advanced report.", menuItems, hasItem("Create Chart"));
             beginAt(WebTestHelper.buildURL("study-reports", getCurrentContainerPath(), "externalReport"));
             assertEquals("App admin shouldn't be able to create an advanced report.", 403, getResponseCode());
         }
