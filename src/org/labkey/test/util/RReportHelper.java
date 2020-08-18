@@ -111,11 +111,10 @@ public class RReportHelper
     public boolean executeScript(String script, String expectedLines, boolean failOnError)
     {
         // running a saved script
-        _test.waitAndClick(Ext4Helper.Locators.tab("Source"));
+        clickSourceTab();
 
         _test.setCodeEditorValue("script-report-editor", script);
-        _test._ext4Helper.clickTabContainingText("Report");
-        _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 5);
+        clickReportTab();
 
         String html = getReportText();
 

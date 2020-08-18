@@ -357,7 +357,7 @@ public class DataReportsTest extends ReportTest
         setCodeEditorValue("script-report-editor", " ");
 
         log("Execute bad scripts");
-        clickReportTab();
+        _rReportHelper.clickReportTab();
         assertTextPresent("Empty script, a script must be provided.");
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1));
 
@@ -392,7 +392,7 @@ public class DataReportsTest extends ReportTest
         pushLocation();
         DataRegionTable.DataRegion(getDriver()).find().goToReport("Create R Report");
         setCodeEditorValue("script-report-editor", "labkey.data");
-        clickReportTab();
+        _rReportHelper.clickReportTab();
         waitForText(R_SORT1);
         assertTextNotPresent(R_REMCOL, R_FILTERED);
         assertTextBefore(R_SORT1, R_SORT2);
@@ -427,13 +427,13 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
-        clickSourceTab();
+        _rReportHelper.clickSourceTab();
         _rReportHelper.selectOption(RReportHelper.ReportOption.shareReport);
         _rReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
         saveReport(R_SCRIPTS[1]);
 
         log("Check that R script worked");
-        clickReportTab();
+        _rReportHelper.clickReportTab();
         assertElementPresent(Locator.lkButton("Start Job"));
 
         log("Check that background run works");
@@ -533,7 +533,7 @@ public class DataReportsTest extends ReportTest
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
         DataRegionTable.DataRegion(getDriver()).find().goToReport( reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
-        clickSourceTab();
+        _rReportHelper.clickSourceTab();
         _rReportHelper.clearOption(RReportHelper.ReportOption.showSourceTab);
         resaveReport();
 
@@ -582,7 +582,7 @@ public class DataReportsTest extends ReportTest
     @LogMethod
     private void saveReport(String name)
     {
-        clickSourceTab();
+        _rReportHelper.clickSourceTab();
         waitForElement(Locator.tagWithText("span","Save"));
         _rReportHelper.saveReport(name);
     }
@@ -591,26 +591,5 @@ public class DataReportsTest extends ReportTest
     {
         doAndWaitForPageToLoad(() -> saveReport(null));
         _ext4Helper.waitForMaskToDisappear();
-    }
-
-    private void clickViewTab()
-    {
-        clickDesignerTab("View");
-    }
-
-    private void clickReportTab()
-    {
-        clickDesignerTab("Report");
-    }
-
-    private void clickSourceTab()
-    {
-        clickDesignerTab("Source");
-    }
-
-    private void clickDesignerTab(String name)
-    {
-        waitAndClick(Ext4Helper.Locators.tab(name));
-        sleep(2000); // TODO
     }
 }
