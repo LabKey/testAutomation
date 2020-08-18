@@ -1678,17 +1678,21 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _permissionsHelper.setUserPermissions(userName, permissions);
     }
 
-    public void createSiteDeveloper(String userEmail)
+    public ApiPermissionsHelper createSiteDeveloper(String userEmail)
     {
-        ensureAdminMode();
-        goToSiteDevelopers();
-
-        if (!isElementPresent(Locator.xpath("//input[@value='" + userEmail + "']")))
+        _userHelper.createUser(userEmail);
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        if (TestProperties.isPrimaryUserAppAdmin())
         {
-            setFormElement(Locator.name("names"), userEmail);
-            uncheckCheckbox(Locator.name("sendEmail"));
-            clickButton("Update Group Membership");
+            apiPermissionsHelper
+                .addMemberToRole(userEmail, "Trusted Analyst", PermissionsHelper.MemberType.user, "/");
         }
+        else
+        {
+            apiPermissionsHelper.addUserToSiteGroup(userEmail, "Developers");
+        }
+
+        return apiPermissionsHelper;
     }
 
     @Deprecated

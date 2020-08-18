@@ -35,6 +35,7 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
 
@@ -127,6 +128,8 @@ public class DataReportsTest extends ReportTest
 
     protected final static String R_USER = "r_editor@report.test";
     protected final static String AUTHOR_USER = "author_user@report.test";
+
+    private final ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -313,6 +316,7 @@ public class DataReportsTest extends ReportTest
             assertThat("Sanity check failed. Check menu text for advanced report.", menuItems, hasItem("Create Chart"));
             beginAt(WebTestHelper.buildURL("study-reports", getCurrentContainerPath(), "externalReport"));
             assertEquals("App admin shouldn't be able to create an advanced report.", 403, getResponseCode());
+            return; // success
         }
 
         dataRegion.goToReport(create_advanced_report);
@@ -409,10 +413,8 @@ public class DataReportsTest extends ReportTest
 
         log("Test user permissions");
         pushLocation();
-        createSiteDeveloper(AUTHOR_USER);
-        clickProject(getProjectName());
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setUserPermissions(AUTHOR_USER, "Author");
+        createSiteDeveloper(AUTHOR_USER)
+            .addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, getProjectName());
         impersonate(AUTHOR_USER);
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
@@ -436,15 +438,9 @@ public class DataReportsTest extends ReportTest
 
         log("Check that background run works");
 
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.clickManageGroup("Users");
-        setFormElement(Locator.name("names"), R_USER);
-        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
-        clickButton("Update Group Membership");
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions("Users", "Editor");
-        _permissionsHelper.exitPermissionsUI();
-
+        _userHelper.createUser(R_USER);
+        _apiPermissionsHelper.addUserToProjGroup(R_USER, getProjectName(), "Users");
+        _apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, getProjectName());
 
         //create R report with dev
         impersonate(R_USER);
@@ -461,12 +457,7 @@ public class DataReportsTest extends ReportTest
         popLocation();
         log("Change user permission");
         stopImpersonating();
-        clickProject(getProjectName());
-        if (isTextPresent("Enable Admin"))
-            clickAndWait(Locator.linkWithText("Enable Admin"));
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions("Users", "Project Administrator");
-        _permissionsHelper.exitPermissionsUI();
+        _apiPermissionsHelper.addMemberToRole("Users", "Project Administrator", PermissionsHelper.MemberType.group, getProjectName());
 
         log("Create a new R script that uses other R scripts");
         navigateToFolder(getProjectName(), getFolderName());
@@ -501,7 +492,7 @@ public class DataReportsTest extends ReportTest
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
 
-        // TODO: 36040: Unable to download PDF for R report run as pipeline job
+        // TODO: Issue 36040: Unable to download PDF for R report run as pipeline job
         // verifyReportPdfDownload("study", 4500d);
     }
 
