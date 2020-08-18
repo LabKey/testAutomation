@@ -28,7 +28,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.IOException;
@@ -197,7 +196,7 @@ public class KnitrReportTest extends AbstractKnitrReportTest
 
         pauseJsErrorChecker(); // Don't fail due to "$ is not a function"
         {
-            click(Ext4Helper.Locators.tab("Report"));
+            _rReportHelper.clickReportTab();
             waitForElement(Locator.id("mtcars_table"));
             assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
         }

@@ -29,7 +29,6 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -625,27 +624,5 @@ public class RReportHelper
 
 
         return reportDiv;
-    }
-
-    /**
-     * @deprecated Remove once RStudio branch is merged (May 2018)
-     */
-    @Deprecated
-    public boolean isReportSourceLineCountMatch(int expectedLineCount)
-    {
-        Locator lastLineLoc = Locator.css(".CodeMirror-code > div:last-of-type .CodeMirror-linenumber");
-        WebElement lastLine = lastLineLoc.findElement(_test.getDriver());
-        int lineCount = Integer.parseInt(lastLine.getText());
-
-        if (lineCount < expectedLineCount)
-        {
-            WebElement codeEditorDiv = Locator.css(".CodeMirror-scroll").findElement(_test.getDriver());
-            _test.executeScript("arguments[0].scrollTop = arguments[0].scrollHeight;", codeEditorDiv);
-            _test.shortWait().until(ExpectedConditions.stalenessOf(lastLine));
-            lastLine = lastLineLoc.findElement(_test.getDriver());
-            lineCount = Integer.parseInt(lastLine.getText());
-        }
-
-        return lineCount == expectedLineCount;
     }
 }
