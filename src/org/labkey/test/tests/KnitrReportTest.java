@@ -88,7 +88,8 @@ public class KnitrReportTest extends AbstractKnitrReportTest
                                       //"propto",           // MathJax source
                                       "data_means"};      // Non-echoed R code
 
-        createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true);
+        Path reportSourcePath = TestProperties.isWithoutTestModules() ? rmdReport_no_scriptpad : rmdReport;
+        createAndVerifyKnitrReport(reportSourcePath, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true);
         assertEquals("Knitr report failed to display plot", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(plotLocator.findElement(getDriver()).getAttribute("src")).getResponseCode());
     }
 

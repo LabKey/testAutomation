@@ -46,7 +46,9 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
 {
     protected static final Path scriptpadReports = new File(TestFileUtils.getTestRoot(), "modules/scriptpad/resources/reports/schemas").toPath();
     protected static final Path rmdReport = scriptpadReports.resolve("script_rmd.rmd");
+    protected static final Path rmdReport_no_scriptpad = scriptpadReports.resolve("no_scriptpad.rmd");
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
+    private static final Path rhtmlReport_no_scriptpad = scriptpadReports.resolve("no_scriptpad.rhtml");
     protected final RReportHelper _rReportHelper = new RReportHelper(this);
 
     private static String readReport(final Path reportFile)
@@ -150,7 +152,8 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
                                       "begin.rcode",                     // knitr commands shouldn't be visible
                                       "opts_chunk"};                     // Un-echoed R code
 
-        createAndVerifyKnitrReport(rhtmlReport, RReportHelper.ReportOption.knitrHtml, reportContains, reportNotContains, false);
+        Path reportSourcePath = TestProperties.isWithoutTestModules() ? rhtmlReport_no_scriptpad : rhtmlReport;
+        createAndVerifyKnitrReport(reportSourcePath, RReportHelper.ReportOption.knitrHtml, reportContains, reportNotContains, false);
     }
 
     @Override
@@ -179,12 +182,15 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
                 "{r",               // Markdown for R code chunks
                 "data_means"};      // Non-echoed R code
 
-        createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true, rmdReport.getFileName() + "MarkdownV2");
+        Path reportSourcePath = TestProperties.isWithoutTestModules() ? rmdReport_no_scriptpad : rmdReport;
+        createAndVerifyKnitrReport(reportSourcePath, RReportHelper.ReportOption.knitrMarkdown, reportContains,
+            reportNotContains, true, reportSourcePath.getFileName() + "MarkdownV2");
     }
 
     protected void moduleReportDependencies()
     {
-        Assume.assumeFalse("Test modules not installed.", TestProperties.isWithoutTestModules());
+        Assume.assumeFalse("Test modules not installed (module report dependencies are provided by scriptpad).",
+            TestProperties.isWithoutTestModules());
         //
         // Checks that the dependencies can be loaded from the included kable report's metadata file.
         // If the dependencies did not load correctly then the test will fail with an
