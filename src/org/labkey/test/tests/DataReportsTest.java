@@ -411,16 +411,25 @@ public class DataReportsTest extends ReportTest
         verifyReportPdfDownload("study", 4500d);
         popLocation();
 
-        log("Test user permissions");
-        pushLocation();
-        createSiteDeveloper(AUTHOR_USER)
-            .addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, getProjectName());
-        impersonate(AUTHOR_USER);
+        if (!TestProperties.isPrimaryUserAppAdmin())
+        {
+            log("Test user permissions");
+            pushLocation();
+            createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, getProjectName());
+            impersonate(AUTHOR_USER);
+        }
+        else
+        {
+            log("App Admin can't impersonate site roles. Just create report as primary test user.");
+        }
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
-        stopImpersonating();
-        popLocation();
+        if (!TestProperties.isPrimaryUserAppAdmin())
+        {
+            stopImpersonating();
+            popLocation();
+        }
 
         log("Create second R script");
         DataRegionTable.DataRegion(getDriver()).find().goToReport("Create R Report");
