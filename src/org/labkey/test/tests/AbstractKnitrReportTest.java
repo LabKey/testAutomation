@@ -46,9 +46,9 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
 {
     protected static final Path scriptpadReports = new File(TestFileUtils.getTestRoot(), "modules/scriptpad/resources/reports/schemas").toPath();
     protected static final Path rmdReport = scriptpadReports.resolve("script_rmd.rmd");
-    protected static final Path rmdReport_no_scriptpad = scriptpadReports.resolve("no_scriptpad.rmd");
+    protected static final Path rmdReport_no_scriptpad = TestFileUtils.getSampleData("reports/knitr_no_scriptpad.rmd").toPath();
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
-    private static final Path rhtmlReport_no_scriptpad = scriptpadReports.resolve("no_scriptpad.rhtml");
+    private static final Path rhtmlReport_no_scriptpad = TestFileUtils.getSampleData("reports/knitr_no_scriptpad.rhtml").toPath();
     protected final RReportHelper _rReportHelper = new RReportHelper(this);
 
     private static String readReport(final Path reportFile)
