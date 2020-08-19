@@ -410,11 +410,11 @@ public class DataReportsTest extends ReportTest
         assertTextNotPresent("Error executing command");
         verifyReportPdfDownload("study", 4500d);
         popLocation();
+        pushLocation();
 
         if (!TestProperties.isPrimaryUserAppAdmin())
         {
             log("Test user permissions");
-            pushLocation();
             createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, getProjectName());
             impersonate(AUTHOR_USER);
         }
@@ -428,9 +428,9 @@ public class DataReportsTest extends ReportTest
         if (!TestProperties.isPrimaryUserAppAdmin())
         {
             stopImpersonating();
-            popLocation();
         }
 
+        popLocation();
         log("Create second R script");
         DataRegionTable.DataRegion(getDriver()).find().goToReport("Create R Report");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
