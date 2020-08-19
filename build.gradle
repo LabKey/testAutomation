@@ -1,7 +1,12 @@
 apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'org.labkey.testRunner'
+apply plugin: 'maven-publish'
 
 import org.labkey.gradle.util.BuildUtils
+import org.labkey.gradle.util.PomFileHelper
+
+project.group = "org.labkey.test"
 
 project.dependencies {
     implementation "org.slf4j:slf4j-log4j12:${slf4jLog4j12Version}" // Suppresses unwanted logging from remoteapi and webdriver
@@ -21,7 +26,12 @@ project.dependencies {
     implementation "org.apache.xmlbeans:xmlbeans:${xmlbeansVersion}"
     implementation "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
     implementation "org.jetbrains:annotations:${annotationsVersion}"
-    implementation "org.mock-server:mockserver-netty:${mockserverVersion}"
+    api "org.mock-server:mockserver-netty:${mockserverVersion}"
+    api "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
+    runtimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
+    implementation "org.aspectj:aspectjtools:${aspectjVersion}"
+    implementation "org.reflections:reflections:${reflectionsVersion}"
+    uiTestRuntimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
 
     if (project.hasProperty("teamcity") || project.findProject(BuildUtils.getApiProjectPath(project.gradle)) == null)
     {
@@ -53,6 +63,13 @@ BuildUtils.addLabKeyDependency(
         depProjectConfig: 'runtimeElements',
         depVersion: project.labkeyClientApiVersion)
 
+BuildUtils.addLabKeyDependency(
+        project: project,
+        config: 'api',
+        depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle),
+        depProjectConfig: 'runtimeElements',
+        depVersion: project.labkeyClientApiVersion)
+
 if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 {
     BuildUtils.addLabKeyDependency(project: project, config: "implementation", depProjectPath: ":remoteapi:labkey-api-jdbc")
@@ -61,4 +78,74 @@ if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 if (project.hasProperty("teamcity"))
 {
     apply plugin: 'org.labkey.teamCity'
+}
+
+project.sourceSets {
+    main {
+        java {
+            srcDirs = ["src"]
+        }
+    }
+}
+
+
+project.afterEvaluate {
+    PomFileHelper pomUtil = new PomFileHelper(project)
+    project.publishing {
+        publications {
+            libs(MavenPublication) {
+                groupId = project.group
+                artifact project.tasks.jar
+                pom {
+                    name = "LabKey Test Automation Classes"
+                    description = "Library of classes and utilities for Selenium testing of LabKey Server components"
+                    url = PomFileHelper.LABKEY_ORG_URL
+                    developers PomFileHelper.getLabKeyTeamDevelopers()
+                    licenses PomFileHelper.getApacheLicense()
+                    organization PomFileHelper.getLabKeyOrganization()
+                    scm {
+                        connection = 'scm:git:https://github.com/LabKey/testAutomation'
+                        developerConnection = 'scm:git:https://github.com/LabKey/testAutomation'
+                        url = 'scm:git:https://github.com/LabKey/testAutomation'
+                    }
+                    withXml {
+                        pomUtil.getDependencyClosure(asNode(), false)
+                    }
+                }
+            }
+        }
+
+        if (project.hasProperty('doPublishing'))
+        {
+            apply plugin: 'com.jfrog.artifactory'
+            artifactory {
+                contextUrl = "${artifactory_contextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
+                publish {
+                    repository {
+                        repoKey = BuildUtils.getRepositoryKey(project)
+                        if (project.hasProperty('artifactory_user') && project.hasProperty('artifactory_password'))
+                        {
+                            username = artifactory_user
+                            password = artifactory_password
+                        }
+                        maven = true
+                    }
+                    defaults
+                            {
+                                publishPom = true
+                                publishIvy = false
+                            }
+                }
+            }
+
+            project.artifactoryPublish {
+                publications('libs')
+            }
+        }
+    }
+    project.model {
+        tasks.publishLibsPublicationToMavenLocal {
+            enabled = false
+        }
+    }
 }
