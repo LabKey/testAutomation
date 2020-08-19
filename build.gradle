@@ -6,7 +6,8 @@ apply plugin: 'maven-publish'
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.PomFileHelper
 
-project.group = "org.labkey.test"
+project.group = "org.labkey.api"
+def apiArtifactName = "labkey-api-selenium"
 
 project.configurations {
     aspectj
@@ -84,68 +85,79 @@ project.sourceSets {
     main {
         java {
             srcDirs = ["src"]
+            exclude "test/tests/**"
         }
     }
 }
+project.tasks.jar {
+    Jar jar ->
+        jar.archiveBaseName.set(apiArtifactName)
+        jar.setGroup('org.labkey.api')
+}
 
 
-project.afterEvaluate {
-    PomFileHelper pomUtil = new PomFileHelper(project)
-    project.publishing {
-        publications {
-            libs(MavenPublication) {
-                groupId = project.group
-                artifact project.tasks.jar
-                pom {
-                    name = "LabKey Test Automation Classes"
-                    description = "Library of classes and utilities for Selenium testing of LabKey Server components"
-                    url = PomFileHelper.LABKEY_ORG_URL
-                    developers PomFileHelper.getLabKeyTeamDevelopers()
-                    licenses PomFileHelper.getApacheLicense()
-                    organization PomFileHelper.getLabKeyOrganization()
-                    scm {
-                        connection = 'scm:git:https://github.com/LabKey/testAutomation'
-                        developerConnection = 'scm:git:https://github.com/LabKey/testAutomation'
-                        url = 'scm:git:https://github.com/LabKey/testAutomation'
-                    }
-                    withXml {
-                        pomUtil.getDependencyClosure(asNode(), false)
-                    }
-                }
-            }
-        }
-
-        if (project.hasProperty('doPublishing'))
-        {
-            apply plugin: 'com.jfrog.artifactory'
-            artifactory {
-                contextUrl = "${artifactory_contextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
-                publish {
-                    repository {
-                        repoKey = BuildUtils.getRepositoryKey(project)
-                        if (project.hasProperty('artifactory_user') && project.hasProperty('artifactory_password'))
-                        {
-                            username = artifactory_user
-                            password = artifactory_password
+if (project.hasProperty('doPublishing'))
+{
+    project.afterEvaluate {
+        PomFileHelper pomUtil = new PomFileHelper(project)
+        project.publishing {
+            publications {
+                libs(MavenPublication) {
+                    groupId = project.group
+                    artifactId = apiArtifactName
+                    artifact project.tasks.jar
+                    pom {
+                        name = "LabKey Test Automation Classes"
+                        description = "Library of classes and utilities for Selenium testing of LabKey Server components"
+                        url = PomFileHelper.LABKEY_ORG_URL
+                        developers PomFileHelper.getLabKeyTeamDevelopers()
+                        licenses PomFileHelper.getApacheLicense()
+                        organization PomFileHelper.getLabKeyOrganization()
+                        scm {
+                            connection = 'scm:git:https://github.com/LabKey/testAutomation'
+                            developerConnection = 'scm:git:https://github.com/LabKey/testAutomation'
+                            url = 'scm:git:https://github.com/LabKey/testAutomation'
                         }
-                        maven = true
+                        withXml {
+                            pomUtil.getDependencyClosure(asNode(), false)
+                        }
                     }
-                    defaults
-                            {
-                                publishPom = true
-                                publishIvy = false
-                            }
                 }
             }
 
-            project.artifactoryPublish {
-                publications('libs')
+            if (project.hasProperty('doPublishing'))
+            {
+                apply plugin: 'com.jfrog.artifactory'
+                artifactory {
+                    contextUrl = "${artifactory_contextUrl}"
+                    //The base Artifactory URL if not overridden by the publisher/resolver
+                    publish {
+                        repository {
+                            repoKey = BuildUtils.getRepositoryKey(project)
+                            if (project.hasProperty('artifactory_user') && project.hasProperty('artifactory_password'))
+                            {
+                                username = artifactory_user
+                                password = artifactory_password
+                            }
+                            maven = true
+                        }
+                        defaults
+                                {
+                                    publishPom = true
+                                    publishIvy = false
+                                }
+                    }
+                }
+
+                project.artifactoryPublish {
+                    publications('libs')
+                }
             }
         }
-    }
-    project.model {
-        tasks.publishLibsPublicationToMavenLocal {
-            enabled = false
+        project.model {
+            tasks.publishLibsPublicationToMavenLocal {
+                enabled = false
+            }
         }
     }
 }
