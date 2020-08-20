@@ -497,6 +497,7 @@ public class DataReportsTest extends ReportTest
         {
             // Issue 41205: Unable to run R report as a pipeline job on trial instance
             waitForPipelineJobsToComplete(2, true);
+            return; // done
         }
         waitForPipelineJobsToComplete(2, false);
         // go back to the report and confirm it is visible
