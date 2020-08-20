@@ -185,7 +185,8 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
             return this;
 
         // try again if necessary and fail if it doesn't work
-        this.setText("filter \"" + columnName + "\" " + operator + val);
+        getWrapper().log("Retrying attempt to set filter with text [" + commandExpression.toString() + "]");
+        this.setText(commandExpression.toString());
         WebDriverWrapper.waitFor(()->  getValue(expectedFilterText.toString()) != null,
                 "Expect a new value to be present with [" + expectedFilterText.toString() + "]", 1500);
 

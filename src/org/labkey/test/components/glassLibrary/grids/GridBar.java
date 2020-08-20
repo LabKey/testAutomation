@@ -9,6 +9,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.glassLibrary.components.MultiMenu;
+import org.labkey.test.components.react.Pager;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -70,32 +71,53 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     }
 
     /**
-     * A word of caution for callers; the Pager is not aware of the grid state.
-     * To navigate (next page, previous, first/last) use methods on GridBar to do it-
-     * they will synchronize against grid updates
+     * gets the Pager for the current grid, if it exists.
+     * If the grid is filtered down to an empty set or if there are no loaded rows, it will not be present
      * @return
      */
     public Pager pager()
     {
-        return new Pager.PagerFinder(getDriver()).waitFor(this);
+        return new Pager.PagerFinder(getDriver(), _responsiveGrid).waitFor(this);
     }
 
+    /**
+     * says whether or not the grid currently shows a pager (for example, when filtered down to zero
+     * or not loaded, the pager will not be present)
+     * @return
+     */
+    public boolean hasPager()
+    {
+        return new Pager.PagerFinder(getDriver(), _responsiveGrid).findOptional(this).isPresent();
+    }
+
+    /**
+     * uses the pager to select a page from the pager dropdown list
+     * @param page the text of the list item to be clicked
+     * @return
+     */
     public GridBar jumpToPage(String page) // e.g. "First Page"|"Last Page"
     {
-        _responsiveGrid.doAndWaitForUpdate(()->
-                pager().jumpToPage(page));
+        pager().jumpToPage(page);
         return this;
     }
 
+    /**
+     * gets the current page number
+     * @return
+     */
     public int getCurrentPage()
     {
         return pager().getCurrentPage();
     }
 
+    /**
+     * selects the number of rows to be shown per page
+     * @param pageSize
+     * @return
+     */
     public GridBar selectPageSize(String pageSize)
     {
-        _responsiveGrid.doAndWaitForUpdate(()->
-                pager().selectPageSize(pageSize));
+        pager().selectPageSize(pageSize);
         return this;
     }
 
@@ -127,17 +149,23 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return !pager().isNextEnabled();
     }
 
-    // Should this really return a grid object?
-    public ResponsiveGrid getNextPage()
+    /**
+     * clicks the 'next' button on the pager associated with this grid and waits for the grid to update
+     * @return
+     */
+    public ResponsiveGrid clickNext()
     {
-        _responsiveGrid.doAndWaitForUpdate(()-> pager().clickNextButton());
+        pager().clickNext();
         return _responsiveGrid;
     }
 
-    // Should this really return a grid object?
-    public ResponsiveGrid getPreviousPage()
+    /**
+     * clicks the 'previous' button on the pager and waits for the grid to update
+     * @return
+     */
+    public ResponsiveGrid clickPrevious()
     {
-        _responsiveGrid.doAndWaitForUpdate(()-> pager().clickPrevious());
+        pager().clickPrevious();
         return _responsiveGrid;
     }
 

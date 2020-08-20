@@ -2,11 +2,10 @@
  * Copyright (c) 2019 LabKey Corporation. All rights reserved. No portion of this work may be reproduced in
  * any form or by any electronic or mechanical means without written permission from LabKey Corporation.
  */
-package org.labkey.test.components.glassLibrary.grids;
+package org.labkey.test.components.react;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.react.DropdownButtonGroup;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -14,12 +13,13 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 {
     private final WebElement _el;
     private final WebDriver _driver;
-    //private final ResponsiveGrid _grid;
+    private final UpdatingComponent _pagedComponent;
 
-    protected Pager(WebElement element, WebDriver driver)
+    protected Pager(WebElement element, UpdatingComponent component, WebDriver driver)
     {
         _el = element;
         _driver = driver;
+        _pagedComponent = component;
     }
 
     @Override
@@ -36,7 +36,8 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public Pager jumpToPage(String jumpTo)
     {
-        elementCache().jumpToDropdown.clickSubMenu(jumpTo);
+        _pagedComponent.doAndWaitForUpdate(()->
+                elementCache().jumpToDropdown.clickSubMenu(jumpTo));
         return this;
     }
     public int getCurrentPage()
@@ -46,7 +47,8 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public Pager selectPageSize(String pageSize)
     {
-        elementCache().pageSizeDropdown.clickSubMenu(pageSize);
+        _pagedComponent.doAndWaitForUpdate(()->
+                elementCache().pageSizeDropdown.clickSubMenu(pageSize));
         return this;
     }
 
@@ -57,7 +59,8 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public Pager clickPrevious()
     {
-        elementCache().prevButton.click();
+        _pagedComponent.doAndWaitForUpdate(()->
+                elementCache().prevButton.click());
         return this;
     }
 
@@ -66,9 +69,10 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         return !elementCache().prevButton.getAttribute("disabled").equals("true");
     }
 
-    public Pager clickNextButton()
+    public Pager clickNext()
     {
-        elementCache().nextButton.click();
+        _pagedComponent.doAndWaitForUpdate(()->
+                elementCache().nextButton.click());
         return this;
     }
 
@@ -173,16 +177,18 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
                 Locator.tagWithClass("div", "pagination-buttons"),  // used in biologics report list
                 Locator.tagWithClass("span", "paging"),             // used in QueryGridPanel, here for backwards-support
                 Locator.tagWithClass("div", "lk-pagination"));      // used in GridPanel
+        private final UpdatingComponent _pagedComponent;
 
-        public PagerFinder(WebDriver driver)
+        public PagerFinder(WebDriver driver, UpdatingComponent pagedComponent)
         {
             super(driver);
+            _pagedComponent = pagedComponent;
         }
 
         @Override
         protected Pager construct(WebElement el, WebDriver driver)
         {
-            return new Pager(el, getDriver());
+            return new Pager(el, _pagedComponent, getDriver());
         }
 
         @Override

@@ -4,12 +4,14 @@
  */
 package org.labkey.test.components.glassLibrary.grids;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
+import org.labkey.test.components.react.UpdatingComponent;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -22,10 +24,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
-public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid.ElementCache>
+public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid.ElementCache> implements UpdatingComponent
 {
     final WebElement _gridElement;
     final WebDriver _driver;
@@ -236,13 +241,29 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
-     * sets the 'select all' checkbox to the desired state, or indeterminate if not possible
+     * sets the 'select all' checkbox to the desired state
      * @param checked   true to check the box, false to uncheck it
      * @return  the current instance
      */
     public T selectAllOnPage(boolean checked)
     {
-        selectAllBox().set(checked);
+        if (checked)
+            return selectAllOnPage(true, ReactCheckBox.CheckboxState.Checked);
+        else
+            return selectAllOnPage(false, ReactCheckBox.CheckboxState.Unchecked);
+    }
+
+    /**
+     * Sometimes in a test scenario, the resulting state in the select-all box will depend upon whether or not
+     * rows on other pages (or in filters) exist and aren't in the select-state intended with the checked parameter.
+     * @param checked   true to select all on the current page, false to deselect all
+     * @param expectedState signals what state to verify in the select-all box.
+     *                      if null, no verification is done on the select-all box, but .
+     * @return
+     */
+    public T selectAllOnPage(boolean checked, @Nullable ReactCheckBox.CheckboxState expectedState)
+    {
+        selectAllBox().set(checked, expectedState);
         Locator selectedText = Locator.XPathLocator.union(
                 Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]"),
                 Locator.tagWithClass("span", "selection-status__count").containing("selected"));
@@ -251,6 +272,14 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         if(checked)
             WebDriverWrapper.waitFor(()->
                     selectedText.findOptionalElement(getComponentElement()).isPresent(), WAIT_FOR_JAVASCRIPT);
+
+        if (expectedState == null)  // we didn't verify expected state of the select-all box,
+        {                           // ensure intended state of rows here
+            if (!checked)
+                assertThat("more than 0 rows in the current page were selected", getSelectedRows().size(), is(0));
+            else
+                assertTrue("not all rows in the current page were selected", getSelectedRows().stream().allMatch(a-> a.isSelected()));
+        }
 
         return getThis();
     }

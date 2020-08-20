@@ -1,6 +1,5 @@
 package org.labkey.test.tests.component;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -42,12 +41,6 @@ public class QueryGridTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-    }
-
-    @Before
-    public void preTest() throws Exception
-    {
-        goToProjectHome();
     }
 
     @Test
@@ -326,7 +319,9 @@ public class QueryGridTest extends BaseWebDriverTest
 
         grid.selectAllRows();
         assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 35"));
-        assertThat(grid.getSelectionStatusCount(), is("35 of 35 selected"));
+        assertThat("unexpected selection tally after select or filter action" +
+                "likely https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41171",
+                grid.getSelectionStatusCount(), is("35 of 35 selected"));
 
         grid.getGridBar().jumpToPage("Last Page");
         grid.selectAllOnPage(false); // uncheck the checkbox

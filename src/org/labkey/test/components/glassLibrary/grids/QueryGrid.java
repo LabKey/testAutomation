@@ -233,7 +233,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
                         elementCache().selectAllN_Btn().click());
             else
                 doAndWaitForUpdate(()->
-                        selectAllOnPage(true));
+                        selectAllOnPage(true, null));
         }
         else
             doAndWaitForUpdate(()->
