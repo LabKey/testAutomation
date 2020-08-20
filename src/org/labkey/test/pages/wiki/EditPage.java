@@ -119,6 +119,7 @@ public class EditPage extends LabKeyPage<EditPage.ElementCache>
     public EditPage clickShowPageTree()
     {
         elementCache().showPageTreeButton.click();
+        shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.id("wiki-toc-tree")));
         return this;
     }
 

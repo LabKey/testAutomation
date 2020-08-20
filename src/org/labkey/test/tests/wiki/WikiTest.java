@@ -40,7 +40,7 @@ public class WikiTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifyProject";
 
-    private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE_WEBPART_ID = "qwp999";
     private static final String WIKI_PAGE_TITLE = "_Test Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
     private static final String WIKI_PAGE_NAME = "_Test Wiki Name " + BaseWebDriverTest.INJECT_CHARS_2;
@@ -49,6 +49,7 @@ public class WikiTest extends BaseWebDriverTest
                     "<b>${labkey.webPart(partName='Query', title='My Users', schemaName='core', " +
                     "queryName='Users', allowChooseQuery='true', allowChooseView='true', dataRegionName='" + WIKI_PAGE_WEBPART_ID + "')}</b>\n";
     private static final String WIKI_CHECK_CONTENT = "More HTML content";
+    private static int numberOfWikiCreated = 0;
 
     @BeforeClass
     public static void setupProject()
@@ -95,6 +96,7 @@ public class WikiTest extends BaseWebDriverTest
         log("test create new html page with a webpart");
         WikiHelper wikiHelper = new WikiHelper(this);
         wikiHelper.createNewWikiPage("HTML");
+        numberOfWikiCreated++;
 
         setFormElement(Locator.name("name"), WIKI_PAGE_TITLE);
         setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
@@ -115,7 +117,7 @@ public class WikiTest extends BaseWebDriverTest
         stopImpersonating();
 
         log("test search wiki");
-        searchFor(PROJECT_NAME, "Wiki", 1, WIKI_PAGE_TITLE);
+        searchFor(PROJECT_NAME, "Wiki", numberOfWikiCreated, WIKI_PAGE_TITLE);
 
         log("test edit wiki");
         clickAndWait(Locator.linkWithText("Edit"));
@@ -136,6 +138,7 @@ public class WikiTest extends BaseWebDriverTest
         portalHelper.addWebPart("Wiki");
         portalHelper.clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/" + getProjectName());
+        selectOptionByTextContaining(Locator.name("name").findElement(getDriver()),WIKI_PAGE_ALTTITLE);
         clickButton("Submit");
         verifyWikiPagePresent();
 
@@ -149,7 +152,7 @@ public class WikiTest extends BaseWebDriverTest
 
         log("verify second wiki part pointing to first handled delete well");
         clickFolder(getSubfolderName());
-        assertTextPresent("This folder does not currently contain any wiki pages to display");
+        assertTextNotPresent(WIKI_PAGE_ALTTITLE);
     }
 
     @Test
@@ -159,6 +162,7 @@ public class WikiTest extends BaseWebDriverTest
         log("Creating the wiki");
         WikiHelper wikiHelper = new WikiHelper(this);
         wikiHelper.createNewWikiPage("HTML");
+        numberOfWikiCreated++;
         setFormElement(Locator.name("name"), WIKI_PAGE_NAME);
         setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
         wikiHelper.setWikiBody(WIKI_CHECK_CONTENT);
@@ -166,9 +170,9 @@ public class WikiTest extends BaseWebDriverTest
 
         log("Verifying the tree is displayed correctly");
         goToProjectHome();
-        EditPage editWikiPage = wikiHelper.editWikiPage(WIKI_PAGE_NAME);
+        EditPage editWikiPage = wikiHelper.editWikiPage();
         editWikiPage.clickShowPageTree();
-        assertElementPresent(Locator.linkContainingText(WIKI_PAGE_TITLE + " (" + WIKI_PAGE_NAME + ")"));
+        assertElementPresent(Locator.id("wiki-toc-tree").append(Locator.linkContainingText(WIKI_PAGE_TITLE + " (" + WIKI_PAGE_NAME + ")")));
     }
 
     protected void verifyWikiPagePresent()
