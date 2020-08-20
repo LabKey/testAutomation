@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -379,13 +380,16 @@ public class TestDataGenerator
         return getRowsFromServer(cn, intendedColumns, null);
     }
 
-    public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns, List<Filter> filters) throws IOException, CommandException
+    public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns, @Nullable  List<Filter> filters) throws IOException, CommandException
     {
         SelectRowsCommand cmd = new SelectRowsCommand(getSchema(), getQueryName());
 
-        for(Filter filter : filters)
+        if(filters != null)
         {
-            cmd.addFilter(filter);
+            for (Filter filter : filters)
+            {
+                cmd.addFilter(filter);
+            }
         }
 
         if (intendedColumns!=null)

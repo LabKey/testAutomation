@@ -43,21 +43,21 @@ public class WikiLongTest extends BaseWebDriverTest
 
     private static final String PROJECT_NAME = "WikiVerifyProject";
     private static final String PROJECT2_NAME = "WikiCopied";
-    private static final String WIKI_PAGE1_TITLE = "Page 1 Wiki Title";
-    private static final String WIKI_PAGE1_NAME= "Page 1 Wiki Name";
-    private static final String WIKI_PAGE2_NAME = "Page 2 Wiki Name";
-    private static final String WIKI_PAGE2_TITLE = "Page 2 Wiki Title";
+    private static final String WIKI_PAGE1_TITLE = "Page 1 Wiki Title " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE1_NAME= "Page 1 Wiki Name " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE2_NAME = "Page 2 Wiki Name " + BaseWebDriverTest.INJECT_CHARS_2;
+    private static final String WIKI_PAGE2_TITLE = "Page 2 Wiki Title " + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String WIKI_PAGE3_ALTTITLE = "PageBBB has HTML";
-    private static final String WIKI_PAGE3_NAME_TITLE = "Page 3 Wiki";
-    private static final String WIKI_PAGE4_TITLE = "New Wiki";
-    private static final String WIKI_PAGE5_NAME = "Malformed";
-    private static final String WIKI_PAGE5_TITLE = "Malformed JavaScript Elements Should Work";
-    private static final String WIKI_PAGE6_NAME = "Index";
-    private static final String WIKI_PAGE6_TITLE = "Indexed Wiki Page Test";
-    private static final String WIKI_PAGE7_TITLE = "Page 7 Title For Markdown Test";
-    private static final String WIKI_PAGE7_NAME= "Page 7 Name For Markdown Test";
-    private static final String WIKI_PAGE8_TITLE = "Page 8 Title For Delete Subtree Test";
-    private static final String WIKI_PAGE8_NAME= "Page 8 Name For Delete Subtree Test";
+    private static final String WIKI_PAGE3_NAME_TITLE = "Page 3 Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE4_TITLE = "New Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE5_NAME = "Malformed " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE5_TITLE = "Malformed JavaScript Elements Should Work " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE6_NAME = "Index " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE6_TITLE = "Indexed Wiki Page Test " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE7_TITLE = "Page 7 Title For Markdown Test " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE7_NAME= "Page 7 Name For Markdown Test " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE8_TITLE = "Page 8 Title For Delete Subtree Test " + BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String WIKI_PAGE8_NAME= "Page 8 Name For Delete Subtree Test " + BaseWebDriverTest.INJECT_CHARS_1;
 
     private static final String WIKI_PAGE1_TITLE_LINK = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name";
     private static final String WIKI_PAGE1_TITLE_LINK_COPY = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name1";
@@ -187,7 +187,8 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Test add content to link page");
         WebElement wikiLink = Locator.linkWithText(WIKI_PAGE2_NAME).findElement(getDriver());
-        assertEquals("Link to other wiki has bad href", WebTestHelper.buildURL("wiki", getProjectName(), "page", Maps.of("name", WIKI_PAGE2_NAME.replace(" ", "%20"))), wikiLink.getAttribute("href"));
+        assertEquals("Link to other wiki has bad href",
+                WebTestHelper.buildURL("wiki", getProjectName(), "page", Maps.of("name", WIKI_PAGE2_NAME.replace(" ", "%20"))), wikiLink.getAttribute("href"));
         clickAndWait(wikiLink);
         assertTextPresent("page has no content");
         clickAndWait(Locator.linkWithText("add content"));
