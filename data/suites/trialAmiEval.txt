@@ -3,3 +3,4 @@ KnitrReportTest
 EvaluationContentTest
 WebDavTest
 DataReportsTest
+ClientAPITest
