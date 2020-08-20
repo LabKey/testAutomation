@@ -2,13 +2,13 @@
  * Copyright (c) 2019 LabKey Corporation. All rights reserved. No portion of this work may be reproduced in
  * any form or by any electronic or mechanical means without written permission from LabKey Corporation.
  */
-package org.labkey.test.components.glassLibrary.grids;
+package org.labkey.test.components.react.grids;
 
 import com.sun.istack.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.glassLibrary.components.MultiMenu;
+import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.Pager;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;

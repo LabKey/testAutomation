@@ -2,7 +2,7 @@ package org.labkey.test.components.query;
 
 import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.glassLibrary.components.ReactSelect;
+import org.labkey.test.components.react.select.ReactSelect;
 
 
 public class AliasFieldDialog extends ModalDialog

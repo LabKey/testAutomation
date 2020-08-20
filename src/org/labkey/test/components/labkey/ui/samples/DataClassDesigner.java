@@ -1,6 +1,6 @@
 package org.labkey.test.components.labkey.ui.samples;
 
-import org.labkey.test.components.glassLibrary.components.ReactSelect;
+import org.labkey.test.components.react.select.ReactSelect;
 import org.openqa.selenium.WebDriver;
 
 /**

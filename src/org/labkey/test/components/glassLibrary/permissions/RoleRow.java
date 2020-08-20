@@ -3,7 +3,7 @@ package org.labkey.test.components.glassLibrary.permissions;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.glassLibrary.components.ReactSelect;
+import org.labkey.test.components.react.select.ReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;

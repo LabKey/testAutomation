@@ -1,4 +1,4 @@
-package org.labkey.test.components.glassLibrary.components;
+package org.labkey.test.components.react;
 
 import org.labkey.test.BootstrapLocators.BannerType;
 import org.labkey.test.Locator;

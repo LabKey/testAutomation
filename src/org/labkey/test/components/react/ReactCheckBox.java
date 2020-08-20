@@ -100,14 +100,17 @@ public class ReactCheckBox extends Checkbox
             switch (expectedState)
             {
                 case Checked:
-                    WebDriverWrapper.waitFor(() -> isChecked(),
+                    WebDriverWrapper.waitFor(this::isChecked,
                             "Failed to check checkbox", 1000);
+                    break;
                 case Indeterminate:
-                    WebDriverWrapper.waitFor(() -> isIndeterminate(),
+                    WebDriverWrapper.waitFor(this::isIndeterminate,
                             "", 1000);
+                    break;
                 case Unchecked:
                     WebDriverWrapper.waitFor(() -> !isChecked() && !isIndeterminate(),
                             "Expected", 1000);
+                    break;
             }
         }
 
