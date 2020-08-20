@@ -201,4 +201,40 @@ public class LabKeyExpectedConditions
         };
     }
 
+    /**
+     * Wraps {@link ExpectedConditions#stalenessOf(WebElement)}
+     * Firefox occasionally throws "NoSuchElementException: Web element reference not seen before"
+     * for short lived elements.
+     *
+     * @param element WebElement that should go stale.
+     * @return false if the element is still attached to the DOM, true otherwise.
+     */
+    public static ExpectedCondition<Boolean> stalenessOf(WebElement element)
+    {
+        return new ExpectedCondition<>()
+        {
+            final ExpectedCondition<Boolean> wrapped = ExpectedConditions.stalenessOf(element);
+
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                try
+                {
+                    return wrapped.apply(driver);
+                }
+                catch (NoSuchElementException ignore)
+                {
+                    // Firefox sometimes throws the wrong exception.
+                    return true;
+                }
+            }
+
+            @Override
+            public String toString()
+            {
+                return wrapped.toString();
+            }
+        };
+    }
+
 }
