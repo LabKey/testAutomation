@@ -1,9 +1,9 @@
-package org.labkey.test.components.react.grids;
+package org.labkey.test.components.glassLibrary.grids;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.components.react.select.ReactSelect;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;

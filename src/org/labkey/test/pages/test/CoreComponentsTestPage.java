@@ -3,9 +3,9 @@ package org.labkey.test.pages.test;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.glassLibrary.components.ReactSelect;
+import org.labkey.test.components.glassLibrary.grids.QueryGrid;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.react.grids.QueryGrid;
-import org.labkey.test.components.react.select.ReactSelect;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 

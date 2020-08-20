@@ -1,8 +1,8 @@
 package org.labkey.test.components.glassLibrary.navigation;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.glassLibrary.components.MultiMenu;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

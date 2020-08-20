@@ -1,4 +1,4 @@
-package org.labkey.test.components.react.files;
+package org.labkey.test.components.glassLibrary.components;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;

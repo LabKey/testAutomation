@@ -2,8 +2,8 @@ package org.labkey.test.components.labkey.ui.samples;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
+import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.react.select.ReactSelect;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

@@ -3,7 +3,7 @@ package org.labkey.test.components.ui;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.react.select.FilteringReactSelect;
+import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 

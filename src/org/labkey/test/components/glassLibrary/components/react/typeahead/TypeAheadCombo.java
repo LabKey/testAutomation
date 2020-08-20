@@ -1,4 +1,4 @@
-package org.labkey.test.components.react.select;
+package org.labkey.test.components.glassLibrary.components.react.typeahead;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
