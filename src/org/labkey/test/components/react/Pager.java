@@ -9,6 +9,8 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.Optional;
+
 public class Pager extends WebDriverComponent<Pager.ElementCache>
 {
     private final WebElement _el;
@@ -60,32 +62,40 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public Pager clickPrevious()
     {
-        _pagedComponent.doAndWaitForUpdate(()->
-                elementCache().prevButton.click());
+        if (elementCache().prevButton().isPresent())
+            _pagedComponent.doAndWaitForUpdate(()->
+                    elementCache().prevButton().get().click());
         return this;
     }
 
     public boolean isPreviousEnabled()
     {
-        String prevBtnClass = elementCache().prevButton.getAttribute("class");
+        if (!elementCache().prevButton().isPresent())
+            return false;
+
+        String prevBtnClass = elementCache().prevButton().get().getAttribute("class");
         if (prevBtnClass.contains("pagination-buttons__prev"))      // this is the new g
-            return !elementCache().prevButton.getAttribute("disabled").equals("true");
+            return !elementCache().prevButton().get().getAttribute("disabled").equals("true");
         else
             return !prevBtnClass.contains("disabled-button");
     }
 
     public Pager clickNext()
     {
-        _pagedComponent.doAndWaitForUpdate(()->
-                elementCache().nextButton.click());
+        if (elementCache().prevButton().isPresent())
+            _pagedComponent.doAndWaitForUpdate(()->
+                    elementCache().nextButton().get().click());
         return this;
     }
 
     public boolean isNextEnabled()
     {
-        String nextBtnClass = elementCache().nextButton.getAttribute("class");
+        if (!elementCache().nextButton().isPresent())
+            return false;
+
+        String nextBtnClass = elementCache().nextButton().get().getAttribute("class");
         if (nextBtnClass.contains("pagination_buttons__next"))
-            return !elementCache().nextButton.getAttribute("disabled").equals("true");
+            return !elementCache().nextButton().get().getAttribute("disabled").equals("true");
         else
             return !nextBtnClass.contains("disabled-button");
     }
@@ -167,14 +177,21 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         final Locator.XPathLocator queryModelPagingCounts = Locator.tagWithClass("span", "pagination-info");
         final Locator pagingCountsSpan = Locator.XPathLocator.union(queryGridModelPagingCounts, queryModelPagingCounts);
 
-        final WebElement prevButton = Locator.XPathLocator.union(
-                Locator.tagWithClass("button", "pagination-buttons__prev"),     // used in gridPanel
-                Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-left"))) // used in QueryGridPanel, here for back-support
-                .findWhenNeeded(this).withTimeout(4000);
-        final WebElement nextButton = Locator.XPathLocator.union(
-                Locator.tagWithClass("button", "pagination-buttons__next"),
-                Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-right")))
-                .findWhenNeeded(this).withTimeout(4000);
+        Optional<WebElement> prevButton()
+        {
+            return Locator.XPathLocator.union(
+                    Locator.tagWithClass("button", "pagination-buttons__prev"),     // used in gridPanel
+                    Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-left"))) // used in QueryGridPanel, here for back-support
+                    .findOptionalElement(this);
+        }
+
+        Optional<WebElement> nextButton()
+        {
+            return Locator.XPathLocator.union(
+                    Locator.tagWithClass("button", "pagination-buttons__next"),
+                    Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-right")))
+                    .findOptionalElement(this);
+        }
 
         public WebElement counts = pagingCountsSpan
                 .refindWhenNeeded(getComponentElement()).withTimeout(4000);
