@@ -256,7 +256,6 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
-    @Ignore // until https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41169 is resolved
     @Test
     public void testEmptyNotEmptyFilter() throws Exception
     {
@@ -296,11 +295,12 @@ public class QueryGridTest extends BaseWebDriverTest
         assertThat(grid.getGridBar().pager().summary(), is("1 - 5"));
         grid.clearSortsAndFilters();
 
-        grid.filterOn("Int Column", "has any value", null);
-        assertThat("[has any value] filter does not work as expected " +
-                "https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41169",
-                grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
-        grid.clearSortsAndFilters();
+        // re-enable this when 41169 is fixed
+//        grid.filterOn("Int Column", "has any value", null);
+//        assertThat("[has any value] filter does not work as expected " +
+//                "https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41169",
+//                grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+//        grid.clearSortsAndFilters();
 
         sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
