@@ -383,9 +383,12 @@ public class TestDataGenerator
     {
         SelectRowsCommand cmd = new SelectRowsCommand(getSchema(), getQueryName());
 
-        for(Filter filter : filters)
+        if (filters != null)
         {
-            cmd.addFilter(filter);
+            for (Filter filter : filters)
+            {
+                cmd.addFilter(filter);
+            }
         }
 
         if (intendedColumns!=null)
