@@ -34,25 +34,26 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         return _driver;
     }
 
-    public Pager jumpToPage(String jumpTo)
+    public Pager jumpToPage(String jumpTo)      // only works on GridPanel
     {
         _pagedComponent.doAndWaitForUpdate(()->
                 elementCache().jumpToDropdown.clickSubMenu(jumpTo));
         return this;
     }
-    public int getCurrentPage()
+
+    public int getCurrentPage()                 // only works on GridPanel
     {
         return Integer.parseInt(elementCache().jumpToDropdown.getButtonText());
     }
 
-    public Pager selectPageSize(String pageSize)
+    public Pager selectPageSize(String pageSize)    // only works on GridPanel
     {
         _pagedComponent.doAndWaitForUpdate(()->
                 elementCache().pageSizeDropdown.clickSubMenu(pageSize));
         return this;
     }
 
-    public int getPageSize()
+    public int getPageSize()                // only works on GridPanel
     {
         return Integer.parseInt(elementCache().pageSizeDropdown.getButtonText());
     }
@@ -66,7 +67,11 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public boolean isPreviousEnabled()
     {
-        return !elementCache().prevButton.getAttribute("disabled").equals("true");
+        String prevBtnClass = elementCache().prevButton.getAttribute("class");
+        if (prevBtnClass.contains("pagination-buttons__prev"))      // this is the new g
+            return !elementCache().prevButton.getAttribute("disabled").equals("true");
+        else
+            return !prevBtnClass.contains("disabled-button");
     }
 
     public Pager clickNext()
@@ -78,7 +83,11 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public boolean isNextEnabled()
     {
-        return !elementCache().nextButton.getAttribute("disabled").equals("true");
+        String nextBtnClass = elementCache().nextButton.getAttribute("class");
+        if (nextBtnClass.contains("pagination_buttons__next"))
+            return !elementCache().nextButton.getAttribute("disabled").equals("true");
+        else
+            return !nextBtnClass.contains("disabled-button");
     }
 
     public int start()
