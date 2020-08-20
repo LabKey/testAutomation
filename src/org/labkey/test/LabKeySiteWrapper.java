@@ -35,7 +35,7 @@ import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.junit.Assert;
-import org.junit.AssumptionViolatedException;
+import org.junit.Assume;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -110,6 +110,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public boolean isGuestModeTest()
     {
         return false;
+    }
+
+    protected void assumeTestModules()
+    {
+        Assume.assumeFalse("Test modules are needed but not installed. Skipping test.",
+            TestProperties.isWithoutTestModules());
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -1141,21 +1147,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void enableEmailRecorder()
     {
+        assumeTestModules();
         int responseCode = getHttpResponse(buildURL("dumbster", "setRecordEmail", Maps.of("record", "true")), "POST").getResponseCode();
-        skipTestForMissingDumbster(responseCode);
         assertEquals("Failed to enable email recording", HttpStatus.SC_OK, responseCode);
-    }
-
-    protected void skipTestForMissingDumbster(int responseCode)
-    {
-        if (responseCode == HttpStatus.SC_NOT_FOUND && TestProperties.isIgnoreMissingModules())
-            throw new AssumptionViolatedException("Skipping test. Dumbster module is not installed");
     }
 
     public EmailRecordTable goToEmailRecord()
     {
         beginAt(buildURL("dumbster", "begin"));
-        skipTestForMissingDumbster(getResponseCode());
         return new EmailRecordTable(getDriver());
     }
 

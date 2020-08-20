@@ -104,6 +104,7 @@ public class KnitrReportTest extends AbstractKnitrReportTest
         if (TestProperties.isServerRemote())
         {
             Assume.assumeTrue("Unable to modify remote webapp. Skipping test.", TestProperties.isWithoutTestModules());
+            // Scriptpad module supplies lib.xml. No need to modify webapp if it isn't present.
         }
         else
         {
