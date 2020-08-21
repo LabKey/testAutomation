@@ -9,7 +9,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.glassLibrary.components.MultiMenu;
-import org.labkey.test.components.glassLibrary.components.OmniBox;
+import org.labkey.test.components.react.Pager;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -28,12 +28,14 @@ import static org.labkey.test.WebDriverWrapper.sleep;
 public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 {
     final private WebElement _gridBarElement;
+    final private WebElement _containerElement;
     final private WebDriver _driver;
-    final private ResponsiveGrid _responsiveGrid;
+    private final ResponsiveGrid _responsiveGrid;
 
     protected GridBar(WebDriver driver, WebElement container, ResponsiveGrid responsiveGrid)
     {
         _gridBarElement = Locators.gridBar().findWhenNeeded(container);
+        _containerElement = container;
         _responsiveGrid = responsiveGrid;  // The responsive grid that is associated with this bar.
         _driver = driver;
     }
@@ -68,11 +70,67 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return getWrapper().doAndWaitForDownload(()->exportButton.click());
     }
 
+    /**
+     * gets the Pager for the current grid, if it exists.
+     * If the grid is filtered down to an empty set or if there are no loaded rows, it will not be present
+     * @return
+     */
+    public Pager pager()
+    {
+        return new Pager.PagerFinder(getDriver(), _responsiveGrid).waitFor(this);
+    }
+
+    /**
+     * says whether or not the grid currently shows a pager (for example, when filtered down to zero
+     * or not loaded, the pager will not be present)
+     * @return
+     */
+    public boolean hasPager()
+    {
+        return new Pager.PagerFinder(getDriver(), _responsiveGrid).findOptional(this).isPresent();
+    }
+
+    /**
+     * uses the pager to select a page from the pager dropdown list
+     * @param page the text of the list item to be clicked
+     * @return
+     */
+    public GridBar jumpToPage(String page) // e.g. "First Page"|"Last Page"
+    {
+        pager().jumpToPage(page);
+        return this;
+    }
+
+    /**
+     * gets the current page number
+     * @return
+     */
+    public int getCurrentPage()
+    {
+        return pager().getCurrentPage();
+    }
+
+    /**
+     * selects the number of rows to be shown per page
+     * @param pageSize
+     * @return
+     */
+    public GridBar selectPageSize(String pageSize)
+    {
+        pager().selectPageSize(pageSize);
+        return this;
+    }
+
+    public int getPageSize()
+    {
+        return pager().getPageSize();
+    }
+
     public int getRecordCount()
     {
         try
         {
-            return Integer.parseInt(Locators.pagingCountsSpan.findElement(this).getAttribute("data-total"));
+            return pager().total();
         }
         catch(NoSuchElementException | StaleElementReferenceException nse)
         {
@@ -83,51 +141,31 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public boolean isOnFirstPage()
     {
-
-        try
-        {
-            return !Locators.pgLeftButton.findElement(this).isEnabled();
-        }
-        catch(NoSuchElementException nse)
-        {
-            // If there is no left button we are on the first/last/only page.
-            return true;
-        }
+        return !pager().isPreviousEnabled();
     }
 
     public boolean isOnLastPage()
     {
-        try
-        {
-        return !Locators.pgRightButton.findElement(this).isEnabled();
-        }
-        catch(NoSuchElementException nse)
-        {
-            // If there is no right button we are on the first/last/only page.
-            return true;
-        }
+        return !pager().isNextEnabled();
     }
 
-    // Should this really return a grid object?
-    public ResponsiveGrid getNextPage()
+    /**
+     * clicks the 'next' button on the pager associated with this grid and waits for the grid to update
+     * @return
+     */
+    public ResponsiveGrid clickNext()
     {
-        WebElement nextButton = Locators.pgRightButton.waitForElement(this, 2500);
-        if (nextButton.isEnabled())
-        {
-            _responsiveGrid.doAndWaitForUpdate(()->nextButton.click());
-        }
-
+        pager().clickNext();
         return _responsiveGrid;
     }
 
-    // Should this really return a grid object?
-    public ResponsiveGrid getPreviousPage()
+    /**
+     * clicks the 'previous' button on the pager and waits for the grid to update
+     * @return
+     */
+    public ResponsiveGrid clickPrevious()
     {
-        WebElement prevButton = Locators.pgLeftButton.waitForElement(this, 2500);
-        if (prevButton.isEnabled())
-        {
-            _responsiveGrid.doAndWaitForUpdate(()->prevButton.click());
-        }
+        pager().clickPrevious();
         return _responsiveGrid;
     }
 
@@ -138,12 +176,10 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public GridBar selectAllRows()
     {
-        _responsiveGrid.selectAllOnPage(true);
-
         Locator selectBtn = Locator.xpath("//button[contains(text(), 'Select all')]");      // Select all n
         Locator selectedText = Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]");   // n of n
         Locator allSelected = Locator.xpath("//span[contains(text(), 'All ')]");            // All n selected
-        WebElement btn = selectBtn.waitForElement(this, 5_000);
+        WebElement btn = selectBtn.waitForElement(_containerElement, 5_000);
         btn.click();
 
         getWrapper().waitFor(() -> allSelected.findOptionalElement(this).isPresent() ||
@@ -160,20 +196,16 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public GridBar clearAllSelections()
     {
-        _responsiveGrid.selectAllOnPage(false);
-
         // Clear button can have text values of 'Clear', 'Clear both' or 'Clear all ' so just look for clear.
         Locator clearBtn = Locator.xpath("//button[contains(text(), 'Clear')]");
 
         if(!clearBtn.findOptionalElement(this).isEmpty())
         {
-
             WebElement btn = clearBtn.waitForElement(this, 5_000);
             btn.click();
 
             getWrapper().waitFor(() -> clearBtn.findOptionalElement(this).isEmpty(),
                     WAIT_FOR_JAVASCRIPT);
-
         }
 
         return this;
@@ -309,28 +341,10 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
                     Locator.tagWithClassContaining("div", "grid-panel__button-bar"));
         }
 
-        // QueryGridModel grid uses class names with the word "paging", QueryModel version uses class names with the
-        // word "pagination", so selectors look for class names containing "pagin".
-        static final Locator pgRightButton = Locator.tagWithClassContaining("span", "pagin")
-                .descendant(Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-right")));
-        static final Locator pgLeftButton =Locator.tagWithClassContaining("span", "pagin")
-                .descendant(Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-left")));
-
-        static final Locator.XPathLocator queryGridModelPagingCounts = Locator.xpath("//span[contains(@class, 'paging')]/span[@data-min]");
-        static final Locator.XPathLocator queryModelPagingCounts = Locator.xpath("//span[contains(@class, 'pagination-info')]");
-        static final Locator pagingCountsSpan = Locator.XPathLocator.union(queryGridModelPagingCounts, queryModelPagingCounts);
-
         static final Locator.XPathLocator viewSelectorButtonGroup = Locator.tagWithClass("div", "dropdown")
                 .withChild(Locator.button("Grid Views"));
         static final Locator.XPathLocator viewSelectorToggleButton = Locator.button("Grid Views");
         static final Locator viewSelectorMenu = Locator.tagWithAttributeContaining("ul", "aria-labelledby", "viewselector");
-
-        static final Locator navTab(String partialTabText)
-        {
-            return Locator.tagWithClass("ul", "nav nav-tabs").child(Locator.tag("li")
-                    .withChild(Locator.linkContainingText(partialTabText)));
-        }
-
     }
 
     public static class GridBarFinder extends WebDriverComponentFinder<GridBar, GridBarFinder>
