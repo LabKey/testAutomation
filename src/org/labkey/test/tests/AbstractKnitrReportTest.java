@@ -15,11 +15,13 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.TestProperties;
+import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -44,7 +46,9 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
 {
     protected static final Path scriptpadReports = new File(TestFileUtils.getTestRoot(), "modules/scriptpad/resources/reports/schemas").toPath();
     protected static final Path rmdReport = scriptpadReports.resolve("script_rmd.rmd");
+    protected static final Path rmdReport_no_scriptpad = TestFileUtils.getSampleData("reports/knitr_no_scriptpad.rmd").toPath();
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
+    private static final Path rhtmlReport_no_scriptpad = TestFileUtils.getSampleData("reports/knitr_no_scriptpad.rhtml").toPath();
     protected final RReportHelper _rReportHelper = new RReportHelper(this);
 
     private static String readReport(final Path reportFile)
@@ -71,7 +75,10 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         _rReportHelper.ensureRConfig(isDocker());
 
         _containerHelper.createProject(getProjectName(), "Collaboration");
-        _containerHelper.enableModule(getProjectName(), "scriptpad");
+        if (!TestProperties.isWithoutTestModules())
+        {
+            _containerHelper.enableModule(getProjectName(), "scriptpad");
+        }
 
         new PortalHelper(this).doInAdminMode(portalHelper -> {
             portalHelper.removeAllWebParts();
@@ -89,9 +96,9 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         String reportSource = readReport(reportSourcePath);
 
         goToProjectHome();
-        goToManageViews();
+        ManageViewsPage manageViewsPage = goToManageViews();
 
-        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"R Report");
+        manageViewsPage.clickAddReport("R Report");
         _rReportHelper.selectOption(knitrOption);
         setCodeEditorValue("script-report-editor", reportSource);
         return reportSource;
@@ -135,7 +142,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     {
         Locator[] reportContains = {Locator.tag("p").withText("This is a minimal example which shows knitr working with HTML pages in LabKey."),
                                     Locator.tag("img").withAttribute("title", "plot of chunk blood-pressure-scatter"),
-                                    Locator.tag("pre").containing("## \"1\",249318596,\"2008-05-17\",86,36,129,76,64,17,0,\"false\",\"English\",\"urn:lsid:labkey.com:Study.Data-2156:5004.249318596.20080517.0000\""),
+                                    Locator.tag("pre").containing("## \"1\",249318596,\"2008-05-17\",86,36,129,76,64"),
                                     Locator.tag("pre").withText("## knitr says hello to HTML!"),
                                     Locator.tag("pre").startsWith("## Error").containing(": non-numeric argument to binary operator"),
                                     Locator.tag("p").startsWith("Well, everything seems to be working. Let's ask R what is the value of \u03C0? Of course it is 3.141")};
@@ -145,7 +152,8 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
                                       "begin.rcode",                     // knitr commands shouldn't be visible
                                       "opts_chunk"};                     // Un-echoed R code
 
-        createAndVerifyKnitrReport(rhtmlReport, RReportHelper.ReportOption.knitrHtml, reportContains, reportNotContains, false);
+        Path reportSourcePath = TestProperties.isWithoutTestModules() ? rhtmlReport_no_scriptpad : rhtmlReport;
+        createAndVerifyKnitrReport(reportSourcePath, RReportHelper.ReportOption.knitrHtml, reportContains, reportNotContains, false);
     }
 
     @Override
@@ -174,11 +182,15 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
                 "{r",               // Markdown for R code chunks
                 "data_means"};      // Non-echoed R code
 
-        createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true, rmdReport.getFileName() + "MarkdownV2");
+        Path reportSourcePath = TestProperties.isWithoutTestModules() ? rmdReport_no_scriptpad : rmdReport;
+        createAndVerifyKnitrReport(reportSourcePath, RReportHelper.ReportOption.knitrMarkdown, reportContains,
+            reportNotContains, true, reportSourcePath.getFileName() + "MarkdownV2");
     }
 
     protected void moduleReportDependencies()
     {
+        Assume.assumeFalse("Test modules not installed (module report dependencies are provided by scriptpad).",
+            TestProperties.isWithoutTestModules());
         //
         // Checks that the dependencies can be loaded from the included kable report's metadata file.
         // If the dependencies did not load correctly then the test will fail with an

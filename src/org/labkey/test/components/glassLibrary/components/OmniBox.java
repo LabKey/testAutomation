@@ -52,6 +52,10 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
             sendClearValue();
         }
 
+        // dismiss any filter/search/sort dropdown prompts
+        if (isOpen())
+            close();
+
         new WebDriverWait(_driver, 1).until(
                 ExpectedConditions.numberOfElementsToBe(Locators.values, 0));
 
@@ -119,6 +123,24 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         return this;
     }
 
+    /**
+     * 'open' checks to see if 'is-open' is on the class of the component element
+     * it is concerned with whether or not the ul.Omnibox-autocomplete list is expanded
+     * @return
+     */
+    private boolean isOpen()
+    {
+        return getComponentElement().getAttribute("class").contains("is-open") ||
+                Locator.tagWithClass("ul", "OmniBox-autocomplete").existsIn(getDriver());
+    }
+
+    private OmniBox close()
+    {
+        elementCache().input.sendKeys(Keys.ESCAPE);
+        getWrapper().waitFor(()-> !isOpen(), 500);
+        return this;
+    }
+
     public boolean isEditing()  // there is always an input; 'editing' means it currently has a value
     {
         return !Locators.editingValue.findElement(this)
@@ -144,18 +166,41 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     public OmniBox setFilter(String columnName, String operator, @Nullable String value)
     {
-        String val  = value != null ? " " + value : "";
-        String expectedValue = columnName + " " + operator + val;
-        this.setText("filter \"" + columnName + "\" " + operator + val);
-        if (WebDriverWrapper.waitFor(()->  getValue(expectedValue) != null, 2500))
+        String val  = value != null ? enquoteIfMultiWord(value) : "";
+        StringBuilder expectedFilterText = new StringBuilder();     // this builds the text to search for as a filter-item in the box
+        expectedFilterText.append(columnName);
+        expectedFilterText.append(" " + operator);
+
+        StringBuilder commandExpression = new StringBuilder("filter");  // this builds the command to enter into the box
+        commandExpression.append(" " + enquoteIfMultiWord(columnName));
+        commandExpression.append(" " + enquoteIfMultiWord(operator));
+        if (null != value)
+        {
+            commandExpression.append(" " + enquoteIfMultiWord(value));
+            expectedFilterText.append(" " + value);
+        }
+
+        this.setText(commandExpression.toString());
+        if (WebDriverWrapper.waitFor(()->  getValue(expectedFilterText.toString()) != null, 2500))
             return this;
 
         // try again if necessary and fail if it doesn't work
-        this.setText("filter \"" + columnName + "\" " + operator + val);
-        WebDriverWrapper.waitFor(()->  getValue(expectedValue) != null,
-                "Expect a new value to be present with [" + expectedValue + "]", 1500);
+        getWrapper().log("Retrying attempt to set filter with text [" + commandExpression.toString() + "]");
+        this.setText(commandExpression.toString());
+        WebDriverWrapper.waitFor(()->  getValue(expectedFilterText.toString()) != null,
+                "Expect a new value to be present with [" + expectedFilterText.toString() + "]", 1500);
 
         return this;
+    }
+
+    private String enquoteIfMultiWord(String expression)
+    {
+        String result;
+        if (expression.contains(" "))
+            result = "\"" + expression + "\"";
+        else
+            result = expression;
+        return  result;
     }
 
     private OmniBox setText(String inputValue)

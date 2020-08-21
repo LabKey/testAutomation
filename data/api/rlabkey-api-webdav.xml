@@ -3,7 +3,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                c("webdav.get", labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/getMe.txt", overwrite=FALSE))
+                c("webdav.get", labkey.webdav.get(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/getMe.txt", overwrite=FALSE))
                 c("file.exists", file.exists("%downloadDir%/getMe.txt"))
                 c("file.info.isdir", file.info("%downloadDir%/getMe.txt")$isdir)
             ]]>
@@ -22,7 +22,7 @@
                 library(Rlabkey)
                 c("file.create", file.create("%downloadDir%/overwriteMe.txt"))
                 c("initial size", file.info("%downloadDir%/overwriteMe.txt")$size)
-                c("webdav.get", labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/overwriteMe.txt", overwrite=TRUE))
+                c("webdav.get", labkey.webdav.get(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/overwriteMe.txt", overwrite=TRUE))
                 c("final size", file.info("%downloadDir%/overwriteMe.txt")$size)
             ]]>
         </url>
@@ -41,7 +41,7 @@
                 library(Rlabkey)
                 c("file.create", file.create("%downloadDir%/dontOverwriteMe.txt"))
                 c("initial size", file.info("%downloadDir%/dontOverwriteMe.txt")$size)
-                c("webdav.get", labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/dontOverwriteMe.txt", overwrite=FALSE))
+                c("webdav.get", labkey.webdav.get(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/dontOverwriteMe.txt", overwrite=FALSE))
                 c("final size", file.info("%downloadDir%/dontOverwriteMe.txt")$size)
             ]]>
         </url>
@@ -59,7 +59,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("dir.create", dir.create("%downloadDir%/overwriteDir"))
-                c("webdav.get", tryCatch({labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/overwriteDir", overwrite=TRUE)},
+                c("webdav.get", tryCatch({labkey.webdav.get(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/overwriteDir", overwrite=TRUE)},
                     error = function(e) {e$message}))
                 c("file.exists", file.exists("%downloadDir%/overwriteDir"))
                 c("file.info.isdir", file.info("%downloadDir%/overwriteDir")$isdir)
@@ -78,7 +78,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-               c("webdav.get",  tryCatch({labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localFilePath="%downloadDir%/getMe_download", overwrite=FALSE)},
+               c("webdav.get",  tryCatch({labkey.webdav.get(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localFilePath="%downloadDir%/getMe_download", overwrite=FALSE)},
                     error = function(e) {e$message}))
                 c("file.exists", file.exists("%downloadDir%/getMe_download"))
             ]]>
@@ -95,7 +95,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("file.exists pre", file.exists("%downloadDir%/noexist.txt"))
-                c("webdav.get", tryCatch({labkey.webdav.get(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/noexist.txt", localFilePath="%downloadDir%/noexist.txt", overwrite=TRUE)},
+                c("webdav.get", tryCatch({labkey.webdav.get(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/noexist.txt", localFilePath="%downloadDir%/noexist.txt", overwrite=TRUE)},
                     error = function(e) {e$message}))
                 c("file.exists post", file.exists("%downloadDir%/noexist.txt"))
             ]]>
@@ -114,7 +114,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("remote file.exists pre", file.exists("%remoteDir%/writeChecks/mkDir"))
-                c("webdav.mkDir", labkey.webdav.mkDir(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/mkDir"))
+                c("webdav.mkDir", labkey.webdav.mkDir(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/mkDir"))
                 c("remote file.exists post", file.exists("%remoteDir%/writeChecks/mkDir"))
                 c("remote file.info.isdir", file.info("%remoteDir%/writeChecks/mkDir")$isdir)
             ]]>
@@ -132,7 +132,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                c("webdav.mkDir", tryCatch({labkey.webdav.mkDir(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/mkDirFail/subdir")},
+                c("webdav.mkDir", tryCatch({labkey.webdav.mkDir(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/mkDirFail/subdir")},
                     error = function(e) {e$message}))
                 c("remote file.exists", file.exists("%remoteDir%/writeChecks/mkDirFail"))
             ]]>
@@ -149,7 +149,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("file.exists pre", file.exists("%remoteDir%/writeChecks/mkDirs1"))
-                c("webdav.mkDirs", labkey.webdav.mkDirs(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/mkDirs1/subdir"))
+                c("webdav.mkDirs", labkey.webdav.mkDirs(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/mkDirs1/subdir"))
                 c("file.exists post", file.exists("%remoteDir%/writeChecks/mkDirs1/subdir"))
                 c("file.info.isdir", file.info("%remoteDir%/writeChecks/mkDirs1/subdir")$isdir)
             ]]>
@@ -168,7 +168,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("file.exists pre", file.exists("%remoteDir%/writeChecks/mkDirs2"))
-                c("webdav.mkDirs", labkey.webdav.mkDirs(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/mkDirs2/subdir/subdir2"))
+                c("webdav.mkDirs", labkey.webdav.mkDirs(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/mkDirs2/subdir/subdir2"))
                 c("file.exists post", file.exists("%remoteDir%/writeChecks/mkDirs2/subdir/subdir2"))
                 c("file.info.isdir", file.info("%remoteDir%/writeChecks/mkDirs2/subdir/subdir2")$isdir)
             ]]>
@@ -187,7 +187,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("remote file.exists pre", file.exists("%remoteDir%/writeChecks/putMe.txt"))
-                c("webdav.put", labkey.webdav.put(localFile="%remoteDir%/readChecks/getMe.txt", baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/putMe.txt"))
+                c("webdav.put", labkey.webdav.put(localFile="%remoteDir%/readChecks/getMe.txt", baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/putMe.txt"))
                 c("remote file.exists post", file.exists("%remoteDir%/writeChecks/putMe.txt"))
                 c("remote file.info.size", file.info("%remoteDir%/writeChecks/putMe.txt")$size)
             ]]>
@@ -205,7 +205,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                c("webdav.pathExists", labkey.webdav.pathExists(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt"))
+                c("webdav.pathExists", labkey.webdav.pathExists(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt"))
             ]]>
         </url>
         <response>
@@ -218,7 +218,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                c("webdav.pathExists", labkey.webdav.pathExists(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/putMe.txt"))
+                c("webdav.pathExists", labkey.webdav.pathExists(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/putMe.txt"))
             ]]>
         </url>
         <response>
@@ -231,7 +231,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                c("webdav.listDir.fileCount", labkey.webdav.listDir(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks")$fileCount)
+                c("webdav.listDir.fileCount", labkey.webdav.listDir(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks")$fileCount)
             ]]>
         </url>
         <response>
@@ -244,7 +244,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                c("webdav.listDir", labkey.webdav.listDir(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt"))
+                c("webdav.listDir", labkey.webdav.listDir(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt"))
             ]]>
         </url>
         <response>
@@ -258,7 +258,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                c("webdav.listDir", tryCatch({labkey.webdav.listDir(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/noexist")},
+                c("webdav.listDir", tryCatch({labkey.webdav.listDir(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/noexist")},
                     error = function(e) {e$message}))
             ]]>
         </url>
@@ -274,7 +274,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("remote file.exists pre", file.exists("%remoteDir%/writeChecks/deleteMe.txt"))
-                c("webdav.delete", labkey.webdav.delete(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/deleteMe.txt"))
+                c("webdav.delete", labkey.webdav.delete(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/deleteMe.txt"))
                 c("remote file.exists post", file.exists("%remoteDir%/writeChecks/deleteMe.txt"))
             ]]>
         </url>
@@ -291,7 +291,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("remote dir.exists pre", dir.exists("%remoteDir%/writeChecks/deleteMe_empty"))
-                c("webdav.delete", labkey.webdav.delete(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/deleteMe_empty"))
+                c("webdav.delete", labkey.webdav.delete(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/deleteMe_empty"))
                 c("remote file.exists post", file.exists("%remoteDir%/writeChecks/deleteMe_empty"))
             ]]>
         </url>
@@ -308,7 +308,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("remote dir.exists pre", dir.exists("%remoteDir%/writeChecks/deleteMe"))
-                c("webdav.delete", labkey.webdav.delete(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/deleteMe"))
+                c("webdav.delete", labkey.webdav.delete(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/deleteMe"))
                 c("remote file.exists post", file.exists("%remoteDir%/writeChecks/deleteMe"))
             ]]>
         </url>
@@ -325,7 +325,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("remote file.exists pre", file.exists("%remoteDir%/writeChecks/noexist.txt"))
-                c("webdav.delete", tryCatch({labkey.webdav.delete(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/writeChecks/noexist.txt")},
+                c("webdav.delete", tryCatch({labkey.webdav.delete(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/noexist.txt")},
                     error = function(e) {e$message}))
                 c("remote file.exists post", file.exists("%remoteDir%/writeChecks/noexist.txt"))
             ]]>
@@ -345,7 +345,7 @@
                 library(Rlabkey)
                 c("dir.exists", dir.exists("%downloadDir%/getMe"))
                 c("dir.exists2", dir.exists("%downloadDir%/readChecks"))
-                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks", localBaseDir="%downloadDir%"))
+                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks", localBaseDir="%downloadDir%"))
                 c("dir.exists post", dir.exists("%downloadDir%/getMe"))
                 c("dir.exists2 post", dir.exists("%downloadDir%/readChecks/getMe"))
                 c("file.info.size a", file.info("%downloadDir%/readChecks/getMe/a.txt")$size)
@@ -373,7 +373,7 @@
                 if (dir.exists("%downloadDir%/getMe")) {unlink("%downloadDir%/getMe", recursive = T)}
                 c("dir.create", dir.create("%downloadDir%/getMe"))
                 c("file.create", dir.create("%downloadDir%/getMe/newFile.txt"))
-                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localBaseDir="%downloadDir%", overwriteFiles=TRUE, mergeFolders=FALSE))
+                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localBaseDir="%downloadDir%", overwriteFiles=TRUE, mergeFolders=FALSE))
                 c("dir.exists post", dir.exists("%downloadDir%/getMe"))
                 c("file.exists post", file.exists("%downloadDir%/getMe/newFile.txt"))
                 c("file.info.size a", file.info("%downloadDir%/getMe/a.txt")$size)
@@ -400,7 +400,7 @@
                 c("dir.create", dir.create("%downloadDir%/overwriteAndMerge/getMe/subdir", recursive=TRUE))
                 c("file.create a", file.create("%downloadDir%/overwriteAndMerge/getMe/a.txt"))
                 c("file.create c", file.create("%downloadDir%/overwriteAndMerge/getMe/subdir/c.txt"))
-                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localBaseDir="%downloadDir%/overwriteAndMerge/", mergeFolders=TRUE, overwriteFiles=TRUE))
+                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localBaseDir="%downloadDir%/overwriteAndMerge/", mergeFolders=TRUE, overwriteFiles=TRUE))
                 c("dir.exists post", dir.exists("%downloadDir%/overwriteAndMerge/getMe"))
                 c("file.info.size a", file.info("%downloadDir%/overwriteAndMerge/getMe/a.txt")$size)
                 c("file.info.size b", file.info("%downloadDir%/overwriteAndMerge/getMe/subdir/b.txt")$size)
@@ -429,7 +429,7 @@
                 c("dir.create", dir.create("%downloadDir%/mergeNoOverwrite/getMe/subdir", recursive=TRUE))
                 c("file.create a", file.create("%downloadDir%/mergeNoOverwrite/getMe/a.txt"))
                 c("file.create c", file.create("%downloadDir%/mergeNoOverwrite/getMe/subdir/c.txt"))
-                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localBaseDir="%downloadDir%/mergeNoOverwrite", mergeFolders=TRUE, overwriteFiles=FALSE))
+                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localBaseDir="%downloadDir%/mergeNoOverwrite", mergeFolders=TRUE, overwriteFiles=FALSE))
                 c("dir.exists post", dir.exists("%downloadDir%/mergeNoOverwrite/getMe"))
                 c("file.info.size a", file.info("%downloadDir%/mergeNoOverwrite/getMe/a.txt")$size)
                 c("file.info.size b", file.info("%downloadDir%/mergeNoOverwrite/getMe/subdir/b.txt")$size)
@@ -459,7 +459,7 @@
                 c("file.create a", file.create("%downloadDir%/noMergeNoOverwrite/getMe/a.txt"))
                 c("file.create c", file.create("%downloadDir%/noMergeNoOverwrite/getMe/subdir/c.txt"))
                 c("empty dir.exists pre", dir.exists("%downloadDir%/noMergeNoOverwrite/getMe/empty_subdir"))
-                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localBaseDir="%downloadDir%/noMergeNoOverwrite", mergeFolders=FALSE, overwriteFiles=FALSE))
+                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localBaseDir="%downloadDir%/noMergeNoOverwrite", mergeFolders=FALSE, overwriteFiles=FALSE))
                 c("dir.exists post", dir.exists("%downloadDir%/noMergeNoOverwrite/getMe"))
                 c("file.info.size a", file.info("%downloadDir%/noMergeNoOverwrite/getMe/a.txt")$size)
                 c("file.info.size b", file.info("%downloadDir%/noMergeNoOverwrite/getMe/subdir/b.txt")$size)
@@ -490,7 +490,7 @@
                 c("file.create a", file.create("%downloadDir%/overwriteNoMerge/getMe/a.txt"))
                 c("dir.create", dir.create("%downloadDir%/overwriteNoMerge/getMe/subdir", recursive=TRUE))
                 c("file.create c", file.create("%downloadDir%/overwriteNoMerge/getMe/subdir/c.txt"))
-                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localBaseDir="%downloadDir%/overwriteNoMerge", mergeFolders=FALSE, overwriteFiles=TRUE))
+                c("webdav.downloadFolder", labkey.webdav.downloadFolder(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe", localBaseDir="%downloadDir%/overwriteNoMerge", mergeFolders=FALSE, overwriteFiles=TRUE))
                 c("dir.exists post", dir.exists("%downloadDir%/overwriteNoMerge/getMe"))
                 c("file.info.size a", file.info("%downloadDir%/overwriteNoMerge/getMe/a.txt")$size)
                 c("file.info.size b", file.info("%downloadDir%/overwriteNoMerge/getMe/subdir/b.txt")$size)
@@ -519,7 +519,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("file.exists pre", file.exists("%downloadDir%/noexist"))
-                c("webdav.downloadFolder", tryCatch({labkey.webdav.downloadFolder(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath="remote/readChecks/noexist", localBaseDir="%downloadDir%", overwrite=TRUE)},
+                c("webdav.downloadFolder", tryCatch({labkey.webdav.downloadFolder(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/noexist", localBaseDir="%downloadDir%", overwrite=TRUE)},
                     error = function(e) {e$message}))
                 c("file.exists post", file.exists("%downloadDir%/noexist"))
             ]]>
@@ -539,7 +539,7 @@
                 library(Rlabkey)
                 dirName <- "TestDir-a%b#c&d@e~2"  #Add tricky characters
                 c("remote file.exists pre", file.exists(paste0("%remoteDir%/writeChecks/", dirName)))
-                c("webdav.mkDir", labkey.webdav.mkDir(baseUrl="%baseUrl%", folderPath="%projectName%", remoteFilePath=paste0("remote/writeChecks/", dirName)))
+                c("webdav.mkDir", labkey.webdav.mkDir(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath=paste0("remote/writeChecks/", dirName)))
                 c("remote file.exists post", file.exists(paste0("%remoteDir%/writeChecks/", dirName)))
                 c("remote file.info.isdir", file.info(paste0("%remoteDir%/writeChecks/", dirName))$isdir)
             ]]>
