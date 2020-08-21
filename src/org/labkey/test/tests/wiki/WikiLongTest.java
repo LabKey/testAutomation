@@ -20,11 +20,11 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
-import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
@@ -185,11 +185,10 @@ public class WikiLongTest extends BaseWebDriverTest
 
         searchFor(PROJECT_NAME, "normal normal normal", 1, WIKI_PAGE1_TITLE);
 
-        log("Test add content to link page");
+        log("Test adding content to linked but missing wiki.");
         WebElement wikiLink = Locator.linkWithText(WIKI_PAGE2_NAME).findElement(getDriver());
-        assertEquals("Link to other wiki has bad href",
-                WebTestHelper.buildURL("wiki", getProjectName(), "page", Maps.of("name", WIKI_PAGE2_NAME.replace(" ", "%20"))), wikiLink.getAttribute("href"));
         clickAndWait(wikiLink);
+        assertEquals("Page title.", WIKI_PAGE2_NAME, getText(Locators.bodyTitle()));
         assertTextPresent("page has no content");
         clickAndWait(Locator.linkWithText("add content"));
         _wikiHelper.convertWikiFormat("RADEOX");
