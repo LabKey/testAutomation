@@ -27,6 +27,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.api.ProjectMenu;
@@ -614,6 +615,9 @@ public class Crawler
             if (getDepth() >= getMaxDepth() && _actionsVisited.contains(getActionId()))
                 return false;
 
+            if (spiderAction.equals(getActionId()) && TestProperties.isPrimaryUserAppAdmin())
+                return false; // SpiderAction is inaccessible to app admin
+
             // Don't let a single bad action fail multiple tests
             if (_actionsWithErrors.contains(getActionId()))
                 return false;
@@ -995,6 +999,7 @@ public class Crawler
         _urlsChecked.add(stripQueryParams(relativeURL));
         URL origin = urlToCheck.getOrigin();
         int depth = urlToCheck.getDepth();
+        String originMessage = origin != null ? "\nOriginating page: " + origin.toString() : "";
 
         try
         {
@@ -1023,13 +1028,23 @@ public class Crawler
                 // Check that there was no error
                 if (code >= 400)
                 {
-                    fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
+                    String message = relativeURL + "\nproduced response code " + code + originMessage;
+                    if (code == 403 && TestProperties.isPrimaryUserAppAdmin())
+                    {
+                        // Crawling as app admin is likely to hit numerous 403s. Don't fail immediately.
+                        _test.checker().wrapAssertion(() -> fail(message));
+                    }
+                    else
+                    {
+                        fail(message);
+                    }
+
                 }
                 List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
                 if (!serverError.isEmpty())
                 {
                     String[] errorLines = serverError.get(0).split("\n");
-                    fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
+                    fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + originMessage);
                 }
 
                 // Find all the links at the site
@@ -1094,9 +1109,9 @@ public class Crawler
             }
 
             if (rethrow instanceof AssertionError)
-                throw rethrow;
+                throw rethrow; // AssertionErrors already contain page and origin information.
             else
-                throw new RuntimeException(relativeURL + "\nTriggered an exception." + (origin != null ? "\nOriginating page: " + origin.toString() : ""), rethrow);
+                throw new RuntimeException(relativeURL + "\nTriggered an exception." + originMessage, rethrow);
         }
 
         if (currentPageUrl != null && urlToCheck.isInjectableURL() && _injectionCheckEnabled)

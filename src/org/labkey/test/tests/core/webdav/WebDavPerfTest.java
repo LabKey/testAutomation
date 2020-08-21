@@ -17,7 +17,6 @@ package org.labkey.test.tests.core.webdav;
 
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
-import com.github.sardine.SardineFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -27,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.core.webdav.WebDavUrlFactory;
+import org.labkey.test.util.core.webdav.WebDavUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class WebDavPerfTest extends BaseWebDriverTest
         WebDavUrlFactory davUrl = WebDavUrlFactory.webDavUrlFactory(getProjectName() + "/" + subfolder);
 
         _containerHelper.createSubfolder(getProjectName(), subfolder);
-        final Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        final Sardine sardine = WebDavUtils.beginSardine(PasswordUtil.getUsername());
         log("Uploading files");
 
         Instant startTime = Instant.now();
