@@ -45,7 +45,7 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String PROJECT2_NAME = "WikiCopied";
     private static final String WIKI_PAGE1_TITLE = "Page 1 Wiki Title " + BaseWebDriverTest.INJECT_CHARS_1;
     private static final String WIKI_PAGE1_NAME= "Page 1 Wiki Name " + BaseWebDriverTest.INJECT_CHARS_1;
-    private static final String WIKI_PAGE2_NAME = "Page 2 Wiki Name " + BaseWebDriverTest.INJECT_CHARS_2;
+    private static final String WIKI_PAGE2_NAME = "Page 2 Wiki Name";
     private static final String WIKI_PAGE2_TITLE = "Page 2 Wiki Title " + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String WIKI_PAGE3_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE3_NAME_TITLE = "Page 3 Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
