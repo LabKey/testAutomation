@@ -351,24 +351,6 @@ public class Runner extends TestSuite
     // Set up only the requested tests
     private static List<Class<?>> getTestClasses(List<String> testNames)
     {
-        Map<String, Class<?>> nameMap = new HashMap<>();
-        TestSet allTests = _suites.getAllTests();
-        for (Class<?> testClass : allTests.getTestList())
-        {
-            String simpleName = testClass.getSimpleName().toLowerCase();
-            nameMap.put(simpleName, testClass);
-            if (simpleName.endsWith("test"))
-            {
-                simpleName = simpleName.substring(0, simpleName.length() - 4);
-                nameMap.put(simpleName, testClass);
-            }
-            // Allow "lists", "samplesets", etc.
-            if (!simpleName.endsWith("s"))
-            {
-                nameMap.put(simpleName + "s", testClass);
-            }
-        }
-
         List<Class<?>> testClasses = new ArrayList<>(testNames.size());
 
         for (String testName : testNames)
@@ -385,12 +367,12 @@ public class Runner extends TestSuite
             else
                 testClassName = testName;
 
-            Class<?> testClass = nameMap.get(testClassName.toLowerCase());
+            Class<?> testClass = _suites.getTestByName(testClassName);
             if (testClass == null)
             {
                 System.err.println("Couldn't find test '" + testClassName + "'.  Valid tests are:");
 
-                List<String> sortedTests = allTests.getTestNames();
+                List<String> sortedTests = _suites.getAllTests().getTestNames();
                 Collections.sort(sortedTests);
 
                 for (String c : sortedTests)

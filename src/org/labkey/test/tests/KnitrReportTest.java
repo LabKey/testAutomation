@@ -17,16 +17,17 @@ package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.IOException;
@@ -55,10 +56,13 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     {
         super.doCleanup(afterTest);
 
-        if (afterTest)
-            revertLibXml();
-        else
-            deleteLibXml();
+        if (!TestProperties.isServerRemote())
+        {
+            if (afterTest)
+                revertLibXml();
+            else
+                deleteLibXml();
+        }
     }
 
     @Test
@@ -83,7 +87,8 @@ public class KnitrReportTest extends AbstractKnitrReportTest
                                       //"propto",           // MathJax source
                                       "data_means"};      // Non-echoed R code
 
-        createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true);
+        Path reportSourcePath = TestProperties.isWithoutTestModules() ? rmdReport_no_scriptpad : rmdReport;
+        createAndVerifyKnitrReport(reportSourcePath, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true);
         assertEquals("Knitr report failed to display plot", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(plotLocator.findElement(getDriver()).getAttribute("src")).getResponseCode());
     }
 
@@ -96,7 +101,15 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     @Test
     public void testAdhocReportDependenciesString()
     {
-        deleteLibXml();
+        if (TestProperties.isServerRemote())
+        {
+            Assume.assumeTrue("Unable to modify remote webapp. Skipping test.", TestProperties.isWithoutTestModules());
+            // Scriptpad module supplies lib.xml. No need to modify webapp if it isn't present.
+        }
+        else
+        {
+            deleteLibXml();
+        }
         verifyAdhocReportDependencies("Strings",
                 "https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js;" +
                 "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js;\r\n" +
@@ -107,6 +120,8 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     @Test
     public void testAdhocReportDependenciesLib()
     {
+        Assume.assumeFalse("Unable to add dependencies to remote webapp root.", TestProperties.isServerRemote());
+
         copyLibXml();
 
         verifyAdhocReportDependencies("ClientLib", "knitr");
@@ -186,7 +201,7 @@ public class KnitrReportTest extends AbstractKnitrReportTest
 
         pauseJsErrorChecker(); // Don't fail due to "$ is not a function"
         {
-            click(Ext4Helper.Locators.tab("Report"));
+            _rReportHelper.clickReportTab();
             waitForElement(Locator.id("mtcars_table"));
             assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
         }

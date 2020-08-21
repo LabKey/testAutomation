@@ -4,11 +4,11 @@
             <![CDATA[
                 library(Rlabkey)
                 df <- data.frame(intKey=c(1:3), customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
-                fields <- labkey.domain.inferFields(baseUrl="%baseUrl%", folderPath="%projectName%", df)
+                fields <- labkey.domain.inferFields(baseUrl=labkey.url.base, folderPath="%projectName%", df)
                 indices = labkey.domain.createIndices(list("intKey", "customInt"), TRUE)
                 indices = labkey.domain.createIndices(list("customInt"), FALSE, indices)
                 dd <- labkey.domain.createDesign(name="test list", fields=fields, indices=indices)
-                labkey.domain.create(baseUrl="%baseUrl%", folderPath="%projectName%", domainKind="IntList", domainDesign=dd, options=list(keyName = "intKey"))
+                labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="IntList", domainDesign=dd, options=list(keyName = "intKey"))
             ]]>
         </url>
         <response>
@@ -28,7 +28,7 @@
                     customInt=1
                     , customString="custom string value")
 
-                labkey.insertRows(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow)
+                labkey.insertRows(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow)
             ]]>
         </url>
         <response>
@@ -49,11 +49,11 @@
             <![CDATA[
                 library(Rlabkey)
                 ## change the type of one of the columns
-                domain <- labkey.domain.get(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list")
+                domain <- labkey.domain.get(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list")
 
                 domain$fields[3,]$rangeURI = "xsd:string"
                 domain$fields[3,]$name = "changed to string"
-                labkey.domain.save(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=domain)
+                labkey.domain.save(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=domain)
             ]]>
         </url>
         <response>
@@ -69,8 +69,8 @@
                 library(Rlabkey)
                 ## remove one of the columns
                 df <- data.frame(intKey=c(1:3), customInt=c(1:3))
-                fields <- labkey.domain.inferFields(baseUrl="%baseUrl%", folderPath="%projectName%", df)
-                oldDesign <- labkey.domain.get(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list")
+                fields <- labkey.domain.inferFields(baseUrl=labkey.url.base, folderPath="%projectName%", df)
+                oldDesign <- labkey.domain.get(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list")
                 newDesign <- labkey.domain.createDesign(name="test list", fields=fields)
 
                 newDesign$domainId = oldDesign$domainId
@@ -81,12 +81,12 @@
                 newDesign$fields[2,]$propertyId = oldDesign$fields[2,]$propertyId
                 newDesign$fields[2,]$propertyURI = oldDesign$fields[2,]$propertyURI
 
-                labkey.domain.save(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=newDesign)
+                labkey.domain.save(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=newDesign)
                 newrow <- data.frame(
                     customInt=2
                     , customString="custom string value")
 
-                labkey.insertRows(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow)
+                labkey.insertRows(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow)
             ]]>
         </url>
         <response>
@@ -100,7 +100,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.domain.drop(baseUrl="%baseUrl%", folderPath="%projectName%", schemaName="lists", queryName="test list")
+                labkey.domain.drop(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list")
             ]]>
         </url>
         <response>
@@ -115,7 +115,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.domain.create(baseUrl="%baseUrl%", folderPath="%projectName%", domainTemplate="Priority", module="simpletest", domainGroup="todolist")
+                labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainTemplate="Priority", module="simpletest", domainGroup="todolist")
             ]]>
         </url>
         <response>

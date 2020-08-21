@@ -37,7 +37,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.serverapi.reader.Readers;
@@ -82,6 +84,7 @@ import java.util.Random;
 public class WebTestHelper
 {
     public static final Random RANDOM = new Random();
+    public static final String API_KEY = "apikey"; // Username for api/session key authentication
 
     private static final String DEFAULT_CONTEXT_PATH = "";
     private static final Integer DEFAULT_WEB_PORT = 8080;
@@ -93,6 +96,7 @@ public class WebTestHelper
     public static final int GC_ATTEMPT_LIMIT = 6;
     private static boolean USE_CONTAINER_RELATIVE_URL = true;
     private static final Map<String, Map<String, Cookie>> savedCookies = new HashMap<>();
+    private static final Map<String, String> savedSessionKeys = new HashMap<>();
 
     public static void setUseContainerRelativeUrl(boolean useContainerRelativeUrl)
     {
@@ -112,6 +116,42 @@ public class WebTestHelper
     public static Map<String, Cookie> getCookies(String user)
     {
         return savedCookies.getOrDefault(user, Collections.emptyMap());
+    }
+
+    public static String getSessionKey(String user)
+    {
+        Cookie sessionCookie = getCookies(user).get(Connection.JSESSIONID);
+        if (sessionCookie == null)
+        {
+            throw new IllegalStateException("No saved session for user: " + user);
+        }
+        String sessionId = sessionCookie.getValue();
+
+        if (!savedSessionKeys.containsKey(sessionId))
+        {
+            Connection connection = getRemoteApiConnection(user, true);
+            PostCommand<?> command = new PostCommand<>("security", "createApiKey");
+            JSONObject json = new JSONObject();
+            json.put("type", "session");
+            command.setJsonObject(json);
+
+            try
+            {
+                CommandResponse response = command.execute(connection, "/");
+                Object apikey = response.getParsedData().get("apikey");
+                if (apikey == null)
+                {
+                    TestLogger.error(response.getText());
+                    throw new RuntimeException("Failed to generate session key");
+                }
+                savedSessionKeys.put(sessionId, (String) apikey);
+            }
+            catch (CommandException | IOException e)
+            {
+                throw new RuntimeException("Unable to generate session key", e);
+            }
+        }
+        return savedSessionKeys.get(sessionId);
     }
 
     public static boolean isUseContainerRelativeUrl()
@@ -403,6 +443,16 @@ public class WebTestHelper
         Connection connection = new Connection(getBaseURL(), username, PasswordUtil.getPassword());
 
         if (includeCookiesFromPrimaryUser)
+            addCachedCookies(connection, username);
+
+        return connection;
+    }
+
+    public static Connection getRemoteApiConnection(String username, boolean includeCookies)
+    {
+        Connection connection = new Connection(getBaseURL(), username, PasswordUtil.getPassword());
+
+        if (includeCookies)
             addCachedCookies(connection, username);
 
         return connection;

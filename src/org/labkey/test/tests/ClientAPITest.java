@@ -1532,6 +1532,8 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void suggestedColumnsInQueryDetailsTest() throws Exception
     {
+        assumeTestModules();
+
         final String PATH = getProjectName() + "/" + FOLDER_NAME;
         final String SCHEMA = "vehicle";
         final String QUERY = "UserDefinedEmissions";
