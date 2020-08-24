@@ -94,7 +94,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
             return false;
 
         String nextBtnClass = elementCache().nextButton().get().getAttribute("class");
-        if (nextBtnClass.contains("pagination_buttons__next"))
+        if (nextBtnClass.contains("pagination-buttons__next"))
             return !elementCache().nextButton().get().getAttribute("disabled").equals("true");
         else
             return !nextBtnClass.contains("disabled-button");

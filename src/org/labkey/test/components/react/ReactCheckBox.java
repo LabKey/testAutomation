@@ -105,11 +105,11 @@ public class ReactCheckBox extends Checkbox
                     break;
                 case Indeterminate:
                     WebDriverWrapper.waitFor(() -> isIndeterminate(),
-                            "", 1000);
+                            "Expected checkbox to be in an indeterminate state", 1000);
                     break;
                 case Unchecked:
                     WebDriverWrapper.waitFor(() -> !isChecked() && !isIndeterminate(),
-                            "Expected", 1000);
+                            "Failed to uncheck checkbox", 1000);
                     break;
             }
         }
