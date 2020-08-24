@@ -59,7 +59,7 @@ public class DeferredErrorCollector
      *
      * @param errorType Additional error type to be recorded.
      */
-    public void addRecordableErrorType(Class<? extends Throwable> errorType)
+    public void addRecordableErrorType(Class<? extends Exception> errorType)
     {
         errorTypes.add(errorType);
     }
@@ -147,19 +147,22 @@ public class DeferredErrorCollector
      * {@link #addRecordableErrorType(Class)} to specify additional error types that should be recorded.
      *
      * @param wrappedAssertion {@link Runnable} that might throw an error that shouldn't fail a test immediately
+     * @return <code>true</code> if <code>wrappedAssertion</code> does not throw, <code>false</code> if an error was recorded,
+     * otherwise rethrow exception thrown by <code>wrappedAssertion</code>
      */
-    public void wrapAssertion(Runnable wrappedAssertion)
+    public boolean wrapAssertion(Runnable wrappedAssertion)
     {
         try
         {
             wrappedAssertion.run();
+            return true;
         }
-        catch (Throwable err)
+        catch (Exception | AssertionError err)
         {
             if (isErrorRecordable(err))
             {
                 recordError(err.getMessage());
-                return;
+                return false;
             }
             throw err; // Not a recordable error
         }
@@ -184,20 +187,11 @@ public class DeferredErrorCollector
      * @param expected Expected value.
      * @param actual Actual value.
      * @see Assert#assertEquals(String, Object, Object)
+     * @return <code>true</code> if objects are equal
      */
-    public final void verifyEquals(String message, Object expected, Object actual)
+    public final boolean verifyEquals(String message, Object expected, Object actual)
     {
-        wrapAssertion(() -> Assert.assertEquals(message, expected, actual));
-    }
-
-    /**
-     * Renamed to match JUnit Assert method
-     * @see #verifyEquals(String, Object, Object)
-     */
-    @Deprecated(forRemoval = true)
-    public final void verifyEqual(String message, Object expected, Object actual)
-    {
-        verifyEquals(message, expected, actual);
+        return wrapAssertion(() -> Assert.assertEquals(message, expected, actual));
     }
 
     /**
@@ -207,68 +201,63 @@ public class DeferredErrorCollector
      * @param unexpected Unexpected value.
      * @param actual Actual value.
      * @see Assert#assertNotEquals(String, Object, Object)
+     * @return <code>true</code> if objects are not equal
      */
-    public final void verifyNotEquals(String message, Object unexpected, Object actual)
+    public final boolean verifyNotEquals(String message, Object unexpected, Object actual)
     {
-        wrapAssertion(() -> Assert.assertNotEquals(message, unexpected, actual));
+        return wrapAssertion(() -> Assert.assertNotEquals(message, unexpected, actual));
     }
 
     /**
-     * Renamed to match JUnit Assert method
-     * @see #verifyNotEquals(String, Object, Object)
-     */
-    @Deprecated(forRemoval = true)
-    public final void verifyNotEqual(String message, Object unexpected, Object actual)
-    {
-        verifyNotEquals(message, unexpected, actual);
-    }
-
-    /**
-     * Record an error if the condition is 'false'.
+     * Record an error if the condition is <code>false</code>.
      *
      * @param message Message to show if check fails.
      * @param condition Conditional check (ex: element.isDisplayed())
      * @see Assert#assertTrue(String, boolean)
+     * @return <code>true</code> if condition is true
      */
-    public final void verifyTrue(String message, boolean condition)
+    public final boolean verifyTrue(String message, boolean condition)
     {
-        wrapAssertion(() -> Assert.assertTrue(message, condition));
+        return wrapAssertion(() -> Assert.assertTrue(message, condition));
     }
 
     /**
-     * Record an error if the condition is 'true'.
+     * Record an error if the condition is <code>true</code>.
      *
      * @param message Message to show if the conditional test is false.
      * @param condition Conditional check (ex: element.isDisplayed())
      * @see Assert#assertFalse(String, boolean)
+     * @return <code>true</code> if condition is false
      */
-    public final void verifyFalse(String message, boolean condition)
+    public final boolean verifyFalse(String message, boolean condition)
     {
-        wrapAssertion(() -> Assert.assertFalse(message, condition));
+        return wrapAssertion(() -> Assert.assertFalse(message, condition));
     }
 
     /**
-     * Record an error if the object is not 'null'.
+     * Record an error if the object is not <code>null</code>.
      *
      * @param message Message to show if check fails.
      * @param object Object to check
      * @see Assert#assertNull(String, Object)
+     * @return <code>true</code> if object is null
      */
-    public final void verifyNull(String message, Object object)
+    public final boolean verifyNull(String message, Object object)
     {
-        wrapAssertion(() -> Assert.assertNull(message, object));
+        return wrapAssertion(() -> Assert.assertNull(message, object));
     }
 
     /**
-     * Record an error if the object is 'null'.
+     * Record an error if the object is <code>null</code>.
      *
      * @param message Message to show if check fails.
      * @param object Object to check
      * @see Assert#assertNotNull(String, Object)
+     * @return <code>true</code> if object is not null
      */
-    public final void verifyNotNull(String message, Object object)
+    public final boolean verifyNotNull(String message, Object object)
     {
-        wrapAssertion(() -> Assert.assertNotNull(message, object));
+        return wrapAssertion(() -> Assert.assertNotNull(message, object));
     }
 
     /**
@@ -279,10 +268,11 @@ public class DeferredErrorCollector
      * @param matcher an expression, built of {@link Matcher}s, specifying allowed
      * values
      * @see Assert#assertThat(String, Object, Matcher)
+     * @return <code>true</code> if the object satisfies the specified condition
      */
-    public final <T> void verifyThat(String reason, T actual, Matcher<? super T> matcher)
+    public final <T> boolean verifyThat(String reason, T actual, Matcher<? super T> matcher)
     {
-        wrapAssertion(() -> Assert.assertThat(reason, actual, matcher));
+        return wrapAssertion(() -> Assert.assertThat(reason, actual, matcher));
     }
 
     /**
@@ -290,10 +280,11 @@ public class DeferredErrorCollector
      *
      * @param message Message to record.
      * @see Assert#fail()
+     * @return Always returns <code>false</code>
      */
-    public final void error(String message)
+    public final boolean error(String message)
     {
-        wrapAssertion(() -> Assert.fail(message));
+        return wrapAssertion(() -> Assert.fail(message));
     }
 
     /**
@@ -402,11 +393,11 @@ public class DeferredErrorCollector
      */
     public String takeScreenShot(String screenshotName)
     {
-        String _snapShotNumberedName = screenshotName + "_" + screenShotCount++;
+        String snapShotNumberedName = screenshotName + "_" + screenShotCount++;
 
-        artifactCollector.dumpPageSnapshot(_snapShotNumberedName, null);
+        artifactCollector.dumpPageSnapshot(snapShotNumberedName, null);
 
-        return _snapShotNumberedName;
+        return snapShotNumberedName;
     }
 
     private abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
@@ -458,7 +449,7 @@ public class DeferredErrorCollector
         }
 
         @Override
-        public void addRecordableErrorType(Class<? extends Throwable> errorType)
+        public void addRecordableErrorType(Class<? extends Exception> errorType)
         {
             getWrappedErrorColloctor().addRecordableErrorType(errorType);
         }
@@ -508,9 +499,10 @@ public class DeferredErrorCollector
         }
 
         @Override
-        public void wrapAssertion(Runnable wrappedAssertion)
+        public boolean wrapAssertion(Runnable wrappedAssertion)
         {
             wrappedAssertion.run();
+            return true;
         }
     }
 
@@ -526,7 +518,7 @@ public class DeferredErrorCollector
         @Override
         protected void recordError(String errorMessage)
         {
-            String shotName = takeScreenShot(_screenshotName);
+            String shotName = super.takeScreenShot(_screenshotName);
             errorMessage = errorMessage + "\nScreen shot name: " + shotName + "\n";
             super.recordError(errorMessage);
         }
