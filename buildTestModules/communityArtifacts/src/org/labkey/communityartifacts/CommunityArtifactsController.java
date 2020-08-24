@@ -43,9 +43,8 @@ public class CommunityArtifactsController extends SpringActionController
             return new JspView("/org/labkey/communityartifacts/view/hello.jsp");
         }
 
-        public NavTree appendNavTrail(NavTree root)
-        {
-            return root;
-        }
+        @Override
+        public void addNavTrail(NavTree root)
+        { }
     }
 }

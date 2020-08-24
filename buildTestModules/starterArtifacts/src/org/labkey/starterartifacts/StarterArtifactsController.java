@@ -43,9 +43,8 @@ public class StarterArtifactsController extends SpringActionController
             return new JspView("/org/labkey/starterartifacts/view/hello.jsp");
         }
 
-        public NavTree appendNavTrail(NavTree root)
-        {
-            return root;
-        }
+        @Override
+        public void addNavTrail(NavTree root)
+        { }
     }
 }
