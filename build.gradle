@@ -79,21 +79,25 @@ if (project.hasProperty("teamcity"))
     apply plugin: 'org.labkey.teamCity'
 }
 
-// the jar file that contains just the classes from this project, not all other
-// projects with src/test directories
-//project.sourceSets {
-//    main {
-//        java {
-//            srcDirs = ["src"]
-//            exclude "test/tests/**"
-//        }
-//    }
-//}
-//project.tasks.jar {
-//    Jar jar ->
-//        jar.archiveBaseName.set(apiArtifactName)
-//        jar.setGroup('org.labkey.api')
-//}
+// If this configuration for the default jar file is included when synching with IntelliJ
+// the classes in other modules that reference classes here will not resolve properly.
+if (!BuildUtils.isIntellij())  {
+    // the jar file that contains just the classes from this project, not all other
+    // projects with src/test directories
+    project.sourceSets {
+        main {
+            java {
+                srcDirs = ["src"]
+                exclude "test/tests/**"
+            }
+        }
+    }
+    project.tasks.jar {
+        Jar jar ->
+            jar.archiveBaseName.set(apiArtifactName)
+            jar.setGroup('org.labkey.api')
+    }
+}
 
 
 if (project.hasProperty('doPublishing'))
