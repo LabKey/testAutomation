@@ -81,19 +81,19 @@ if (project.hasProperty("teamcity"))
 
 // the jar file that contains just the classes from this project, not all other
 // projects with src/test directories
-project.sourceSets {
-    main {
-        java {
-            srcDirs = ["src"]
-            exclude "test/tests/**"
-        }
-    }
-}
-project.tasks.jar {
-    Jar jar ->
-        jar.archiveBaseName.set(apiArtifactName)
-        jar.setGroup('org.labkey.api')
-}
+//project.sourceSets {
+//    main {
+//        java {
+//            srcDirs = ["src"]
+//            exclude "test/tests/**"
+//        }
+//    }
+//}
+//project.tasks.jar {
+//    Jar jar ->
+//        jar.archiveBaseName.set(apiArtifactName)
+//        jar.setGroup('org.labkey.api')
+//}
 
 
 if (project.hasProperty('doPublishing'))
