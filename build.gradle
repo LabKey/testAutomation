@@ -116,7 +116,7 @@ if (project.hasProperty('doPublishing'))
                         scm {
                             connection = 'scm:git:https://github.com/LabKey/testAutomation'
                             developerConnection = 'scm:git:https://github.com/LabKey/testAutomation'
-                            url = 'scm:git:https://github.com/LabKey/testAutomation'
+                            url = 'https://github.com/LabKey/testAutomation'
                         }
                         withXml {
                             pomUtil.getDependencyClosure(asNode(), false)
