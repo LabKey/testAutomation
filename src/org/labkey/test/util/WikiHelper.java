@@ -88,6 +88,12 @@ public class WikiHelper
         return TestFileUtils.getSampleData("fileTypes/xls_sample.xls");
     }
 
+    public EditPage editWikiPage()
+    {
+        _test.clickAndWait(Locator.tagWithAttribute("span", "title", "Edit"));
+        return new EditPage(_test.getWrappedDriver());
+    }
+
     private void setSourceFromFile(File file)
     {
         setSource(TestFileUtils.getFileContents(file));

@@ -16,7 +16,6 @@
 package org.labkey.test.util.core.webdav;
 
 import com.github.sardine.Sardine;
-import com.github.sardine.SardineFactory;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -48,12 +47,12 @@ public class WebDavUploadHelper
 
     public WebDavUploadHelper(@NotNull WebDavUrlFactory urlFactory)
     {
-        this(urlFactory, SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword()));
+        this(urlFactory, WebDavUtils.beginSardine(PasswordUtil.getUsername()));
     }
 
     public WebDavUploadHelper(@NotNull String containerPath)
     {
-        this(WebDavUrlFactory.webDavUrlFactory(containerPath), SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword()));
+        this(WebDavUrlFactory.webDavUrlFactory(containerPath), WebDavUtils.beginSardine(PasswordUtil.getUsername()));
     }
 
     /**

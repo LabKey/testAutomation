@@ -91,7 +91,7 @@ public abstract class TestProperties
 
     public static boolean isServerRemote()
     {
-        return "true".equals(System.getProperty("labkey.isRemote", "false"));
+        return "true".equals(System.getProperty("webtest.server.remote", "false"));
     }
 
     public static boolean isIgnoreMissingModules()
@@ -186,6 +186,11 @@ public abstract class TestProperties
     public static boolean isWithoutTestModules()
     {
         return "true".equals(System.getProperty("webtest.without.test.modules"));
+    }
+
+    public static boolean isTrialServer()
+    {
+        return "true".equals(System.getProperty("webtest.server.trial"));
     }
 
     public static String ensureGeckodriverExeProperty()

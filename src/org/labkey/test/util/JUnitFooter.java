@@ -27,7 +27,7 @@ public class JUnitFooter extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return null;
+        return List.of();
     }
 
     @Override
@@ -39,8 +39,9 @@ public class JUnitFooter extends BaseWebDriverTest
     @Test
     public void afterJUnit()
     {
+        resetErrors(); // Ignore errors logged by server-side tests.
         log("** This should follow JUnitTest.");
-        log("** It will check for any errors or memory leaks caused by server-side tests");
+        log("** It will check for memory leaks and clean up the 'Shared/_junit' project.");
 
         PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
         pipelineToolsHelper.resetPipelineToolsDirectory();
@@ -49,6 +50,7 @@ public class JUnitFooter extends BaseWebDriverTest
             _containerHelper.deleteFolder("Shared", "_junit");
 
         waitForSystemMaintenanceCompletion();
+        super.checkErrors();
     }
 
     @Override
@@ -60,7 +62,7 @@ public class JUnitFooter extends BaseWebDriverTest
     @Override
     public void checkErrors()
     {
-        // Skip. Need a way to ignore expected errors.
+        // Skip normal check. Server-side tests might generate expected errors.
     }
 
     @Override public BrowserType bestBrowser()
