@@ -58,6 +58,10 @@ public class ListArchiveImportTest extends BaseWebDriverTest
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
     }
 
+    /**
+     * Regression test:
+     * Issue 32667: Errors during list import leave Connection in bad state
+     */
     @Test
     public void testImportListArchiveWithError() throws IOException
     {
