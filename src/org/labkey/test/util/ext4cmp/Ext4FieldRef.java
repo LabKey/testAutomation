@@ -127,7 +127,7 @@ public class Ext4FieldRef extends Ext4CmpRef
     {
         try
         {
-            String val = (String)getFnEval("return this.getValue() ? this.getValue().format('c') : null");
+            String val = (String)getFnEval("return this.getValue() ? Ext4.Date.format(this.getValue(), 'c') : null");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
             return val == null ? null : dateFormat.parse(val);
         }
