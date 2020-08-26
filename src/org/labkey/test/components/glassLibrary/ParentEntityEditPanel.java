@@ -68,6 +68,29 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     //  using generics (much in the same way the modal dialog does), but I don't have time to do that right now.
 
     /**
+     * Check to see if the panel is loaded. A panel is considered loaded if all of the combo-boxes in the panel are
+     * valid and are not loading.
+     *
+     * @return True if all of the combo-box references are valid and not loading.
+     */
+    public boolean isPanelLoaded()
+    {
+        try
+        {
+            boolean allThere = true;
+            for(ReactSelect rs : getAllTypeCombo())
+            {
+                allThere = (rs.isInteractive() && !rs.isLoading()) && allThere;
+            }
+            return allThere;
+        }
+        catch(StaleElementReferenceException exception)
+        {
+            return false;
+        }
+    }
+
+    /**
      * Clicking either the 'Save' or 'Cancel' button will remove this edit panel. This helper function will click the
      * button sent to it and then wait until it has some indication the edit panel is gone and the default panel is
      * shown.

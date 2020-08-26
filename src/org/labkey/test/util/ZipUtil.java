@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.labkey.test.util;
+import org.labkey.test.TestFileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -33,27 +35,33 @@ public class ZipUtil
         _source = source;
     }
 
+    public File tempZip() throws IOException
+    {
+        TestFileUtils.getTestTempDir();
+        return zipInto(TestFileUtils.getTestTempDir());
+    }
+
     public File zipInto(File destDir) throws IOException
     {
         return zipIt(new File(destDir, _source.getName() + ".zip"));
     }
 
-    public File zipIt(File _dest) throws IOException
+    public File zipIt(File destZip) throws IOException
     {
         List<File> fileList = generateFileList(_source, new ArrayList<>());
 
-        TestLogger.log("Output to Zip : " + _dest.toString());
-        Files.createDirectories(_dest.getParentFile().toPath());
-        if (_dest.exists())
+        TestLogger.log("Output to Zip : " + destZip.toString());
+        Files.createDirectories(destZip.getParentFile().toPath());
+        if (destZip.exists())
         {
-            Files.delete(_dest.toPath());
+            Files.delete(destZip.toPath());
         }
-        Files.createFile(_dest.toPath());
+        Files.createFile(destZip.toPath());
 
         byte[] buffer = new byte[1024];
 
         try(
-                FileOutputStream fos = new FileOutputStream(_dest);
+                FileOutputStream fos = new FileOutputStream(destZip);
                 ZipOutputStream zos = new ZipOutputStream(fos)
         )
         {
@@ -77,7 +85,7 @@ public class ZipUtil
             TestLogger.log(String.format("Zipped %d files", fileList.size()));
         }
 
-        return _dest;
+        return destZip;
     }
 
     private List<File> generateFileList(File node, List<File> fileList)
