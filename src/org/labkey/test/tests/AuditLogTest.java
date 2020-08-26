@@ -46,6 +46,7 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Log4jUtils;
@@ -59,6 +60,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,7 +157,7 @@ public class AuditLogTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps() throws IOException
+    public void testSteps() throws IOException, CommandException
     {
         turnOnAuditLogFile();
 
@@ -295,7 +297,8 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add(AUDIT_TEST_USER + "fail failed to login: user does not exist");
         expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
 
-        for (String msg : expectedLogValues)
+        Collections.reverse(expectedLogValues);
+        for (int i = 0; i < expectedLogValues.size(); i++)
         {
             verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, msg, 20);
         }
@@ -490,17 +493,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     public static void goToAuditEventView(BaseWebDriverTest instance, String eventType)
     {
-        if (!instance.isTextPresent("Audit Log"))
-        {
-            instance.ensureAdminMode();
-
-            instance.goToAdminConsole().clickAuditLog();
-        }
-
-        if (!instance.getSelectedOptionText(Locator.name("view")).equals(eventType))
-        {
-            instance.doAndWaitForPageToLoad(() -> instance.selectOptionByText(Locator.name("view"), eventType));
-        }
+        new AuditLogHelper(instance).goToAuditEventView(eventType);
     }
 
     public static void verifyAuditEvent(BaseWebDriverTest instance, String eventType, String column, String msg, int rowsToSearch)

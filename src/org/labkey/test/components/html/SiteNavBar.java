@@ -335,6 +335,11 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             window.clickImpersonate();
         }
 
+        public void signOut()
+        {
+            clickSubMenu(true, "Sign Out");
+        }
+
         @Override
         public UserMenu withExpandRetries(int retries)
         {
