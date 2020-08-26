@@ -168,8 +168,9 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
         if (expectRedirect)
         {
             // The click does nothing, but we want to wait for the redirect before continuing
+            log("Process done, clicking and waiting for redirect");
             clickAndWait(elementCache().statusText);
-            log("Redirected on success as expected");
+            log("Redirected on success as expected: " + getDriver().getCurrentUrl());
         }
 
         return this;
