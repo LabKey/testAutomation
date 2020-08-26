@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from PostgreSQL 18.1 at http://localhost:8080/labkey/home/project-begin.view by adam on Tue Jan 02 09:26:45 PST 2018-->
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="People" tableDbType="TABLE">
+    <description>This is my description</description>
+    <columns>
+      <column columnName="Key">
+        <datatype>integer</datatype>
+        <columnTitle>Key</columnTitle>
+        <rangeURI>http://www.w3.org/2001/XMLSchema#int</rangeURI>
+        <nullable>false</nullable>
+        <isHidden>true</isHidden>
+        <isKeyField>true</isKeyField>
+        <isAutoInc>true</isAutoInc>
+      </column>
+      <column columnName="First">
+        <datatype>varchar</datatype>
+        <columnTitle>First</columnTitle>
+        <rangeURI>http://www.w3.org/2001/XMLSchema#string</rangeURI>
+        <required>true</required>
+        <defaultValueType>FIXED_EDITABLE</defaultValueType>
+        <scale>100</scale>
+      </column>
+      <column columnName="Last">
+        <datatype>varchar</datatype>
+        <columnTitle>Last</columnTitle>
+        <rangeURI>http://www.w3.org/2001/XMLSchema#string</rangeURI>
+        <required>true</required>
+        <defaultValue>Flintstone</defaultValue>
+        <validators>
+          <validator>
+            <name>No Lums!</name>
+            <description>Don't allow anyone named Lum</description>
+            <typeURI>urn:lsid:labkey.com:PropertyValidator:regex</typeURI>
+            <expression>Lum</expression>
+            <errorMessage>No Lums allowed!</errorMessage>
+            <property>
+              <name>failOnMatch</name>
+              <value>true</value>
+            </property>
+          </validator>
+        </validators>
+        <scale>200</scale>
+      </column>
+      <column columnName="Age">
+        <datatype>integer</datatype>
+        <columnTitle>Age</columnTitle>
+        <rangeURI>http://www.w3.org/2001/XMLSchema#int</rangeURI>
+        <measure>false</measure>
+        <formatString><![CDATA[0.0 "''>--><'script>alert(''8('');</script>']]></formatString>
+        <defaultValueType>LAST_ENTERED</defaultValueType>
+        <validators>
+          <validator>
+            <name>Age out of range</name>
+            <description>The age is ridiculous</description>
+            <typeURI>urn:lsid:labkey.com:PropertyValidator:range</typeURI>
+            <expression><![CDATA[~gte=0&~lt=130]]></expression>
+            <errorMessage>That's out of range, you dork!</errorMessage>
+          </validator>
+          <validator>
+            <name>Some regex</name>
+            <description>Supposed to be good for you</description>
+            <typeURI>urn:lsid:labkey.com:PropertyValidator:regex</typeURI>
+            <expression>[0-8]+</expression>
+            <errorMessage>Doesn't match, dummy!</errorMessage>
+          </validator>
+        </validators>
+      </column>
+      <column columnName="Appearance">
+        <datatype>timestamp</datatype>
+        <columnTitle>Appearance</columnTitle>
+        <rangeURI>http://www.w3.org/2001/XMLSchema#dateTime</rangeURI>
+      </column>
+      <column columnName="Sex">
+        <datatype>integer</datatype>
+        <columnTitle>Sex</columnTitle>
+        <rangeURI>http://www.w3.org/2001/XMLSchema#int</rangeURI>
+        <fk>
+          <fkDbSchema>lists</fkDbSchema>
+          <fkTable>Gender</fkTable>
+          <fkColumnName>Key</fkColumnName>
+        </fk>
+        <validators>
+          <validator>
+            <name>Lookup validator</name>
+            <typeURI>urn:lsid:labkey.com:PropertyValidator:lookup</typeURI>
+          </validator>
+        </validators>
+      </column>
+      <column columnName="Height">
+        <datatype>double</datatype>
+        <columnTitle>Height</columnTitle>
+        <rangeURI>http://www.w3.org/2001/XMLSchema#double</rangeURI>
+        <measure>false</measure>
+        <defaultValue>2.0</defaultValue>
+        <conditionalFormats>
+          <conditionalFormat>
+            <filters>
+              <filter operator="gt" value="2.0"/>
+            </filters>
+            <textColor>FF00FF</textColor>
+          </conditionalFormat>
+        </conditionalFormats>
+      </column>
+      <column columnName="File">
+        <datatype>varchar</datatype>
+        <columnTitle>File</columnTitle>
+        <rangeURI>http://www.labkey.org/exp/xml#attachment</rangeURI>
+        <url replaceMissing="blankValue"><![CDATA[/labkey/home/list-download.view?listId=11&entityId=${EntityId}&name=${File}]]></url>
+        <phi>Limited</phi>
+        <scale>4000</scale>
+      </column>
+      <column columnName="Notes">
+        <datatype>varchar</datatype>
+        <columnTitle>Notes</columnTitle>
+        <rangeURI>http://www.w3.org/2001/XMLSchema#string</rangeURI>
+        <defaultValueType>FIXED_EDITABLE</defaultValueType>
+        <scale>2147483647</scale>
+      </column>
+    </columns>
+    <pkColumnName>Key</pkColumnName>
+  </table>
+</tables>
