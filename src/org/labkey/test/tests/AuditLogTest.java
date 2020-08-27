@@ -262,45 +262,56 @@ public class AuditLogTest extends BaseWebDriverTest
     {
         ArrayList<String> auditLogBefore;
         ArrayList<String> auditLogAfter;
+        ArrayList<String> expectedLogValues = new ArrayList<>();
 
         auditLogBefore = getAuditLogFromFile();
         // Use UI helper to avoid unexpected events from API authentication
         UIUserHelper userHelper = new UIUserHelper(this);
         log("testing user audit events");
         userHelper.createUser(AUDIT_TEST_USER);
-        impersonate(AUDIT_TEST_USER);
-        stopImpersonating();
-        impersonateRoles(PROJECT_ADMIN_ROLE, AUTHOR_ROLE);
-        stopImpersonating();
-        String adminGroup = "Administrator";
-        impersonateGroup(adminGroup, true);
-        stopImpersonating();
-        signOut();
-        signInShouldFail(AUDIT_TEST_USER, "asdf"); // Bad login.  Existing User
-        signInShouldFail(AUDIT_TEST_USER + "fail", "asdf"); // Bad login.  Non-existent User
-        simpleSignIn();
-        userHelper.deleteUsers(true, AUDIT_TEST_USER);
-
-        ArrayList<String> expectedLogValues = new ArrayList<>();
         expectedLogValues.add(AUDIT_TEST_USER + " was added to the system and the administrator chose not to send a verification email.");
+
+        impersonate(AUDIT_TEST_USER);
         expectedLogValues.add(getCurrentUser() + " impersonated " + AUDIT_TEST_USER);
         expectedLogValues.add(AUDIT_TEST_USER + " was impersonated by " + getCurrentUser());
+
+        stopImpersonating();
         expectedLogValues.add(AUDIT_TEST_USER + " was no longer impersonated by " + getCurrentUser());
         expectedLogValues.add(getCurrentUser() + " stopped impersonating " + AUDIT_TEST_USER);
+
+        impersonateRoles(PROJECT_ADMIN_ROLE, AUTHOR_ROLE);
         expectedLogValues.add(getCurrentUser() + " impersonated roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+
+        stopImpersonating();
         expectedLogValues.add(getCurrentUser() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+
+        String adminGroup = "Administrator";
+        impersonateGroup(adminGroup, true);
         expectedLogValues.add(getCurrentUser() + " impersonated group: " + adminGroup);
+
+        stopImpersonating();
         expectedLogValues.add(getCurrentUser() + " stopped impersonating group: " + adminGroup);
+
+        navBar().userMenu().signOut();
         expectedLogValues.add(getCurrentUser() + " logged out.");
+
+        signInShouldFail(AUDIT_TEST_USER, "asdf"); // Bad login.  Existing User
         expectedLogValues.add(AUDIT_TEST_USER + " failed to login: incorrect password");
-        expectedLogValues.add(getCurrentUser() + " logged in successfully via the \"Standard database authentication\" configuration.");
+
+        signInShouldFail(AUDIT_TEST_USER + "fail", "asdf"); // Bad login.  Non-existent User
         expectedLogValues.add(AUDIT_TEST_USER + "fail failed to login: user does not exist");
+
+        simpleSignIn();
+        expectedLogValues.add(getCurrentUser() + " logged in successfully via the \"Standard database authentication\" configuration.");
+
+        userHelper.deleteUsers(true, AUDIT_TEST_USER);
         expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
 
         Collections.reverse(expectedLogValues);
         for (int i = 0; i < expectedLogValues.size(); i++)
         {
-            verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, msg, 20);
+            String msg = expectedLogValues.get(i);
+            verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, msg, i + 1);
         }
 
         // Check the file after the UI check, if the UI tests passed then we should have confidence that the entry is in the file.
