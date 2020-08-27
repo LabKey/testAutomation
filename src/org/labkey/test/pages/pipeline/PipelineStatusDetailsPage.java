@@ -293,6 +293,19 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
         return this;
     }
 
+    public PipelineStatusDetailsPage assertLogTextNotContains(Collection<String> texts)
+    {
+        return assertLogTextNotContains(texts.toArray(new String[0]));
+    }
+
+    @LogMethod
+    public PipelineStatusDetailsPage assertLogTextNotContains(String... texts)
+    {
+        assertTextNotPresent(new TextSearcher(getLogText()), texts);
+        log("Log text not present: " + StringUtils.join(texts, ", "));
+        return this;
+    }
+
     @LogMethod
     public PipelineStatusTable clickShowGrid()
     {
