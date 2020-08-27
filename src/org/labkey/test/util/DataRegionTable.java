@@ -26,12 +26,12 @@ import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PagingWidget;
-import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.components.SummaryStatisticsDialog;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.study.DatasetFacetPanel;
+import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.RefindingWebElement;
@@ -1382,7 +1382,7 @@ public class DataRegionTable extends DataRegion
 
         public static Locator.XPathLocator columnHeader(String regionName, String fieldName)
         {
-            return Locator.tagWithAttribute("th", "column-name", regionName + ":" + fieldName).childTag("div");
+            return Locator.tagWithAttribute("th", "column-name", regionName + ":" + fieldName);
         }
 
         public static Locator.XPathLocator floatingHeader()
