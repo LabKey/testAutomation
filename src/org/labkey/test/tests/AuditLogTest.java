@@ -69,6 +69,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({DailyA.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -272,28 +273,28 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add(AUDIT_TEST_USER + " was added to the system and the administrator chose not to send a verification email.");
 
         impersonate(AUDIT_TEST_USER);
-        expectedLogValues.add(getCurrentUser() + " impersonated " + AUDIT_TEST_USER);
-        expectedLogValues.add(AUDIT_TEST_USER + " was impersonated by " + getCurrentUser());
+        expectedLogValues.add(getUsername() + " impersonated " + AUDIT_TEST_USER);
+        expectedLogValues.add(AUDIT_TEST_USER + " was impersonated by " + getUsername());
 
         stopImpersonating();
-        expectedLogValues.add(AUDIT_TEST_USER + " was no longer impersonated by " + getCurrentUser());
-        expectedLogValues.add(getCurrentUser() + " stopped impersonating " + AUDIT_TEST_USER);
+        expectedLogValues.add(AUDIT_TEST_USER + " was no longer impersonated by " + getUsername());
+        expectedLogValues.add(getUsername() + " stopped impersonating " + AUDIT_TEST_USER);
 
         impersonateRoles(PROJECT_ADMIN_ROLE, AUTHOR_ROLE);
-        expectedLogValues.add(getCurrentUser() + " impersonated roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+        expectedLogValues.add(getUsername() + " impersonated roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
 
         stopImpersonating();
-        expectedLogValues.add(getCurrentUser() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+        expectedLogValues.add(getUsername() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
 
         String adminGroup = "Administrator";
         impersonateGroup(adminGroup, true);
-        expectedLogValues.add(getCurrentUser() + " impersonated group: " + adminGroup);
+        expectedLogValues.add(getUsername() + " impersonated group: " + adminGroup);
 
         stopImpersonating();
-        expectedLogValues.add(getCurrentUser() + " stopped impersonating group: " + adminGroup);
+        expectedLogValues.add(getUsername() + " stopped impersonating group: " + adminGroup);
 
         navBar().userMenu().signOut();
-        expectedLogValues.add(getCurrentUser() + " logged out.");
+        expectedLogValues.add(getUsername() + " logged out.");
 
         signInShouldFail(AUDIT_TEST_USER, "asdf"); // Bad login.  Existing User
         expectedLogValues.add(AUDIT_TEST_USER + " failed to login: incorrect password");
@@ -302,7 +303,7 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add(AUDIT_TEST_USER + "fail failed to login: user does not exist");
 
         simpleSignIn();
-        expectedLogValues.add(getCurrentUser() + " logged in successfully via the \"Standard database authentication\" configuration.");
+        expectedLogValues.add(getUsername() + " logged in successfully via the \"Standard database authentication\" configuration.");
 
         userHelper.deleteUsers(true, AUDIT_TEST_USER);
         expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
