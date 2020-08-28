@@ -1232,7 +1232,7 @@ public class ClientAPITest extends BaseWebDriverTest
                     executeEmailScript(EMAIL_NO_LOGIN, EMAIL_SUBJECT_FROM_NEW_USER, new String[]{EMAIL_RECIPIENT1}, null, EMAIL_BODY_HTML));
         }
         stopImpersonating();
-        assertTrue("We should have recorded a server side error if no recipients are present.", getServerErrors().contains("Error sending email: No recipient addresses"));
+        assertTrue("We should have recorded a server side error if no recipients are present.", getServerErrors().contains("No recipient addresses"));
         checkExpectedErrors(count + 1);
 
         signOut();
