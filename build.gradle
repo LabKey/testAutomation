@@ -48,14 +48,14 @@ project.dependencies {
     implementation "org.apache.tika:tika-core:${tikaVersion}"
     implementation "org.apache.commons:commons-compress:${commonsCompressVersion}"
     api "org.apache.commons:commons-lang3:${commonsLang3Version}"
-    //implementation "org.apache.commons:commons-math3:${commonsMath3Version}"
+    implementation "org.apache.commons:commons-math3:${commonsMath3Version}" // used by test classes in targetedms
     implementation "org.apache.pdfbox:pdfbox:${pdfboxVersion}"
     api "org.apache.poi:poi:${poiVersion}"
     implementation "org.apache.poi:poi-ooxml:${poiVersion}"
     implementation "org.apache.xmlbeans:xmlbeans:${xmlbeansVersion}"
     implementation "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
     implementation "org.jetbrains:annotations:${annotationsVersion}"
-    //api "org.mock-server:mockserver-netty:${mockserverVersion}"
+    implementation "org.mock-server:mockserver-netty:${mockserverNettyVersion}" // used by test classes in accounts
     runtimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
     api "org.aspectj:aspectjtools:${aspectjVersion}"
     implementation "org.reflections:reflections:${reflectionsVersion}"
