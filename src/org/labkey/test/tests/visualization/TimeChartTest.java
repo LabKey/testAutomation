@@ -16,11 +16,11 @@
 package org.labkey.test.tests.visualization;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.BeforeClass;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.tests.ReportTest;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -51,44 +51,38 @@ public abstract class TimeChartTest extends ReportTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("study");
-    }
-
-    public TimeChartTest()
-    {
-        setContainerHelper(new UIContainerHelper(this));
+        return Arrays.asList("study", "visualization");
     }
 
     @Override
-    protected String getProjectName()
+    protected final String getProjectName()
     {
         return PROJECT_NAME;
     }
 
     @Override
-    protected String getFolderName()
+    protected final String getFolderName()
     {
         return FOLDER_NAME;
     }
 
+    @BeforeClass
+    public static void doInit()
+    {
+        TimeChartTest init = (TimeChartTest) getCurrentTest();
+        init._containerHelper.createProject(init.getProjectName());
+    }
+
     @LogMethod protected void configureStudy()
     {
-        openProjectMenu();
-        if (!isElementPresent(Locator.linkWithText(getProjectName())))
-            _containerHelper.createProject(getProjectName(), null);
-
-        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null);
+        _containerHelper.createSubfolder(getProjectName(), getFolderName(), "Study");
         waitForText("Import Study");
         importStudyFromZip(STUDY_ZIP);
     }
 
     @LogMethod protected void configureVisitStudy()
     {
-        openProjectMenu();
-        if (!isElementPresent(Locator.linkWithText(getProjectName())))
-            _containerHelper.createProject(getProjectName(), null);
-
-        _containerHelper.createSubfolder(getProjectName(), getProjectName(), VISIT_FOLDER_NAME, "Study", null);
+        _containerHelper.createSubfolder(getProjectName(), VISIT_FOLDER_NAME, "Study");
         initializePipeline();
 
         clickFolder(VISIT_FOLDER_NAME);
