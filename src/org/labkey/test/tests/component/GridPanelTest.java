@@ -1,7 +1,6 @@
 package org.labkey.test.tests.component;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -22,7 +21,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 @Category({DailyB.class})       // until we create a component suite, it's a daily
-public class QueryGridTest extends BaseWebDriverTest
+public class GridPanelTest extends BaseWebDriverTest
 {
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -33,7 +32,7 @@ public class QueryGridTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        QueryGridTest init = (QueryGridTest) getCurrentTest();
+        GridPanelTest init = (GridPanelTest) getCurrentTest();
 
         init.doSetup();
     }
@@ -53,7 +52,7 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        QueryGrid grid = testPage.getQueryGrid("samples", "grid_paging_samples");
+        QueryGrid grid = testPage.getGridPanel("samples", "grid_paging_samples");
 
         assertThat(grid.getGridBar().pager().start(), is(1));
         assertThat(grid.getGridBar().pager().end(), is(20));
@@ -81,7 +80,7 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        QueryGrid grid = testPage.getQueryGrid("samples", "grid_page_size_samples");
+        QueryGrid grid = testPage.getGridPanel("samples", "grid_page_size_samples");
 
         // assume default page size is 20
         assertThat(grid.getGridBar().getCurrentPage(), is(1));
@@ -133,7 +132,7 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        QueryGrid grid = testPage.getQueryGrid("samples", "filtered_grid_selection_samples");
+        QueryGrid grid = testPage.getGridPanel("samples", "filtered_grid_selection_samples");
 
         // confirm that selectAll is limited to just the records in a filtered set
         grid.filterOn("Description", "=", "used to test issue 39011");
@@ -178,7 +177,7 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        QueryGrid grid = testPage.getQueryGrid("samples", "tiny_sampleset");
+        QueryGrid grid = testPage.getGridPanel("samples", "tiny_sampleset");
 
         grid.filterOn("description", "=", "used to test single-page filter selection");
         grid.selectAllRows();
@@ -207,7 +206,7 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        QueryGrid grid = testPage.getQueryGrid("samples", "filtered_grid_multipageselection_samples");
+        QueryGrid grid = testPage.getGridPanel("samples", "filtered_grid_multipageselection_samples");
 
         // confirm that selectAll is limited to just the records in a filtered set
         grid.filterOn("Description", "=", "used to test issue 39011");
@@ -246,7 +245,7 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        QueryGrid grid = testPage.getQueryGrid("samples", "search_for_description_expression");
+        QueryGrid grid = testPage.getGridPanel("samples", "search_for_description_expression");
 
         // prove we can filter on this criteria
         grid.filterOn("Description", "contains", "off-view");
@@ -273,7 +272,7 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        QueryGrid grid = testPage.getQueryGrid("samples", "empty_filter_test_set");
+        QueryGrid grid = testPage.getGridPanel("samples", "empty_filter_test_set");
 
         grid.filterOn("Description", "is blank", null);
         assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
@@ -315,7 +314,7 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        QueryGrid grid = testPage.getQueryGrid("samples", "deselect_one_page_set");
+        QueryGrid grid = testPage.getGridPanel("samples", "deselect_one_page_set");
 
         grid.selectAllRows();
         assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 35"));
@@ -350,7 +349,7 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        QueryGrid grid = testPage.getQueryGrid("samples", "remove_filters_with_selections_set");
+        QueryGrid grid = testPage.getGridPanel("samples", "remove_filters_with_selections_set");
 
         grid.filterOn("Int Column", "is not blank", null);
 
@@ -371,7 +370,6 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
-    @Ignore // https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41171
     @Test
     public void testDeselectRecordsWithFilter() throws Exception
     {
@@ -389,7 +387,7 @@ public class QueryGridTest extends BaseWebDriverTest
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        QueryGrid grid = testPage.getQueryGrid("samples", "deselect_with_filter");
+        QueryGrid grid = testPage.getGridPanel("samples", "deselect_with_filter");
 
         grid.selectAllRows();
         grid.filterOn("String Column", "does not contain", "filtered_y");

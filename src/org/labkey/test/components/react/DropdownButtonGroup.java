@@ -250,6 +250,11 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
         {
             return Locator.tagWithClass("div", "dropdown").withChild(Locators.toggleAnchor().withAttribute("id", Id));
         }
+
+        static public Locator.XPathLocator buttonGroupWithClass(String cls)
+        {
+            return Locator.tagWithClass("div", "dropdown").withChild(Locators.toggleAnchor().withClass(cls));
+        }
     }
 
     public static class DropdownButtonGroupFinder extends WebDriverComponentFinder<DropdownButtonGroup, DropdownButtonGroupFinder>
@@ -278,6 +283,12 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
         public DropdownButtonGroupFinder withButtonId(String Id)
         {
             _baseLocator = Locators.buttonGroupWithId(Id);
+            return this;
+        }
+
+        public DropdownButtonGroupFinder withButtonClass(String Id)
+        {
+            _baseLocator = Locators.buttonGroupWithClass(Id);
             return this;
         }
 
