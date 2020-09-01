@@ -286,9 +286,9 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
             return this;
         }
 
-        public DropdownButtonGroupFinder withButtonClass(String Id)
+        public DropdownButtonGroupFinder withButtonClass(String cls)
         {
-            _baseLocator = Locators.buttonGroupWithClass(Id);
+            _baseLocator = Locators.buttonGroupWithClass(cls);
             return this;
         }
 
