@@ -168,7 +168,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return getRows().get(index);
     }
 
-    private WebElement getCell(int row, String column)
+    public WebElement getCell(int row, String column)
     {
         int columnIndex = getColumnIndex(column);
         WebElement gridCell = getRow(row).findElement(By.cssSelector("td:nth-of-type(" + columnIndex + ")"));
