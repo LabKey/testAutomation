@@ -38,7 +38,7 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
      * @param query
      * @return  a QueryGrid to wrap the GridPanel, once it is found
      */
-    public QueryGrid getQueryGrid(String schema, String query)
+    public QueryGrid getGridPanel(String schema, String query)
     {
         getComponentSelect().select("GridPanel");       // note: we use GridPanel now, not QueryGridPanel
         Input.Input(Locator.input("schemaName"), getDriver()).waitFor().set(schema);

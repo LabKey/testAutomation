@@ -169,9 +169,9 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     protected class ElementCache extends WebDriverComponent.ElementCache
     {
         DropdownButtonGroup jumpToDropdown = new DropdownButtonGroup.DropdownButtonGroupFinder(getDriver())
-                .withButtonId("current-page-drop-model").findWhenNeeded(this);
+                .withButtonClass("current-page-dropdown").findWhenNeeded(this);
         DropdownButtonGroup pageSizeDropdown = new DropdownButtonGroup.DropdownButtonGroupFinder(getDriver())
-                .withButtonId("page-size-drop-model").findWhenNeeded(this);
+                .withButtonClass("page-size-dropdown").findWhenNeeded(this);
 
         final Locator.XPathLocator queryGridModelPagingCounts = Locator.tag("span").withAttribute("data-min");
         final Locator.XPathLocator queryModelPagingCounts = Locator.tagWithClass("span", "pagination-info");
@@ -180,7 +180,8 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         Optional<WebElement> prevButton()
         {
             return Locator.XPathLocator.union(
-                    Locator.tagWithClass("button", "pagination-buttons__prev"),     // used in gridPanel
+                    Locator.tagWithClass("button", "pagination-button--previous"),     // used in GridPanel
+                    Locator.tagWithClass("button", "pagination-buttons__prev"),     // used in ReportList
                     Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-left"))) // used in QueryGridPanel, here for back-support
                     .findOptionalElement(this);
         }
@@ -188,7 +189,8 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         Optional<WebElement> nextButton()
         {
             return Locator.XPathLocator.union(
-                    Locator.tagWithClass("button", "pagination-buttons__next"),
+                    Locator.tagWithClass("button", "pagination-button--next"), // used in GridPanel
+                    Locator.tagWithClass("button", "pagination-buttons__next"), // used in ReportList
                     Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-right")))
                     .findOptionalElement(this);
         }
