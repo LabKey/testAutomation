@@ -168,7 +168,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return getRows().get(index);
     }
 
-    public WebElement getCell(int row, String column)
+    private WebElement getCell(int row, String column)
     {
         int columnIndex = getColumnIndex(column);
         WebElement gridCell = getRow(row).findElement(By.cssSelector("td:nth-of-type(" + columnIndex + ")"));
@@ -382,7 +382,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return selection;
     }
 
-    private String copyCurrentSelection() throws IOException, UnsupportedFlavorException
+    public String copyCurrentSelection() throws IOException, UnsupportedFlavorException
     {
         // now copy the contents of the current selection to the clipboard
         Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
