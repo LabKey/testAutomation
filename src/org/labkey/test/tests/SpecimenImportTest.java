@@ -100,7 +100,7 @@ public class SpecimenImportTest extends SpecimenBaseTest
     {
         goToImport();
         waitAndClick(Locator.linkContainingText("Show Expected Data Fields"));
-        assertTextPresent(GLOBAL_UNIQUE_ID,"Sample Id", PARTICIPANT_ID, "Volume", "Volume Units", "Primary Type", "Derivative Type", "Additive Type");
+        assertTextPresent("Global Unique Id","Sample Id", "Participant Id", "Volume", "Volume Units", "Primary Type", "Derivative Type", "Additive Type");
         if(!visit)
         {
             assertTextNotPresent("Visit");
