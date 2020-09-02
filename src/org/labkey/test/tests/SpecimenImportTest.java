@@ -27,6 +27,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -99,7 +100,7 @@ public class SpecimenImportTest extends SpecimenBaseTest
     {
         goToImport();
         waitAndClick(Locator.linkContainingText("Show Expected Data Fields"));
-        assertTextPresent("Global Unique Id","Sample Id","Participant Id", "Volume", "Volume Units", "Primary Type", "Derivative Type", "Additive Type");
+        assertTextPresent(GLOBAL_UNIQUE_ID,"Sample Id", PARTICIPANT_ID, "Volume", "Volume Units", "Primary Type", "Derivative Type", "Additive Type");
         if(!visit)
         {
             assertTextNotPresent("Visit");
@@ -116,7 +117,7 @@ public class SpecimenImportTest extends SpecimenBaseTest
         clickTab("Manage");
         waitAndClick(Locator.linkContainingText("Change Study Properties"));
         waitForText("Timepoint Type:");
-        _ext4Helper.selectRadioButton("Timepoint Type:", "VISIT");
+        new RadioButton(Locator.id("visit").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
         clickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
     }
     protected void doUploads()
