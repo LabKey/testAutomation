@@ -174,16 +174,10 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     //Issue 12597: Need to delete exp.data objects when deleting a flow run
     protected void deleteAllRuns()
     {
-        if (!isElementPresent(Locator.linkWithText(getProjectName())))
-            goToHome();
-        if (!isElementPresent(Locator.linkWithText(getProjectName())))
+        if (!_containerHelper.doesContainerExist(getContainerPath()))
+        {
             return;
-
-        clickProject(getProjectName());
-        if (!isElementPresent(Locator.linkWithText(getFolderName())))
-            return;
-
-        clickFolder(getFolderName());
+        }
 
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Runs");
         DataRegionTable table = new DataRegionTable("query", this);
