@@ -115,8 +115,7 @@ public class SpecimenImportTest extends SpecimenBaseTest
     protected void changeTimepointType()
     {
         clickTab("Manage");
-        waitAndClick(Locator.linkContainingText("Change Study Properties"));
-        waitForText("Timepoint Type:");
+        waitAndClickAndWait(Locator.linkContainingText("Change Study Properties"));
         new RadioButton(Locator.id("visit").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
         clickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
     }
