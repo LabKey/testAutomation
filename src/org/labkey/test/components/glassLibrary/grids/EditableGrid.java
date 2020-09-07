@@ -382,7 +382,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return selection;
     }
 
-    private String copyCurrentSelection() throws IOException, UnsupportedFlavorException
+    public String copyCurrentSelection() throws IOException, UnsupportedFlavorException
     {
         // now copy the contents of the current selection to the clipboard
         Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
