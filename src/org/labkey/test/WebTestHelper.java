@@ -89,6 +89,7 @@ public class WebTestHelper
     private static final String DEFAULT_CONTEXT_PATH = "";
     private static final Integer DEFAULT_WEB_PORT = 8080;
     private static final String DEFAULT_TARGET_SERVER = "http://localhost";
+    private static final Object SERVER_LOCK = new Object();
     private static String _targetServer = null;
     private static Integer _webPort = null;
     private static String _contextPath = null;
@@ -211,7 +212,7 @@ public class WebTestHelper
 
     public static Integer getWebPort()
     {
-        synchronized (DEFAULT_WEB_PORT)
+        synchronized (SERVER_LOCK)
         {
             if (_webPort == null)
             {
@@ -234,7 +235,7 @@ public class WebTestHelper
 
     public static String getTargetServer()
     {
-        synchronized (DEFAULT_TARGET_SERVER)
+        synchronized (SERVER_LOCK)
         {
             if (_targetServer == null || !_targetServer.equals(System.getProperty("labkey.server")))
             {
@@ -337,7 +338,7 @@ public class WebTestHelper
 
     public static String getContextPath()
     {
-        synchronized (DEFAULT_CONTEXT_PATH)
+        synchronized (SERVER_LOCK)
         {
             if (_contextPath == null)
             {
@@ -365,7 +366,7 @@ public class WebTestHelper
         return buildURL(controller, null, action, Collections.emptyMap());
     }
 
-    public static String buildURL(String controller, String action, @Nullable Map<String, String> params)
+    public static String buildURL(String controller, String action, @Nullable Map<String, ?> params)
     {
         return buildURL(controller, null, action, params);
     }
@@ -375,7 +376,7 @@ public class WebTestHelper
         return buildURL(controller, containerPath, action, Collections.emptyMap());
     }
 
-    public static String buildURL(String controller, @Nullable String containerPath, String action, Map<String, String> params)
+    public static String buildURL(String controller, @Nullable String containerPath, String action, Map<String, ?> params)
     {
         return getBaseURL() + buildRelativeUrl(controller, containerPath, action, params);
     }
@@ -385,7 +386,7 @@ public class WebTestHelper
         return buildRelativeUrl(controller, null, action, Collections.emptyMap());
     }
 
-    public static String buildRelativeUrl(String controller, String action, @Nullable Map<String, String> params)
+    public static String buildRelativeUrl(String controller, String action, @Nullable Map<String, ?> params)
     {
         return buildRelativeUrl(controller, null, action, params);
     }
@@ -395,7 +396,7 @@ public class WebTestHelper
         return buildRelativeUrl(controller, containerPath, action, Collections.emptyMap());
     }
 
-    public static String buildRelativeUrl(String controller, @Nullable String containerPath, String action, Map<String, String> params)
+    public static String buildRelativeUrl(String controller, @Nullable String containerPath, String action, Map<String, ?> params)
     {
         URLBuilder builder = new URLBuilder(controller, action, containerPath);
         builder.setQuery(params);
