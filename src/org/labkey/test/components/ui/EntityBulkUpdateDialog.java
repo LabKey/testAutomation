@@ -104,6 +104,25 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return elementCache().numericInput(fieldKey).get();
     }
 
+    public EntityBulkUpdateDialog setDateField(String fieldKey, String dateString)
+    {
+        Input input = elementCache().textInput(fieldKey);
+        elementCache().title.click();
+        getWrapper().waitFor(()-> !isDatePickerExpanded(), 1500);
+        input.set(dateString);
+        return this;
+    }
+
+    private boolean isDatePickerExpanded()
+    {
+        return Locator.tagWithClass("div", "react-datepicker-popper").existsIn(this);
+    }
+
+    public String getDateField(String fieldKey)
+    {
+        return elementCache().textInput(fieldKey).get();
+    }
+
     public EntityBulkUpdateDialog setBooleanField(String fieldKey, boolean checked)
     {
         setEditableState(fieldKey, true);
