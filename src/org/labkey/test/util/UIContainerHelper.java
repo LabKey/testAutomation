@@ -116,16 +116,10 @@ public class UIContainerHelper extends AbstractContainerHelper
 
         _test.clickButton("Delete");
 
-        // in case there are sub-folders
-        if (_test.isElementPresent(Locator.lkButton("Delete All Folders")))
-        {
-            _test.clickButton("Delete All Folders");
-        }
-
         long startTime = System.currentTimeMillis();
         // confirm delete:
         _test.log("Starting delete of project '" + project + "'...");
-        _test.clickButton("Delete", wait);
+        _test.clickButton("Yes, delete all", wait);
 
         if (projectLinkExists(project))
         {
