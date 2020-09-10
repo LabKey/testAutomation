@@ -271,13 +271,6 @@ public class Ext4GridRef extends Ext4CmpRef
             {
                 grid = Locator.id(_id).findElement(_test.getDriver());
                 cell = cellLoc.waitForElement(grid, 10000);
-//                try
-//                {
-//                    // Clicking the 'td' doesn't work for some grids on certain browsers. Use nested <div> if it exists.
-//                    // Specifically, 'laboratory-prepareExptRun.view' was having problems
-//                    cell = Locator.tag("div").findElement(cell);
-//                }
-//                catch (NoSuchElementException ignore) {}
             }
             catch (NoSuchElementException e)
             {
