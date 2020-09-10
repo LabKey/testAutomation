@@ -360,7 +360,7 @@ public class FolderTest extends BaseWebDriverTest
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/WorkbookParent/2, containing the following objects"));
         waitForElement(Locator.tagWithText("li", "1 lists"));
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/WorkbookParent/3 and all the objects it contains"));
-        clickButton("Delete", WAIT_FOR_PAGE);
+        clickButton("Yes, delete all", WAIT_FOR_PAGE);
 
         //make sure we cannot delete using the client API
         goToProjectHome(getProjectName() + "/WorkbookParent");
