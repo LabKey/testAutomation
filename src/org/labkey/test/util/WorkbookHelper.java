@@ -85,7 +85,7 @@ public class WorkbookHelper
         _test.assertAlert("Are you sure you want to delete the selected row" + (checked == 1 ? "" : "s") + "?");
 
         _test.waitForElement(Locator.tagWithText("td", "You are about to delete the following folder" + (checked == 1 ? "" : "s") +":"));
-        _test.clickButton("Yes, Delete All", WebDriverWrapper.WAIT_FOR_PAGE);
+        _test.clickButton("Yes, delete all", WebDriverWrapper.WAIT_FOR_PAGE);
     }
 
     public enum WorkbookFolderType

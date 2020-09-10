@@ -305,7 +305,7 @@ public class FolderTest extends BaseWebDriverTest
         waitForElement(Locator.tagWithText("td", "You are about to delete the following folder:"));
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/NoChildren, containing the following objects:"));
         waitForElement(Locator.tagWithText("li", "1 lists"));
-        clickButton("Yes, Delete All", WAIT_FOR_PAGE);
+        clickButton("Yes, delete all", WAIT_FOR_PAGE);
     }
 
     @Test
@@ -329,7 +329,7 @@ public class FolderTest extends BaseWebDriverTest
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/HasChildren, containing the following objects:"));
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/HasChildren/Subfolder"));
         waitForElement(Locator.tagWithText("li", "1 lists"));
-        clickButton("Yes, Delete All", WAIT_FOR_PAGE);
+        clickButton("Yes, delete all", WAIT_FOR_PAGE);
     }
 
     @Test
