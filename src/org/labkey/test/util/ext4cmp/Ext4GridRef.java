@@ -271,6 +271,13 @@ public class Ext4GridRef extends Ext4CmpRef
             {
                 grid = Locator.id(_id).findElement(_test.getDriver());
                 cell = cellLoc.waitForElement(grid, 10000);
+//                try
+//                {
+//                    // Clicking the 'td' doesn't work for some grids on certain browsers. Use nested <div> if it exists.
+//                    // Specifically, 'laboratory-prepareExptRun.view' was having problems
+//                    cell = Locator.tag("div").findElement(cell);
+//                }
+//                catch (NoSuchElementException ignore) {}
             }
             catch (NoSuchElementException e)
             {
@@ -290,8 +297,8 @@ public class Ext4GridRef extends Ext4CmpRef
                 }
             }
 
-            _test.scrollIntoView(cell); // aligns to bottom
-            _test.scrollBy(0, 100); // bumps up a few rows, above any footers or scrollbars
+            _test.scrollIntoView(cell,true); // aligns to bottom
+//            _test.scrollBy(0, 100); // bumps up a few rows, above any footers or scrollbars
             new Actions(_test.getDriver()).moveToElement(cell).build().perform();
             if (_clicksToEdit > 1)
                 _test.doubleClick(cell);
