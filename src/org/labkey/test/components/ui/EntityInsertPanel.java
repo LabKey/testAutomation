@@ -52,6 +52,13 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
+    public ReactSelect getParentSelect(String label)
+    {
+        if (!ReactSelect.finder(getDriver()).followingLabelWithSpan(label).findOptional(this).isPresent())
+            elementCache().addParent.click();
+        return getEntityTypeSelect(label);
+    }
+
     public EntityInsertPanel clearParents()
     {
         Locator loc = Locator.tagWithClass("span", "container--action-button")
