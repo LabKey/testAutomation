@@ -226,6 +226,16 @@ public class MultiMenu extends BootstrapMenu
             return this;
         }
 
+        /**
+         * Looks for the export button using the fa-download class
+         * @return export menu utility
+         */
+        public MultiMenuFinder exportButton()
+        {
+            _locator = Locators.menuContainer().withDescendant(Locator.byClass("fa-download"));
+            return this;
+        }
+
         @Override
         protected MultiMenuFinder getThis()
         {
