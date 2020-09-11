@@ -513,6 +513,24 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     @Override
+    protected void clearElementCache()
+    {
+        super.clearElementCache();
+    }
+
+    public void doAndWaitForUpdate(Runnable func)
+    {
+        func.run();
+        waitForUpdate();
+    }
+
+    private void waitForUpdate()
+    {
+        waitForLoaded();
+        clearElementCache();
+    }
+
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
