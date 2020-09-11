@@ -1,5 +1,5 @@
 
-CREATE OR ALTER PROCEDURE etltest.etlTest
+ALTER PROCEDURE etltest.etlTest
 	@transformRunId int,
 	@containerId entityid = NULL OUTPUT,
 	@rowsInserted int = 0 OUTPUT,

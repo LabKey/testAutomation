@@ -229,7 +229,7 @@ public class TabTest extends SimpleModuleTest
         waitForText(STUDY_FOLDER_TAB_NAME);
         clickButton("Delete", 2 * WAIT_FOR_PAGE);
         assertTextPresent("You are about to delete the following folder:");
-        clickButton("Delete", 2 * WAIT_FOR_PAGE);
+        clickButton("Yes, delete all", 2 * WAIT_FOR_PAGE);
         assertTextNotPresent(STUDY_FOLDER_TAB_NAME);
 
         // Resurrect tab folder
