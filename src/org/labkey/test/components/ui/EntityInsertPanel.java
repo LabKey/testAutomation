@@ -148,6 +148,13 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
+    public EntityInsertPanel clickRemove()
+    {
+        getEditableGrid().doAndWaitForUpdate(()->
+                elementCache().deleteRows.click());
+        return this;
+    }
+
     public EntityBulkInsertDialog clickBulkInsert()
     {
         elementCache().bulkInsert.click();
@@ -197,8 +204,13 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     protected class ElementCache extends Component.ElementCache
     {
+        Locator deleteRowsBtnLoc = Locator.XPathLocator.union(
+                Locator.button("Delete rows"),
+                Locator.buttonContainingText("Remove"));
+
         WebElement bulkInsert = Locator.button("Bulk Insert").findWhenNeeded(_driver);
-        WebElement deleteRows = Locator.button("Delete rows").findWhenNeeded(_driver);
+        WebElement bulkUpdate = Locator.button("Bulk update").findWhenNeeded(_driver);
+        WebElement deleteRows = deleteRowsBtnLoc.findWhenNeeded(_driver);
         EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).findWhenNeeded();
         WebElement addRowsTxtBox = Locator.tagWithName("input", "addCount").findWhenNeeded(_driver);
         WebElement addRowsButton = Locator.buttonContainingText("Add").findWhenNeeded(_driver);
