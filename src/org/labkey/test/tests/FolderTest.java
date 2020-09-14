@@ -305,7 +305,7 @@ public class FolderTest extends BaseWebDriverTest
         waitForElement(Locator.tagWithText("td", "You are about to delete the following folder:"));
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/NoChildren, containing the following objects:"));
         waitForElement(Locator.tagWithText("li", "1 lists"));
-        clickButton("Delete", WAIT_FOR_PAGE);
+        clickButton("Yes, delete all", WAIT_FOR_PAGE);
     }
 
     @Test
@@ -326,12 +326,10 @@ public class FolderTest extends BaseWebDriverTest
         waitAndClick(Locator.tagWithText("span", "HasChildren").withClass("x4-tree-node-text"));
         waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode("HasChildren"));
         clickButton("Delete", WAIT_FOR_PAGE);
-        waitForElement(Locator.tagWithText("td", "This folder has subfolders. If you continue you will permanently delete the folder, its subfolders, and all the objects they contain. The next page will summarize some of the objects in these folders and give you another chance to cancel."));
-        clickButton("Delete All Folders", WAIT_FOR_PAGE);
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/HasChildren, containing the following objects:"));
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/HasChildren/Subfolder"));
         waitForElement(Locator.tagWithText("li", "1 lists"));
-        clickButton("Delete", WAIT_FOR_PAGE);
+        clickButton("Yes, delete all", WAIT_FOR_PAGE);
     }
 
     @Test
@@ -362,7 +360,7 @@ public class FolderTest extends BaseWebDriverTest
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/WorkbookParent/2, containing the following objects"));
         waitForElement(Locator.tagWithText("li", "1 lists"));
         waitForElement(Locator.tagContainingText("li", getProjectName() + "/WorkbookParent/3 and all the objects it contains"));
-        clickButton("Delete", WAIT_FOR_PAGE);
+        clickButton("Yes, delete all", WAIT_FOR_PAGE);
 
         //make sure we cannot delete using the client API
         goToProjectHome(getProjectName() + "/WorkbookParent");

@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 
 import java.net.URISyntaxException;
@@ -84,7 +85,7 @@ public class WorkbookHelper
         _test.assertAlert("Are you sure you want to delete the selected row" + (checked == 1 ? "" : "s") + "?");
 
         _test.waitForElement(Locator.tagWithText("td", "You are about to delete the following folder" + (checked == 1 ? "" : "s") +":"));
-        _test.clickButton("Delete", _test.WAIT_FOR_PAGE);
+        _test.clickButton("Yes, delete all", WebDriverWrapper.WAIT_FOR_PAGE);
     }
 
     public enum WorkbookFolderType
