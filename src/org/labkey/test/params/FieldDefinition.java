@@ -301,7 +301,7 @@ public class FieldDefinition extends PropertyDescriptor
         Integer("Integer", "int"),
         String("Text", "string"),
         Subject("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null),
-        DateAndTime("Date Time", "date"),
+        DateAndTime("Date Time", "dateTime"),
         Boolean("Boolean", "boolean"),
         Double("Number (Double)", "float"),
         Decimal("Decimal (floating point)", "float"),
