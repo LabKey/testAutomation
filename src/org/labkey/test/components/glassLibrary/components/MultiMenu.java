@@ -232,7 +232,7 @@ public class MultiMenu extends BootstrapMenu
          */
         public MultiMenuFinder exportButton()
         {
-            _locator = Locators.menuContainer().withDescendant(Locator.byClass("fa-download"));
+            _locator = Locators.menuContainer().withChild(Locators.dropdownToggle().withChild(Locator.byClass("fa-download")));
             return this;
         }
 
