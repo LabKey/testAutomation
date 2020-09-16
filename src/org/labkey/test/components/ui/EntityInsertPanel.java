@@ -208,23 +208,22 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
                 Locator.button("Delete rows"),
                 Locator.buttonContainingText("Remove"));
 
-        WebElement bulkInsert = Locator.button("Bulk Insert").findWhenNeeded(_driver);
-        WebElement bulkUpdate = Locator.button("Bulk update").findWhenNeeded(_driver);
-        WebElement deleteRows = deleteRowsBtnLoc.findWhenNeeded(_driver);
+        WebElement bulkInsert = Locator.button("Bulk Insert").findWhenNeeded(this);
+        WebElement bulkUpdate = Locator.button("Bulk update").findWhenNeeded(this);
+        WebElement deleteRows = deleteRowsBtnLoc.findWhenNeeded(this);
         EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).findWhenNeeded();
-        WebElement addRowsTxtBox = Locator.tagWithName("input", "addCount").findWhenNeeded(_driver);
-        WebElement addRowsButton = Locator.buttonContainingText("Add").findWhenNeeded(_driver);
+        WebElement addRowsTxtBox = Locator.tagWithName("input", "addCount").findWhenNeeded(this);
+        WebElement addRowsButton = Locator.buttonContainingText("Add").findWhenNeeded(this);
 
         WebElement addParent = Locator.tagWithClass("span", "container--action-button")
                 .containing("Parent").findWhenNeeded(getDriver());
     }
 
-    public static class InsertRecordFinder extends WebDriverComponent.WebDriverComponentFinder<EntityInsertPanel, InsertRecordFinder>
+    public static class EntityInsertPanelFinder extends WebDriverComponent.WebDriverComponentFinder<EntityInsertPanel, EntityInsertPanelFinder>
     {
-
         private Locator _locator;
 
-        public InsertRecordFinder(WebDriver driver)
+        public EntityInsertPanelFinder(WebDriver driver)
         {
             super(driver);
             _locator = Locator.tagWithClass("div", "panel").child(Locator.tagWithClass("div", "panel-body"));
