@@ -228,6 +228,7 @@ public class TestDataGenerator
             case "boolean":
                 return () -> randomBoolean();
             case "date":
+            case "datetime":
                 return () -> randomDateString(DateUtils.addWeeks(new Date(), -39), new Date());
             default:
                 throw new IllegalArgumentException("ColumnType " + columnType + " isn't implemented yet");
