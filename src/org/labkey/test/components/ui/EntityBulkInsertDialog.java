@@ -4,6 +4,8 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
+import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.Input;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
@@ -51,17 +53,26 @@ public class EntityBulkInsertDialog extends ModalDialog
         return getWrapper().getFormElement(elementCache().description);
     }
 
-    public EntityBulkInsertDialog setTextField(String fieldCaption, String value)
+    public EntityBulkInsertDialog setTextField(String fieldKey, String value)
     {
-        String forField = Locator.xpath("//div[@class='modal-body']//label[./span[contains(text(), '" + fieldCaption + "')]]").findElement(getComponentElement()).getAttribute("for");
-        getWrapper().setFormElement(Locator.tagWithId("input", forField), value);
+        elementCache().textInput(fieldKey).set(value);
         return this;
     }
 
-    public String getTextField(String fieldCaption)
+    public String getTextField(String fieldKey)
     {
-        String forField = Locator.xpath("//div[@class='modal-body']//label[./span[contains(text(), '" + fieldCaption + "')]]").findElement(getComponentElement()).getAttribute("for");
-        return getWrapper().getFormElement(Locator.tagWithId("input", forField));
+        return elementCache().textInput(fieldKey).get();
+    }
+
+    public EntityBulkInsertDialog setNumericField(String fieldKey, String value)
+    {
+        elementCache().numericInput(fieldKey).set(value);
+        return this;
+    }
+
+    public String getNumericField(String fieldKey)
+    {
+        return elementCache().numericInput(fieldKey).get();
     }
 
     public EntityBulkInsertDialog setSelectionField(String fieldCaption, List<String> selectValues)
@@ -86,6 +97,30 @@ public class EntityBulkInsertDialog extends ModalDialog
     public String getFieldWithId(String id)
     {
         return getWrapper().getFormElement(Locator.tagWithId("input", id));
+    }
+
+    public EntityBulkInsertDialog setDateField(String fieldKey, String dateString)
+    {
+        ReactDatePicker input = elementCache().dateInput(fieldKey);
+        input.set(dateString);
+        return this;
+    }
+
+    public String getDateField(String fieldKey)
+    {
+        return elementCache().dateInput(fieldKey).get();
+    }
+
+    public EntityBulkInsertDialog setBooleanField(String fieldKey, boolean checked)
+    {
+        Checkbox box = elementCache().checkBox(fieldKey);
+        box.set(checked);
+        return this;
+    }
+
+    public boolean getBooleanField(String fieldKey)
+    {
+        return elementCache().checkBox(fieldKey).get();
     }
 
     public void clickAddRows()
@@ -136,6 +171,37 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
+        public WebElement formRow(String fieldKey)
+        {
+            return Locator.tagWithClass("div", "row")
+                    .withChild(Locator.tagWithAttribute("label", "for", fieldKey))
+                    .findElement(this);
+        }
+
+        public Checkbox checkBox(String fieldKey)
+        {
+            WebElement row = elementCache().formRow(fieldKey);
+            return new Checkbox(checkBoxLoc.findElement(row));
+        }
+
+        public Input textInput(String fieldKey)
+        {
+            WebElement inputEl = textInputLoc.findElement(elementCache().formRow(fieldKey));
+            return new Input(inputEl, getDriver());
+        }
+
+        public Input numericInput(String fieldKey)
+        {
+            WebElement inputEl = numberInputLoc.findElement(formRow(fieldKey));
+            return new Input(inputEl, getDriver());
+        }
+
+        public ReactDatePicker dateInput(String fieldKey)
+        {
+            return new ReactDatePicker.ReactDateInputFinder(getDriver())
+                    .withInputId(fieldKey).find(formRow(fieldKey));
+        }
+
         WebElement cancelButton = Locator.tagWithClass("button", "test-loc-cancel-button")
                 .findWhenNeeded(getComponentElement());
 
@@ -149,6 +215,9 @@ public class EntityBulkInsertDialog extends ModalDialog
         WebElement description = Locator.tagWithId("textarea", "Description")
                 .findWhenNeeded(getComponentElement());
 
+        final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
+        final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
+        final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
     }
 
 }
