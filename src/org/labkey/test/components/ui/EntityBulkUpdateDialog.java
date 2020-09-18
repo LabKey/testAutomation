@@ -104,6 +104,21 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return elementCache().numericInput(fieldKey).get();
     }
 
+    public EntityBulkUpdateDialog setDateField(String fieldKey, String dateString)
+    {
+        setEditableState(fieldKey, true);
+        ReactDatePicker input = elementCache().dateInput("sampleDate");
+        getWrapper().waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
+                "the checkbox did not become enabled in time", 2000);
+        input.set(dateString);
+        return this;
+    }
+
+    public String getDateField(String fieldKey)
+    {
+        return elementCache().dateInput(fieldKey).get();
+    }
+
     public EntityBulkUpdateDialog setBooleanField(String fieldKey, boolean checked)
     {
         setEditableState(fieldKey, true);
@@ -191,20 +206,26 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
         public Input textInput(String fieldKey)
         {
-            WebElement inputEl = textInputLoc.findElement(elementCache().formRow(fieldKey));
+            WebElement inputEl = textInputLoc.findElement(formRow(fieldKey));
             return new Input(inputEl, getDriver());
         }
 
         public Input textArea(String fieldKey)
         {
-            WebElement inputEl = Locator.textarea(fieldKey).findElement(elementCache().formRow(fieldKey));
+            WebElement inputEl = Locator.textarea(fieldKey).findElement(formRow(fieldKey));
             return new Input(inputEl, getDriver());
         }
 
         public Input numericInput(String fieldKey)
         {
-            WebElement inputEl = numberInputLoc.findElement(elementCache().formRow(fieldKey));
+            WebElement inputEl = numberInputLoc.findElement(formRow(fieldKey));
             return new Input(inputEl, getDriver());
+        }
+
+        public ReactDatePicker dateInput(String fieldKey)
+        {
+            return new ReactDatePicker.ReactDateInputFinder(getDriver())
+                    .withInputId(fieldKey).find(formRow(fieldKey));
         }
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
