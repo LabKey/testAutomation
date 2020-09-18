@@ -48,3 +48,4 @@
 
 # LuceneSearchServiceImpl.TikaTestCase depends on exact file sizes. Do not normalize these files on checkout.
 data/fileTypes/* -text
+data/Nab/SpectraMax/* -text
