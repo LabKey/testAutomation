@@ -20,6 +20,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.DomainDesignerPage;
@@ -39,7 +40,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
@@ -143,6 +146,41 @@ public class FileBrowserHelper extends WebDriverWrapper
                 }
             }
         }
+    }
+
+    public void sortFileBrowserColumn(String columnText, SortDirection sortDirection)
+    {
+        Locator headerLoc = Locator.tagWithClass("div", "fbrowser")
+                .descendant(Locator.tagWithClass("div", "x4-column-header")
+                .withChild(Locator.tagWithClass("div", "x4-column-header-inner")
+                .withChild(Locator.tagWithClass("span", "x4-column-header-text").withText(columnText))));
+
+        WebElement headerElement = headerLoc.findElement(getDriver());
+
+        // often initial state is unsorted, first click sets it to ASC
+        if (!getSortDirection(headerLoc).equals(sortDirection))
+        {
+            doAndWaitForFileListRefresh(()-> headerElement.click());
+        }
+        // if we intended DESC, it may require another click
+        if (!getSortDirection(headerLoc).equals(sortDirection))
+        {
+            doAndWaitForFileListRefresh(()-> headerElement.click());
+        }
+
+        assertThat("Did not get expected sort for column ["+columnText+"]",
+                getSortDirection(headerLoc), is(sortDirection));
+    }
+
+    private SortDirection getSortDirection(Locator headerElementLoc)
+    {
+        String elementClass = headerElementLoc.findElement(getDriver()).getAttribute("class");
+        if (elementClass.contains("column-header-sort-DESC"))
+            return SortDirection.DESC;
+        else if (elementClass.contains("column-header-sort-ASC"))
+            return SortDirection.ASC;
+        else
+            return SortDirection.ASC; // if it doesn't have an explicit sort direction, default behavior is ASC
     }
 
     @LogMethod(quiet = true)
