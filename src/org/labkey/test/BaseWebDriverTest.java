@@ -1731,11 +1731,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         // if the row does not exist then most likely the cohort passed in is incorrect
         int rowIndex = cohortTable.getRowIndex("Label", cohort);
-        cohortTable.clickEditRow(rowIndex);
-        WebElement checkboxElement = Locator.name("quf_enrolled").waitForElement(getDriver(), 2000);
-        new org.labkey.test.components.html.Checkbox(checkboxElement).set(enroll);   // the ext4 checkbox doesn't correctly parse checked state of this html checkbox
-
-        clickButton("Submit");
+        cohortTable.updateRow(rowIndex, Map.of("enrolled", Boolean.toString(enroll)), true);
     }
 
     public void setExportPhi(PhiSelectType exportPhiLevel)

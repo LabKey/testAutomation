@@ -154,19 +154,17 @@ public class FileBrowserHelper extends WebDriverWrapper
                 .descendant(Locator.tagWithClass("div", "x4-column-header")
                 .withChild(Locator.tagWithClass("div", "x4-column-header-inner")
                 .withChild(Locator.tagWithClass("span", "x4-column-header-text").withText(columnText))));
+        String sortText = sortDirection == SortDirection.DESC ? "Sort Descending" : "Sort Ascending";
 
         WebElement headerElement = headerLoc.findElement(getDriver());
-
-        // often initial state is unsorted, first click sets it to ASC
-        if (!getSortDirection(headerLoc).equals(sortDirection))
-        {
-            doAndWaitForFileListRefresh(()-> headerElement.click());
-        }
-        // if we intended DESC, it may require another click
-        if (!getSortDirection(headerLoc).equals(sortDirection))
-        {
-            doAndWaitForFileListRefresh(()-> headerElement.click());
-        }
+        mouseOver(headerElement);   // reveal the element to toggle the sort menu
+        WebElement headerMenuTrigger = Locator.tagWithClass("div", "x4-column-header-trigger").waitForElement(headerElement, 1500);
+        mouseOver(headerMenuTrigger); // make it interactable
+        headerMenuTrigger.click();
+        WebElement sortMenuLink = Locator.tagWithClass("a", "x4-menu-item-link")
+                .withDescendant(Locator.tagWithClass("span", "x4-menu-item-text").withText(sortText))
+                .waitForElement(getDriver(), 1500);
+        doAndWaitForFileListRefresh(()-> sortMenuLink.click());
 
         assertThat("Did not get expected sort for column ["+columnText+"]",
                 getSortDirection(headerLoc), is(sortDirection));
@@ -180,7 +178,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         else if (elementClass.contains("column-header-sort-ASC"))
             return SortDirection.ASC;
         else
-            return SortDirection.ASC; // if it doesn't have an explicit sort direction, default behavior is ASC
+            return null; // No sort defined for column
     }
 
     @LogMethod(quiet = true)
