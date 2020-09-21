@@ -1719,26 +1719,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
      */
     public void verifyCohortStatus(DataRegionTable table, String cohort, boolean enrolled)
     {
-        int row = getCohortRow(table, cohort);
+        int row = table.getRowIndex("Label", cohort);
         assertEquals("Enrollment state for cohort " + cohort, String.valueOf(enrolled).toLowerCase(), table.getDataAsText(row, "Enrolled").toLowerCase());
-    }
-
-    /**
-     * Used by CohortTest and StudyCohortExportTest
-     * Retrieves the row for the cohort matching the label passed in
-     */
-    public int getCohortRow(DataRegionTable cohortTable, String cohort)
-    {
-        int row;
-        for (row = 0; row < cohortTable.getDataRowCount(); row++)
-        {
-            String s = cohortTable.getDataAsText(row, "Label");
-            if (0 == s.compareToIgnoreCase(cohort))
-            {
-                break;
-            }
-        }
-        return row;
     }
 
     /**
@@ -1748,14 +1730,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void changeCohortStatus(DataRegionTable cohortTable, String cohort, boolean enroll)
     {
         // if the row does not exist then most likely the cohort passed in is incorrect
-        int rowIndex = getCohortRow(cohortTable, cohort);
-        cohortTable.clickEditRow(rowIndex);
-
-        if (!enroll)
-            uncheckCheckbox(Locator.name("quf_enrolled"));
-        else
-            checkCheckbox(Locator.name("quf_enrolled"));
-        clickButton("Submit");
+        int rowIndex = cohortTable.getRowIndex("Label", cohort);
+        cohortTable.updateRow(rowIndex, Map.of("enrolled", Boolean.toString(enroll)), true);
     }
 
     public void setExportPhi(PhiSelectType exportPhiLevel)
