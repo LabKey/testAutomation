@@ -1397,7 +1397,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextNotPresent("Prius");
         try
         {
-            rootEl.isDisplayed();
+            rootEl.isEnabled();
         }
         catch (StaleElementReferenceException stale)
         {

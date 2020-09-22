@@ -459,7 +459,7 @@ public class DataRegionTable extends DataRegion
 
     public List<String> getColumnLabels()
     {
-        getComponentElement().isDisplayed(); // validate cached element
+        getComponentElement().isEnabled(); // validate cached element
 
         if (_columnLabels.isEmpty())
         {
@@ -473,7 +473,7 @@ public class DataRegionTable extends DataRegion
 
     public List<String> getColumnNames()
     {
-        getComponentElement().isDisplayed(); // validate cached element
+        getComponentElement().isEnabled(); // validate cached element
 
         if (_columnNames.isEmpty())
         {
@@ -628,7 +628,7 @@ public class DataRegionTable extends DataRegion
     {
         assertTrue("Need the selector checkboxes value to find row by pk", hasSelectors());
 
-        getComponentElement().isDisplayed(); // refresh cache
+        getComponentElement().isEnabled(); // refresh cache
 
         Integer cached = _mapRows.get(pk);
         if (cached != null)
