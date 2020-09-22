@@ -78,15 +78,6 @@ public class Checkbox extends Component implements FormItem<Boolean>
     {
         if (checked != isChecked())
             toggle();
-
-        // There are checkbox/radio buttons that have problems here. Sometimes the component element is
-        // not an input but the container element used to find it. In BaseWebDriverTest.prepareForFolderExport
-        // the wrapping table element used to find the radio button is what _el is set to.
-        if(getComponentElement().getTagName().toLowerCase().equals("input"))
-        {
-            Assert.assertEquals("Checkbox/Radio Button state is not as expected.", checked, isChecked());
-        }
-
     }
 
     public void toggle()
