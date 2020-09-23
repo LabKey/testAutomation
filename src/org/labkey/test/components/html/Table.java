@@ -86,7 +86,7 @@ public class Table extends WebDriverComponent<Table.Elements>
      */
     public List<String> getTableHeaderTexts()
     {
-        List<WebElement> headerEls = Locator.xpath("./thead/th").findElements(this);
+        List<WebElement> headerEls = Locator.xpath("//thead//th").findElements(this);
         List<String> columnHeaders = new ArrayList<>();
         for(WebElement headerEl : headerEls){columnHeaders.add(headerEl.getText());}
         return columnHeaders;
