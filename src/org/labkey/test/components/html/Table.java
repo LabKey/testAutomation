@@ -86,7 +86,7 @@ public class Table extends WebDriverComponent<Table.Elements>
      */
     public List<String> getTableHeaderTexts()
     {
-        List<WebElement> headerEls = Locator.xpath("//thead//th").findElements(this);
+        List<WebElement> headerEls = Locator.xpath("./thead/th").findElements(this);
         List<String> columnHeaders = new ArrayList<>();
         for(WebElement headerEl : headerEls){columnHeaders.add(headerEl.getText());}
         return columnHeaders;
@@ -100,9 +100,7 @@ public class Table extends WebDriverComponent<Table.Elements>
         return columnHeaders;
     }
 
-    // TODO: This finder makes a bad assumption that the column headers will be in a tr in the tbody. In a well formed
-    //  html table that is not the case the column headers could be in a th in a thead, which is outside the tbody.
-    // The problem is compounded because some of the other functions, like getDataAsText(int row, String columnName), build on this assumption.
+    // TODO: This finder makes an assumption that the column headers will be in a tr in the tbody, that is not always the case.
     // Maybe a possible solution would be to remove "./tbody" from the locator, but that is a thread I am not willing to pull at this time.
     private List<WebElement> getColumnHeaderElements(int headerRow)
     {

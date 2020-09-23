@@ -20,9 +20,7 @@ import org.labkey.test.Locator;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
-// TODO: We may want to revisit this inheritance. Specifically I have run into problems being able to check if a
-//  radio button is checked or not. It doesn't look like their status (checked/unchecked) is always stored as an
-//  attribute of the input control. Sometimes it is stored as an attribute in one of it's ancestor tags.
+// TODO: We may want to revisit this inheritance, not sure we are getting what we want from it.
 public class RadioButton extends Checkbox
 {
     public RadioButton(WebElement element)

@@ -351,11 +351,11 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     {
         goToDataViews();
         waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
+        sleep(500);
         mouseOver(Locator.xpath("//a[text()='"+chart+"']"));
         Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
         waitForElement(thumbnail);
         // Trying to protect against a possible race condition when icon is there but thumbnail has not yet been generated.
-        sleep(500);
         String thumbnailData;
         thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
 

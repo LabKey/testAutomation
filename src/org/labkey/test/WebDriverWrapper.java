@@ -3457,10 +3457,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         RadioButton radioButton = RadioButton(radioButtonLocator).find(getDriver());
         radioButton.check();
 
+        // TODO: Should review this code, and understand why it was written.
         // I'm not sure this code is doing what was intended, or is the correct thing to do.
         // I think this may be exposing a bug in the RadioButton finder. Look at baseWebDriverTest.prepareForFolderExport (line 1448).
         // The locator sent into this function is a table, which will find the input element, but it makes the base
-        // element table which never returns true for checked.
+        // element the table as well which will never returns true for checked.
         if (!waitFor(()-> radioButton.isChecked(), 250))
             radioButton.check();
         return radioButton;
