@@ -273,7 +273,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             {
                 clickSubMenu(false, "Impersonate", "User");
                 window = new ImpersonateUserWindow(getDriver());
-                window.getComponentElement().isDisplayed(); // force it to resolve
+                window.getComponentElement().isEnabled(); // force it to resolve
             }
             catch (NoSuchElementException notfound)
             {
@@ -298,7 +298,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             {
                 clickSubMenu(false, "Impersonate", "Roles");
                 window = new ImpersonateRoleWindow(getDriver());
-                window.getComponentElement().isDisplayed(); // force it to find/resolve
+                window.getComponentElement().isEnabled(); // force it to find/resolve
             }
             catch (NoSuchElementException notFound)
             {
@@ -319,7 +319,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             {
                 clickSubMenu(false, "Impersonate", "Group");
                 window = new ImpersonateGroupWindow(getDriver());
-                window.getComponentElement().isDisplayed(); // force it to resolve
+                window.getComponentElement().isEnabled(); // force it to resolve
             }
             catch (NoSuchElementException retry)
             {

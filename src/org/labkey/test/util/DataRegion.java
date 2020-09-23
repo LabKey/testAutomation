@@ -93,7 +93,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
     @Override
     public ElementCache elementCache()
     {
-        getComponentElement().isDisplayed(); // Trigger cache reset
+        getComponentElement().isEnabled(); // Trigger cache reset
         return super.elementCache();
     }
 
