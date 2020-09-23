@@ -23,10 +23,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Issues;
-import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.components.html.OptionSelect;
-import org.labkey.test.pages.issues.IssuesAdminPage;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.pages.issues.InsertPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -120,8 +120,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
         final String defaultSingular = "Issue";
         final String defaultPlural = "Issues";
 
-        _containerHelper.createProject(PROJECT3, null);
-        _containerHelper.enableModule("Issues");
+        _containerHelper.createProject(PROJECT3, null, "Issues");
 
         _issuesHelper.goToIssueListDefinitions(PROJECT3).createIssuesListDefinition("issues");
 

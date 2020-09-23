@@ -145,12 +145,10 @@ public class WikiLongTest extends BaseWebDriverTest
     public void testSteps()
     {
         enableEmailRecorder();
-        _containerHelper.createProject(PROJECT2_NAME, null);
-        _containerHelper.enableModule(PROJECT2_NAME, "MS2");
+        _containerHelper.createProject(PROJECT2_NAME, null, "MS2");
         _securityHelper.setProjectPerm(USERS_GROUP, "Editor");
         clickButton("Save and Finish");
-        _containerHelper.createProject(PROJECT_NAME, null);
-        _containerHelper.enableModule(PROJECT_NAME, "MS2");
+        _containerHelper.createProject(PROJECT_NAME, null, "MS2");
         _permissionsHelper.createPermissionsGroup("testers");
         _securityHelper.setProjectPerm("testers", "Editor");
         _securityHelper.setProjectPerm(USERS_GROUP, "Editor");

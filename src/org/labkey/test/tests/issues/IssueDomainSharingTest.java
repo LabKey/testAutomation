@@ -24,12 +24,12 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Issues;
-import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.pages.issues.IssuesAdminPage;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.InsertIssueDefPage;
 import org.labkey.test.pages.issues.InsertPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
@@ -80,10 +80,8 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     private void doSetup()
     {
         _userHelper.createUser(USER);
-        _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.enableModule("Issues");
-        _containerHelper.createSubfolder(getProjectName(), FOLDER);
-        _containerHelper.enableModule("Issues");
+        _containerHelper.createProject(getProjectName(), null, "Issues");
+        _containerHelper.createSubfolder(getProjectName(), FOLDER, "Issues");
     }
 
     @Test
@@ -172,8 +170,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     {
         final String listDef = "UnSharedTestDef";
 
-        _containerHelper.createProject(PROJECT2, null);
-        _containerHelper.enableModule("Issues");
+        _containerHelper.createProject(PROJECT2, null, "Issues");
         _issuesHelper.goToIssueListDefinitions(PROJECT2)
                 .createIssuesListDefinition(listDef);
 

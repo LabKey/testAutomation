@@ -79,17 +79,10 @@ public abstract class AbstractContainerHelper
 
     /** @param folderType the name of the type of container to create.
      * May be null, in which case you get the server's default folder type */
-    public final void createProject(@LoggedParam String projectName, @Nullable String folderType)
-    {
-        createProject(projectName, folderType, List.of());
-    }
-
-    /** @param folderType the name of the type of container to create.
-     * May be null, in which case you get the server's default folder type */
     @LogMethod(quiet = true)
-    public final void createProject(@LoggedParam String projectName, @Nullable String folderType, List<String> enableModules)
+    public final void createProject(@LoggedParam String projectName, @Nullable String folderType, String... enableModules)
     {
-        doCreateProject(projectName, folderType, enableModules);
+        doCreateProject(projectName, folderType, Arrays.asList(enableModules));
         _createdProjects.add(projectName);
     }
 
