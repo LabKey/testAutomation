@@ -79,6 +79,19 @@ public class Table extends WebDriverComponent<Table.Elements>
         return elementCache().getRows().size();
     }
 
+    /**
+     * For a well formed html table get the text from the th elements in the thead.
+     *
+     * @return A list of the text values contained in the th tags in the thead.
+     */
+    public List<String> getTableHeaderTexts()
+    {
+        List<WebElement> headerEls = Locator.xpath("//thead//th").findElements(this);
+        List<String> columnHeaders = new ArrayList<>();
+        for(WebElement headerEl : headerEls){columnHeaders.add(headerEl.getText());}
+        return columnHeaders;
+    }
+
     public List<String> getColumnHeaders(int headerRow)
     {
         List<WebElement> headerEls = getColumnHeaderElements(headerRow);
@@ -87,6 +100,8 @@ public class Table extends WebDriverComponent<Table.Elements>
         return columnHeaders;
     }
 
+    // TODO: This finder makes an assumption that the column headers will be in a tr in the tbody, that is not always the case.
+    // Maybe a possible solution would be to remove "./tbody" from the locator, but that is a thread I am not willing to pull at this time.
     private List<WebElement> getColumnHeaderElements(int headerRow)
     {
         return getComponentElement().findElements(By.xpath("./tbody/tr["+ headerRow +"]/*[(name()='TH' or name()='TD' or name()='th' or name()='td')]"));

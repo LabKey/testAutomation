@@ -934,13 +934,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     getDriver().switchTo().window(failureWindow);
                 }
             }
-            catch (RuntimeException | Error e)
+            catch (RuntimeException e)
             {
                 log("Unable to dump screenshots");
                 System.err.println(e.getMessage());
             }
-            // Reset errors before next test and make it easier to view server-side errors that may have happened during the test.
-            checker().withScreenshot("serverErrors").wrapAssertion(this::checkErrors);
+            if (isTestRunningOnTeamCity()) // Don't risk modifying browser state when running locally
+            {
+                // Reset errors before next test and make it easier to view server-side errors that may have happened during the test.
+                checker().withScreenshot("serverErrors").wrapAssertion(this::checkErrors);
+            }
         }
         finally
         {
