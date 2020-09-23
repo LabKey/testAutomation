@@ -16,10 +16,11 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
-import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.pages.admin.CreateFolderPage;
+import org.labkey.test.pages.admin.SetFolderPermissionsPage;
+import org.labkey.test.params.ContainerProps;
 
 import java.util.List;
 
@@ -34,38 +35,30 @@ public class UIContainerHelper extends AbstractContainerHelper
 
     @Override
     @LogMethod
-    public void doCreateFolder(String child, String parentPath, String foldertype)
+    public void doCreateFolder(String parentPath, String folderName, String foldertype, List<String> enableModules)
     {
         String[] ancestors = parentPath.split("/");
-        createSubfolder(ancestors[0], ancestors[ancestors.length - 1], child, foldertype, null);
+        createSubfolder(ancestors[0], ancestors[ancestors.length - 1], folderName, foldertype, enableModules.toArray(new String[]{}));
     }
 
     @Override
     @LogMethod
-    protected void doCreateProject(String projectName, String folderType)
+    protected void doCreateProject(String projectName, String folderType, List<String> enableModules)
     {
         _test.log("Creating project with name " + projectName);
         _test.ensureAdminMode();
-        _test.goToCreateProject();
-        _test.waitForElement(Locator.name("name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement(Locator.name("name"), projectName);
-
-        if (null != folderType && !folderType.equals("None"))
-            _test.click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input"));
-        else
-        {
-            _test.click(Locator.xpath("//td[./label[text()='Custom']]/input"));
-            _test.waitForElementToBeVisible(Locator.input("defaultModule")); // wait for module-choice flyout
-        }
-
-        _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Next"));
+        CreateFolderPage createFolderPage = _test.goToCreateProject();
+        createFolderPage.setName(projectName);
+        createFolderPage.selectFolderType(folderType);
+        createFolderPage.addTabs(enableModules.toArray(new String[]{}));
+        SetFolderPermissionsPage setFolderPermissionsPage = createFolderPage.clickNext();
 
         List<String> errors = _test.getTexts(Locators.labkeyError.findElements(_test.getDriver()));
         if (!errors.isEmpty())
             fail("Unexpected error(s) during project creation: " + errors);
 
         //second page of the wizard
-        _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Next"));
+        setFolderPermissionsPage.clickNext();
 
         //third page of wizard
         if (_test.isElementPresent(Ext4Helper.Locators.ext4Button("Finish")))
@@ -84,10 +77,28 @@ public class UIContainerHelper extends AbstractContainerHelper
         // block until the project exists
         long startTime = System.currentTimeMillis();
         _test.log("Wait extra long for folder to finish deleting.");
-        while (!projectLinkExists(projectName) && System.currentTimeMillis() - startTime < LabKeySiteWrapper.WAIT_FOR_JAVASCRIPT)
+        while (!projectLinkExists(projectName) && System.currentTimeMillis() - startTime < WebDriverWrapper.WAIT_FOR_JAVASCRIPT)
         {
             WebDriverWrapper.sleep(5000);
             _test.refresh();
+        }
+    }
+
+    @Override
+    protected void doCreateContainer(ContainerProps props)
+    {
+        if (props.isWorkbook())
+        {
+            throw new IllegalArgumentException(
+                "UIContainerHelper doesn't support workbooks. Use APIContainerHelper or WorkbookHelper.");
+        }
+        else if (props.isProject())
+        {
+            doCreateProject(props.getName(), props.getFolderType(), props.getEnsureModules());
+        }
+        else
+        {
+            doCreateFolder(props.getParentPath(), props.getName(), props.getFolderType(), props.getEnsureModules());
         }
     }
 

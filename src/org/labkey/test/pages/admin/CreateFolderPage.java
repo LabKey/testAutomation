@@ -21,9 +21,12 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class CreateSubFolderPage extends LabKeyPage
+/**
+ * Wraps createFolder.jsp, rendered by 'AdminController.CreateFolderAction'
+ */
+public class CreateFolderPage extends LabKeyPage
 {
-    public CreateSubFolderPage(WebDriver test)
+    public CreateFolderPage(WebDriver test)
     {
         super(test);
     }
@@ -42,20 +45,25 @@ public class CreateSubFolderPage extends LabKeyPage
         return new SetFolderPermissionsPage(getDriver());
     }
 
-    public CreateSubFolderPage setFolderName(String name)
+    public CreateFolderPage setName(String name)
     {
         setFormElement(newElementCache().nameInput, name);
         return this;
     }
 
-    public CreateSubFolderPage selectFolderType(String folderType)
+    public CreateFolderPage selectFolderType(String folderType)
     {
+        if (null == folderType || folderType.equals("None"))
+        {
+            folderType = "Custom";
+        }
+
         WebElement folderTypeRadioButton =Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]")
                 .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-         folderTypeRadioButton.click();
+        folderTypeRadioButton.click();
 
-         if (folderType.equalsIgnoreCase("Custom"))
-             waitFor(()-> Locator.tagWithText("div", "Choose Modules:").findElementOrNull(getDriver()) != null, 4000 );
+        if (folderType.equalsIgnoreCase("Custom"))
+            waitFor(()-> Locator.tagWithText("div", "Choose Modules:").findElementOrNull(getDriver()) != null, 4000 );
 
         if (folderType.equalsIgnoreCase("Create From Template Folder"))
             waitFor(()-> Locator.input("templateSourceId").findElementOrNull(getDriver()) != null, 4000 );
@@ -63,7 +71,7 @@ public class CreateSubFolderPage extends LabKeyPage
          return this;
     }
 
-    public CreateSubFolderPage createFromTemplateFolder(String templateFolder)
+    public CreateFolderPage createFromTemplateFolder(String templateFolder)
     {
         selectFolderType("Create From Template Folder");
         _ext4Helper.waitForMaskToDisappear();
@@ -75,14 +83,14 @@ public class CreateSubFolderPage extends LabKeyPage
         return this;
     }
 
-    public CreateSubFolderPage setTemplatePartCheckBox(String templatePart, boolean checked)
+    public CreateFolderPage setTemplatePartCheckBox(String templatePart, boolean checked)
     {
         Checkbox checkbox = new Checkbox(Locator.xpath("//td[label[text()='"+templatePart+"']]/input").waitForElement(getDriver(), 4000));
         checkbox.set(checked);
         return this;
     }
 
-    public CreateSubFolderPage addTabs(String[] tabsToAdd)
+    public CreateFolderPage addTabs(String[] tabsToAdd)
     {
         if (tabsToAdd != null)
         {
@@ -92,13 +100,13 @@ public class CreateSubFolderPage extends LabKeyPage
         return this;
     }
 
-    public CreateSubFolderPage setTitle(String title)
+    public CreateFolderPage setTitle(String title)
     {
         setFormElement(newElementCache().titleInput, title);
         return this;
     }
 
-    public CreateSubFolderPage setUseNameAsDisplayTitle()
+    public CreateFolderPage setUseNameAsDisplayTitle()
     {
         _ext4Helper.checkCheckbox(Locator.ehrCheckboxWithLabel( "Use name as display title"));
         return this;

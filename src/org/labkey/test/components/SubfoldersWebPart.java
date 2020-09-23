@@ -17,7 +17,7 @@ package org.labkey.test.components;
 
 import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.pages.admin.CreateSubFolderPage;
+import org.labkey.test.pages.admin.CreateFolderPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -55,11 +55,11 @@ public class SubfoldersWebPart extends BodyWebPart<SubfoldersWebPart.ElementCach
         return new LabKeyPage(getDriver());
     }
 
-    public CreateSubFolderPage clickCreateSubfolder()
+    public CreateFolderPage clickCreateSubfolder()
     {
         getWrapper().clickButton("Create New Subfolder", WAIT_FOR_PAGE);
 
-        return new CreateSubFolderPage(getDriver());
+        return new CreateFolderPage(getDriver());
     }
 
     @Override

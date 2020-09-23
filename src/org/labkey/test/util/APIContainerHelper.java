@@ -16,24 +16,24 @@
 package org.labkey.test.util;
 
 import org.apache.http.HttpStatus;
-import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
-import org.labkey.remoteapi.security.CreateContainerCommand;
 import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
 import org.labkey.remoteapi.security.GetContainersCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.params.ContainerProps;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -54,77 +54,79 @@ public class APIContainerHelper extends AbstractContainerHelper
     }
 
     @Override
-    protected void doCreateProject(String projectName, String folderType)
+    protected void doCreateProject(String projectName, String folderType, List<String> enableModules)
     {
-        doCreateFolder("", projectName, folderType);
+        doCreateFolder("", projectName, folderType, enableModules);
     }
 
     public CreateContainerResponse createWorkbook(String parentPath, String title, String folderType)
     {
-        return doCreateContainer(parentPath, null, title, folderType, true);
+        ContainerProps props = ContainerProps.workbook(parentPath).setTitle(title).setFolderType(folderType);
+        return createContainer(props);
     }
 
     @Override
-    protected void doCreateFolder(String path, String folderName, String folderType)
+    protected void doCreateFolder(String parentPath, String folderName, String folderType, List<String> enableModules)
     {
-        doCreateContainer(path, folderName, null, folderType, false);
-
-        String[] splitPath = path.split("/");
-        StringBuilder fullPath = new StringBuilder();
-        for (String container : splitPath)
-        {
-            fullPath.append(container).append("/");
-        }
-        fullPath.append(folderName);
+        ContainerProps containerProps = ContainerProps.folder(parentPath, folderName).setType(folderType)
+            .setEnsureModules(enableModules);
+        CreateContainerResponse createContainerResponse = createContainer(containerProps);
 
         if (navigateToCreatedFolders)
         {
-            _test.beginAt(WebTestHelper.buildURL("project", fullPath.toString(), "begin"));
+            _test.beginAt(WebTestHelper.buildURL("project", createContainerResponse.getPath(), "begin"));
         }
     }
 
-    public CreateContainerResponse doCreateContainer(String parentPath, @Nullable String name, String title, String folderType, boolean isWorkbook)
+    @Override
+    protected void doCreateContainer(ContainerProps props)
     {
-        Connection connection = WebTestHelper.getRemoteApiConnection();
-        CreateContainerCommand command = new CreateContainerCommand(name);
+        createContainer(props);
+    }
 
-        if (isWorkbook)
-            command.setWorkbook(true);
-
-        if (title != null)
-            command.setTitle(title);
-
-        command.setFolderType(folderType);
-        parentPath = (parentPath.startsWith("/") ? "" : "/") + parentPath;
+    public CreateContainerResponse createContainer(ContainerProps props)
+    {
+        String parentPath = props.getParentPath();
+        String name = props.getName();
+        String folderType = props.getFolderType();
+        boolean isWorkbook = props.isWorkbook();
+        String expectedPath = String.join("/", props.isProject() ? "/" : parentPath, name).replaceAll("//+", "/");
 
         if (isWorkbook)
             _test.log("Creating new workbook via API in container: " + parentPath);
-        else if (parentPath.equals("/"))
-            _test.log("Creating project via API: " + name);
+        else if (props.isProject())
+            _test.log("Creating project via API: " + props.getName());
         else
-            _test.log("Creating new folder via API: " + parentPath + "/" + name);
+            _test.log("Creating new folder via API: " + parentPath + "/" + props.getName());
 
         try
         {
-            CreateContainerResponse response = command.execute(connection, parentPath);
+            Connection connection = WebTestHelper.getRemoteApiConnection();
+            CreateContainerResponse response = props.getCreateCommand().execute(connection, parentPath);
             if (!isWorkbook)
             {
-                String path = String.join("/", parentPath, name).replace("//", "/");
-                assertEquals("Unexpected path for created container", path, response.getPath());
+                assertEquals("Unexpected path for created container", expectedPath, response.getPath());
             }
-            if (folderType == null || "custom".equals(folderType.toLowerCase()) || "none".equals(folderType))
+            if (folderType == null || "custom".equalsIgnoreCase(folderType) || "none".equals(folderType))
                 folderType = (isWorkbook ? "Workbook" : "None");
             assertEquals("Wrong folder type for " + response.getPath() + ". Defining module may be missing.", folderType, response.getProperty("folderType"));
             return response;
         }
         catch (CommandException | IOException e)
         {
-            throw new RuntimeException("Failed to create container: " + parentPath + (name == null ? "" : "/" + name), e);
+            if (props.isWorkbook())
+            {
+                throw new RuntimeException("Failed to create workbook in: " + parentPath, e);
+            }
+            else
+            {
+                throw new RuntimeException("Failed to create container: " + expectedPath, e);
+            }
         }
     }
 
     @Override
-    protected void doDeleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException
+    protected void doDeleteProject(String projectName, boolean failIfNotFound, int wait)
     {
         deleteContainer("/" + projectName, failIfNotFound, wait);
     }
@@ -136,13 +138,13 @@ public class APIContainerHelper extends AbstractContainerHelper
         deleteContainer(project + "/" + folderName, true, waitTime);
     }
 
-    public void deleteWorkbook(String parent, int rowId, boolean failIfNotFound, int wait) throws TestTimeoutException
+    public void deleteWorkbook(String parent, int rowId, boolean failIfNotFound, int wait)
     {
         String path = parent + "/" + rowId;
         deleteContainer(path, failIfNotFound, wait);
     }
 
-    public void deleteContainer(String path, boolean failIfNotFound, int wait) throws TestTimeoutException
+    public void deleteContainer(String path, boolean failIfNotFound, int wait)
     {
         WebTestHelper.logToServer("=Test= Starting container delete: " + path);
 

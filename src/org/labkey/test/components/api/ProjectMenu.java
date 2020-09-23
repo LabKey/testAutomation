@@ -19,8 +19,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.pages.admin.CreateFolderPage;
 import org.labkey.test.pages.admin.CreateProjectPage;
-import org.labkey.test.pages.admin.CreateSubFolderPage;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -186,11 +186,11 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     /**
      * Creates a subfolder from the context you are already in (e.g. project/folder)
      */
-    public CreateSubFolderPage navigateToCreateSubFolderPage()
+    public CreateFolderPage navigateToCreateSubFolderPage()
     {
         open();
         getWrapper().clickAndWait(elementCache().newSubFolderButton);
-        return new CreateSubFolderPage(getDriver());
+        return new CreateFolderPage(getDriver());
     }
 
     public CreateProjectPage navigateToCreateProjectPage()
