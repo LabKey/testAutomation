@@ -14,28 +14,50 @@ project.configurations {
 }
 
 project.dependencies {
+    api("junit:junit:${junitVersion}")
+    api("org.seleniumhq.selenium:selenium-api:${seleniumVersion}")
+    implementation("commons-io:commons-io:${commonsIoVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotationsVersion}")
+    implementation("org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}")
+
+    //api "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
+    implementation("org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}")
+    api("org.seleniumhq.selenium:selenium-support:${seleniumVersion}")
+    implementation("org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}")
+    implementation("org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}")
+    implementation("org.seleniumhq.selenium:jetty-repacked:${jettyRepackagedVersion}")
+
+    api("org.apache.httpcomponents:httpcore:${httpcoreVersion}")
+    implementation("com.google.guava:guava:${guavaVersion}")
+    api("org.apache.httpcomponents:httpclient:${httpclientVersion}")
+    api("org.hamcrest:hamcrest-core:${hamcrestCoreVersion}")
+    implementation("org.apache.commons:commons-text:${commonsTextVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+    implementation("org.apache.httpcomponents:httpmime:${httpmimeVersion}")
+    implementation("org.apache.commons:commons-collections4:${commonsCollections4Version}")
+    implementation("net.sf.opencsv:opencsv:${opencsvVersion}")
+    implementation("javax.servlet:javax.servlet-api:${servletApiVersion}") // originally 3.1.0
     aspectj "org.aspectj:aspectjtools:${aspectjVersion}"
     implementation "org.slf4j:slf4j-log4j12:${slf4jLog4j12Version}" // Suppresses unwanted logging from remoteapi and webdriver
-    implementation "com.github.lookfirst:sardine:${project.lookfirstSardineVersion}"
-    implementation "com.googlecode.json-simple:json-simple:${jsonSimpleVersion}"
-    implementation "javax.xml.bind:jaxb-api:${jaxbVersion}"
+    api "com.github.lookfirst:sardine:${project.lookfirstSardineVersion}"
+    api "com.googlecode.json-simple:json-simple:${jsonSimpleVersion}"
+    //implementation "javax.xml.bind:jaxb-api:${jaxbVersion}"
     implementation "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
     implementation "com.sun.xml.bind:jaxb-core:${jaxbVersion}"
-    implementation "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
+    api "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
     implementation "org.apache.tika:tika-core:${tikaVersion}"
     implementation "org.apache.commons:commons-compress:${commonsCompressVersion}"
-    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
-    implementation "org.apache.commons:commons-math3:${commonsMath3Version}"
+    api "org.apache.commons:commons-lang3:${commonsLang3Version}"
+    implementation "org.apache.commons:commons-math3:${commonsMath3Version}" // used by test classes in targetedms
     implementation "org.apache.pdfbox:pdfbox:${pdfboxVersion}"
-    implementation "org.apache.poi:poi:${poiVersion}"
+    api "org.apache.poi:poi:${poiVersion}"
     implementation "org.apache.poi:poi-ooxml:${poiVersion}"
     implementation "org.apache.xmlbeans:xmlbeans:${xmlbeansVersion}"
     implementation "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
     implementation "org.jetbrains:annotations:${annotationsVersion}"
-    api "org.mock-server:mockserver-netty:${mockserverVersion}"
-    api "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
+    implementation "org.mock-server:mockserver-netty:${mockserverNettyVersion}" // used by test classes in accounts
     runtimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
-    implementation "org.aspectj:aspectjtools:${aspectjVersion}"
+    api "org.aspectj:aspectjtools:${aspectjVersion}"
     implementation "org.reflections:reflections:${reflectionsVersion}"
     uiTestRuntimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
 
