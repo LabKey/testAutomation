@@ -52,6 +52,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     {
         return elementCache().navbarNavBlock;
     }
+    @Override
     protected WebDriver getDriver()
     {
         return _driver;
@@ -332,6 +333,11 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
                 window.selectGroup(group);
 
             window.clickImpersonate();
+        }
+
+        public void signOut()
+        {
+            clickSubMenu(true, "Sign Out");
         }
 
         @Override

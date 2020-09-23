@@ -16,19 +16,19 @@
 package org.labkey.test.params;
 
 import org.jetbrains.annotations.Nullable;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.test.components.html.OptionSelect;
+
+import java.util.List;
 
 public class FieldDefinition extends PropertyDescriptor
 {
     // for UI helpers
     private ColumnType _type;
     private LookupInfo _lookup;
-
-    // UI Only field properties
-    private FieldValidator _validator;
-    private String _url;
 
     // Field properties not supported by PropertyDescriptor
     private Integer _scale;
@@ -37,6 +37,8 @@ public class FieldDefinition extends PropertyDescriptor
     private Boolean _shownInUpdateView;
     private Boolean _isPrimaryKey;
     private Boolean _lookupValidatorEnabled;
+    private String _url;
+    private List<FieldValidator<?>> _validators;
 
     public FieldDefinition(String name, ColumnType type)
     {
@@ -78,10 +80,19 @@ public class FieldDefinition extends PropertyDescriptor
             json.put("lookupValidatorEnabled", getLookupValidatorEnabled());
         if (getType().getConceptURI() != null)
             json.put("conceptURI", getType().getConceptURI());
+        if (getURL() != null)
+            json.put("url", getURL());
+        if (getValidators() != null)
+        {
+            JSONArray propertyValidators = new JSONArray();
+            getValidators().stream().map(FieldValidator::toJSONObject).forEachOrdered(propertyValidators::add);
+            json.put("propertyValidators", propertyValidators);
+        }
 
         return json;
     }
 
+    @Override
     public FieldDefinition setLabel(String label)
     {
         super.setLabel(label);
@@ -161,14 +172,14 @@ public class FieldDefinition extends PropertyDescriptor
         return setLookup(new LookupInfo(container, schema, query));
     }
 
-    public FieldValidator getValidator()
+    public List<FieldValidator<?>> getValidators()
     {
-        return _validator;
+        return _validators;
     }
 
-    public FieldDefinition setValidator(FieldValidator validator)
+    public FieldDefinition setValidators(List<FieldValidator<?>> validators)
     {
-        _validator = validator;
+        _validators = validators;
         return this;
     }
 
@@ -286,51 +297,38 @@ public class FieldDefinition extends PropertyDescriptor
 
     public enum ColumnType
     {
-        MultiLine("Multi-Line Text", "Multi-Line Text", "string"),
-        Integer("Integer", "Integer", "int"),
-        String("Text", "Text (String)", "string"),
-        Subject("Subject/Participant", "Subject/Participant (String)",
-                "string", "http://cpas.labkey.com/Study#ParticipantId", null),
-        DateTime("DateTime", "DateTime", "date"), // TODO remove this after GWT designer removed
-        DateAndTime("Date Time", "Date Time", "date"),
-        Boolean("Boolean", "Boolean", "boolean"),
-        Double("Number (Double)", "Number (Double)", "float"), // TODO remove this after GWT designer removed
-        Decimal("Decimal", "Decimal", "float"),
-        File("File", "File", "fileLink"),
-        AutoInteger("Auto-Increment Integer", "Auto-Increment Integer", "int"),
-        Flag("Flag", "Flag (String)", "string",
-                "http://www.labkey.org/exp/xml#flag", null),
-        Attachment("Attachment", "Attachment", "attachment"),
-        User("User", "User", "int", null,
-                new LookupInfo(null, "core", "users")),
-        Lookup("Lookup", "Lookup", null),
-        Sample("Sample", "Sample", "int",
-                "http://www.labkey.org/exp/xml#sample",
-                new LookupInfo(null, "exp", "Materials"));
+        MultiLine("Multi-Line Text", "string"),
+        Integer("Integer", "int"),
+        String("Text", "string"),
+        Subject("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null),
+        DateAndTime("Date Time", "dateTime"),
+        Boolean("Boolean", "boolean"),
+        Double("Number (Double)", "float"),
+        Decimal("Decimal (floating point)", "float"),
+        File("File", "fileLink"),
+        AutoInteger("Auto-Increment Integer", "int"),
+        Flag("Flag", "string", "http://www.labkey.org/exp/xml#flag", null),
+        Attachment("Attachment", "attachment"),
+        User("User", "int", null, new LookupInfo(null, "core", "users")),
+        Lookup("Lookup", null),
+        Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials"));
 
         private final String _label; // the display value in the UI for this kind of field
-        private final String _description; // TODO remove this after GWT designer removed
         private final String _rangeURI;     // the key used inside the API
         private final String _conceptURI;
         private final LookupInfo _lookupInfo;
 
-        ColumnType(String label, String description, String rangeURI, String conceptURI, LookupInfo lookupInfo)
+        ColumnType(String label, String rangeURI, String conceptURI, LookupInfo lookupInfo)
         {
             _label = label;
-            _description = description;
             _rangeURI = rangeURI;
             _conceptURI = conceptURI;
             _lookupInfo = lookupInfo;
         }
 
-        ColumnType(String label, String description, String rangeURI)
+        ColumnType(String label, String rangeURI)
         {
-            this(label, description, rangeURI, null, null);
-        }
-
-        public String toString()
-        {
-            return _description;
+            this(label, rangeURI, null, null);
         }
 
         public String getLabel()
@@ -348,6 +346,102 @@ public class FieldDefinition extends PropertyDescriptor
         protected LookupInfo getLookupInfo()
         {
             return _lookupInfo;
+        }
+    }
+
+    public enum ScaleType implements OptionSelect.SelectOption
+    {
+        LINEAR("Linear"),
+        LOG("Log");
+
+        String _text;
+
+        ScaleType(String text)
+        {
+            _text = text;
+        }
+
+        @Override
+        public String getValue()
+        {
+            return name();
+        }
+
+        @Override
+        public String getText()
+        {
+            return _text;
+        }
+    }
+
+    public enum DefaultType implements OptionSelect.SelectOption
+    {
+        FIXED_EDITABLE("Editable default"),
+        LAST_ENTERED("Last entered"),
+        FIXED_NON_EDITABLE("Fixed value");
+
+        String _text;
+
+        DefaultType(String text)
+        {
+            _text = text;
+        }
+
+        @Override
+        public String getValue()
+        {
+            return name();
+        }
+
+        @Override
+        public String getText()
+        {
+            return _text;
+        }
+    }
+
+    /**
+     * Represents possible PHI levels for a field
+     *
+     * @see org.labkey.api.data.PHI
+     */
+    public enum PhiSelectType implements OptionSelect.SelectOption
+    {
+        // Ordered from least to most restrictive
+        NotPHI("Not PHI", null),
+        Limited("Limited PHI", "Limited PHI Reader"),
+        PHI("Full PHI", "Full PHI Reader"),
+        Restricted("Restricted PHI", "Restricted PHI Reader");
+
+        private final String _text;
+        private final String _roleName;
+
+        PhiSelectType(String text, String roleName)
+        {
+            _text = text;
+            _roleName = roleName;
+        }
+
+        @Override
+        public String getValue()
+        {
+            return name();
+        }
+
+        @Override
+        public String getText()
+        {
+            return _text;
+        }
+
+        public int getRank()
+        {
+            return ordinal();
+        }
+
+        public String getRoleName()
+        {
+            return _roleName;
         }
     }
 
@@ -403,17 +497,15 @@ public class FieldDefinition extends PropertyDescriptor
         }
     }
 
-    public static abstract class FieldValidator
+    public static abstract class FieldValidator<V extends FieldValidator<V>>
     {
         private String _name;
         private String _description;
         private String _message;
 
-        public FieldValidator()
-        {
+        private boolean _failOnMatch = false;
 
-        }
-        public FieldValidator(String name, String description, String message)
+        protected FieldValidator(String name, String description, String message)
         {
             _name = name;
             _description = description;
@@ -434,9 +526,64 @@ public class FieldDefinition extends PropertyDescriptor
         {
             return _message;
         }
+
+        public V setFailOnMatch(boolean failOnMatch)
+        {
+            _failOnMatch = failOnMatch;
+            return getThis();
+        }
+
+        protected abstract V getThis();
+
+        protected abstract String getExpression();
+
+        protected abstract String getType();
+
+        protected JSONObject getProperties()
+        {
+            JSONObject json = new JSONObject();
+            json.put("failOnMatch", _failOnMatch);
+            return json;
+        }
+
+        /**
+         * JSON for a field validator looks something like this:
+         * <pre>
+         * {
+         *   "description": "description",
+         *   "errorMessage": "error message",
+         *   "expression": "~gt=34&~lt=99",
+         *   "name": "V range 1",
+         *   "new": true,
+         *   "properties": {
+         *     "failOnMatch": false
+         *   },
+         *   "type": "Range"
+         * }
+         * </pre>
+         * @return
+         */
+        protected JSONObject toJSONObject()
+        {
+            JSONObject json = new JSONObject();
+            json.put("name", _name);
+            if (_description != null)
+            {
+                json.put("description", _description);
+            }
+            if (_message != null)
+            {
+                json.put("errorMessage", _message);
+            }
+            json.put("new", true);
+            json.put("properties", getProperties());
+            json.put("type", getType());
+
+            return json;
+        }
     }
 
-    public static class RegExValidator extends FieldValidator
+    public static class RegExValidator extends FieldValidator<RegExValidator>
     {
         private String _expression;
 
@@ -446,29 +593,26 @@ public class FieldDefinition extends PropertyDescriptor
             _expression = expression;
         }
 
+        @Override
+        protected RegExValidator getThis()
+        {
+            return this;
+        }
+
+        @Override
+        protected String getType()
+        {
+            return "RegEx";
+        }
+
+        @Override
         public String getExpression()
         {
             return _expression;
         }
     }
 
-    public static class LookUpValidator extends FieldValidator
-    {
-        private ColumnType _colType;
-
-        public LookUpValidator()
-        {
-            super("Lookup validator", null, null);
-            _colType = ColumnType.Lookup;
-        }
-
-        public ColumnType getColType()
-        {
-            return _colType;
-        }
-    }
-
-    public static class RangeValidator extends FieldValidator
+    public static class RangeValidator extends FieldValidator<RangeValidator>
     {
         private RangeType _firstType;
         private String _firstRange;
@@ -477,16 +621,53 @@ public class FieldDefinition extends PropertyDescriptor
 
         public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange)
         {
-            super(name, description, message);
-            _firstType = firstType;
-            _firstRange = firstRange;
+            this(name, description, message, firstType, firstRange, null, null);
         }
 
         public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange, RangeType secondType, String secondRange)
         {
-            this(name, description, message, firstType, firstRange);
+            super(name, description, message);
+            _firstType = firstType;
+            _firstRange = firstRange;
             _secondType = secondType;
             _secondRange = secondRange;
+        }
+
+        @Override
+        protected RangeValidator getThis()
+        {
+            return this;
+        }
+
+        @Override
+        protected String getType()
+        {
+            return "Range";
+        }
+
+        @Override
+        protected String getExpression()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("~");
+            sb.append(_firstType.getOperator().getUrlKey());
+            if (_firstRange != null)
+            {
+                sb.append("=");
+                sb.append(_firstRange);
+            }
+            if (_secondType != null)
+            {
+                sb.append("&");
+                sb.append("~");
+                sb.append(_secondType.getOperator().getUrlKey());
+                if (_secondRange != null)
+                {
+                    sb.append("=");
+                    sb.append(_secondRange);
+                }
+            }
+            return sb.toString();
         }
 
         public RangeType getFirstType()

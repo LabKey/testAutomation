@@ -49,6 +49,7 @@ public class UserNotificationsPage extends LabKeyPage
         return new UserNotificationsPage(driver.getDriver());
     }
 
+    @Override
     protected void waitForPage()
     {
         waitForText(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, "User Notifications");

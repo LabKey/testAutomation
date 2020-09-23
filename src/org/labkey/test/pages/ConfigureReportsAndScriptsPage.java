@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -156,7 +157,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         List<String> dockerEngineNames = new ArrayList<>();
         String defaultDockerR = null;
 
-        List<WebElement> engines = getREngineLoc(true).findElements(getDriver());
+        List<WebElement> engines = Locators.enginesGridRowForLanguageSandboxed("R").findElements(getDriver());
         for (WebElement engine : engines)
         {
             engine.click();
@@ -263,9 +264,105 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         return engineRow;
     }
 
-    public Locator getREngineLoc(boolean sandboxed)
+    public EditEngineWindow editDefaultEngine(String engineLanguage)
     {
-        return sandboxed ? Locators.enginesGridRowForLanguageSandboxed("R") : Locators.enginesGridRowForLanguageNotSandboxed("R");
+        Locator engineLoc = Locators.defaultEnginesGridRowForLanguage(engineLanguage);
+        WebElement engineRow = engineLoc.findElement(getDriver());
+        doubleClick(engineRow);
+        return new EditEngineWindow();
+    }
+
+    public class EditEngineWindow extends Window
+    {
+        private final Input _nameInput =
+            Input.Input(Locator.id("editEngine_name-inputEl"), getDriver()).findWhenNeeded(this);
+        private final Input _languageNameInput =
+            Input.Input(Locator.id("editEngine_languageName-inputEl"), getDriver()).findWhenNeeded(this);
+        private final Input _languageVersionInput =
+            Input.Input(Locator.id("editEngine_languageVersion-inputEl"), getDriver()).findWhenNeeded(this);
+        private final Input _extensionsInput =
+            Input.Input(Locator.id("editEngine_extensions-inputEl"), getDriver()).findWhenNeeded(this);
+        private final Input _exePathInput =
+            Input.Input(Locator.id("editEngine_exePath-inputEl"), getDriver()).findWhenNeeded(this);
+        private final Input _exeCommandInput =
+            Input.Input(Locator.id("editEngine_exeCommand-inputEl"), getDriver()).findWhenNeeded(this);
+        private final Input _outputFileNameInput =
+            Input.Input(Locator.id("editEngine_outputFileName-inputEl"), getDriver()).findWhenNeeded(this);
+
+        public EditEngineWindow()
+        {
+            super(EDIT_WINDOW_TITLE, ConfigureReportsAndScriptsPage.this.getDriver());
+        }
+
+        public String getName()
+        {
+            return _nameInput.get();
+        }
+
+        public void setName(String name)
+        {
+            _nameInput.set(name);
+        }
+
+        public String getLanguageName()
+        {
+            return _languageNameInput.get();
+        }
+
+        public void setLanguage(String language)
+        {
+            _languageNameInput.set(language);
+        }
+
+        public String getLanguageVersion()
+        {
+            return _languageVersionInput.get();
+        }
+
+        public void setVersion(String version)
+        {
+            _languageVersionInput.set(version);
+        }
+
+        public String getExtensions()
+        {
+            return _extensionsInput.get();
+        }
+
+        public void setExtensions(String extensions)
+        {
+            _extensionsInput.set(extensions);
+        }
+
+        public String getPath()
+        {
+            return _exePathInput.get();
+        }
+
+        public void setPath(String path)
+        {
+            _exePathInput.set(path);
+        }
+
+        public String getCommand()
+        {
+            return _exeCommandInput.get();
+        }
+
+        public void setCommand(String command)
+        {
+            _exeCommandInput.set(command);
+        }
+
+        public String getOutputFileName()
+        {
+            return _outputFileNameInput.get();
+        }
+
+        public void setOutputFileName(String outputFileName)
+        {
+            _outputFileNameInput.set(outputFileName);
+        }
     }
 
     public enum EngineType
@@ -524,6 +621,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
             return this;
         }
 
+        @Override
         public Map<Locator, String> getConfigMap()
         {
             Map<Locator, String> configMap = super.getConfigMap();
@@ -536,6 +634,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
             return configMap;
         }
 
+        @Override
         public void configureEngine(EngineType type, Window configWindow, WebDriverWrapper wrapper)
         {
             // need to set the change password checkbox
@@ -565,17 +664,22 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
         public static Locator.XPathLocator enginesGridRowForLanguage(String engineLanguage)
         {
-            return enginesGrid.append(Locator.tagWithClass("tr", "x4-grid-row").withPredicate(Locator.xpath(String.format("//td[%d]", languageColumnIndex + 1)).withText(engineLanguage)));
+            return enginesGrid.append(Locator.tagWithClass("tr", "x4-grid-row").withDescendant(Locator.tag("td").position(languageColumnIndex + 1).withText(engineLanguage)));
+        }
+
+        public static Locator defaultEnginesGridRowForLanguage(String engineLanguage)
+        {
+            return enginesGridRowForLanguage(engineLanguage).withDescendant(Locator.tag("td").position(nameColumnIndex + 1).containing("default : true"));
         }
 
         public static Locator enginesGridRowForLanguageSandboxed(String engineLanguage)
         {
-            return enginesGridRowForLanguage(engineLanguage).withPredicate(Locator.xpath(String.format("//td[%d]", nameColumnIndex + 1)).containing("sandboxed : true"));
+            return enginesGridRowForLanguage(engineLanguage).withDescendant(Locator.tag("td").position(nameColumnIndex + 1).containing("sandboxed : true"));
         }
 
         public static Locator enginesGridRowForLanguageNotSandboxed(String engineLanguage)
         {
-            return enginesGridRowForLanguage(engineLanguage).withoutPredicate(Locator.xpath(String.format("//td[%d]", nameColumnIndex + 1)).containing("sandboxed : true"));
+            return enginesGridRowForLanguage(engineLanguage).withDescendant(Locator.tag("td").position(nameColumnIndex + 1).containing("sandboxed : false"));
         }
 
         public static Locator editEngineWindow = Ext4Helper.Locators.window("Edit Engine Configuration");

@@ -18,7 +18,6 @@ package org.labkey.test.tests.list;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -202,7 +201,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
         DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
         changeScale(fieldsPanel, MAX_ROW, LT_SCALE, false);
-        listDefinitionPage.clickSaveExpectingError();
+        listDefinitionPage.clickSaveExpectingErrors();
         String expectedErrorTxt ="The property \"" + MAX_COLUMN_NAME + "\" cannot be scaled down. It contains existing values exceeding [" + LT_SCALE + "] characters.";
         assertEquals(expectedErrorTxt, fieldsPanel.getPanelErrorText());
         checkExpectedErrors(0);  // Shouldn't log any SQLExceptions - product should detect inability to scale and not issue an alter query
@@ -223,7 +222,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
      * Set value of scale widget
      * @param rowIndex row Index of field to change scale on
      * @param newScale new scale value
-     * @param checkMax Override flag to set Max (will not unset Max if newScale >4K)
+     * @param checkMax Override flag to set Max (will not unset Max if newScale &gt; 4K)
      */
     private void changeScale(DomainFormPanel fieldsPanel, int rowIndex, int newScale, boolean checkMax)
     {

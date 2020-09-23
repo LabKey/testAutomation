@@ -52,6 +52,7 @@ public class ShowCreateSampleRequestPage extends LabKeyPage<ShowCreateSampleRequ
         return new ManageRequestPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

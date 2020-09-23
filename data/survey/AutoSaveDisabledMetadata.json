@@ -1,0 +1,107 @@
+{
+  "survey" : {
+    "layout" : "auto",
+    "showCounts" : false,
+    "autoSaveInterval" : 500,
+    "disableAutoSave" : true,
+    "sections" : [ {
+      "questions" : [ {
+        "name" : "txtField",
+        "caption" : "Txt Field",
+        "shortCaption" : "Txt Field",
+        "hidden" : false,
+        "jsonType" : "string",
+        "inputType" : "text",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "txtAreaField",
+        "caption" : "Txt Area Field",
+        "shortCaption" : "Txt Area Field",
+        "hidden" : false,
+        "jsonType" : "string",
+        "inputType" : "text",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "boolField",
+        "caption" : "Bool Field",
+        "shortCaption" : "Bool Field",
+        "hidden" : false,
+        "jsonType" : "boolean",
+        "inputType" : "checkbox",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "intField",
+        "caption" : "Int Field",
+        "shortCaption" : "Int Field",
+        "hidden" : false,
+        "jsonType" : "int",
+        "inputType" : "text",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "dblField",
+        "caption" : "Dbl Field",
+        "shortCaption" : "Dbl Field",
+        "hidden" : false,
+        "jsonType" : "float",
+        "inputType" : "text",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "dtField",
+        "caption" : "Dt Field",
+        "shortCaption" : "Dt Field",
+        "hidden" : false,
+        "jsonType" : "date",
+        "inputType" : "text",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "dtTimeField",
+        "caption" : "DateTime Field",
+        "shortCaption" : "DateTime Field",
+        "hidden" : false,
+        "jsonType" : "date",
+        "inputType" : "text",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "attField",
+        "caption" : "Att Field",
+        "shortCaption" : "Att Field",
+        "hidden" : false,
+        "jsonType" : "string",
+        "inputType" : "file",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "lkField",
+        "caption" : "Lk Field",
+        "shortCaption" : "Lk Field",
+        "hidden" : false,
+        "jsonType" : "int",
+        "inputType" : "text",
+        "lookup" : {
+          "schema" : "lists",
+          "keyColumn" : "key",
+          "public" : true,
+          "displayColumn" : "value",
+          "isPublic" : true,
+          "queryName" : "lookup",
+          "schemaName" : "lists",
+          "table" : "lookup"
+        },
+        "required" : false,
+        "width" : 800
+      } ],
+      "description" : null,
+      "header" : true,
+      "title" : "listA",
+      "collapsible" : true,
+      "defaultLabelWidth" : 350
+    } ]
+  }
+}

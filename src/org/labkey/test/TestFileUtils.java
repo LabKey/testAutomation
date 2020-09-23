@@ -38,6 +38,7 @@ import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.NotFoundException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -60,11 +61,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Static methods for finding finding and reading test-related files
@@ -74,6 +74,7 @@ public abstract class TestFileUtils
     private static File _labkeyRoot = null;
     private static File _buildDir = null;
     private static File _testRoot = null;
+    private static Set<File> _sampledataDirs = null;
 
     public static String getFileContents(String rootRelativePath)
     {
@@ -185,47 +186,81 @@ public abstract class TestFileUtils
     }
 
     /**
-     * Searches all sampledata directories for the specified file
+     * Searches all sampledata directories for the specified file.
+     *
      * @param relativePath e.g. "lists/ListDemo.lists.zip" or "OConnor_Test.folder.zip"
      * @return File object with the full path to the specified file
+     *
+     * @see #getSampleDataDirs()
      */
     @NotNull
     public static File getSampleData(String relativePath)
     {
-        Set<String> sampledataDirs = new TreeSet<>();
+        List<File> sampleDatas = getSampleDatas(relativePath);
 
-        File sampledataDirsFile = new File(getTestBuildDir(), "sampledata.dirs");
-        if (sampledataDirsFile.exists())
+        if (sampleDatas.isEmpty())
         {
-            String path = getFileContents(sampledataDirsFile);
-            sampledataDirs.addAll(Arrays.asList(path.split(";")));
+            throw new NotFoundException("Sample data not found: " + relativePath + "\n" +
+                    "Run `./gradlew :server:test:build :server:test:writeSampleDataFile` once to locate all sampledata" + "\n" +
+                    "Currently known sample data locations: " + getSampleDataDirs().stream().map(File::getAbsolutePath).collect(Collectors.joining("\n")));
         }
-        else
+        if (sampleDatas.size() > 1)
         {
-            sampledataDirs.add(new File(getLabKeyRoot(), "sampledata").toString());
-            sampledataDirs.add(new File(getTestRoot(), "data").toString());
+            throw new IllegalArgumentException(
+                "Ambiguous file specified: " + relativePath + "\n" +
+                    "Found:\n" +
+                    sampleDatas.stream().map(File::getAbsolutePath).collect(Collectors.joining("\n")));
         }
 
-        File foundFile = null;
-        for (String sampledataDir : sampledataDirs)
+        return sampleDatas.get(0);
+    }
+
+    /**
+     * Searches all sampledata directories for the specified relative path.
+     *
+     * @param relativePath e.g. "lists/ListDemo.lists.zip" or "OConnor_Test.folder.zip"
+     * @return files with the relative path in all sampledata directories
+     *
+     * @see #getSampleDataDirs()
+     */
+    @NotNull
+    public static List<File> getSampleDatas(String relativePath)
+    {
+        Set<File> sampledataDirs = getSampleDataDirs();
+        List<File> foundFiles = new ArrayList<>();
+
+        for (File sampledataDir : sampledataDirs)
         {
             File checkFile = new File(sampledataDir, relativePath);
             if (checkFile.exists())
             {
-                if (foundFile != null && foundFile.length() != checkFile.length()) // Allow duplicate files to ease migration
-                    throw new IllegalArgumentException("Ambiguous file specified: " + relativePath + "\n" +
-                            "Found:\n" +
-                            foundFile + "\n" +
-                            checkFile);
-                else
-                    foundFile = checkFile;
+                foundFiles.add(checkFile);
             }
         }
 
-        assertNotNull("Sample data not found: " + relativePath + "\n" +
-                "Run `./gradlew :server:test:build :server:test:writeSampleDataFile` once to locate all sampledata" + "\n" +
-                "Currently known sample data locations: " + String.join("\n", sampledataDirs), foundFile);
-        return foundFile;
+        return foundFiles;
+    }
+
+    @NotNull
+    public static Set<File> getSampleDataDirs()
+    {
+        if (_sampledataDirs == null)
+        {
+            _sampledataDirs = new TreeSet<>();
+
+            File sampledataDirsFile = new File(getTestBuildDir(), "sampledata.dirs");
+            if (sampledataDirsFile.exists())
+            {
+                String path = getFileContents(sampledataDirsFile);
+                _sampledataDirs.addAll(Arrays.stream(path.split(";")).map(File::new).collect(Collectors.toList()));
+            }
+            else
+            {
+                _sampledataDirs.add(new File(getTestRoot(), "data"));
+            }
+        }
+
+        return _sampledataDirs;
     }
 
     public static File getTestTempDir()

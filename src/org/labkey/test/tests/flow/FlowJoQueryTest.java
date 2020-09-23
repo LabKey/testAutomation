@@ -139,7 +139,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickButton("Analyze selected runs");
         setFormElement(Locator.name("ff_analysisName"), "LabKeyAnalysis");
         clickButton("Analyze runs");
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("LabKeyAnalysis"));
         new DataRegionTable("query", getDriver()).clickHeaderMenu("Query", "Comparison");
@@ -163,7 +163,7 @@ public class FlowJoQueryTest extends BaseFlowTest
                 "FROM CompensationMatrices cm";
         ExecuteSqlCommand cmd = new ExecuteSqlCommand("flow", sql);
 
-        Connection conn = createDefaultConnection(true);
+        Connection conn = createDefaultConnection();
         SelectRowsResponse r;
         try
         {

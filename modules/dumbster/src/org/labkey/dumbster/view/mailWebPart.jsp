@@ -107,11 +107,11 @@ function toggleRecorder(checkbox)
 
             if (checked)
             {
-                var t = document.getElementById(<%=PageFlowUtil.jsString(emailRegion.getDomId())%>);
+                var t = document.getElementById(<%=q(emailRegion.getDomId())%>);
                 var len = t.rows.length;
                 for (var i = len - 2; i > 0; i--)
                     t.deleteRow(i);
-                Ext4.get(<%=PageFlowUtil.jsString(renderId)%>).setDisplayed("");
+                Ext4.get(<%=q(renderId)%>).setDisplayed("");
             }
         }
     };

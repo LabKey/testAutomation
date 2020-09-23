@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cohorts xmlns="http://labkey.org/study/xml">
+  <cohort label="Group 1: Accute HIV-1" enrolled="true">
+    <id>249318596</id>
+    <id>249320107</id>
+    <id>249320489</id>
+  </cohort>
+  <cohort label="Group 2: HIV-1 Negative" enrolled="true">
+    <id>249320127</id>
+    <id>249320897</id>
+    <id>249325717</id>
+  </cohort>
+</cohorts>

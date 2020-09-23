@@ -102,6 +102,7 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
         clickAndWait(elementCache().importFolderButton);
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

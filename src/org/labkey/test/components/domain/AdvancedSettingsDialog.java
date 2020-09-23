@@ -1,12 +1,12 @@
 package org.labkey.test.components.domain;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.EnumSelect;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -92,7 +92,7 @@ public class AdvancedSettingsDialog extends ModalDialog
         return elementCache().defaultTypeSelect.getFirstSelectedOption().getText();
     }
 
-    public AdvancedSettingsDialog setDefaultValueType(PropertiesEditor.DefaultType type)
+    public AdvancedSettingsDialog setDefaultValueType(FieldDefinition.DefaultType type)
     {
         getWrapper().waitFor(()->  elementCache().defaultTypeSelect.getOptions()
                         .stream().map(WebElement::getText).collect(Collectors.toList()).contains(type.getText()),
@@ -112,7 +112,7 @@ public class AdvancedSettingsDialog extends ModalDialog
         return elementCache().phiSelect.getFirstSelectedOption().getText();
     }
 
-    public AdvancedSettingsDialog setPHILevel(PropertiesEditor.PhiSelectType phiLevel)
+    public AdvancedSettingsDialog setPHILevel(FieldDefinition.PhiSelectType phiLevel)
     {
         getWrapper().waitFor(()->  elementCache().phiSelect.getOptions()
                         .stream().map(WebElement::getText).collect(Collectors.toList()).contains(phiLevel.getText()),
@@ -182,6 +182,7 @@ public class AdvancedSettingsDialog extends ModalDialog
 
     public AdvancedSettingsDialog setMissingValuesEnabled(boolean checked)
     {
+        getWrapper().scrollIntoView(Locator.name("domainpropertiesrow-mvEnabled"));
         elementCache().enableMissingValues.set(checked);
         getWrapper().waitFor(()-> elementCache().enableMissingValues.get().equals(checked),
                 "missingValue checkbox was not set as expected", 1000);
@@ -225,8 +226,8 @@ public class AdvancedSettingsDialog extends ModalDialog
                 Locator.input("domainpropertiesrow-shownInDetailsView").findWhenNeeded(this));
 
         // default value options
-        private final EnumSelect<PropertiesEditor.DefaultType> defaultTypeSelect =
-                EnumSelect.EnumSelect(Locator.tagWithName("select", "domainpropertiesrow-defaultValueType"), PropertiesEditor.DefaultType.class)
+        private final EnumSelect<FieldDefinition.DefaultType> defaultTypeSelect =
+                EnumSelect.EnumSelect(Locator.tagWithName("select", "domainpropertiesrow-defaultValueType"), FieldDefinition.DefaultType.class)
                         .findWhenNeeded(this);
 
         // misc options

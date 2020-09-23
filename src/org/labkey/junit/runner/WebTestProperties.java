@@ -34,7 +34,7 @@ public abstract class WebTestProperties
     private static ModuleMap associatedModules = new ModuleMap();
     private static final List<String> installedModules = getInstalledModules();
 
-    private static void loadTestProperties(Class testClass)
+    private static void loadTestProperties(Class<?> testClass)
     {
         if (!WebTest.class.isAssignableFrom(testClass))
             return;
@@ -42,7 +42,7 @@ public abstract class WebTestProperties
         try
         {
             WebTest test;
-            Constructor<WebTest> c = testClass.getConstructor();
+            Constructor<WebTest> c = (Constructor<WebTest>) testClass.getConstructor();
             test = c.newInstance();
 
             List<String> modules = test.getAssociatedModules();
@@ -64,7 +64,7 @@ public abstract class WebTestProperties
         }
     }
 
-    public static Collection<String> getAssociatedModules(Class test)
+    public static Collection<String> getAssociatedModules(Class<?> test)
     {
         if (!associatedModules.containsKey(test))
         {
@@ -76,17 +76,17 @@ public abstract class WebTestProperties
     /**
      * This assumes that info for all relevant tests has already been stashed
      */
-    public static Collection<Class> getAssociatedTests(String module)
+    public static Collection<Class<?>> getAssociatedTests(String module)
     {
         return associatedTests.getOrDefault(module, Collections.emptySet());
     }
 
     // A simple MultiMap
-    public static class TestMap extends CaseInsensitiveHashMap<Collection<Class>>
+    public static class TestMap extends CaseInsensitiveHashMap<Collection<Class<?>>>
     {
-        public Collection<Class> put(String key, Class clazz)
+        public Collection<Class<?>> put(String key, Class<?> clazz)
         {
-            Collection<Class> collection = get(key);
+            Collection<Class<?>> collection = get(key);
 
             if (null == collection)
             {
@@ -100,9 +100,9 @@ public abstract class WebTestProperties
     }
 
     // A simple MultiMap
-    public static class ModuleMap extends HashMap<Class, Collection<String>>
+    public static class ModuleMap extends HashMap<Class<?>, Collection<String>>
     {
-        public Collection<String> put(Class key, String module)
+        public Collection<String> put(Class<?> key, String module)
         {
             Collection<String> collection = get(key);
 
@@ -126,6 +126,6 @@ public abstract class WebTestProperties
 
         String[] moduleNames = modulesDir.list((dir, name) -> (new File(dir, name)).isDirectory());
 
-        return Arrays.asList(moduleNames);
+        return moduleNames != null ? Arrays.asList(moduleNames) : Collections.emptyList();
     }
 }

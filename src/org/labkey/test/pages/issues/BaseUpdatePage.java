@@ -52,7 +52,7 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
     }
 
     /**
-     * Find a named field you know to be a <select>
+     * Find a named field you know to be a &lt;select&gt;
      */
     public OptionSelect selectWithName(String fieldName)
     {
@@ -100,6 +100,7 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
         return new DetailsPage(getDriver());
     }
 
+    @Override
     protected EC newElementCache()
     {
         return (EC) new ElementCache();

@@ -29,7 +29,7 @@ import javax.swing.tree.TreeCellRenderer;
 
 /**
 @author Nobuo Tamemasa
-@editedBy Erik Ulberg
+@author Erik Ulberg
 */
 public class CheckRenderer extends JPanel implements TreeCellRenderer {
     protected JCheckBox _check;
@@ -44,8 +44,9 @@ public class CheckRenderer extends JPanel implements TreeCellRenderer {
         _label.setForeground(new Color(102, 102, 102));
     }
 
+    @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected,
-             boolean expanded, boolean leaf, int row, boolean hasFocus)
+                                                  boolean expanded, boolean leaf, int row, boolean hasFocus)
     {
         String stringValue = tree.convertValueToText(value, isSelected, expanded, leaf, row, hasFocus);
         setEnabled(tree.isEnabled());
@@ -55,6 +56,7 @@ public class CheckRenderer extends JPanel implements TreeCellRenderer {
         return this;
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         Dimension d_check = _check.getPreferredSize();
@@ -63,6 +65,7 @@ public class CheckRenderer extends JPanel implements TreeCellRenderer {
                 (d_check.height < d_label.height ? d_label.height : d_check.height));
     }
 
+    @Override
     public void doLayout()
     {
         Dimension d_check = _check.getPreferredSize();
@@ -83,6 +86,7 @@ public class CheckRenderer extends JPanel implements TreeCellRenderer {
         _label.setBounds(d_check.width,y_label,d_label.width,d_label.height);
     }
 
+    @Override
     public void setBackground(Color color)
     {
         if (color instanceof ColorUIResource)

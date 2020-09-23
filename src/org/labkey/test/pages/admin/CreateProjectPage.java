@@ -41,6 +41,12 @@ public class CreateProjectPage extends LabKeyPage<CreateProjectPage.ElementCache
         return new CreateProjectPage(driver.getDriver());
     }
 
+    @Override
+    public void waitForPage()
+    {
+        waitFor(()-> isCurrentStepHighlit(), WAIT_FOR_PAGE);
+    }
+
     public CreateProjectPage setProjectName(String projectName)
     {
         log("Creating project with name " + projectName);
@@ -76,6 +82,12 @@ public class CreateProjectPage extends LabKeyPage<CreateProjectPage.ElementCache
         return new SetFolderPermissionsPage(getDriver());
     }
 
+    public boolean isCurrentStepHighlit()
+    {
+        return elementCache().activePane.existsIn(getDriver());
+    }
+
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -87,5 +99,7 @@ public class CreateProjectPage extends LabKeyPage<CreateProjectPage.ElementCache
         WebElement titleInput = Locator.input("title").findWhenNeeded(this).withTimeout(4000);;
         WebElement useNameAsDisplayTitleCheckBox = Locator.checkboxByLabel("Use name as display title", false)
                 .findWhenNeeded(this).withTimeout(4000);
+        Locator activePane = Locator.tagWithClass("li", "active")
+                .withChild(Locator.linkWithText("Create Project"));
     }
 }

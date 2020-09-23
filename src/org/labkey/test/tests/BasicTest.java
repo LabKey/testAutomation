@@ -33,6 +33,7 @@ import org.labkey.test.categories.Git;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.WebPart;
+import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.util.UIContainerHelper;
 import org.openqa.selenium.WebElement;
 
@@ -60,6 +61,7 @@ public class BasicTest extends BaseWebDriverTest
         _containerHelper = new UIContainerHelper(this);
     }
 
+    @Override
     protected String getProjectName()
     {
         return PROJECT_NAME;
@@ -74,6 +76,8 @@ public class BasicTest extends BaseWebDriverTest
     @Test
     public void testSystemSettings()
     {
+        Assume.assumeFalse("Testing system settings require site admin.", TestProperties.isPrimaryUserAppAdmin());
+
         // Disable scheduled system maintenance
         setSystemMaintenance(false);
 
@@ -81,17 +85,17 @@ public class BasicTest extends BaseWebDriverTest
         WebElement modeElement = Locator.tagWithText("td", "Mode").append("/../td[2]").findElement(getDriver());
         String mode = modeElement.getText();
         if (TestProperties.isDevModeEnabled())
-            Assert.assertEquals("Development", mode); // Verify that we're running in dev mode
-        else
-            Assert.assertEquals("Production", mode); // Unless we're not supposed to be.
+            checker().verifyEquals("Wrong server mode",
+                    TestProperties.isDevModeEnabled() ? "Development" : "Production", mode); // Verify whether we're running in dev mode
 
-        goToAdminConsole().clickSiteSettings();
-        checkRadioButton(Locator.radioButtonByNameAndValue("usageReportingLevel", "NONE"));     // Don't report usage to labkey.org
-        checkRadioButton(Locator.radioButtonByNameAndValue("exceptionReportingLevel", "NONE"));   // Don't report exceptions to labkey.org - we leave the self-report setting unchanged
-        clickButton("Save");
+        CustomizeSitePage customizeSitePage = goToAdminConsole().clickSiteSettings();
+        customizeSitePage.setUsageReportingLevel(CustomizeSitePage.ReportingLevel.NONE); // Don't report usage to labkey.org
+        customizeSitePage.setExceptionReportingLevel(CustomizeSitePage.ReportingLevel.NONE); // Don't report exceptions to labkey.org
+        // Note: leave the self-report setting unchanged
+        customizeSitePage.save();
 
         // Verify scheduled system maintenance is disabled (see above). Can disable this only in dev mode.
-        if (TestProperties.isDevModeEnabled())
+        if (TestProperties.isDevModeEnabled() && !TestProperties.isPrimaryUserAppAdmin())
         {
             goToAdminConsole().clickRunningThreads();
             assertTextNotPresent("SystemMaintenance");
@@ -102,7 +106,7 @@ public class BasicTest extends BaseWebDriverTest
     public void testFolderAndRole()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
-        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"Messages", "Wiki", "FileContent"});
+        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"FileContent"});
         _permissionsHelper.createPermissionsGroup("testers");
         _ext4Helper.clickTabContainingText("Permissions");
         _permissionsHelper.assertPermissionSetting("testers", "No Permissions");
@@ -180,6 +184,7 @@ public class BasicTest extends BaseWebDriverTest
         Assert.assertEquals("Initial user action did not redirect properly when logged in", expectedTitle, getDriver().getTitle());
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("core");

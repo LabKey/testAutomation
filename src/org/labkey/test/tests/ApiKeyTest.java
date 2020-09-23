@@ -213,7 +213,7 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .setAllowApiKeys(false)
                 .setAllowSessionKeys(true)
                 .save();
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         PostCommand generateAPIKeyCommand = new PostCommand("security", "createApiKey");
         generateAPIKeyCommand.setParameters(new HashMap<>(Maps.of("type", "apikey")));
         try
@@ -238,7 +238,7 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .setAllowApiKeys(true)
                 .setAllowSessionKeys(false)
                 .save();
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         PostCommand generateAPIKeyCommand = new PostCommand("security", "createApiKey");
         generateAPIKeyCommand.setParameters(new HashMap<>(Maps.of("type", "session")));
         try
@@ -279,14 +279,15 @@ public class ApiKeyTest extends BaseWebDriverTest
 
     private String generateSessionKey()
     {
-        goToAPIKeyPage();
+        goToExternalToolPage();
+        waitForText("API keys are used to authorize");
         clickButton("Generate session key", "session|");
         return Locator.inputById("session-token").findElement(getDriver()).getAttribute("value");
     }
 
     private String generateAPIKey(List<Map<String, Object>> _generatedApiKeys) throws IOException
     {
-        goToAPIKeyPage();
+        goToExternalToolPage();
         clickButton("Generate API key", "apikey|");
         String apiKey = Locator.inputById("apikey-token").findElement(getDriver()).getAttribute("value");
         // get record
@@ -321,13 +322,6 @@ public class ApiKeyTest extends BaseWebDriverTest
         newRow.put(keyField, rowId);
 
         return newRow;
-    }
-
-
-    private void goToAPIKeyPage()
-    {
-        clickUserMenuItem("API Keys");
-        waitForText("API keys are used to authorize");
     }
 
     @Override

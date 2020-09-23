@@ -228,18 +228,18 @@ function renderRunsWebPart()
   if (webpart) webpart.render();
 }
 
-// Assume the test sample set exists for the purposes of the ModuleAssayTest
-// automated test, but if the sample set doesn't exist skip adding input
-// samples when uploading data.  The BiologicsAssayTest uses this assay
-// without creating the test sample set.
-var TEST_SAMPLE_SET_NAME = "Test Sample Set";
+// Assume the test sample type exists for the purposes of the ModuleAssayTest
+// automated test, but if the sample type doesn't exist skip adding input
+// samples when uploading data. The BiologicsAssayTest uses this assay
+// without creating the test sample type.
+var TEST_SAMPLE_TYPE_NAME = "Test Sample Type";
 var testSampleSetExists = true;
 
 function checkSampleSetExists() {
   LABKEY.Query.selectRows({
     schemaName: "exp",
     queryName: "SampleSets",
-    filterArray: [ LABKEY.Filter.create("Name", TEST_SAMPLE_SET_NAME) ],
+    filterArray: [ LABKEY.Filter.create("Name", TEST_SAMPLE_TYPE_NAME) ],
     success: function (data) {
       if (data && data.rowCount === 0) {
         testSampleSetExists = false;
@@ -269,14 +269,14 @@ function handleDataUpload(f, action)
     run.materialInputs[0] = {
       name: "MyNewMaterialInput_" + LABKEY.page.batch.name + "_" + run.name,
       properties: { Barcode: "xyzzy" },
-      sampleSet: { name: TEST_SAMPLE_SET_NAME }
+      sampleSet: { name: TEST_SAMPLE_TYPE_NAME }
     };
 
     run.materialOutputs = run.materialOutputs || [];
     run.materialOutputs[0] = {
       name: "MyNewMaterialOutput_" + LABKEY.page.batch.name + "_" + run.name,
       properties: { Barcode: "xyzzy" },
-      sampleSet: { name: TEST_SAMPLE_SET_NAME }
+      sampleSet: { name: TEST_SAMPLE_TYPE_NAME }
     };
   }
 

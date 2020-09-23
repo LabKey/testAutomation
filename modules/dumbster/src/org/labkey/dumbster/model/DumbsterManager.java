@@ -17,7 +17,8 @@ package org.labkey.dumbster.model;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.util.ContextListener;
 import org.labkey.api.util.MailHelper;
@@ -41,7 +42,7 @@ import java.util.Properties;
  */
 public class DumbsterManager implements ShutdownListener
 {
-    private static final Logger _log = Logger.getLogger(DumbsterManager.class);
+    private static final Logger _log = LogManager.getLogger(DumbsterManager.class);
 
     private static DumbsterManager instance;
 
@@ -130,10 +131,12 @@ public class DumbsterManager implements ShutdownListener
         return "Dumbster manager";
     }
 
+    @Override
     public void shutdownPre()
     {
     }
 
+    @Override
     public void shutdownStarted()
     {
         // Stop listening on the mail port before shutdown.

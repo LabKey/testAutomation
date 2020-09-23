@@ -26,7 +26,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFieldRow;
@@ -63,7 +63,7 @@ import static org.junit.Assert.assertThat;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
 
-@Category({BVT.class, FileBrowser.class})
+@Category({DailyB.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class FileContentUploadTest extends BaseWebDriverTest
 {
@@ -81,6 +81,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     private static final String LOOKUP_VALUE_1 = "Hydrogen";
     private static final String LOOKUP_VALUE_2 = "Helium";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("filecontent");
@@ -102,6 +103,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         initTest.doSetupSteps();
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);

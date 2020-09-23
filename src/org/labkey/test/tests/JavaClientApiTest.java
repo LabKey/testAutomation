@@ -128,7 +128,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
                 new PropertyDescriptor("Notes", "Notes", "string")
         ));
 
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         DomainResponse createResp = createCmd.execute(cn, PROJECT_NAME);
         assertEquals(200, createResp.getStatusCode());
     }
@@ -203,7 +203,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
     {
         log("Starting CRUD test...");
         log("Inserting a new record into that list...");
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
 
         //insert a row
         Date now = new Date();
@@ -283,7 +283,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
     protected void doTruncateTableTest() throws Exception
     {
         log("Starting TruncateTable test...");
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
 
         //delete the record
         log("Truncating the table");
@@ -481,7 +481,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         // require userId or email
         try
         {
-            Connection cn = createDefaultConnection(false);
+            Connection cn = createDefaultConnection();
             ImpersonateUserCommand impCmd = new ImpersonateUserCommand(null);
             CommandResponse resp = impCmd.execute(cn, PROJECT_NAME);
             fail("Expect CommandException");
@@ -494,7 +494,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         // user doesn't exist
         try
         {
-            Connection cn = createDefaultConnection(false);
+            Connection cn = createDefaultConnection();
             ImpersonateUserCommand impCmd = new ImpersonateUserCommand("email-does-not-exist");
             CommandResponse resp = impCmd.execute(cn, PROJECT_NAME);
             fail("Expect CommandException");
@@ -507,7 +507,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         // Can't impersonate yourself
         try
         {
-            Connection cn = createDefaultConnection(false);
+            Connection cn = createDefaultConnection();
             ImpersonateUserCommand impCmd = new ImpersonateUserCommand(getCurrentUser());
             CommandResponse resp = impCmd.execute(cn, PROJECT_NAME);
             fail("Expect CommandException");
@@ -523,7 +523,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
     {
         goToProjectHome();
 
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         cn.setAcceptSelfSignedCerts(true);
 
         // grant edit permission
@@ -580,7 +580,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         goToProjectHome();
 
         // grant edit permission
-        int userId = ensureUser(createDefaultConnection(false), USER2_NAME);
+        int userId = ensureUser(createDefaultConnection(), USER2_NAME);
         ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
         permHelper.setUserPermissions(USER2_NAME, "Editor");
 

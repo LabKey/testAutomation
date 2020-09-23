@@ -15,7 +15,8 @@
  */
 package org.labkey.linkedschematest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.apache.xmlbeans.SimpleValue;
 import org.apache.xmlbeans.XmlObject;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +42,7 @@ import java.util.Map;
  */
 public class TestLinkedSchemaCustomizer implements LinkedSchemaCustomizer
 {
-    private static Logger LOG = Logger.getLogger(TestLinkedSchemaCustomizer.class);
+    private static Logger LOG = LogManager.getLogger(TestLinkedSchemaCustomizer.class);
 
     // Name of the parameter declaration
     private static final String PARAM_FAMILY = "PARAM_FAMILY";

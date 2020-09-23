@@ -18,6 +18,8 @@ package org.labkey.test.pages;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.study.DatasetDesignerPage;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -32,15 +34,24 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
         // TODO: Need to figure out a way to wait for buttons to be responsive so that we don't need to use clickUntilStale
     }
 
+    @Override
+    public void waitForPage()
+    {
+        waitFor(()-> Locator.tagWithClass("div", "lk-body-title")
+                        .withChild(Locator.tag("h3")).existsIn(getDriver()),
+                "The page did not render in time", WAIT_FOR_PAGE);
+    }
+
+    @Override
     protected DatasetPropertiesPage.ElementCache newElementCache()
     {
         return new DatasetPropertiesPage.ElementCache();
     }
 
-    public EditDatasetDefinitionPage clickEditDefinition()
+    public DatasetDesignerPage clickEditDefinition()
     {
         doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(elementCache().editDefinitionButton)));
-        return new EditDatasetDefinitionPage(getDriver());
+        return new DatasetDesignerPage(getDriver());
     }
 
     public ViewDatasetDataPage clickViewData()

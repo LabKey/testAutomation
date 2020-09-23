@@ -48,6 +48,7 @@ public class ResourceEncodingTest extends BaseWebDriverTest
         return null;
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("core");

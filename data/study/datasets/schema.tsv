@@ -1,0 +1,1112 @@
+platename	platelabel	plateno	Property	label	RangeURI	required	format	concepturi	key	AutoKey
+TYP	Types	2	boolean	Boolean	xsd:boolean		
+TYP	Types	2	dbl	Double	xsd:double		
+TYP	Types	2	date	Date	xsd:dateTime		
+TYP	Types	2	integer	Integer	xsd:int		
+TYP	Types	2	string	String	xsd:string		
+DEM-1	DEM-1: Demographics	1	DEMdt	Contact Date	xsd:dateTime	required	DD/MMM/YY   http://cpas.labkey.com/Study#VisitDate
+DEM-1	DEM-1: Demographics	1	DEMbdt	1.Date of Birth	xsd:string	required	dd/mmm/YY
+DEM-1	DEM-1: Demographics	1	DEMsex	2.What is your sex?	xsd:string	required	
+DEM-1	DEM-1: Demographics	1	DEMhisp	3.Latino/a or Hispanic?	xsd:string	required	
+DEM-1	DEM-1: Demographics	1	DEMnatam	4a.Amer Indian/Alaska	xsd:string	optional	
+DEM-1	DEM-1: Demographics	1	DEMasian	4b.Asian	xsd:string	optional	
+DEM-1	DEM-1: Demographics	1	DEMblack	4c.African American/Black	xsd:string	optional	
+DEM-1	DEM-1: Demographics	1	DEMhawpi	4d.Hawaiian/Pacific Islnd	xsd:string	optional	
+DEM-1	DEM-1: Demographics	1	DEMwhite	4e.White	xsd:string	optional	
+DEM-1	DEM-1: Demographics	1	DEMraco	4f.Other specify	xsd:string	optional	
+DEM-1	DEM-1: Demographics	1	DEMracox	"4f. Other, specify text"	xsd:string	optional	
+DEM-1	DEM-1: Demographics	1	DEMsexor	5. Sexual orientation	xsd:string	required	
+DEM-1	DEM-1: Demographics	1	formlang	Form Language	xsd:string	required	nn
+DEM-1	DEM-1: Demographics	1	sfdt_001	Staff Initials/Date	xsd:string	required	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PREdt	Form Completion Date	xsd:dateTime	required	DD/MMM/YY
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PREnopre	No pre-existing condition	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE1desc	1. Description	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE1dsmy	1. Date Diagnosis/Surgery	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE1dsdt	1. Date Dx/Surgery	xsd:string	optional	nn/nn
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE1qc	Condition 1	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE1com	1. Comments	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE1ongo	1. Is condition ongoing?	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE1init	1. Staff Initials/Date	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE2desc	2. Description	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE2dsmy	2. Date Diagnosis/Surgery	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE2dsdt	2. Date Dx/Surgery	xsd:string	optional	nn/nn
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE2qc	Condition 2	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE2com	2. Comments	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE2ongo	2. Is condition ongoing?	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE2init	2. Staff Initials/Date	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE3desc	3. Description	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE3dsmy	3. Date Diagnosis/Surgery	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE3dsdt	3. Date Dx/Surgery	xsd:string	optional	nn/nn
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE3qc	Condition 3	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE3com	3. Comments	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE3ongo	3. Is condition ongoing?	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE3init	3. Staff Initials/Date	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE4desc	4. Description	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE4dsmy	4. Date Diagnosis/Surgery	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE4dsdt	4. Date Dx/Surgery	xsd:string	optional	nn/nn
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE4qc	Condition 4	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE4com	4. Comments	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE4ongo	4. Is condition ongoing?	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE4init	4. Staff Initials/Date	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE5desc	5. Description	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE5dsmy	5. Date Diagnosis/Surgery	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE5dsdt	5. Date Dx/Surgery	xsd:string	optional	nn/nn
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE5qc	Condition 5	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE5com	5. Comments	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE5ongo	5. Is condition ongoing?	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE5init	5. Staff Initials/Date	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE6desc	6. Description	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE6dsmy	6. Date Diagnosis/Surgery	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE6dsdt	6. Date Dx/Surgery	xsd:string	optional	nn/nn
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE6qc	Condition 6	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE6com	6. Comments	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE6ongo	6. Is condition ongoing?	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	PRE6init	6. Staff Initials/Date	xsd:string	optional	
+PRE-1	PRE-1: Pre-Existing Conditions 	12	formlang	Form Language	xsd:string	required	nn
+URS-1	URS-1: Screening Urinalysis	14	URSdsdt	1.Dipstick Coll. Date	xsd:dateTime	required	DD/MMM/YY
+URS-1	URS-1: Screening Urinalysis	14	URSdgluc	2a.Glucose	xsd:string	required	
+URS-1	URS-1: Screening Urinalysis	14	URSdglqc	Glucose	xsd:string	optional	
+URS-1	URS-1: Screening Urinalysis	14	URSdprot	2b.Protein	xsd:string	required	
+URS-1	URS-1: Screening Urinalysis	14	URSdprqc	Protein	xsd:string	optional	
+URS-1	URS-1: Screening Urinalysis	14	URSdhemo	2c.Hemoglobin	xsd:string	required	
+URS-1	URS-1: Screening Urinalysis	14	URSdheqc	Hemoglobin	xsd:string	optional	
+URS-1	URS-1: Screening Urinalysis	14	URSrbc	2c1.RBCs within range?	xsd:string	optional	
+URS-1	URS-1: Screening Urinalysis	14	URSdoabn	2d.Other abnorm findings?	xsd:string	required	
+URS-1	URS-1: Screening Urinalysis	14	URSdoabx	2d1.Specify abnormality	xsd:string	optional	
+URS-1	URS-1: Screening Urinalysis	14	URSdover	3.U/A-Dip Overall result	xsd:string	required	
+URS-1	URS-1: Screening Urinalysis	14	URSdovqc	Dipstick overall result	xsd:string	optional	
+URS-1	URS-1: Screening Urinalysis	14	URScomx	Comments 	xsd:string	optional	
+URS-1	URS-1: Screening Urinalysis	14	formlang	Form Language	xsd:string	required	nn
+URS-1	URS-1: Screening Urinalysis	14	sfdt_014	Staff Initials/Date	xsd:string	required
+URS-1	URS-1: Screening Urinalysis	14	autokey	Autokey	xsd:int	optional			1	TRUE
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLSdt	Initial Specimen Coll Dt	xsd:dateTime	required	DD/MMM/YY
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLShbdt	1.Alt Hepatitis Coll Date	xsd:dateTime	optional	DD/MMM/YY
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLShb	1a. Hepatitis B Surf. Ant	xsd:string	required	
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLShc	1b. Hepatitis C Antibody	xsd:string	required	
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLShcv	1b1. HCV PCR	xsd:string	optional	
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLSstidt	2. Alt STI Sero Coll Dt	xsd:dateTime	optional	DD/MMM/YY
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLSsyps	2a. Syphilis screen test	xsd:string	required	
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLSsypc	2b. Syphilis confirm test	xsd:string	optional	
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLShivdt	3. Alt HIV Test Coll Dt	xsd:dateTime	optional	DD/MMM/YY
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLShiv	3. HIV Test Results	xsd:string	required	
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	LLSco1x	Comments	xsd:string	optional	
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	formlang	Form Language	xsd:string	required	nn
+LLS-1	LLS-1: Screening Local Lab Results (Page 1)	16	sfdt_016	Staff Initials/Date	xsd:string	required	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLShemdt	4. Alt Hemogram Coll Date	xsd:dateTime	optional	DD/MMM/YY
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSwbc	4a. WBC	xsd:double	required	nnn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSwbcqc	WBC	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLShgb	4b. Hemoglobin	xsd:double	required	nn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLShgbqc	Hemoglobin	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLShct	4c. Hematocrit	xsd:double	required	nn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLShctqc	Hematocrit	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSmcv	4d. MCV	xsd:int	required	nnn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSmcvqc	MCV	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSplt	4e. Platelet Count	xsd:int	required	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSpltqc	Platelet Count	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSdifdt	5. Alt Diff Coll Date	xsd:dateTime	optional	DD/MMM/YY
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSneup	5a. Neutrophils %	xsd:int	optional	nn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSneu	5a. Neutrophils cells/mm3	xsd:int	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSneuqc	Neutrophils	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSlym	5b. Lymphs cells/mm3	xsd:int	required	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSlymqc	Lymphs	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSmonn	5c.Monocytes not reported	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSmonp	5c. Monocytes %	xsd:int	optional	nn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSmon	5c. Monocytes cells/mm3	xsd:int	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSmonqc	Monocytes	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSeosn	5d.Eosinophils not report	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSeosp	5d. Eosinophils %	xsd:double	optional	nn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSeos	5d. Eosinophils cells/mm3	xsd:int	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSeosqc	Eosinophils	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSbasn	5e. Basophils not report	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSbasp	5e. Basophils %	xsd:double	optional	nn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSbas	5e. Basophils cells/mm3	xsd:int	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSbasqc	Basophils	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSbann	5f. Bands not reported	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSbanp	5f. Bands %	xsd:double	optional	nn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSban	5f. Bands cells/mm3	xsd:int	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSbanqc	Bands	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSatyn	5g. Atyp lymph not report	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSatyp	5g.Atypical Lymphocytes %	xsd:double	optional	nn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSaty	5g.Atyp Lympho. cells/mm3	xsd:int	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSatyqc	Atypical Lymphocytes	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSodn	"5h. Other, not reported"	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSodp	5h. Other %	xsd:int	optional	nn.n
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSod	5h. Other cells/mm3	xsd:int	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSodqc	Other WBC	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSodx	"5h. Other, specify text"	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSdnorm	5i. Differential normal?	xsd:string	required	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSdifap	5j. Investigator approve?	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	LLSco2x	Comments	xsd:string	optional	
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	formlang	Form Language	xsd:string	required	nn
+LLS-2	LLS-2: Screening Local Lab Results (Page 2)	17	sfdt_017	Staff Initials/Date	xsd:string	required	
+CPS-1	CPS-1: Screening Chemistry Panel	19	CPSdt	Initial Spec Collect Date	xsd:dateTime	required	DD/MMM/YY
+CPS-1	CPS-1: Screening Chemistry Panel	19	CPSaltdt	1a.Alter ALT Coll Date	xsd:dateTime	optional	DD/MMM/YY
+CPS-1	CPS-1: Screening Chemistry Panel	19	CPSalt	1a. ALT (SGPT)	xsd:int	required	
+CPS-1	CPS-1: Screening Chemistry Panel	19	CPSaltqc	ALT (SGPT)	xsd:string	optional	
+CPS-1	CPS-1: Screening Chemistry Panel	19	CPScredt	2a.Alt Creat Coll Date	xsd:dateTime	optional	DD/MMM/YY
+CPS-1	CPS-1: Screening Chemistry Panel	19	CPScre	2a. Creatinine	xsd:double	required	nn.n
+CPS-1	CPS-1: Screening Chemistry Panel	19	CPScreqc	Creatinine	xsd:string	optional	
+CPS-1	CPS-1: Screening Chemistry Panel	19	CPScomm	Comments	xsd:string	optional	
+CPS-1	CPS-1: Screening Chemistry Panel	19	formlang	Form Language	xsd:string	required	nn
+CPS-1	CPS-1: Screening Chemistry Panel	19	sfdt_019	Staff Initials/Date	xsd:string	required	
+ECI-1	ECI-1: Eligibility Criteria	23	ECIdt	Form Completion Date	xsd:dateTime	required	DD/MMM/YY
+ECI-1	ECI-1: Eligibility Criteria	23	ECIelig	1.Meet eligible criteria?	xsd:string	required	
+ECI-1	ECI-1: Eligibility Criteria	23	ECIpsign	1a.PI Signature/Date	xsd:string	required	
+ECI-1	ECI-1: Eligibility Criteria	23	ECIssign	1b.Second Signature/Date	xsd:string	required	
+ECI-1	ECI-1: Eligibility Criteria	23	ECIcomm	Comments	xsd:string	optional	
+ECI-1	ECI-1: Eligibility Criteria	23	formlang	Form Language	xsd:string	required	nn
+ECI-1	ECI-1: Eligibility Criteria	23	sfdt_023	Staff Initials/Date	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXdt	Exam Date	xsd:dateTime	required	DD/MMM/YY
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXhtcm	1. Height in cm	xsd:int	required	nnn
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXwtkg	2. Weight in kg	xsd:int	required	nnn
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXwtqc	Weight	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXtempc	3. Body Temp	xsd:double	required	nn.n
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXbpsys	4. BP systolic xxx/	xsd:int	required	nnn
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXbpdia	4. BP diastolic /xxx	xsd:int	required	nnn
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXbpqc	Blood Pressure	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXpulse	5. Pulse	xsd:int	required	nnn
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXresp	6. Respirations	xsd:int	required	nn
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXheent	7. HEENT	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXheenx	7. HEENT Notes	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXneck	8. Neck	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXneckx	8. Neck Notes	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXlymph	9. Lymph Nodes	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXlympx	9. Lymph Nodes Notes	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXheart	10. Heart	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXhrtx	10. Heart Notes	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXchest	11. Chest	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXchstx	11. Chest Notes	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXabdom	12. Abdomen	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXabdox	12. Abdomen Notes	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXextrm	13. Extremities	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXextrx	13. Extremities Notes	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXneuro	14. Neurological	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXneurx	14. Neurological Notes	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXskin	15. Skin	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXskinx	15. Skin Notes	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXother	16. Other	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXothex	16. Other Notes	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXcemqc	Sx-directed eval deemed	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXcemh	17. Evaluation Summary	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXsign	Clinical signature/date	xsd:string	required	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXprdt	18. Date preg test done	xsd:dateTime	optional	DD/MMM/YY
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXpregt	18a. Preg. test result	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	EPXcom	Comments	xsd:string	optional	
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	formlang	Form Language	xsd:string	required	nn
+EPX-1	EPX-1: Enrollment Abbreviated Physical Exam	122	sfdt_122	Staff Initials/Date	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENRdt	Form Completion Date	xsd:dateTime	required	DD/MMM/YY
+ENR-1	ENR-1: Enrollment	124	ENRsclab	1.Screening ID used?	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	scrnptid	1a.SCHARP Screening ID	xsd:string	optional	
+ENR-1	ENR-1: Enrollment	124	protptid	1a.Other HVTN Prot. ID	xsd:string	optional	
+ENR-1	ENR-1: Enrollment	124	ENRcouns	2a.Free counseling	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENRhivt	2b.Free HIV tests	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENRothrt	2c.Other tests/medical	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENRfindv	2d.Help find vaccine	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENRhprot	2e.Vaccine might protect	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENRcomp	2f.Paid	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENRhrsch	2g.Informed of research	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENRbehav	2h.Avoid high-risk beh.	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENRhlpcm	2i.Helping community	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENRknow	2j.Know someone/HIV	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	ENReffct	3.How effective vaccine?	xsd:string	required	
+ENR-1	ENR-1: Enrollment	124	formlang	Form Language	xsd:string	required	nn
+ENR-1	ENR-1: Enrollment	124	sfdt_124	Staff Initials/Date	xsd:string	required	
+EVC-1	EVC-1: Enrollment Vaccination	125	EVCdt	1. Date of vaccination	xsd:dateTime	required	DD/MMM/YY
+EVC-1	EVC-1: Enrollment Vaccination	125	EVCgroup	2. Enrollment group	xsd:string	required	
+EVC-1	EVC-1: Enrollment Vaccination	125	EVCloc	3a. Location of injection	xsd:string	required	
+EVC-1	EVC-1: Enrollment Vaccination	125	EVCtm	3b. Time of injection	xsd:string	required	nn:nn
+EVC-1	EVC-1: Enrollment Vaccination	125	EVCadm	Injection administered by	xsd:string	required	
+EVC-1	EVC-1: Enrollment Vaccination	125	formlang	Form Language	xsd:string	required	nn
+EVC-1	EVC-1: Enrollment Vaccination	125	sfdt_125	Staff Initials/Date	xsd:string	required	
+VAC-1	VAC-1: Post-enrollment Vaccination	135	VACgiven	1. Was vaccination given?	xsd:string	required	
+VAC-1	VAC-1: Post-enrollment Vaccination	135	VACdt	2. Date of today's vacc.	xsd:dateTime	optional	DD/MMM/YY
+VAC-1	VAC-1: Post-enrollment Vaccination	135	VACdelt	3a. Location of injection	xsd:string	optional	
+VAC-1	VAC-1: Post-enrollment Vaccination	135	VACtm	3b.Time of injection	xsd:string	optional	nn:nn
+VAC-1	VAC-1: Post-enrollment Vaccination	135	VACadmby	Injection administered by	xsd:string	optional	
+VAC-1	VAC-1: Post-enrollment Vaccination	135	formlang	Form Language	xsd:string	required	nn
+VAC-1	VAC-1: Post-enrollment Vaccination	135	sfdt_135	Staff Initials/Date	xsd:string	required	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXdt	Exam Date	xsd:dateTime	required	DD/MMM/YY
+APX-1	APX-1: Abbreviated Physical Exam	136	APXwtkg	1. Weight	xsd:double	required	nnn
+APX-1	APX-1: Abbreviated Physical Exam	136	APXwtqc	Weight QC	xsd:string	optional	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXtempc	2. Body Temp	xsd:double	required	nn.n
+APX-1	APX-1: Abbreviated Physical Exam	136	APXtemqc	Body Temp QC	xsd:string	optional	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXbpsys	3. BP systolic xxx/	xsd:int	required	nnn
+APX-1	APX-1: Abbreviated Physical Exam	136	APXbpdia	3. BP diastolic /xxx	xsd:int	required	nnn
+APX-1	APX-1: Abbreviated Physical Exam	136	APXbpqc	Blood Pressure QC	xsd:string	optional	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXpulse	4. Pulse	xsd:int	required	nnn
+APX-1	APX-1: Abbreviated Physical Exam	136	APXresp	5. Respirations	xsd:int	required	nn
+APX-1	APX-1: Abbreviated Physical Exam	136	APXheent	6. HEENT	xsd:string	required	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXheenx	6. HEENT Notes	xsd:string	optional	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXneck	7. Neck	xsd:string	required	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXneckx	7. Neck Notes	xsd:string	optional	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXlymph	8. Lymph Nodes	xsd:string	required
+APX-1	APX-1: Abbreviated Physical Exam	136	APXlympx	8. Lymph Nodes Notes	xsd:string	optional
+APX-1	APX-1: Abbreviated Physical Exam	136	APXheart	9. Heart	xsd:string	required
+APX-1	APX-1: Abbreviated Physical Exam	136	APXhrtx	9. Heart Notes	xsd:string	optional
+APX-1	APX-1: Abbreviated Physical Exam	136	APXchest	10. Chest	xsd:string	required
+APX-1	APX-1: Abbreviated Physical Exam	136	APXchstx	10. Chest Notes	xsd:string	optional
+APX-1	APX-1: Abbreviated Physical Exam	136	APXabdom	11. Abdomen	xsd:string	required
+APX-1	APX-1: Abbreviated Physical Exam	136	APXabdox	11. Abdomen Notes	xsd:string	optional
+APX-1	APX-1: Abbreviated Physical Exam	136	APXextrm	12. Extremities	xsd:string	required
+APX-1	APX-1: Abbreviated Physical Exam	136	APXextrx	12. Extremities Notes	xsd:string	optional
+APX-1	APX-1: Abbreviated Physical Exam	136	APXneuro	13. Neurological	xsd:string	required
+APX-1	APX-1: Abbreviated Physical Exam	136	APXneurx	13. Neurological Notes	xsd:string	optional
+APX-1	APX-1: Abbreviated Physical Exam	136	APXskin	14. Skin	xsd:string	required
+APX-1	APX-1: Abbreviated Physical Exam	136	APXskinx	14. Skin Notes	xsd:string	optional
+APX-1	APX-1: Abbreviated Physical Exam	136	APXother	15. Other	xsd:string	required
+APX-1	APX-1: Abbreviated Physical Exam	136	APXothex	15. Other Notes	xsd:string	optional
+APX-1	APX-1: Abbreviated Physical Exam	136	APXcemqc	Sx-directed eval deemed	xsd:string	optional	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXcemh	16. Evaluation Summary	xsd:string	required	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXsign	Clinician signature/date	xsd:string	required	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXprdt	17. Date Pregnancy test	xsd:dateTime	optional	DD/MMM/YY
+APX-1	APX-1: Abbreviated Physical Exam	136	APXprtna	17. Pregnancy test N/A	xsd:string	optional	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXpregt	17a. Preg. test result	xsd:string	optional	
+APX-1	APX-1: Abbreviated Physical Exam	136	APXco1x	Comments	xsd:string	optional	
+APX-1	APX-1: Abbreviated Physical Exam	136	formlang	Form Language	xsd:string	required	nn
+APX-1	APX-1: Abbreviated Physical Exam	136	sfdt_136	Staff Initials/Date	xsd:string	required	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFmenst	1. Menstruation occurring	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFddone	2.Dipstick exam done?	xsd:string	required	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdsdt	2a.Dipstick Coll. Date	xsd:dateTime	optional	DD/MMM/YY
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdsloc	2b.Dipstick performed by 	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdprot	3a.Protein	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdprqc	Protein	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdhemo	3b.Hemoglobin	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdheqc	Hemoglobin	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdoabn	3c.Othr abnml findings?	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdotqc	macroscopic findings	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdoabx	3c1.Specify abnormality	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdover	4.Dipstick overall result	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFdovqc	dipstick overall result	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFmei	5.Micro exam indicated	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFmedn	5a.Micro exam done?	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	URFco1x	Comments 	xsd:string	optional	
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	formlang	Form Language	xsd:string	required	nn
+URF-1	URF-1: Follow-up Urinalysis (Page 1) 	140	sfdt_140	Staff Initials/Date	xsd:string	required	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmidt	6.Micro Spec. Coll. Date	xsd:dateTime	required	DD/MMM/YY
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmiloc	6a.Micro exam performed:	xsd:string	required	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmrbcp	7a.RBC present?	xsd:string	required	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmrbcl	7a.RBC #/hpf (low)	xsd:int	optional	nnnn
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmrbch	7a.RBC #/hpf (high)	xsd:int	optional	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFrtntc	7a.RBC too numerous 	xsd:string	optional	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmrbqc	Microscopic RBC 	xsd:string	optional	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmwbcp	7b.WBC present?	xsd:string	required	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmwbcl	7b.WBC #/hpf (low)	xsd:int	optional	nnnn
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmwbch	7b.WBC #/hpf (high)	xsd:int	optional	nnnn
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFwtntc	7b.WBC too numerous	xsd:string	optional	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmwbqc	Microscopic WBC	xsd:string	optional	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmoth	7c.Other abn.findings?	xsd:string	required	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmotqc	Other	xsd:string	optional	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFmothx	7c1.Specify abnormality	xsd:string	optional	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFuover	7d.Microscopic overall 	xsd:string	required	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFuovqc	Urinalysis overall	xsd:string	optional	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	URFco2x	Comments 	xsd:string	optional	
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	formlang	Form Language	xsd:string	required	nn
+URF-2	URF-2: Follow-up Urinalysis (Page 2)	141	sfdt_141	Staff Initials/Date	xsd:string	required	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFdt	Initial Spec. Coll. Date	xsd:dateTime	required	DD/MMM/YY
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFhemn	1.Hem Not Done/Not Collec	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFhemdt	1.Hemo. Alt. Coll. Date	xsd:dateTime	optional	DD/MMM/YY
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFwbcn	1a. WBC not reported	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFwbc	1a. WBC	xsd:double	optional	nnn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFwbcgr	1a. WBC AE Severity Grade	xsd:int	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFwbcpg	1a. WBC AE Log Page #	xsd:int	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFwbcqc	WBC	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFhgbn	1b. Hemoglobin not report	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFhgb	1b. Hemoglobin	xsd:double	optional	nn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFhgbgr	1b.HgB AE Severity Grade	xsd:int	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFhgbpg	1b.HgB AE Log Page #	xsd:int	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFhgbqc	HgB	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFhctn	1c.Hematocrit not done	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFhct	1c.Hematocrit	xsd:double	optional	nn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFhctqc	Hct	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFmcvn	1d.MCV not done	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFmcv	1d. MCV	xsd:int	optional	nnn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFmcvqc	MCV	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFpltn	1e.Platelets not done	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFplt	1e. Platelets	xsd:int	optional	nnnnnnn
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFpltgr	1e.Plt AE Severity Grade	xsd:int	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFpltpg	1e. Plate. AE Log Page #	xsd:int	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFpltqc	Platelets	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFdifn	2.Diff Not Done/Not Coll	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFdifdt	2. Diff. Alt Coll Date	xsd:dateTime	optional	DD/MMM/YY
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFneun	2a.Neuts Not Reported	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFneup	2a.Neutrophils %	xsd:double	optional	nn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFneu	2a.Neutrophils cells/mm3	xsd:int	optional	nnnnn
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFneugr	2a.Neut. AE Sever. Grade	xsd:int	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFneupg	2a.Neut. AE Log Page #	xsd:int	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFneuqc	Neutrophils	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFlymn	2b.Lymphs Not Reported	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFlymp	2b.Lymphocites %	xsd:double	optional	nn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFlym	2b.Lymphs cells/mm3	xsd:int	optional	nnnn
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFlymgr	2b.Lymph AE Sever. Grade	xsd:int	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFlympg	2b.Lymph AE Log Page #	xsd:int	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFlymqc	Lymphocites	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFmonn	2c.Monocytes Not Reported	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFmonp	2c.Monocytes %	xsd:double	optional	nn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFmon	2c.Monocytes cells/mm3	xsd:int	optional	nnnn
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFmonqc	Monocytes	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFeosn	2d.Eosinophils Not Rprtd.	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFeosp	2d.Eosinophils %	xsd:double	optional	nn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFeos	2d.Eosinophils cells/mm3	xsd:int	optional	nnnn
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFeosqc	Eosinophils	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFbasn	2e.Basophils Not Reprtd.	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFbasp	2e.Basophils %	xsd:double	optional	nn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFbas	2e.Basophils cells/mm3	xsd:int	optional	nnnn
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFbasqc	Basophils	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFbann	2f.Bands Not Reported	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFbanp	2f.Bands %	xsd:int	optional	nn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFban	2f.Bands cells/mm3	xsd:int	optional	nnnn
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFbanqc	Bands	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFatyn	2g.Atypic lymph Nt Reprtd	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFatyp	2g.Atypical lymphocytes %	xsd:int	optional	nn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFaty	2g.Atyp Lymphs cells/mm3	xsd:int	optional	nnnn
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFatyqc	Atypical lymphocyte	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFodn	2h.Other Not Reported	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFodp	2h.Other %	xsd:int	optional	nn.n
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFod	2h.Other cells/mm3	xsd:int	optional	nnnn
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFodqc	Other Differential	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFodx	"2h.Other, specify text"	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	LLFco2x	Comments	xsd:string	optional	
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	formlang	Form Language	xsd:string	required	nn
+LLF-1	LLF-1: Follow-up Local Lab Results (Page 1)	143	sfdt_143	Staff Initials/Date	xsd:string	required	
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFdt	Initial Spec Coll Date	xsd:dateTime	required	DD/MMM/YY
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFaltn	1a. ALT Not Done/Not Coll	xsd:string	optional	
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFaltdt	1a. ALT Alternate Coll Dt	xsd:dateTime	optional	DD/MMM/YY
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFalt	1a. ALT (SGPT)	xsd:int	optional	nnnn
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFaltgr	1a.ALT AE Severity Grade	xsd:int	optional	
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFaltpg	1a. ALT AE Log Page #	xsd:int	optional	
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFaltqc	ALT (SGPT)	xsd:string	optional	
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFcren	2a.Crea Not Done/Not Coll	xsd:string	optional	
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFcredt	2a.Creat. Alter. Coll Dt	xsd:dateTime	optional	DD/MMM/YY
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFcre	2a. Creatinine	xsd:double	optional	nn.n
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFcregr	2a.Creat. AE Sever. Grade	xsd:int	optional	
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFcrepg	2a. Creat. AE Log Page #	xsd:int	optional	
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFcreqc	Creatinine	xsd:string	optional	
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	CPFcomm	Comments	xsd:string	optional	
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	formlang	Form Language	xsd:string	required	nn
+CPF-1	CPF-1: Follow-up Chemistry Panel	144	sfdt_144	Staff Initials/Date	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAdt	Contact Date	xsd:dateTime	required	DD/MMM/YY
+SIA-1	SIA-1: Social Impact Assessment	150	SIAfamly	1. Negative experiences	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAtravl	1. Travel problems	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAwork	1. Job/work problems	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAeduc	1. School/educ. problems	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAmedic	1. Refused medical tx	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAhthin	1.Health insur problems	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAlifin	1.Life insurance problems	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAhouse	1. Housing problems	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAmilit	1.Military/govt. problem 	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAother	1. Other problems  	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAothrx	"1. Other, specify text"	xsd:string	optional	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAttlim	1.Total number of impacts	xsd:int	required	nn
+SIA-1	SIA-1: Social Impact Assessment	150	SIAbenef	2. Beneficial impact?	xsd:string	required	
+SIA-1	SIA-1: Social Impact Assessment	150	SIAcomm	2a.Describe benef. impact	xsd:string	optional	
+SIA-1	SIA-1: Social Impact Assessment	150	formlang	Form Language	xsd:string	required	nn
+SIA-1	SIA-1: Social Impact Assessment	150	sfdt_150	Staff Initials/Date	xsd:string	required	
+SIL-1	SIL-1: Social Impact Log	151	SILsumx	1.Describe social impact	xsd:string	required	
+SIL-1	SIL-1: Social Impact Log	151	SILondt	2.Onset Date	xsd:string	required	dd/MMM/YY
+SIL-1	SIL-1: Social Impact Log	151	SILatvis	3.Reported at Visit	xsd:int	required	nn.n
+SIL-1	SIL-1: Social Impact Log	151	SILcode	4.Social Impact Code	xsd:int	required	nn
+SIL-1	SIL-1: Social Impact Log	151	SILtpdis	5.Participation known?	xsd:string	required	
+SIL-1	SIL-1: Social Impact Log	151	SILtpdsm	5a.Disclosure Summary	xsd:string	optional	
+SIL-1	SIL-1: Social Impact Log	151	SILtpdox	"5a.Other, specify:"	xsd:string	optional	
+SIL-1	SIL-1: Social Impact Log	151	SILhivts	6.HIV testing an issue?	xsd:string	required	
+SIL-1	SIL-1: Social Impact Log	151	SILhivpf	6a.HIV testing performed?	xsd:string	optional	
+SIL-1	SIL-1: Social Impact Log	151	SILqol	7.Situation impact	xsd:string	required	
+SIL-1	SIL-1: Social Impact Log	151	SILrspx	8a.Participant response 	xsd:string	required	
+SIL-1	SIL-1: Social Impact Log	151	SILrssx	8b.Staff response 	xsd:string	required	
+SIL-1	SIL-1: Social Impact Log	151	SILoutcm	9. Current status	xsd:string	required	
+SIL-1	SIL-1: Social Impact Log	151	SILresdt	9.Closure Date	xsd:string	optional	dd/MMM/YY
+SIL-1	SIL-1: Social Impact Log	151	formlang	Form Language	xsd:string	required	nn
+SIL-1	SIL-1: Social Impact Log	151	sfdt_151	Staff Initials/Date	xsd:string	required	
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	BRAdt	Assessment Date	xsd:dateTime	required	DD/MMM/YY
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	BRAprt	1. Total# of sex partners	xsd:int	required	nnn
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	BRAuprt	2.Total unprotect partner	xsd:int	optional	nnn
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	BRAmprt	3a. Total # male partners	xsd:int	optional	nnn
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	BRAmvprt	3a1. Unprotected vag sex?	xsd:string	optional	
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	BRAmaprt	3a2. Unprotected anal sex	xsd:string	optional	
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	BRAfprt	3b. Total # female part	xsd:int	optional	nnn
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	BRAfvprt	3b1. Unprotect vag sex?	xsd:string	optional	
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	BRAfaprt	3b2. Unprotect anal sex?	xsd:string	optional	
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	formlang	Form Language	xsd:string	required	nn
+BRA-1	BRA-1: Behavioral Risk Assessment (Page 1) 	171	sfdt_171	Staff Initials/Date	xsd:string	required	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	BRAdprt	4a. Injection drug users?	xsd:string	optional	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	BRAhprt	4b. HIV-infected?	xsd:string	optional	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	BRAbuzz	5a. Vag/anal sex drunk?	xsd:string	optional	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	BRAcsw	5b. Xchng. vag/anal sex?	xsd:string	optional	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	BRAcswb	"6. Sex for money, etc.?"	xsd:string	optional	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	BRApcsw	7. Partner sex w/others?	xsd:string	optional	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	BRAivdrg	8a. Injected drugs?	xsd:string	required	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	BRAstd	8b. Diagnosed/treated STD	xsd:string	required	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	BRAhsv	8c. Genital sores/ulcers?	xsd:string	required	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	BRAgd	8d.Discharge/clinic visit	xsd:string	required	
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	formlang	Form Language	xsd:string	required	nn
+BRA-2	BRA-2: Behavioral Risk Assessment (Page 2) 	172	sfdt_172	Staff Initials/Date	xsd:string	required	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBdt	Contact Date	xsd:dateTime	required	DD/MMM/YY
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBhivt	1.HIV test outside study?	xsd:string	required	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBhivtn	1a.# times tested	xsd:int	optional	nn
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBhors	1b1.Req. by other study	xsd:string	optional	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBmed	1b2.Req. by med provider	xsd:string	optional	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBhins	1b3.Req. for insurance	xsd:string	optional	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBhtrvl	1b4.Req. for travel/imm.	xsd:string	optional	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBhjail	1b5.Req. by jail/drug tx	xsd:string	optional	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBhblod	1b6.Sold or donated blood	xsd:string	optional	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBhhrsk	1b7.Poss. hi-risk expos.	xsd:string	optional	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBant	1b8.Antibodies to vaccine	xsd:string	optional	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBhothr	1b9.Other reason	xsd:string	optional	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBspe	"1b9.Other, specify text"	xsd:string	optional	
+OTB-1	OTB-1: Outside Testing/Belief	173	OTBvacpl	2.Vaccine or Placebo?	xsd:string	required	
+OTB-1	OTB-1: Outside Testing/Belief	173	formlang	Form Language	xsd:string	required	nn
+OTB-1	OTB-1: Outside Testing/Belief	173	sfdt_173	Staff Initials/Date	xsd:string	required	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBdt	Assessment Date	xsd:dateTime	required	DD/MMM/YY
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBassdn	1.Was assessment done?	xsd:string	required	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBextm 	2.Time	xsd:string	optional	nn:nn
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBtempc	3.Body temperature	xsd:double	optional	nn.n
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBtemqc	3.Body Temp	xsd:double	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBrdelt	4. Right Deltoid	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBrles	4a.Vaccine-related lesion	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBreryx	4b.Erythema 1st measure	xsd:int	optional	nn.n
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBreryy	4b.Erythema 2nd measure	xsd:int	optional	nn.n
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBrerqc	4b.Right Erythema	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBrindx	4b.Induration 1st measure	xsd:int	optional	nn.n
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBrindy	4b.Induration 2nd measure	xsd:int	optional	nn.n
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBrinqc	4b.Right Induration	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBldelt	5. Left Deltoid	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlles	5a.Vaccine-related lesion	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBleryx	5b.Erythema 1st measure	xsd:double	optional	nn.n
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBleryy	5b.Erythema 2nd measure	xsd:double	optional	nn.n
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlerqc	5b.Left Erythema	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlindx	5b.Induration 1st measure	xsd:double	optional	nn.n
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlindy	5b.Induration 2nd measure	xsd:double	optional	nn.n
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlinqc	5b.Left Induration	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlnanp	6.AxillaryLymphadenopathy	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlnaqc	6.Lymphadenopathy	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBmf	7a.Malaise/Fatigue	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBmfqc	Malaise/Fatigue	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBmyal	7b.Myalgia	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBmyaqc	Myalgia	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBhead	7c.Headache	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBheaqc	Headache	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBnaus	7d.Nausea	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBnauqc	Nausea	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBvom	7e.Vomiting	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBvomqc	Vomiting	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBchill	7f.Chills	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBchiqc	Chills	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBarth	7g.Arthralgia	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBartqc	Arthralgia	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlpr	8a.Pain (R deltoid)	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlprqc	Local pain (right)	xsd:string	optional
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBtr	8b.Tenderness (R deltoid)	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBtrqc	Local tenderness (rt)	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlpl	8c.Pain (L deltoid)	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBlplqc	Local pain (left)	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBtl	8d.Tenderness (L deltoid)	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBtlqc	Local tenderness (lft)	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	RCBcomx	Comments	xsd:string	optional	
+RCB-1	RCB-1: Reactogenicity-Baseline	180	formlang	Form Language	xsd:string	required	nn
+RCB-1	RCB-1: Reactogenicity-Baseline	180	sfdt_180	Staff Initials/Date	xsd:string	required	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMdt	Assessment Date	xsd:dateTime	required	DD/MMM/YY
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMassdn	1.Was assessment done?	xsd:string	required	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMextm 	2.Time	xsd:string	optional	nn:nn
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMtempc	3.Body temperature	xsd:double	optional	nn.n
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMtemqc	Body Temp	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMrdelt	4. Right Deltoid	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMrles	4a.Vaccine-related lesion	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMreryx	4b.Erythema 1st measure	xsd:int	optional	nn.n
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMreryy	4b.Erythema 2nd measure	xsd:int	optional	nn.n
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMrerqc	4b.Right Erythema	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMrindx	4c.Induration 1st measure	xsd:int	optional	nn.n
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMrindy	4c.Induration 2nd measure	xsd:int	optional	nn.n
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMrinqc	4b.Right Induration	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMldelt	5. Left Deltoid	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlles	5a.Vaccine-related lesion	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMleryx	5b.Erythema 1st measure	xsd:double	optional	nn.n
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMleryy	5b.Erythema 2nd measure	xsd:double	optional	nn.n
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlerqc	5b.Left Erythema	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlindx	5c.Induration 1st measure	xsd:double	optional	nn.n
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlindy	5c.Induration 2nd measure	xsd:double	optional	nn.n
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlinqc	5c.Left Induration	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlnanp	6.AxillaryLymphadenopathy	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlnaqc	6.Lymphadenopathy	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMmf	7a.Malaise/Fatigue	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMmfqc	Malaise/Fatigue	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMmyal	7b.Myalgia	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMmyaqc	Myalgia	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMhead	7c.Headache	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMheaqc	Headache	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMnaus	7d.Nausea	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMnauqc	Nausea	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMvom	7e.Vomiting	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMvomqc	Vomiting	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMchill	7f.Chills	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMchiqc	Chills	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMarth	7g.Arthralgia	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMartqc	Arthralgia	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlpr	8a.Pain (R Deltoid)	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlprqc	Local pain (right)	xsd:string	optional
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMtr	8b.Tenderness (R Deltoid)	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMtrqc	Tenderness (R Deltoid)	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlpl	8c.Pain (L Deltoid)	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMlplqc	Local pain (left)	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMtl	8d.Tenderness (L Deltoid)	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMtlqc	Tenderness (L Deltoid)	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	RCMcomx	Comments	xsd:string	optional	
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	formlang	Form Language	xsd:string	required	nn
+RCM-1	RCM-1: Reactogenicity-Early Assessment	182	sfdt_182	Staff Initials/Date	xsd:string	required	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEdt	Assessment Date	xsd:dateTime	required	DD/MMM/YY
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEassdn	1.Was assessment done?	xsd:string	required	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEtempc	2.Body temperature	xsd:double	optional	nn.n
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEtemqc	Body Temp	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCErdelt	3. Right Deltoid	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCErles	3a.Vaccine-related lesion	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEreryx	3b.Erythema 1st measure	xsd:double	optional	nn.n
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEreryy	3b.Erythema 2nd measure	xsd:double	optional	nn.n
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCErerqc	Right Erythema	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCErindx	3c.Induration 1st measure	xsd:double	optional	nn.n
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCErindy	3c.Induration 2nd measure	xsd:double	optional	nn.n
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCErinqc	Right Induration	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEldelt	4. Left Deltoid	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElles	4a.Vaccine-related lesion	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEleryx	4b.Erythema 1st measure	xsd:double	optional	nn.n
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEleryy	4b.Erythema 2nd measure	xsd:double	optional	nn.n
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElerqc	Left Erythema	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElindx	4c.Induration 1st measure	xsd:int	optional	nn.n
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElindy	4c.Induration 2nd measure	xsd:int	optional	nn.n
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElinqc	Left Induration	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElnanp	5.AxillaryLymphadenopathy	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElnaqc	Lymphadenopathy	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEmfqc	Malaise/Fatigue	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEmf	6a.Malaise/Fatigue	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEmyal	6b.Myalgia	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEmyaqc	Myalgia	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEhead	6c.Headache	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEheaqc	Headache	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEnaus	6d.Nausea	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEnauqc	Nausea	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEvom	6e.Vomiting	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEvomqc	Vomiting	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEchill	6f.Chills	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEchiqc	Chills	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEarth	6g.Arthralgia	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEartqc	Arthralgia	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElpr	7a.Pain (R deltoid)	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElprqc	Local pain (right)	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEtr	7b.Tenderness (R deltoid)	xsd:string	optional
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEtrqc	Local tenderness (right)	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElpl	7c.Pain (L deltoid)	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCElplqc	Local pain (left)	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEtl	7d.Tenderness (L deltoid)	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEtlqc	Local tenderness (left)	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	RCEcomx	Comments	xsd:string	optional	
+RCE-1	RCE-1: Reactogenicity-Day 0	184	formlang	Form Language	xsd:string	required	nn
+RCE-1	RCE-1: Reactogenicity-Day 0	184	sfdt_184	Staff Initials/Date	xsd:string	required	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHdt	Assessment Date	xsd:dateTime	required	DD/MMM/YY
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHassdn	1.Was assessment done?	xsd:string	required	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHtempc	2.Body temperature	xsd:double	optional	nn.n
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHtemqc	Body Temp	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHrdelt	3. Right Deltoid	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHrles	3a.Vaccine-related lesion	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHreryx	3b.Erythema 1st measure	xsd:int	optional	nn.n
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHreryy	3b.Erythema 2nd measure	xsd:int	optional	nn.n
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHrerqc	Right Erythema	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHrindx	3c.Induration 1st measure	xsd:int	optional	nn.n
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHrindy	3c.Induration 2nd measure	xsd:int	optional	nn.n
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHrinqc	Right Induration	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHldelt	4. Left Deltoid	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlles	4a.Vaccine-related lesion	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHleryx	4b.Erythema 1st measure	xsd:double	optional	nn.n
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHleryy	4b.Erythema 2nd measure	xsd:double	optional	nn.n
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlerqc	Left Erythema	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlindx	4c.Induration 1st measure	xsd:double	optional	nn.n
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlindy	4c.Induration 2nd measure	xsd:double	optional	nn.n
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlinqc	Left Induration	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlnanp	5.AxillaryLymphadenopathy	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlnaqc	Lymphadenopathy	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHmf	6a.Malaise/Fatigue	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHmfqc	Malaise/Fatigue	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHmyal	6b.Myalgia	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHmyaqc	Myalgia	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHhead	6c.Headache	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHheaqc	Headache	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHnaus	6d.Nausea	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHnauqc	Nausea	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHvom	6e.Vomiting	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHvomqc	Vomiting	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHchill	6f.Chills	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHchiqc	Chills	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHarth	6g.Arthralgia	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHartqc	Arthralgia	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlpr	7a.Pain (R deltoid)	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlprqc	Local pain (right)	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHtr	7b.Tenderness (R deltoid)	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHtrqc	Local tenderness (right)	xsd:string	optional
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlpl	7c.Pain (L deltoid)	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHlplqc	Local pain (left)	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHtl	7d.Tenderness (L deltoid)	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHtlqc	Local tenderness (left)	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	RCHcomx	Comments	xsd:string	optional	
+RCH-1	RCH-1: Reactogenicity-Day 1	186	formlang	Form Language	xsd:string	required	nn
+RCH-1	RCH-1: Reactogenicity-Day 1	186	sfdt_186	Staff Initials/Date	xsd:string	required	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFdt	Assessment Date	xsd:dateTime	required	DD/MMM/YY
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFassdn	1.Was assessment done?	xsd:string	required	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFtempc	2.Body temperature	xsd:double	optional	nn.n
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFtemqc	Body Temp	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFrdelt	3. Right Deltoid	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFrles	3a.Vaccine-related lesion	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFreryx	3b.Erythema 1st measure	xsd:int	optional	nn.n
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFreryy	3b.Erythema 2nd measure	xsd:int	optional	nn.n
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFrerqc	Right Erythema	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFrindx	3c.Induration 1st measure	xsd:int	optional	nn.n
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFrindy	3c.Induration 2nd measure	xsd:int	optional	nn.n
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFrinqc	Right Induration	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFldelt	4. Left Deltoid	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlles	4a.Vaccine-related lesion	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFleryx	4b.Erythema 1st measure	xsd:double	optional	nn.n
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFleryy	4b.Erythema 2nd measure	xsd:double	optional	nn.n
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlerqc	Left Erythema	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlindx	4c.Induration 1st measure	xsd:double	optional	nn.n
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlindy	4c.Induration 2nd measure	xsd:double	optional	nn.n
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlinqc	Left Induration	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlnanp	5.AxillaryLymphadenopathy	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlnaqc	Lymphadenopathy	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFmf	6a.Malaise/Fatigue	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFmfqc	Malaise/Fatigue	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFmyal	6b.Myalgia	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFmyaqc	Myalgia	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFhead	6c.Headache	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFheaqc	Headache	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFnaus	6d.Nausea	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFnauqc	Nausea	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFvom	6e.Vomiting	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFvomqc	Vomiting	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFchill	6f.Chills	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFchiqc	Chills	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFarth	6g.Arthralgia	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFartqc	Arthralgia	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlpr	7a.Pain (R deltoid)	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlprqc	Local pain (right)	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFtr	7b.Tenderness (R deltoid)	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFtrqc	Local tenderness (right)	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlpl	7c.Pain (L deltoid)	xsd:string	optional
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFlplqc	Local pain (left)	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFtl	7d.Tenderness (L deltoid)	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFtlqc	Local tenderness (left)	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	RCFcomx	Comments	xsd:string	optional	
+RCF-1	RCF-1: Reactogenicity-Day 2	188	formlang	Form Language	xsd:string	required	nn
+RCF-1	RCF-1: Reactogenicity-Day 2	188	sfdt_188	Staff Initials/Date	xsd:string	required	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTdt	Assessment Date	xsd:dateTime	required	DD/MMM/YY
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTassdn	1.Was assessment done?	xsd:string	required	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTtempc	2.Body temperature	xsd:double	optional	nn.n
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTtemqc	Body Temp	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTrdelt	3. Right Deltoid	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTrles	3a.Vaccine-related lesion	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTreryx	3b.Erythema 1st measure	xsd:int	optional	nn.n
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTreryy	3b.Erythema 2nd measure	xsd:int	optional	nn.n
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTrerqc	Right Erythema	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTrindx	3c.Induration 1st measure	xsd:int	optional	nn.n
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTrindy	3c.Induration 2nd measure	xsd:int	optional	nn.n
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTrinqc	Right Induration	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTldelt	4. Left Deltoid	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlles	4a.Vaccine-related lesion	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTleryx	4b.Erythema 1st measure	xsd:double	optional	nn.n
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTleryy	4b.Erythema 2nd measure	xsd:double	optional	nn.n
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlerqc	Left Erythema	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlindx	4c.Induration 1st measure	xsd:double	optional	nn.n
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlindy	4c.Induration 2nd measure	xsd:double	optional	nn.n
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlinqc	Left Induration	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlnanp	5.AxillaryLymphadenopathy	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlnaqc	Lymphadenopathy	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTmf	6a.Malaise/Fatigue	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTmfqc	Malaise/Fatigue	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTmyal	6b.Myalgia	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTmyaqc	Myalgia	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCThead	6c.Headache	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTheaqc	Headache	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTnaus	6d.Nausea	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTnauqc	Nausea	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTvom	6e.Vomiting	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTvomqc	Vomiting	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTchill	6f.Chills	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTchiqc	Chills	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTarth	6g.Arthralgia	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTartqc	Arthralgia	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlpr	7a.Pain (R deltoid)	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlprqc	Local pain (right)	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTtr	7b.Tenderness (R deltoid)	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTtrqc	Local tenderness (right)	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlpl	7c.Pain (L deltoid)	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTlplqc	Local pain (left)	xsd:string	optional
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTtl	7d.Tenderness (L deltoid)	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTtlqc	Local tenderness (left)	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTany72	8.Continuing Reacto Symps	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	RCTcomx	Comments	xsd:string	optional	
+RCT-1	RCT-1: Reactogenicity-Day 3	190	formlang	Form Language	xsd:string	required	nn
+RCT-1	RCT-1: Reactogenicity-Day 3	190	sfdt_190	Staff Initials/Date	xsd:string	required	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtecna	1. Body Temp. N/A	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtempc	1. Body Temperature	xsd:double	optional	nn.n
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtemqc	Body Temp	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPterdt	1. Body Temp. resolution 	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPrerna	2. Erythema N/A (Right)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPreryx	2. Erythema 1st measure-R	xsd:int	optional	nn.n
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPreryy	2. Erythema 2nd measure-R	xsd:int	optional	nn.n
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPrerqc	Erythema (Right deltoid)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPrrrdt	2. Erythema date of res-R	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPrinna	3. Induration N/A (Right)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPrindx	3.Induration 1st meas.(R)	xsd:int	optional	nn.n
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPrindy	3.Induration 2nd meas.(R)	xsd:int	optional	nn.n
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPrinqc	Induration (Right)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPrirdt	3. Induration res.(Right)	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlerna	4. Erythema N/A (Left)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPleryx	4. Erythema 1st measure-L	xsd:double	optional	nn.n
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPleryy	4. Erythema 2nd measure-L	xsd:double	optional	nn.n
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlerqc	Erythema (Left deltoid)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlrrdt	4. Erythema date of res-L	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlinna	5. Induration N/A (Left)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlindx	5.Induration 1st meas.(L)	xsd:double	optional	nn.n
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlindy	5.Induration 2nd meas.(L)	xsd:double	optional	nn.n
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlinqc	Induration (Left)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlirdt	5. Induration res.(Left)	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPmfna	6a. Malaise/Fatigue N/A	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPmf	6a. Malaise/Fatigue Sever	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPmfqc	Malaise/fatigue	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPmfrdt	6a. Mal/Fat date of res.	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPmyana	6b. Myalgia N/A	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPmyal	6b. Myalgia severity	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPmyaqc	Myalgia	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPmyrdt	6b. Myalgia date of res.	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPheana	6c. Headache N/A	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPhead	6c. Headache severity	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPheaqc	Headache	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPherdt	6c. Headache date of res.	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPnauna	6d. Nausea N/A	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPnaus	6d. Nausea severity	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPnauqc	Nausea	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPnardt	6d. Nausea date of res.	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPvomna	6e. Vomiting N/A	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPvom	6e. Vomiting severity	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPvomqc	Vomiting	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPvordt	6e. Vomiting date of res.	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPchina	6f. Chills N/A	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPchill	6f. Chills severity	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPchiqc	Chills 	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPchrdt	6f. Chills date of res.	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPartna	6g. Arthralgia N/A	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCParth	6g. Arthralgia severity	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPartqc	Arthralgia	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCParrdt	6g. Arthr. date of res.	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlprna	7a. Pain N/A (Right)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlpr	7a. Pain severity (Right)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlprqc	Local pain  (Right)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlprdt	7a. Pain date/res.(Right)	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtrna	7b. Tenderness N/A (R)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtr	7b. Tenderness sever (R)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtrqc	Tenderness (Right)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtrdt	7b.Tendrnss date/res. (R)	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlplna	7c. Pain N/A (Left)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlpl	7c. Pain severity (Left)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlplqc	Local pain (Left)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPlpldt	7c. Pain date/res.(Left)	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtlna	7d. Tenderness N/A (L)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtl	7d. Tenderness sever (L)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtlqc	Tenderness (Left)	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPtldt	7d.Tendrnss date/res. (L)	xsd:dateTime	optional	DD/MMM/YY
+RCP-1	RCP-1: Reactogenicity-Resolution	192	RCPcomx	Comments	xsd:string	optional	
+RCP-1	RCP-1: Reactogenicity-Resolution	192	formlang	Form Language	xsd:string	required	nn
+RCP-1	RCP-1: Reactogenicity-Resolution	192	sfdt_192	Staff Initials/Date	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXdt	Exam Date	xsd:dateTime	required	DD/MMM/YY
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXwtkg	1. Weight	xsd:int	required	nnn
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXwtqc	Weight	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXtempc	2. Body Temp	xsd:double	required	nn.n
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXtemqc	Body Temp	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXbpsys	3. BP systolic xxx/	xsd:int	required	nnn
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXbpdia	3. BP diastolic /xxx	xsd:int	required	nnn
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXbpqc	Blood Pressure	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXpulse	4. Pulse	xsd:int	required	nnn
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXresp	5. Respirations	xsd:int	required	nn
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXheent	6. HEENT	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXheenx	6. HEENT Notes	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXneck	7. Neck	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXneckx	7. Neck Notes	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXlymph	8. Lymph Nodes	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXlympx	8. Lymph Nodes Notes	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXheart	9. Heart	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXhrtx	9. Heart Notes	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXchest	10. Chest	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXchstx	10. Chest Notes	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXabdom	11. Abdomen	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXabdox	11. Abdomen Notes	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXextrm	12. Extremities	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXextrx	12. Extremities Notes	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXneuro	13. Neurological	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXneurx	13. Neurological Notes	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXskin	14. Skin	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXskinx	14. Skin Notes	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXother	15. Other	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXothex	15. Other Notes	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXcemqc	Sx-directed eval deemed	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXcemh	16. Evaluation Summary	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXsign	Clinician signature/date	xsd:string	required	
+FPX-1	FPX-1: Final Complete Physical Exam	200	FPXcom	Comments	xsd:string	optional	
+FPX-1	FPX-1: Final Complete Physical Exam	200	formlang	Form Language	xsd:string	required	nn
+FPX-1	FPX-1: Final Complete Physical Exam	200	sfdt_200	Staff Initials/Date	xsd:string	required	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVdcdt	Date of Discontinuation	xsd:dateTime	required	DD/MMM/YY
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVlvdt	1. Date last vaccination	xsd:dateTime	required	DD/MMM/YY
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVcqc	Reason Vacc Disconinued	xsd:string	optional	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVreas	2. Reason discontinued	xsd:string	required	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVunsrx	2d. Schedule specify	xsd:string	optional	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVclaed	2f. AE/Clinician discont	xsd:string	optional	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVptaed	2f. AE/Ppt discontinue	xsd:string	optional	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVresym	2g. Specify symptoms	xsd:string	optional	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVclred	2g. Clinician decision	xsd:string	optional	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVptred	2g. Ppt. decision	xsd:string	optional	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVptorx	"2j.Other refuse, specif  "	xsd:string	optional	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVblorx	"2k. Blood prod., specify"	xsd:string	optional	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVothrx	2l. Other reason specify	xsd:string	optional	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	DOVflwup	3. Follow-up visits	xsd:string	required	
+DOV-1	DOV-1: Discontinuation of Vaccination	300	formlang	Form Language	xsd:string	required	nn
+DOV-1	DOV-1: Discontinuation of Vaccination	300	sfdt_300	Staff Initials/Date	xsd:string	required	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPdt	Form Completion Date	xsd:dateTime	required	DD/MMM/YY
+ SP-1	 SP-1: Study Product Admin. Error	310	SPerdt	1. Date error occured	xsd:dateTime	required	DD/MMM/YY
+ SP-1	 SP-1: Study Product Admin. Error	310	SPersite	2a. Incorrect admin site	xsd:string	optional	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPersitx	2a. specify (TEXT)	xsd:string	optional	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPerprod	2b. Incorrect prod admin	xsd:string	optional	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPerdose	2c. Incorrect dose admin.	xsd:string	optional	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPnovia	2d. Adm. beyond viability	xsd:string	optional	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPoutsd	2e. Admin outside window	xsd:string	optional	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPerothr	2f. Other	xsd:string	optional	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPerothx	2f. specify (TEXT)	xsd:string	optional	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPaction	3. Outcome	xsd:string	required	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPactox	3. specify (TEXT)	xsd:string	optional	
+ SP-1	 SP-1: Study Product Admin. Error	310	SPcomm	Comments (TEXT)	xsd:string	optional	
+ SP-1	 SP-1: Study Product Admin. Error	310	formlang	Form Language	xsd:string	required	nn
+ SP-1	 SP-1: Study Product Admin. Error	310	sfdt_310	Staff Initials/Date	xsd:string	required	
+IV-1	IV-1:Interim Visit	350	IVdt	Form Completion Date	xsd:dateTime	Required	DD/MMM/YY
+IV-1	IV-1:Interim Visit	350	IVrmakup	1a. Visit missed	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVvisit	1a1. Visit complte/replce	xsd:int	optional	nn.n
+IV-1	IV-1:Interim Visit	350	IVrae	1b. Ppt reported AE	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVrspec	1c. Repeat spec. coll.	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVrfupae	1d. F/U abnormal safety	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVriht	1e. Interim HIV testing	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVroth	"1f. Other, specify"	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVrothx	1f. Specify text	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVpapx	2a. Abbrev. phys. exam	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVpsia	2b. Social impact	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVpotb	2c. OTB questionnaire	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVpiht	2d. HIV infection	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVpllf	2e. Local Lab	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVpcpf	2f. Chemistry panel	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVpurf	2g. Urine dip/micro exam	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVpoth	"2h. Other, specify"	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	IVpothx	2h. Specify text	xsd:string	optional	
+IV-1	IV-1:Interim Visit	350	formlang	Form Language	xsd:string	required	nn
+IV-1	IV-1:Interim Visit	350	sfdt_350	Staff Initials/Date	xsd:string	required	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTdt	Contact Date	xsd:dateTime	required	DD/MMM/YY
+IHT-1	IHT-1:  Interim HIV Test	360	IHTreq	Ppt / Clinician Request 	xsd:string	required	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTsympt	1.Recent or current sx?	xsd:string	required	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTsympx	1a.Describe symptoms	xsd:string	optional	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTexp	2.Reason poss. exposure?	xsd:string	required	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTex1dt	2a.1st date of poss.expos	xsd:string	optional	dd/MMM/YY
+IHT-1	IHT-1:  Interim HIV Test	360	IHTex2dt	2a.2nd date of poss.expos	xsd:string	optional	dd/MMM/YY
+IHT-1	IHT-1:  Interim HIV Test	360	IHTex3dt	2a.3rd date of poss.expos	xsd:string	optional	dd/MMM/YY
+IHT-1	IHT-1:  Interim HIV Test	360	IHTex4dt	2a.4th date of poss.expos	xsd:string	optional	dd/MMM/YY
+IHT-1	IHT-1:  Interim HIV Test	360	IHTex5dt	2a.5th date of poss.expos	xsd:string	optional	dd/MMM/YY
+IHT-1	IHT-1:  Interim HIV Test	360	IHTuskp	2b1.Sex w/known HIV+	xsd:string	optional	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTusunk	2b2.Sex w/unknown HIV?	xsd:string	optional	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTsnkp	2b3.Shared needle w/HIV+	xsd:string	optional	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTsnunk	2b4.Shared needle w/HIV?	xsd:string	optional	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTothr	2b5.Other	xsd:string	optional	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTothrx	2b5.other (text)	xsd:string	optional	
+IHT-1	IHT-1:  Interim HIV Test	360	IHTorea	3.Other reason HIV test	xsd:string	required	
+IHT-1	IHT-1:  Interim HIV Test	360	IHToreax	"3.Yes, specify reason"	xsd:string	optional	
+IHT-1	IHT-1:  Interim HIV Test	360	formlang	Form Language	xsd:string	required	nn
+IHT-1	IHT-1:  Interim HIV Test	360	sfdt_360	Staff Initials/Date	xsd:string	required	
+AE-1	AE-1:(VTN) AE Log	420	AEsubsum	AE subsumed	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	AErptdt	Date Reported to Site	xsd:dateTime	required	DD/MMM/YY
+AE-1	AE-1:(VTN) AE Log	420	AEsaeno	SAE number	xsd:int	optional	
+AE-1	AE-1:(VTN) AE Log	420	AEfver	MedDRA flagversion	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	AEmdra	MedDRA text	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	AEdiag	1.Adverse Experience (AE)	xsd:string	required	
+AE-1	AE-1:(VTN) AE Log	420	AEcodeq	Coding Query	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	AEondt	2. Onset Date	xsd:string	required	dd/MMM/YY
+AE-1	AE-1:(VTN) AE Log	420	AEseveqc	CQC - Illness/AE log	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	AEseve	3. Severity	xsd:string	required	
+AE-1	AE-1:(VTN) AE Log	420	AErelpro	4.Relation to Study Prod.	xsd:string	required	
+AE-1	AE-1:(VTN) AE Log	420	AEdrad	5. Study Product Admin.	xsd:string	required	
+AE-1	AE-1:(VTN) AE Log	420	AEoutc	6. Status/Outcome	xsd:string	required	
+AE-1	AE-1:(VTN) AE Log	420	AEocdt	6a. Status/Outcome Date	xsd:string	optional	dd/MMM/YY
+AE-1	AE-1:(VTN) AE Log	420	AEtrno	7. None	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	AEtrrx	7. Medication(s)	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	AEtrho	7. New/Prolonged hosp.	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	AEtrpr	7. Procedure/Surgery	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	AEtrot	7. Other	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	AEich	8. AE serious per ICH?	xsd:string	required	
+AE-1	AE-1:(VTN) AE Log	420	AEdaids	9. Reported to DAIDS	xsd:string	required	
+AE-1	AE-1:(VTN) AE Log	420	AEsaerct	10.SAE on Reactogenicity?	xsd:string	required	
+AE-1	AE-1:(VTN) AE Log	420	AEvisit	9. Visit Code reported	xsd:int	required	nn.n
+AE-1	AE-1:(VTN) AE Log	420	AEcomm	Comments	xsd:string	optional	
+AE-1	AE-1:(VTN) AE Log	420	formlang	Form Language	xsd:string	required	nn
+AE-1	AE-1:(VTN) AE Log	420	sfdt_420	Staff Initials/Date	xsd:string	required	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CMnone	No meds @ Screen/Enroll.	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	sfdt_423	No Meds - Staff Init/Date	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CMnomeds	No Meds taken thru study	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CMsfdtno	No Meds(study)-Init/Date	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1med	Medication Name #1	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1mdsce	#1 Clinically Significant	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1medqc	CQC- 1st Con Med	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1ind	Med #1: Indication	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1init	Med #1: Initials/Log Date	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1stdt	Med #1: Date Started  	xsd:string	optional	dd/mmm/YY
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1spdt	Med #1: Date Stopped 	xsd:string	optional	dd/MMM/YY
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1cont	Med #1: Continuing at end	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1ae	Med #1: Taken for AE?	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1ae1p	Med#1: First AE Page #	xsd:int	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1ae2p	Med#1: Second AE Page #	xsd:int	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1ae3p	Med#1: Third AE Page #	xsd:int	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1ae4p	Med#1: Fourth AE Page #	xsd:int	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1dose	Med #1: Dose/Units 	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1rte	Med #1: Route	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1rtoth	"Med#1:Route Other,specify"	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1freq	Med #1: Frequency	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1hr	Med #1: qxh hrs	xsd:int	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM1fqoth	"Med #1:Freq Other,specify"	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2med	Medication Name #2	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2mdsce	#2 Clinically Significant	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2medqc	CQC- 2nd Con Med	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2ind	Med #2: Indication	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2init	Med #2: Initials/Log Date	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2stdt	Med #2: Date Started	xsd:string	optional	dd/mmm/YY
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2spdt	Med #2: Date Stopped	xsd:string	optional	dd/MMM/YY
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2cont	Med #2: Continuing at end	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2ae	Med #2: Taken for AE?	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2ae1p	Med#2: First AE Page #	xsd:int	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2ae2p	Med#2: Second AE Page #	xsd:int	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2ae3p	Med#2: Third AE Page #	xsd:int	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2ae4p	Med#2: Fourth AE Page #	xsd:int	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2dose	Med #2: Dose/Units	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2rte	Med #2: Route	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2rtoth	"Med#2:Route Other,specify"	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2freq	Med #2: Frequency	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2hr	Med #2: qxh hrs	xsd:int	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM2fqoth	"Med #2:Freq Other,specify"	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3med	Medication Name #3	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3mdsce	#3 Clinically Significant	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3medqc	CQC- 3rd Con Med	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3ind	Med #3: Indication	xsd:string	optional
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3init	Med #3: Initials/Log Date	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3stdt	Med #3: Date Started 	xsd:string	optional	dd/mmm/YY
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3spdt	Med #3: Date Stopped	xsd:string	optional	dd/MMM/YY
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3cont	Med #3: Continuing at end	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3ae	Med #3: Taken for AE?	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3ae1p	Med#3: First AE Page #	xsd:int	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3ae2p	Med#3: Second AE Page #	xsd:int	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3ae3p	Med#3: Third AE Page #	xsd:int	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3ae4p	Med#3: Fourth AE Page #	xsd:int	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3dose	Med #3: Dose/Units 	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3rte	Med #3: Route	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3rtoth	"Med#3:Route Other,specify"	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3freq	Med #3: Frequency	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3hr	Med #3: qxh hrs	xsd:int	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	CM3fqoth	"Med #3:Freq Other,specify"	xsd:string	optional	
+CM-1	CM-1:(Ph I/II) Concomitant Medications Log	423	formlang	Form Language	xsd:string	required	nn
+PR-1	PR-1: Pregnancy Report and History	440	PRqc	PR-1 CQC	xsd:string	optional	
+PR-1	PR-1: Pregnancy Report and History	440	PRlmpdt	1. Dt. of last menses	xsd:dateTime	required	DD/MMM/YY
+PR-1	PR-1: Pregnancy Report and History	440	PRdlvdt	2. Estimated Delivery dt.	xsd:dateTime	required	DD/MMM/YY
+PR-1	PR-1: Pregnancy Report and History	440	PRevrprg	3.Pregnant before?	xsd:string	required	
+PR-1	PR-1: Pregnancy Report and History	440	PRfstprg	3a. 1st preg since enroll	xsd:string	optional	
+PR-1	PR-1: Pregnancy Report and History	440	PRftmbth	3b. Number of full term	xsd:int	optional	
+PR-1	PR-1: Pregnancy Report and History	440	PRprmbth	3c. Number of premature	xsd:int	optional	
+PR-1	PR-1: Pregnancy Report and History	440	PRstlbth	3d. Nbr spontaneous deat	xsd:int	optional	
+PR-1	PR-1: Pregnancy Report and History	440	PRmscrg	3e. Nbr spontaneous abor	xsd:int	optional	
+PR-1	PR-1: Pregnancy Report and History	440	PRabort	3f. Nbr elective abortio	xsd:int	optional	
+PR-1	PR-1: Pregnancy Report and History	440	PRectprg	3g. Nbr ectopic pregnanc	xsd:int	optional	
+PR-1	PR-1: Pregnancy Report and History	440	PRhxcom	4. Hist complications be	xsd:string	optional	
+PR-1	PR-1: Pregnancy Report and History	440	PRcomm	Comments 	xsd:string	optional	
+PR-1	PR-1: Pregnancy Report and History	440	formlang	Form Language	xsd:string	required	nn
+PR-1	PR-1: Pregnancy Report and History	440	sfdt_440	Staff Initials/Date	xsd:string	required	
+PO-1	PO-1: Pregnancy Outcome	441	POunk	Outcome unknown study end	xsd:string	optional	
+PO-1	PO-1: Pregnancy Outcome	441	POinit	Outcome Staff Init/Date	xsd:string	optional	
+PO-1	PO-1: Pregnancy Outcome	441	POqc	PO-1 CQC	xsd:string	optional	
+PO-1	PO-1: Pregnancy Outcome	441	POoutcm	1. How many outcomes?	xsd:int	optional	
+PO-1	PO-1: Pregnancy Outcome	441	PO1outdt	2a. Outcome Date #1	xsd:string	optional	dd/MMM/YY
+PO-1	PO-1: Pregnancy Outcome	441	PO1outcm	2b. Pregnancy outcome #1	xsd:string	optional	
+PO-1	PO-1: Pregnancy Outcome	441	PO1mthd	2b1. Method	xsd:string	optional	
+PO-1	PO-1: Pregnancy Outcome	441	PO1anom	2c. Anomalies identified?	xsd:string	optional	
+PO-1	PO-1: Pregnancy Outcome	441	PO2outdt	3a. Outcome Date #2	xsd:string	optional	dd/MMM/YY
+PO-1	PO-1: Pregnancy Outcome	441	PO2outcm	3b. Pregnancy outcome #2	xsd:string	optional	
+PO-1	PO-1: Pregnancy Outcome	441	PO2mthd	3b1. Method	xsd:string	optional	
+PO-1	PO-1: Pregnancy Outcome	441	PO2anom	3c. Anomalies identified?	xsd:string	optional	
+PO-1	PO-1: Pregnancy Outcome	441	POcomm	Comments	xsd:string	optional	
+PO-1	PO-1: Pregnancy Outcome	441	formlang	Form Language	xsd:string	required	nn
+PO-1	PO-1: Pregnancy Outcome	441	sfdt_441	Staff Initials/Date	xsd:string	required	
+SCL-1	SCL-1: Specimen Collection	449	SCLdt	Visit Date	xsd:dateTime	required	DD/MMM/YY
+SCL-1	SCL-1: Specimen Collection	449	SCLcoll	No spec coll/Spec coll	xsd:string	required	
+SCL-1	SCL-1: Specimen Collection	449	SCLscdt	Specimen Collection Date	xsd:dateTime	optional	DD/MMM/YY
+SCL-1	SCL-1: Specimen Collection	449	SCLsctm	Collection Time 	xsd:string	optional	nn:nn
+SCL-1	SCL-1: Specimen Collection	449	SCLcomm	Comments	xsd:string	optional	
+SCL-1	SCL-1: Specimen Collection	449	formlang	Form Language	xsd:string	required	nn
+SCL-1	SCL-1: Specimen Collection	449	sfdt_449	Staff Initials/Date	xsd:string	required	
+MV-1	MV-1: Missed Visit	463	MVfcdt	Form Completion Date	xsd:dateTime	required	DD/MMM/YY
+MV-1	MV-1: Missed Visit	463	MVcomm	Comments	xsd:string	optional	
+MV-1	MV-1: Missed Visit	463	formlang	Form Language	xsd:string	required	nn
+MV-1	MV-1: Missed Visit	463	sfdt_463	Staff Initials/Date	xsd:string	required	
+PT-1	PT-1: Participant Transfer 	465	PTdt	Form Completion Date	xsd:dateTime	required	DD/MMM/YY
+PT-1	PT-1: Participant Transfer 	465	PTtsite	1. Transferring site name	xsd:string	required	
+PT-1	PT-1: Participant Transfer 	465	PTtuid	Transferring site Unit ID	xsd:int	optional	
+PT-1	PT-1: Participant Transfer 	465	PTrsite	2. Receiving Site Name	xsd:string	required	
+PT-1	PT-1: Participant Transfer 	465	PTruid	Receiving site Unit ID	xsd:int	optional	
+PT-1	PT-1: Participant Transfer 	465	PTvisit	3. Visit of last contact 	xsd:int	required	nn.n
+PT-1	PT-1: Participant Transfer 	465	PTsentdt	4. Date records sent  	xsd:dateTime	required	DD/MMM/YY
+PT-1	PT-1: Participant Transfer 	465	PTcomm	Comments	xsd:string	optional	
+PT-1	PT-1: Participant Transfer 	465	formlang	Form Language	xsd:string	required	nn
+PT-1	PT-1: Participant Transfer 	465	sfdt_465	Staff Initials/Date	xsd:string	required	
+PRC-1	PRC-1: Participant Receipt 	466	PRCdt	Form Completion Date	xsd:dateTime	required	DD/MMM/YY
+PRC-1	PRC-1: Participant Receipt 	466	PRCrsite	1. Receiving site name	xsd:string	required	
+PRC-1	PRC-1: Participant Receipt 	466	PRCruid	Receiving site Unit ID	xsd:int	optional	
+PRC-1	PRC-1: Participant Receipt 	466	PRCtsite	2. Transferring site name	xsd:string	required	
+PRC-1	PRC-1: Participant Receipt 	466	PRCtuid	Transferring site Unit ID	xsd:int	optional	
+PRC-1	PRC-1: Participant Receipt 	466	PRCrecdt	3.Consent Date at rcvg.	xsd:dateTime	required	DD/MMM/YY
+PRC-1	PRC-1: Participant Receipt 	466	PRCcomm	Comments	xsd:string	optional	
+PRC-1	PRC-1: Participant Receipt 	466	formlang	Form Language	xsd:string	required	nn
+PRC-1	PRC-1: Participant Receipt 	466	sfdt_466	Staff Initials/Date	xsd:string	required	
+PIL-1	PIL-1: Participant Incident Log	487	PILfcdt	Form Completion Date	xsd:dateTime	required	DD/MMM/YY
+PIL-1	PIL-1: Participant Incident Log	487	PILstaff	SC Staff Name	xsd:string	required	
+PIL-1	PIL-1: Participant Incident Log	487	PILsourc	Source of Information	xsd:string	optional	
+PIL-1	PIL-1: Participant Incident Log	487	PILplate	Plate # if applicable	xsd:int	optional	nnn
+PIL-1	PIL-1: Participant Incident Log	487	PILvisit	Visit # if applicable	xsd:int	optional	
+PIL-1	PIL-1: Participant Incident Log	487	PILforms	Subject: forms	xsd:string	optional	
+PIL-1	PIL-1: Participant Incident Log	487	PILprot	Subject: protocol	xsd:string	optional	
+PIL-1	PIL-1: Participant Incident Log	487	PILdata	Subject: data	xsd:string	optional	
+PIL-1	PIL-1: Participant Incident Log	487	PILlab	Subject: lab	xsd:string	optional	
+PIL-1	PIL-1: Participant Incident Log	487	PILenrol	Subject: enrollment	xsd:string	optional	
+PIL-1	PIL-1: Participant Incident Log	487	PILrand	Subject: randomization	xsd:string	optional	
+PIL-1	PIL-1: Participant Incident Log	487	PILsubo	Subject: other	xsd:string	optional	
+PIL-1	PIL-1: Participant Incident Log	487	PILsubox	"Subject: other, specify"	xsd:string	optional	
+PIL-1	PIL-1: Participant Incident Log	487	PILevnt	Event and details	xsd:string	required	
+ESI-1	ESI-1: End of Study Inventory	489	ESIdt	Form Completion Date	xsd:dateTime	required	DD/MMM/YY
+ESI-1	ESI-1: End of Study Inventory	489	ESIhvis	1. Highest Visit Code	xsd:int	required	nn.n
+ESI-1	ESI-1: End of Study Inventory	489	ESIivis	2.How many interim visits	xsd:int	required	nnn
+ESI-1	ESI-1: End of Study Inventory	489	ESIaepg	3a. Highest AE Log Page	xsd:int	optional	nnn
+ESI-1	ESI-1: End of Study Inventory	489	ESIaepgn	3a.No AE pages submitted	xsd:string	optional	
+ESI-1	ESI-1: End of Study Inventory	489	ESIcmpg	3b.Highest Con. Med Page	xsd:int	required	nn
+ESI-1	ESI-1: End of Study Inventory	489	ESIprepg	3c. Highest Pre-Exst Cond	xsd:int	required	nn
+ESI-1	ESI-1: End of Study Inventory	489	ESIsipg	3d. Highest Social Impact	xsd:int	optional	nn
+ESI-1	ESI-1: End of Study Inventory	489	ESIsipgn	3d. No Social Impact 	xsd:string	optional	
+ESI-1	ESI-1: End of Study Inventory	489	ESI	Comments	xsd:string	optional	
+ESI-1	ESI-1: End of Study Inventory	489	formlang	Form Language	xsd:string	required	nn
+ESI-1	ESI-1: End of Study Inventory	489	sfdt_489	Staff Initials/Date	xsd:string	required	
+TM-1	TM-1: Termination	490	TMtmdt	1. Termination Date	xsd:dateTime	required	DD/MMM/YY
+TM-1	TM-1: Termination	490	TMtrmrsn	2. Reason for termination	xsd:string	required	
+TM-1	TM-1: Termination	490	TMddt	2b1. Date of Death	xsd:string	optional	dd/MMM/YY
+TM-1	TM-1: Termination	490	TMddun	2b1. Date of Death Unk	xsd:string	optional	
+TM-1	TM-1: Termination	490	TMdcau	2b2. Cause of Death	xsd:string	optional	
+TM-1	TM-1: Termination	490	TMdcun	2b2. Cause of Death Unk.	xsd:string	optional	
+TM-1	TM-1: Termination	490	TMrefrx	"2c. Ppt. refused, specify"	xsd:string	optional	
+TM-1	TM-1: Termination	490	TMinvdx	"2f. Inv.decision, specify"	xsd:string	optional	
+TM-1	TM-1: Termination	490	TMtrmox	"2k. Other, specify"	xsd:string	optional	
+TM-1	TM-1: Termination	490	TMae	3a. Adverse Experience?	xsd:string	optional	
+TM-1	TM-1: Termination	490	TMae1p	3a. First AE Log page #	xsd:int	optional	
+TM-1	TM-1: Termination	490	TMreact	3b. Reactogenicity?	xsd:string	optional	
+TM-1	TM-1: Termination	490	TMreacx	"3b. Reacto, specify"	xsd:string	optional	
+TM-1	TM-1: Termination	490	TMcomm	Comments	xsd:string	optional	
+TM-1	TM-1: Termination	490	formlang	Form Language	xsd:string	required	nn
+TM-1	TM-1: Termination	490	sfdt_490	Staff Initials/Date	xsd:string	required	
+QC	Quality Control Report	501	QCREP_ID	Quality Control Report #	xsd:int	required	

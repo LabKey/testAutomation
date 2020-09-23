@@ -63,6 +63,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPa
         _title = null;
     }
 
+    @Override
     protected WebDriverWrapper getWrapper()
     {
         return _wDriver;
@@ -147,6 +148,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPa
         new BootstrapMenu(getDriver(), elementCache().UX_MENU).collapse();
     }
 
+    @Override
     protected abstract EC newElementCache();
 
     public class ElementCache extends WebPartPanel.ElementCache

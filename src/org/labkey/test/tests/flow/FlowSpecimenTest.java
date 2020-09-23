@@ -92,6 +92,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         verifyFlowDatasetSpecimenFK();
     }
 
+    @Override
     @LogMethod
     protected void importFCSFiles()
     {
@@ -102,7 +103,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         selectOptionByText(Locator.id("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Import Selected Runs");
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
 
         log("** Verify Target Study is set on FCSFile run");
         beginAt("/flow-run/" + getContainerPath() + "/showRuns.view");
@@ -124,7 +125,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         _fileBrowserHelper.selectFileBrowserItem("version");
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         clickButton("Import Selected Runs");
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
         verifyUploadReport(
                 "Reading keywords from file Fake_2_0.fcs",
                 "Reading keywords from file Fake_3_0.fcs",
@@ -136,9 +137,7 @@ public class FlowSpecimenTest extends BaseFlowTest
     @LogMethod
     private void verifyUploadReport(String... reportText)
     {
-        waitForPipeline("/" + getProjectName() + "/" + getFolderName());
         goToFlowDashboard();
-        waitForPipeline("/" + getProjectName() + "/" + getFolderName());
         clickAndWait(Locator.linkContainingText("Show Jobs"));
         PipelineStatusTable statusTable = new PipelineStatusTable(this);
         statusTable.clickStatusLink(0);

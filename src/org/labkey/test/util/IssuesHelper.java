@@ -28,8 +28,8 @@ import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.IssueListDefDataRegion;
-import org.labkey.test.pages.issues.AdminPage;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.ListPage;
@@ -70,7 +70,7 @@ public class IssuesHelper extends WebDriverWrapper
 
     public boolean doesIssueListDefExist(String container, String listDefLabel)
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         SelectRowsCommand selectCmd = new SelectRowsCommand(ISSUES_SCHEMA, ISSUE_LIST_DEF_QUERY);
         selectCmd.setMaxRows(1);
         selectCmd.addFilter("Label", listDefLabel, Filter.Operator.EQUAL);
@@ -144,7 +144,7 @@ public class IssuesHelper extends WebDriverWrapper
 
     public int getHighestIssueId(String containerPath, String issuesQuery)
     {
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
         SelectRowsCommand command = new SelectRowsCommand("issues", issuesQuery.toLowerCase().replaceAll(" ", ""));
         command.addSort("IssueId", Sort.Direction.DESCENDING);
         command.setMaxRows(1);
@@ -209,19 +209,18 @@ public class IssuesHelper extends WebDriverWrapper
     @LogMethod
     public void setIssueAssignmentList(@Nullable @LoggedParam String group)
     {
-        new AdminPage(getDriver()).setIssueAssignmentList(group);
+        new IssuesAdminPage(getDriver()).setAssignedTo(group);
     }
 
     @LogMethod
     public void setIssueAssignmentUser(@Nullable @LoggedParam String user)
     {
-        new AdminPage(getDriver()).setIssueAssignmentUser(user);
+        new IssuesAdminPage(getDriver()).setDefaultUser(user);
     }
 
-    public AdminPage goToAdmin()
+    public IssuesAdminPage goToAdmin()
     {
         clickButton("Admin");
-        waitForText("Configure Fields");
-        return new AdminPage(getDriver());
+        return new IssuesAdminPage(getDriver());
     }
 }

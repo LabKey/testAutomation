@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -22,10 +23,11 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.reports.SaveCategoriesCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.pages.issues.AdminPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.util.APIContainerHelper;
@@ -126,6 +128,13 @@ public class RlabkeyTest extends BaseWebDriverTest
         issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_2));
     }
 
+    private void setupAssays()
+    {
+        log("Create a GPAT assay design");
+        goToManageAssays();
+        _assayHelper.createAssayDesign("General", "Rlabkey GPAT Test").clickFinish();
+    }
+
     /**
      * Create a new issues list and override the default assigned to group
      */
@@ -133,9 +142,9 @@ public class RlabkeyTest extends BaseWebDriverTest
     {
         issuesHelper.createNewIssuesList(name, _containerHelper);
 
-        AdminPage.beginAt(this, name)
-                .setIssueAssignmentList(null)
-                .save();
+        IssuesAdminPage.beginAt(this, name)
+                .setAssignedTo(null) // All Project Users
+                .clickSave();
         ListPage.beginAt(this, name);
     }
 
@@ -153,6 +162,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         // Dummy files for saveBatch API test
         _fileBrowserHelper.createFolder("data.tsv");
         _fileBrowserHelper.createFolder("result.txt");
+        setupAssays();
 
         doRLabkeyTest(RLABKEY_API_EXPERIMENT);
     }
@@ -173,7 +183,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     public void testRlabkeyQueryApi() throws Exception
     {
         log("Import Lists");
-        File listArchive = new File(_rReportHelper.getRLibraryPath(), "/listArchive.zip");
+        File listArchive = new File(RReportHelper.getRLibraryPath(), "/listArchive.zip");
         goToProjectHome();
         _listHelper.importListArchive(listArchive);
 
@@ -205,6 +215,8 @@ public class RlabkeyTest extends BaseWebDriverTest
     @Test
     public void testRlabkeyWebDavApi() throws Exception
     {
+        Assume.assumeFalse("Skipping webdav API test on remote server.", TestProperties.isServerRemote());
+
         Map<String, String> scriptReplacements = new HashMap<>();
 
         WebDavUploadHelper webDav = new WebDavUploadHelper(getProjectName());
@@ -248,8 +260,10 @@ public class RlabkeyTest extends BaseWebDriverTest
             List<String> errors = new ArrayList<>();
 
             // we want to load the Rlabkey package from the override location
-            File libPath = _rReportHelper.getRLibraryPath();
-            String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
+            File libPath = RReportHelper.getRLibraryPath();
+            String pathCmd = TestProperties.isServerRemote()
+                ? ""
+                : String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
 
             for (APITestHelper.ApiTestCase test : tests)
             {
@@ -314,6 +328,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         _userHelper.deleteUsers(afterTest, USER);
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return null;

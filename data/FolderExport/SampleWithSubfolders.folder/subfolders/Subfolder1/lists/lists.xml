@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/Folder%201/Subfolder1/begin.view by cnathe@labkey.com on Fri Nov 02 10:57:39 CDT 2012-->
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="People" tableDbType="TABLE">
+    <columns>
+      <column columnName="Key">
+        <datatype>integer</datatype>
+        <columnTitle>Key</columnTitle>
+        <nullable>false</nullable>
+        <isHidden>true</isHidden>
+        <isKeyField>true</isKeyField>
+        <isAutoInc>true</isAutoInc>
+      </column>
+      <column columnName="Name">
+        <datatype>varchar</datatype>
+        <columnTitle>Name</columnTitle>
+      </column>
+      <column columnName="Age">
+        <datatype>integer</datatype>
+        <columnTitle>Age</columnTitle>
+      </column>
+      <column columnName="Crazy">
+        <datatype>boolean</datatype>
+        <columnTitle>Crazy</columnTitle>
+      </column>
+    </columns>
+    <pkColumnName>Key</pkColumnName>
+  </table>
+</tables>

@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -107,6 +108,7 @@ public class UserTest extends BaseWebDriverTest
         createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor");
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -344,7 +346,7 @@ public class UserTest extends BaseWebDriverTest
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
         issuesHelper.goToAdmin();
-        issuesHelper.setIssueAssignmentList("Site:Users");
+        issuesHelper.setIssueAssignmentList("Site: Users");
         clickButton("Save");
         clickAndWait(Locator.linkWithText("New Issue"));
         assertElementNotPresent(createAssignedToOptionLocator(disabledUserId));
@@ -556,7 +558,7 @@ public class UserTest extends BaseWebDriverTest
         goToSiteUsers();
         clickButton("Add Users");
         setFormElement(Locator.name("newUsers"), "nocsrf@user.test");
-        setFormElementJS(Locator.name("X-LABKEY-CSRF"), "");
+        setFormElementJS(Locator.name(Connection.X_LABKEY_CSRF), "");
 
         clickButton("Add Users");
         assertElementPresent(Locators.labkeyError.containing("This request has an invalid security context."));

@@ -28,18 +28,21 @@ public class LookAndFeelBarPlot extends ChartLayoutDialog<LookAndFeelBarPlot.Ele
         super(wDriver);
     }
 
+    @Override
     public LookAndFeelBarPlot setPlotTitle(String title)
     {
         super.setPlotTitle(title);
         return this;
     }
 
+    @Override
     public LookAndFeelBarPlot setPlotWidth(String width)
     {
         super.setPlotWidth(width);
         return this;
     }
 
+    @Override
     public LookAndFeelBarPlot setPlotHeight(String height)
     {
         super.setPlotHeight(height);

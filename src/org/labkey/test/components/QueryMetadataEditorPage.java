@@ -1,48 +1,38 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.query.AliasFieldDialog;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public class QueryMetadataEditorPage extends DomainDesignerPage
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
+/**
+ * Automates the platform component defined in: query/src/client/QueryMetadataEditor/QueryMetadataEditor.tsx
+ */
+public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorPage.ElementCache>
 {
     public QueryMetadataEditorPage(WebDriver driver)
     {
         super(driver);
     }
 
-    @Override
-    public void clickFinish()
+    public void resetToDefault()
     {
-        scrollIntoView(elementCache().finishButton());
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().finishButton()));
-        click(Locator.button(elementCache().finishButton().getText()));
-        // TODO: Wait for success
-    }
-
-    public void reset()
-    {
-        scrollIntoView(elementCache().resetButton);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().resetButton));
         elementCache().resetButton.click();
-        click(Locator.button("Reset")); // Reset confirmation on the confirm modal
+        getWrapper().click(Locator.button("Reset")); // Reset confirmation on the confirm modal
         // TODO: Wait for reset
     }
 
     public void viewData()
     {
-        scrollIntoView(elementCache().viewDataButton);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().viewDataButton));
-        clickAndWait(elementCache().viewDataButton);
+        getWrapper().clickAndWait(elementCache().viewDataButton);
     }
 
     public void editSource()
     {
-        scrollIntoView(elementCache().editSourceButton);
-        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editSourceButton));
-        clickAndWait(elementCache().editSourceButton);
+        getWrapper().clickAndWait(elementCache().editSourceButton);
     }
 
     public AliasFieldDialog aliasField()
@@ -52,9 +42,10 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
     }
 
     @Override
-    protected QueryMetadataEditorPage.ElementCache elementCache()
+    public QueryMetadataEditorPage clickSave()
     {
-        return (QueryMetadataEditorPage.ElementCache) super.elementCache();
+        elementCache().saveButton.click();
+        return this;
     }
 
     @Override
@@ -63,19 +54,27 @@ public class QueryMetadataEditorPage extends DomainDesignerPage
         return new QueryMetadataEditorPage.ElementCache();
     }
 
-    public class ElementCache extends DomainDesignerPage.ElementCache
+    public class ElementCache extends DomainDesigner.ElementCache
     {
-        final WebElement resetButton = Locator.button("Reset To Default")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        private final WebElement resetButton = Locator.button("Reset To Default")
+                .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
+        private final WebElement aliasFieldButton = Locator.button("Alias Field")
+                .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
+        private final WebElement viewDataButton = Locator.button("View Data")
+                .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
+        private final WebElement editSourceButton = Locator.button("Edit Source")
+                .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        final WebElement aliasFieldButton = Locator.button("Alias Field")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        @Override
+        protected int getFieldPanelIndex()
+        {
+            return 0;
+        }
 
-        final WebElement viewDataButton = Locator.button("View Data")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-
-        final WebElement editSourceButton = Locator.button("Edit Source")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-
+        @Override
+        protected Locator.XPathLocator buttonPanelLocator()
+        {
+            return Locator.byClass("query-metadata-editor-buttons");
+        }
     }
 }

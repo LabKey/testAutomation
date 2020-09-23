@@ -43,10 +43,11 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.SiteNavBar;
-import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -359,7 +360,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Map<String, Object> rowMapM = new HashMap<>();
         rowMapM.put("Name", "TestManufacturer");
         insertCmdM.addRow(rowMapM);
-        SaveRowsResponse respM = insertCmdM.execute(createDefaultConnection(false), getProjectName());
+        SaveRowsResponse respM = insertCmdM.execute(createDefaultConnection(), getProjectName());
         Object manufacturerId = respM.getRows().get(0).get("RowId");
 
         //This table has one validator defined in the schema XML and one in query XML.  First do insert that should fail schema validator:
@@ -387,7 +388,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         rowMap.put("ManufacturerId", manufacturerId);
         rowMap.put("InitialReleaseYear", 2000);
         insertCmd.addRow(rowMap);
-        SaveRowsResponse resp = insertCmd.execute(createDefaultConnection(false), getProjectName());
+        SaveRowsResponse resp = insertCmd.execute(createDefaultConnection(), getProjectName());
         Object rowId = resp.getRows().get(0).get("RowId");
 
         //now try to update it:
@@ -413,27 +414,27 @@ public class SimpleModuleTest extends BaseWebDriverTest
         rowMap.put("Name", "Model2");
         rowMap.put("InitialReleaseYear", 2000);
         updateCmd.addRow(rowMap);
-        updateCmd.execute(createDefaultConnection(false), getProjectName());
+        updateCmd.execute(createDefaultConnection(), getProjectName());
 
         //clean:
         DeleteRowsCommand deleteCmd = new DeleteRowsCommand("vehicle", "Models");
         rowMap = new HashMap<>();
         rowMap.put("RowId", rowId);
         deleteCmd.addRow(rowMap);
-        deleteCmd.execute(createDefaultConnection(false), getProjectName());
+        deleteCmd.execute(createDefaultConnection(), getProjectName());
 
         deleteCmd = new DeleteRowsCommand("vehicle", "Manufacturers");
         rowMap = new HashMap<>();
         rowMap.put("RowId", manufacturerId);
         deleteCmd.addRow(rowMap);
-        deleteCmd.execute(createDefaultConnection(false), getProjectName());
+        deleteCmd.execute(createDefaultConnection(), getProjectName());
     }
 
     private void submitAndTestExpectedFailure(Command cmd, String expectedError) throws Exception
     {
         try
         {
-            cmd.execute(createDefaultConnection(false), getProjectName());
+            cmd.execute(createDefaultConnection(), getProjectName());
 
             throw new Exception("This should have failed");
         }
@@ -457,7 +458,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickProject(getProjectName());
         PortalHelper portalHelper = new PortalHelper(this);
 
-        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Sets", "Assay List");
+        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Type", "Assay List");
         assertTextPresent("Run Groups");
         assertElementNotPresent(Locator.linkWithText("Create Run Group")); // Not in small Run Groups web-part.
         portalHelper.checkWebpartPermission("A customized web part", "Read", null);
@@ -912,7 +913,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText("view history"));
 
         table = new DataRegionTable("query", this);
-        assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
+        assertEquals("A row was updated.", table.getDataAsText(0, "Comment"));
         assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
         // click the details link
@@ -941,7 +942,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.tagWithClass("div", "lk-body-title")
                 .child(Locator.tagWithText("*", "Details")));
         table = new DataRegionTable("query", this);
-        assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
+        assertEquals("A row was updated.", table.getDataAsText(0, "Comment"));
         assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
         // click the details link
@@ -1085,7 +1086,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
                         TestDataGenerator.simpleFieldDef("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
                 ));
-        dgen.createList(createDefaultConnection(true), "Key");
+        dgen.createList(createDefaultConnection(), "Key");
         goToManageLists();
         _listHelper.goToList(LIST_NAME);
     }
@@ -1106,7 +1107,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
                         TestDataGenerator.simpleFieldDef("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
                 ));
-        dgen.createList(createDefaultConnection(true), "Key");
+        dgen.createList(createDefaultConnection(), "Key");
         refresh();
     }
 
@@ -1670,7 +1671,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private static final String DATASET_NAME = "Data Name";
     private static final String DATASET_LABEL = "Data Label";
-    private static final String DATASET_FIELDS = "Property\nFirst\nLast";
 
     @LogMethod
     private void doTestDatasetsAndFileBasedQueries()
@@ -1681,17 +1681,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
         waitForText("Create Study");
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));
-        EditDatasetDefinitionPage editDatasetPage = _studyHelper.goToManageDatasets()
+        DatasetDesignerPage editDatasetPage = _studyHelper.goToManageDatasets()
                 .clickCreateNewDataset()
                 .setName(DATASET_NAME)
-                .submit()
                 .setDatasetLabel(DATASET_LABEL);
-        clickButton("Import Fields", "Paste tab-delimited");
-        setFormElement(Locator.name("tsv"), DATASET_FIELDS);
-        clickButton("Import", 0);
-        waitForText("First");
-        editDatasetPage
-                .save()
+
+        DomainFormPanel fieldsPanel = editDatasetPage.getFieldsPanel();
+        fieldsPanel.manuallyDefineFields("First");
+        fieldsPanel.addField("Last");
+
+        editDatasetPage.clickSave()
                 .clickViewData();
         assertTextPresent("My Custom View", "Hello Dataset", "Visit");
         assertTextNotPresent("Participant Identifier");

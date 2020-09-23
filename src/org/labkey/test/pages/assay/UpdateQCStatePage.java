@@ -38,6 +38,7 @@ public class UpdateQCStatePage extends LabKeyPage<UpdateQCStatePage.ElementCache
         return new AssayRunsPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -51,6 +51,7 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
         return this;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -25,22 +25,30 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.List;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@Category({BVT.class, Reports.class})
+@Category({DailyB.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class DataReportsTest extends ReportTest
 {
@@ -48,13 +56,13 @@ public class DataReportsTest extends ReportTest
 
     protected static final String AUTHOR_REPORT = "Author report";
 
-    private static final String QUERY_REPORT_NAME = "First Test Query Report";
-    private static final String QUERY_REPORT_DESCRIPTION = "Description for the first query report.";
+    private static final String QUERY_REPORT_NAME = BaseWebDriverTest.INJECT_CHARS_1;
+    private static final String QUERY_REPORT_DESCRIPTION = BaseWebDriverTest.INJECT_CHARS_1;
     private static final String QUERY_REPORT_SCHEMA_NAME = "study";
     private static final String QUERY_REPORT_QUERY_NAME = "Mouse";
 
-    private static final String QUERY_REPORT_NAME_2 = "Second Test Query Report";
-    private static final String QUERY_REPORT_DESCRIPTION_2 = "Description for the first query report.";
+    private static final String QUERY_REPORT_NAME_2 = BaseWebDriverTest.INJECT_CHARS_2;
+    private static final String QUERY_REPORT_DESCRIPTION_2 = BaseWebDriverTest.INJECT_CHARS_2;
     private static final String QUERY_REPORT_SCHEMA_NAME_2 = "study";
     private static final String QUERY_REPORT_QUERY_NAME_2 = "AE-1 (AE-1:(VTN) AE Log)";
     private static final String QUERY_REPORT_VIEW_NAME_2 = "Limited PTIDS";
@@ -120,6 +128,8 @@ public class DataReportsTest extends ReportTest
 
     protected final static String R_USER = "r_editor@report.test";
     protected final static String AUTHOR_USER = "author_user@report.test";
+
+    private final ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -294,7 +304,22 @@ public class DataReportsTest extends ReportTest
     public void doAdvancedViewTest()
     {
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
-        DataRegionTable.DataRegion(getDriver()).find().goToReport( "Create Advanced Report");
+        DataRegionTable dataRegion = DataRegionTable.DataRegion(getDriver()).find();
+        String create_advanced_report = "Create Advanced Report";
+
+        if (TestProperties.isPrimaryUserAppAdmin())
+        {
+            BootstrapMenu reportMenu = dataRegion.getReportMenu();
+            reportMenu.expand();
+            List<String> menuItems = getTexts(reportMenu.findVisibleMenuItems());
+            assertThat("App admin shouldn't be able to create an advanced report.", menuItems, not(hasItem(create_advanced_report)));
+            assertThat("Sanity check failed. Check menu text for advanced report.", menuItems, hasItem("Create Chart"));
+            beginAt(WebTestHelper.buildURL("study-reports", getCurrentContainerPath(), "externalReport"));
+            assertEquals("App admin shouldn't be able to create an advanced report.", 403, getResponseCode());
+            return; // success
+        }
+
+        dataRegion.goToReport(create_advanced_report);
 
         log("Verify txt report");
         selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
@@ -332,7 +357,7 @@ public class DataReportsTest extends ReportTest
         setCodeEditorValue("script-report-editor", " ");
 
         log("Execute bad scripts");
-        clickReportTab();
+        _rReportHelper.clickReportTab();
         assertTextPresent("Empty script, a script must be provided.");
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1));
 
@@ -367,7 +392,7 @@ public class DataReportsTest extends ReportTest
         pushLocation();
         DataRegionTable.DataRegion(getDriver()).find().goToReport("Create R Report");
         setCodeEditorValue("script-report-editor", "labkey.data");
-        clickReportTab();
+        _rReportHelper.clickReportTab();
         waitForText(R_SORT1);
         assertTextNotPresent(R_REMCOL, R_FILTERED);
         assertTextBefore(R_SORT1, R_SORT2);
@@ -385,45 +410,46 @@ public class DataReportsTest extends ReportTest
         assertTextNotPresent("Error executing command");
         verifyReportPdfDownload("study", 4500d);
         popLocation();
-
-        log("Test user permissions");
         pushLocation();
-        createSiteDeveloper(AUTHOR_USER);
-        clickProject(getProjectName());
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setUserPermissions(AUTHOR_USER, "Author");
-        impersonate(AUTHOR_USER);
+
+        if (!TestProperties.isPrimaryUserAppAdmin())
+        {
+            log("Test user permissions");
+            createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, getProjectName());
+            impersonate(AUTHOR_USER);
+        }
+        else
+        {
+            log("App Admin can't impersonate site roles. Just create report as primary test user.");
+        }
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
-        stopImpersonating();
-        popLocation();
+        if (!TestProperties.isPrimaryUserAppAdmin())
+        {
+            stopImpersonating();
+        }
 
+        popLocation();
         log("Create second R script");
         DataRegionTable.DataRegion(getDriver()).find().goToReport("Create R Report");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
-        clickSourceTab();
+        _rReportHelper.clickSourceTab();
         _rReportHelper.selectOption(RReportHelper.ReportOption.shareReport);
         _rReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
         saveReport(R_SCRIPTS[1]);
 
         log("Check that R script worked");
-        clickReportTab();
+        _rReportHelper.clickReportTab();
         assertElementPresent(Locator.lkButton("Start Job"));
 
         log("Check that background run works");
 
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.clickManageGroup("Users");
-        setFormElement(Locator.name("names"), R_USER);
-        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
-        clickButton("Update Group Membership");
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions("Users", "Editor");
-        _permissionsHelper.exitPermissionsUI();
-
+        _userHelper.createUser(R_USER);
+        _apiPermissionsHelper.addUserToProjGroup(R_USER, getProjectName(), "Users");
+        _apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, getProjectName());
 
         //create R report with dev
         impersonate(R_USER);
@@ -440,12 +466,7 @@ public class DataReportsTest extends ReportTest
         popLocation();
         log("Change user permission");
         stopImpersonating();
-        clickProject(getProjectName());
-        if (isTextPresent("Enable Admin"))
-            clickAndWait(Locator.linkWithText("Enable Admin"));
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions("Users", "Project Administrator");
-        _permissionsHelper.exitPermissionsUI();
+        _apiPermissionsHelper.addMemberToRole("Users", "Project Administrator", PermissionsHelper.MemberType.group, getProjectName());
 
         log("Create a new R script that uses other R scripts");
         navigateToFolder(getProjectName(), getFolderName());
@@ -458,8 +479,7 @@ public class DataReportsTest extends ReportTest
         saveReport(R_SCRIPTS[2]);
 
         log("Test editing R scripts");
-        signOut();
-        signIn();
+        signIn(); // Reset session to make sure R report isn't cached
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
@@ -468,11 +488,18 @@ public class DataReportsTest extends ReportTest
         log("Check that edit worked");
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[1]);
-
         waitAndClick(Locator.lkButton("Start Job"));
+
         WebElement pipelineLink = waitForElement(Locator.linkWithText("click here"));
         waitForElement(Locator.byClass("x4-window").containing("Start Pipeline Job").hidden());
         clickAndWait(pipelineLink);
+        if (TestProperties.isTrialServer())
+        {
+            // Issue 41205: Unable to run R report as a pipeline job on trial instance
+            waitForPipelineJobsToComplete(2, true);
+            checkExpectedErrors(2); // Pipeline errors
+            return; // done
+        }
         waitForPipelineJobsToComplete(2, false);
         // go back to the report and confirm it is visible
         clickReportGridLink(R_SCRIPTS[1]);
@@ -480,7 +507,7 @@ public class DataReportsTest extends ReportTest
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
 
-        // TODO: 36040: Unable to download PDF for R report run as pipeline job
+        // TODO: Issue 36040: Unable to download PDF for R report run as pipeline job
         // verifyReportPdfDownload("study", 4500d);
     }
 
@@ -521,7 +548,7 @@ public class DataReportsTest extends ReportTest
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
         DataRegionTable.DataRegion(getDriver()).find().goToReport( reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
-        clickSourceTab();
+        _rReportHelper.clickSourceTab();
         _rReportHelper.clearOption(RReportHelper.ReportOption.showSourceTab);
         resaveReport();
 
@@ -570,7 +597,7 @@ public class DataReportsTest extends ReportTest
     @LogMethod
     private void saveReport(String name)
     {
-        clickSourceTab();
+        _rReportHelper.clickSourceTab();
         waitForElement(Locator.tagWithText("span","Save"));
         _rReportHelper.saveReport(name);
     }
@@ -579,26 +606,5 @@ public class DataReportsTest extends ReportTest
     {
         doAndWaitForPageToLoad(() -> saveReport(null));
         _ext4Helper.waitForMaskToDisappear();
-    }
-
-    private void clickViewTab()
-    {
-        clickDesignerTab("View");
-    }
-
-    private void clickReportTab()
-    {
-        clickDesignerTab("Report");
-    }
-
-    private void clickSourceTab()
-    {
-        clickDesignerTab("Source");
-    }
-
-    private void clickDesignerTab(String name)
-    {
-        waitAndClick(Ext4Helper.Locators.tab(name));
-        sleep(2000); // TODO
     }
 }

@@ -4,7 +4,7 @@ import org.labkey.gradle.util.BuildUtils;
 apply plugin: 'java'
 
 dependencies {
-  BuildUtils.addLabKeyDependency(project: project, config: "implementation", depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle))
+  BuildUtils.addLabKeyDependency(project: project, config: "implementation", depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle), depVersion: project.labkeyClientApiVersion)
 }
 
 sourceSets {
@@ -21,7 +21,7 @@ project.task('validatorJar',
         description: "Builds jar for assay validation",
         {
             from sourceSets.main.output
-            from { configurations.default.collect { it.isDirectory() ? it : zipTree(it) } }
+            from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             archiveFileName.set("validator.jar")
             destinationDirectory = project.projectDir
@@ -41,7 +41,7 @@ project.task('transformJar',
 
         {
             from sourceSets.main.output
-            from { configurations.default.collect { it.isDirectory() ? it : zipTree(it) } }
+            from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             archiveFileName.set("transform.jar")
             destinationDirectory = project.projectDir
@@ -60,7 +60,7 @@ project.task('transformWarningJar',
         description: "Builds jar for doing assay transform warnings",
         {
             from sourceSets.main.output
-            from { configurations.default.collect { it.isDirectory() ? it : zipTree(it) } }
+            from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             archiveFileName.set("transformWarning.jar")
             destinationDirectory = project.projectDir

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/Folder%201/Subfolder1/_hidden/begin.view by cnathe@labkey.com on Tue Oct 30 14:42:01 CDT 2012-->
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="Hidden Folder List" tableDbType="TABLE">
+    <columns>
+      <column columnName="Key">
+        <datatype>integer</datatype>
+        <columnTitle>Key</columnTitle>
+        <nullable>false</nullable>
+        <isHidden>true</isHidden>
+        <isKeyField>true</isKeyField>
+        <isAutoInc>true</isAutoInc>
+      </column>
+    </columns>
+    <pkColumnName>Key</pkColumnName>
+  </table>
+</tables>

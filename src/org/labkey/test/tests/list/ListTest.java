@@ -36,7 +36,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -165,6 +164,7 @@ public class ListTest extends BaseWebDriverTest
     private final File TSV_SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("list");
@@ -193,6 +193,7 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -701,7 +702,7 @@ public class ListTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(info)
                 .withColumns(cols);
-        DomainResponse createResponse = dgen.createList(createDefaultConnection(true), "key");
+        DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
         List<PropertyDescriptor> listFields = createResponse.getDomain().getFields();
         listFields.add(new FieldDefinition("volume", FieldDefinition.ColumnType.Decimal));
@@ -710,7 +711,7 @@ public class ListTest extends BaseWebDriverTest
         // now save with an extra field
         SaveDomainCommand saveCmd = new SaveDomainCommand(info.getSchema(), info.getTable());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(true), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
 
         // now verify
         assertEquals(listFields.size(), saveResponse.getDomain().getFields().size());
@@ -736,7 +737,7 @@ public class ListTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(info)
                 .withColumns(cols);
-        DomainResponse createResponse = dgen.createList(createDefaultConnection(true), "key");
+        DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
         List<PropertyDescriptor> listFields = createResponse.getDomain().getFields();
         listFields.removeIf(a-> a.getName().equals("removeMe"));
@@ -744,7 +745,7 @@ public class ListTest extends BaseWebDriverTest
 
         SaveDomainCommand saveCmd = new SaveDomainCommand(info.getSchema(), info.getTable());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(true), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
 
         checker().verifyFalse("'removeMe' field was not deleted.",
                 saveResponse.getDomain().getFields().stream()
@@ -764,13 +765,13 @@ public class ListTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(info)
                 .withColumns(cols);
-        DomainResponse createResponse = dgen.createList(createDefaultConnection(true), "key");
+        DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
         listDomain.setName("remoteAPIAfterRename");
 
         SaveDomainCommand saveCmd = new SaveDomainCommand(listDomain.getDomainId());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(true), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
 
         assertEquals("remoteAPIAfterRename", saveResponse.getDomain().getName());
     }
@@ -1037,21 +1038,26 @@ public class ListTest extends BaseWebDriverTest
     {
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
         String listName = "new";
-        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListColumnType.String, "Some new column"));
+        String origFieldName = "BarBar";
+        String newFieldName = "FooFoo";
+        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key", new ListColumn(origFieldName, origFieldName, ListColumnType.String, "first column"));
 
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
-        assertTextPresent("BarBar");
-        listDefinitionPage.setColumnName(1, "FooFoo");
-        listDefinitionPage.setColumnLabel(1, "FooFoo");
+        listDefinitionPage.getFieldsPanel()
+                .getField(origFieldName)
+                .setName(newFieldName)
+                .setLabel(newFieldName);
         listDefinitionPage.clickSave();
-        assertTextPresent("FooFoo");
-        assertTextNotPresent("BarBar");
+
+        assertTextPresent(newFieldName);
+        assertTextNotPresent(origFieldName);
 
         listDefinitionPage = _listHelper.goToEditDesign(listName);
-        ListColumn newCol = new ListColumn("BarBar", "BarBar", ListColumnType.String, "None");
+        ListColumn newCol = new ListColumn(origFieldName, origFieldName, ListColumnType.String, "second column");
         listDefinitionPage.addField(newCol);
         listDefinitionPage.clickSave();
-        assertTextBefore("FooFoo", "BarBar");
+
+        assertTextBefore(newFieldName, origFieldName);
     }
 
     @Test
@@ -1074,10 +1080,10 @@ public class ListTest extends BaseWebDriverTest
 
         // set phi levels
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
-        listDefinitionPage.setColumnPhiLevel("NotPhiColumn", PropertiesEditor.PhiSelectType.NotPHI);
-        listDefinitionPage.setColumnPhiLevel("LimitedPhiColumn", PropertiesEditor.PhiSelectType.Limited);
-        listDefinitionPage.setColumnPhiLevel("PhiColumn", PropertiesEditor.PhiSelectType.PHI);
-        listDefinitionPage.setColumnPhiLevel("RestrictedPhiColumn", PropertiesEditor.PhiSelectType.Restricted);
+        listDefinitionPage.setColumnPhiLevel("NotPhiColumn", FieldDefinition.PhiSelectType.NotPHI);
+        listDefinitionPage.setColumnPhiLevel("LimitedPhiColumn", FieldDefinition.PhiSelectType.Limited);
+        listDefinitionPage.setColumnPhiLevel("PhiColumn", FieldDefinition.PhiSelectType.PHI);
+        listDefinitionPage.setColumnPhiLevel("RestrictedPhiColumn", FieldDefinition.PhiSelectType.Restricted);
         listDefinitionPage.clickSave();
 
         goToProjectHome();
@@ -1182,9 +1188,11 @@ public class ListTest extends BaseWebDriverTest
                                col(descriptionCol, ListColumnType.String),
                                col(attachmentCol, ListColumnType.Attachment));
         // index on attachment column
-        _listHelper.goToEditDesign(listName)
-            .checkIndexFileAttachements(true)
-            .clickSave();
+        EditListDefinitionPage editListDefinitionPage = _listHelper.goToEditDesign(listName);
+        editListDefinitionPage.openAdvancedListSettings()
+                .setIndexFileAttachments(true)
+                .clickApply() // Advanced settings
+                .clickSave();
 
         // Insert data, upload attachment
         goToProjectHome();

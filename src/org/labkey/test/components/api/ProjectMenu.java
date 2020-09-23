@@ -206,6 +206,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         return _driver;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

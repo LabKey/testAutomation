@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
@@ -46,7 +46,7 @@ import static org.junit.Assert.assertEquals;
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter
  */
-@Category({BVT.class, Data.class})
+@Category({DailyB.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 18)
 public class FilterTest extends BaseWebDriverTest
 {
@@ -83,6 +83,7 @@ public class FilterTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
+    @Override
     protected String getProjectName()
     {
         return "FilterVerifyProject";
@@ -272,8 +273,8 @@ public class FilterTest extends BaseWebDriverTest
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
         issuesHelper.goToAdmin()
-                .setIssueAssignmentList("Site:Administrators")
-                .save();
+                .setAssignedTo("Site: Administrators")
+                .clickSave();
         IssuesTest.addLookupValues(this, "issues", "Type", Arrays.asList("typea", "typeb"));
 
         HashMap<String, String> projectIssue = new HashMap<>();
@@ -295,7 +296,7 @@ public class FilterTest extends BaseWebDriverTest
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
         issuesHelper.goToAdmin();
-        issuesHelper.setIssueAssignmentList("Site:Administrators");
+        issuesHelper.setIssueAssignmentList("Site: Administrators");
         clickButton("Save");
 
         clickProject(getProjectName());

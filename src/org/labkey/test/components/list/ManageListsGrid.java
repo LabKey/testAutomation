@@ -16,9 +16,14 @@
 package org.labkey.test.components.list;
 
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.list.BeginPage;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.ImportListArchivePage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
+
+import java.io.File;
+import java.util.List;
 
 public class ManageListsGrid extends DataRegionTable
 {
@@ -33,29 +38,39 @@ public class ManageListsGrid extends DataRegionTable
         return new ImportListArchivePage(getDriver());
     }
 
-    public LabKeyPage clickCreateList()
+    public EditListDefinitionPage clickCreateList()
     {
         clickHeaderButtonAndWait("Create New List");
-        return new LabKeyPage(getDriver());
+        return new EditListDefinitionPage(getDriver());
     }
 
-    public LabKeyPage exportSelectedLists()
+    public File exportSelectedLists()
     {
-        clickHeaderButtonAndWait("Export List Archive");
-        return new LabKeyPage(getDriver());
+        return getWrapper().doAndWaitForDownload(() ->
+            clickHeaderButton("Export List Archive"));
     }
 
-    public LabKeyPage deleteSelectedLists()
+    public BeginPage deleteSelectedLists()
     {
         deleteSelectedRows();
-        return new LabKeyPage(getDriver());
+        return new BeginPage(getDriver());
     }
 
-    public LabKeyPage viewListDesign(String listName)
+    public List<String> getListNames()
     {
+        return getColumnDataAsText("Name");
+    }
 
+    public DataRegionTable viewListData(String listName)
+    {
+        getWrapper().clickAndWait(link(getRowIndex("Name", listName), getColumnIndex("Name")));
+        return new DataRegionTable("query", getDriver());
+    }
+
+    public EditListDefinitionPage viewListDesign(String listName)
+    {
         getWrapper().clickAndWait(link(getRowIndex("Name", listName), 0));
-        return null;
+        return new EditListDefinitionPage(getDriver());
     }
 
     public LabKeyPage viewListHistory(String listName)

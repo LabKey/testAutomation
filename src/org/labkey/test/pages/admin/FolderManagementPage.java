@@ -149,7 +149,7 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
     }
 
     /**
-     * Is the &lt;li> element associated with this tabId marked as active?
+     * Is the &lt;li&gt; element associated with this tabId marked as active?
      */
     private boolean isActiveTab(String tabId)
     {
@@ -163,6 +163,7 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return new ReorderFoldersPage(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

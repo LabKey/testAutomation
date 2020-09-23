@@ -129,6 +129,7 @@ public class AssayResultsExportTest extends AbstractExportTest
         _assayHelper.importAssay(ASSAY_NAME, ASSAY_RUN_FILE, getProjectName());
     }
 
+    @Override
     protected void goToDataRegionPage()
     {
         clickProject(getProjectName());

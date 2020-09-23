@@ -48,20 +48,23 @@ public class ModeratorReviewPage extends LabKeyPage<ModeratorReviewPage.ElementC
     public ModeratorReviewPage review(String title, boolean approve)
     {
         elementCache()._dataRegionTable.checkCheckbox(elementCache()._dataRegionTable.getRowIndex("Title", title));
-        if (approve)
-        {
-            elementCache().approveButton.click();
-            assertAlertContains("approve");
-        }
-        else
-        {
-            elementCache().spamButton.click();
-            assertAlertContains("spam");
-        }
+        doAndWaitForPageToLoad(() -> {
+            if (approve)
+            {
+                elementCache().approveButton.click();
+                assertAlertContains("approve");
+            }
+            else
+            {
+                elementCache().spamButton.click();
+                assertAlertContains("spam");
+            }
+        });
 
         return new ModeratorReviewPage(getDriver());
     }
 
+    @Override
     protected ModeratorReviewPage.ElementCache newElementCache()
     {
         return new ModeratorReviewPage.ElementCache();

@@ -210,11 +210,13 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         clickButton("Update");
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("query");

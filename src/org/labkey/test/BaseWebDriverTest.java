@@ -84,6 +84,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -121,10 +122,10 @@ import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.logToServer;
-import static org.labkey.test.components.PropertiesEditor.PhiSelectType;
-import static org.labkey.test.components.PropertiesEditor.PhiSelectType.NotPHI;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
+import static org.labkey.test.params.FieldDefinition.PhiSelectType;
+import static org.labkey.test.params.FieldDefinition.PhiSelectType.NotPHI;
 
 /**
  * This class should be used as the base for all functional test classes
@@ -133,14 +134,16 @@ import static org.labkey.test.components.html.RadioButton.RadioButton;
  * Shared setup steps should be in a public static void method annotated with org.junit.BeforeClass
  * The name of the method is not important. The JUnit runner finds the method solely based on the BeforeClass annotation
  *
- * @BeforeClass
+ * <pre>
+ * &amp;BeforeClass
  * public static void setupProject() throws Exception
  * {
  *     MyTestClass initTest = (MyTestClass)getCurrentTest();
  *     initTest.doSetup(); // Perform shared setup steps here
  * }
+ *</pre>
  *
- * @{link org.junit.AfterClass} is also supported, but should not be used to perform any destructive cleanup or
+ * {@link org.junit.AfterClass} is also supported, but should not be used to perform any destructive cleanup or
  * navigation as it is executed before the base test class can perform its final checks -- link check, leak check, etc.
  * The doCleanup method should be overridden for initial and final project cleanup
  */
@@ -156,7 +159,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected static boolean _testFailed = false;
     protected static boolean _anyTestFailed = false;
     private final ArtifactCollector _artifactCollector;
-    private DeferredErrorCollector _errorCollector;
+    private final DeferredErrorCollector _errorCollector;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public final CustomizeView _customizeViewsHelper;
@@ -196,6 +199,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public BaseWebDriverTest()
     {
         _artifactCollector = new ArtifactCollector(this);
+        _errorCollector = new DeferredErrorCollector(_artifactCollector);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeView(this);
 
@@ -241,6 +245,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return getCurrentTest() != null ? getCurrentTest().getClass() : null;
     }
 
+    @Override
     public WebDriver getWrappedDriver()
     {
         return SingletonWebDriver.getInstance().getWebDriver();
@@ -286,10 +291,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public final DeferredErrorCollector checker()
     {
-        if (_errorCollector == null)
-        {
-            throw new IllegalStateException("Default error collector only available within '@Test' methods.");
-        }
         return _errorCollector;
     }
 
@@ -376,9 +377,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 try
                 {
-                    currentTest = (BaseWebDriverTest) description.getTestClass().newInstance();
+                    currentTest = (BaseWebDriverTest) description.getTestClass().getConstructor().newInstance();
                 }
-                catch (InstantiationException | IllegalAccessException e)
+                catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
                 {
                     currentTest = null; // Make sure previous instance is cleared
                     throw new RuntimeException(e);
@@ -401,6 +402,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void succeeded(Description description)
             {
+                getCurrentTest().checker().recordResults();
                 if (!_anyTestFailed)
                     getCurrentTest().doPostamble();
                 else
@@ -574,33 +576,37 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
+
+        // Only do this as part of test startup if we haven't already checked. Since we do this as the last
+        // step in the test, there's no reason to bother doing it again at the beginning of the next test
+        if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
+        {
+            checker().addRecordableErrorType(WebDriverException.class);
+            checker().withScreenshot("startupErrors").wrapAssertion(this::checkErrors);
+            checker().withScreenshot("startupLeaks").wrapAssertion(this::checkLeaks);
+            checker().resetErrorTypes();
+            _checkedLeaksAndErrors = true;
+        }
+
         setServerDebugLogging();
         setExperimentalFlags();
 
         // Start logging JS errors.
         resumeJsErrorChecker();
 
-        resetErrors();
         assertModulesAvailable(getAssociatedModules());
         deleteSiteWideTermsOfUsePage();
         try
         {
             enableEmailRecorder();
         }
-        catch (AssumptionViolatedException ignore) { } // Tests should, generally, enable dumbster if they need it
+        catch (AssumptionViolatedException | AssertionError ignore) { } // Tests should, generally, enable dumbster if they need it
         reenableMiniProfiler = disableMiniProfiler();
 
         if (isSystemMaintenanceDisabled())
         {
             // Disable scheduled system maintenance to prevent timeouts during nightly tests.
             disableMaintenance();
-        }
-
-        // Only do this as part of test startup if we haven't already checked. Since we do this as the last
-        // step in the test, there's no reason to bother doing it again at the beginning of the next test
-        if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
-        {
-            checkLeaksAndErrors();
         }
 
         cleanup(false);
@@ -667,7 +673,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (_testFailed)
                     resetErrors(); // Clear errors from a previously failed test
                 _testFailed = false;
-                _errorCollector = new DeferredErrorCollector(getArtifactCollector());
             }
 
             @Override
@@ -807,7 +812,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 if (isTestRunningOnTeamCity())
                 {
-                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "sampledata"));
                     getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"));
                     getArtifactCollector().dumpPipelineFiles();
                 }
@@ -935,6 +939,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 log("Unable to dump screenshots");
                 System.err.println(e.getMessage());
             }
+            // Reset errors before next test and make it easier to view server-side errors that may have happened during the test.
+            checker().withScreenshot("serverErrors").wrapAssertion(this::checkErrors);
         }
         finally
         {
@@ -987,7 +993,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (!isTestCleanupSkipped())
         {
-            goToHome();
             cleanup(true);
 
             if (getDownloadDir().exists())
@@ -1008,7 +1013,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
         {
-            checkLeaksAndErrors();
+            checkErrors();
+            checkLeaks();
         }
 
         if (reenableMiniProfiler)
@@ -1019,7 +1025,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private void waitForPendingRequests(int msWait)
     {
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
         MutableLong pendingRequestCount = new MutableLong(-1);
         waitFor(() -> {
             pendingRequestCount.setValue(getPendingRequestCount(connection));
@@ -1047,6 +1053,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private void cleanup(boolean afterTest)
     {
+        ensureSignedInAsPrimaryTestUser();
+
         if (!ClassUtils.getAllInterfaces(getClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
         {
             if (afterTest)
@@ -1069,6 +1077,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    @Override
     public void cleanup() throws Exception
     {
         try
@@ -1092,16 +1101,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static File getDownloadDir()
     {
         return SingletonWebDriver.getInstance().getDownloadDir();
-    }
-
-    @LogMethod
-    private void checkLeaksAndErrors()
-    {
-        if ( isGuestModeTest() )
-            return;
-        checkErrors();
-        checkLeaks();
-        _checkedLeaksAndErrors = true;
     }
 
     protected void checkLeaks()
@@ -1679,17 +1678,21 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _permissionsHelper.setUserPermissions(userName, permissions);
     }
 
-    public void createSiteDeveloper(String userEmail)
+    public ApiPermissionsHelper createSiteDeveloper(String userEmail)
     {
-        ensureAdminMode();
-        goToSiteDevelopers();
-
-        if (!isElementPresent(Locator.xpath("//input[@value='" + userEmail + "']")))
+        _userHelper.createUser(userEmail);
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        if (TestProperties.isPrimaryUserAppAdmin())
         {
-            setFormElement(Locator.name("names"), userEmail);
-            uncheckCheckbox(Locator.name("sendEmail"));
-            clickButton("Update Group Membership");
+            apiPermissionsHelper
+                .addMemberToRole(userEmail, "Trusted Analyst", PermissionsHelper.MemberType.user, "/");
         }
+        else
+        {
+            apiPermissionsHelper.addUserToSiteGroup(userEmail, "Developers");
+        }
+
+        return apiPermissionsHelper;
     }
 
     @Deprecated
@@ -1716,26 +1719,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
      */
     public void verifyCohortStatus(DataRegionTable table, String cohort, boolean enrolled)
     {
-        int row = getCohortRow(table, cohort);
+        int row = table.getRowIndex("Label", cohort);
         assertEquals("Enrollment state for cohort " + cohort, String.valueOf(enrolled).toLowerCase(), table.getDataAsText(row, "Enrolled").toLowerCase());
-    }
-
-    /**
-     * Used by CohortTest and StudyCohortExportTest
-     * Retrieves the row for the cohort matching the label passed in
-     */
-    public int getCohortRow(DataRegionTable cohortTable, String cohort)
-    {
-        int row;
-        for (row = 0; row < cohortTable.getDataRowCount(); row++)
-        {
-            String s = cohortTable.getDataAsText(row, "Label");
-            if (0 == s.compareToIgnoreCase(cohort))
-            {
-                break;
-            }
-        }
-        return row;
     }
 
     /**
@@ -1745,14 +1730,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void changeCohortStatus(DataRegionTable cohortTable, String cohort, boolean enroll)
     {
         // if the row does not exist then most likely the cohort passed in is incorrect
-        int rowIndex = getCohortRow(cohortTable, cohort);
-        cohortTable.clickEditRow(rowIndex);
-
-        if (!enroll)
-            uncheckCheckbox(Locator.name("quf_enrolled"));
-        else
-            checkCheckbox(Locator.name("quf_enrolled"));
-        clickButton("Submit");
+        int rowIndex = cohortTable.getRowIndex("Label", cohort);
+        cohortTable.updateRow(rowIndex, Map.of("enrolled", Boolean.toString(enroll)), true);
     }
 
     public void setExportPhi(PhiSelectType exportPhiLevel)
@@ -2321,8 +2300,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitFor(() -> isElementPresent(svgLoc), WAIT_FOR_JAVASCRIPT);
 
         String svgText = getText(svgLoc);
-        final String ignoredRaphaelText = "Created with Rapha\u00ebl 2.1.0";
-        svgText = svgText.replace(ignoredRaphaelText, "");
         svgText = svgText.trim();
         svgText = svgText.replaceAll("[\n]", "");
         return svgText;
@@ -2348,9 +2325,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private String prepareSvgText(String svgText)
     {
-        // Remove raphael credits to make this function work with Raphael and d3 renderers.
-        final String ignoredRaphaelText = "Created with Rapha\u00ebl 2.1.0";
-        svgText = svgText.replace(ignoredRaphaelText, "");
         svgText = svgText.trim();
 
         // Strip out all the whitespace to deal with different return of getText from svgs

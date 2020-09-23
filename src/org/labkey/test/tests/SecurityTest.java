@@ -27,6 +27,7 @@ import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
@@ -104,6 +105,7 @@ public class SecurityTest extends BaseWebDriverTest
         return false;
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -111,14 +113,17 @@ public class SecurityTest extends BaseWebDriverTest
         _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER);
 
         // Make sure the feature is turned off.
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
     }
 
     @Test
     public void testSteps() throws IOException
     {
-        enableEmailRecorder();
+        if (!TestProperties.isWithoutTestModules())
+        {
+            enableEmailRecorder();
+        }
 
         clonePermissionsTest();
         displayNameTest();
@@ -131,13 +136,16 @@ public class SecurityTest extends BaseWebDriverTest
             addRemoveSiteAdminTest();
         }
 
-        log("Check welcome emails [6 new users]");
-        goToModule("Dumbster");
+        if (!TestProperties.isWithoutTestModules())
+        {
+            log("Check welcome emails [6 new users]");
+            goToModule("Dumbster");
 
-        EmailRecordTable table = new EmailRecordTable(this);
-        assertEquals("Notification emails.", 12, table.getEmailCount());
-        // Once in the message itself, plus copies in the headers
-        assertTextPresent(": Welcome", 18);
+            EmailRecordTable table = new EmailRecordTable(this);
+            assertEquals("Notification emails.", 12, table.getEmailCount());
+            // Once in the message itself, plus copies in the headers
+            assertTextPresent(": Welcome", 18);
+        }
 
         if (!isQuickTest())
         {
@@ -259,7 +267,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         try
         {
-            Connection cn = createDefaultConnection(false);
+            Connection cn = createDefaultConnection();
             command.execute(cn, null);
         }
         catch (CommandException e)
@@ -450,21 +458,18 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void disableGuestAccountTest()
     {
-        Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", true);
+        ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(), "disableGuestAccount", true);
 
         goToHome();
         signOut();
 
         // Validate that the user is shown a login screen.
-        if(!isElementPresent(Locator.tagWithName("form", "login")))
-        {
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
-            Assert.fail("Should have seen the sign-in screen, it wasn't there.");
-        }
+        checker().withScreenshot("disableGuestAccountTest")
+                .verifyTrue("Should be on login page when guest account is disabled",
+                        isElementPresent(Locator.tagWithName("form", "login")));
 
         signIn();
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(), "disableGuestAccount", false);
     }
 
     @LogMethod
@@ -618,6 +623,7 @@ public class SecurityTest extends BaseWebDriverTest
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertFailureAuthenticationToken(xml);
 
+        // #40884 - Verify that while impersonating, token authentication still resolves to admin user
         impersonate(NORMAL_USER);
 
         beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
@@ -625,10 +631,10 @@ public class SecurityTest extends BaseWebDriverTest
         assertEquals("Redirected to wrong URL", homePageUrl, removeUrlParameters(getURL().toString()));
 
         email = getUrlParam("labkeyEmail", true);
-        assertEquals("Wrong email", NORMAL_USER, email);
+        assertEquals("Wrong email", userName, email);
         token = getUrlParam("labkeyToken", true);
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
-        assertSuccessAuthenticationToken(xml, token, email, 15);
+        assertSuccessAuthenticationToken(xml, token, email, 32783);
 
         // Back to the admin user
         stopImpersonating();
@@ -709,12 +715,10 @@ public class SecurityTest extends BaseWebDriverTest
 
         impersonate(SITE_ADMIN_USER);
         String siteAdminDisplayName = getDisplayName(); // Use when checking audit log, below
-        ensureAdminMode();
         goToAdminConsole();  // Site admin should be able to get to the admin console
         new UIUserHelper(this).deleteUsers(true, TO_BE_DELETED_USER);
         stopImpersonating();
 
-        ensureAdminMode();
         goToAdminConsole().clickAuditLog();
 
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "User events"));
@@ -800,7 +804,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertTextNotPresent("Choose a new password.");
 
         stopImpersonating();
-        DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection(true));
+        DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection());
     }
 
     @LogMethod

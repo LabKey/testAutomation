@@ -15,6 +15,8 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.time.DateUtils;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -26,6 +28,7 @@ import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -222,6 +225,11 @@ public class TestDataGenerator
                 return () -> randomFloat(0, 20);
             case "double":
                 return () -> randomDouble(0, 20);
+            case "boolean":
+                return () -> randomBoolean();
+            case "date":
+            case "datetime":
+                return () -> randomDateString(DateUtils.addWeeks(new Date(), -39), new Date());
             default:
                 throw new IllegalArgumentException("ColumnType " + columnType + " isn't implemented yet");
         }
@@ -263,14 +271,24 @@ public class TestDataGenerator
         return  min + r.nextDouble() * (max - min);
     }
 
+    public String randomDateString(Date min, Date max)
+    {
+        return randomDateString("yyyy-MM-dd HH:mm", min, max);
+    }
+
     /*
-    * simple way to get a dateformat:  (String)executeScript("return LABKEY.container.formats.dateTimeFormat");
-    * */
+     * simple way to get a dateformat:  (String)executeScript("return LABKEY.container.formats.dateTimeFormat");
+     * */
     public String randomDateString(String dateFormat, Date min, Date max)
     {
         long random = ThreadLocalRandom.current().nextLong(min.getTime(), max.getTime());
         Date date = new Date(random);
         return new SimpleDateFormat(dateFormat).format(date);
+    }
+
+    public boolean randomBoolean()
+    {
+        return ThreadLocalRandom.current().nextBoolean();
     }
 
     public String writeTsvContents()
@@ -355,14 +373,29 @@ public class TestDataGenerator
 
     public SelectRowsResponse getRowsFromServer(Connection cn) throws IOException, CommandException
     {
-        return getRowsFromServer(cn, null);
+        return getRowsFromServer(cn, null, null);
     }
 
     public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns) throws IOException, CommandException
     {
+        return getRowsFromServer(cn, intendedColumns, null);
+    }
+
+    public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns, @Nullable  List<Filter> filters) throws IOException, CommandException
+    {
         SelectRowsCommand cmd = new SelectRowsCommand(getSchema(), getQueryName());
+
+        if(filters != null)
+        {
+            for (Filter filter : filters)
+            {
+                cmd.addFilter(filter);
+            }
+        }
+
         if (intendedColumns!=null)
             cmd.setColumns(intendedColumns);
+
         return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
@@ -399,16 +432,78 @@ public class TestDataGenerator
     {
         Connection connection = WebTestHelper.getRemoteApiConnection();
 
-        CreateDomainCommand createSampleSetCommand = def.getCreateCommand();
+        CreateDomainCommand createSampleTypeCommand = def.getCreateCommand();
         try
         {
-            CommandResponse response = createSampleSetCommand.execute(connection, containerPath);
+            createSampleTypeCommand.execute(connection, containerPath);
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Failed to create domain", e);
+            throw new RuntimeException("Failed to create domain.", e);
         }
 
         return def.getTestDataGenerator(containerPath);
     }
+
+    /**
+     * Delete a domain.
+     *
+     * @param containerPath Container where the domain exists.
+     * @param schema The schema of the domain. For example for sample types it would be 'exp.data'.
+     * @param queryName The name of the query to delete. For example for a sample type it would be its name.
+     * @return The command response after executing the delete. Calling function would need to validate the response.
+     * @throws CommandException Thrown if there is some kind of exception deleting the domain.
+     */
+    public static CommandResponse deleteDomain(final String containerPath, final String schema,
+                                                 final String queryName)
+            throws CommandException
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        DropDomainCommand delCmd = new DropDomainCommand(schema, queryName);
+
+        try
+        {
+            return delCmd.execute(connection, containerPath);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to delete domain.", e);
+        }
+
+    }
+
+    /**
+     * Check to see if a domain exists.
+     *
+     * @param containerPath The container to look for the domain/query.
+     * @param schema The schema of the domain. For example for sample types it would be 'exp.data'.
+     * @param queryName The name of the query to look for. For example for a sample type it would be its name.
+     * @return True if it exists in the given container false otherwise.
+     * @throws IOException Thrown if there is an issue while looking for the domain.
+     */
+    public static boolean doesDomainExists(final String containerPath, final String schema,
+                                                final String queryName)
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        GetDomainCommand cmd = new GetDomainCommand(schema, queryName);
+        try
+        {
+            DomainResponse response = cmd.execute(connection, containerPath);
+            return true;
+        }
+        catch (CommandException ce)
+        {
+            if(ce.getStatusCode() == 404)
+            {
+                return false;
+            }
+            throw new RuntimeException("Exception while looking for domain.", ce);
+        }
+        catch (IOException ioe)
+        {
+            throw new RuntimeException("IO exception while looking for the domain.", ioe);
+        }
+
+    }
+
 }

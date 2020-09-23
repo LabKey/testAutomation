@@ -35,7 +35,7 @@ import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.junit.Assert;
-import org.junit.AssumptionViolatedException;
+import org.junit.Assume;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -110,6 +110,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public boolean isGuestModeTest()
     {
         return false;
+    }
+
+    protected void assumeTestModules()
+    {
+        Assume.assumeFalse("Test modules are needed but not installed. Skipping test.",
+            TestProperties.isWithoutTestModules());
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -225,7 +231,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         try
         {
             SimpleHttpResponse response = logOutRequest.getResponse();
-            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+            if (HttpStatus.SC_OK != response.getResponseCode() && HttpStatus.SC_UNAUTHORIZED != response.getResponseCode())
+            {
+                fail("Failed to stop impersonating. " + response.getResponseCode());
+            }
         }
         catch (IOException e)
         {
@@ -236,23 +245,19 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     public void ensureSignedInAsPrimaryTestUser()
     {
-        if (!onLabKeyPage() || isOnServerErrorPage())
-            goToHome();
-        if (isImpersonating())
-        {
-            if (!onLabKeyClassicPage()) // Single-page apps don't have impersonation capabilities
-            {
-                goToHome();
-            }
-            stopImpersonating(false);
-        }
+        boolean wasImpersonating = isImpersonating(); // To make sure browser isn't in an apparent impersonation state
+        stopImpersonatingHTTP();
         if (!isSignedInAsPrimaryTestUser())
         {
             if (isSignedIn())
-                signOut();
+                signOutHTTP();
             simpleSignIn();
         }
-        WebTestHelper.saveSession(PasswordUtil.getUsername(), getDriver());
+        else if (wasImpersonating || !onLabKeyPage() || isOnServerErrorPage())
+        {
+            goToHome();
+        }
+        WebTestHelper.saveSession(getCurrentUser(), getDriver()); // In case a test signed in without using a helper
     }
 
     @LogMethod
@@ -274,7 +279,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             clickAndWait(Locator.input("TestSecondary"));
 
             // delete the current secondaryAuth configuration
-            deleteAuthenticationConfiguration(configId, createDefaultConnection(true));
+            deleteAuthenticationConfiguration(configId, createDefaultConnection());
         }
         catch (NoSuchElementException ignored)
         {
@@ -324,14 +329,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         simpleSignOut();
         checkForUpgrade();
         simpleSignIn();
-        ensureAdminMode();
+        assertEquals("Signed in as wrong user.", PasswordUtil.getUsername(), getCurrentUser());
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
     public void signIn(String email, String password)
     {
         attemptSignIn(email, password);
-        waitForElementToDisappear(Locator.lkButton("Sign In"));
         Assert.assertEquals("Logged in as wrong user", email, getCurrentUser());
         WebTestHelper.saveSession(email, getDriver());
     }
@@ -359,7 +363,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertElementPresent(Locator.tagWithName("form", "login"));
         setFormElement(Locator.id("email"), email);
         setFormElement(Locator.id("password"), password);
-        clickButton("Sign In", 0);
+        WebElement signInButton = Locator.lkButton("Sign In").findElement(getDriver());
+        signInButton.click();
+        shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));
+        shortWait().until(ExpectedConditions.or(
+                ExpectedConditions.stalenessOf(signInButton), // Successful login
+                ExpectedConditions.presenceOfElementLocated(Locators.labkeyError.withText()))); // Error during sign-in
     }
 
     public void signInShouldFail(String email, String password, String... expectedMessages)
@@ -388,15 +397,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected String getPasswordResetUrl(String username)
     {
-        goToHome();
-        goToModule("Dumbster");
-        String emailSubject = "Reset Password Notification";
+        beginAt(WebTestHelper.buildURL("security", "showResetEmail", Map.of("email", username)));
 
-        EmailRecordTable emailRecordTable = new EmailRecordTable(getDriver());
-        WebElement email = Locator.xpath("//td[text() = '" + username + "']/..//a[starts-with(text(), '" + emailSubject + "')]").findElement(emailRecordTable);
-        email.click();
-
-        WebElement resetLink = Locator.xpath("//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]").findElement(emailRecordTable);
+        WebElement resetLink = Locator.xpath("//a[contains(@href, 'setPassword.view')]").findElement(getDriver());
         shortWait().until(ExpectedConditions.elementToBeClickable(resetLink));
         return resetLink.getText();
     }
@@ -466,6 +469,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
+    /**
+     * @deprecated This method is mostly unnecessary and the end state is
+     * inconsistent. It may or may not navigate and may or may not stop
+     * impersonating.
+     */
+    @Deprecated
     public void ensureAdminMode()
     {
         if (!onLabKeyPage())
@@ -835,8 +844,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 EntityUtils.consume(response.getEntity());
 
                 List<NameValuePair> logoutParams = new ArrayList<>();
-                Optional<Cookie> csrfToken = httpContext.getCookieStore().getCookies().stream().filter(c -> c.getName().equals("X-LABKEY-CSRF")).findAny();
-                csrfToken.ifPresent(cookie -> logoutParams.add(new BasicNameValuePair("X-LABKEY-CSRF", cookie.getValue())));
+                Optional<Cookie> csrfToken = httpContext.getCookieStore().getCookies().stream().filter(c -> c.getName().equals(Connection.X_LABKEY_CSRF)).findAny();
+                csrfToken.ifPresent(cookie -> logoutParams.add(new BasicNameValuePair(Connection.X_LABKEY_CSRF, cookie.getValue())));
                 // Logout to verify redirect
                 HttpPost logoutMethod = new HttpPost(getBaseURL() + "/login/logout.view");
                 logoutMethod.setEntity(new UrlEncodedFormEntity(logoutParams));
@@ -986,9 +995,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         goToProjectSettings();
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.LabKeySiteWrapper#goToAdminConsole}
+     */
+    @Deprecated (forRemoval = true)
     public void goToAdmin()
     {
-        beginAt("/admin/showAdmin.view");
+        goToAdminConsole();
     }
 
     public UserDetailsPage goToMyAccount()
@@ -1003,6 +1016,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return new PipelineStatusTable(this);
     }
 
+    public void goToExternalToolPage()
+    {
+        clickUserMenuItem("External Tool Access");
+    }
+
     protected WebElement openMenu(String menuText)
     {
         WebElement menu = Locator.menuBarItem(menuText).findElement(getDriver());
@@ -1010,18 +1028,60 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return menu;
     }
 
-    // enable/disable the flags specified by the test properties
-    @LogMethod()
-    public void setExperimentalFlags()
+    private static Map<String, Boolean> _originalFeatureFlags = new HashMap<>();
+
+    /**
+     * Enable/disable the experimental features specified by the test properties. Intended for use by base tests only.
+     * Currently only {@link BaseWebDriverTest}.
+     */
+    protected void setExperimentalFlags()
     {
-        Map<String, Boolean> flagsToSet = TestProperties.getExperimentalFeatures();
-        ExperimentalFeaturesHelper.setFeatures(this, flagsToSet);
+        Map<String, Boolean> flags = TestProperties.getExperimentalFeatures();
+
+        if (flags.isEmpty())
+            return;
+
+        TestLogger.log("Setting experimental flags for duration of the test:");
+        TestLogger.increaseIndent();
+
+        Connection cn = createDefaultConnection();
+        for (Map.Entry<String, Boolean> flag : flags.entrySet())
+        {
+            String feature = flag.getKey();
+            Boolean value = flag.getValue();
+            Boolean previouslyEnabled = ExperimentalFeaturesHelper.setExperimentalFeature(cn, feature, value);
+
+            // When setting a feature flag the first time, remember the previous setting
+            if (!_originalFeatureFlags.containsKey(feature))
+            {
+                _originalFeatureFlags.put(feature, previouslyEnabled.booleanValue());
+            }
+        }
+        TestLogger.decreaseIndent();
     }
 
-    @LogMethod()
-    public void resetExperimentalFlags()
+    /**
+     * Reset the experimental features specified by the test properties. Intended for use by base tests only.
+     * Currently only {@link BaseWebDriverTest}.
+     */
+    protected void resetExperimentalFlags()
     {
-        ExperimentalFeaturesHelper.resetFeatures(this);
+        if (_originalFeatureFlags.isEmpty() || TestProperties.isTestRunningOnTeamCity())
+        {
+            return;
+        }
+
+        TestLogger.log("Resetting experimental flags to their original value:");
+
+        TestLogger.increaseIndent();
+        Connection cn = createDefaultConnection();
+        for (Map.Entry<String, Boolean> features : _originalFeatureFlags.entrySet())
+        {
+            ExperimentalFeaturesHelper.setExperimentalFeature(cn, features.getKey(), features.getValue());
+        }
+        TestLogger.decreaseIndent();
+
+        _originalFeatureFlags = new HashMap<>();
     }
 
     @LogMethod(quiet = true)
@@ -1036,7 +1096,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public boolean isMiniProfilerEnabled()
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         Command command = new Command("mini-profiler", "isEnabled");
         try
         {
@@ -1063,7 +1123,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     public void setMiniProfilerEnabled(boolean enabled)
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         PostCommand setEnabled = new PostCommand("mini-profiler", "enable");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("enabled", enabled);
@@ -1087,27 +1147,20 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void enableEmailRecorder()
     {
+        assumeTestModules();
         int responseCode = getHttpResponse(buildURL("dumbster", "setRecordEmail", Maps.of("record", "true")), "POST").getResponseCode();
-        skipTestForMissingDumbster(responseCode);
         assertEquals("Failed to enable email recording", HttpStatus.SC_OK, responseCode);
-    }
-
-    protected void skipTestForMissingDumbster(int responseCode)
-    {
-        if (responseCode == HttpStatus.SC_NOT_FOUND && TestProperties.isIgnoreMissingModules())
-            throw new AssumptionViolatedException("Skipping test. Dumbster module is not installed");
     }
 
     public EmailRecordTable goToEmailRecord()
     {
         beginAt(buildURL("dumbster", "begin"));
-        skipTestForMissingDumbster(getResponseCode());
         return new EmailRecordTable(getDriver());
     }
 
     public void setAuthenticationProvider(String provider, boolean enabled)
     {
-        setAuthenticationProvider(provider, enabled, createDefaultConnection(true));
+        setAuthenticationProvider(provider, enabled, createDefaultConnection());
     }
 
     @LogMethod(quiet = true)
@@ -1177,7 +1230,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
-     * @deprecated Use {@link #projectMenu().open()}
+     * @deprecated Use {@link org.labkey.test.components.api.ProjectMenu#open}
      */
     @Deprecated
     public void openProjectMenu()
@@ -1312,7 +1365,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters)
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(containerFilter);

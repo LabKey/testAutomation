@@ -73,7 +73,8 @@ public class DataRegionTest extends AbstractQWPTest
                     Pair.of("Show All Rows", "testShowAllTotalRows"),
                     Pair.of("Use getBaseFilters", "testGetBaseFilters"),
                     Pair.of("Filter on \"Sort\" column", "testFilterOnSortColumn"),
-                    Pair.of("Use onRender via ButtonBarOptions", "testButtonBarConfig")
+                    Pair.of("Use onRender via ButtonBarOptions", "testButtonBarConfig"),
+                    Pair.of("Exclude \"skipPrefixes\"", "testRespectExcludingPrefixes")
                     );
 
     static
@@ -111,6 +112,7 @@ public class DataRegionTest extends AbstractQWPTest
         TOTAL_ROWS = map.size();
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return null;

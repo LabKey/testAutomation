@@ -28,14 +28,15 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelScatterPlot;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.SaveChartDialog;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.pages.DatasetPropertiesPage;
-import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.pages.ViewDatasetDataPage;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -77,6 +78,7 @@ public class ScatterPlotTest extends GenericChartsTest
         return true;
     }
 
+    @Override
     @LogMethod
     protected void testPlots()
     {
@@ -132,26 +134,25 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Submit");
 
         log("Go and edit the column definition to be a measure");
-        EditDatasetDefinitionPage editDatasetDefinitionPage = new ViewDatasetDataPage(getDriver())
+        DatasetDesignerPage datasetDesignerPage = new ViewDatasetDataPage(getDriver())
                 .clickManageDataset()
                 .clickEditDefinition();
 
-        final PropertiesEditor datasetFieldsPanel = editDatasetDefinitionPage.getFieldsEditor();
-        waitForElement(Locator.lkButton("Export Fields"));
+        final DomainFormPanel datasetFieldsPanel = datasetDesignerPage.getFieldsPanel();
 
         log("Select the HEENT field");
-        datasetFieldsPanel.selectField(APXHEENT);
+        DomainFieldRow  apxField = datasetFieldsPanel.getField(APXHEENT);
 
         log("Change the column's reporting status to 'measure'");
-        datasetFieldsPanel.fieldProperties().selectReportingTab().setMeasure(true);
+        apxField.setMeasure(true);
 
-        log("click on the 'Pulse' field");
-        datasetFieldsPanel.selectField(APXPULSE);
+        log("get the 'Pulse' field");
+        DomainFieldRow pulseField = datasetFieldsPanel.getField(APXPULSE);
 
         log("Change the column's reporting status to 'dimension'");
-        datasetFieldsPanel.fieldProperties().selectReportingTab().setDimension(true);
+        pulseField.setDimension(true);
+        datasetDesignerPage.clickSave();
 
-        clickAndWait(Locator.linkWithSpan("Save"));
         waitForText("APX-1: Abbreviated Physical Exam Dataset Properties");
 
         navigateToFolder(getProjectName(), getFolderName());
@@ -515,31 +516,26 @@ public class ScatterPlotTest extends GenericChartsTest
         final String FIELDS_REGION_TITLE = "Dataset Fields";
 
         ChartTypeDialog chartTypeDialog;
-        List<String> listOfMeasureLabels;
         int listIndex;
 
         log("Remove color and shape measures.");
         navigateToFolder(getProjectName(), getFolderName());
 
-        EditDatasetDefinitionPage editDatasetPage = _studyHelper.goToManageDatasets()
+        DatasetDesignerPage editDatasetPage = _studyHelper.goToManageDatasets()
                 .selectDatasetByName("APX-1")
                 .clickEditDefinition();
 
-        waitForText(FIELDS_REGION_TITLE);
-        PropertiesEditor propertiesEditor = editDatasetPage.getFieldsEditor();
+        DomainFormPanel domainFormPanel = editDatasetPage.getFieldsPanel();
 
-        listOfMeasureLabels = getLabels(FIELDS_REGION_TITLE);
         log("Remove color measure.");
-        listIndex = listOfMeasureLabels.indexOf(MEASURE_7_NECK);
-        propertiesEditor.selectField(listIndex)
-                .markForDeletion();
+        domainFormPanel.getField("APXneck")
+                .clickRemoveField(true);
 
         log("Remove shape measure.");
-        listIndex = listOfMeasureLabels.indexOf(MEASURE_16_EVAL_SUM);
-        propertiesEditor.selectField(listIndex)
-                .markForDeletion();
+        domainFormPanel.getField("APXcemh")
+                .clickRemoveField(true);
 
-        editDatasetPage.save();
+        editDatasetPage.clickSave();
 
         log("Verify proper error messages for removed measures.");
         PortalTab.find("Clinical and Assay Data", getDriver()).activate();
@@ -568,12 +564,9 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Manage", WAIT_FOR_PAGE);
         editDatasetPage = new DatasetPropertiesPage(getDriver()).clickEditDefinition();
 
-        waitForText(FIELDS_REGION_TITLE);
-        listOfMeasureLabels = getLabels(FIELDS_REGION_TITLE);
         log("Remove x-axis measure.");
-        listIndex = listOfMeasureLabels.indexOf(MEASURE_FORM_LANGUAGE);
-        editDatasetPage.getFieldsEditor().selectField(listIndex).markForDeletion();
-        editDatasetPage.save();
+        editDatasetPage.getFieldsPanel().getField("formlang").clickRemoveField(true);
+        editDatasetPage.clickSave();
 
         log("Verify missing measure error message.");
         clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));

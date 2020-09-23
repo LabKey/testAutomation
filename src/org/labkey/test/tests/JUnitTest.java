@@ -34,13 +34,16 @@ import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.UnitTests;
+import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.LogMethod;
@@ -103,9 +106,12 @@ public class JUnitTest extends TestSuite
 
     public static class JUnitSeleniumHelper extends BaseWebDriverTest
     {
+        @Override
         protected String getProjectName() {return null;}
+        @Override
         protected void doCleanup(boolean afterTest) throws TestTimeoutException
         { }
+        @Override
         public List<String> getAssociatedModules() { return null; }
 
         @Override public BrowserType bestBrowser() {return BrowserType.CHROME;}
@@ -172,6 +178,11 @@ public class JUnitTest extends TestSuite
 
     private static TestSuite _suite(Predicate<Map<String,Object>> accept, final int attempt, final int upgradeAttempts) throws Exception
     {
+        if (TestProperties.isPrimaryUserAppAdmin())
+        {
+            return new TestSuite(); // server-side tests require site admin
+        }
+
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
         try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
@@ -331,11 +342,11 @@ public class JUnitTest extends TestSuite
             long startTime = System.currentTimeMillis();
             try
             {
-                Command command = new Command("junit", "go");
+                Command<CommandResponse> command = new PostCommand<>("junit", "go");
                 Map<String, Object> params = new HashMap<>();
                 params.put("testCase", _remoteClass);
                 command.setParameters(params);
-                command.setTimeout(_timeout * 1000 * 2);
+                command.setTimeout(_timeout * 1000);
 
                 CommandResponse response = command.execute(connection, "/");
                 Map<String, Object> resultJson = response.getParsedData();
@@ -353,6 +364,7 @@ public class JUnitTest extends TestSuite
             {
                 String timed_out = getLogTestString("timed out", startTime);
                 err(timed_out);
+                ArtifactCollector.dumpThreads();
                 throw new RuntimeException(timed_out, ste);
             }
             catch (IOException ioe)
@@ -368,7 +380,6 @@ public class JUnitTest extends TestSuite
                 err(dump(ce.getResponseText(), false));
                 fail(("remote junit failed (HTTP status code " + ce.getStatusCode() + "): " + _remoteClass) + "\n" + dump(ce.getResponseText(), true));
             }
-
         }
 
         private String getLogTestString(String message, long startTime)

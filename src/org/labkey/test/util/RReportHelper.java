@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -28,7 +29,6 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -38,7 +38,6 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
@@ -76,15 +75,15 @@ public class RReportHelper
 
     private static File rExecutable = null;
     private static File rScriptExecutable = null;
+    private static String defaultEngineVersion = null;
 
     private static final String localEngineName = "R Scripting Engine";
     public static final String R_DOCKER_SCRIPTING_ENGINE = "R Docker Scripting Engine";
     private static final String REMOTE_R_SERVE ="Remote R Scripting Engine";
 
     private static final String INSTALL_RLABKEY = "install.packages(\"Rlabkey\", repos=\"http://cran.r-project.org\")";
-    private static final String INSTALL_LOCAL_RLABKEY = "install.packages(\"%s\", repos=NULL)";
 
-    public File getRLibraryPath()
+    public static File getRLibraryPath()
     {
         String libPath = System.getenv("R_LIBS_USER");
         if (libPath != null)
@@ -111,11 +110,10 @@ public class RReportHelper
     public boolean executeScript(String script, String expectedLines, boolean failOnError)
     {
         // running a saved script
-        _test.waitAndClick(Ext4Helper.Locators.tab("Source"));
+        clickSourceTab();
 
         _test.setCodeEditorValue("script-report-editor", script);
-        _test._ext4Helper.clickTabContainingText("Report");
-        _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 5);
+        clickReportTab();
 
         String html = getReportText();
 
@@ -181,33 +179,6 @@ public class RReportHelper
         return false;
     }
 
-    /**
-     * Installs the latest version of the Rlabkey package that is either built or checked into the ../remoteapi/r/latest
-     * directory. In order to install any dependent packages: (httr, rjson), an installation from the CRAN repository
-     * is performed first, then if the local flag has been set, the local package is installed over the top.
-     */
-    @LogMethod
-    public void installRlabkey(boolean local)
-    {
-        if (executeScript(INSTALL_RLABKEY, null, true))
-        {
-            if (local)
-            {
-                File rPackage = new File(getRLibraryPath(), "Rlabkey.zip");
-
-                if (!rPackage.exists())
-                    fail("Unable to locate the local Rlabkey package: " + rPackage.getName());
-
-                String cmd = String.format(INSTALL_LOCAL_RLABKEY, rPackage.getAbsolutePath());
-                cmd = cmd.replaceAll("\\\\", "/");
-                if (!executeScript(cmd, null, true))
-                    fail("Unable to install the local Rlabkey package.");
-            }
-        }
-        else
-            fail("Unable to install the base Rlabkey package and dependencies.");
-    }
-
     public String ensureRConfig()
     {
         return ensureRConfig(false);
@@ -221,9 +192,26 @@ public class RReportHelper
     @LogMethod
     public String ensureRConfig(boolean useDocker)
     {
-        _test.ensureAdminMode();
-
         ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
+
+        if (TestProperties.isServerRemote() || TestProperties.isPrimaryUserAppAdmin())
+        {
+            String reason = "Unable to configure script engines " + (TestProperties.isServerRemote()
+                ? "on remote server."
+                : "as app admin.");
+            Assert.assertTrue("R engine not present. " + reason,
+                scripts.isEnginePresentForLanguage("R"));
+            TestLogger.log(reason + " Using existing engine.");
+            if (defaultEngineVersion == null)
+            {
+                ConfigureReportsAndScriptsPage.EditEngineWindow editEngineWindow =
+                    scripts.editDefaultEngine("R");
+                defaultEngineVersion = editEngineWindow.getLanguageVersion();
+                _test.getArtifactCollector().dumpPageSnapshot("R_engine_config", null);
+            }
+            TestLogger.log("R engine version: " + defaultEngineVersion);
+            return defaultEngineVersion;
+        }
 
         _test.log("Check if R already is configured");
 
@@ -351,12 +339,12 @@ public class RReportHelper
 
     public void setPandocEnabled(Boolean enabled)
     {
-        _test.goToProjectHome();
-        _test.ensureAdminMode();
-
-        _test.log("Check if R already is configured");
-        _test.goToAdminConsole().clickViewsAndScripting();
-        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
+        if (TestProperties.isPrimaryUserAppAdmin())
+        {
+            TestLogger.warn("Test is running as app admin. Unable to modify R engine.");
+            return;
+        }
+        ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
         String defaultScriptName = "R Scripting Engine";
         assertTrue("R Engine not setup", scripts.isEnginePresentForLanguage("R"));
@@ -636,27 +624,5 @@ public class RReportHelper
 
 
         return reportDiv;
-    }
-
-    /**
-     * @deprecated Remove once RStudio branch is merged (May 2018)
-     */
-    @Deprecated
-    public boolean isReportSourceLineCountMatch(int expectedLineCount)
-    {
-        Locator lastLineLoc = Locator.css(".CodeMirror-code > div:last-of-type .CodeMirror-linenumber");
-        WebElement lastLine = lastLineLoc.findElement(_test.getDriver());
-        int lineCount = Integer.parseInt(lastLine.getText());
-
-        if (lineCount < expectedLineCount)
-        {
-            WebElement codeEditorDiv = Locator.css(".CodeMirror-scroll").findElement(_test.getDriver());
-            _test.executeScript("arguments[0].scrollTop = arguments[0].scrollHeight;", codeEditorDiv);
-            _test.shortWait().until(ExpectedConditions.stalenessOf(lastLine));
-            lastLine = lastLineLoc.findElement(_test.getDriver());
-            lineCount = Integer.parseInt(lastLine.getText());
-        }
-
-        return lineCount == expectedLineCount;
     }
 }

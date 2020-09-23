@@ -27,6 +27,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -402,7 +403,7 @@ public class DataViewsTest extends ParticipantListTest
 
         //capture the categories and subcategories via Java api
         GetCategoriesCommand cmd = new GetCategoriesCommand();
-        Connection conn = this.createDefaultConnection(false);
+        Connection conn = this.createDefaultConnection();
         GetCategoriesResponse response = cmd.execute(conn, getProjectName() + "/" + getFolderName());
         log("Categories present in query response:");
         for ( org.labkey.remoteapi.reports.Category cat : response.getCategoryList())
@@ -640,12 +641,14 @@ public class DataViewsTest extends ParticipantListTest
     private void createDataset(@LoggedParam String name)
     {
         waitAndClickAndWait(Locator.linkWithText("Create New Dataset"));
-        setFormElement(Locator.xpath("//input[@name='typeName']"), name);
-        clickButton("Next");
-        waitForElement(Locator.xpath("//input[@id='name0-input']"));
-        setFormElement(Locator.xpath("//input[@id='name0-input']"), "XTest");
-        clickButton("Save");
-        clickButton("Manage Datasets");
+        DatasetDesignerPage datasetDesignerPage = new DatasetDesignerPage(getDriver())
+                .setName(name);
+        datasetDesignerPage
+                .getFieldsPanel()
+                .manuallyDefineFields("XTest");
+        datasetDesignerPage.clickSave()
+            .clickManageDatasets();
+
         assertElementPresent(Locator.linkWithText(name));
     }
 }

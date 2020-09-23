@@ -22,20 +22,16 @@ import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -56,15 +52,6 @@ public class ListHelper extends LabKeySiteWrapper
         this(() -> driver);
     }
 
-    private void enabledGwtListDesigner()
-    {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "experimental-gwtlistdesigner");
-    }
-    private void disableGwtListDesigner()
-    {
-        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "experimental-gwtlistdesigner");
-    }
-
     @Override
     public WebDriver getWrappedDriver()
     {
@@ -77,11 +64,6 @@ public class ListHelper extends LabKeySiteWrapper
         setFormElement(Locator.id("tsv3"), listData);
         _extHelper.selectComboBoxItem("Format:", "Comma-separated text (csv)");
         submitImportTsv_success();
-    }
-
-    public PropertiesEditor getListFieldEditor()
-    {
-        return PropertiesEditor.PropertiesEditor(getDriver()).withTitle("List Fields").find();
     }
 
     public void uploadData(String listData)
@@ -171,83 +153,11 @@ public class ListHelper extends LabKeySiteWrapper
         setRowData(data, validateText);
     }
 
-    @Deprecated // Temporary method for debugging list metadata problems
-    @LogMethod
-    public RuntimeException dumpListMetadataInfo(NoSuchElementException nse)
-    {
-        if (nse.getMessage().contains("quf_"))
-        {
-            Map<String, String> urlParameters = getUrlParameters();
-            String schemaName = urlParameters.get("schemaName");
-            String queryName = urlParameters.get("query.queryName");
-            if (schemaName == null || queryName == null)
-                throw nse;
-
-            String containerPath = getCurrentContainerPath();
-            String subdir = schemaName + " MetadataError";
-            ArtifactCollector artifactCollector = BaseWebDriverTest.getCurrentTest().getArtifactCollector();
-
-            artifactCollector.dumpPageSnapshot("insertPage", subdir, false);
-            if ("lists".equals(schemaName))
-            {
-                try
-                {
-                    WebElement cancelButton = Locator.lkButton("Cancel").findElement(getDriver());
-                    String cancelHref = cancelButton.getAttribute("href");
-                    int listId = Integer.parseInt(WebTestHelper.parseUrlQuery(new URL(cancelHref)).get("listId"));
-
-                    // list-editListDefinition.view?listId=11
-                    EditListDefinitionPage.beginAt(this, containerPath, listId);
-                    waitForElement(Locator.lkButton("Export Fields"));
-                    artifactCollector.dumpPageSnapshot("listDefinitionById", subdir, false);
-                }
-                catch (MalformedURLException | NumberFormatException | NoSuchElementException ignore) { }
-
-                // list-editListDefinition.view?name=People
-                EditListDefinitionPage.beginAt(this, containerPath, queryName);
-                waitForElement(Locator.lkButton("Export Fields"));
-                artifactCollector.dumpPageSnapshot("listDefinitionByName", subdir, false);
-            }
-            // query-begin.view?#sbh-qdp-%26lists%26People
-            beginAt(WebTestHelper.buildURL("query", containerPath, "begin") + "#sbh-qdp-%26" + schemaName + "%26" + queryName);
-            waitForAnyElement(Locator.linkWithText("view data"), Locator.byClass("lk-qd-error"));
-            artifactCollector.dumpPageSnapshot("schemaBrowser", subdir, false);
-
-            // query-metadataQuery.view?schemaName=lists&queryName=People
-            beginAt(WebTestHelper.buildURL("query", containerPath, "metadataQuery", Map.of("schemaName", schemaName, "queryName", queryName)));
-            artifactCollector.dumpPageSnapshot("metadataEditor", subdir, false);
-
-            // query-rawTableMetaData.view?schemaName=lists&query.queryName=People
-            beginAt(WebTestHelper.buildURL("query", containerPath, "rawTableMetaData", Map.of("schemaName", schemaName, "query.queryName", queryName)));
-            artifactCollector.dumpPageSnapshot("rawMetadata", subdir, false);
-
-            // Clear caches
-            TestLogger.log("Clear cache: " +
-                    WebTestHelper.getHttpResponse(WebTestHelper.buildURL("admin", "memTracker", Map.of("clearCaches", "1"))).getResponseCode());
-
-            // Check schema browser after clearing caches
-            beginAt(WebTestHelper.buildURL("query", containerPath, "begin") + "#sbh-qdp-%26" + schemaName + "%26" + queryName);
-            waitForAnyElement(Locator.linkWithText("view data"), Locator.byClass("lk-qd-error"));
-            artifactCollector.dumpPageSnapshot("schemaBrowserClearedCache", subdir, false);
-
-            return new RuntimeException("Detected possible metadata problem.", nse);
-        }
-        return nse;
-    }
-
     protected void setRowData(Map<String, ?> data, boolean validateText)
     {
         for (String key : data.keySet())
         {
-            WebElement field;
-            try
-            {
-                field = waitForElement(Locator.name("quf_" + key));
-            }
-            catch (NoSuchElementException nse)
-            {
-                throw dumpListMetadataInfo(nse);
-            }
+            WebElement field = waitForElement(Locator.name("quf_" + key));
             String inputType = field.getAttribute("type");
             Object value = data.get(key);
             if (value instanceof File)
@@ -328,7 +238,6 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod
     public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        disableGwtListDesigner();
         beginCreateListFromTab(tabName, listName);
         createListHelper(listKeyType, listKeyName, cols);
     }
@@ -336,7 +245,6 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod
     public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        disableGwtListDesigner();
         beginCreateList(containerPath, listName);
         createListHelper(listKeyType, listKeyName, cols);
     }
@@ -350,11 +258,6 @@ public class ListHelper extends LabKeySiteWrapper
             fieldsPanel.addField(col);
         }
         listDefinitionPage.clickSave();
-    }
-
-    public void addField(ListColumn col)
-    {
-        getListFieldEditor().addField(col);
     }
 
     private void beginCreateListFromTab(String tabName, String listName)
@@ -389,13 +292,12 @@ public class ListHelper extends LabKeySiteWrapper
         log("Add List");
         clickButton("Create New List");
         EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
-        listDefinitionPage.setListName(listName);
+        listDefinitionPage.setName(listName);
         return listDefinitionPage;
     }
 
     public void createListFromFile(String containerPath, String listName, File inputFile)
     {
-        disableGwtListDesigner();
         EditListDefinitionPage listEditPage = beginCreateList(containerPath, listName);
         listEditPage.getFieldsPanel()
             .setInferFieldFile(inputFile);
@@ -475,17 +377,6 @@ public class ListHelper extends LabKeySiteWrapper
         // if we are on the Manage List page, click the list name first
         if (isElementPresent(Locators.bodyTitle("Available Lists")))
             clickAndWait(Locator.linkWithText(listName));
-    }
-
-    /**
-     * @deprecated Use {@link PropertiesEditor#addField(FieldDefinition)}
-     */
-    @Deprecated
-    @LogMethod(quiet = true)
-    public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
-    {
-        PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(areaTitle).find()
-                .addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
     }
 
     /**
@@ -620,7 +511,8 @@ public class ListHelper extends LabKeySiteWrapper
             setDescription(description);
             setFormat(format);
             setLookup(lookup);
-            setValidator(validator);
+            if (validator != null)
+                setValidators(List.of(validator));
             setURL(url);
             setScale(scale);
         }

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.remoteapi.Connection;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
@@ -92,6 +93,7 @@ public class SimpleHttpRequest
             {
                 Authenticator.setDefault(new Authenticator()
                 {
+                    @Override
                     protected PasswordAuthentication getPasswordAuthentication()
                     {
                         return new PasswordAuthentication(_username, _password.toCharArray());
@@ -129,7 +131,10 @@ public class SimpleHttpRequest
         StringBuilder cookieString = new StringBuilder();
         for (Map.Entry cookie : _cookies.entrySet())
         {
-            if (cookie.getKey().equals("X-LABKEY-CSRF"))
+            if (cookie.getKey().equals(Connection.X_LABKEY_CSRF))
+                con.setRequestProperty((String)cookie.getKey(), (String)cookie.getValue());
+
+            if (cookie.getKey().equals(Connection.JSESSIONID))
                 con.setRequestProperty((String)cookie.getKey(), (String)cookie.getValue());
 
             if (cookieString.length() > 0)

@@ -40,12 +40,26 @@ public class SetInitialFolderSettingsPage extends LabKeyPage<SetInitialFolderSet
         return new SetInitialFolderSettingsPage(driver.getDriver());
     }
 
+    @Override
+    public void waitForPage()
+    {
+        waitFor(()-> isCurrentStepHighlit(), WAIT_FOR_JAVASCRIPT);
+    }
+
     public SetInitialFolderSettingsPage setCustomFileRoot(String fileRoot)
     {
         elementCache().customLocRadioButton.click();
         setFormElement(elementCache().folderRootPathInput, fileRoot);
         return this;
     }
+
+    public SetInitialFolderSettingsPage useDefaultLocation()
+    {
+        elementCache().useDefaultRadioButton.click();
+        return this;
+    }
+
+
 
     public LabKeyPage clickFinish()
     {
@@ -54,6 +68,12 @@ public class SetInitialFolderSettingsPage extends LabKeyPage<SetInitialFolderSet
         return new LabKeyPage(getDriver());
     }
 
+    public boolean isCurrentStepHighlit()
+    {
+        return elementCache().activePane.existsIn(getDriver());
+    }
+
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -68,5 +88,7 @@ public class SetInitialFolderSettingsPage extends LabKeyPage<SetInitialFolderSet
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         final WebElement folderRootPathInput = Locator.input("folderRootPath")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        final Locator activePane = Locator.tagWithClass("li", "active")
+                .withChild(Locator.linkWithText("Project Settings"));
     }
 }

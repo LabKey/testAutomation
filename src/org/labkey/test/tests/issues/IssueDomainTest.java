@@ -87,7 +87,7 @@ public class IssueDomainTest extends BaseWebDriverTest
     {
         log("Remove mandatory field 'notifylist'");
         GetDomainCommand getCmd = new GetDomainCommand(DOMAIN_NAME, ISSUES_NAME);
-        DomainResponse getDomainResponse = getCmd.execute(this.createDefaultConnection(false), getContainerPath());
+        DomainResponse getDomainResponse = getCmd.execute(this.createDefaultConnection(), getContainerPath());
         List<PropertyDescriptor> getDomainCols = getDomainResponse.getDomain().getFields();
         ListIterator<PropertyDescriptor> getDomainColsIterator = getDomainCols.listIterator();
 
@@ -116,7 +116,7 @@ public class IssueDomainTest extends BaseWebDriverTest
     {
         try
         {
-            cmd.execute(this.createDefaultConnection(false), getContainerPath());
+            cmd.execute(this.createDefaultConnection(), getContainerPath());
             fail("Expected " + domainApiType + " API to throw CommandException.");
         }
         catch (CommandException e)

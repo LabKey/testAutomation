@@ -179,7 +179,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
                 .removeField("VisitID")
                 .removeField("ParticipantID")
                 .removeField("SpecimenID");
-        dataFields.startNewDesign("Name");
+        dataFields.manuallyDefineFields("Name");
         dataFields.addField("Age").setType(FieldDefinition.ColumnType.Integer);
         assayDesignerPage.clickFinish();
 
@@ -315,14 +315,14 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
-                "INFO : hello Nashorn timeout world!",
+                "INFO : hello java timeout world!",
                 // ${pipeline, protocol name} token replacement
                 "arg[2]=" + protocolName,
                 // ${httpSessionId} token replacement. Expect apikey prefix
                 "arg[3]=apikey|",
                 "sleeping for 8 seconds",
                 "Process killed after exceeding timeout of 3 seconds");
-        assertTextNotPresent("goodbye Nashorn timeout world!");
+        assertTextNotPresent("goodbye java timeout world!");
     }
 
 

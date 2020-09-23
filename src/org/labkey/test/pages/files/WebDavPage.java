@@ -32,14 +32,9 @@ public class WebDavPage extends LabKeyPage<WebDavPage.ElementCache>
         _fileBrowserHelper = new FileBrowserHelper(driver);
     }
 
-    public static WebDavPage beginAt(WebDriverWrapper driver)
+    public static WebDavPage beginAt(WebDriverWrapper driver, String path)
     {
-        return beginAt(driver, driver.getCurrentContainerPath());
-    }
-
-    public static WebDavPage beginAt(WebDriverWrapper driver, String containerPath)
-    {
-        driver.beginAt(WebTestHelper.getBaseURL() + "/_webdav/" + containerPath + "/@files/");
+        driver.beginAt(WebTestHelper.getBaseURL() + "/_webdav/" + path);
         return new WebDavPage(driver.getDriver());
     }
 
@@ -53,6 +48,7 @@ public class WebDavPage extends LabKeyPage<WebDavPage.ElementCache>
         return elementCache().webDavUrlElement.getText();
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

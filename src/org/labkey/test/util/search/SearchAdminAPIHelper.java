@@ -18,12 +18,14 @@ package org.labkey.test.util.search;
 import org.apache.http.HttpStatus;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.openqa.selenium.WebDriver;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -40,6 +42,15 @@ public abstract class SearchAdminAPIHelper
         assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
     }
 
+    @LogMethod(quiet = true)
+    public static void waitForIndexerBackground()
+    {
+        // Invoke a special server action that waits until all previous indexer tasks are complete, even wait for background indexing tasks to complete (e.g. deleteContainer)
+        int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("search", "waitForIndexer", Map.of("priority","background"))).getResponseCode();
+        assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
+    }
+
+    @LogMethod(quiet = true)
     public static void startCrawler(WebDriver driver)
     {
         SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin", Maps.of("start", "true")));
@@ -56,6 +67,7 @@ public abstract class SearchAdminAPIHelper
         }
     }
 
+    @LogMethod(quiet = true)
     public static void pauseCrawler(WebDriver driver)
     {
         SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin", Maps.of("pause", "true")));
@@ -72,7 +84,8 @@ public abstract class SearchAdminAPIHelper
         }
     }
 
-    public static void setDirectoryType(DirectoryType type, WebDriver driver)
+    @LogMethod(quiet = true)
+    public static void setDirectoryType(@LoggedParam DirectoryType type, WebDriver driver)
     {
         SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin",
                 Maps.of("directory", "true", "directoryType", type.toString())));
@@ -89,6 +102,7 @@ public abstract class SearchAdminAPIHelper
         }
     }
 
+    @LogMethod(quiet = true)
     public static void deleteIndex(WebDriver driver)
     {
         SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin", Maps.of("delete", "true")));

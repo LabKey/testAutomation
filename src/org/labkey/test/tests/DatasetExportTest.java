@@ -52,6 +52,7 @@ public class DatasetExportTest extends AssayResultsExportTest
         return 0;
     }
 
+    @Override
     protected String getDataRegionColumnName()
     {
         return "ParticipantId";

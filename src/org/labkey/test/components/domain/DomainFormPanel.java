@@ -4,10 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
-import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,27 +19,25 @@ import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
-public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementCache>
+/**
+ * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/DomainForm.tsx
+ */
+public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, DomainFormPanel>
 {
-    private final WebElement _el;
-    private final WebDriver _driver;
-
-    public DomainFormPanel(WebElement element, WebDriver driver)
+    public DomainFormPanel(DomainPanel<?,?> panel)
     {
-        _el = element;
-        _driver = driver;
+        super(panel);
+    }
+
+    private DomainFormPanel(WebElement element, WebDriver driver)
+    {
+        super(element, driver);
     }
 
     @Override
-    public WebElement getComponentElement()
+    protected DomainFormPanel getThis()
     {
-        return _el;
-    }
-
-    @Override
-    public WebDriver getDriver()
-    {
-        return _driver;
+        return this;
     }
 
     public DomainFormPanel addField(FieldDefinition fieldDefinition)
@@ -80,15 +76,36 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         if (fieldDefinition.getLookupValidatorEnabled() != null)
             fieldRow.setLookupValidatorEnabled(fieldDefinition.getLookupValidatorEnabled());
 
-        if (fieldDefinition.getValidator() != null)
+        if (fieldDefinition.getValidators() != null && !fieldDefinition.getValidators().isEmpty())
         {
-            FieldDefinition.FieldValidator validator = fieldDefinition.getValidator();
-            if (validator instanceof FieldDefinition.RegExValidator)
-                fieldRow.setRegExValidators(List.of((FieldDefinition.RegExValidator)validator));
-            else if (validator instanceof FieldDefinition.RangeValidator)
-                fieldRow.setRangeValidators(List.of((FieldDefinition.RangeValidator)validator));
-            else
-                throw new IllegalArgumentException("Validators are not yet supported");
+            List<FieldDefinition.RegExValidator> regexValidators = new ArrayList<>();
+            List<FieldDefinition.RangeValidator> rangeValidators = new ArrayList<>();
+
+            List<FieldDefinition.FieldValidator<?>> validators = fieldDefinition.getValidators();
+            for (FieldDefinition.FieldValidator<?> validator : validators)
+            {
+                if (validator instanceof FieldDefinition.RegExValidator)
+                {
+                    regexValidators.add((FieldDefinition.RegExValidator) validator);
+                }
+                else if (validator instanceof FieldDefinition.RangeValidator)
+                {
+                    rangeValidators.add((FieldDefinition.RangeValidator) validator);
+                }
+                else
+                {
+                    throw new IllegalArgumentException("Validator not supported: " + validator.getClass().getName());
+                }
+            }
+
+            if (!regexValidators.isEmpty())
+            {
+                fieldRow.setRegExValidators(regexValidators);
+            }
+            if (!rangeValidators.isEmpty())
+            {
+                fieldRow.setRangeValidators(rangeValidators);
+            }
         }
 
         fieldRow.collapse();
@@ -108,15 +125,27 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return newFieldRow;
     }
 
-    public DomainFieldRow startNewDesign(String name)
+    public boolean isManuallyDefineFieldsPresent()
     {
-        getWrapper().scrollIntoView(elementCache().startNewDesignLink, true);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().startNewDesignLink)); // give modal dialogs time to disappear
-        elementCache().startNewDesignLink.click();
+        return getWrapper().isElementPresent(elementCache().manuallyDefineFieldsLoc);
+    }
+
+    public DomainFieldRow manuallyDefineFields(String name)
+    {
+        getWrapper().scrollIntoView(elementCache().manuallyDefineFieldsLink, true);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineFieldsLink)); // give modal dialogs time to disappear
+        elementCache().manuallyDefineFieldsLink.click();
 
         DomainFieldRow newFieldRow = elementCache().findFieldRows().get(0);
         newFieldRow.setName(name);
         return newFieldRow;
+    }
+
+    public DomainFieldRow manuallyDefineFields(FieldDefinition fieldDefinition)
+    {
+        DomainFieldRow fieldRow = manuallyDefineFields(fieldDefinition.getName());
+        setField(fieldDefinition);
+        return fieldRow;
     }
 
     public DomainFormPanel removeField(String name)
@@ -172,47 +201,15 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return this;
     }
 
+    // TODO: add ability to select "import data"/"don't import" here, after inferring fields from file
+    // for datasets, the ability to map key columns is exposed when 'import data' is selected
+
     public List<String> fieldNames()
     {
         return elementCache().findFieldRows()
                 .stream()
                 .map(DomainFieldRow::getName)
                 .collect(Collectors.toList());
-    }
-
-    public DomainFormPanel expand()
-    {
-        if (!isExpanded())
-        {
-            elementCache().expandToggle.click();
-            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
-        }
-        return this;
-    }
-
-    public DomainFormPanel collapse()
-    {
-        if (isExpanded())
-        {
-            elementCache().expandToggle.click();
-            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
-        }
-        return this;
-    }
-
-    private boolean isExpanded()
-    {
-        return elementCache().panelBody.isDisplayed();
-    }
-
-    public boolean hasPanelTitle()
-    {
-        return elementCache().panelTitleLoc.existsIn(this);
-    }
-
-    public String getPanelTitle()
-    {
-        return hasPanelTitle() ? elementCache().panelTitle.getText() : null;
     }
 
     public String getPanelErrorText()
@@ -262,7 +259,7 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         return new ElementCache();
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends DomainPanel<ElementCache, DomainFormPanel>.ElementCache
     {
         protected WebElement addFieldButton = new WebElementWrapper()
         {
@@ -328,31 +325,27 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
             return fieldRows.get(fieldNames.get(name));
         }
 
-        WebElement startNewDesignLink = Locator.tagWithClass("span", "domain-form-add-link")
-                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator manuallyDefineFieldsLoc = Locator.tagWithClass("span", "domain-form-add-link");
+        WebElement manuallyDefineFieldsLink = manuallyDefineFieldsLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
 
-        WebElement expandToggle = Locator.tagWithClass("svg", "domain-form-expand-btn").findWhenNeeded(DomainFormPanel.this);
-        Locator.XPathLocator panelTitleLoc = Locator.tagWithClass("span", "domain-panel-title");
-        WebElement panelTitle = panelTitleLoc.findWhenNeeded(DomainFormPanel.this);
-        WebElement panelBody = Locator.byClass("panel-body").findWhenNeeded(this);
     }
 
-    public static class DomainFormPanelFinder extends WebDriverComponentFinder<DomainFormPanel, DomainFormPanelFinder>
+    /**
+     * This will find any domain panel.
+     * There is no simple method to differentiate field editor panels from other domain panels
+     */
+    public static class DomainFormPanelFinder extends BaseDomainPanelFinder<DomainFormPanel, DomainFormPanelFinder>
     {
-        private final Locator.XPathLocator _panelLocator = Locator.tagWithClass("div", "domain-form-panel");
-
-        private String _title = null;
-
         public DomainFormPanelFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public DomainFormPanelFinder withTitle(String title)
+        @Override
+        protected DomainFormPanelFinder getThis()
         {
-            _title = title;
             return this;
         }
 
@@ -360,20 +353,6 @@ public class DomainFormPanel extends WebDriverComponent<DomainFormPanel.ElementC
         protected DomainFormPanel construct(WebElement el, WebDriver driver)
         {
             return new DomainFormPanel(el, driver);
-        }
-
-        @Override
-        protected Locator locator()
-        {
-            if (_title != null)
-            {
-                Locator.XPathLocator titleLoc = Locator.byClass("domain-panel-title").startsWith(_title);
-                return _panelLocator.withDescendant(titleLoc);
-            }
-            else
-            {
-                return _panelLocator;
-            }
         }
     }
 }

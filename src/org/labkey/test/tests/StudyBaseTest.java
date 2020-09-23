@@ -24,10 +24,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.PropertiesEditor.PhiSelectType;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.DatasetPropertiesPage;
+import org.labkey.test.params.FieldDefinition.PhiSelectType;
 import org.labkey.test.util.APITestHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
@@ -71,11 +72,13 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         new SpecimenHelper(this).setupRequestStatuses();
     }
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("study");
     }
 
+    @Override
     protected String getProjectName()
     {
         return "StudyVerifyProject";
@@ -100,7 +103,8 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
             _containerHelper.createProject(getProjectName(), null);
         }
 
-        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getFolderName(), "Study");
+        new ApiPermissionsHelper(this).checkInheritedPermissions();
     }
 
     // Start importing the specimen archive.  This can load in the background while executing the first set of
@@ -136,6 +140,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         return new File[0]; 
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -151,6 +156,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     {
         File dataRoot = new File(StudyHelper.getPipelinePath() + directoryName);
         File[] logFiles = dataRoot.listFiles(new FilenameFilter(){
+            @Override
             public boolean accept(File dir, String name)
             {
                 return name.endsWith(".log");
@@ -263,7 +269,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
                 .selectDatasetByLabel(datasetLabel)
                 .clickEditDefinition()
                 .setIsDemographicData(demographics)
-                .save();
+                .clickSave();
     }
 
     // Must be on study home page or "manage study" page
@@ -273,7 +279,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
                 .selectDatasetByLabel(datasetLabel)
                 .clickEditDefinition()
                 .setShowInOverview(showByDefault)
-                .save();
+                .clickSave();
     }
 
     public void selectOption(String name, int i, String value)

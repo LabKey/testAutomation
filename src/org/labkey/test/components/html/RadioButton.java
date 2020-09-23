@@ -37,6 +37,7 @@ public class RadioButton extends Checkbox
         return new RadioButtonFinder();
     }
 
+    @Override
     protected void assertElementType()
     {
         String type = getComponentElement().getCssValue("type");

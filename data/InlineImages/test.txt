@@ -1,0 +1,144 @@
+[danduffek]dans-labkey-mbp:~/VirtualBox VMs/Windows 8.1 ->vboxmanage modifyhd 'Windows 8.1.vdi' --resize 81920
+
+
+prepare:
+    [mkdir] Created dir: /Users/danduffek/labkey/trunk/server/test/build/classes
+    [mkdir] Created dir: /Users/danduffek/labkey/trunk/server/test/build/logs
+     [iajc] warning incorrect classpath: /Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/tools.jar
+
+
+
+
+$x("//div[contains(@class, 'learncolumnheader’)]/./following-sibling::div[contains(@class, 'detail-wrapper')]")
+
+$x("//div[contains(@class, 'learncolumnheader')]/./following-sibling::div[contains(@class, 'detail-wrapper')]")
+
+$x("//div[not(contains(@style, 'display: none')) and not(contains(@style, 'display:none'))]//div[contains(@class, 'learncolumnheader')]/./following-sibling::div[contains(@class, 'detail-wrapper')]")
+
+
+//*[@id="panel-1078-0"]/g/a[1]
+#panel-1078-0 > g > a.dataspace-box-plot
+svg > g > g > a.dataspace-box-plot
+svg a.dataspace-box-plot
+#panel-1078 > svg > g:nth-child(3) > g.tick-text > g:nth-child(2) > text
+#panel-1078-0 > g:nth-child(5) > a.dataspace-box-plot
+
+
+#study-axis > svg > g:nth-child(1)
+
+
+//div[contains(@class, 'y-axis-selector')]//div[contains(@class, 'advanced')]//fieldset[contains(@class, 'y-axis-selector-option-cell_type')]//div[contains(@class, 'main-label')]
+
+
+//div[contains(@class, 'x-axis-selector-option-cell_type-dropdown')]
+//div[contains(@class, 'x-axis-selector-option-cell_type-dropdown')]//label[text()='All']
+
+span.x-btn-inner.x-btn-inner-center
+
+//div[contains(concat(' ',normalize-space(@class),' '), ' x-column-header-inner ')][normalize-space()='Subject Id']//div[contains(concat(' ',normalize-space(@class),' '), ' x-column-header-inner ')]
+//div[contains(concat(' ',normalize-space(@class),' '), ' x-column-header-inner ')][normalize-space()='Subject Id']
+
+®
+
+
+xpath=//div[contains(concat(' ',normalize-space(@class),' '), ' x-column-header-inner ')][normalize-space()='Race']
+xpath=//div[contains(concat(' ',normalize-space(@class),' '), ' x-column-header-inner ')][normalize-space()='Race']//div[contains(concat(' ',normalize-space(@class),' '), ' x-column-header-trigger ')]
+xpath=//div[contains(concat(' ',normalize-space(@class),' '), ' x-column-header-inner ')][normalize-space()='Race']//div[contains(concat(' ',normalize-space(@class),' '), ' x-column-header-over ')]
+xpath=//div[contains(concat(' ',normalize-space(@class),' '), ' x-column-header-inner ')][normalize-space()='Race'][contains(concat(' ',normalize-space(@class),' '), ' x-column-header-over ')]
+
+<h1 class="line1">Choose a "y" variable and up to two more to plot at a time.</h1>
+
+#study-axis > svg > g:nth-child(1) > image:nth-child(10)
+<image class="visit-tag" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/labkey/production/Connector/resources/images/nonvaccination_normal.svg" x="511.71127406049504" y="6" width="8" height="8"></image>
+
+
+href="/labkey/production/Connector/resources/images/nonvaccination_normal.svg"
+#study-axis > svg > g.study > image[href=/labkey/production/Connector/resources/images/nonvaccination_normal.svg]
+#study-axis > svg > g.study > image[href$='/labkey/production/Connector/resources/images/nonvaccination_normal.svg']
+#study-axis > svg > g.study > image[href$='nonvaccination_normal.svg']
+#study-axis > svg > g.study > image[class='visit-tag']
+$$("#study-axis > svg > g.study > image[href*='nonvaccination_normal.svg']")
+
+//div[contains(@class, 'x-axis-selector')]//div[contains(@class, 'advanced')]//div[contains(@class, 'main-label')]
+//div[contains(@class, 'x-axis-selector')]//div[contains(@class, 'advanced')]//div[contains(@class, 'field-label')][text()='Aligned by:']/./following-sibling::div[contains(@class, 'field-display')]//div[contains(@class, 'main-label')]
+
+git branch —set-upstream fb_test origin/fb_test
+https://github.com/LabKey/cds.git
+
+
+//div[contains(@class, 'y-axis-selector')]//div[contains(@class, 'content')]//label[text()='All']
+
+$x("//div[contains(@class, 'y-axis-selector')]//div[contains(@class, 'content')]//label[text()='All']/./ancestor::table[contains(@class, 'checkbox2')][contains(@class, 'x-form-cb-checked')]")
+
+//div[contains(@class, 'x-axis-selector')]//div[contains(@class, 'advanced')]//fieldset[contains(@class, 'x-axis-selector-option-virus')][not(contains(@style, 'display: none'))]//div[contains(@class, 'main-label')]
+//div[contains(@class, 'x-axis-selector')]//div[contains(@class, 'content')]
+
+<path d="M1.2-2.6h-2.6h-1.2v1.3v2.5v1.3h1.3h2.5h1.3V1.2v-2.6v-1.2H1.2z M1.2,1.2h-2.6v-2.6h2.5v2.6H1.2z" fill="#FF9400" stroke="#FF9400" fill-opacity="0.5" stroke-opacity="0.5" transform="translate(456.4004782400765,634.5286187322611)"></path>
+
+[[[ChromeDriver: chrome on MAC (ca040d258ef75d5ae241da4d8f826412)] -> css selector: a.point > path[fill='#FF9400'][d='M1.2-2.6h-2.6h-1.2v1.3v2.5v1.3h1.3h2.5h1.3V1.2v-2.6v-1.2H1.2z M1.2,1.2h-2.6v-2.6h2.5v2.6H1.2z']]] -> xpath: ..
+
+[[ChromeDriver: chrome on MAC (41ba2c364cf8e7229dd2726104339f93)] -> css selector: #color-legend > svg > .legend-point]
+#color-legend > svg
+
+
+
+//div[contains(@class, 'x-axis-selector')]//div[contains(@class, 'advanced')]//fieldset[contains(@class, 'x-axis-selector-option-summaer_level')]//div[contains(@class, 'main-label')]
+//div[contains(@class, 'x-axis-selector-option-summary_level-dropdown')]
+//div[contains(@class, 'x-axis-selector')]//div[contains(@class, 'advanced')]//fieldset[contains(@class, 'x-axis-selector-option-summaer_level')]//div[contains(@class, 'main-label')]
+
+
+xpath=//div[contains(@class, 'x-axis-selector')]//div[contains(@class, 'content')]//div[translate(@test-data-value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='not_available-not_currently_recorded_in_data-sivmac239.ps.lucr.t2a.ecto-count']/./parent::div
+
+.x-axis-selector div.content-label
+<div class="content-label">BAMA&nbsp;(Binding Ab multiplex assay)</div>
+//*[@id="dataview-1092"]/div[5]/div[1]
+<div class="content-label">BAMA&nbsp;(Binding Ab multiplex assay)</div>
+
+http://localhost:8080/labkey/cds/CDSTest%20Project/begin.view
+https://cds.labkey.com/cds/Dataspace/app.view?
+https://cds.labkey.com/cds/Dataspace/begin.view
+
+
+Lab ID
+Specimen type
+Target cell
+Virus name
+ 
+Antigen
+Antigen clade
+Antigen type
+Assay identifier
+Data provenance
+Experimental Assay Design Code
+Initial dilution
+Neutralization tier
+Response call
+Titer IC50
+Titer IC80
+Virus insert name
+Virus type
+Visit
+Visit Day
+
+
+Lab ID
+Specimen type
+Target cell
+Virus name
+ 
+Antigen
+Antigen clade
+Antigen type
+Assay identifier
+Data provenance
+Experimental Assay Design Code
+Initial dilution
+Neutralization tier
+Response call
+Titer IC50
+
+
+
+
+
+

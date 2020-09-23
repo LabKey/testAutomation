@@ -52,11 +52,13 @@ public class ReadOnlyFormItem extends Component implements FormItem<String>
         return _el;
     }
 
+    @Override
     public String get()
     {
         return getComponentElement().getText();
     }
 
+    @Override
     public void set(String value)
     {
         throw new UnsupportedOperationException("Field is read-only or needs special automation");

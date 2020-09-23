@@ -36,6 +36,7 @@ public class FilesWebPart extends BodyWebPart<FilesWebPart.ElementCache>
         return new FileBrowserHelper(getDriver());
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

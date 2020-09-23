@@ -34,23 +34,25 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Hosting;
-import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.UIUserHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -58,6 +60,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +68,8 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({DailyA.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -92,6 +97,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     public static final String COMMENT_COLUMN = "Comment";
 
+    @Override
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("audit");
@@ -131,6 +137,7 @@ public class AuditLogTest extends BaseWebDriverTest
     {
     } // Skip.  Project is deleted as part of test
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         // Needed for pre-clean only. User & project are deleted during test.
@@ -151,7 +158,7 @@ public class AuditLogTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps() throws IOException
+    public void testSteps() throws IOException, CommandException
     {
         turnOnAuditLogFile();
 
@@ -242,50 +249,70 @@ public class AuditLogTest extends BaseWebDriverTest
                         .append("\n");
         }
 
-        assertTrue(stringBuilder.toString(), pass);
+        if (!pass)
+        {
+            File dumpDir = new File(getArtifactCollector().ensureDumpDir(), "audit_logs");
+            dumpDir.mkdir();
+            TestFileUtils.saveFile(dumpDir, "audit_log_before.log", String.join("\n", auditLogBefore));
+            TestFileUtils.saveFile(dumpDir, "audit_log_after.log", String.join("\n", auditLogAfter));
+            fail(stringBuilder.toString());
+        }
     }
 
     protected void userAuditTest() throws IOException
     {
         ArrayList<String> auditLogBefore;
         ArrayList<String> auditLogAfter;
+        ArrayList<String> expectedLogValues = new ArrayList<>();
 
         auditLogBefore = getAuditLogFromFile();
-
+        // Use UI helper to avoid unexpected events from API authentication
+        UIUserHelper userHelper = new UIUserHelper(this);
         log("testing user audit events");
-        _userHelper.createUser(AUDIT_TEST_USER);
+        userHelper.createUser(AUDIT_TEST_USER);
+        expectedLogValues.add(AUDIT_TEST_USER + " was added to the system and the administrator chose not to send a verification email.");
+
         impersonate(AUDIT_TEST_USER);
+        expectedLogValues.add(getUsername() + " impersonated " + AUDIT_TEST_USER);
+        expectedLogValues.add(AUDIT_TEST_USER + " was impersonated by " + getUsername());
+
         stopImpersonating();
+        expectedLogValues.add(AUDIT_TEST_USER + " was no longer impersonated by " + getUsername());
+        expectedLogValues.add(getUsername() + " stopped impersonating " + AUDIT_TEST_USER);
+
         impersonateRoles(PROJECT_ADMIN_ROLE, AUTHOR_ROLE);
+        expectedLogValues.add(getUsername() + " impersonated roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+
         stopImpersonating();
+        expectedLogValues.add(getUsername() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+
         String adminGroup = "Administrator";
         impersonateGroup(adminGroup, true);
-        stopImpersonating();
-        signOut();
-        signInShouldFail(AUDIT_TEST_USER, "asdf"); // Bad login.  Existing User
-        signInShouldFail(AUDIT_TEST_USER + "fail", "asdf"); // Bad login.  Non-existent User
-        simpleSignIn();
-        _userHelper.deleteUsers(true, AUDIT_TEST_USER);
+        expectedLogValues.add(getUsername() + " impersonated group: " + adminGroup);
 
-        ArrayList<String> expectedLogValues = new ArrayList<>();
-        expectedLogValues.add(AUDIT_TEST_USER + " was added to the system and the administrator chose not to send a verification email.");
-        expectedLogValues.add(getCurrentUser() + " impersonated " + AUDIT_TEST_USER);
-        expectedLogValues.add(AUDIT_TEST_USER + " was impersonated by " + getCurrentUser());
-        expectedLogValues.add(AUDIT_TEST_USER + " was no longer impersonated by " + getCurrentUser());
-        expectedLogValues.add(getCurrentUser() + " stopped impersonating " + AUDIT_TEST_USER);
-        expectedLogValues.add(getCurrentUser() + " impersonated roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
-        expectedLogValues.add(getCurrentUser() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
-        expectedLogValues.add(getCurrentUser() + " impersonated group: " + adminGroup);
-        expectedLogValues.add(getCurrentUser() + " stopped impersonating group: " + adminGroup);
-        expectedLogValues.add(getCurrentUser() + " logged out.");
+        stopImpersonating();
+        expectedLogValues.add(getUsername() + " stopped impersonating group: " + adminGroup);
+
+        navBar().userMenu().signOut();
+        expectedLogValues.add(getUsername() + " logged out.");
+
+        signInShouldFail(AUDIT_TEST_USER, "asdf"); // Bad login.  Existing User
         expectedLogValues.add(AUDIT_TEST_USER + " failed to login: incorrect password");
-        expectedLogValues.add(getCurrentUser() + " logged in successfully via Database authentication.");
+
+        signInShouldFail(AUDIT_TEST_USER + "fail", "asdf"); // Bad login.  Non-existent User
         expectedLogValues.add(AUDIT_TEST_USER + "fail failed to login: user does not exist");
+
+        simpleSignIn();
+        expectedLogValues.add(getUsername() + " logged in successfully via the \"Standard database authentication\" configuration.");
+
+        userHelper.deleteUsers(true, AUDIT_TEST_USER);
         expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
 
-        for (String msg : expectedLogValues)
+        Collections.reverse(expectedLogValues);
+        for (int i = 0; i < expectedLogValues.size(); i++)
         {
-            verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, msg, 20);
+            String msg = expectedLogValues.get(i);
+            verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, msg, i + 1);
         }
 
         // Check the file after the UI check, if the UI tests passed then we should have confidence that the entry is in the file.
@@ -478,17 +505,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     public static void goToAuditEventView(BaseWebDriverTest instance, String eventType)
     {
-        if (!instance.isTextPresent("Audit Log"))
-        {
-            instance.ensureAdminMode();
-
-            instance.goToAdminConsole().clickAuditLog();
-        }
-
-        if (!instance.getSelectedOptionText(Locator.name("view")).equals(eventType))
-        {
-            instance.doAndWaitForPageToLoad(() -> instance.selectOptionByText(Locator.name("view"), eventType));
-        }
+        new AuditLogHelper(instance).goToAuditEventView(eventType);
     }
 
     public static void verifyAuditEvent(BaseWebDriverTest instance, String eventType, String column, String msg, int rowsToSearch)
@@ -625,14 +642,14 @@ public class AuditLogTest extends BaseWebDriverTest
 
         log("Change properties on field '" + FIELD01_NAME + "'.");
         fieldsPanel.getField(FIELD01_NAME)
-                .setPHILevel(PropertiesEditor.PhiSelectType.Restricted)
+                .setPHILevel(FieldDefinition.PhiSelectType.Restricted)
                 .setRequiredField(true)
                 .setDescription(FIELD01_UPDATED_DESCRIPTION)
                 .setLabel(FIELD01_UPDATED_LABEL);
 
         log("Change properties on field '" + FIELD02_NAME + "'.");
         DomainFieldRow field2 = fieldsPanel.getField(FIELD02_NAME)
-                .setScaleType(PropertiesEditor.ScaleType.LOG)
+                .setScaleType(FieldDefinition.ScaleType.LOG)
                 .setNumberFormat("#!");
         ConditionalFormatDialog formatDlg = field2.clickConditionalFormatButton();
         formatDlg.getOpenFormatPanel().setFirstValue("5");

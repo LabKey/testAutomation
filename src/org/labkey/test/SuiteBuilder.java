@@ -29,6 +29,7 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
+import java.io.File;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
@@ -43,16 +44,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class SuiteBuilder
 {
     private static SuiteBuilder _instance;
+    private static final Map<String, List<String>> _requestedMissingTests = new CaseInsensitiveHashMap<>();
 
-    private final Map<String, Set<Class>> _suites;
+    private final Map<String, Set<Class<?>>> _suites;
+    private final Map<String, Class<?>> _testsByName;
+    private final Map<String, List<String>> _missingTests;
 
     private SuiteBuilder()
     {
         _suites = new CaseInsensitiveHashMap<>();
+        _testsByName = new CaseInsensitiveHashMap<>();
+        _missingTests = new CaseInsensitiveHashMap<>();
         loadSuites();
     }
 
@@ -102,8 +109,7 @@ public class SuiteBuilder
         _suites.put(Test.class.getSimpleName(), new HashSet<>()); // Without this, Runner will crash if 'test.packages' property is misconfigured
         _suites.put(Empty.class.getSimpleName(), Collections.emptySet());
 
-        Map<String, Class> testClasses = new CaseInsensitiveHashMap<>();
-        for (Class test : tests)
+        for (Class<?> test : tests)
         {
             if (Modifier.isAbstract(test.getModifiers()))
                 continue; // Don't try to run abstract test classes, even if they have a @Category annotation
@@ -111,41 +117,71 @@ public class SuiteBuilder
             {
                 // Ensure that test class names are unique
                 String simpleName = test.getSimpleName();
-                if (testClasses.containsKey(simpleName))
-                    throw new IllegalStateException("Found two tests with the same class name, please rename one of them: " + testClasses.get(simpleName).getName() + " & " + test.getName());
-                testClasses.put(simpleName, test);
+                if (_testsByName.containsKey(simpleName))
+                {
+                    throw new IllegalStateException("Found two tests with the same class name, please rename one of them: " +
+                                                        _testsByName.get(simpleName).getName() + " & " + test.getName());
+                }
+                _testsByName.put(simpleName, test);
             }
 
-            List<Class<?>> categoriesFromAnnotation = new ArrayList<>(Arrays.asList(((Category) test.getAnnotation(Category.class)).value()));
-            if (categoriesFromAnnotation.contains(Disabled.class))
+            List<Class<?>> categoriesFromAnnotation = new ArrayList<>(Arrays.asList((test.getAnnotation(Category.class)).value()));
+            boolean disabledTest = categoriesFromAnnotation.contains(Disabled.class);
+            if (disabledTest)
             {
                 // Remove disabled tests from all other suites
                 categoriesFromAnnotation = Collections.singletonList(Disabled.class);
             }
 
-            // parse test package, add module-derived suites. We expect these to follow the pattern
-            //    <testPackage>.tests.<moduleName>.<testClassName>
+            /*
+             * Parse test package, add module-derived suites. We expect test packages to follow the pattern
+             * {testPackage}.tests.moduleName[.featureArea[.featureAreaX]].TestClass
+             * Such a test would be added to the following suites:
+             *  - moduleName
+             *  - featureArea
+             *  - featureAreaX
+             *  - moduleName.featureArea
+             *  - moduleName.featureArea.featureAreaX
+             */
             List<String> packageNameParts = Arrays.asList(test.getPackage().getName().split("\\."));
             int testsPkgIndex = packageNameParts.indexOf("tests");
-            for (int i = testsPkgIndex + 1; testsPkgIndex > -1 && i < packageNameParts.size(); i++)
+            if (testsPkgIndex > -1)
             {
-                String suiteName = packageNameParts.get(i);
-                if (categoriesFromAnnotation.contains(Disabled.class))
+                packageNameParts = packageNameParts.subList(testsPkgIndex + 1, packageNameParts.size());
+                StringBuilder subSuite = new StringBuilder();
+                for (int i = 0; i < packageNameParts.size(); i++)
                 {
-                    suiteName = suiteName + "_disabled";
+                    String suiteName = packageNameParts.get(i);
+
+                    if (i > 0)
+                    {
+                        subSuite.append(".");
+                    }
+                    subSuite.append(suiteName);
+                    String subSuiteName = subSuite.toString();
+
+                    if (disabledTest)
+                    {
+                        suiteName = suiteName + "_disabled";
+                        subSuiteName = subSuiteName + "_disabled";
+                    }
+                    else if (categoriesByName.containsKey(suiteName))
+                    {
+                        // Respect suite inheritance for package-inferred suites that match explicit @Category suites
+                        categoriesFromAnnotation.add(categoriesByName.get(suiteName));
+                    }
+                    addTestToSuite(test, suiteName);
+                    if (i > 0)
+                    {
+                        addTestToSuite(test, subSuiteName);
+                    }
                 }
-                else if (categoriesByName.containsKey(suiteName))
-                {
-                    // Respect suite inheritance for package-inferred suites
-                    categoriesFromAnnotation.add(categoriesByName.get(suiteName));
-                }
-                addTestToSuite(test, suiteName);
             }
 
-            for (Class category : categoriesFromAnnotation)
+            for (Class<?> category : categoriesFromAnnotation)
             {
                 addTestToSuite(test, category.getSimpleName());
-                Class supercategory = category.getSuperclass();
+                Class<?> supercategory = category.getSuperclass();
 
                 while (supercategory != null && Test.class.isAssignableFrom(supercategory))
                 {
@@ -156,14 +192,52 @@ public class SuiteBuilder
 
             addTestToSuite(test, Test.class.getSimpleName()); // Make sure test is in the master "Test" suite
         }
+
+        loadFileBasedSuites();
     }
 
-    private void addTestToSuite(Class test, String suiteName)
+    private void loadFileBasedSuites()
+    {
+        List<File> suitesDirs = TestFileUtils.getSampleDatas("suites");
+        for (File suiteDir : suitesDirs)
+        {
+            File[] suiteFiles = suiteDir.listFiles(file -> !file.getName().startsWith("_") && file.getName().endsWith(".txt"));
+            for (File suiteFile : suiteFiles)
+            {
+                String suiteName = suiteFile.getName().split("\\.")[0]; // drop file extension
+                List<String> testList = Arrays.stream(TestFileUtils.getFileContents(suiteFile).trim().split("\\s+"))
+                    .filter(testName -> !testName.startsWith("#")).collect(Collectors.toList());
+                for (String testName : testList)
+                {
+                    Class<?> testClass = _testsByName.get(testName);
+                    if (testClass == null)
+                    {
+                        if (!_missingTests.containsKey(suiteName))
+                        {
+                            _missingTests.put(suiteName, new ArrayList<>());
+                        }
+                        _missingTests.get(suiteName).add(testName);
+                    }
+                    else
+                    {
+                        addTestToSuite(testClass, suiteName);
+                    }
+                }
+            }
+        }
+    }
+
+    private void addTestToSuite(Class<?> test, String suiteName)
     {
         if (!_suites.containsKey(suiteName.toLowerCase()))
             _suites.put(suiteName, new HashSet<>());
 
         _suites.get(suiteName).add(test);
+    }
+
+    public Class<?> getTestByName(String testClassName)
+    {
+        return _testsByName.get(testClassName);
     }
 
     public TestSet getAllTests()
@@ -196,7 +270,14 @@ public class SuiteBuilder
 
             suiteName = matcher.group(1);
         }
-        Set<Class> tests = _suites.getOrDefault(suiteName, optional ? Collections.emptySet() : null);
+        Set<Class<?>> tests = _suites.getOrDefault(suiteName, optional ? Collections.emptySet() : null);
+
+        if (tests != null && _missingTests.containsKey(suiteName))
+        {
+            // Move missing tests to static member for MissingTestsError to see.
+            _requestedMissingTests.put(suiteName, _missingTests.get(suiteName));
+            tests.add(MissingTests.class);
+        }
 
         tests = extractSubset(tests, subset, subsetCount);
 
@@ -206,14 +287,14 @@ public class SuiteBuilder
         return new TestSet(tests, suiteName);
     }
 
-    private Set<Class> extractSubset(Set<Class> tests, int subset, int subsetCount)
+    private Set<Class<?>> extractSubset(Set<Class<?>> tests, int subset, int subsetCount)
     {
         if (tests == null || tests.isEmpty() || subsetCount == 1)
         {
             return tests;
         }
 
-        List<Class> sorted = new ArrayList<>(tests);
+        List<Class<?>> sorted = new ArrayList<>(tests);
         sorted.sort(Comparator.comparing(Class::getName));
 
         int size = sorted.size();
@@ -235,5 +316,33 @@ public class SuiteBuilder
     public Set<String> getSuites()
     {
         return _suites.keySet();
+    }
+
+    public static Map<String, List<String>> getRequestedMissingTests()
+    {
+        return _requestedMissingTests;
+    }
+
+    public static class MissingTests
+    {
+        public MissingTests() { }
+
+        @Override
+        public String toString()
+        {
+            return "MissingTests";
+        }
+
+        @org.junit.Test
+        public void run()
+        {
+            Map<String, List<String>> requestedMissingTests = SuiteBuilder.getRequestedMissingTests();
+            StringBuilder msg = new StringBuilder("Suite specifies non-existent test(s):");
+            for (String suite : requestedMissingTests.keySet())
+            {
+                msg.append("\n    ").append(suite).append(": ").append(requestedMissingTests.get(suite));
+            }
+            throw new IllegalArgumentException(msg.toString());
+        }
     }
 }

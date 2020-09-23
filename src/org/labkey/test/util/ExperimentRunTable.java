@@ -36,6 +36,7 @@ public class ExperimentRunTable extends DataRegionTable
         _cache = cache;
     }
 
+    @Override
     public int getDataRowCount()
     {
         if (!_cache || _rows == -1)

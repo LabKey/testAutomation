@@ -27,6 +27,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -79,7 +80,7 @@ public class SpecimenImportTest extends SpecimenBaseTest
 
         assertIdsSet();
 
-        assertSampleSetData();
+        assertSampleTypeData();
     }
 
     @Override
@@ -90,18 +91,16 @@ public class SpecimenImportTest extends SpecimenBaseTest
 
     protected void goToImport()
     {
-        clickTab("Data");
+        clickTab("Specimen Data");
         waitForText("No specimens found");
-        waitForText("Import Specimens");
-        sleep(100);
-        clickAndWait(Locator.linkContainingText("Import Specimens"));
+        waitAndClickAndWait(Locator.linkContainingText("Import Specimens"));
     }
 
     protected void checkRequiredFields(boolean visit)
     {
         goToImport();
         waitAndClick(Locator.linkContainingText("Show Expected Data Fields"));
-        assertTextPresent("Global Unique Id","Sample Id","Participant Id", "Volume", "Volume Units", "Primary Type", "Derivative Type", "Additive Type");
+        assertTextPresent("Global Unique Id","Sample Id", "Participant Id", "Volume", "Volume Units", "Primary Type", "Derivative Type", "Additive Type");
         if(!visit)
         {
             assertTextNotPresent("Visit");
@@ -116,9 +115,8 @@ public class SpecimenImportTest extends SpecimenBaseTest
     protected void changeTimepointType()
     {
         clickTab("Manage");
-        waitAndClick(Locator.linkContainingText("Change Study Properties"));
-        waitForText("Timepoint Type:");
-        _ext4Helper.selectRadioButton("Timepoint Type:", "VISIT");
+        waitAndClickAndWait(Locator.linkContainingText("Change Study Properties"));
+        new RadioButton(Locator.id("visit").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
         clickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
     }
     protected void doUploads()
@@ -137,7 +135,7 @@ public class SpecimenImportTest extends SpecimenBaseTest
 
     protected void assertIdsSet()
     {
-        clickTab("Data");
+        clickTab("Specimen Data");
         waitAndClick(Locator.linkContainingText("By Individual Vial"));
         DataRegionTable region = new DataRegionTable("SpecimenDetail", this);
         assertTrue("Failed to find Participant ID 1", region.getRow("Participant Id", "1") == 0);
@@ -147,30 +145,30 @@ public class SpecimenImportTest extends SpecimenBaseTest
     }
 
     // Checking for regression like the one that occurred in issue 36863: specimen importer doesn't create rows in provisioned table.
-    protected  void assertSampleSetData()
+    protected  void assertSampleTypeData()
     {
         String folderPath = "/" + getProjectName() + "/" + getFolderName();
         List<String> fields = Arrays.asList("Name", "Run", "Flag/Comment");
 
-        List<Map<String, String>> sampleSetData = getSampleDataFromDB(folderPath, "Study Specimens", fields);
+        List<Map<String, String>> sampleTypeData = getSampleDataFromDB(folderPath, "Study Specimens", fields);
 
-        Assert.assertNotEquals("There are no rows in the \"Study Specimens\" sample set.", sampleSetData.size(), 0);
+        Assert.assertNotEquals("There are no rows in the \"Study Specimens\" sample type.", sampleTypeData.size(), 0);
 
         List<String> expectedNames = Arrays.asList("1", "2", "3", "4");
 
         boolean pass = true;
-        if(sampleSetData.size() != expectedNames.size())
+        if(sampleTypeData.size() != expectedNames.size())
         {
             pass = false;
-            log("\n*************** ERROR ***************\nThe number of records returned is not as expected. Expected: " + expectedNames.size() + " found: " + sampleSetData.size() + "\n*************** ERROR ***************");
+            log("\n*************** ERROR ***************\nThe number of records returned is not as expected. Expected: " + expectedNames.size() + " found: " + sampleTypeData.size() + "\n*************** ERROR ***************");
         }
 
         for(int i = 0; i < expectedNames.size(); i++)
         {
             boolean found = false;
-            for(int j = 0; j < sampleSetData.size(); j++)
+            for(int j = 0; j < sampleTypeData.size(); j++)
             {
-                if(expectedNames.get(i).trim().equalsIgnoreCase(sampleSetData.get(j).get("Name").trim()))
+                if(expectedNames.get(i).trim().equalsIgnoreCase(sampleTypeData.get(j).get("Name").trim()))
                 {
                     found = true;
                     break;
@@ -186,18 +184,18 @@ public class SpecimenImportTest extends SpecimenBaseTest
 
         if(!pass)
         {
-            log("\n*************** ERROR ***************\nExpected values: " + expectedNames + "\nValues returned: " + sampleSetData + "\n*************** ERROR ***************");
-            Assert.fail("Sample Set data not as expected.");
+            log("\n*************** ERROR ***************\nExpected values: " + expectedNames + "\nValues returned: " + sampleTypeData + "\n*************** ERROR ***************");
+            Assert.fail("Sample Type data not as expected.");
         }
     }
 
-    protected List<Map<String, String>> getSampleDataFromDB(String folderPath, String sampleSetName, List<String> fields)
+    protected List<Map<String, String>> getSampleDataFromDB(String folderPath, String sampleTypeName, List<String> fields)
     {
         List<Map<String, String>> results = new ArrayList<>(6);
         Map<String, String> tempRow;
 
         Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleSetName);
+        SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleTypeName);
         cmd.setColumns(fields);
 
         try
@@ -256,7 +254,10 @@ public class SpecimenImportTest extends SpecimenBaseTest
             _containerHelper.createProject(getProjectName(), null);
         }
 
-        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "CAVD Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
+        clickButton("Create Study");
+        click(Locator.radioButtonById("dateTimepointType"));
+        clickButton("Create Study");
     }
 
     @Override

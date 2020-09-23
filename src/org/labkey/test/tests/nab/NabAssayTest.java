@@ -33,6 +33,8 @@ import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
+import org.labkey.test.pages.assay.plate.PlateDesignerPage;
+import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
@@ -192,13 +194,11 @@ public class NabAssayTest extends AbstractAssayTest
             .setPlateTemplate("NAb: 5 specimens in duplicate")
             .clickFinish();
 
-        // go back into assay design to configure templates
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
-        assayDesignerPage.goToConfigureTemplates();
-
-        // todo: implement in/refactor to use template page
-        clickAndWait(Locator.linkWithText("new 96 well (8x12) NAb single-plate template"));
+        PlateTemplateListPage templateListPage = PlateTemplateListPage.beginAt(this);
+        templateListPage.clickNewPlate((PlateDesignerPage.PlateDesignerParams
+                ._96well()
+                .setAssayType("NAb")
+                .setTemplateType("single-plate")));
 
         setFormElement(Locator.inputById("templateName"), PLATE_TEMPLATE_NAME);
 
@@ -560,7 +560,7 @@ public class NabAssayTest extends AbstractAssayTest
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
-        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/napApiTest.html")));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/nabApiTest.html")));
         wikiHelper.saveWikiPage();
         waitForElement(Locator.id(TEST_DIV_ID));
         waitForElements(Locator.id(TEST_DIV_ID).child(Locator.tagWithText("div", "Success!")), 2);

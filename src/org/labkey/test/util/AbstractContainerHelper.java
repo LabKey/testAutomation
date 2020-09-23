@@ -167,7 +167,7 @@ public abstract class AbstractContainerHelper
 
     public Set<String> getAllModules()
     {
-        GetModulesResponse modulesResponse = getModules("/");
+        GetModulesResponse modulesResponse = getModules("home");
         Set<String> modules = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
         modulesResponse.getModules().stream()
                 .forEach(module -> modules.add(module.getName()));
@@ -191,7 +191,7 @@ public abstract class AbstractContainerHelper
 
     private GetModulesResponse getModules(String containerPath)
     {
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _test.createDefaultConnection();
         GetModulesCommand getModulesCommand = new GetModulesCommand();
         try
         {

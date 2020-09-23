@@ -21,16 +21,17 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PipelineStatusTable;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -61,11 +62,13 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _valid = true;
     }
 
+    @Override
     public PipelineWebTestBase getTest()
     {
         return _test;
     }
 
+    @Override
     public String getDataPath()
     {
         return _dataPath;
@@ -77,21 +80,25 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         return parts[parts.length - 1]; 
     }
 
+    @Override
     public String getProtocolName()
     {
         return _protocolName;
     }
 
+    @Override
     public String getProtocolType()
     {
         return _protocolType;
     }
 
+    @Override
     public String[] getSampleNames()
     {
         return _sampleNames;
     }
 
+    @Override
     public String getParametersFile()
     {
         return _parametersFile != null ? _parametersFile : _protocolType + ".xml";
@@ -102,6 +109,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _parametersFile = parametersFile;
     }
 
+    @Override
     public String[] getInputExtensions()
     {
         return _inputExtensions;
@@ -112,6 +120,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _inputExtensions = inputExtensions;
     }
 
+    @Override
     public String[] getOutputExtensions()
     {
         return _outputExtensions;
@@ -122,6 +131,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _outputExtensions = outputExtensions;
     }
 
+    @Override
     public String getRunKey()
     {
         return _dataPath + " (" + _protocolType + "/" + _protocolName + ")";
@@ -132,6 +142,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         return getDataDirName() + " (" + _protocolName + ")";
     }
 
+    @Override
     public String[] getExperimentLinks()
     {
         if (_experimentLinks == null)
@@ -152,31 +163,37 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         return _experimentLinks;
     }
 
+    @Override
     public void setExperimentLinks(String[] experimentLinks)
     {
         _experimentLinks = experimentLinks;
     }
 
+    @Override
     public PipelineFolder.MailSettings getMailSettings()
     {
         return _mailSettings;
     }
 
+    @Override
     public void setMailSettings(PipelineFolder.MailSettings mailSettings)
     {
         _mailSettings = mailSettings;
     }
 
+    @Override
     public boolean isExpectError()
     {
         return _expectError;
     }
 
+    @Override
     public void setExpectError(boolean expectError)
     {
         _expectError = expectError;
     }
 
+    @Override
     public void validate()
     {
         if (_mailSettings != null)
@@ -196,6 +213,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         }
     }
 
+    @Override
     public void validateTrue(String message, boolean condition)
     {
         if (!condition)
@@ -205,11 +223,13 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         }
     }
 
+    @Override
     public boolean isValid()
     {
         return _valid;
     }
 
+    @Override
     public void verifyClean(File rootDir)
     {
         File analysisDir = new File(rootDir, getDataPath() + File.separatorChar + getProtocolType());
@@ -217,11 +237,13 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
             fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
     }
 
+    @Override
     public void clean(File rootDir)
     {
         TestFileUtils.delete(new File(new File(rootDir, getDataPath()), getProtocolType()));
     }
 
+    @Override
     public void startProcessing()
     {
         _test.log("Start analysis of " + getDataPath());
@@ -243,6 +265,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
     protected abstract void clickSubmitButton();
 
+    @Override
     public void remove()
     {
         ExperimentRunTable tableExp = getExperimentRunTable();
@@ -270,7 +293,6 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     
     private void validateExperiment()
     {
-        _test.clickButton("Data");
         ExperimentGraph graph = new ExperimentGraph(_test);
         graph.validate(this);
     }
@@ -282,21 +304,18 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         validateEmail("COMPLETE", getDirStatusDesciption(), _mailSettings.isNotifyOnSuccess(),
                 _mailSettings.getNotifyUsersOnSuccess());
 
-        if (_test.isButtonPresent("Data"))
+        // Data button will be hidden if the pipeline job isn't complete yet or there is no dataUrl
+        PipelineStatusDetailsPage detailsPage = new PipelineStatusDetailsPage(_test.getDriver());
+        if (detailsPage.clickDataLink())
         {
             validateExperiment();
         }
         else
         {
-            int split = 1;
-            while (_test.isElementPresent(Locator.linkWithText("COMPLETE").index(split)))
-            {
-                _test.pushLocation();
-                Integer index = split++;
-                _test.clickAndWait(Locator.linkWithText("COMPLETE").index(index));
+            detailsPage.forEachSplitJobLink(splitDetailsPage -> {
+                splitDetailsPage.clickDataLink();
                 validateExperiment();
-                _test.popLocation();
-            }
+            });
         }
     }
 
@@ -363,30 +382,4 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         return false;
     }
 
-    public void validateEmailEscalation(int sampleIndex)
-    {
-        assertNotNull("Email validation requires mail settings", _mailSettings);
-
-        String escalateEmail = _mailSettings.getEscalateUsers()[0];
-        String messageText = "I have no idea why this job failed.  Please help me.";
-
-        String sampleExp = getExperimentLinks()[sampleIndex];
-
-        _test.log("Escalate an error");
-        EmailRecordTable emailTable = new EmailRecordTable(_test);
-        PipelineStatusTable statusTable = new PipelineStatusTable(_test);
-        _test.pushLocation();
-        statusTable.clickStatusLink(sampleExp);
-        _test.clickButton("Escalate Job Failure");
-        _test.selectOptionByTextContaining(Locator.id("escalateUser").findElement(_test.getDriver()), escalateEmail);
-        _test.setFormElement(Locator.id("escalationMessage"), messageText);
-        // DetailsView adds a useless form.
-        //test.submit();
-        _test.clickButton("Send");
-        _test.popLocation();
-
-        EmailRecordTable.EmailMessage message = emailTable.getMessageWithSubjectContaining(sampleExp);
-        assertNotNull("Escalation message not sent", message);
-        assertEquals("Escalation not sent to " + escalateEmail, escalateEmail, message.getTo()[0]);
-    }
 }

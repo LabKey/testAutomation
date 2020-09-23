@@ -1,0 +1,19 @@
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="DeviationFromMean" tableDbType="NOT_IN_DB">
+    <titleColumn>Verdict</titleColumn>
+    <columns>
+      <column columnName="Live Deviation">
+<datatype>double</datatype>
+<formatString>#,##0.###</formatString>
+</column>
+      <column columnName="CD4 Deviation">
+<datatype>double</datatype>
+<formatString>#,##0.###</formatString>
+</column>
+      <column columnName="CD8 Deviation">
+<datatype>double</datatype>
+<formatString>#,##0.###</formatString>
+</column>
+    </columns>
+  </table>
+</tables>

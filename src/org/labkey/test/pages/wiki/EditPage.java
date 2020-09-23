@@ -116,11 +116,19 @@ public class EditPage extends LabKeyPage<EditPage.ElementCache>
         return this;
     }
 
+    public EditPage clickShowPageTree()
+    {
+        elementCache().showPageTreeButton.click();
+        shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.id("wiki-toc-tree")));
+        return this;
+    }
+
     public WikiFilePicker getFilePicker()
     {
         return elementCache().filePicker;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -130,6 +138,7 @@ public class EditPage extends LabKeyPage<EditPage.ElementCache>
     {
         WebElement saveAndCloseButton = Locator.lkButton("Save & Close").findWhenNeeded(this);
         WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
+        WebElement showPageTreeButton = Locator.linkWithText("Show Page Tree").findWhenNeeded(this);
         WebElement convertButton = Locator.lkButton("Convert To...").findWhenNeeded(this);
         Input nameInput = Input.Input(Locator.name("name"), getDriver()).findWhenNeeded(this);
         Input titleInput = Input.Input(Locator.name("title"), getDriver()).findWhenNeeded(this);

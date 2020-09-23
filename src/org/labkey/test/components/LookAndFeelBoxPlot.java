@@ -28,59 +28,69 @@ public class LookAndFeelBoxPlot extends ChartLayoutDialog<LookAndFeelBoxPlot.Ele
         super(wDriver);
     }
 
+    @Override
     public LookAndFeelBoxPlot setPlotTitle(String title)
     {
         super.setPlotTitle(title);
         return this;
     }
 
+    @Override
     public LookAndFeelBoxPlot setPlotWidth(String width)
     {
         super.setPlotWidth(width);
         return this;
     }
 
+    @Override
     public LookAndFeelBoxPlot setPlotHeight(String height)
     {
         super.setPlotHeight(height);
         return this;
     }
+    @Override
     public LookAndFeelBoxPlot clickGeneralTab()
     {
         super.clickGeneralTab();
         return this;
     }
 
+    @Override
     public LookAndFeelBoxPlot clickXAxisTab()
     {
         super.clickXAxisTab();
         return this;
     }
 
+    @Override
     public LookAndFeelBoxPlot clickYAxisTab()
     {
         super.clickYAxisTab();
         return this;
     }
 
+    @Override
     public LookAndFeelBoxPlot setXAxisLabel(String label)
     {
         super.setXAxisLabel(label);
         return this;
     }
 
+    @Override
     public LookAndFeelBoxPlot setXAxisScale(ScaleType scaleType)
     {
         super.setXAxisScale(scaleType);
         return this;
     }
 
+    @Override
     public LookAndFeelBoxPlot setYAxisLabel(String label)
     {
         super.setYAxisLabel(label);
         return this;
     }
 
+    @Override
     public LookAndFeelBoxPlot setYAxisScale(ScaleType scaleType)
     {
         super.setYAxisScale(scaleType);

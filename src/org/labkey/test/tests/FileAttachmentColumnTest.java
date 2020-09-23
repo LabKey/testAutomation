@@ -24,13 +24,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
-import org.labkey.test.pages.experiment.UpdateSampleSetPage;
+import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SampleSetHelper;
+import org.labkey.test.util.SampleTypeHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -94,8 +94,8 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         //create list with attachment columns
         createList();
 
-        //create sampleset with file columns
-        createSampleSet();
+        //create sample type with file columns
+        createSampleType();
     }
 
     private void createList()
@@ -128,23 +128,23 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         listHelper.insertNewRow(tifRow, false);
     }
 
-    private void createSampleSet()
+    private void createSampleType()
     {
         beginAt("/project/" + getProjectName() +"/"+ FOLDER_NAME + "/begin.view?");
         clickTab("Portal");
 
         PortalHelper portalHelper = new PortalHelper(getDriver());
-        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Types");
 
-        log("adding sample set with file column");
+        log("adding sample type with file column");
 
-        SampleSetHelper sampleHelper = new SampleSetHelper(this);
-        sampleHelper.createSampleSet(new SampleSetDefinition(SAMPLESET_NAME).setFields(List.of(new FieldDefinition("color", FieldDefinition.ColumnType.String))), Collections.singletonList(Map.of("Name", "ed", "color", "green")));
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLESET_NAME).setFields(List.of(new FieldDefinition("color", FieldDefinition.ColumnType.String))), Collections.singletonList(Map.of("Name", "ed", "color", "green")));
 
         // add a 'file' column
-        log("editing fields for sample set");
+        log("editing fields for sample type");
         clickFolder(FOLDER_NAME);
-        UpdateSampleSetPage updatePage = sampleHelper.goToEditSampleSet(SAMPLESET_NAME);
+        UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(SAMPLESET_NAME);
         updatePage.addFields(List.of(new FieldDefinition("File", FieldDefinition.ColumnType.File)));
         updatePage.clickSave();
 

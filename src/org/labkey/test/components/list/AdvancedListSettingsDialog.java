@@ -8,12 +8,11 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.core.login.SvgCheckbox;
 import org.labkey.test.pages.list.EditListDefinitionPage;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 public class AdvancedListSettingsDialog extends ModalDialog
 {
-    private EditListDefinitionPage _page;
+    private final EditListDefinitionPage _page;
 
     public AdvancedListSettingsDialog(EditListDefinitionPage page)
     {
@@ -27,23 +26,21 @@ public class AdvancedListSettingsDialog extends ModalDialog
         return this;
     }
 
-
-
     public AdvancedListSettingsDialog disableDiscussionLinks()
     {
-        elementCache().radio(this, "Disable discussion links").check();
+        elementCache().radio("Disable discussion links").check();
         return this;
     }
 
     public AdvancedListSettingsDialog allowOneDiscussionPerItem()
     {
-        elementCache().radio(this, "Allow one discussion per item").check();
+        elementCache().radio("Allow one discussion per item").check();
         return this;
     }
 
     public AdvancedListSettingsDialog allowMultipleDiscussionsPerItem()
     {
-        elementCache().radio(this, "Allow multiple discussions per item").check();
+        elementCache().radio("Allow multiple discussions per item").check();
         return this;
     }
 
@@ -60,8 +57,8 @@ public class AdvancedListSettingsDialog extends ModalDialog
             WebElement expandCollapsePane = elementCache().collapsibleField(labelText);
             expandPane(expandCollapsePane);
             Input.Input(Locator.id("entireListTitleTemplate"), getDriver()).find().set(docTitle);
-            elementCache().radio(expandContainer, includeOptions.toString()).check();
-            elementCache().radio(expandContainer, indexOptions.toString()).check();
+            elementCache().radio(includeOptions.toString()).check();
+            elementCache().radio(indexOptions.toString()).check();
         }
         return this;
     }
@@ -83,7 +80,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
             expandPane(expandCollapsePane);
 
             Input.Input(Locator.id("eachItemTitleTemplate"), getDriver()).find().set(docTitle);
-            elementCache().radio(expandContainer, indexOptions.toString()).check();
+            elementCache().radio(indexOptions.toString()).check();
         }
         return this;
     }
@@ -165,7 +162,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
             return new SvgCheckbox(checkBoxLoc(labelText).waitForElement(this, 2000), getDriver());
         }
 
-        RadioButton radio(SearchContext searchContext, String labelText)
+        RadioButton radio(String labelText)
         {
             Locator loc = Locator.tagWithClass("div", "radio")
                     .withChild(Locator.tagContainingText("label", labelText))

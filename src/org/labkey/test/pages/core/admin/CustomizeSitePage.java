@@ -195,6 +195,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
