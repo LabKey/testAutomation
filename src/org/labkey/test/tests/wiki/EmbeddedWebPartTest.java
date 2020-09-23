@@ -96,7 +96,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
 
         try
         {
-            el.isDisplayed();
+            el.isEnabled();
         }
         catch (NoSuchElementException fail)
         {

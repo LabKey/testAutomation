@@ -864,6 +864,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
+    public static final Pattern ERROR_PATTERN = Pattern.compile("^ERROR", Pattern.MULTILINE);
+
     public void checkErrors()
     {
         if (isGuestModeTest())
@@ -873,6 +875,19 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         String serverErrors = getServerErrors();
         if (!serverErrors.isEmpty())
         {
+            Matcher errorMatcher = ERROR_PATTERN.matcher(serverErrors);
+            while (errorMatcher.find())
+            {
+                String[] errorLines = errorMatcher.group().split("\n");
+                TestLogger.error("Server error:");
+                TestLogger.increaseIndent();
+                for (int i = 0; i < 10 && i < errorLines.length; i++)
+                {
+                    TestLogger.error(errorLines[i]);
+                }
+                TestLogger.decreaseIndent();
+            }
+
             beginAt(buildURL("admin", "showErrorsSinceMark"));
             resetErrors();
             if (serverErrors.toLowerCase().contains(CLIENT_SIDE_ERROR.toLowerCase()))
@@ -909,8 +924,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     protected int getServerErrorCount()
     {
         String text = getServerErrors();
-        Pattern errorPattern = Pattern.compile("^ERROR", Pattern.MULTILINE);
-        Matcher errorMatcher = errorPattern.matcher(text);
+        Matcher errorMatcher = ERROR_PATTERN.matcher(text);
         int count = 0;
         while (errorMatcher.find())
         {
