@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
+import org.labkey.test.components.glassLibrary.grids.EditableGrid;
 import org.labkey.test.components.glassLibrary.grids.QueryGrid;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
@@ -30,6 +31,12 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
     public ReactSelect getComponentSelect()
     {
         return ReactSelect.finder(getDriver()).waitFor();
+    }
+
+    public EditableGrid getEditableGrid()
+    {
+        getComponentSelect().select("EditableGridPanel");
+        return new EditableGrid.EditableGridFinder(getDriver()).waitFor();
     }
 
     /**

@@ -495,6 +495,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             return Locator.tagWithClass("div", "cell-warning").findElement(gridCell).getText();
     }
 
+    public String getCellPopoverText(int row, String column)
+    {
+        WebElement warnDiv = Locator.tagWithClass("div", "cellular-display").findElement(getCell(row, column));
+        getWrapper().mouseOver(warnDiv);   // cause the tooltip to be present
+        if (getWrapper().waitFor(()-> null != warnDiv.getAttribute("aria-describedby"), 1000))
+        {
+            String popoverId = warnDiv.getAttribute("aria-describedby");
+            return Locator.id(popoverId).findElement(getDriver()).getText();
+        }
+        else
+            return null;
+    }
+
     public List<WebElement> getCellErrors()
     {
         return Locator.tagWithClass("div", "cell-warning").findElements(this);
