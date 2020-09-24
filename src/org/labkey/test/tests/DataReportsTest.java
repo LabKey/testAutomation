@@ -493,13 +493,6 @@ public class DataReportsTest extends ReportTest
         WebElement pipelineLink = waitForElement(Locator.linkWithText("click here"));
         waitForElement(Locator.byClass("x4-window").containing("Start Pipeline Job").hidden());
         clickAndWait(pipelineLink);
-        if (TestProperties.isTrialServer())
-        {
-            // Issue 41205: Unable to run R report as a pipeline job on trial instance
-            waitForPipelineJobsToComplete(2, true);
-            checkExpectedErrors(2); // Pipeline errors
-            return; // done
-        }
         waitForPipelineJobsToComplete(2, false);
         // go back to the report and confirm it is visible
         clickReportGridLink(R_SCRIPTS[1]);
