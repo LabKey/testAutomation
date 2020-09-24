@@ -13,9 +13,10 @@ import org.labkey.test.pages.test.CoreComponentsTestPage;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class})
 public class EditableGridTest extends BaseWebDriverTest
@@ -56,6 +57,8 @@ public class EditableGridTest extends BaseWebDriverTest
         assertThat("Expect cell error to explain that paste cannot add columns",
                 testGrid.getCellPopoverText(0, "Description"),
                 is("Unable to paste. Cannot paste columns beyond the columns found in the grid."));
+        assertThat("Expect failed paste to leave data unchanged",
+                testGrid.getColumnData("LSID *"), everyItem(is("")));
     }
 
     @Test
@@ -74,9 +77,11 @@ public class EditableGridTest extends BaseWebDriverTest
 
         testGrid.pasteFromCell(0, "Description", tallShape);
         List<String> pastedColData = testGrid.getColumnData("Description");
+        List<String> unpastedColData = testGrid.getColumnData("LSID *");
 
-        assertThat(pastedColData, hasItems("42", "41", "40", "39", "38"));
-        assertThat(testGrid.getRowCount(), is(5));
+        assertEquals("Didn't get correct values", List.of("42", "41", "40", "39", "38"), pastedColData);
+        assertThat("expect other column to remain empty",
+                unpastedColData, everyItem(is("")));
     }
 
     @Override
