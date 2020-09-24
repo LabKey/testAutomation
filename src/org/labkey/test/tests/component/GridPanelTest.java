@@ -20,7 +20,7 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-@Category({DailyB.class})       // until we create a component suite, it's a daily
+@Category({DailyB.class})
 public class GridPanelTest extends BaseWebDriverTest
 {
     @Override
