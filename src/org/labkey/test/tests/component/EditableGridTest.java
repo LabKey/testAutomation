@@ -17,7 +17,7 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-@Category({DailyB.class})   // until there's a component suite
+@Category({DailyB.class})
 public class EditableGridTest extends BaseWebDriverTest
 {
     @Override
