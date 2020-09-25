@@ -142,6 +142,18 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
+     * Finds the first row with the specified texts in the specified columns, and sets its checkbox
+     * @param partialMap    key-column, value-text in that column
+     * @param checked       the desired checkbox state
+     * @return
+     */
+    public ResponsiveGrid selectRow(Map partialMap, boolean checked)
+    {
+        getRow(partialMap).select(checked);
+        return getThis();
+    }
+
+    /**
      * Finds the first row with the specified text in the specified column and sets its checkbox
      * @param columnLabel    header text of the specified column
      * @param text          Text to be found in the specified column
