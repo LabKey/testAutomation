@@ -172,7 +172,7 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         final Locator collapseIconLocator = Locator.tagWithClass("div", "domain-validator-collapse-icon");
         final WebElement textColor = Locator.tagWithName("button", "domainpropertiesrow-textColor").findWhenNeeded(this);
         final WebElement fillColor = Locator.tagWithName("button", "domainpropertiesrow-backgroundColor").findWhenNeeded(this);
-        final WebElement removeButton = Locator.button("Remove Validator").findWhenNeeded(this);
+        final WebElement removeButton = Locator.button("Remove Formatting").findWhenNeeded(this);
     }
 
 
