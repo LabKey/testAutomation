@@ -1125,7 +1125,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                         + (GC_ATTEMPT_LIMIT - attempt) + " attempt(s) remaining.)");
 
                 // If another thread (e.g., SearchService) is doing work then give it 10 seconds before trying again
-                if (isElementPresent(Locators.labkeyError.containing("Active thread(s) may have objects in use:")))
+                if (isRequestThreadActive())
                 {
                     log("Pausing 10 seconds to wait for active thread");
                     sleep(10000);
@@ -1164,6 +1164,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         else
             log("Found " + leakCount + " in-use objects.  This is within the expected number of " + MAX_LEAK_LIMIT + ".");
+    }
+
+    /** Assuming you're on the Admin Console's memory usage page, checks for text indicating there's an active thread processing an HTTP request. */
+    protected boolean isRequestThreadActive()
+    {
+        return isElementPresent(Locators.labkeyError.containing("Active thread(s) may have objects in use:"));
     }
 
     @LogMethod
