@@ -142,6 +142,21 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
+     * Finds the first row with the specified texts in the specified columns, and sets its checkbox
+     * @param partialMap    key-column, value-text in that column
+     * @param checked       the desired checkbox state
+     * @return
+     */
+    public ResponsiveGrid selectRow(Map<String, String> partialMap, boolean checked)
+    {
+        GridRow row = getRow(partialMap);
+        selectRowAndVerifyCheckedCounts(row, checked);
+        getWrapper().log("Row described by map ["+partialMap+"] selection state set to + ["+row.isSelected()+"]");
+
+        return getThis();
+    }
+
+    /**
      * Finds the first row with the specified text in the specified column and sets its checkbox
      * @param columnLabel    header text of the specified column
      * @param text          Text to be found in the specified column
@@ -150,10 +165,18 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public ResponsiveGrid selectRow(String columnLabel, String text, boolean checked)
     {
+        GridRow row = getRow(columnLabel, text);
+        selectRowAndVerifyCheckedCounts(row, checked);
+        getWrapper().log("Row at column ["+columnLabel+"] with text ["+text+"] selection state set to + ["+row.isSelected()+"]");
+
+        return getThis();
+    }
+
+    private void selectRowAndVerifyCheckedCounts(GridRow row, boolean checked)
+    {
         Locator selectedCheckboxes = Locator.css("tr td input:checked[type='checkbox']");
         int initialCount = selectedCheckboxes.findElements(this).size();
         int increment = 0;
-        GridRow row = getRow(columnLabel, text);
 
         if (checked && !row.isSelected())
             increment++;
@@ -165,8 +188,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         int finalIncrement = increment;
         int subsequentCount = selectedCheckboxes.findElements(this).size();
         waitFor(()-> subsequentCount == initialCount + finalIncrement, 1000);
-        getWrapper().log("Row at column ["+columnLabel+"] with text ["+text+"] selection state set to + ["+row.isSelected()+"]");
-        return getThis();
     }
 
     /**
