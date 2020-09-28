@@ -19,7 +19,7 @@ public class RangeValidatorDialog extends ModalDialog
 
     public RangeValidatorDialog(DomainFieldRow row)
     {
-        this(row, new ModalDialogFinder(row.getDriver()).withTitle("Range Validator for " + row.getName()));
+        this(row, new ModalDialogFinder(row.getDriver()).withTitle("Range Validator(s) for " + row.getName()));
     }
 
     public List<RangeValidatorPanel> validators()
