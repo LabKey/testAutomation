@@ -1324,7 +1324,7 @@ public class ListTest extends BaseWebDriverTest
     void createList(String name, List<ListHelper.ListColumn> cols, String[][] data)
     {
         log("Add List -- " + name);
-        _listHelper.createList(PROJECT_VERIFY, name, ListColumnType.fromNew(cols.get(0).getType()), cols.get(0).getName(),
+        _listHelper.createList(PROJECT_VERIFY, name, cols.get(0),
                 cols.subList(1, cols.size()).toArray(new ListHelper.ListColumn[cols.size() - 1]));
         _listHelper.goToList(name);
         _listHelper.clickImportData();

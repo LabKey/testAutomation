@@ -497,7 +497,7 @@ public class FieldDefinition extends PropertyDescriptor
         }
     }
 
-    public static abstract class FieldValidator<V extends FieldValidator<V>>
+    public abstract static class FieldValidator<V extends FieldValidator<V>>
     {
         private String _name;
         private String _description;

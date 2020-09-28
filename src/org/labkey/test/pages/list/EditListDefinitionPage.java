@@ -25,7 +25,6 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.ToggleButton;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -33,7 +32,6 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
-import static org.labkey.test.WebDriverWrapper.sleep;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 /**
@@ -100,16 +98,19 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
 
     // List Fields
 
-    public DomainFormPanel setKeyField(ListHelper.ListColumnType listKeyType, String listKeyName)
+    public DomainFormPanel setKeyField(FieldDefinition keyFieldDefinition)
     {
+        String listKeyName = keyFieldDefinition.getName();
+        FieldDefinition.ColumnType listKeyType = keyFieldDefinition.getType();
+
         DomainFormPanel fieldsPanel = getFieldsPanel();
-        if (listKeyType == ListHelper.ListColumnType.AutoInteger)
+        if (listKeyType == FieldDefinition.ColumnType.AutoInteger)
         {
-            fieldsPanel.manuallyDefineFields("REMOVE_ME");
+            fieldsPanel.manuallyDefineFields();
             selectAutoIntegerKeyField();
-            sleep(500); // wait just a bit for the auto integer key field to be added
+            WebDriverWrapper.waitFor(() -> fieldsPanel.getFields().size() > 1, "Auto-integer key field didn't appear", 1000);
             fieldsPanel.getField(0).setName(listKeyName);
-            fieldsPanel.removeField("REMOVE_ME");
+            fieldsPanel.getField(1).clickRemoveField(false);
         }
         else
         {

@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
@@ -58,11 +59,11 @@ public class FieldValidatorTest extends BaseWebDriverTest
 
                 new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, ""),
                 new ListHelper.ListColumn("id", "ID", ListHelper.ListColumnType.String, "",
-                        new ListHelper.RegExValidator("idValidator", "idValidator", ID_ERROR_MSG, "ID:.*:001")),
+                        new FieldDefinition.RegExValidator("idValidator", "idValidator", ID_ERROR_MSG, "ID:.*:001")),
                 new ListHelper.ListColumn("age", "Age", ListHelper.ListColumnType.Integer, "",
-                        new ListHelper.RangeValidator("ageValidator", "ageValidator", AGE_ERROR_MSG, ListHelper.RangeType.Equals, "25")),
+                        new FieldDefinition.RangeValidator("ageValidator", "ageValidator", AGE_ERROR_MSG, FieldDefinition.RangeType.Equals, "25")),
                 new ListHelper.ListColumn("sex", "Sex", ListHelper.ListColumnType.String, "",
-                        new ListHelper.RegExValidator("sexValidator", "sexValidator", SEX_ERROR_MSG, "male|female")),
+                        new FieldDefinition.RegExValidator("sexValidator", "sexValidator", SEX_ERROR_MSG, "male|female")),
         };
 
         _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);

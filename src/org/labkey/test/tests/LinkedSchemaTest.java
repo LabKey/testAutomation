@@ -31,6 +31,7 @@ import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LinkedSchemaTestUtils;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RelativeUrl;
@@ -46,6 +47,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.LinkedSchemaTestUtils.A_PEOPLE_SCHEMA_NAME;
+import static org.labkey.test.util.LinkedSchemaTestUtils.LIST_NAME;
+import static org.labkey.test.util.LinkedSchemaTestUtils.QUERY_NAME;
 
 /**
  * This test created linked schemas from a source container in a target container.
@@ -105,7 +109,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private static final String MOTHER = "Mother";
     private static final String READER_USER = "reader@linkedschema.test";
 
-    public static final String LIST_NAME = "LinkedSchemaTestPeople";
     public static final String LIST_DATA = "Name\tAge\tCrazy\tP\tQ\tR\tS\tT\tU\tV\tW\tX\tY\tZ\n" +
             "Dave\t39\tTrue\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz\n" +
             "Adam\t65\tTrue\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz\n" +
@@ -119,10 +122,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             "249318596\tStudyA\n" +
             "249320107\tStudyB\n" +
             "249320127\tStudyA";
-
-    // Original list definition title and URL
-    public static final String LIST_DEF_TITLE = "Original List";
-    public static final String LIST_DEF_URL   = "list_original.view";
 
     // File-based metadata lives in linkedschematest/queries/lists/LinkedSchemaTestPeople.query.xml
     public static final String LIST_FILE_METADATA_TITLE = "file_metadata List";
@@ -175,7 +174,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             "  </table>\n" +
             "</tables>";
 
-    public static final String QUERY_NAME = "LinkedSchemaTestQuery";
     // BUGBUG? Can't apply database metadata to a file-based query.
 //    public static final String QUERY_METADATA_OVERRIDE_TITLE = "db_metadata Query";
 //    public static final String QUERY_METADATA_OVERRIDE_URL   = "db_metadata.view";
@@ -212,7 +210,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 //            "</tables>";
 
     // A_People linked schema definition and metadata override
-    public static final String A_PEOPLE_SCHEMA_NAME = "A_People";
     public static final String A_PEOPLE_METADATA_TITLE = "A_People template List Name";
     public static final String A_PEOPLE_METADATA =
             "<tables xmlns=\"http://labkey.org/data/xml\" xmlns:cv=\"http://labkey.org/data/xml/queryCustomView\">\n" +
@@ -424,7 +421,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     public void lookupTest()
     {
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "BasicLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", null);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "BasicLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", null);
 
         //Ensure that all the columns we would expect to come through are coming through
         assertColumnsPresent(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", "SubjectID", "Name", "Family", "Mother", "Father", "Species", "Occupation",
@@ -448,7 +445,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         createLinkedSchemaQuery(SOURCE_FOLDER, "lists", "QueryOverLookup", "NIMHDemographics");
 
         //Create a new linked schema that includes that query, and ensure that it is propagating lookups in the expected manner
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "QueryLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions,QueryOverLookup", null);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "QueryLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions,QueryOverLookup", null);
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
 
@@ -465,7 +462,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         log("** Creating linked schema filtered by 'Frisby' family");
         String customFilterMetadata = getCustomFilterMetadata("Frisby");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "CustomFilterLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", customFilterMetadata);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "CustomFilterLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", customFilterMetadata);
 
         log("** Verifying linked schema tables are filtered");
         navigateToQuery("CustomFilterLinkedSchema", "NIMHDemographics");
@@ -500,7 +497,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         log("Create the linked schema to the study.");
         String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, "study", "Demographics", STUDY_FILTER_METADATA);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, "study", "Demographics", STUDY_FILTER_METADATA);
 
         log("Validate that with no filter all of the participants are visible in the linked schema.");
         checkLinkedSchema(STUDY_FILTER_METADATA, null, 6);
@@ -616,22 +613,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     void createList()
     {
         log("** Importing some data...");
-        _listHelper.createList(getProjectName() + "/" + SOURCE_FOLDER, LIST_NAME,
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"),
-                new ListHelper.ListColumn("P", LIST_DEF_TITLE + " P", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("Q", LIST_DEF_TITLE + " Q", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("R", LIST_DEF_TITLE + " R", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("S", LIST_DEF_TITLE + " S", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("T", LIST_DEF_TITLE + " T", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("U", LIST_DEF_TITLE + " U", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("V", LIST_DEF_TITLE + " V", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("W", LIST_DEF_TITLE + " W", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("X", LIST_DEF_TITLE + " X", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("Y", LIST_DEF_TITLE + " Y", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("Z", LIST_DEF_TITLE + " Z", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL));
+        LinkedSchemaTestUtils.createOriginalList(getProjectName() + "/" + SOURCE_FOLDER, getDriver());
 
         log("** Importing some data...");
         _listHelper.goToList(LIST_NAME);
@@ -662,7 +644,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema APeople without template");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", LIST_NAME + "," + QUERY_NAME, A_PEOPLE_METADATA);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", LIST_NAME + "," + QUERY_NAME, A_PEOPLE_METADATA);
 
         log("** Applying metadata to " + LIST_NAME + " in linked schema container");
         beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + LIST_NAME + "#metadata");
@@ -755,7 +737,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema BPeople using BPeopleTemplate");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, B_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, null, null);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, B_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, null, null);
     }
 
     @LogMethod
@@ -777,7 +759,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema BPeople using BPeopleTemplate with metadata override to only show 'D' people");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, LIST_NAME + "," + QUERY_NAME, D_PEOPLE_METADATA);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, LIST_NAME + "," + QUERY_NAME, D_PEOPLE_METADATA);
     }
 
     @LogMethod

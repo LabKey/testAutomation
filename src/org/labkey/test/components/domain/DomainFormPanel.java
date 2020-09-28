@@ -132,13 +132,18 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public DomainFieldRow manuallyDefineFields(String name)
     {
+        DomainFieldRow newFieldRow = manuallyDefineFields();
+        newFieldRow.setName(name);
+        return newFieldRow;
+    }
+
+    public DomainFieldRow manuallyDefineFields()
+    {
         getWrapper().scrollIntoView(elementCache().manuallyDefineFieldsLink, true);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineFieldsLink)); // give modal dialogs time to disappear
         elementCache().manuallyDefineFieldsLink.click();
 
-        DomainFieldRow newFieldRow = elementCache().findFieldRows().get(0);
-        newFieldRow.setName(name);
-        return newFieldRow;
+        return elementCache().findFieldRows().get(0);
     }
 
     public DomainFieldRow manuallyDefineFields(FieldDefinition fieldDefinition)
@@ -173,6 +178,11 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         DomainFieldRow row = elementCache().findFieldRows().get(tabIndex);
         scrollRowIntoView(row);
         return row;
+    }
+
+    public List<DomainFieldRow> getFields()
+    {
+        return elementCache().findFieldRows();
     }
 
     private void scrollRowIntoView(DomainFieldRow row)

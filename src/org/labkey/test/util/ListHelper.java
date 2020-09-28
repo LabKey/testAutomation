@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 public class ListHelper extends LabKeySiteWrapper
 {
     public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
-    private WrapsDriver _wrapsDriver;
+    private final WrapsDriver _wrapsDriver;
 
     public ListHelper(WrapsDriver wrapsDriver)
     {
@@ -235,35 +235,47 @@ public class ListHelper extends LabKeySiteWrapper
         clickButton("OK");
     }
 
-    @LogMethod
-    public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    /**
+     * @deprecated Use {@link #createList(String, FieldDefinition, FieldDefinition...)}
+     */
+    @Deprecated (since = "20.10")
+    public void createList(String listName, ListColumnType listKeyType, String listKeyName, FieldDefinition... cols)
     {
-        beginCreateListFromTab(tabName, listName);
-        createListHelper(listKeyType, listKeyName, cols);
+        createList(listName, new FieldDefinition(listKeyName, listKeyType.toNew()), cols);
     }
 
     @LogMethod
-    public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    public void createList(@LoggedParam String listName, FieldDefinition listKey, FieldDefinition... cols)
+    {
+        beginCreateListHelper(listName);
+        defineListFields(listKey, cols);
+    }
+
+    /**
+     * @deprecated Use {@link #createList(String, String, FieldDefinition, FieldDefinition...)}
+     */
+    @Deprecated (since = "20.10")
+    public void createList(String containerPath, String listName, ListColumnType listKeyType, String listKeyName, FieldDefinition... cols)
+    {
+        createList(containerPath, listName, new FieldDefinition(listKeyName, listKeyType.toNew()), cols);
+    }
+
+    @LogMethod
+    public void createList(String containerPath, @LoggedParam String listName, FieldDefinition listKey, FieldDefinition... cols)
     {
         beginCreateList(containerPath, listName);
-        createListHelper(listKeyType, listKeyName, cols);
+        defineListFields(listKey, cols);
     }
 
-    private void createListHelper(ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    private void defineListFields(FieldDefinition listKey, FieldDefinition... cols)
     {
         EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
-        DomainFormPanel fieldsPanel = listDefinitionPage.setKeyField(listKeyType, listKeyName);
-        for (ListColumn col : cols)
+        DomainFormPanel fieldsPanel = listDefinitionPage.setKeyField(listKey);
+        for (FieldDefinition col : cols)
         {
             fieldsPanel.addField(col);
         }
         listDefinitionPage.clickSave();
-    }
-
-    private void beginCreateListFromTab(String tabName, String listName)
-    {
-        clickTab(tabName.replace(" ", ""));
-        beginCreateListHelper(listName);
     }
 
     public void clickTab(String tabname)
@@ -415,49 +427,29 @@ public class ListHelper extends LabKeySiteWrapper
     @Deprecated
     public enum ListColumnType
     {
-        MultiLine("Multi-Line Text"),
-        Integer("Integer"),
-        String("Text (String)"),
-        Subject("Subject/Participant (String)"),
-        DateAndTime("Date Time"),
-        Boolean("Boolean"),
-        Decimal("Decimal"),
-        File("File"),
-        AutoInteger("Auto-Increment Integer"),
-        Flag("Flag (String)"),
-        Attachment("Attachment"),
-        User("User");
+        MultiLine(FieldDefinition.ColumnType.MultiLine),
+        Integer(FieldDefinition.ColumnType.Integer),
+        String(FieldDefinition.ColumnType.String),
+        Subject(FieldDefinition.ColumnType.Subject),
+        DateAndTime(FieldDefinition.ColumnType.DateAndTime),
+        Boolean(FieldDefinition.ColumnType.Boolean),
+        Decimal(FieldDefinition.ColumnType.Decimal),
+        File(FieldDefinition.ColumnType.File),
+        AutoInteger(FieldDefinition.ColumnType.AutoInteger),
+        Flag(FieldDefinition.ColumnType.Flag),
+        Attachment(FieldDefinition.ColumnType.Attachment),
+        User(FieldDefinition.ColumnType.User);
 
-        private final String _description;
+        private final FieldDefinition.ColumnType _newType;
 
-        ListColumnType(String description)
+        ListColumnType(FieldDefinition.ColumnType newType)
         {
-            _description = description;
-        }
-
-        public String toString()
-        {
-            return _description;
+            _newType = newType;
         }
 
         public FieldDefinition.ColumnType toNew()
         {
-            for (FieldDefinition.ColumnType thisType : FieldDefinition.ColumnType.values())
-            {
-                if (name().equals(thisType.name()))
-                    return thisType;
-            }
-            throw new IllegalArgumentException("Type mismatch: " + this);
-        }
-
-        public static ListColumnType fromNew(FieldDefinition.ColumnType newType)
-        {
-            for (ListColumnType thisType : values())
-            {
-                if (newType.name().equals(thisType.name()))
-                    return thisType;
-            }
-            throw new IllegalArgumentException("Type mismatch: " + newType);
+            return _newType;
         }
     }
 
@@ -474,36 +466,12 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
     /**
-     * @deprecated Use {@link FieldDefinition.RegExValidator}
-     */
-    @Deprecated
-    public static class RegExValidator extends FieldDefinition.RegExValidator
-    {
-        public RegExValidator(String name, String description, String message, String expression)
-        {
-            super(name, description, message, expression);
-        }
-    }
-
-    /**
-     * @deprecated Use {@link FieldDefinition.RangeValidator}
-     */
-    @Deprecated
-    public static class RangeValidator extends FieldDefinition.RangeValidator
-    {
-        public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange)
-        {
-            super(name, description, message, firstType.toNew(), firstRange);
-        }
-    }
-
-    /**
      * @deprecated Use {@link FieldDefinition}
      */
     @Deprecated
     public static class ListColumn extends FieldDefinition
     {
-        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url, Integer scale)
+        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator<?> validator, String url, Integer scale)
         {
             super(name);
             setLabel(label);
@@ -517,7 +485,7 @@ public class ListHelper extends LabKeySiteWrapper
             setScale(scale);
         }
 
-        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url)
+        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator<?> validator, String url)
         {
             this(name, label, type, description, format, lookup, validator, url, null);
         }
@@ -537,7 +505,7 @@ public class ListHelper extends LabKeySiteWrapper
             this(name, label, type, description, null, null, null, null);
         }
 
-        public ListColumn(String name, String label, ListColumnType type, String description, FieldValidator validator)
+        public ListColumn(String name, String label, ListColumnType type, String description, FieldValidator<?> validator)
         {
             this(name, label, type, description, null, null, validator, null);
         }
