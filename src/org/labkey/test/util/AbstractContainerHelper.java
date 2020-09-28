@@ -30,8 +30,9 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.pages.admin.CreateSubFolderPage;
+import org.labkey.test.pages.admin.CreateFolderPage;
 import org.labkey.test.pages.admin.SetFolderPermissionsPage;
+import org.labkey.test.params.ContainerProps;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
@@ -79,9 +80,9 @@ public abstract class AbstractContainerHelper
     /** @param folderType the name of the type of container to create.
      * May be null, in which case you get the server's default folder type */
     @LogMethod(quiet = true)
-    public final void createProject(@LoggedParam String projectName, @Nullable String folderType)
+    public final void createProject(@LoggedParam String projectName, @Nullable String folderType, String... enableModules)
     {
-        doCreateProject(projectName, folderType);
+        doCreateProject(projectName, folderType, Arrays.asList(enableModules));
         _createdProjects.add(projectName);
     }
 
@@ -126,11 +127,12 @@ public abstract class AbstractContainerHelper
     @LogMethod
     public final void createSubfolder(String parentPath, String folderName, String folderType)
     {
-        doCreateFolder(parentPath, folderName, folderType);
+        doCreateFolder(parentPath, folderName, folderType, null);
     }
 
-    protected abstract void doCreateProject(String projectName, String folderType);
-    protected abstract void doCreateFolder(String parentPath, String folderName, String folderType);
+    protected abstract void doCreateProject(String projectName, String folderType, List<String> enableModules);
+    protected abstract void doCreateFolder(String parentPath, String folderName, String folderType, List<String> enableModules);
+    protected abstract void doCreateContainer(ContainerProps props);
 
     // Projects might be created by other means
     public void addCreatedProject(String projectName)
@@ -274,7 +276,7 @@ public abstract class AbstractContainerHelper
     public void createSubfolder(String project, String child, String[] tabsToAdd)
     {
         // create a child of the top-level project folder:
-        createSubfolder(project, project, child, "None", tabsToAdd);
+        doCreateFolder(project, child, "None", Arrays.asList(tabsToAdd));
     }
 
     public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String[] tabsToAdd)
@@ -305,34 +307,34 @@ public abstract class AbstractContainerHelper
     @LogMethod
     public void createSubfolder(@LoggedParam String project, String parent, @LoggedParam String child, @Nullable String folderType, String templateFolder, @Nullable String[] templatePartsToUncheck, @Nullable String[] tabsToAdd, boolean inheritPermissions, @Nullable String title)
     {
-        CreateSubFolderPage createSubFolderPage = startCreateFolder(project, parent, child);
+        CreateFolderPage createFolderPage = startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
         {
-            createSubFolderPage.selectFolderType(folderType);
+            createFolderPage.selectFolderType(folderType);
             if(folderType.equals("Create From Template Folder"))
             {
                 _test.log("create from template");
-                createSubFolderPage.createFromTemplateFolder(templateFolder);
+                createFolderPage.createFromTemplateFolder(templateFolder);
                 if(title != null)
                 {
-                    createSubFolderPage.setUseNameAsDisplayTitle();
-                    createSubFolderPage.setTitle(title);
+                    createFolderPage.setUseNameAsDisplayTitle();
+                    createFolderPage.setTitle(title);
                 }
                 if (templatePartsToUncheck != null)
                 {
                     for(String part : templatePartsToUncheck)
                     {
-                        createSubFolderPage.setTemplatePartCheckBox(part, false);
+                        createFolderPage.setTemplatePartCheckBox(part, false);
                     }
                 }
             }
         }
         else {
-            createSubFolderPage.selectFolderType("Custom");
-            createSubFolderPage.addTabs(tabsToAdd);
+            createFolderPage.selectFolderType("Custom");
+            createFolderPage.addTabs(tabsToAdd);
         }
 
-        SetFolderPermissionsPage setFolderPermissionsPage = createSubFolderPage.clickNext();
+        SetFolderPermissionsPage setFolderPermissionsPage = createFolderPage.clickNext();
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, child));
 
         //second page of the wizard
@@ -379,7 +381,7 @@ public abstract class AbstractContainerHelper
         }
     }
 
-    private CreateSubFolderPage startCreateFolder(String project, String parent, String child)
+    private CreateFolderPage startCreateFolder(String project, String parent, String child)
     {
         if (!parent.equals(project))
             _test.navigateToFolder(project, parent);
@@ -387,28 +389,13 @@ public abstract class AbstractContainerHelper
             _test.clickProject(project);
 
         return _test.projectMenu().navigateToCreateSubFolderPage()
-                .setFolderName(child);
+                .setName(child);
     }
 
     public boolean doesContainerExist(String containerPath)
     {
         int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("project", containerPath, "begin")).getResponseCode();
         return response != HttpStatus.SC_NOT_FOUND;
-    }
-
-    /**
-     * @deprecated Use precise container path: {@link #doesContainerExist(String)}
-     */
-    @Deprecated
-    public boolean doesFolderExist(String project, String parent, String child)
-    {
-        _test.clickProject(project);
-        if (!parent.equals(project))
-        {
-            _test.clickFolder(parent);
-        }
-        _test.openFolderMenu();
-        return _test.isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child)));
     }
 
     public void deleteFolder(String project, @LoggedParam String folderName)

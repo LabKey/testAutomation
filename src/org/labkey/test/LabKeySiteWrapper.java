@@ -478,14 +478,24 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void ensureAdminMode()
     {
         if (!onLabKeyPage())
+        {
+            TestLogger.warn("ensureAdminMode called from non-standard page");
             goToHome();
+        }
         if (!isSignedIn())
+        {
+            TestLogger.warn("ensureAdminMode called while not logged in");
             simpleSignIn();
+        }
         else if (!isUserSystemAdmin() && isImpersonating())
+        {
+            TestLogger.warn("ensureAdminMode called while impersonating non-admin");
             stopImpersonating(false);
+        }
         Locator projectMenu = ProjectMenu.Locators.menuProjectNav;
         if (!isElementPresent(projectMenu))
         {
+            TestLogger.warn("project menu not present after ensureAdminMode");
             goToHome();
             waitForElement(projectMenu, WAIT_FOR_PAGE);
         }

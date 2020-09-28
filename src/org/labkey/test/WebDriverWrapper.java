@@ -35,6 +35,7 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.LabKeyAlert;
+import org.labkey.test.pages.admin.CreateFolderPage;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.assay.AssayBeginPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
@@ -879,9 +880,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new BeginPage(getDriver());
     }
 
-    public void goToCreateProject()
+    public CreateFolderPage goToCreateProject()
     {
         clickAdminMenuItem("Site", "Create Project");
+        return new CreateFolderPage(getDriver());
     }
 
 

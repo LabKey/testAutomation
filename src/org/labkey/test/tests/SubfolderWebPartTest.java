@@ -161,7 +161,7 @@ public class SubfolderWebPartTest extends BaseWebDriverTest
 
         subfoldersWebPart.clickCreateSubfolder()
                 .selectFolderType("Collaboration")
-                .setFolderName(newSubFolderName)
+                .setName(newSubFolderName)
                 .clickNext()
                 .setMyUserOnly()
                 .clickFinish();
