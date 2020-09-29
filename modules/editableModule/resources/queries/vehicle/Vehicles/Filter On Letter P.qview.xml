@@ -1,0 +1,10 @@
+<cv:customView xmlns:cv="http://labkey.org/data/xml/queryCustomView">
+    <cv:columns>
+        <cv:column name="RowId" />
+        <cv:column name="Color" />
+        <cv:column name="ModelId" />
+    </cv:columns>
+    <cv:filters>
+        <cv:filter column="ModelId/Name" operator="startswith" value="P"/>
+    </cv:filters>
+</cv:customView>
