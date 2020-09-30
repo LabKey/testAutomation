@@ -6,6 +6,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.FluentWait;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,8 +37,22 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         return _driver;
     }
 
-    private void expandToFolder(DirectorySubTree parent, String[] pathParts)
+    public DirectorySubTree selectFolder(String folderPath)
     {
+        String[] pathParts = folderPath.split("/");
+        DirectorySubTree dir = elementCache().rootDir;
+        for (String pathPart : pathParts)
+        {
+            dir = dir.getSubfolder(pathPart);
+        }
+        return dir.select();
+    }
+
+    public void selectFile(String filePath)
+    {
+        int fileNameIndex = filePath.lastIndexOf('/');
+        DirectorySubTree parentFolder = selectFolder(filePath.substring(0, fileNameIndex));
+        parentFolder.getFile(filePath.substring(fileNameIndex + 1));
     }
 
     @Override
@@ -48,7 +63,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        DirectorySubTree rootDir = new DirectorySubTree(FileTree.directorySubTreeLoc(null).findWhenNeeded(this));
+        DirectorySubTree rootDir = new DirectorySubTree(FileTree.directorySubTreeLoc(null, true).findWhenNeeded(this));
 
     }
 
@@ -74,9 +89,10 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         }
     }
 
-    private static Locator directorySubTreeLoc(String directory)
+    private static Locator directorySubTreeLoc(String directory, boolean dir)
     {
-        Locator.XPathLocator dirNameLoc = Locator.xpath("./div[1]//div").withClass("filetree-directory-name");
+        String nameDivClass = dir ? "filetree-directory-name" : "filetree-file-name";
+        Locator.XPathLocator dirNameLoc = Locator.xpath("./div[1]//div").withClass(nameDivClass);
         if (directory != null)
         {
             dirNameLoc = dirNameLoc.withText(directory);
@@ -86,11 +102,13 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
     private static final Pattern rotationPattern = Pattern.compile("transform: rotateZ\\((.+)deg\\);");
 
-    private class DirectorySubTree extends Component
+    private static class DirectorySubTree extends Component<Component<?>.ElementCache>
     {
         private final WebElement _el; // <li> that wraps subtree
         private final WebElement _toggleArrow = Locator.xpath("./div[1]/div[1]").findWhenNeeded(this);
+        private final WebElement _checkboxContainer = Locator.xpath("./div/span").withClass("filetree-checkbox-container").findWhenNeeded(this);
         private final WebElement _directoryName = Locator.byClass("filetree-directory-name").findWhenNeeded(this);
+        private final FluentWait<Object> toggleWait = new FluentWait<>(new Object());
 
         DirectorySubTree(WebElement el)
         {
@@ -99,7 +117,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
         DirectorySubTree(DirectorySubTree parent, String dirName)
         {
-            this(FileTree.directorySubTreeLoc(dirName).findElement(parent._el));
+            this(FileTree.directorySubTreeLoc(dirName, true).findElement(parent));
         }
 
         @Override
@@ -108,14 +126,89 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             return _el;
         }
 
-        private String getRotation()
+        public String getName()
+        {
+            return _directoryName.getText();
+        }
+
+        public DirectorySubTree getSubfolder(String dirName)
+        {
+            expand();
+            return new DirectorySubTree(this, dirName);
+        }
+
+        public WebElement getFile(String fileName)
+        {
+            expand();
+            return FileTree.directorySubTreeLoc(fileName, false).findElement(this);
+        }
+
+        public DirectorySubTree select()
+        {
+            if (!isSelected())
+            {
+                _directoryName.click();
+                waitForToggle();
+            }
+            return this;
+        }
+
+        private DirectorySubTree expand()
+        {
+            if (waitForToggle() != DirExpansionState.OPEN)
+            {
+                _toggleArrow.click();
+                toggleWait.until(o -> getState() == DirExpansionState.OPEN);
+            }
+            return this;
+        }
+
+        private DirectorySubTree collapse()
+        {
+            if (waitForToggle() != DirExpansionState.CLOSED)
+            {
+                _toggleArrow.click();
+                toggleWait.until(o -> getState() == DirExpansionState.CLOSED);
+            }
+            return this;
+        }
+
+        private boolean isSelected()
+        {
+            return _checkboxContainer.getAttribute("class").contains("active");
+        }
+
+        private DirExpansionState waitForToggle()
+        {
+            return toggleWait.until(o -> {
+                DirExpansionState state = getState();
+                if (state == DirExpansionState.ANIMATING)
+                {
+                    return null; // keep waiting
+                }
+                else
+                {
+                    return state;
+                }
+            });
+        }
+
+        private DirExpansionState getState()
         {
             String style = StringUtils.trimToEmpty(_toggleArrow.getAttribute("style"));
             Matcher matcher = rotationPattern.matcher(style);
             if (matcher.matches())
             {
                 String rotation = matcher.group(1);
-                return rotation;
+                switch (rotation)
+                {
+                    case "90":
+                        return DirExpansionState.OPEN;
+                    case "0":
+                        return DirExpansionState.CLOSED;
+                    default:
+                        return DirExpansionState.ANIMATING;
+                }
             }
             else
             {
@@ -126,6 +219,8 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
     private enum DirExpansionState
     {
-
+        OPEN,
+        CLOSED,
+        ANIMATING
     }
 }
