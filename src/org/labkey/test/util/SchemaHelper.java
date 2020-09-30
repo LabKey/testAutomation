@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 
 public class SchemaHelper
 {
@@ -28,16 +29,44 @@ public class SchemaHelper
         _test = test;
     }
 
-    @LogMethod
+    /**
+     * @deprecated Use other {@link #createLinkedSchema(String, String, String, String, String, String, String)}
+     */
+    @Deprecated (since = "20.10")
     public void createLinkedSchema(String projectName, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {
-        _editLinkedSchema(true, projectName, targetFolder, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
+        StringBuilder targetContainerPath = new StringBuilder(projectName);
+        if (targetFolder != null)
+        {
+            targetContainerPath.append("/").append(targetFolder);
+        }
+        createLinkedSchema(targetContainerPath.toString(), name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
     }
 
     @LogMethod
+    public void createLinkedSchema(String targetContainerPath, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
+    {
+        createOrEditLinkedSchema(true, targetContainerPath, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
+    }
+
+    /**
+     * @deprecated Use other {@link #updateLinkedSchema(String, String, String, String, String, String, String)}
+     */
+    @Deprecated (since = "20.10")
     public void updateLinkedSchema(String projectName, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {
-        _editLinkedSchema(false, projectName, targetFolder, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
+        StringBuilder targetContainerPath = new StringBuilder(projectName);
+        if (targetFolder != null)
+        {
+            targetContainerPath.append("/").append(targetFolder);
+        }
+        updateLinkedSchema(targetContainerPath.toString(), name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
+    }
+
+    @LogMethod
+    public void updateLinkedSchema(String targetContainerPath, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
+    {
+        createOrEditLinkedSchema(false, targetContainerPath, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
     }
 
     //delete external or linked schema
@@ -57,9 +86,9 @@ public class SchemaHelper
         _queryLoadTimeOut = timeout;
     }
 
-    public void _editLinkedSchema(boolean create, String projectName, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
+    private void createOrEditLinkedSchema(boolean create, String targetContainerPath, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {
-        _test.beginAt("/query/" + projectName + (targetFolder == null ? "" : "/" + targetFolder) + "/admin.view");
+        _test.beginAt(WebTestHelper.buildURL("query", targetContainerPath, "admin"));
 
         // Click the create new or edit existing link.
         Locator link;
@@ -73,6 +102,10 @@ public class SchemaHelper
         _test.setFormElement(Locator.xpath("//input[@name='userSchemaName']"), name);
 
         _test.waitForElement(Locator.css(".containers-loaded-marker"));
+        if (!sourceContainerPath.startsWith("/"))
+        {
+            sourceContainerPath = "/" + sourceContainerPath;
+        }
         _test._ext4Helper.selectComboBoxItem("Source Container:", sourceContainerPath);
 
         if (schemaTemplate != null)
