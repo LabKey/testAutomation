@@ -138,7 +138,8 @@ public class ElisaAssayTest extends AbstractAssayTest
     protected void uploadFile(File file, String uniqueifier, String finalButton, boolean testPrepopulation, int startSpecimen, int lastSpecimen)
     {
         // for now just select the legacy linear curve fit
-        selectOptionByText(Locator.name("curveFitMethod"), "Linear");
+        // uncomment when the ELISA experimental feature is removed
+        // selectOptionByText(Locator.name("curveFitMethod"), "Linear");
         for (int i = startSpecimen; i <= lastSpecimen; i++)
         {
             Locator specimenLocator = Locator.name("specimen" + (i) + "_SpecimenID");
