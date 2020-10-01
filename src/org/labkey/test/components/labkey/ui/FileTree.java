@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 
 /**
  * Wraps 'packages/components/src/components/files/FileTree.tsx' from labkey-ui-components
+ * TODO: Merge with {@link org.labkey.test.components.glassLibrary.files.FileSelectTree}
+ * 'FileSelectTree' assumes that rows have checkboxes, this component doesn't support checkboxes at all
  */
 public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 {
@@ -63,7 +65,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        DirectorySubTree rootDir = new DirectorySubTree(FileTree.directorySubTreeLoc(null, true).findWhenNeeded(this));
+        DirectorySubTree rootDir = new DirectorySubTree(FileTree.directoryChildLoc(null, true).findWhenNeeded(this));
 
     }
 
@@ -89,20 +91,20 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         }
     }
 
-    private static Locator directorySubTreeLoc(String directory, boolean dir)
+    private static Locator directoryChildLoc(String name, boolean dir)
     {
         String nameDivClass = dir ? "filetree-directory-name" : "filetree-file-name";
-        Locator.XPathLocator dirNameLoc = Locator.xpath("./div[1]//div").withClass(nameDivClass);
-        if (directory != null)
+        Locator.XPathLocator nameDivLoc = Locator.xpath("./div[1]//div").withClass(nameDivClass);
+        if (name != null)
         {
-            dirNameLoc = dirNameLoc.withText(directory);
+            nameDivLoc = nameDivLoc.withText(name);
         }
-        return Locator.xpath("./div/ul/li").withDescendant(dirNameLoc);
+        return Locator.xpath("./div/ul/li").withDescendant(nameDivLoc);
     }
 
     private static final Pattern rotationPattern = Pattern.compile("transform: rotateZ\\((.+)deg\\);");
 
-    private static class DirectorySubTree extends Component<Component<?>.ElementCache>
+    public static class DirectorySubTree extends Component<Component<?>.ElementCache>
     {
         private final WebElement _el; // <li> that wraps subtree
         private final WebElement _toggleArrow = Locator.xpath("./div[1]/div[1]").findWhenNeeded(this);
@@ -117,7 +119,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
         DirectorySubTree(DirectorySubTree parent, String dirName)
         {
-            this(FileTree.directorySubTreeLoc(dirName, true).findElement(parent));
+            this(FileTree.directoryChildLoc(dirName, true).findElement(parent));
         }
 
         @Override
@@ -140,12 +142,12 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         public WebElement getFile(String fileName)
         {
             expand();
-            return FileTree.directorySubTreeLoc(fileName, false).findElement(this);
+            return FileTree.directoryChildLoc(fileName, false).findElement(this);
         }
 
         public DirectorySubTree select()
         {
-            if (!isSelected())
+            if (!isActive())
             {
                 _directoryName.click();
                 waitForToggle();
@@ -173,7 +175,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             return this;
         }
 
-        private boolean isSelected()
+        private boolean isActive()
         {
             return _checkboxContainer.getAttribute("class").contains("active");
         }
@@ -219,8 +221,8 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
     private enum DirExpansionState
     {
-        OPEN,
-        CLOSED,
+        OPEN, // transform: rotateZ(90deg)
+        CLOSED, // transform: rotateZ(0deg)
         ANIMATING
     }
 }
