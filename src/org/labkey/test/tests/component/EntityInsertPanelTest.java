@@ -71,6 +71,21 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
         assertThat(success.getText(), is("Created 3 samples in sample type 'insert_from_edit_grid'."));
         List<Map<String, Object>> insertedRows = dgen.getRowsFromServer(createDefaultConnection()).getRows();
         assertThat(insertedRows.size(), is(3));
+        Map<String, Object> ed_row = insertedRows.stream().filter(a-> a.get("name").equals("ed")).findFirst().get();
+        assertThat(ed_row.get("intColumn"), is(2));
+        // eventually, parse the date out of dateColumn
+        assertThat(ed_row.get("stringColumn"), is("stringfellow"));
+        assertThat(ed_row.get("boolColumn"), is(true));
+
+        Map<String, Object> jed_row = insertedRows.stream().filter(a-> a.get("name").equals("jed")).findFirst().get();
+        assertThat(jed_row.get("intColumn"), is(3));
+        assertThat(jed_row.get("stringColumn"), is("strongfellow"));
+        assertThat(jed_row.get("boolColumn"), is(false));
+
+        Map<String, Object> ted_row = insertedRows.stream().filter(a-> a.get("name").equals("ted")).findFirst().get();
+        assertThat(ted_row.get("intColumn"), is(4));
+        assertThat(ted_row.get("stringColumn"), is("strangefellow"));
+        assertThat(ted_row.get("boolColumn"), is(true));
 
         dgen.deleteDomain(createDefaultConnection());
     }
