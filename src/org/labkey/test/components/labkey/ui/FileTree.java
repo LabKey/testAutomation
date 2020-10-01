@@ -8,8 +8,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Wraps 'packages/components/src/components/files/FileTree.tsx' from labkey-ui-components
@@ -104,7 +106,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
     private static final Pattern rotationPattern = Pattern.compile("transform: rotateZ\\((.+)deg\\);");
 
-    public static class DirectorySubTree extends Component<Component<?>.ElementCache>
+    public class DirectorySubTree extends Component<Component<?>.ElementCache>
     {
         private final WebElement _el; // <li> that wraps subtree
         private final WebElement _toggleArrow = Locator.xpath("./div[1]/div[1]").findWhenNeeded(this);
@@ -143,6 +145,32 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         {
             expand();
             return FileTree.directoryChildLoc(fileName, false).findElement(this);
+        }
+
+        public boolean containsFile(String name)
+        {
+            expand();
+            return FileTree.directoryChildLoc(name, false).existsIn(this);
+        }
+
+        public boolean containsDir(String name)
+        {
+            expand();
+            return FileTree.directoryChildLoc(name, true).existsIn(this);
+        }
+
+        public List<String> listFiles()
+        {
+            expand();
+            return FileTree.directoryChildLoc(null, false).findElements(this).stream()
+                .map(WebElement::getText).collect(Collectors.toList());
+        }
+
+        public List<String> listDirs()
+        {
+            expand();
+            return FileTree.directoryChildLoc(null, true).findElements(this).stream()
+                .map(WebElement::getText).collect(Collectors.toList());
         }
 
         public DirectorySubTree select()
