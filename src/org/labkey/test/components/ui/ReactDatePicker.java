@@ -145,6 +145,7 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
             .withDescendant(Locator.tag("input"));
         private String _inputId = null;
         private String _name = null;
+        private String _placeholder = null;
 
         public ReactDateInputFinder(WebDriver driver)
         {
@@ -163,6 +164,12 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
             return this;
         }
 
+        public ReactDateInputFinder withPlaceholder(String placeholder)
+        {
+            _placeholder = placeholder;
+            return this;
+        }
+
         @Override
         protected ReactDatePicker construct(WebElement el, WebDriver driver)
         {
@@ -177,6 +184,8 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
                 return _baseLocator.withDescendant(Locator.inputById( _inputId));
             else if (_name != null)
                 return _baseLocator.withDescendant(Locator.input(_name));
+            else if (_placeholder != null)
+                return _baseLocator.withDescendant(Locator.tagWithAttribute("input", "placeholder", _placeholder));
             else
                 return _baseLocator;
         }
