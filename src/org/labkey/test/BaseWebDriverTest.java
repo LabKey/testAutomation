@@ -942,7 +942,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (isTestRunningOnTeamCity()) // Don't risk modifying browser state when running locally
             {
                 // Reset errors before next test and make it easier to view server-side errors that may have happened during the test.
-                checker().withScreenshot("serverErrors").wrapAssertion(this::checkErrors);
+                checker().withScreenshot(testName + "_serverErrors").wrapAssertion(this::checkErrors);
             }
         }
         finally
