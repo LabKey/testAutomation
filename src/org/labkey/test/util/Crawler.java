@@ -177,6 +177,7 @@ public class Crawler
             new ControllerActionId("assay", "downloadSampleQCData"),
             new ControllerActionId("assay", "template"),
             new ControllerActionId("cds", "exportTourDefinitions"), // Download action
+            new ControllerActionId("cds", "permissionsReportExport"),
             new ControllerActionId("core", "downloadFileLink"), // Download action
             new ControllerActionId("dumbster", "begin"),
             new ControllerActionId("experiment", "exportProtocols"),
