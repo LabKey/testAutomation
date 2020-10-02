@@ -267,7 +267,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             super(driver, componentElement);
         }
 
-        public void impersonate(String fakeUser)
+        public void impersonate(String fakeUser) throws InterruptedException
         {
             ImpersonateUserWindow window;
             try
@@ -287,7 +287,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             AbstractUserHelper.saveCurrentDisplayName(getWrapper());
 
             // since the error page does not have home button
-            if (getWrapper().isElementPresent(Locator.buttonContainingText("Back")))
+            if (getWrapper().waitForElement(Locator.buttonContainingText("Back"), 6000, false))
             {
                 getWrapper().goToHome();
             }
