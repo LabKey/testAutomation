@@ -267,7 +267,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             super(driver, componentElement);
         }
 
-        public void impersonate(String fakeUser) throws InterruptedException
+        public void impersonate(String fakeUser)
         {
             ImpersonateUserWindow window;
             try
