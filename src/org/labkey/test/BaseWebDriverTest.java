@@ -188,6 +188,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static final String ACTION_SUMMARY_TABLE_NAME = "actions";
 
     protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation.";
+    protected static final String NOT_FOUND_ERROR = "notFound";
 
     static final Set<String> urlsSeen = new HashSet<>();
 

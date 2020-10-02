@@ -199,9 +199,9 @@ public class SecurityTest extends BaseWebDriverTest
         //admin site link not available
         assertElementNotPresent(Locator.id("adminMenuPopupText"));
 
-        //can't reach admin urls directly either
+        //can't reach admin urls and invalid urls directly either
         for (String url : unreachableUrls)
-            assertUrlForbidden(url);
+            assertNonReachableUrl(url);
 
         //shouldn't be able to view own history either
         goToMyAccount();
@@ -211,12 +211,15 @@ public class SecurityTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    public void assertUrlForbidden(String url)
+    public void assertNonReachableUrl(String url)
     {
         log("Attempting to reach URL user does not have permission for:  " + url);
         SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(url);
-        if (HttpStatus.SC_FORBIDDEN != httpResponse.getResponseCode() ||
-            !httpResponse.getResponseBody().contains(PERMISSION_ERROR))
+
+        if ((HttpStatus.SC_FORBIDDEN != httpResponse.getResponseCode() ||
+                !httpResponse.getResponseBody().contains(PERMISSION_ERROR)) &&
+                (HttpStatus.SC_NOT_FOUND != httpResponse.getResponseCode() ||
+                !httpResponse.getResponseBody().contains(NOT_FOUND_ERROR)))
         {
             // Go to page for better failure screenshot
             beginAt(url);
@@ -858,7 +861,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertFalse("Self-registration button is visible", link != null && link.isDisplayed());
 
         beginAt(buildURL("login", "register"));
-        assertElementPresent(Locators.labkeyError.withText("Registration is not enabled."));
+        assertElementPresent(Locators.labkeyErrorSubHeading.withText("The requested page cannot be found. Registration is not enabled."));
 
         // cleanup: sign admin back in
         signIn();

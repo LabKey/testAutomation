@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.html;
 
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -285,11 +286,10 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
             AbstractUserHelper.saveCurrentDisplayName(getWrapper());
 
-            // since the new error page does not have home button,
-            // the previous page may also be hidden to the impersonated user
-            while (getWrapper().isElementPresent(Locator.buttonContainingText("Back")))
+            // since the error page does not have home button
+            if (getWrapper().isElementPresent(Locator.buttonContainingText("Back")))
             {
-                getWrapper().clickAndWait(Locator.buttonContainingText("Back"));
+                getWrapper().goToHome();
             }
         }
 
