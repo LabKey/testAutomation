@@ -7,6 +7,7 @@ import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.glassLibrary.grids.EditableGrid;
 import org.labkey.test.components.glassLibrary.grids.QueryGrid;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.ui.EntityInsertPanel;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 
@@ -31,6 +32,13 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
     public ReactSelect getComponentSelect()
     {
         return ReactSelect.finder(getDriver()).waitFor();
+    }
+
+    public EntityInsertPanel getEntityInsertPanel()
+    {
+        getComponentSelect().select("EntityInsertPanel");
+        return new EntityInsertPanel.EntityInsertPanelFinder(getDriver())
+                .waitFor();
     }
 
     public EditableGrid getEditableGrid()
