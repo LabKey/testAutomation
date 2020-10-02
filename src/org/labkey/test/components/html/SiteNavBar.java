@@ -285,9 +285,11 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
             AbstractUserHelper.saveCurrentDisplayName(getWrapper());
 
-            if (getWrapper().isElementPresent(Locator.lkButton("Home")))
+            // since the new error page does not have home button,
+            // the previous page may also be hidden to the impersonated user
+            while (getWrapper().isElementPresent(Locator.buttonContainingText("Back")))
             {
-                getWrapper().clickAndWait(Locator.lkButton("Home"));
+                getWrapper().clickAndWait(Locator.buttonContainingText("Back"));
             }
         }
 
