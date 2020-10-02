@@ -101,7 +101,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         {
             nameDivLoc = nameDivLoc.withText(name);
         }
-        return Locator.xpath("./div/ul/li").withDescendant(nameDivLoc);
+        return Locator.xpath("./ul/li").withDescendant(nameDivLoc);
     }
 
     private static final Pattern rotationPattern = Pattern.compile("transform: rotateZ\\((.+)deg\\);");
@@ -112,6 +112,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         private final WebElement _toggleArrow = Locator.xpath("./div[1]/div[1]").findWhenNeeded(this);
         private final WebElement _checkboxContainer = Locator.xpath("./div/span").withClass("filetree-checkbox-container").findWhenNeeded(this);
         private final WebElement _directoryName = Locator.byClass("filetree-directory-name").findWhenNeeded(this);
+        private final WebElement _children = Locator.xpath("./div[2]").findWhenNeeded(this);
         private final FluentWait<Object> toggleWait = new FluentWait<>(new Object());
 
         DirectorySubTree(WebElement el)
@@ -121,7 +122,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
         DirectorySubTree(DirectorySubTree parent, String dirName)
         {
-            this(FileTree.directoryChildLoc(dirName, true).findElement(parent));
+            this(FileTree.directoryChildLoc(dirName, true).findElement(parent._children));
         }
 
         @Override
@@ -144,32 +145,32 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         public WebElement getFile(String fileName)
         {
             expand();
-            return FileTree.directoryChildLoc(fileName, false).findElement(this);
+            return FileTree.directoryChildLoc(fileName, false).findElement(_children);
         }
 
         public boolean containsFile(String name)
         {
             expand();
-            return FileTree.directoryChildLoc(name, false).existsIn(this);
+            return FileTree.directoryChildLoc(name, false).existsIn(_children);
         }
 
         public boolean containsDir(String name)
         {
             expand();
-            return FileTree.directoryChildLoc(name, true).existsIn(this);
+            return FileTree.directoryChildLoc(name, true).existsIn(_children);
         }
 
         public List<String> listFiles()
         {
             expand();
-            return FileTree.directoryChildLoc(null, false).findElements(this).stream()
+            return FileTree.directoryChildLoc(null, false).findElements(_children).stream()
                 .map(WebElement::getText).collect(Collectors.toList());
         }
 
         public List<String> listDirs()
         {
             expand();
-            return FileTree.directoryChildLoc(null, true).findElements(this).stream()
+            return FileTree.directoryChildLoc(null, true).findElements(_children).stream()
                 .map(WebElement::getText).collect(Collectors.toList());
         }
 
