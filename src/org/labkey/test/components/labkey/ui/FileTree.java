@@ -170,7 +170,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
                 .map(WebElement::getText).collect(Collectors.toList());
         }
 
-        public List<String> listDirs()
+        public List<String> listFolders()
         {
             expand();
             return FileTree.directoryChildLoc(null, true).findElements(_children).stream()
