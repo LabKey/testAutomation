@@ -47,7 +47,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         DirectorySubTree dir = elementCache().rootDir;
         for (String pathPart : pathParts)
         {
-            dir = dir.getSubfolder(pathPart);
+            dir = dir.findSubfolder(pathPart);
         }
         return dir.select();
     }
@@ -56,7 +56,9 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
     {
         int fileNameIndex = filePath.lastIndexOf('/');
         DirectorySubTree parentFolder = selectFolder(filePath.substring(0, fileNameIndex));
-        parentFolder.getFile(filePath.substring(fileNameIndex + 1));
+        WebElement fileRow = parentFolder.findFile(filePath.substring(fileNameIndex + 1));
+        fileRow.click();
+        Locator.css("span.filetree-leaf-node.active").waitForElement(fileRow, 1000);
     }
 
     @Override
@@ -104,13 +106,14 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         return Locator.xpath("./ul/li").withDescendant(nameDivLoc);
     }
 
-    private static final Pattern rotationPattern = Pattern.compile("transform: rotateZ\\((.+)deg\\);");
+    private static final Pattern folderIconPattern = Pattern.compile(".*(fa-folder.*?)(?: |$).*");
 
     public class DirectorySubTree extends Component<Component<?>.ElementCache>
     {
         private final WebElement _el; // <li> that wraps subtree
         private final WebElement _toggleArrow = Locator.xpath("./div[1]/div[1]").findWhenNeeded(this);
         private final WebElement _checkboxContainer = Locator.xpath("./div/span").withClass("filetree-checkbox-container").findWhenNeeded(this);
+        private final WebElement _icon = Locator.css("svg.filetree-folder-icon").findWhenNeeded(_checkboxContainer);
         private final WebElement _directoryName = Locator.byClass("filetree-directory-name").findWhenNeeded(this);
         private final WebElement _children = Locator.xpath("./div[2]").findWhenNeeded(this);
         private final FluentWait<Object> toggleWait = new FluentWait<>(new Object());
@@ -136,13 +139,13 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             return _directoryName.getText();
         }
 
-        public DirectorySubTree getSubfolder(String dirName)
+        public DirectorySubTree findSubfolder(String dirName)
         {
             expand();
             return new DirectorySubTree(this, dirName);
         }
 
-        public WebElement getFile(String fileName)
+        public WebElement findFile(String fileName)
         {
             expand();
             return FileTree.directoryChildLoc(fileName, false).findElement(_children);
@@ -189,7 +192,8 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             if (waitForToggle() != DirExpansionState.OPEN)
             {
                 _toggleArrow.click();
-                toggleWait.until(o -> getState() == DirExpansionState.OPEN);
+                toggleWait.withMessage(() -> String.format("Waiting for '%s' to expand.", getName()))
+                    .until(o -> getState() == DirExpansionState.OPEN);
             }
             return this;
         }
@@ -199,7 +203,8 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             if (waitForToggle() != DirExpansionState.CLOSED)
             {
                 _toggleArrow.click();
-                toggleWait.until(o -> getState() == DirExpansionState.CLOSED);
+                toggleWait.withMessage(() -> String.format("Waiting for '%s' to collapse.", getName()))
+                    .until(o -> getState() == DirExpansionState.CLOSED);
             }
             return this;
         }
@@ -211,47 +216,53 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
         private DirExpansionState waitForToggle()
         {
-            return toggleWait.until(o -> {
-                DirExpansionState state = getState();
-                if (state == DirExpansionState.ANIMATING)
-                {
-                    return null; // keep waiting
-                }
-                else
-                {
-                    return state;
-                }
-            });
+            return toggleWait.withMessage(() -> String.format("Waiting for '%s' to animate.", getName()))
+                .until(o -> {
+                    DirExpansionState state = getState();
+                    if (state == DirExpansionState.ANIMATING)
+                    {
+                        return null; // keep waiting
+                    }
+                    else
+                    {
+                        return state;
+                    }
+                });
         }
 
         private DirExpansionState getState()
         {
-            String style = StringUtils.trimToEmpty(_toggleArrow.getAttribute("style"));
-            Matcher matcher = rotationPattern.matcher(style);
+            boolean animating = StringUtils.trimToEmpty(_toggleArrow.getAttribute("class")).contains("animating");
+            if (animating)
+            {
+                return DirExpansionState.ANIMATING;
+            }
+
+            String iconClasses = _icon.getAttribute("class");
+            Matcher matcher = folderIconPattern.matcher(iconClasses);
             if (matcher.matches())
             {
-                String rotation = matcher.group(1);
-                switch (rotation)
+                String folderIcon = matcher.group(1);
+                switch (folderIcon)
                 {
-                    case "90":
+                    case "fa-folder-open":
                         return DirExpansionState.OPEN;
-                    case "0":
+                    case "fa-folder":
                         return DirExpansionState.CLOSED;
                     default:
-                        return DirExpansionState.ANIMATING;
+                        break; // Fall through to IllegalStateException
                 }
             }
-            else
-            {
-                throw new IllegalStateException("Unable to determine row expansion state. Possibly not a directory?: " + this.toString());
-            }
+
+            throw new IllegalStateException(String.format(
+                "Unable to determine row expansion state for '%s'. Possibly not a directory?: %s", getName(), _icon.toString()));
         }
     }
 
     private enum DirExpansionState
     {
-        OPEN, // transform: rotateZ(90deg)
-        CLOSED, // transform: rotateZ(0deg)
+        OPEN, // fa-folder
+        CLOSED, // fa-folder-open
         ANIMATING
     }
 }
