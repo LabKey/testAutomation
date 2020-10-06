@@ -81,6 +81,8 @@ public class SecurityTest extends BaseWebDriverTest
     protected static final String NORMAL_USER_PASSWORD = PASSWORDS[0];
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin_securitytest@security.test";
+    protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation.";
+    protected static final String NOT_FOUND_ERROR = "notFound";
 
     @Override
     public List<String> getAssociatedModules()
@@ -861,8 +863,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertFalse("Self-registration button is visible", link != null && link.isDisplayed());
 
         beginAt(buildURL("login", "register"));
-        waitForAnyElement(Locators.labkeyError, Locators.labkeyErrorSubHeading);
-        assertElementPresent(Locators.labkeyErrorSubHeading.withText("Registration is not enabled."));
+        waitForElement(Locators.labkeyErrorSubHeading.withText("Registration is not enabled."));
 
         // cleanup: sign admin back in
         signIn();

@@ -1350,6 +1350,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             goToHome();
     }
 
+    public void goToHome()
+    {
+        beginAt(WebTestHelper.buildURL("project", "home", "begin"));
+        waitFor(this::onLabKeyPage, "Home project didn't seem to load. JavaScript 'LABKEY' namespace not found.", 10000);
+    }
+
     public void clickPortalTab(String tabText)
     {
         new PortalHelper(this).activateTab(tabText);

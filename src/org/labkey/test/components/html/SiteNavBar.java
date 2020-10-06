@@ -15,7 +15,6 @@
  */
 package org.labkey.test.components.html;
 
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -286,7 +285,11 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
             AbstractUserHelper.saveCurrentDisplayName(getWrapper());
 
-            getWrapper().goToHome();
+            if (getDriver().getTitle().contains("403"))
+            {
+                // go to home
+                getWrapper().clickAndWait(Locator.tagWithClass("a", "brand-logo"));
+            }
 
         }
 

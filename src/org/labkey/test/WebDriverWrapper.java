@@ -778,12 +778,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return null;
     }
 
-    public void goToHome()
-    {
-        beginAt(WebTestHelper.buildURL("project", "home", "begin"));
-        waitFor(this::onLabKeyPage, "Home project didn't seem to load. JavaScript 'LABKEY' namespace not found.", 10000);
-    }
-
     // Click on a module listed on the admin menu;
     public void goToModule(String moduleName)
     {
