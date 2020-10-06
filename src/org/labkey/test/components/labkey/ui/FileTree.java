@@ -43,8 +43,12 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
     public DirectorySubTree selectFolder(String folderPath)
     {
-        String[] pathParts = folderPath.split("/");
         DirectorySubTree dir = elementCache().rootDir;
+        if (folderPath.isEmpty())
+        {
+            return dir;
+        }
+        String[] pathParts = folderPath.split("/");
         for (String pathPart : pathParts)
         {
             dir = dir.findSubfolder(pathPart);
@@ -55,7 +59,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
     public void selectFile(String filePath)
     {
         int fileNameIndex = filePath.lastIndexOf('/');
-        DirectorySubTree parentFolder = selectFolder(filePath.substring(0, fileNameIndex));
+        DirectorySubTree parentFolder = selectFolder(fileNameIndex > 0 ? filePath.substring(0, fileNameIndex) : "");
         WebElement fileRow = parentFolder.findFile(filePath.substring(fileNameIndex + 1));
         fileRow.click();
         Locator.css("span.filetree-leaf-node.active").waitForElement(fileRow, 1000);
