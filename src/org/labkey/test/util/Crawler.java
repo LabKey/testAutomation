@@ -174,7 +174,9 @@ public class Crawler
             new ControllerActionId("assay", "assayDetailRedirect"),
             new ControllerActionId("assay", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("assay", "template"),
-            new ControllerActionId("core", "downloadFileLink"),
+            new ControllerActionId("cds", "exportTourDefinitions"), // Download action
+            new ControllerActionId("cds", "permissionsReportExport"),
+            new ControllerActionId("core", "downloadFileLink"), // Download action
             new ControllerActionId("dumbster", "begin"),
             new ControllerActionId("experiment", "exportProtocols"),
             new ControllerActionId("experiment", "exportRunFiles"),
