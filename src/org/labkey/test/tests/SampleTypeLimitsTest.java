@@ -199,9 +199,6 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
             generationDepth++;
         }
         assertEquals("Expect lineage depth to be" +intendedGenerationDepth, intendedGenerationDepth, generationDepth);
-
-        // clean up the sampleset on success
-        dgen.deleteDomain(createDefaultConnection());
     }
 
 }
