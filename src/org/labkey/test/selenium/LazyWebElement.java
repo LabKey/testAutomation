@@ -17,9 +17,7 @@ package org.labkey.test.selenium;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
 
@@ -39,19 +37,6 @@ public class LazyWebElement<T extends LazyWebElement<T>> extends WebElementWrapp
     {
         _locator = locator;
         _searchContext = searchContext;
-    }
-
-    @Override
-    public boolean isDisplayed()
-    {
-        try
-        {
-            return super.isDisplayed();
-        }
-        catch (StaleElementReferenceException | NoSuchElementException ex)
-        {
-            return false;
-        }
     }
 
     public final T withTimeout(long ms)
