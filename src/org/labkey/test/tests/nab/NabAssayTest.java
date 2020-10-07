@@ -463,7 +463,7 @@ public class NabAssayTest extends AbstractAssayTest
             beginAt(ptid1c_detailsURL);
             assertEquals(403, getResponseCode());
 
-            clickAndWait(Locator.lkButton("Home"));
+            clickButton("Back");
             stopImpersonating();
 
             doNabApiTest(); // Use NAb study APIs
