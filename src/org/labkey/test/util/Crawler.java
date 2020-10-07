@@ -1031,7 +1031,7 @@ public class Crawler
                 if (code >= 400)
                 {
                     String message = relativeURL + "\nproduced response code " + code + originMessage;
-                    if (code == 403 && TestProperties.isPrimaryUserAppAdmin())
+                    if ((code == 403 && TestProperties.isPrimaryUserAppAdmin()) || code == 404)
                     {
                         // Crawling as app admin is likely to hit numerous 403s. Don't fail immediately.
                         _test.checker().wrapAssertion(() -> fail(message));
