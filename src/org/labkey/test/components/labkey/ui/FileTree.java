@@ -44,14 +44,13 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
     public SubTree selectFolder(String folderPath)
     {
         SubTree dir = elementCache().rootDir;
-        if (folderPath.isEmpty())
+        if (!folderPath.isEmpty())
         {
-            return dir;
-        }
-        String[] pathParts = folderPath.split("/");
-        for (String pathPart : pathParts)
-        {
-            dir = dir.findSubfolder(pathPart);
+            String[] pathParts = folderPath.split("/");
+            for (String pathPart : pathParts)
+            {
+                dir = dir.findSubfolder(pathPart);
+            }
         }
         return dir.select();
     }
