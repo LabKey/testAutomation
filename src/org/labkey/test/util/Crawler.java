@@ -1031,7 +1031,7 @@ public class Crawler
                 if (code >= 400)
                 {
                     String message = relativeURL + "\nproduced response code " + code + originMessage;
-                    if ((code == 403 && TestProperties.isPrimaryUserAppAdmin()) || code == 404)
+                    if (code == 403 && TestProperties.isPrimaryUserAppAdmin())
                     {
                         // Crawling as app admin is likely to hit numerous 403s. Don't fail immediately.
                         _test.checker().wrapAssertion(() -> fail(message));
@@ -1146,7 +1146,7 @@ public class Crawler
         {
             if (origin == null || _actionsMayLinkTo404.contains(new ControllerActionId(origin.toString())))
                 return true; // Ignore 404s from the initial set of links
-            if (_test.isElementPresent(Locators.labkeyError.containing("module is not enabled")))
+            if (_test.isElementPresent(Locators.labkeyErrorSubHeading.containing("module is not enabled")))
                 return true; // Some modules return 404 when not enabled
         }
 
