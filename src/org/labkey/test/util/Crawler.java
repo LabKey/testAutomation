@@ -203,6 +203,7 @@ public class Crawler
             new ControllerActionId("microarray", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("ms2", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("ms2", "showParamsFile"),
+            new ControllerActionId("ms2", "showList"),
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "showPeptide"),
             new ControllerActionId("nabassay", "downloadDatafile"),
@@ -1146,8 +1147,6 @@ public class Crawler
         {
             if (origin == null || _actionsMayLinkTo404.contains(new ControllerActionId(origin.toString())))
                 return true; // Ignore 404s from the initial set of links
-            if (_test.isElementPresent(Locators.labkeyErrorSubHeading.containing("module is not enabled")))
-                return true; // Some modules return 404 when not enabled
         }
 
         if (code == HttpStatus.SC_METHOD_NOT_ALLOWED) // 405
