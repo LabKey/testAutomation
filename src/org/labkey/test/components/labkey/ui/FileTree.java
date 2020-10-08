@@ -41,9 +41,9 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         return _driver;
     }
 
-    public DirectorySubTree selectFolder(String folderPath)
+    public SubTree selectFolder(String folderPath)
     {
-        DirectorySubTree dir = elementCache().rootDir;
+        SubTree dir = elementCache().rootDir;
         if (folderPath.isEmpty())
         {
             return dir;
@@ -56,13 +56,14 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         return dir.select();
     }
 
-    public void selectFile(String filePath)
+    public WebElement selectFile(String filePath)
     {
         int fileNameIndex = filePath.lastIndexOf('/');
-        DirectorySubTree parentFolder = selectFolder(fileNameIndex > 0 ? filePath.substring(0, fileNameIndex) : "");
+        SubTree parentFolder = selectFolder(fileNameIndex > 0 ? filePath.substring(0, fileNameIndex) : "");
         WebElement fileRow = parentFolder.findFile(filePath.substring(fileNameIndex + 1));
         fileRow.click();
         Locator.css("span.filetree-leaf-node.active").waitForElement(fileRow, 1000);
+        return fileRow;
     }
 
     @Override
@@ -73,7 +74,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        DirectorySubTree rootDir = new DirectorySubTree(FileTree.directoryChildLoc(null, true).findWhenNeeded(this));
+        SubTree rootDir = new SubTree(FileTree.directoryChildLoc(null, true).findWhenNeeded(this));
 
     }
 
@@ -112,7 +113,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
     private static final Pattern folderIconPattern = Pattern.compile(".*(fa-folder.*?)(?: |$).*");
 
-    public class DirectorySubTree extends Component<Component<?>.ElementCache>
+    public class SubTree extends Component<Component<?>.ElementCache>
     {
         private final WebElement _el; // <li> that wraps subtree
         private final WebElement _toggleArrow = Locator.xpath("./div[1]/div[1]").findWhenNeeded(this);
@@ -122,12 +123,12 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         private final WebElement _children = Locator.xpath("./div[2]").findWhenNeeded(this);
         private final FluentWait<Object> toggleWait = new FluentWait<>(new Object());
 
-        DirectorySubTree(WebElement el)
+        SubTree(WebElement el)
         {
             _el = el;
         }
 
-        DirectorySubTree(DirectorySubTree parent, String dirName)
+        SubTree(SubTree parent, String dirName)
         {
             this(FileTree.directoryChildLoc(dirName, true).findElement(parent._children));
         }
@@ -143,10 +144,10 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             return _directoryName.getText();
         }
 
-        public DirectorySubTree findSubfolder(String dirName)
+        public SubTree findSubfolder(String dirName)
         {
             expand();
-            return new DirectorySubTree(this, dirName);
+            return new SubTree(this, dirName);
         }
 
         public WebElement findFile(String fileName)
@@ -181,7 +182,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
                 .map(WebElement::getText).collect(Collectors.toList());
         }
 
-        public DirectorySubTree select()
+        public SubTree select()
         {
             if (!isActive())
             {
@@ -191,7 +192,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             return this;
         }
 
-        private DirectorySubTree expand()
+        private SubTree expand()
         {
             if (waitForToggle() != DirExpansionState.OPEN)
             {
@@ -202,7 +203,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             return this;
         }
 
-        private DirectorySubTree collapse()
+        private SubTree collapse()
         {
             if (waitForToggle() != DirExpansionState.CLOSED)
             {

@@ -252,6 +252,11 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             getWrapper().clickAndWait(moduleLinkElement);
         }
 
+        public void clickDeveloperLink(String linkText, boolean triggersPageLoad)
+        {
+            clickSubMenu(triggersPageLoad, "Developer Links", linkText);
+        }
+
         @Override
         public AdminMenu withExpandRetries(int retries)
         {
