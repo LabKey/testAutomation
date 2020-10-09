@@ -26,6 +26,8 @@ import java.util.List;
 
 public class BootstrapMenu extends BaseBootstrapMenu
 {
+    private Locator _toggleLocator;
+
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
     public BootstrapMenu(WebDriver driver, WebElement componentElement)
     {
@@ -110,7 +112,16 @@ public class BootstrapMenu extends BaseBootstrapMenu
     @Override
     protected Locator getToggleLocator()
     {
-        return Locators.toggleAnchor();
+        if (_toggleLocator != null)
+            return _toggleLocator;
+        else
+            return Locators.toggleAnchor();
+    }
+
+    public BootstrapMenu setToggleLocator(Locator toggleLocator)
+    {
+        _toggleLocator = toggleLocator;
+        return this;
     }
 
     @Override
