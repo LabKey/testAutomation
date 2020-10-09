@@ -658,7 +658,7 @@ public class ListTest extends BaseWebDriverTest
         assertEquals("Incorrect response code", 404, getResponseCode());
         assertTextPresent("Query '" + LIST_NAME_COLORS + "' in schema 'lists' doesn't exist.");
 
-        clickButton("Folder");
+        clickButton("Back");
         // after the 13.2 audit log migration, we are no longer going to co-mingle domain and list events in the same table
         AuditLogTest.verifyAuditEvent(this, DOMAIN_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "The domain " + LIST_NAME_COLORS + " was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was deleted", 5);
