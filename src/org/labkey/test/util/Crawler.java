@@ -205,7 +205,7 @@ public class Crawler
             new ControllerActionId("ms2", "showParamsFile"),
             new ControllerActionId("ms2", "showList"),
             // Tested directly in XTandemTest
-            new ControllerActionId("ms2", "showPeptide"),
+            new ControllerActionId("ms2", "doProteinSearch"),
             new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
