@@ -290,10 +290,12 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
             AbstractUserHelper.saveCurrentDisplayName(getWrapper());
 
-            if (getWrapper().isElementPresent(Locator.lkButton("Home")))
+            if (getDriver().getTitle().contains("403"))
             {
-                getWrapper().clickAndWait(Locator.lkButton("Home"));
+                // go to home
+                getWrapper().clickAndWait(Locator.tagWithClass("a", "brand-logo"));
             }
+
         }
 
         public void impersonateRoles(String oneRole, String... roles)

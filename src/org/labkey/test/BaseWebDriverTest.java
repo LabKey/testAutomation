@@ -25,6 +25,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.simple.JSONObject;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
@@ -42,6 +43,7 @@ import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -186,8 +188,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     protected static boolean _checkedLeaksAndErrors = false;
     private static final String ACTION_SUMMARY_TABLE_NAME = "actions";
-
-    protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation.";
 
     static final Set<String> urlsSeen = new HashSet<>();
 
@@ -588,6 +588,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             _checkedLeaksAndErrors = true;
         }
 
+        if (TestProperties.isTroubleshootingStacktracesEnabled())
+        {
+            enableTroubleshootingStacktraces();
+        }
         setServerDebugLogging();
         setExperimentalFlags();
 
@@ -610,6 +614,29 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         cleanup(false);
+    }
+
+    private void enableTroubleshootingStacktraces()
+    {
+        if (TestProperties.isPrimaryUserAppAdmin())
+        {
+            return; // app admin can't enable stack traces
+        }
+        Connection cn = createDefaultConnection();
+        PostCommand command = new PostCommand("mini-profiler", "enableTroubleshootingStacktraces");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("enabled", true);
+        command.setJsonObject(jsonObject);
+        try
+        {
+            CommandResponse r = command.execute(cn, null);
+            Map<String, Object> response = r.getParsedData();
+            log("Troubleshooting stacktraces state updated: " + response.get("data"));
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to enable troubleshooting stacktraces", e);
+        }
     }
 
     private void setServerDebugLogging()
@@ -1540,12 +1567,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             log("properties were already set, no changed needed");
         }
-    }
-
-    public void assertAtUserUserLacksPermissionPage()
-    {
-        assertTextPresent(PERMISSION_ERROR);
-        assertTitleEquals("403: Error Page -- User does not have permission to perform this operation.");
     }
 
     public void assertNavTrail(String... links)
