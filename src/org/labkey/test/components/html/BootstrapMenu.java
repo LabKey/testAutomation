@@ -167,9 +167,7 @@ public class BootstrapMenu extends BaseBootstrapMenu
     {
         public static Locator.XPathLocator toggleAnchor()
         {
-            return Locator.XPathLocator.union(
-                    Locator.tagWithAttribute("*", "data-toggle", "dropdown"),
-                    Locator.tagWithClass("a", "dropdown-toggle"));
+            return Locator.tagWithAttribute("*", "data-toggle", "dropdown");
         }
 
         public static Locator.XPathLocator menuItem(String text)
