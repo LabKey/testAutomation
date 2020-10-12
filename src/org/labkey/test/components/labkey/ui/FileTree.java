@@ -41,20 +41,31 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         return _driver;
     }
 
+    /**
+     * Select a folder at the given relative path under the tree's root node.
+     * This will expand parent folders as needed to reveal the specified folder.
+     * @param folderPath relative to the tree's root. <code>null</code> or blank to select the root node.
+     * @return The subtree component with the specified folder as the tree's root.
+     */
     public SubTree selectFolder(String folderPath)
     {
         SubTree dir = elementCache().rootDir;
-        if (!folderPath.isEmpty())
+        if (!StringUtils.isBlank(folderPath))
         {
             String[] pathParts = folderPath.split("/");
             for (String pathPart : pathParts)
             {
-                dir = dir.findSubfolder(pathPart);
+                dir = dir.findFolder(pathPart);
             }
         }
         return dir.select();
     }
-
+    /**
+     * Select a file at the given relative path under the tree's root node.
+     * This will expand parent folders as needed to reveal the specified file.
+     * @param filePath relative to the tree's root.
+     * @return The row element for the selected file.
+     */
     public WebElement selectFile(String filePath)
     {
         int fileNameIndex = filePath.lastIndexOf('/');
@@ -112,14 +123,36 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
     private static final Pattern folderIconPattern = Pattern.compile(".*(fa-folder.*?)(?: |$).*");
 
+    /**
+     * Represents a particular subtree within the <code>FileTree</code> component. May represent the root node.
+     * The DOM looks something like this:
+     * <pre>
+     * &lt;li>
+     *     &lt;div>
+     *         Folder's name, icon, selection state, etc.
+     *     &lt;/div>
+     *     &lt;div>
+     *         &lt;ul>
+     *             Children: subtrees and files
+     *         &lt;/ul>
+     *     &lt;/div>
+     * &lt;/li>
+     * </pre>
+     */
     public class SubTree extends Component<Component<?>.ElementCache>
     {
-        private final WebElement _el; // <li> that wraps subtree
+        // <li> that wraps subtree
+        private final WebElement _el;
+
+        // Elements in the first <div> under the <li>.
         private final WebElement _toggleArrow = Locator.xpath("./div[1]/div[1]").findWhenNeeded(this);
         private final WebElement _checkboxContainer = Locator.xpath("./div/span").withClass("filetree-checkbox-container").findWhenNeeded(this);
         private final WebElement _icon = Locator.css("svg.filetree-folder-icon").findWhenNeeded(_checkboxContainer);
         private final WebElement _directoryName = Locator.byClass("filetree-directory-name").findWhenNeeded(this);
+
+        // Second <div> under the <li>
         private final WebElement _children = Locator.xpath("./div[2]").findWhenNeeded(this);
+
         private final FluentWait<Object> toggleWait = new FluentWait<>(new Object());
 
         SubTree(WebElement el)
@@ -138,35 +171,63 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             return _el;
         }
 
+        /**
+         * Get the name of this folder
+         * @return folder name
+         */
         public String getName()
         {
             return _directoryName.getText();
         }
 
-        public SubTree findSubfolder(String dirName)
+        /**
+         * Expand self and find a child directory with the given name
+         * @param dirName directory name
+         * @return subtree for the specified directory
+         */
+        public SubTree findFolder(String dirName)
         {
             expand();
             return new SubTree(this, dirName);
         }
 
+        /**
+         * Expand self and find a child file with the given name
+         * @param fileName file name
+         * @return row element for the specified file
+         */
         public WebElement findFile(String fileName)
         {
             expand();
             return FileTree.directoryChildLoc(fileName, false).findElement(_children);
         }
 
+        /**
+         * Check whether the specified file is a direct child of this folder
+         * @param name file name
+         * @return <code>true</code> if the file exists
+         */
         public boolean containsFile(String name)
         {
             expand();
             return FileTree.directoryChildLoc(name, false).existsIn(_children);
         }
 
-        public boolean containsDir(String name)
+        /**
+         * Check whether the specified folder is a direct child of this folder
+         * @param name file name
+         * @return <code>true</code> if the file exists
+         */
+        public boolean containsFolder(String name)
         {
             expand();
             return FileTree.directoryChildLoc(name, true).existsIn(_children);
         }
 
+        /**
+         * Get names of all child Files
+         * @return List of file names
+         */
         public List<String> listFiles()
         {
             expand();
@@ -174,6 +235,10 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
                 .map(WebElement::getText).collect(Collectors.toList());
         }
 
+        /**
+         * Get names of all child Folders
+         * @return List of folder names
+         */
         public List<String> listFolders()
         {
             expand();
@@ -181,6 +246,11 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
                 .map(WebElement::getText).collect(Collectors.toList());
         }
 
+        /**
+         * Select this folder.
+         * If not already selected, this will toggle the expand/collapse state as well.
+         * @return <code>this</code>
+         */
         public SubTree select()
         {
             if (!isActive())
@@ -191,7 +261,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             return this;
         }
 
-        private SubTree expand()
+        private void expand()
         {
             if (waitForToggle() != DirExpansionState.OPEN)
             {
@@ -199,10 +269,9 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
                 toggleWait.withMessage(() -> String.format("Waiting for '%s' to expand.", getName()))
                     .until(o -> getState() == DirExpansionState.OPEN);
             }
-            return this;
         }
 
-        private SubTree collapse()
+        private void collapse()
         {
             if (waitForToggle() != DirExpansionState.CLOSED)
             {
@@ -210,7 +279,6 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
                 toggleWait.withMessage(() -> String.format("Waiting for '%s' to collapse.", getName()))
                     .until(o -> getState() == DirExpansionState.CLOSED);
             }
-            return this;
         }
 
         private boolean isActive()
