@@ -48,7 +48,7 @@ public class NotificationBanner<P extends LabKeyPage<?>> extends WebDriverCompon
 
     public BannerType getType()
     {
-        List<String> css = Arrays.asList(getComponentElement().getAttribute("class").trim().split("\\w+"));
+        List<String> css = Arrays.asList(getComponentElement().getAttribute("class").trim().split("\\s+"));
         for (BannerType type : BannerType.values())
         {
             if (css.contains(type.getCss()))
