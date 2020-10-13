@@ -1010,7 +1010,9 @@ public class Crawler
             {
                 long loadTime = _test.beginAt(relativeURL
                         .replace("[", "%5B")
-                        .replace("]", "%5D")); // Escape brackets to prevent 400 errors
+                        .replace("]", "%5D")
+                        .replace("{", "%7B")
+                        .replace("}", "%7D")); // Escape brackets to prevent 400 errors
                 _actionProfiler.updateActionProfile(relativeURL, loadTime);
             }
             catch (UnhandledAlertException alert)
