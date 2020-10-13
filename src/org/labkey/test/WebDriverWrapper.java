@@ -1790,7 +1790,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
         for (WebElement app : apps)
         {
             waitFor(() -> Locator.xpath("./*").findElements(app).stream()
-                .anyMatch(WebElement::isDisplayed), "App didn't seem to load. No visible content. " + app.toString(), 1000);
+                .anyMatch(webElement ->
+                {
+                    try
+                    {
+                        return webElement.isDisplayed();
+                    }
+                    catch (StaleElementReferenceException stale)
+                    {
+                        return false;
+                    }
+                }), "App didn't seem to load. No visible content. " + app.toString(), 1000);
         }
         mouseOut();
         _testTimeout = false;
