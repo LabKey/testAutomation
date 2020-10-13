@@ -76,6 +76,7 @@ public class SecurityTest extends BaseWebDriverTest
     protected static final String NORMAL_USER_TEMPLATE = "_user.template@security.test";
     protected static final String BOGUS_USER_TEMPLATE = "bogus@bogus@bogus";
     protected static final String PROJECT_ADMIN_USER = "admin_securitytest@security.test";
+    private static final String PROJECT_ADMIN_ROLE = "Project Administrator";
     protected static final String NORMAL_USER = "user_securitytest@security.test";
     protected static final String[] PASSWORDS = {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
     protected static final String NORMAL_USER_PASSWORD = PASSWORDS[0];
@@ -557,6 +558,7 @@ public class SecurityTest extends BaseWebDriverTest
     protected void projectUsersTest()
     {
         beginAt("/project/SecurityVerifyProject/begin.view?");
+        impersonateRoles(PROJECT_ADMIN_ROLE);
         ShowUsersPage usersPage = goToProjectUsers();
         String userEmail = "fromprojectusers@gmail.com";
 
@@ -567,6 +569,7 @@ public class SecurityTest extends BaseWebDriverTest
                 .clickAddUsers();
 
         assertTextPresent(userEmail);
+        stopImpersonating();
     }
 
     @LogMethod
