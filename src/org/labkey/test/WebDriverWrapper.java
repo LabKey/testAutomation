@@ -1783,6 +1783,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
         waitForOnReady("LABKEY.Utils");
+        if (Locator.id("app").existsIn(getDriver()))
+        {
+            waitFor(() -> executeScript("return LABKEY.App.__app__.isDOMContentLoaded;", Boolean.class), "App didn't render.", 10000);
+        }
         mouseOut();
         _testTimeout = false;
     }
