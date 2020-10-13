@@ -17,7 +17,6 @@
 package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -34,6 +33,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
+import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.params.login.DatabaseAuthenticationProvider;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -128,6 +128,7 @@ public class SecurityTest extends BaseWebDriverTest
         }
 
         clonePermissionsTest();
+        projectUsersTest();
         displayNameTest();
         tokenAuthenticationTest();
         if (!isQuickTest())
@@ -551,6 +552,21 @@ public class SecurityTest extends BaseWebDriverTest
         checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators", 2);
         checkGroupMembership(NORMAL_USER, "SecurityVerifyProject/Testers", 1);
         assertNavTrail("Site Users", "User Details", "Permissions");
+    }
+
+    protected void projectUsersTest()
+    {
+        beginAt("/project/SecurityVerifyProject/begin.view?");
+        ShowUsersPage usersPage = goToProjectUsers();
+        String userEmail = "fromprojectusers@gmail.com";
+
+        usersPage
+                .clickAddUsers()
+                .setNewUsers(Arrays.asList(userEmail))
+                .setSendNotification(true)
+                .clickAddUsers();
+
+        assertTextPresent(userEmail);
     }
 
     @LogMethod

@@ -817,6 +817,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new ProjectSettingsPage(getDriver());
     }
 
+    public ShowUsersPage goToProjectUsers()
+    {
+        clickAdminMenuItem("Folder", "Project Users");
+        return new ShowUsersPage(getDriver());
+    }
+
     public ShowUsersPage goToSiteUsers()
     {
         if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Site Users")))
