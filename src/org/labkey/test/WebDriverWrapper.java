@@ -1789,6 +1789,25 @@ public abstract class WebDriverWrapper implements WrapsDriver
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
         waitForOnReady("LABKEY.Utils");
+
+        List<WebElement> apps = Locator.findElements(getDriver(),
+            Locator.tagWithAttributeContaining("div", "id", "error-handler-app"), // from errorView.jsp
+            Locator.id("app")); // Most other apps start with an empty '<div id="app"></div>'
+        for (WebElement app : apps)
+        {
+            waitFor(() -> Locator.xpath("./*").findElements(app).stream()
+                .anyMatch(webElement ->
+                {
+                    try
+                    {
+                        return webElement.isDisplayed();
+                    }
+                    catch (StaleElementReferenceException stale)
+                    {
+                        return false;
+                    }
+                }), "App didn't seem to load. No visible content. " + app.toString(), 5000);
+        }
         mouseOut();
         _testTimeout = false;
     }
