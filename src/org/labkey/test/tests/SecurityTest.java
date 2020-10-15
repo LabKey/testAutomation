@@ -557,7 +557,7 @@ public class SecurityTest extends BaseWebDriverTest
 
     protected void projectUsersTest()
     {
-        beginAt("/project/SecurityVerifyProject/begin.view?");
+        beginAt(WebTestHelper.buildUrl("project", getProjectName(), "begin"));
         impersonateRoles(PROJECT_ADMIN_ROLE);
         ShowUsersPage usersPage = goToProjectUsers();
         String userEmail = "fromprojectusers@gmail.com";
