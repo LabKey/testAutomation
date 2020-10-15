@@ -31,6 +31,7 @@ import org.labkey.test.categories.Specimen;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.pages.study.specimen.ManageNotificationsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -56,6 +57,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.pages.study.specimen.ManageNotificationsPage.SpecimensAttachment;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({DailyC.class, Specimen.class})
@@ -649,18 +651,17 @@ public class SpecimenTest extends SpecimenBaseTest
     @LogMethod
     private void verifySpecimenTableAttachments()
     {
+        enableEmailRecorder(); // Clear out previous notifications
         goToProjectHome();
         clickFolder(getFolderName());
 
         log("Setup Excel specimen attachment");
         waitAndClickAndWait(Locator.linkWithText("Manage"));
         waitAndClickAndWait(Locator.linkWithText("Manage Notifications"));
-        WebElement newRequestNotifyCheckbox = Locator.checkboxById("newRequestNotifyCheckbox").findElement(getDriver());
-        checkCheckbox(newRequestNotifyCheckbox);
-        checkCheckbox(newRequestNotifyCheckbox); // First try just doesn't stick sometimes
-        setFormElement(waitForElement(Locator.id("newRequestNotify").notHidden()), PasswordUtil.getUsername());
-        checkRadioButton(Locator.radioButtonByNameAndValue("specimensAttachment", "ExcelAttachment"));
-        clickButton("Save");
+        ManageNotificationsPage manageNotificationsPage = new ManageNotificationsPage(getDriver());
+        manageNotificationsPage.setNotificationUsers(List.of(PasswordUtil.getUsername()));
+        manageNotificationsPage.setSpecimenAttachmentType(SpecimensAttachment.EXCEL);
+        manageNotificationsPage.clickSave();
 
         log("Create request with excel specimen attachment");
         goToSpecimenData();
@@ -672,15 +673,28 @@ public class SpecimenTest extends SpecimenBaseTest
         setFormElement(Locator.id("input1"), "Shipping");
         setFormElement(Locator.id("input3"), "Comments");
         clickButton("Create and View Details");
-        clickButton("Submit Request", 0);
-        acceptAlert();
+        doAndWaitForPageToLoad(() -> {
+            clickButton("Submit Request", 0);
+            acceptAlert();
+        });
         waitForElement(Locator.css("h3").withText("Your request has been successfully submitted."));
 
+        log("Verify specimen tsv attachment");
+        EmailRecordTable emailRecordTable = goToEmailRecord();
+
+        emailRecordTable.clickSubject("Specimen Request Notification");
+        waitForElement(Locator.linkWithText("SpecimenDetail.xls"));
+
+        // Each notification should be have only the specimen request details, no specimen list
+        assertElementPresent(Locator.css("#email_body_1 > table"), 1);
+
+        enableEmailRecorder(); // Clear out previous notifications
         log("Setup text specimen attachment");
         waitAndClickAndWait(Locator.linkWithText("Manage"));
         waitAndClickAndWait(Locator.linkWithText("Manage Notifications"));
-        checkRadioButton(Locator.radioButtonByNameAndValue("specimensAttachment", "TextAttachment"));
-        clickButton("Save");
+        manageNotificationsPage = new ManageNotificationsPage(getDriver());
+        manageNotificationsPage.setSpecimenAttachmentType(SpecimensAttachment.TEXT);
+        manageNotificationsPage.clickSave();
 
         log("Create request with text specimen attachment");
         goToSpecimenData();
@@ -692,21 +706,20 @@ public class SpecimenTest extends SpecimenBaseTest
         setFormElement(Locator.id("input1"), "Shipping");
         setFormElement(Locator.id("input3"), "Comments");
         clickButton("Create and View Details");
-        clickButton("Submit Request", 0);
-        acceptAlert();
+        doAndWaitForPageToLoad(() -> {
+            clickButton("Submit Request", 0);
+            acceptAlert();
+        });
         waitForElement(Locator.css("h3").withText("Your request has been successfully submitted."));
 
-        log("Verify specimen list attachments");
-        goToModule("Dumbster");
+        log("Verify specimen xls attachment");
+        emailRecordTable = goToEmailRecord();
 
-        click(Locator.linkContainingText("Specimen Request Notification"));             // expand them both, don't worry about order
-        click(Locator.linkContainingText("Specimen Request Notification").index(1));
-        waitForElement(Locator.linkWithText("SpecimenDetail.tsv"));                     // ensure they are both present
-        waitForElement(Locator.linkWithText("SpecimenDetail.xls"));
+        emailRecordTable.clickSubject("Specimen Request Notification");
+        waitForElement(Locator.linkWithText("SpecimenDetail.tsv"));
 
         // Each notification should be have only the specimen request details, no specimen list
         assertElementPresent(Locator.css("#email_body_1 > table"), 1);
-        assertElementPresent(Locator.css("#email_body_2 > table"), 1);
     }
 
     @LogMethod
@@ -755,6 +768,8 @@ public class SpecimenTest extends SpecimenBaseTest
         clickButton("Save Changes and Send Notifications");
 
         goToModule("Dumbster");
+
+        getArtifactCollector().dumpPageSnapshot("deactivatedUsers", null);
     }
 
     /**
