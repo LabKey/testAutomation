@@ -1,7 +1,7 @@
-package org.labkey.test.util.announcements;
+package org.labkey.remoteapi.announcements;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +15,17 @@ public class TestAnnouncementModel
     private String _containerId;
     private String _containerPath;
     private String _created;
-    private Integer _createdBy;
+    private Long _createdBy;
     private String _modified;
-    private Integer _modifiedBy;
+    private Long _modifiedBy;
     private String _discussionSrcIdentifier;
     private String _entityId;
     private String _formattedHtml;
     private String _rendererType;
     private List<TestAnnouncementModel> _responses = new ArrayList<>();
-    private Integer _rowId;
+    private Long _rowId;
     private String _title;
+    private String _parent;
 
     public TestAnnouncementModel()
     {
@@ -43,11 +44,11 @@ public class TestAnnouncementModel
         if (json.get("created") != null)
             _created = json.get("created").toString();
         if (json.get("createdBy") != null)
-            _createdBy = (Integer) json.get("createdBy");
+            _createdBy = (Long) json.get("createdBy");
         if (json.get("modified") != null)
             _modified = json.get("modified").toString();
         if (json.get("modifiedBy") != null)
-            _modifiedBy = (Integer) json.get("modifiedBy");
+            _modifiedBy = (Long) json.get("modifiedBy");
         if (json.get("discussionSrcIdentifier") != null)
             _discussionSrcIdentifier = json.get("discussionSrcIdentifier").toString();
         if (json.get("entityId") != null)
@@ -57,15 +58,17 @@ public class TestAnnouncementModel
         if (json.get("rendererType") != null)
             _rendererType = json.get("rendererType").toString();
         if (json.get("rowId") != null)
-            _rowId = (Integer) json.get("rowId");
+            _rowId = (Long) json.get("rowId");
         if (json.get("title") != null)
             _title = json.get("title").toString();
+        if (json.get("parent") != null)
+            _parent = json.get("parent").toString();
 
         if (json.get("responses") != null)
         {
             var responses = new ArrayList<TestAnnouncementModel>();
             var rawResponses = (JSONArray) json.get("responses");
-            for (int i = 0; i < rawResponses.length(); i++)
+            for (int i = 0; i < rawResponses.size(); i++)
                 responses.add(new TestAnnouncementModel((JSONObject) rawResponses.get(i)));
             _responses = responses;
         }
@@ -89,6 +92,7 @@ public class TestAnnouncementModel
         if (getResponses() != null && getResponses().size() > 0) json.put("responses", getResponses());
         if (getRowId() != null) json.put("rowId", getRowId());
         if (getTitle() != null) json.put("title", getTitle());
+        if (getParent() != null) json.put("parent", getParent());
         return json;
     }
 
@@ -107,9 +111,10 @@ public class TestAnnouncementModel
         return _body;
     }
 
-    public void setBody(String body)
+    public TestAnnouncementModel setBody(String body)
     {
         _body = body;
+        return this;
     }
 
     public String getContainerId()
@@ -142,12 +147,12 @@ public class TestAnnouncementModel
         _created = created;
     }
 
-    public Integer getCreatedBy()
+    public Long getCreatedBy()
     {
         return _createdBy;
     }
 
-    public void setCreatedBy(Integer createdBy)
+    public void setCreatedBy(Long createdBy)
     {
         _createdBy = createdBy;
     }
@@ -162,12 +167,12 @@ public class TestAnnouncementModel
         _modified = modified;
     }
 
-    public Integer getModifiedBy()
+    public Long getModifiedBy()
     {
         return _modifiedBy;
     }
 
-    public void setModifiedBy(Integer modifiedBy)
+    public void setModifiedBy(Long modifiedBy)
     {
         _modifiedBy = modifiedBy;
     }
@@ -222,12 +227,12 @@ public class TestAnnouncementModel
         _responses = responses;
     }
 
-    public Integer getRowId()
+    public Long getRowId()
     {
         return _rowId;
     }
 
-    public void setRowId(Integer rowId)
+    public void setRowId(Long rowId)
     {
         _rowId = rowId;
     }
@@ -237,8 +242,19 @@ public class TestAnnouncementModel
         return _title;
     }
 
-    public void setTitle(String title)
+    public TestAnnouncementModel setTitle(String title)
     {
         _title = title;
+        return this;
+    }
+
+    public String getParent()
+    {
+        return _parent;
+    }
+
+    public void setParent(String parent)
+    {
+        _parent = parent;
     }
 }
