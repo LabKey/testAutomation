@@ -149,7 +149,7 @@ public class SecurityTest extends BaseWebDriverTest
             goToModule("Dumbster");
 
             EmailRecordTable table = new EmailRecordTable(this);
-            assertEquals("Notification emails.", 12, table.getEmailCount());
+            assertEquals("Notification emails.", 14, table.getEmailCount());
             // Once in the message itself, plus copies in the headers
             assertTextPresent(": Welcome", 18);
         }
