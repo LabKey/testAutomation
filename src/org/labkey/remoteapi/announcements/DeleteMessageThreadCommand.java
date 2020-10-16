@@ -5,19 +5,19 @@ import org.labkey.remoteapi.PostCommand;
 
 public class DeleteMessageThreadCommand extends PostCommand<DeleteMessageThreadResponse>
 {
-    private String _id;
+    private String _entityId;
     private Long _rowId;
 
-    public DeleteMessageThreadCommand(String id)
+    public DeleteMessageThreadCommand(String entityId)
     {
         super("announcements", "deleteThread");
-        _id = id;
+        _entityId = entityId;
     }
 
     public DeleteMessageThreadCommand(Long rowId)
     {
         super("announcements", "deleteThread");
-        _rowId = _rowId;
+        _rowId = rowId;
     }
 
     @Override
@@ -25,11 +25,10 @@ public class DeleteMessageThreadCommand extends PostCommand<DeleteMessageThreadR
     {
         setRequiredVersion(0);
         JSONObject result = new JSONObject();
-        if (getId() != null) result.put("rowId", _rowId);
-        else if (getRowId() != null) result.put("entityId", _id);
+        if (getRowId() != null) result.put("rowId", getRowId());
+        else if (getEntityId() != null) result.put("entityId", getEntityId());
         return result;
     }
-
 
     @Override
     protected DeleteMessageThreadResponse createResponse(String text, int status, String contentType, JSONObject json)
@@ -37,19 +36,21 @@ public class DeleteMessageThreadCommand extends PostCommand<DeleteMessageThreadR
         return new DeleteMessageThreadResponse(text, status, contentType, json, this);
     }
 
-    public void setId(String id)
+    public void setEntityId(String entityId)
     {
-        _id=id;
+        _entityId = entityId;
     }
-    public String getId()
+
+    public String getEntityId()
     {
-        return _id;
+        return _entityId;
     }
 
     public void setRowId(Long rowId)
     {
         _rowId = rowId;
     }
+
     public Long getRowId()
     {
         return _rowId;

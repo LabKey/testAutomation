@@ -13,7 +13,6 @@ import org.labkey.remoteapi.announcements.GetMessageThreadCommand;
 import org.labkey.remoteapi.announcements.MessageThreadResponse;
 import org.labkey.remoteapi.announcements.TestAnnouncementModel;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 
 import java.util.Arrays;
@@ -26,12 +25,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyC.class})
 public class AnnouncementAPITest extends BaseWebDriverTest
 {
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
-
     @BeforeClass
     public static void setupProject()
     {
@@ -42,7 +35,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
 
     private void doSetup()
     {
-        _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createProject(getProjectName());
     }
 
     @Before
@@ -52,7 +45,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     }
 
     @Test
-    public void testGetDiscusssion() throws Exception
+    public void testGetDiscussion() throws Exception
     {
         TestAnnouncementModel parentThread = createThread(new TestAnnouncementModel().setBody("parent"), getProjectName())
                 .getAnnouncementModel();
@@ -124,7 +117,6 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         assertThat(confirm.getStatusCode(), is(200));
         assertThat(confirm.getAnnouncementModel().getBody(), is(createdThread.getBody()));
 
-
         // now delete it
         DeleteMessageThreadCommand delCmd = new DeleteMessageThreadCommand(createdThread.getEntityId());
         DeleteMessageThreadResponse delResponse = delCmd.execute(createDefaultConnection(), getProjectName());
@@ -152,9 +144,9 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         TestAnnouncementModel createdChild = childCreateResponse.getAnnouncementModel();
         assertThat(createdChild.getParent(), is(createdParent.getEntityId()));
 
-        TestAnnouncementModel orignialParent = getThread(createdParent, getProjectName()).getAnnouncementModel();
+        TestAnnouncementModel originalParent = getThread(createdParent, getProjectName()).getAnnouncementModel();
         assertTrue("Expect parent row to be updated with added child",
-                orignialParent.getResponses().stream().anyMatch(a-> a.getEntityId().equals(createdChild.getEntityId())));
+                originalParent.getResponses().stream().anyMatch(a-> a.getEntityId().equals(createdChild.getEntityId())));
     }
 
     private MessageThreadResponse createThread(TestAnnouncementModel thread, String containerPath) throws Exception
@@ -168,8 +160,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         CreateMessageThreadCommand replyCmd = new CreateMessageThreadCommand(respondingThread);
         replyCmd.setReply(true);
         respondingThread.setParent(parentThread.getEntityId());
-        MessageThreadResponse childCreateResponse = replyCmd.execute(createDefaultConnection(), getProjectName());
-        return childCreateResponse;
+        return replyCmd.execute(createDefaultConnection(), getProjectName());
     }
 
     private MessageThreadResponse getThread(TestAnnouncementModel thread, String containerPath) throws Exception
