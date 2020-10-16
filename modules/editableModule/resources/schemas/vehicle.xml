@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+ * Copyright (c) 2013-2019 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+
+ -->
+<tables xmlns="http://labkey.org/data/xml">
+
+  <table tableName="Colors" tableDbType="TABLE">
+    <pkColumnName>Name</pkColumnName>
+    <columns>
+      <column columnName="Name">
+        <datatype>varchar</datatype>
+        <scale>30</scale>
+      </column>
+      <column columnName="Hex">
+        <nullable>true</nullable>
+        <datatype>varchar</datatype>
+      </column>
+      <column columnName="TriggerScriptProperty">
+        <isUserEditable>true</isUserEditable>
+        <nullable>false</nullable>
+        <datatype>varchar</datatype>
+        <isHidden>true</isHidden>
+      </column>
+    </columns>
+  </table>
+
+  <table tableName="Manufacturers" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <auditLogging>SUMMARY</auditLogging>
+    <columns>
+      <column columnName="RowId">
+        <datatype>serial</datatype>
+        <isAutoInc>true</isAutoInc>
+        <scale>10</scale>
+        <nullable>false</nullable>
+        <isReadOnly>true</isReadOnly>
+        <isKeyField>true</isKeyField>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="Name">
+        <datatype>varchar</datatype>
+        <scale>255</scale>
+      </column>
+    </columns>
+  </table>
+
+  <table tableName="FirstFKTable" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <columns>
+      <column columnName="RowId">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="StartCycleCol">
+        <datatype>int</datatype>
+        <fk>
+          <fkColumnName>StartCycleCol</fkColumnName>
+          <fkTable>SecondFKTable</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+      </column>
+    </columns>
+  </table>
+
+  <table tableName="SecondFKTable" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <columns>
+      <column columnName="RowId">
+        <datatype>int</datatype>
+      </column>
+        <column columnName="StartCycleCol">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="CycleCol">
+        <fk>
+          <fkColumnName>CycleCol</fkColumnName>
+          <fkTable>ThirdFKTable</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+        <datatype>int</datatype>
+      </column>
+    </columns>
+  </table>
+
+  <table tableName="ThirdFKTable" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <columns>
+      <column columnName="RowId">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="CycleCol">
+        <fk>
+          <fkColumnName>CycleCol</fkColumnName>
+          <fkTable>SecondFKTable</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+        <datatype>int</datatype>
+      </column>
+    </columns>
+  </table>
+
+  <table tableName="Models" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <auditLogging>DETAILED</auditLogging>
+    <columns>
+      <column columnName="RowId">
+        <datatype>serial</datatype>
+        <isAutoInc>true</isAutoInc>
+        <scale>10</scale>
+        <nullable>false</nullable>
+        <isReadOnly>true</isReadOnly>
+        <isKeyField>true</isKeyField>
+        <isHidden>true</isHidden>
+        <url>/editablemodule/model.view?rowid=${RowId}</url>
+      </column>
+      <column columnName="Name">
+        <datatype>varchar</datatype>
+        <scale>255</scale>
+        <url>/editablemodule/model.view?rowid=${RowId}</url>
+      </column>
+      <column columnName="ManufacturerId">
+        <columnTitle>Manufacturer</columnTitle>
+        <fk>
+          <fkColumnName>RowId</fkColumnName>
+          <fkTable>Manufacturers</fkTable>
+          <fkDbSchema>simple</fkDbSchema>
+        </fk>
+        <datatype>int</datatype>
+      </column>
+      <column columnName="InitialReleaseYear">
+        <validators>
+          <validator>
+            <name>SchemaTableValidator</name>
+            <typeURI>urn:lsid:labkey.com:PropertyValidator:regex</typeURI>
+            <!--A very permissive RegEx-->
+            <expression>^[^5]*$</expression>
+            <errorMessage>Failed Schema Layer RegEx</errorMessage>
+          </validator>
+        </validators>
+      </column>
+      <column columnName="Image">
+        <datatype>varchar</datatype>
+        <displayColumnFactory>
+          <className>org.labkey.api.data.URLDisplayColumn$Factory</className>
+          <properties>
+            <property name="thumbnailImageWidth">50px</property>
+            <property name="thumbnailImageUrl">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>
+            <property name="popupImageUrl">/_webdav/SimpleModuleTest%20Project/%40files/${popupImage}</property>
+          </properties>
+        </displayColumnFactory>
+        <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>
+      </column>
+      <column columnName="ThumbnailImage">
+        <datatype>varchar</datatype>
+      </column>
+      <column columnName="PopupImage">
+        <datatype>varchar</datatype>
+      </column>
+      <column columnName="urlBadColumnWithDefaultBehavior" wrappedColumnName="RowId">
+        <url>/editablemodule/model.view?rowid=${RowId}&amp;doesNotExist=${doesNotExist}</url>
+      </column>
+      <column columnName="urlBadColumnWithNullResult" wrappedColumnName="RowId">
+        <url replaceMissing="nullResult">/editablemodule/model.view?rowid=${RowId}&amp;doesNotExist=${doesNotExist}</url>
+      </column>
+      <column columnName="urlBadColumnWithNullValue" wrappedColumnName="RowId">
+        <url replaceMissing="nullValue">/editablemodule/model.view?rowid=${RowId}&amp;doesNotExist=${doesNotExist}</url>
+      </column>
+      <column columnName="urlBadColumnWithBlankValue" wrappedColumnName="RowId">
+        <url replaceMissing="blankValue">/editablemodule/model.view?rowid=${RowId}&amp;doesNotExist=${doesNotExist}</url>
+      </column>
+      <column columnName="urlBadColumnWithDefaultValue" wrappedColumnName="RowId">
+        <url>/editablemodule/model.view?rowid=${RowId}&amp;doesNotExist=${doesNotExist:defaultValue('fred')}</url>
+      </column>
+
+      <column columnName="urlNullableColumnWithDefaultBehavior" wrappedColumnName="RowId">
+        <url>/editablemodule/model.view?rowid=${RowId}&amp;nullableColumn=${initialReleaseYear}</url>
+      </column>
+      <column columnName="urlNullableColumnWithNullResult" wrappedColumnName="RowId">
+        <url replaceMissing="nullResult">/editablemodule/model.view?rowid=${RowId}&amp;nullableColumn=${initialReleaseYear}</url>
+      </column>
+      <column columnName="urlNullableColumnWithNullValue" wrappedColumnName="RowId">
+        <url replaceMissing="nullValue">/editablemodule/model.view?rowid=${RowId}&amp;nullableColumn=${initialReleaseYear}</url>
+      </column>
+      <column columnName="urlNullableColumnWithBlankValue" wrappedColumnName="RowId">
+        <url replaceMissing="blankValue">/editablemodule/model.view?rowid=${RowId}&amp;nullableColumn=${initialReleaseYear}</url>
+      </column>
+      <column columnName="urlNullableColumnWithDefaultValue" wrappedColumnName="RowId">
+        <url>/editablemodule/model.view?rowid=${RowId}&amp;nullableColumn=${initialReleaseYear:defaultValue('fred')}</url>
+      </column>
+
+    </columns>
+  </table>
+
+  <table tableName="Vehicles" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <tableUrl>/editablemodule/vehicle.view?rowid=${RowId}</tableUrl>
+    <importMessage>Hello.  Please read this before you import data</importMessage>
+    <importTemplates>
+        <template label="Template 1" url="/query/exportExcelTemplate.view?schemaName=vehicle&amp;query.queryName=Vehicles&amp;captionType=Label&amp;filenamePrefix=vehicles" />
+        <template label="Template 2" url="/query/exportExcelTemplate.view?schemaName=vehicle&amp;query.queryName=Vehicles&amp;captionType=Label&amp;filenamePrefix=vehicles&amp;query.viewName=AlternateImportTemplate" />
+    </importTemplates>
+    <columns>
+      <column columnName="RowId">
+        <datatype>serial</datatype>
+        <isAutoInc>true</isAutoInc>
+        <scale>10</scale>
+        <nullable>false</nullable>
+        <isReadOnly>true</isReadOnly>
+        <isKeyField>true</isKeyField>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="Container">
+        <isUserEditable>false</isUserEditable>
+        <datatype>entityid</datatype>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="CreatedBy">
+        <isUserEditable>false</isUserEditable>
+        <datatype>userid</datatype>
+        <isReadOnly>true</isReadOnly>
+        <isHidden>true</isHidden>
+        <fk>
+          <fkColumnName>UserId</fkColumnName>
+          <fkTable>Users</fkTable>
+          <fkDbSchema>core</fkDbSchema>
+        </fk>
+      </column>
+      <column columnName="Created">
+        <isUserEditable>false</isUserEditable>
+        <datatype>timestamp</datatype>
+        <isReadOnly>true</isReadOnly>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="ModifiedBy">
+        <isUserEditable>false</isUserEditable>
+        <datatype>userid</datatype>
+        <isReadOnly>true</isReadOnly>
+        <isHidden>true</isHidden>
+        <fk>
+          <fkColumnName>UserId</fkColumnName>
+          <fkTable>Users</fkTable>
+          <fkDbSchema>core</fkDbSchema>
+        </fk>
+      </column>
+      <column columnName="Modified">
+        <isUserEditable>false</isUserEditable>
+        <datatype>timestamp</datatype>
+        <isReadOnly>true</isReadOnly>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="ModelId">
+        <columnTitle>Model</columnTitle>
+        <fk>
+          <fkColumnName>Name</fkColumnName>
+          <fkTable>Models</fkTable>
+          <fkDbSchema>simple</fkDbSchema>
+        </fk>
+        <datatype>int</datatype>
+      </column>
+      <column columnName="Color">
+        <fk>
+          <fkColumnName>Name</fkColumnName>
+          <fkTable>Colors</fkTable>
+          <fkDbSchema>simple</fkDbSchema>
+        </fk>
+        <datatype>varchar</datatype>
+        <scale>30</scale>
+        <!--used in SimpleModuleTest.doTestInsertUpdateViews()-->
+        <shownInDetailsView>false</shownInDetailsView>
+      </column>
+      <column columnName="ModelYear">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="Milage">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="LastService">
+        <datatype>timestamp</datatype>
+      </column>
+    </columns>
+  </table>
+
+  <table tableName="EmissionTest" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <auditLogging>SUMMARY</auditLogging>
+    <columns>
+      <column columnName="RowId">
+        <datatype>serial</datatype>
+        <isAutoInc>true</isAutoInc>
+        <scale>10</scale>
+        <nullable>false</nullable>
+        <isReadOnly>true</isReadOnly>
+        <isKeyField>true</isKeyField>
+        <isHidden>false</isHidden>
+      </column>
+      <column columnName="Name">
+
+      </column>
+      <column columnName="Container">
+        <isUserEditable>false</isUserEditable>
+        <datatype>entityid</datatype>
+        <isHidden>false</isHidden>
+      </column>
+      <column columnName="ParentTest">
+        <columnTitle>Parent Test</columnTitle>
+        <fk>
+          <fkColumnName>RowId</fkColumnName>
+          <fkTable>EmissionTest</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+      </column>
+      <column columnName="VehicleId">
+        <fk>
+          <fkColumnName>RowId</fkColumnName>
+          <fkTable>Vehicles</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+      </column>
+      <column columnName="Result">
+      </column>
+    </columns>
+  </table>
+</tables>
