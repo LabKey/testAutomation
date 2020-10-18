@@ -151,7 +151,7 @@ public class SecurityTest extends BaseWebDriverTest
             EmailRecordTable table = new EmailRecordTable(this);
             assertEquals("Notification emails.", 14, table.getEmailCount());
             // Once in the message itself, plus copies in the headers
-            assertTextPresent(": Welcome", 18);
+            assertTextPresent(": Welcome", 21);
         }
 
         if (!isQuickTest())
