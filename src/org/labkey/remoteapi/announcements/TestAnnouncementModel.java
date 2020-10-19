@@ -2,6 +2,7 @@ package org.labkey.remoteapi.announcements;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.labkey.test.util.WikiHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -182,9 +183,10 @@ public class TestAnnouncementModel
         return _discussionSrcIdentifier;
     }
 
-    public void setDiscussionSrcIdentifier(String discussionSrcIdentifier)
+    public TestAnnouncementModel setDiscussionSrcIdentifier(String discussionSrcIdentifier)
     {
         _discussionSrcIdentifier = discussionSrcIdentifier;
+        return this;
     }
 
     public String getEntityId()
@@ -212,9 +214,10 @@ public class TestAnnouncementModel
         return _rendererType;
     }
 
-    public void setRendererType(String rendererType)
+    public TestAnnouncementModel setRendererType(WikiHelper.WikiRendererType rendererType)
     {
-        _rendererType = rendererType;
+        _rendererType = rendererType.toString();
+        return this;
     }
 
     public List<TestAnnouncementModel> getResponses()
