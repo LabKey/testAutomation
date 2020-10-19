@@ -309,13 +309,28 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         // act and assert
         // as a Reader, attempt to do basic things that require permissions and confirm
 
+        // first, get an existing thread as a reader
+        MessageThreadResponse createResponse = getThread(created, getProjectName());
+        assertThat(createResponse.getStatusCode(), is(200));
+
         // create a thread
         try
         {
             createThread(new TestAnnouncementModel(), getProjectName());
+            fail("Reader should not have permissions to create a thread");
         }catch (CommandException success)
         {
              assertThat(success.getMessage(), is("User does not have permission to perform this operation."));
+        }
+
+        // respond to a thread
+        try
+        {
+            respondToThread(created, new TestAnnouncementModel().setTitle("fake"), getProjectName());
+            fail("Reader should not have permission to respond to a thread via createThread.api");
+        }catch (CommandException success)
+        {
+            assertThat(success.getMessage(), is("User does not have permission to perform this operation."));
         }
 
         // delete a thread
