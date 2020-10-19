@@ -263,10 +263,11 @@ public class AnnouncementAPITest extends BaseWebDriverTest
 
         // assert
         TestAnnouncementModel updated = updateResponse.getAnnouncementModel();
-        assertThat(updated.getTitle(), is("new title"));
-        assertThat(updated.getBody(), is("new body"));
-        assertThat(updated.getDiscussionSrcIdentifier(), is("whole new discussionsrcIdentifier"));
-        assertThat(updated.getRendererType(), is("HTML"));
+        assertThat("expect title to update", updated.getTitle(), is("new title"));
+        assertThat("expect body to update", updated.getBody(), is("new body"));
+        assertThat("don't expect discussionSrcIdentifier to update",
+                updated.getDiscussionSrcIdentifier(), is("old discussionSrcIdentifier"));
+        assertThat("expect renderer to update", updated.getRendererType(), is("HTML"));
     }
 
     private MessageThreadResponse createThread(TestAnnouncementModel thread, String containerPath) throws Exception
