@@ -170,6 +170,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     @Test
     public void testDeleteThreadByRowId() throws Exception
     {
+        // arrange
         TestAnnouncementModel preThread = new TestAnnouncementModel().setBody("deleteMeByRowId");
         TestAnnouncementModel createdThread = createThread(preThread, getProjectName()).getAnnouncementModel();
 
@@ -180,16 +181,29 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         assertThat(confirm.getStatusCode(), is(200));
         assertThat(confirm.getAnnouncementModel().getBody(), is(createdThread.getBody()));
 
-        // now delete
+        // act
         DeleteMessageThreadCommand delCmd = new DeleteMessageThreadCommand(confirm.getAnnouncementModel().getRowId());
         DeleteMessageThreadResponse delResponse = delCmd.execute(createDefaultConnection(), getProjectName());
 
+        // assert
         assertThat(delResponse.getStatusCode(), is(200));
+
+        // ensure it's no longer there
+        try
+        {
+            getThread(createdThread, getProjectName());
+            fail("expect not to find thread after it is deleted");
+        }catch(CommandException success)
+        {
+            assertThat("Expect to be unable to find thread once it is deleted",
+                    success.getMessage(), is("Unable to find thread in folder /AnnouncementAPITest Project"));
+        }
     }
 
     @Test
     public void testDeleteThreadByEntityId() throws Exception
     {
+        // arrange
         TestAnnouncementModel preThread = new TestAnnouncementModel().setBody("deleteMeByEntityId");
         TestAnnouncementModel createdThread = createThread(preThread, getProjectName()).getAnnouncementModel();
 
@@ -200,11 +214,23 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         assertThat(confirm.getStatusCode(), is(200));
         assertThat(confirm.getAnnouncementModel().getBody(), is(createdThread.getBody()));
 
-        // now delete it
+        // act
         DeleteMessageThreadCommand delCmd = new DeleteMessageThreadCommand(createdThread.getEntityId());
         DeleteMessageThreadResponse delResponse = delCmd.execute(createDefaultConnection(), getProjectName());
 
+        // assert
         assertThat(delResponse.getStatusCode(), is(200));
+
+        // ensure it's no longer there
+        try
+        {
+            getThread(createdThread, getProjectName());
+            fail("expect not to find thread after it is deleted");
+        }catch(CommandException success)
+        {
+            assertThat("Expect to be unable to find thread once it is deleted",
+                    success.getMessage(), is("Unable to find thread in folder /AnnouncementAPITest Project"));
+        }
     }
 
     @Test
@@ -268,6 +294,53 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         assertThat("don't expect discussionSrcIdentifier to update",
                 updated.getDiscussionSrcIdentifier(), is("old discussionSrcIdentifier"));
         assertThat("expect renderer to update", updated.getRendererType(), is("HTML"));
+    }
+
+    @Test
+    public void testApiPermissions() throws Exception
+    {
+        // arrange
+        TestAnnouncementModel toCreate = new TestAnnouncementModel().setBody("forPermissionsTesting");
+        TestAnnouncementModel created = createThread(toCreate, getProjectName()).getAnnouncementModel();
+
+        goToProjectHome(getProjectName());
+        impersonateRole("Reader");
+
+        // act and assert
+        // as a Reader, attempt to do basic things that require permissions and confirm
+
+        // create a thread
+        try
+        {
+            createThread(new TestAnnouncementModel(), getProjectName());
+        }catch (CommandException success)
+        {
+             assertThat(success.getMessage(), is("User does not have permission to perform this operation."));
+        }
+
+        // delete a thread
+        try
+        {
+            DeleteMessageThreadCommand delCmd = new DeleteMessageThreadCommand(created.getEntityId());
+            delCmd.execute(createDefaultConnection(), getProjectName());
+            fail("Reader should not have permissions to delete via deleteThread.api");
+        }catch (CommandException success)
+        {
+            assertThat(success.getMessage(), is("User does not have permission to perform this operation."));
+        }
+
+        // update a thread
+        try
+        {
+            UpdateMessageThreadCommand updateCmd = new UpdateMessageThreadCommand(created);
+            updateCmd.execute(createDefaultConnection(), getProjectName());
+            fail("Reader should not have permission to update via updateThread.api");
+        }catch (CommandException success)
+        {
+            assertThat(success.getMessage(), is("User does not have permission to perform this operation."));
+        }
+
+        stopImpersonatingHTTP();
     }
 
     private MessageThreadResponse createThread(TestAnnouncementModel thread, String containerPath) throws Exception
