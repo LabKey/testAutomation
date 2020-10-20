@@ -17,7 +17,6 @@
 package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -34,6 +33,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
+import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.params.login.DatabaseAuthenticationProvider;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -76,7 +76,10 @@ public class SecurityTest extends BaseWebDriverTest
     protected static final String NORMAL_USER_TEMPLATE = "_user.template@security.test";
     protected static final String BOGUS_USER_TEMPLATE = "bogus@bogus@bogus";
     protected static final String PROJECT_ADMIN_USER = "admin_securitytest@security.test";
+    private static final String PROJECT_ADMIN_ROLE = "Project Administrator";
+    private static final String FOLDER_ADMIN_ROLE = "Folder Administrator";
     protected static final String NORMAL_USER = "user_securitytest@security.test";
+    private static final String ADDED_USER = "fromprojectusers@security.test";
     protected static final String[] PASSWORDS = {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
     protected static final String NORMAL_USER_PASSWORD = PASSWORDS[0];
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
@@ -112,7 +115,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
 
-        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER);
+        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER, ADDED_USER);
 
         // Make sure the feature is turned off.
         Connection cn = createDefaultConnection();
@@ -128,6 +131,8 @@ public class SecurityTest extends BaseWebDriverTest
         }
 
         clonePermissionsTest();
+        addUserAsProjAdmin();
+        dontAddUserAsFolderAdmin();
         displayNameTest();
         tokenAuthenticationTest();
         if (!isQuickTest())
@@ -144,9 +149,9 @@ public class SecurityTest extends BaseWebDriverTest
             goToModule("Dumbster");
 
             EmailRecordTable table = new EmailRecordTable(this);
-            assertEquals("Notification emails.", 12, table.getEmailCount());
+            assertEquals("Notification emails.", 14, table.getEmailCount());
             // Once in the message itself, plus copies in the headers
-            assertTextPresent(": Welcome", 18);
+            assertTextPresent(": Welcome", 21);
         }
 
         if (!isQuickTest())
@@ -551,6 +556,32 @@ public class SecurityTest extends BaseWebDriverTest
         checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators", 2);
         checkGroupMembership(NORMAL_USER, "SecurityVerifyProject/Testers", 1);
         assertNavTrail("Site Users", "User Details", "Permissions");
+    }
+
+    protected void addUserAsProjAdmin()
+    {
+        beginAt(WebTestHelper.buildURL("project", getProjectName(), "begin"));
+        impersonateRoles(PROJECT_ADMIN_ROLE);
+        ShowUsersPage usersPage = goToProjectUsers();
+
+        usersPage
+                .clickAddUsers()
+                .setNewUsers(Arrays.asList(ADDED_USER))
+                .setSendNotification(true)
+                .clickAddUsers();
+
+        assertTextPresent(ADDED_USER);
+        stopImpersonating();
+    }
+
+    protected void dontAddUserAsFolderAdmin()
+    {
+        beginAt(WebTestHelper.buildURL("project", getProjectName(), "begin"));
+        impersonateRoles(FOLDER_ADMIN_ROLE);
+        goToProjectUsers();
+
+        assertElementNotPresent(Locator.lkButton("Add Users"));
+        stopImpersonating();
     }
 
     @LogMethod
