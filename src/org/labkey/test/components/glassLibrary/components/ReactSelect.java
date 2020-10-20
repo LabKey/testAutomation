@@ -47,20 +47,16 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         return this;
     }
 
-    // TODO: Issue 40180: ReactSelect needs to deal with control being recreated after a selection is made.
-    public ReactSelect select(String option)
+    public void select(String option)
     {
         waitForLoaded();
-        List<String> selections = scrollIntoView()
-                .open()
-                .clickOption(option)
-                .getSelections();
+        scrollIntoView();
+        open();
+        clickOption(option);
         waitForClosed();
-
-        return this;
     }
 
-    protected ReactSelect clickOption(String option)
+    protected void clickOption(String option)
     {
         WebElement optionEl = null;
         int tryCount = 0;
@@ -107,8 +103,6 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         optionEl.click();
 
         new FluentWait<>(_wrapper.getDriver()).withTimeout(Duration.ofSeconds(1)).until(ExpectedConditions.stalenessOf(optionEl));
-
-        return this;
     }
 
     public boolean noResultsFound()  // asks whether or not the select has loaded its options
@@ -119,12 +113,12 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
     }
 
     @Override
-    protected ElementCache elementCache()
+    protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected class ElementCache extends BaseReactSelect<?>.ElementCache
+    protected class ElementCache extends BaseReactSelect<ReactSelect>.ElementCache
     {
         @Override
         @NotNull
