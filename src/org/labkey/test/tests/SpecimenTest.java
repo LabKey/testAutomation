@@ -384,8 +384,8 @@ public class SpecimenTest extends SpecimenBaseTest
             clickButton("Submit Request", 0);
             assertAlertIgnoreCaseAndSpaces("Once a request is submitted, its specimen list may no longer be modified.  Continue?");
         });
+        waitForText("New Request");
         assertTextNotPresent("Not Yet Submitted");
-        assertTextPresent("New Request");
 
         // Add request attachment
         click(Locator.linkWithText("Update Request"));
