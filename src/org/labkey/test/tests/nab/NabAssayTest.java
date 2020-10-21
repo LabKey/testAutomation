@@ -463,7 +463,6 @@ public class NabAssayTest extends AbstractAssayTest
             beginAt(ptid1c_detailsURL);
             assertEquals(403, getResponseCode());
 
-            clickAndWait(Locator.lkButton("Home"));
             stopImpersonating();
 
             doNabApiTest(); // Use NAb study APIs
@@ -849,7 +848,7 @@ public class NabAssayTest extends AbstractAssayTest
 
         clickAndWait(Locator.linkWithText("Download Datafile"));
         assertTextPresent("Data file for run ptid + date was not found.");
-        clickButton("Folder");
+        clickButton("Back");
     }
 
     protected void runNabQCTest()

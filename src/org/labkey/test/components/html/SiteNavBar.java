@@ -252,6 +252,11 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             getWrapper().clickAndWait(moduleLinkElement);
         }
 
+        public void clickDeveloperLink(String linkText, boolean triggersPageLoad)
+        {
+            clickSubMenu(triggersPageLoad, "Developer Links", linkText);
+        }
+
         @Override
         public AdminMenu withExpandRetries(int retries)
         {
@@ -273,7 +278,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             {
                 clickSubMenu(false, "Impersonate", "User");
                 window = new ImpersonateUserWindow(getDriver());
-                window.getComponentElement().isDisplayed(); // force it to resolve
+                window.getComponentElement().isEnabled(); // force it to resolve
             }
             catch (NoSuchElementException notfound)
             {
@@ -285,10 +290,12 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
             AbstractUserHelper.saveCurrentDisplayName(getWrapper());
 
-            if (getWrapper().isElementPresent(Locator.lkButton("Home")))
+            if (getDriver().getTitle().contains("403"))
             {
-                getWrapper().clickAndWait(Locator.lkButton("Home"));
+                // go to home
+                getWrapper().clickAndWait(Locator.tagWithClass("a", "brand-logo"));
             }
+
         }
 
         public void impersonateRoles(String oneRole, String... roles)
@@ -298,7 +305,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             {
                 clickSubMenu(false, "Impersonate", "Roles");
                 window = new ImpersonateRoleWindow(getDriver());
-                window.getComponentElement().isDisplayed(); // force it to find/resolve
+                window.getComponentElement().isEnabled(); // force it to find/resolve
             }
             catch (NoSuchElementException notFound)
             {
@@ -319,7 +326,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             {
                 clickSubMenu(false, "Impersonate", "Group");
                 window = new ImpersonateGroupWindow(getDriver());
-                window.getComponentElement().isDisplayed(); // force it to resolve
+                window.getComponentElement().isEnabled(); // force it to resolve
             }
             catch (NoSuchElementException retry)
             {
@@ -333,6 +340,11 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
                 window.selectGroup(group);
 
             window.clickImpersonate();
+        }
+
+        public void signOut()
+        {
+            clickSubMenu(true, "Sign Out");
         }
 
         @Override

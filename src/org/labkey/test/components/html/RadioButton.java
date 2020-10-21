@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
+// TODO: We may want to revisit this inheritance, not sure we are getting what we want from it.
 public class RadioButton extends Checkbox
 {
     public RadioButton(WebElement element)

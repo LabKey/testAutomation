@@ -45,16 +45,16 @@ function sampleSetDomainTypeTest() {
     var NAME = 'AlternativeSet';
 
     function getSuccessHandler(dd) {
-        r('The Sample Set \'' + NAME + '\' already exists.', true);
+        r('The Sample Type \'' + NAME + '\' already exists.', true);
     }
 
     function getErrorHandler() {
-        r('Did not find the \'' + NAME + '\' Sample Set.');
+        r('Did not find the \'' + NAME + '\' Sample Type.');
 
         // Try to create the domain
         var domainDesign = {
             name : NAME,
-            description : 'A Sample Set created via the Client JavaScript API',
+            description : 'A Sample Type created via the Client JavaScript API',
             fields : [{
                 name : 'id',
                 rangeURI : 'int'
@@ -69,7 +69,7 @@ function sampleSetDomainTypeTest() {
         };
 
         function createSuccessHandler() {
-            r('Successfully created the \'' + NAME + '\' Sample Set.');
+            r('Successfully created the \'' + NAME + '\' Sample Type.');
             LABKEY.Domain.get(function(_dd){
 
                 _dd.description = 'An updated description via the Client JavaScript API';
@@ -78,7 +78,7 @@ function sampleSetDomainTypeTest() {
                     r('Successfully updated the description.', true);
                 },
                         function(response){
-                            r('Failed to update the \'' + NAME + '\' Sample Set.' +
+                            r('Failed to update the \'' + NAME + '\' Sample Type.' +
                                     '<br/><span class="labkey-error" style="color: red;">' +
                                     response.exception +
                                     (response['stackTrace'] != undefined ? ('<br/>' + response.stackTrace[0]) : '') +
@@ -87,7 +87,7 @@ function sampleSetDomainTypeTest() {
                         _dd, 'Samples', NAME);
 
             }, function(response) {
-                r('Failed to update the \'' + NAME + '\' Sample Set.<br/><br/><span class="labkey-error" style="color: red;">' +
+                r('Failed to update the \'' + NAME + '\' Sample Type.<br/><br/><span class="labkey-error" style="color: red;">' +
                         response.exception +
                         (response['stackTrace'] != undefined ? ('<br/>' + response.stackTrace[0]) : '') +
                         '</span>', true);
@@ -95,7 +95,7 @@ function sampleSetDomainTypeTest() {
         }
 
         function createErrorHandler(response) {
-            r('Failed to create the \'' + NAME + '\' Sample Set.<br/><br/><span class="labkey-error" style="color: red;">' +
+            r('Failed to create the \'' + NAME + '\' Sample Type.<br/><br/><span class="labkey-error" style="color: red;">' +
                     response.exception +
                     (response['stackTrace'] != undefined ? ('<br/>' + response.stackTrace[0]) : '') +
                     '</span>', true);

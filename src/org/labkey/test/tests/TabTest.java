@@ -144,14 +144,14 @@ public class TabTest extends SimpleModuleTest
 
         //verify Tab 1
         clickTab("Tab 1");
-        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Sets", "Assay List");
+        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Types", "Assay List");
         portalHelper.addWebPart("Messages");
 
         clickTab("Tab 2");
 
         //verify added webpart is persisted
         clickTab("Tab 1");
-        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Sets", "Assay List", "Messages");
+        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Types", "Assay List", "Messages");
 
         //there is a selector for the assay controller and tab2
         clickAndWait(Locator.lkButton("New Assay Design"));
@@ -229,7 +229,7 @@ public class TabTest extends SimpleModuleTest
         waitForText(STUDY_FOLDER_TAB_NAME);
         clickButton("Delete", 2 * WAIT_FOR_PAGE);
         assertTextPresent("You are about to delete the following folder:");
-        clickButton("Delete", 2 * WAIT_FOR_PAGE);
+        clickButton("Yes, delete all", 2 * WAIT_FOR_PAGE);
         assertTextNotPresent(STUDY_FOLDER_TAB_NAME);
 
         // Resurrect tab folder

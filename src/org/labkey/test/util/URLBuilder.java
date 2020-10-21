@@ -146,7 +146,7 @@ public class URLBuilder
         if (params != null)
         {
             boolean firstParam = true;
-            for (Map.Entry param : params.entrySet())
+            for (Map.Entry<String, ?> param : params.entrySet())
             {
                 if (null != param.getKey())
                 {

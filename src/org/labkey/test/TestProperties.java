@@ -91,7 +91,7 @@ public abstract class TestProperties
 
     public static boolean isServerRemote()
     {
-        return "true".equals(System.getProperty("labkey.isRemote", "false"));
+        return "true".equals(System.getProperty("webtest.server.remote", "false"));
     }
 
     public static boolean isIgnoreMissingModules()
@@ -173,9 +173,29 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.webdriver.logging"));
     }
 
+    public static boolean isTroubleshootingStacktracesEnabled()
+    {
+        return "true".equals(System.getProperty("webtest.troubleshooting.stacktraces"));
+    }
+
     public static boolean isDebugLoggingEnabled()
     {
         return "true".equals(System.getProperty("webtest.logging.debug"));
+    }
+
+    public static boolean isPrimaryUserAppAdmin()
+    {
+        return "true".equals(System.getProperty("webtest.primary.app.admin"));
+    }
+
+    public static boolean isWithoutTestModules()
+    {
+        return "true".equals(System.getProperty("webtest.without.test.modules"));
+    }
+
+    public static boolean isTrialServer()
+    {
+        return "true".equals(System.getProperty("webtest.server.trial"));
     }
 
     public static String ensureGeckodriverExeProperty()
@@ -276,9 +296,10 @@ public abstract class TestProperties
                     ? (Boolean)entry.getValue()
                     : Boolean.valueOf(String.valueOf(entry.getValue()));
 
-            if (key.startsWith("experimental.") && value != null)
+            String prefix = "webtest.experimental.";
+            if (key.startsWith(prefix))
             {
-                String feature = key.substring("experimental.".length());
+                String feature = key.substring(prefix.length());
                 features.put(feature, value);
             }
         }

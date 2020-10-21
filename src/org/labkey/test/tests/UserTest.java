@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -557,10 +558,10 @@ public class UserTest extends BaseWebDriverTest
         goToSiteUsers();
         clickButton("Add Users");
         setFormElement(Locator.name("newUsers"), "nocsrf@user.test");
-        setFormElementJS(Locator.name("X-LABKEY-CSRF"), "");
+        setFormElementJS(Locator.name(Connection.X_LABKEY_CSRF), "");
 
         clickButton("Add Users");
-        assertElementPresent(Locators.labkeyError.containing("This request has an invalid security context."));
+        assertElementPresent(Locators.labkeyErrorSubHeading.containing("You do not have the permissions required to access this page."));
     }
 
     @Override

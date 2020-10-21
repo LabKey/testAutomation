@@ -939,7 +939,7 @@ public abstract class Locator extends By
 
     public static String cq(String value)
     {
-        return "\"" + value.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"") + "\"";
+        return "\"" + value.replace("\\\\", "\\\\\\\\").replace("\"", "\\\\\"") + "\"";
     }
 
     private static class XPathCSSLocator extends XPathLocator
@@ -1207,6 +1207,11 @@ public abstract class Locator extends By
             return this.withPredicate("starts-with(normalize-space(), "+xq(text)+")");
         }
 
+        public XPathLocator startsWithIgnoreCase(String text)
+        {
+            return this.withPredicate("starts-with(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(text.toLowerCase())+")");
+        }
+
         @Override
         public XPathLocator index(Integer index)
         {
@@ -1333,7 +1338,7 @@ public abstract class Locator extends By
 
         public XPathLocator attributeStartsWith(String attribute, String text)
         {
-            return this.withPredicate(String.format("starts-with(@%s, "+xq(text)+")", attribute));
+            return this.withPredicate(String.format("starts-with(@%s, %s)", attribute, xq(text)));
         }
 
         public XPathLocator attributeEndsWith(String attribute, String substring)
@@ -1493,6 +1498,10 @@ public abstract class Locator extends By
         {
             super(Locator.xpath("//*").withAttribute("id", id), CssLocator.forId(id));
             _id = id.contains(" ") ? null : id;
+            if (_id == null)
+            {
+                TestLogger.warn(String.format("Element has an invalid ID: '%s'", id));
+            }
         }
 
         @Override

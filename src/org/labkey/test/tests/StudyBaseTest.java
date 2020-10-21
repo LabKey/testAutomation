@@ -24,10 +24,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.params.FieldDefinition.PhiSelectType;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.DatasetPropertiesPage;
+import org.labkey.test.params.FieldDefinition.PhiSelectType;
 import org.labkey.test.util.APITestHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
@@ -102,7 +103,8 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
             _containerHelper.createProject(getProjectName(), null);
         }
 
-        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getFolderName(), "Study");
+        new ApiPermissionsHelper(this).checkInheritedPermissions();
     }
 
     // Start importing the specimen archive.  This can load in the background while executing the first set of

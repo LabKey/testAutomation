@@ -70,7 +70,7 @@ public class IssuesHelper extends WebDriverWrapper
 
     public boolean doesIssueListDefExist(String container, String listDefLabel)
     {
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         SelectRowsCommand selectCmd = new SelectRowsCommand(ISSUES_SCHEMA, ISSUE_LIST_DEF_QUERY);
         selectCmd.setMaxRows(1);
         selectCmd.addFilter("Label", listDefLabel, Filter.Operator.EQUAL);
@@ -144,7 +144,7 @@ public class IssuesHelper extends WebDriverWrapper
 
     public int getHighestIssueId(String containerPath, String issuesQuery)
     {
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
         SelectRowsCommand command = new SelectRowsCommand("issues", issuesQuery.toLowerCase().replaceAll(" ", ""));
         command.addSort("IssueId", Sort.Direction.DESCENDING);
         command.setMaxRows(1);

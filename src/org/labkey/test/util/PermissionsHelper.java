@@ -67,7 +67,7 @@ public abstract class PermissionsHelper
         {
             _roles = new HashMap<>();
             GetRolesCommand command = new GetRolesCommand();
-            Connection connection = _driver.createDefaultConnection(false);
+            Connection connection = _driver.createDefaultConnection();
 
             try
             {

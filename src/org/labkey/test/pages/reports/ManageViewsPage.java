@@ -63,4 +63,19 @@ public class ManageViewsPage extends LabKeyPage
                 "Failed to delete report: " + reportName, WAIT_FOR_JAVASCRIPT);
     }
 
+    @LogMethod
+    public void editReport(String reportName)
+    {
+        //td[1] is the pencil
+        final Locator report = Locator.tag("tr").withClass("x4-grid-row").containing(reportName).childTag("td").position(1);
+        click(report);
+    }
+
+    @LogMethod
+    public void selectReport(String reportName)
+    {
+        final Locator report = Locator.tag("tr").withClass("x4-grid-row").containing(reportName).childTag("td").position(3);
+        waitForElement(report, 10000);
+        click(report);
+    }
 }

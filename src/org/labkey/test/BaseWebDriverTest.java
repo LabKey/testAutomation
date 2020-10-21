@@ -25,6 +25,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.simple.JSONObject;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
@@ -42,6 +43,7 @@ import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -84,6 +86,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -121,10 +124,10 @@ import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.logToServer;
-import static org.labkey.test.params.FieldDefinition.PhiSelectType;
-import static org.labkey.test.params.FieldDefinition.PhiSelectType.NotPHI;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
+import static org.labkey.test.params.FieldDefinition.PhiSelectType;
+import static org.labkey.test.params.FieldDefinition.PhiSelectType.NotPHI;
 
 /**
  * This class should be used as the base for all functional test classes
@@ -158,7 +161,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected static boolean _testFailed = false;
     protected static boolean _anyTestFailed = false;
     private final ArtifactCollector _artifactCollector;
-    private DeferredErrorCollector _errorCollector;
+    private final DeferredErrorCollector _errorCollector;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public final CustomizeView _customizeViewsHelper;
@@ -186,8 +189,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected static boolean _checkedLeaksAndErrors = false;
     private static final String ACTION_SUMMARY_TABLE_NAME = "actions";
 
-    protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation.";
-
     static final Set<String> urlsSeen = new HashSet<>();
 
     static
@@ -198,6 +199,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public BaseWebDriverTest()
     {
         _artifactCollector = new ArtifactCollector(this);
+        _errorCollector = new DeferredErrorCollector(_artifactCollector);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeView(this);
 
@@ -289,10 +291,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public final DeferredErrorCollector checker()
     {
-        if (_errorCollector == null)
-        {
-            throw new IllegalStateException("Default error collector only available within '@Test' methods.");
-        }
         return _errorCollector;
     }
 
@@ -379,9 +377,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 try
                 {
-                    currentTest = (BaseWebDriverTest) description.getTestClass().newInstance();
+                    currentTest = (BaseWebDriverTest) description.getTestClass().getConstructor().newInstance();
                 }
-                catch (InstantiationException | IllegalAccessException e)
+                catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
                 {
                     currentTest = null; // Make sure previous instance is cleared
                     throw new RuntimeException(e);
@@ -404,6 +402,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void succeeded(Description description)
             {
+                getCurrentTest().checker().recordResults();
                 if (!_anyTestFailed)
                     getCurrentTest().doPostamble();
                 else
@@ -577,20 +576,35 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
+
+        // Only do this as part of test startup if we haven't already checked. Since we do this as the last
+        // step in the test, there's no reason to bother doing it again at the beginning of the next test
+        if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
+        {
+            checker().addRecordableErrorType(WebDriverException.class);
+            checker().withScreenshot("startupErrors").wrapAssertion(this::checkErrors);
+            checker().withScreenshot("startupLeaks").wrapAssertion(this::checkLeaks);
+            checker().resetErrorTypes();
+            _checkedLeaksAndErrors = true;
+        }
+
+        if (TestProperties.isTroubleshootingStacktracesEnabled())
+        {
+            enableTroubleshootingStacktraces();
+        }
         setServerDebugLogging();
         setExperimentalFlags();
 
         // Start logging JS errors.
         resumeJsErrorChecker();
 
-        resetErrors();
         assertModulesAvailable(getAssociatedModules());
         deleteSiteWideTermsOfUsePage();
         try
         {
             enableEmailRecorder();
         }
-        catch (AssumptionViolatedException ignore) { } // Tests should, generally, enable dumbster if they need it
+        catch (AssumptionViolatedException | AssertionError ignore) { } // Tests should, generally, enable dumbster if they need it
         reenableMiniProfiler = disableMiniProfiler();
 
         if (isSystemMaintenanceDisabled())
@@ -599,14 +613,30 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             disableMaintenance();
         }
 
-        // Only do this as part of test startup if we haven't already checked. Since we do this as the last
-        // step in the test, there's no reason to bother doing it again at the beginning of the next test
-        if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
-        {
-            checkLeaksAndErrors();
-        }
-
         cleanup(false);
+    }
+
+    private void enableTroubleshootingStacktraces()
+    {
+        if (TestProperties.isPrimaryUserAppAdmin())
+        {
+            return; // app admin can't enable stack traces
+        }
+        Connection cn = createDefaultConnection();
+        PostCommand command = new PostCommand("mini-profiler", "enableTroubleshootingStacktraces");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("enabled", true);
+        command.setJsonObject(jsonObject);
+        try
+        {
+            CommandResponse r = command.execute(cn, null);
+            Map<String, Object> response = r.getParsedData();
+            log("Troubleshooting stacktraces state updated: " + response.get("data"));
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to enable troubleshooting stacktraces", e);
+        }
     }
 
     private void setServerDebugLogging()
@@ -670,7 +700,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (_testFailed)
                     resetErrors(); // Clear errors from a previously failed test
                 _testFailed = false;
-                _errorCollector = new DeferredErrorCollector(getArtifactCollector());
             }
 
             @Override
@@ -810,7 +839,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 if (isTestRunningOnTeamCity())
                 {
-                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "sampledata"));
                     getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"));
                     getArtifactCollector().dumpPipelineFiles();
                 }
@@ -933,10 +961,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     getDriver().switchTo().window(failureWindow);
                 }
             }
-            catch (RuntimeException | Error e)
+            catch (RuntimeException e)
             {
                 log("Unable to dump screenshots");
                 System.err.println(e.getMessage());
+            }
+            if (isTestRunningOnTeamCity()) // Don't risk modifying browser state when running locally
+            {
+                // Reset errors before next test and make it easier to view server-side errors that may have happened during the test.
+                checker().withScreenshot(testName + "_serverErrors").wrapAssertion(this::checkErrors);
             }
         }
         finally
@@ -990,7 +1023,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (!isTestCleanupSkipped())
         {
-            goToHome();
             cleanup(true);
 
             if (getDownloadDir().exists())
@@ -1011,7 +1043,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
         {
-            checkLeaksAndErrors();
+            checkErrors();
+            checkLeaks();
         }
 
         if (reenableMiniProfiler)
@@ -1022,7 +1055,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private void waitForPendingRequests(int msWait)
     {
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
         MutableLong pendingRequestCount = new MutableLong(-1);
         waitFor(() -> {
             pendingRequestCount.setValue(getPendingRequestCount(connection));
@@ -1050,6 +1083,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private void cleanup(boolean afterTest)
     {
+        ensureSignedInAsPrimaryTestUser();
+
         if (!ClassUtils.getAllInterfaces(getClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
         {
             if (afterTest)
@@ -1096,16 +1131,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static File getDownloadDir()
     {
         return SingletonWebDriver.getInstance().getDownloadDir();
-    }
-
-    @LogMethod
-    private void checkLeaksAndErrors()
-    {
-        if ( isGuestModeTest() )
-            return;
-        checkErrors();
-        checkLeaks();
-        _checkedLeaksAndErrors = true;
     }
 
     protected void checkLeaks()
@@ -1544,12 +1569,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    public void assertAtUserUserLacksPermissionPage()
-    {
-        assertTextPresent(PERMISSION_ERROR);
-        assertTitleEquals("403: Error Page -- User does not have permission to perform this operation.");
-    }
-
     public void assertNavTrail(String... links)
     {
         String expectedNavTrail = String.join("", links);
@@ -1683,17 +1702,21 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _permissionsHelper.setUserPermissions(userName, permissions);
     }
 
-    public void createSiteDeveloper(String userEmail)
+    public ApiPermissionsHelper createSiteDeveloper(String userEmail)
     {
-        ensureAdminMode();
-        goToSiteDevelopers();
-
-        if (!isElementPresent(Locator.xpath("//input[@value='" + userEmail + "']")))
+        _userHelper.createUser(userEmail);
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        if (TestProperties.isPrimaryUserAppAdmin())
         {
-            setFormElement(Locator.name("names"), userEmail);
-            uncheckCheckbox(Locator.name("sendEmail"));
-            clickButton("Update Group Membership");
+            apiPermissionsHelper
+                .addMemberToRole(userEmail, "Trusted Analyst", PermissionsHelper.MemberType.user, "/");
         }
+        else
+        {
+            apiPermissionsHelper.addUserToSiteGroup(userEmail, "Developers");
+        }
+
+        return apiPermissionsHelper;
     }
 
     @Deprecated
@@ -1720,26 +1743,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
      */
     public void verifyCohortStatus(DataRegionTable table, String cohort, boolean enrolled)
     {
-        int row = getCohortRow(table, cohort);
+        int row = table.getRowIndex("Label", cohort);
         assertEquals("Enrollment state for cohort " + cohort, String.valueOf(enrolled).toLowerCase(), table.getDataAsText(row, "Enrolled").toLowerCase());
-    }
-
-    /**
-     * Used by CohortTest and StudyCohortExportTest
-     * Retrieves the row for the cohort matching the label passed in
-     */
-    public int getCohortRow(DataRegionTable cohortTable, String cohort)
-    {
-        int row;
-        for (row = 0; row < cohortTable.getDataRowCount(); row++)
-        {
-            String s = cohortTable.getDataAsText(row, "Label");
-            if (0 == s.compareToIgnoreCase(cohort))
-            {
-                break;
-            }
-        }
-        return row;
     }
 
     /**
@@ -1749,14 +1754,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void changeCohortStatus(DataRegionTable cohortTable, String cohort, boolean enroll)
     {
         // if the row does not exist then most likely the cohort passed in is incorrect
-        int rowIndex = getCohortRow(cohortTable, cohort);
-        cohortTable.clickEditRow(rowIndex);
-
-        if (!enroll)
-            uncheckCheckbox(Locator.name("quf_enrolled"));
-        else
-            checkCheckbox(Locator.name("quf_enrolled"));
-        clickButton("Submit");
+        int rowIndex = cohortTable.getRowIndex("Label", cohort);
+        cohortTable.updateRow(rowIndex, Map.of("enrolled", Boolean.toString(enroll)), true);
     }
 
     public void setExportPhi(PhiSelectType exportPhiLevel)

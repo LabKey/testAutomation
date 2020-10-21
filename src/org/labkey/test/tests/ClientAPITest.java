@@ -74,7 +74,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 
 @Category({BVT.class})
@@ -405,7 +404,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateStudyDatasetVisitDomainKindInDateBasedStudy()
     {
-        // make sure you can't use StudyDatasetVisit domain kind in a date based study
+        // make sure you can't use StudyDatasetVisit domain kind in a date-based study
         projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
@@ -425,7 +424,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateStudyDatasetDateDomainKindInVisitBasedStudy()
     {
-        // make sure you can't use StudyDatasetVisit domain kind in a date based study
+        // make sure you can't use StudyDatasetDate domain kind in a visit-based study
         projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
@@ -1233,7 +1232,7 @@ public class ClientAPITest extends BaseWebDriverTest
                     executeEmailScript(EMAIL_NO_LOGIN, EMAIL_SUBJECT_FROM_NEW_USER, new String[]{EMAIL_RECIPIENT1}, null, EMAIL_BODY_HTML));
         }
         stopImpersonating();
-        assertTrue("We should have recorded a server side error if no recipients are present.", getServerErrors().contains("Error sending email: No recipient addresses"));
+        assertTrue("We should have recorded a server side error if no recipients are present.", getServerErrors().contains("No recipient addresses"));
         checkExpectedErrors(count + 1);
 
         signOut();
@@ -1363,10 +1362,12 @@ public class ClientAPITest extends BaseWebDriverTest
     }
 
     private static final String AUTOCOMPLETE_USER = "autocomplete1@clientapi.test";
+    private String _autocompleteUserDisplayName = null;
 
     @Test
     public void usernameAutocompleteValuesTest()
     {
+        _autocompleteUserDisplayName = _userHelper.getDisplayNameForEmail(AUTOCOMPLETE_USER);
         Connection cn = getConnection(true);
         verifyAutocompletionResponse(cn, "security", "completeUser", false, true);
         verifyAutocompletionResponse(cn, "security", "completeUserRead", false, true);
@@ -1406,7 +1407,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @LogMethod
     private void verifyAutocompletionResponse(Connection cn, String controller, String action, boolean displayNameOnly, boolean actionAllowed)
     {
-        Command command = new Command(controller, action);
+        Command<?> command = new Command<>(controller, action);
         Map<String, Object> completionValues;
         String errMsg = "for controller " + controller + ", displayNameOnly == " + Boolean.toString(displayNameOnly);
         try
@@ -1425,14 +1426,14 @@ public class ClientAPITest extends BaseWebDriverTest
         JSONArray entries = (JSONArray)completionValues.get("completions");
         assertTrue("No autocompletion entries returned" + errMsg, entries.size() > 0);
         boolean testPassed = false;
-        String displayName = _userHelper.getDisplayNameForEmail(AUTOCOMPLETE_USER);
+
         for (JSONObject entry : (List<JSONObject>)entries)
         {
             // The order in the response isn't guaranteed. Loop to find one we know should be in the list.
             String responseValue = (String)entry.get("value");
-            if (StringUtils.startsWith(responseValue, displayName))
+            if (StringUtils.startsWith(responseValue, _autocompleteUserDisplayName))
             {
-                String correctValue = displayNameOnly ? displayName : AUTOCOMPLETE_USER + " (" + displayName + ")";
+                String correctValue = displayNameOnly ? _autocompleteUserDisplayName : AUTOCOMPLETE_USER + " (" + _autocompleteUserDisplayName + ")";
                 assertEquals("Incorrect autocomplete value from for user " + AUTOCOMPLETE_USER + errMsg, correctValue, responseValue);
                 testPassed = true;
                 break;
@@ -1531,6 +1532,8 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void suggestedColumnsInQueryDetailsTest() throws Exception
     {
+        assumeTestModules();
+
         final String PATH = getProjectName() + "/" + FOLDER_NAME;
         final String SCHEMA = "vehicle";
         final String QUERY = "UserDefinedEmissions";

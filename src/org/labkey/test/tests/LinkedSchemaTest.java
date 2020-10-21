@@ -424,7 +424,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     public void lookupTest()
     {
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "BasicLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", null);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "BasicLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", null);
 
         //Ensure that all the columns we would expect to come through are coming through
         assertColumnsPresent(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", "SubjectID", "Name", "Family", "Mother", "Father", "Species", "Occupation",
@@ -448,7 +448,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         createLinkedSchemaQuery(SOURCE_FOLDER, "lists", "QueryOverLookup", "NIMHDemographics");
 
         //Create a new linked schema that includes that query, and ensure that it is propagating lookups in the expected manner
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "QueryLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions,QueryOverLookup", null);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "QueryLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions,QueryOverLookup", null);
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
 
@@ -465,7 +465,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         log("** Creating linked schema filtered by 'Frisby' family");
         String customFilterMetadata = getCustomFilterMetadata("Frisby");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "CustomFilterLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", customFilterMetadata);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "CustomFilterLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", customFilterMetadata);
 
         log("** Verifying linked schema tables are filtered");
         navigateToQuery("CustomFilterLinkedSchema", "NIMHDemographics");
@@ -500,7 +500,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         log("Create the linked schema to the study.");
         String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, "study", "Demographics", STUDY_FILTER_METADATA);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, "study", "Demographics", STUDY_FILTER_METADATA);
 
         log("Validate that with no filter all of the participants are visible in the linked schema.");
         checkLinkedSchema(STUDY_FILTER_METADATA, null, 6);
@@ -662,7 +662,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema APeople without template");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", LIST_NAME + "," + QUERY_NAME, A_PEOPLE_METADATA);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", LIST_NAME + "," + QUERY_NAME, A_PEOPLE_METADATA);
 
         log("** Applying metadata to " + LIST_NAME + " in linked schema container");
         beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + LIST_NAME + "#metadata");
@@ -755,7 +755,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema BPeople using BPeopleTemplate");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, B_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, null, null);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, B_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, null, null);
     }
 
     @LogMethod
@@ -777,7 +777,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema BPeople using BPeopleTemplate with metadata override to only show 'D' people");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, LIST_NAME + "," + QUERY_NAME, D_PEOPLE_METADATA);
+        _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, LIST_NAME + "," + QUERY_NAME, D_PEOPLE_METADATA);
     }
 
     @LogMethod

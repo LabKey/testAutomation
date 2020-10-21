@@ -56,7 +56,7 @@ public class StudyHelper
 
     public boolean doesStudyExist(String containerPath)
     {
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _test.createDefaultConnection();
         SelectRowsCommand command = new SelectRowsCommand("study", "Datasets");
         try
         {
@@ -467,7 +467,7 @@ public class StudyHelper
 
     public static String getPipelinePath()
     {
-        return TestFileUtils.getLabKeyRoot() + "/sampledata/study/";
+        return TestFileUtils.getSampleData("study/study.xml").getParentFile().getAbsolutePath();
     }
 
     public static File getStudySampleData(String relativePath)

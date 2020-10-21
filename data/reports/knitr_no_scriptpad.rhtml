@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A minimal knitr example in HTML</title>
+</head>
+<body>
+
+<!--begin.rcode echo=FALSE
+  opts_chunk$set(fig.width=5, fig.height=5)
+  end.rcode-->
+
+<p>This is a minimal example which shows <strong>knitr</strong>
+    working with HTML
+    pages in LabKey.</p>
+
+<!--begin.rcode echo=FALSE
+#
+# setup: load data
+#
+print('Setup script time');
+ptm <- proc.time();
+if (!exists("sharedSession")) {
+    print('running setup code ...');
+    print('scriptpad module unavailable. Defining data frame manually.');
+    participantid <- c(249318596, 249318596, 249318596, 249318596, 249318596, 249318596, 249318596, 249318596, 249318596, 249318596, 249320107, 249320107, 249320107, 249320107, 249320107, 249320127, 249320127, 249320127, 249320127, 249320127, 249320127, 249320127, 249320489, 249320489, 249320489, 249320489, 249320489, 249320897, 249320897, 249320897, 249320897, 249320897, 249320897, 249325717, 249325717, 249325717, 249325717, 249325717);
+    date <- c('2008-05-17', ' 2008-08-04', ' 2008-09-02', ' 2008-11-23', ' 2009-01-18', ' 2009-02-17', ' 2009-03-16', ' 2009-04-17', ' 2009-05-16', ' 2009-06-15', ' 2008-06-04', ' 2008-07-16', ' 2008-07-30', ' 2008-09-17', ' 2009-01-06', ' 2008-07-30', ' 2008-09-17', ' 2009-01-06', ' 2009-02-08', ' 2009-03-12', ' 2009-04-17', ' 2009-05-09', ' 2008-07-30', ' 2008-09-26', ' 2008-12-03', ' 2009-01-15', ' 2009-02-05', ' 2008-05-01', ' 2008-06-13', ' 2008-07-20', ' 2008-08-14', ' 2009-01-03', ' 2009-02-10', ' 2008-04-27', ' 2008-05-21', ' 2008-06-28', ' 2008-07-20', ' 2008-11-23');
+    weight_kg <- c(86, 84, 83, 80, 79, 79, 79, 78, 77, 75, 55, 54, 52, 50, 51, 62, 64, 63, 65, 65, 67, 69, 90, 86, 84, 75, 72, 73, 77, 74, 75, 77, 75, 98, 111, 110, 112, 138);
+    temp_c <- c(36.0, 37.0, 37.0, 36.7, 36.8, 37.3, 38.0, 40.0, 39.0, 39.0, 37.0, 37.0, 36.9, 37.3, 36.6, 36.9, 37.3, 36.6, 39.9, 36.0, 41.0, 38.0, 36.9, 40.0, 37.2, 36.5, 37.5, 37.5, 36.8, 37.0, 36.0, 37.2, 36.7, 37.4, 38.0, 33.0, 37.0, 36.5);
+    systolicbloodpressure <- c(129, 133, 133, 135, 142, 129, 122, 122, 121, 123, 120, 123, 120, 139, 114, 140, 179, 134, 135, 131, 137, 129, 124, 134, 128, 140, 130, 112, 121, 120, 134, 115, 97, 108, 137, 136, 133, 156);
+    diastolicbloodpressure <- c(76, 79, 85, 85, 90, 87, 80, 76, 78, 76, 85, 86, 83, 80, 79, 90, 110, 89, 89, 74, 87, 76, 75, 75, 78, 90, 90, 74, 79, 72, 85, 70, 67, 74, 90, 112, 74, 117);
+    pulse <- c(64, 67, 68, 70, 75, 79, 64, 63, 65, 64, 63, 65, 62, 66, 64, 70, 74, 75, 76, 59, 65, 76, 70, 70, 56, 78, 70, 67, 65, 66, 69, 67, 70, 89, 77, 112, 90, 113);
+    labkey.data <- data.frame(participantid, date, weight_kg, temp_c, systolicbloodpressure, diastolicbloodpressure, pulse);
+    sharedSession <- 1;
+}
+print(proc.time() - ptm);
+end.rcode-->
+
+
+<!--begin.rcode blood-pressure-scatter, warning=FALSE, message=FALSE, echo=FALSE, fig.align='center'
+#
+# plot 1
+#
+plot(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure,
+main="Diastolic vs. Systolic Pressures: All Visitsx",
+ylab="Systolic (mm Hg)", xlab="Diastolic (mm Hg)", ylim =c(60, 200));
+abline(lsfit(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure));
+
+#
+# plot 2
+#
+data_means <- aggregate(labkey.data, list(ParticipantID =
+ labkey.data$participantid), mean, na.rm = TRUE);
+#Cairo(file="${imgout:Blood Pressure/Multiple.png}", type="png")
+op <- par(mfcol = c(2, 2)) # 2 x 2 pictures on one plot
+c11 <- plot(data_means$diastolicbloodpressure, data_means$weight_kg, ,
+ xlab="Diastolic Blood Pressure (mm Hg)", ylab="Weight (kg)",
+ mfg=c(1, 1))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$weight_kg))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$systolicbloodpressure, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Systolic Blood Pressure (mm Hg)", mfg= c(2, 1))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$systolicbloodpressure))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$pulse, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Pulse Rate (Beats/Minute)", mfg= c(1, 2))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$pulse))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$temp_c, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Temperature (Degrees C)", mfg= c(2, 2))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$temp_c))
+par(op); #Restore graphics parameters
+#dev.off();
+end.rcode -->
+
+<!--begin.rcode
+
+#
+# csv
+#
+##write.csv(labkey.data, file = "${txtout:csvfile}");
+write.csv(labkey.data);
+end.rcode-->
+
+<p>Errors, messages and warnings can be put into <code>div</code>'s
+    with different <code>class</code>es:</p>
+
+<!--begin.rcode
+    sqrt(-1)  # warning
+    message('knitr says hello to HTML!')
+    1+'a'  # mission impossible
+    end.rcode-->
+
+<p>Well, everything seems to be working. Let's ask R what is the
+    value of &pi;? Of course it is <!--rinline pi -->.</p>
+
+</body>
+</html>

@@ -37,7 +37,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.serverapi.reader.Readers;
@@ -82,10 +84,12 @@ import java.util.Random;
 public class WebTestHelper
 {
     public static final Random RANDOM = new Random();
+    public static final String API_KEY = "apikey"; // Username for api/session key authentication
 
     private static final String DEFAULT_CONTEXT_PATH = "";
     private static final Integer DEFAULT_WEB_PORT = 8080;
     private static final String DEFAULT_TARGET_SERVER = "http://localhost";
+    private static final Object SERVER_LOCK = new Object();
     private static String _targetServer = null;
     private static Integer _webPort = null;
     private static String _contextPath = null;
@@ -93,6 +97,7 @@ public class WebTestHelper
     public static final int GC_ATTEMPT_LIMIT = 6;
     private static boolean USE_CONTAINER_RELATIVE_URL = true;
     private static final Map<String, Map<String, Cookie>> savedCookies = new HashMap<>();
+    private static final Map<String, String> savedSessionKeys = new HashMap<>();
 
     public static void setUseContainerRelativeUrl(boolean useContainerRelativeUrl)
     {
@@ -112,6 +117,42 @@ public class WebTestHelper
     public static Map<String, Cookie> getCookies(String user)
     {
         return savedCookies.getOrDefault(user, Collections.emptyMap());
+    }
+
+    public static String getSessionKey(String user)
+    {
+        Cookie sessionCookie = getCookies(user).get(Connection.JSESSIONID);
+        if (sessionCookie == null)
+        {
+            throw new IllegalStateException("No saved session for user: " + user);
+        }
+        String sessionId = sessionCookie.getValue();
+
+        if (!savedSessionKeys.containsKey(sessionId))
+        {
+            Connection connection = getRemoteApiConnection(user, true);
+            PostCommand<?> command = new PostCommand<>("security", "createApiKey");
+            JSONObject json = new JSONObject();
+            json.put("type", "session");
+            command.setJsonObject(json);
+
+            try
+            {
+                CommandResponse response = command.execute(connection, "/");
+                Object apikey = response.getParsedData().get("apikey");
+                if (apikey == null)
+                {
+                    TestLogger.error(response.getText());
+                    throw new RuntimeException("Failed to generate session key");
+                }
+                savedSessionKeys.put(sessionId, (String) apikey);
+            }
+            catch (CommandException | IOException e)
+            {
+                throw new RuntimeException("Unable to generate session key", e);
+            }
+        }
+        return savedSessionKeys.get(sessionId);
     }
 
     public static boolean isUseContainerRelativeUrl()
@@ -171,7 +212,7 @@ public class WebTestHelper
 
     public static Integer getWebPort()
     {
-        synchronized (DEFAULT_WEB_PORT)
+        synchronized (SERVER_LOCK)
         {
             if (_webPort == null)
             {
@@ -194,7 +235,7 @@ public class WebTestHelper
 
     public static String getTargetServer()
     {
-        synchronized (DEFAULT_TARGET_SERVER)
+        synchronized (SERVER_LOCK)
         {
             if (_targetServer == null || !_targetServer.equals(System.getProperty("labkey.server")))
             {
@@ -297,7 +338,7 @@ public class WebTestHelper
 
     public static String getContextPath()
     {
-        synchronized (DEFAULT_CONTEXT_PATH)
+        synchronized (SERVER_LOCK)
         {
             if (_contextPath == null)
             {
@@ -310,6 +351,11 @@ public class WebTestHelper
                 }
                 else
                     System.out.println("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
+
+                if ("/".equals(_contextPath))
+                {
+                    _contextPath = "";
+                }
             }
             return _contextPath;
         }
@@ -320,7 +366,7 @@ public class WebTestHelper
         return buildURL(controller, null, action, Collections.emptyMap());
     }
 
-    public static String buildURL(String controller, String action, @Nullable Map<String, String> params)
+    public static String buildURL(String controller, String action, @Nullable Map<String, ?> params)
     {
         return buildURL(controller, null, action, params);
     }
@@ -330,7 +376,7 @@ public class WebTestHelper
         return buildURL(controller, containerPath, action, Collections.emptyMap());
     }
 
-    public static String buildURL(String controller, @Nullable String containerPath, String action, Map<String, String> params)
+    public static String buildURL(String controller, @Nullable String containerPath, String action, Map<String, ?> params)
     {
         return getBaseURL() + buildRelativeUrl(controller, containerPath, action, params);
     }
@@ -340,7 +386,7 @@ public class WebTestHelper
         return buildRelativeUrl(controller, null, action, Collections.emptyMap());
     }
 
-    public static String buildRelativeUrl(String controller, String action, @Nullable Map<String, String> params)
+    public static String buildRelativeUrl(String controller, String action, @Nullable Map<String, ?> params)
     {
         return buildRelativeUrl(controller, null, action, params);
     }
@@ -350,7 +396,7 @@ public class WebTestHelper
         return buildRelativeUrl(controller, containerPath, action, Collections.emptyMap());
     }
 
-    public static String buildRelativeUrl(String controller, @Nullable String containerPath, String action, Map<String, String> params)
+    public static String buildRelativeUrl(String controller, @Nullable String containerPath, String action, Map<String, ?> params)
     {
         URLBuilder builder = new URLBuilder(controller, action, containerPath);
         builder.setQuery(params);
@@ -389,12 +435,22 @@ public class WebTestHelper
 
     public static Connection getRemoteApiConnection()
     {
-        return getRemoteApiConnection(false);
+        return getRemoteApiConnection(true);
     }
 
-    public static Connection getRemoteApiConnection(boolean includeCookies)
+    public static Connection getRemoteApiConnection(boolean includeCookiesFromPrimaryUser)
     {
         String username = PasswordUtil.getUsername();
+        Connection connection = new Connection(getBaseURL(), username, PasswordUtil.getPassword());
+
+        if (includeCookiesFromPrimaryUser)
+            addCachedCookies(connection, username);
+
+        return connection;
+    }
+
+    public static Connection getRemoteApiConnection(String username, boolean includeCookies)
+    {
         Connection connection = new Connection(getBaseURL(), username, PasswordUtil.getPassword());
 
         if (includeCookies)
@@ -403,13 +459,12 @@ public class WebTestHelper
         return connection;
     }
 
-    private static Connection addCachedCookies(Connection connection, String username)
+    private static void addCachedCookies(Connection connection, String username)
     {
         for (Cookie cookie : getCookies(username).values())
         {
             connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
         }
-        return connection;
     }
 
     public static void logToServer(String message)
@@ -431,7 +486,7 @@ public class WebTestHelper
             return;
         }
 
-        PostCommand command = new PostCommand("admin", "log");
+        PostCommand<?> command = new PostCommand<>("admin", "log");
         Map<String, Object> params = new HashMap<>();
         params.put("message", message);
         command.setParameters(params);
@@ -751,49 +806,6 @@ public class WebTestHelper
         @Override
         public int hashCode() {
             return (41 * (41 + getProjectName().hashCode()) + getFolderName().hashCode());
-        }
-    }
-
-    public static class MapArea
-    {
-        private String _shape;
-        private String _href;
-        private String _title;
-        private String _alt;
-        private String _coords;
-
-        public MapArea(String shape, String href, String title, String alt, String coords)
-        {
-            _shape = shape;
-            _href = href;
-            _title = title;
-            _alt = alt;
-            _coords = coords;
-        }
-
-        public String getAlt()
-        {
-            return _alt;
-        }
-
-        public String getCoords()
-        {
-            return _coords;
-        }
-
-        public String getHref()
-        {
-            return _href;
-        }
-
-        public String getShape()
-        {
-            return _shape;
-        }
-
-        public String getTitle()
-        {
-            return _title;
         }
     }
 }

@@ -138,7 +138,6 @@ public class PipelineFolder
         private boolean _notifyOnError;
         private boolean _notifyOwnerOnError;
         private String[] _notifyUsersOnError = new String[0];
-        private String[] _escalateUsers = new String[0];
 
         public MailSettings(PipelineWebTestBase test)
         {
@@ -164,8 +163,6 @@ public class PipelineFolder
                 check("notifyOwnerOnError", _notifyOwnerOnError);
                 if (_notifyUsersOnError != null)
                     _test.setFormElement(Locator.id("notifyUsersOnError"), StringUtils.join(_notifyUsersOnError, '\n'));
-                if (_escalateUsers != null)
-                    _test.setFormElement(Locator.id("escalationUsers"), StringUtils.join(_escalateUsers, '\n'));
             }
             _test.clickAndWait(updateButton);
         }
@@ -225,14 +222,5 @@ public class PipelineFolder
             }
         }
 
-        public String[] getEscalateUsers()
-        {
-            return _escalateUsers;
-        }
-
-        public void setEscalateUsers(String... users)
-        {
-            _escalateUsers = users;
-        }
     }
 }

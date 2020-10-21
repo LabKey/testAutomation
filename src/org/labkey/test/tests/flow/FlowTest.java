@@ -31,6 +31,7 @@ import org.labkey.test.components.flow.FlowReportsWebpart;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.flow.reports.QCReportEditorPage;
 import org.labkey.test.pages.flow.reports.ReportEditorPage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.DataRegion;
@@ -93,8 +94,8 @@ public class FlowTest extends BaseFlowTest
     {
         analysisFilterTest();
         testChartMeasurePicker();
-        configureSampleSetAndMetadata();
-        sampleSetAndMetadataTest();
+        configureSampleTypeAndMetadata();
+        sampleTypeAndMetadataTest();
         customGraphQuery();
         positivityReportTest();
         qcReportTest();
@@ -285,7 +286,7 @@ public class FlowTest extends BaseFlowTest
                 "Current Directory (25 fcs files)");
         assertTextNotPresent(FCS_FILE_2);
         clickButton("Import Selected Runs");
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
         goToFlowDashboard();
 
         // Drill into the run, and see that it was uploaded, and keywords were read.
@@ -357,7 +358,7 @@ public class FlowTest extends BaseFlowTest
         clickButton("Analyze selected runs");
         setFormElement(Locator.name("ff_analysisName"), "FlowExperiment2");
         clickButton("Analyze runs");
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("FlowExperiment2"));
         URL urlBase = getURL();
@@ -422,7 +423,7 @@ public class FlowTest extends BaseFlowTest
         assertTextNotPresent(FCS_FILE_1);
         assertTextPresent(FCS_FILE_2);
         clickButton("Import Selected Runs");
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
 
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
@@ -494,9 +495,9 @@ public class FlowTest extends BaseFlowTest
         doAndWaitForPageToLoad(chartTypeDialog::clickCancel);
     }
 
-    // Test sample set and ICS metadata
+    // Test sample type and ICS metadata
     @LogMethod
-    protected void configureSampleSetAndMetadata()
+    protected void configureSampleTypeAndMetadata()
     {
         Map<String, FieldDefinition.ColumnType> fields = new HashMap<>();
         fields.put("Exp Name", FieldDefinition.ColumnType.String);
@@ -526,9 +527,9 @@ public class FlowTest extends BaseFlowTest
     }
 
     @LogMethod
-    public void sampleSetAndMetadataTest()
+    public void sampleTypeAndMetadataTest()
     {
-        // verify sample set and background values can be displayed in the FCSAnalysis grid
+        // verify sample type and background values can be displayed in the FCSAnalysis grid
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("29 FCS files"));
         new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
@@ -559,7 +560,7 @@ public class FlowTest extends BaseFlowTest
         _customizeViewsHelper.addColumn("Graph/Singlets$SL$SLive$S3+(<PE Cy55-A>:<FITC-A>)");
         _customizeViewsHelper.saveCustomView();
 
-        // check PTID value from sample set present
+        // check PTID value from sample type present
         assertTextPresent("P02034");
 
         // check no graph errors are present and the graphs have labels
@@ -623,7 +624,7 @@ public class FlowTest extends BaseFlowTest
 
         updatePositivityReportFilter(reportName);
         executeReport(reportName);
-        waitForPipeline(getContainerPath());
+        waitForPipelineComplete();
         verifyReport(reportName);
 
         deleteReport(reportName);
@@ -706,6 +707,7 @@ public class FlowTest extends BaseFlowTest
         clickButton("Next");
         waitForText("Import Analysis: Confirm");
         clickButton("Finish");
+        new PipelineStatusDetailsPage(getDriver()).waitForComplete();
         waitForElement(Locator.tagWithClass("div", "alert alert-warning").containing("Ignoring filter/sort"), defaultWaitForPage);
         DataRegionTable query = new DataRegionTable("query", getDriver());
         List<String> names = query.getColumnDataAsText("Name");
@@ -777,8 +779,7 @@ public class FlowTest extends BaseFlowTest
     private void verifyReportError(@LoggedParam String reportName, String errorText)
     {
         executeReport(reportName);
-        waitForPipelineError(getContainerPath());
-        clickAndWait(Locator.linkWithText("ERROR"));
+        waitForPipelineError(List.of(errorText));
 
         assertTitleContains(reportName);
         assertTextPresent(errorText);

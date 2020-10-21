@@ -32,9 +32,11 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.openqa.selenium.NoSuchElementException;
@@ -483,6 +485,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         catch (NoSuchElementException ignore) {}
     }
 
+    @LogMethod
     protected void runTransformTest()
     {
         // add the transform script to the assay
@@ -510,6 +513,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkContainingText("transformed assayId"));
     }
 
+    @LogMethod
     protected void doBackgroundSubtractionTest()
     {
         removeTransformScript();
@@ -543,7 +547,9 @@ public class ElispotAssayTest extends AbstractAssayTest
         runTable.checkAllOnPage();
         clickButton("Subtract Background");
 
-        waitForTextWithRefresh(WAIT_FOR_PAGE, "COMPLETE");
+        new PipelineStatusTable(getDriver())
+                .clickStatusLink(0)
+                .waitForComplete();
 
         // Check well counts for TEST_ASSAY_ELISPOT_FILE4
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
@@ -615,6 +621,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         assertEquals(Arrays.asList("10.0","9.0","6.0","10.0","18.0","7.0","11.0","244.0","0.0","0.0","0.0","0.0"), plateSummary.getRowValues(E));
     }
 
+    @LogMethod
     private void testTNTCdata()
     {
         clickProject(TEST_ASSAY_PRJ_ELISPOT);

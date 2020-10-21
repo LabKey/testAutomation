@@ -17,7 +17,6 @@
 package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -27,12 +26,14 @@ import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
+import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.params.login.DatabaseAuthenticationProvider;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -75,11 +76,16 @@ public class SecurityTest extends BaseWebDriverTest
     protected static final String NORMAL_USER_TEMPLATE = "_user.template@security.test";
     protected static final String BOGUS_USER_TEMPLATE = "bogus@bogus@bogus";
     protected static final String PROJECT_ADMIN_USER = "admin_securitytest@security.test";
+    private static final String PROJECT_ADMIN_ROLE = "Project Administrator";
+    private static final String FOLDER_ADMIN_ROLE = "Folder Administrator";
     protected static final String NORMAL_USER = "user_securitytest@security.test";
+    private static final String ADDED_USER = "fromprojectusers@security.test";
     protected static final String[] PASSWORDS = {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
     protected static final String NORMAL_USER_PASSWORD = PASSWORDS[0];
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin_securitytest@security.test";
+    protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation.";
+    protected static final String NOT_FOUND_ERROR = "notFound";
 
     @Override
     public List<String> getAssociatedModules()
@@ -109,19 +115,24 @@ public class SecurityTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
 
-        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER);
+        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER, ADDED_USER);
 
         // Make sure the feature is turned off.
-        Connection cn = createDefaultConnection(false);
+        Connection cn = createDefaultConnection();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
     }
 
     @Test
     public void testSteps() throws IOException
     {
-        enableEmailRecorder();
+        if (!TestProperties.isWithoutTestModules())
+        {
+            enableEmailRecorder();
+        }
 
         clonePermissionsTest();
+        addUserAsProjAdmin();
+        dontAddUserAsFolderAdmin();
         displayNameTest();
         tokenAuthenticationTest();
         if (!isQuickTest())
@@ -132,13 +143,16 @@ public class SecurityTest extends BaseWebDriverTest
             addRemoveSiteAdminTest();
         }
 
-        log("Check welcome emails [6 new users]");
-        goToModule("Dumbster");
+        if (!TestProperties.isWithoutTestModules())
+        {
+            log("Check welcome emails [6 new users]");
+            goToModule("Dumbster");
 
-        EmailRecordTable table = new EmailRecordTable(this);
-        assertEquals("Notification emails.", 12, table.getEmailCount());
-        // Once in the message itself, plus copies in the headers
-        assertTextPresent(": Welcome", 18);
+            EmailRecordTable table = new EmailRecordTable(this);
+            assertEquals("Notification emails.", 14, table.getEmailCount());
+            // Once in the message itself, plus copies in the headers
+            assertTextPresent(": Welcome", 21);
+        }
 
         if (!isQuickTest())
         {
@@ -192,9 +206,9 @@ public class SecurityTest extends BaseWebDriverTest
         //admin site link not available
         assertElementNotPresent(Locator.id("adminMenuPopupText"));
 
-        //can't reach admin urls directly either
+        //can't reach admin urls and invalid urls directly either
         for (String url : unreachableUrls)
-            assertUrlForbidden(url);
+            assertNonReachableUrl(url);
 
         //shouldn't be able to view own history either
         goToMyAccount();
@@ -204,12 +218,15 @@ public class SecurityTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    public void assertUrlForbidden(String url)
+    public void assertNonReachableUrl(String url)
     {
         log("Attempting to reach URL user does not have permission for:  " + url);
         SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(url);
-        if (HttpStatus.SC_FORBIDDEN != httpResponse.getResponseCode() ||
-            !httpResponse.getResponseBody().contains(PERMISSION_ERROR))
+
+        if ((HttpStatus.SC_FORBIDDEN != httpResponse.getResponseCode() ||
+                !httpResponse.getResponseBody().contains(PERMISSION_ERROR)) &&
+                (HttpStatus.SC_NOT_FOUND != httpResponse.getResponseCode() ||
+                !httpResponse.getResponseBody().contains(NOT_FOUND_ERROR)))
         {
             // Go to page for better failure screenshot
             beginAt(url);
@@ -260,7 +277,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         try
         {
-            Connection cn = createDefaultConnection(false);
+            Connection cn = createDefaultConnection();
             command.execute(cn, null);
         }
         catch (CommandException e)
@@ -451,21 +468,18 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void disableGuestAccountTest()
     {
-        Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", true);
+        ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(), "disableGuestAccount", true);
 
         goToHome();
         signOut();
 
         // Validate that the user is shown a login screen.
-        if(!isElementPresent(Locator.tagWithName("form", "login")))
-        {
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
-            Assert.fail("Should have seen the sign-in screen, it wasn't there.");
-        }
+        checker().withScreenshot("disableGuestAccountTest")
+                .verifyTrue("Should be on login page when guest account is disabled",
+                        isElementPresent(Locator.tagWithName("form", "login")));
 
         signIn();
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
+        ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(), "disableGuestAccount", false);
     }
 
     @LogMethod
@@ -544,6 +558,32 @@ public class SecurityTest extends BaseWebDriverTest
         assertNavTrail("Site Users", "User Details", "Permissions");
     }
 
+    protected void addUserAsProjAdmin()
+    {
+        beginAt(WebTestHelper.buildURL("project", getProjectName(), "begin"));
+        impersonateRoles(PROJECT_ADMIN_ROLE);
+        ShowUsersPage usersPage = goToProjectUsers();
+
+        usersPage
+                .clickAddUsers()
+                .setNewUsers(Arrays.asList(ADDED_USER))
+                .setSendNotification(true)
+                .clickAddUsers();
+
+        assertTextPresent(ADDED_USER);
+        stopImpersonating();
+    }
+
+    protected void dontAddUserAsFolderAdmin()
+    {
+        beginAt(WebTestHelper.buildURL("project", getProjectName(), "begin"));
+        impersonateRoles(FOLDER_ADMIN_ROLE);
+        goToProjectUsers();
+
+        assertElementNotPresent(Locator.lkButton("Add Users"));
+        stopImpersonating();
+    }
+
     @LogMethod
     protected void checkGroupMembership(String userName, String groupName, int expectedCount)
     {
@@ -619,6 +659,7 @@ public class SecurityTest extends BaseWebDriverTest
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertFailureAuthenticationToken(xml);
 
+        // #40884 - Verify that while impersonating, token authentication still resolves to admin user
         impersonate(NORMAL_USER);
 
         beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
@@ -626,10 +667,10 @@ public class SecurityTest extends BaseWebDriverTest
         assertEquals("Redirected to wrong URL", homePageUrl, removeUrlParameters(getURL().toString()));
 
         email = getUrlParam("labkeyEmail", true);
-        assertEquals("Wrong email", NORMAL_USER, email);
+        assertEquals("Wrong email", userName, email);
         token = getUrlParam("labkeyToken", true);
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
-        assertSuccessAuthenticationToken(xml, token, email, 15);
+        assertSuccessAuthenticationToken(xml, token, email, 32783);
 
         // Back to the admin user
         stopImpersonating();
@@ -710,12 +751,10 @@ public class SecurityTest extends BaseWebDriverTest
 
         impersonate(SITE_ADMIN_USER);
         String siteAdminDisplayName = getDisplayName(); // Use when checking audit log, below
-        ensureAdminMode();
         goToAdminConsole();  // Site admin should be able to get to the admin console
         new UIUserHelper(this).deleteUsers(true, TO_BE_DELETED_USER);
         stopImpersonating();
 
-        ensureAdminMode();
         goToAdminConsole().clickAuditLog();
 
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "User events"));
@@ -801,7 +840,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertTextNotPresent("Choose a new password.");
 
         stopImpersonating();
-        DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection(true));
+        DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection());
     }
 
     @LogMethod
@@ -855,7 +894,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertFalse("Self-registration button is visible", link != null && link.isDisplayed());
 
         beginAt(buildURL("login", "register"));
-        assertElementPresent(Locators.labkeyError.withText("Registration is not enabled."));
+        waitForElement(Locators.labkeyErrorSubHeading.withText("Registration is not enabled."));
 
         // cleanup: sign admin back in
         signIn();

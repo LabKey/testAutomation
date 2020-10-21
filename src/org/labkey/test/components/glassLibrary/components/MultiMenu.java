@@ -98,8 +98,8 @@ public class MultiMenu extends BootstrapMenu
             catch(StaleElementReferenceException staleExc)
             {
                 // This happens in the time between the change of the menu content from containing "loading"
-                // to having data (like "sample sets").
-                getComponentElement().isDisplayed(); // will throw an uncaught 'StaleReferenceException' if the entire menu went stale
+                // to having data (like "sample types").
+                getComponentElement().isEnabled(); // will throw an uncaught 'StaleReferenceException' if the entire menu went stale
                 stale = true;
             }
 
@@ -223,6 +223,16 @@ public class MultiMenu extends BootstrapMenu
         public MultiMenuFinder withButtonId(String id)
         {
             _locator = Locators.menuContainer().withChild(Locator.id(id));
+            return this;
+        }
+
+        /**
+         * Looks for the export button using the fa-download class
+         * @return export menu utility
+         */
+        public MultiMenuFinder exportButton()
+        {
+            _locator = Locators.menuContainer().withChild(Locators.dropdownToggle().withChild(Locator.byClass("fa-download")));
             return this;
         }
 

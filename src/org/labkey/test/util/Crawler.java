@@ -27,6 +27,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.api.ProjectMenu;
@@ -149,7 +150,8 @@ public class Crawler
     protected List<ControllerActionId> getDefaultExcludedActions()
     {
         List<ControllerActionId> list = new ArrayList<>();
-        Collections.addAll(list,
+        Collections.addAll(
+            list,
             new ControllerActionId("admin", "resetErrorMark"),
             new ControllerActionId("admin", "doCheck"),
             new ControllerActionId("admin", "runSystemMaintenance"),
@@ -172,13 +174,15 @@ public class Crawler
             new ControllerActionId("admin-sql", "saveReorderedScript"),
             new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
-            new ControllerActionId("assay", "designer"), // assay designer prompts to save design when navigating away
+            new ControllerActionId("assay", "downloadSampleQCData"),
             new ControllerActionId("assay", "template"),
-            new ControllerActionId("core", "downloadFileLink"),
+            new ControllerActionId("cds", "exportTourDefinitions"), // Download action
+            new ControllerActionId("cds", "permissionsReportExport"),
+            new ControllerActionId("core", "downloadFileLink"), // Download action
             new ControllerActionId("dumbster", "begin"),
             new ControllerActionId("experiment", "exportProtocols"),
             new ControllerActionId("experiment", "exportRunFiles"),
-            new ControllerActionId("experiment", "exportSampleSet"),
+            new ControllerActionId("experiment", "exportSampleType"),
             new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("filetransfer", "auth"), // redirects to external site
             new ControllerActionId("flow-compensation", "download"),
@@ -186,6 +190,8 @@ public class Crawler
             new ControllerActionId("flow-run", "download"),
             new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
+            new ControllerActionId("harvest", "formatInvoice"),
+            new ControllerActionId("harvest", "sickSafeTime"),
             new ControllerActionId("issues", "download"),
             new ControllerActionId("list", "download"),
             new ControllerActionId("login", "logout"),
@@ -197,8 +203,10 @@ public class Crawler
             new ControllerActionId("microarray", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("ms2", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("ms2", "showParamsFile"),
+            new ControllerActionId("ms2", "showList"),
             // Tested directly in XTandemTest
-            new ControllerActionId("ms2", "showPeptide"),
+            new ControllerActionId("ms2", "doProteinSearch"),
+            new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
             new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
@@ -232,12 +240,9 @@ public class Crawler
             new ControllerActionId("study-samples", "getSpecimenExcel"),
             new ControllerActionId("study-samples", "download"),
             new ControllerActionId("targetedms", "downloadChromLibrary"),
-            new ControllerActionId("test", "npe"),
-            new ControllerActionId("nabassay", "downloadDatafile"),
-            new ControllerActionId("wiki", "download"),
-            new ControllerActionId("harvest", "sickSafeTime"),
-            new ControllerActionId("harvest", "formatInvoice"),
             new ControllerActionId("targetedms", "downloadDocument"),
+            new ControllerActionId("test", "npe"),
+            new ControllerActionId("wiki", "download"),
 
                 // Disable crawler for single-page apps until we make `beginAt` work with them
                 new ControllerActionId("biologics", "app"),
@@ -612,6 +617,9 @@ public class Crawler
             // after navigating past the first N levels of links, we'll only try "new" actions:
             if (getDepth() >= getMaxDepth() && _actionsVisited.contains(getActionId()))
                 return false;
+
+            if (spiderAction.equals(getActionId()) && TestProperties.isPrimaryUserAppAdmin())
+                return false; // SpiderAction is inaccessible to app admin
 
             // Don't let a single bad action fail multiple tests
             if (_actionsWithErrors.contains(getActionId()))
@@ -994,6 +1002,7 @@ public class Crawler
         _urlsChecked.add(stripQueryParams(relativeURL));
         URL origin = urlToCheck.getOrigin();
         int depth = urlToCheck.getDepth();
+        String originMessage = origin != null ? "\nOriginating page: " + origin.toString() : "";
 
         try
         {
@@ -1001,7 +1010,9 @@ public class Crawler
             {
                 long loadTime = _test.beginAt(relativeURL
                         .replace("[", "%5B")
-                        .replace("]", "%5D")); // Escape brackets to prevent 400 errors
+                        .replace("]", "%5D")
+                        .replace("{", "%7B")
+                        .replace("}", "%7D")); // Escape brackets to prevent 400 errors
                 _actionProfiler.updateActionProfile(relativeURL, loadTime);
             }
             catch (UnhandledAlertException alert)
@@ -1022,13 +1033,23 @@ public class Crawler
                 // Check that there was no error
                 if (code >= 400)
                 {
-                    fail(relativeURL + "\nproduced response code " + code + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
+                    String message = relativeURL + "\nproduced response code " + code + originMessage;
+                    if (code == 403 && TestProperties.isPrimaryUserAppAdmin())
+                    {
+                        // Crawling as app admin is likely to hit numerous 403s. Don't fail immediately.
+                        _test.checker().wrapAssertion(() -> fail(message));
+                    }
+                    else
+                    {
+                        fail(message);
+                    }
+
                 }
                 List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
                 if (!serverError.isEmpty())
                 {
                     String[] errorLines = serverError.get(0).split("\n");
-                    fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + (origin != null ? ".\nOriginating page: " + origin.toString() : ""));
+                    fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + originMessage);
                 }
 
                 // Find all the links at the site
@@ -1093,9 +1114,9 @@ public class Crawler
             }
 
             if (rethrow instanceof AssertionError)
-                throw rethrow;
+                throw rethrow; // AssertionErrors already contain page and origin information.
             else
-                throw new RuntimeException(relativeURL + "\nTriggered an exception." + (origin != null ? "\nOriginating page: " + origin.toString() : ""), rethrow);
+                throw new RuntimeException(relativeURL + "\nTriggered an exception." + originMessage, rethrow);
         }
 
         if (currentPageUrl != null && urlToCheck.isInjectableURL() && _injectionCheckEnabled)
@@ -1128,8 +1149,6 @@ public class Crawler
         {
             if (origin == null || _actionsMayLinkTo404.contains(new ControllerActionId(origin.toString())))
                 return true; // Ignore 404s from the initial set of links
-            if (_test.isElementPresent(Locators.labkeyError.containing("module is not enabled")))
-                return true; // Some modules return 404 when not enabled
         }
 
         if (code == HttpStatus.SC_METHOD_NOT_ALLOWED) // 405

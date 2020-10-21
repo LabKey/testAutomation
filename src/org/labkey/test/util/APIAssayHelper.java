@@ -63,7 +63,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         ImportRunCommand  irc = new ImportRunCommand(assayID, file);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
+        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
     }
 
     @LogMethod(quiet = true)
@@ -73,7 +73,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         irc.setRunFilePath(runFilePath);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
+        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
     }
 
     @LogMethod(quiet = true)
@@ -85,7 +85,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         irc.setProperties(runProperties);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
+        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
     }
 
     @LogMethod(quiet = true)
@@ -122,7 +122,7 @@ public class APIAssayHelper extends AbstractAssayHelper
             irc.setBatchProperties(batchProperties);
 
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
+        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
     }
 
     @Override
@@ -163,7 +163,7 @@ public class APIAssayHelper extends AbstractAssayHelper
     public void uploadXarFileAsAssayDesign(@LoggedParam File file)
     {
         AddXarFileCommand addXarFileCommand = new AddXarFileCommand(file);
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _test.createDefaultConnection();
 
         try
         {
@@ -187,7 +187,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         AssayListResponse alr = null;
         try
         {
-            alr = alc.execute(_test.createDefaultConnection(false), "/" + projectPath);
+            alr = alc.execute(_test.createDefaultConnection(), "/" + projectPath);
         }
         catch (CommandException | IOException e)
         {
@@ -260,12 +260,12 @@ public class APIAssayHelper extends AbstractAssayHelper
     {
         SaveAssayBatchCommand cmd = new SaveAssayBatchCommand(assayId, batch);
         cmd.setTimeout(180000); // Wait 3 minutes for assay import
-        cmd.execute(_test.createDefaultConnection(false), "/" + projectPath);
+        cmd.execute(_test.createDefaultConnection(), "/" + projectPath);
     }
 
     public Protocol createAssayDesignWithDefaults(String containerPath, String providerName, String assayName) throws Exception
     {
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _test.createDefaultConnection();
         GetProtocolCommand getProtocolCommand = new GetProtocolCommand(providerName);
         ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
 
@@ -286,7 +286,7 @@ public class APIAssayHelper extends AbstractAssayHelper
      */
     public Protocol copyAssayDesign(Integer assayId, String containerPath, String assayName) throws Exception
     {
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _test.createDefaultConnection();
         GetProtocolCommand getProtocolCommand = new GetProtocolCommand(assayId, true);
         ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
 
@@ -310,7 +310,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General", "PlateTemplate");
         selectRowsCmd.setColumns(List.of("Lsid"));
 
-        SelectRowsResponse resp = selectRowsCmd.execute(_test.createDefaultConnection(false), folderPath);
+        SelectRowsResponse resp = selectRowsCmd.execute(_test.createDefaultConnection(), folderPath);
 
         return String.valueOf(resp.getRows().get(0).get("Lsid"));
     }

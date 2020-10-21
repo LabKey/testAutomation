@@ -1,0 +1,6 @@
+<webpart xmlns="http://labkey.org/data/xml/webpart" title="Editable Module Web Part">
+    <view name="webpart"/>
+    <locations>
+        <location name="body"/>
+    </locations>
+</webpart>

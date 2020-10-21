@@ -43,7 +43,7 @@ public class ImpersonationLoggingAspect
             _impersonating = impersonating;
             _startTime = System.currentTimeMillis();
         }
-        else
+        else if (!_impersonating.equals(impersonating))
         {
             TestLogger.decreaseIndent();
             TestLogger.log("><Switch Impersonation : " + _impersonating + TestLogger.formatElapsedTime(System.currentTimeMillis() - _startTime) + " -> " + impersonating);
@@ -57,6 +57,9 @@ public class ImpersonationLoggingAspect
     @AfterReturning(value = "stopImpersonation()")
     public void afterImpersonation()
     {
+        if (_startTime == null || _impersonating == null)
+            return;
+
         String impersonating = _impersonating;
 
         String elapsedStr = TestLogger.formatElapsedTime(System.currentTimeMillis() - _startTime);

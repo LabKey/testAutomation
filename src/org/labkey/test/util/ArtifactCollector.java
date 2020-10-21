@@ -22,10 +22,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -117,7 +119,7 @@ public class ArtifactCollector
         publishArtifact(dumpDir, dumpDir.getName() + ".tar.gz");
     }
 
-    public void dumpThreads()
+    public static void dumpThreads()
     {
         if (!isLocalServer())
             return;
@@ -171,7 +173,7 @@ public class ArtifactCollector
         // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
         _driver.beginAt("/admin/dumpHeap.view");
         File destDir = ensureDumpDir();
-        String dumpMsg = Locators.bodyPanel().childTag("div").findElement(_test.getDriver()).getText();
+        String dumpMsg = Locators.bodyPanel().childTag("div").findElement(_driver.getDriver()).getText();
         String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
         File heapDump = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", filename);
         File destFile = new File(destDir, filename);
@@ -332,5 +334,13 @@ public class ArtifactCollector
             }
         }
         return allFiles;
+    }
+
+    public File exportDiagnostics()
+    {
+        _driver.beginAt(WebTestHelper.buildURL("diagnostics", "exportDiagnostics"));
+        File diagnostics = _driver.clickAndWaitForDownload(Locator.id("downloadBtn"));
+        TestLogger.log("Server diagnostics exported to: " + diagnostics.getAbsolutePath());
+        return diagnostics;
     }
 }

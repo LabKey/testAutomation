@@ -68,6 +68,29 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     //  using generics (much in the same way the modal dialog does), but I don't have time to do that right now.
 
     /**
+     * Check to see if the panel is loaded. A panel is considered loaded if all of the combo-boxes in the panel are
+     * valid and are not loading.
+     *
+     * @return True if all of the combo-box references are valid and not loading.
+     */
+    public boolean isPanelLoaded()
+    {
+        try
+        {
+            boolean allThere = true;
+            for(ReactSelect rs : getAllTypeCombo())
+            {
+                allThere = (rs.isInteractive() && !rs.isLoading()) && allThere;
+            }
+            return allThere;
+        }
+        catch(StaleElementReferenceException exception)
+        {
+            return false;
+        }
+    }
+
+    /**
      * Clicking either the 'Save' or 'Cancel' button will remove this edit panel. This helper function will click the
      * button sent to it and then wait until it has some indication the edit panel is gone and the default panel is
      * shown.
@@ -353,10 +376,40 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         if(found)
         {
            elementCache().removeButton(index + 1).click();
-           getWrapper().waitFor(()-> getAllTypeCombo().size() < typeCombos.size(),
-                   "The type '" + typeName + "' was not successfully removed.",
-                   1_000);
+
+           // Need to check if this is removing the last/only type.
+           if(typeCombos.size() > 1)
+           {
+               // If it is not removing the last one can simply check that the count of combos is as expected.
+               getWrapper().waitFor(() -> getAllTypeCombo().size() < typeCombos.size(),
+                       "The type '" + typeName + "' was not successfully removed.",
+                       1_000);
+           }
+           else
+           {
+               // If this is removing the last/only one the count of combos will still be 1, so need a different check.
+               ReactSelect rs = getAllTypeCombo().get(0);
+               rs.getSelections();
+               getWrapper().waitFor(() -> rs.getSelections().get(0).toLowerCase().contains("select a "),
+                       "The type '" + typeName + "' was not successfully removed.",
+                       1_000);
+           }
+
         }
+
+        return this;
+    }
+
+    protected ParentEntityEditPanel addParentId(int index, String id)
+    {
+
+        FilteringReactSelect parentIdCombo = getIdCombo(index);
+
+        getWrapper().scrollIntoView(parentIdCombo.getComponentElement());
+
+        int selCount = parentIdCombo.getSelections().size();
+        parentIdCombo.typeAheadSelect(id);
+        getWrapper().waitFor(()-> parentIdCombo.getSelections().size() > selCount, 500);
 
         return this;
     }

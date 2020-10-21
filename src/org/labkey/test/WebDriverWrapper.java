@@ -26,7 +26,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.GuestCredentialsProvider;
+import org.labkey.remoteapi.security.WhoAmICommand;
+import org.labkey.remoteapi.security.WhoAmIResponse;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
@@ -45,7 +49,6 @@ import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
@@ -249,6 +252,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     prefs.put("pdfjs.disabled", true); // Download PDFs
                     prefs.put("credentials_enable_service", false);
                     prefs.put("profile.password_manager_enabled", false);
+                    prefs.put("safebrowsing.enabled", false); // Disable "This type of file can harm your computer."
                     options.setExperimentalOption("prefs", prefs);
                     options.setExperimentalOption("detach", true); // Leaves browser window open after stopping the driver service
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
@@ -306,6 +310,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "application/octet-stream," +
                                     "application/pdf," +
                                     "application/zip," +
+                                    "application/x-x509-ca-cert," + // .crt, .cer
                                     "application/x-gzip," +
                                     "application/x-zip-compressed," +
                                     "application/xml," +
@@ -350,13 +355,23 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         binary.addCommandLineOptions("--headless");
                     }
                     capabilities.setCapability(FirefoxDriver.BINARY, binary);
+                    FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
                     try
                     {
-                        newWebDriver = new FirefoxDriver(new FirefoxOptions(capabilities));
+                        newWebDriver = new FirefoxDriver(firefoxOptions);
                     }
-                    catch (WebDriverException rethrow)
+                    catch (WebDriverException retry)
                     {
-                        throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. Ensure that you are using Firefox 62 or newer.", rethrow);
+                        try
+                        {
+                            retry.printStackTrace(System.err);
+                            sleep(10000);
+                            newWebDriver = new FirefoxDriver(firefoxOptions);
+                        }
+                        catch (WebDriverException rethrow)
+                        {
+                            throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. Ensure that you are using Firefox 62 or newer.", rethrow);
+                        }
                     }
                 }
                 break;
@@ -466,37 +481,24 @@ public abstract class WebDriverWrapper implements WrapsDriver
     @LogMethod(quiet = true)
     public void resumeJsErrorChecker()
     {
-        // Turn on server side logging of client errors.
-        if (isScriptCheckEnabled())
-        {
-            Connection cn = createDefaultConnection(false);
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", true);
-        }
+        setJsErrorLogging(true);
     }
 
     @LogMethod(quiet = true)
     public void pauseJsErrorChecker()
     {
-        // Turn off server side logging of client errors.
+        setJsErrorLogging(false);
+    }
+
+    private void setJsErrorLogging(boolean b)
+    {
+        // Enable/disable server side logging of client errors.
         if (isScriptCheckEnabled())
         {
-            Connection cn = createDefaultConnection(false);
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", false);
+            // Don't use browser session. Some tests need to pause briefly, while impersonating.
+            Connection cn = WebTestHelper.getRemoteApiConnection(false);
+            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", b);
         }
-    }
-
-    @LogMethod(quiet = true)
-    public void enableUxDomainDesigner()
-    {
-        Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", true);
-    }
-
-    @LogMethod(quiet = true)
-    public void disableUxDomainDesigner()
-    {
-        Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "experimental-uxdomaindesigner", false);
     }
 
     public enum BrowserType
@@ -815,6 +817,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new ProjectSettingsPage(getDriver());
     }
 
+    public ShowUsersPage goToProjectUsers()
+    {
+        clickAdminMenuItem("Folder", "Project Users");
+        return new ShowUsersPage(getDriver());
+    }
+
     public ShowUsersPage goToSiteUsers()
     {
         if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Site Users")))
@@ -981,23 +989,32 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @param reuseSession true to have the Java API connection "hijack" the session from the Selenium browser window
+     * Create a Java API connection, copying the session from the Selenium browser window
+     * Use {@link WebTestHelper#getRemoteApiConnection()} to get a connection using 'BasicAuth'.
      */
-    public Connection createDefaultConnection(boolean reuseSession)
+    public Connection createDefaultConnection()
     {
-        Connection connection = WebTestHelper.getRemoteApiConnection();
-        if (reuseSession)
-        {
-            Cookie cookie = getDriver().manage().getCookieNamed("JSESSIONID");
-            if (cookie == null)
-            {
-                throw new IllegalStateException("No session cookie available to reuse.");
-            }
+        Connection connection = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
 
+        Set<Cookie> cookies = getDriver().manage().getCookies();
+        for (Cookie cookie : cookies)
+        {
             connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
         }
-
         return connection;
+    }
+
+    /**
+     * @deprecated Copying the browser session is preferred unless tests have specific needs otherwise.
+     * Use {@link WebTestHelper#getRemoteApiConnection(boolean)} to get a fresh Connection.
+     *
+     * @param reuseSession ignored
+     * @return A new remoteapi connection matching the current browser session
+     */
+    @Deprecated
+    public Connection createDefaultConnection(boolean reuseSession)
+    {
+        return createDefaultConnection();
     }
 
     public long beginAt(String relativeURL)
@@ -1113,9 +1130,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (String)executeScript("return LABKEY.container.path;");
     }
 
+    public WhoAmIResponse whoAmI()
+    {
+        try
+        {
+            return new WhoAmICommand().execute(createDefaultConnection(), "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to fetch current user info.", e);
+        }
+    }
+
     public String getCurrentUser()
     {
-        return (String)executeScript("return LABKEY.user.email;");
+        return whoAmI().getEmail();
     }
 
     public String getCurrentUserName()
@@ -1126,7 +1155,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     // Return display name for the current logged in user (or impersonated user)
     public String getDisplayName()
     {
-        return (String)executeScript("return LABKEY.user.displayName");
+        return whoAmI().getDisplayName();
+    }
+
+    public String getCurrentDateFormatString()
+    {
+        return (String)executeScript("return LABKEY.container.formats.dateTimeFormat");
     }
 
     public boolean onLabKeyPage()
@@ -1141,7 +1175,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public boolean isSignedIn()
     {
-        return (Boolean)executeScript("return LABKEY.user.isSignedIn;");
+        return whoAmI().getUserId().longValue() > 0;
     }
 
     public boolean isUserSystemAdmin()
@@ -1161,7 +1195,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public boolean isImpersonating()
     {
-        return (Boolean)executeScript("return LABKEY.impersonatingUser != undefined;");
+        return whoAmI().isImpersonated();
     }
 
     public void assertSignedInNotImpersonating()
@@ -1755,6 +1789,25 @@ public abstract class WebDriverWrapper implements WrapsDriver
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
         waitForOnReady("LABKEY.Utils");
+
+        List<WebElement> apps = Locator.findElements(getDriver(),
+            Locator.tagWithAttributeContaining("div", "id", "error-handler-app"), // from errorView.jsp
+            Locator.id("app")); // Most other apps start with an empty '<div id="app"></div>'
+        for (WebElement app : apps)
+        {
+            waitFor(() -> Locator.xpath("./*").findElements(app).stream()
+                .anyMatch(webElement ->
+                {
+                    try
+                    {
+                        return webElement.isDisplayed();
+                    }
+                    catch (StaleElementReferenceException stale)
+                    {
+                        return false;
+                    }
+                }), "App didn't seem to load. No visible content. " + app.toString(), 5000);
+        }
         mouseOut();
         _testTimeout = false;
     }
@@ -1968,7 +2021,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         func.run();
 
         if (previousElement != null)
-            wait.until(ExpectedConditions.stalenessOf(previousElement));
+        {
+            wait.until(LabKeyExpectedConditions.stalenessOf(previousElement));
+        }
 
         return wait.until(wd -> elementFinder.get());
     }
@@ -3155,6 +3210,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
             .perform();
     }
 
+    /**
+     *  puts the specified text into the clipboard, then pastes it into the specified element,
+     *  or whatever has focus at the moment.
+     * @param input
+     * @param text
+     */
     public void actionPaste(WebElement input, String text)
     {
         String osName = System.getProperty("os.name");
@@ -3164,11 +3225,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
         StringSelection sel = new StringSelection(text);
         c.setContents(sel, sel);
 
-        new Actions(getDriver())
-            .keyDown(cmdKey)
-            .sendKeys(input, "v")       // paste the contents of the clipboard into the input
-            .keyUp(cmdKey)
-            .perform();
+        if (input == null)
+        {
+            new Actions(getDriver())
+                    .keyDown(cmdKey)
+                    .sendKeys("v")       // paste the contents of the clipboard, without a target
+                    .keyUp(cmdKey)
+                    .perform();
+        }
+        else
+        {
+            new Actions(getDriver())
+                    .keyDown(cmdKey)
+                    .sendKeys(input, "v")       // paste the contents of the clipboard into the input
+                    .keyUp(cmdKey)
+                    .perform();
+        }
     }
 
     private static final List<String> html5InputTypes = Arrays.asList("color", "date", "datetime-local", "email", "month", "number", "range", "search", "tel", "time", "url", "week");
@@ -3409,6 +3481,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         RadioButton radioButton = RadioButton(radioButtonLocator).find(getDriver());
         radioButton.check();
+
+        // TODO: Should review this code, and understand why it was written.
+        // I'm not sure this code is doing what was intended, or is the correct thing to do.
+        // I think this may be exposing a bug in the RadioButton finder. Look at baseWebDriverTest.prepareForFolderExport (line 1448).
+        // The locator sent into this function is a table, which will find the input element, but it makes the base
+        // element the table as well which will never returns true for checked.
         if (!waitFor(()-> radioButton.isChecked(), 250))
             radioButton.check();
         return radioButton;

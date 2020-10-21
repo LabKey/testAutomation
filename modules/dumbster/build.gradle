@@ -1,0 +1,5 @@
+dependencies 
+{
+    implementation "com.sun.mail:jakarta.mail:${javaMailVersion}"
+    jspImplementation "com.sun.mail:jakarta.mail:${javaMailVersion}"
+}

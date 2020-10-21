@@ -26,12 +26,12 @@ import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PagingWidget;
-import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.components.SummaryStatisticsDialog;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.study.DatasetFacetPanel;
+import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.RefindingWebElement;
@@ -459,7 +459,7 @@ public class DataRegionTable extends DataRegion
 
     public List<String> getColumnLabels()
     {
-        getComponentElement().isDisplayed(); // validate cached element
+        getComponentElement().isEnabled(); // validate cached element
 
         if (_columnLabels.isEmpty())
         {
@@ -473,7 +473,7 @@ public class DataRegionTable extends DataRegion
 
     public List<String> getColumnNames()
     {
-        getComponentElement().isDisplayed(); // validate cached element
+        getComponentElement().isEnabled(); // validate cached element
 
         if (_columnNames.isEmpty())
         {
@@ -628,7 +628,7 @@ public class DataRegionTable extends DataRegion
     {
         assertTrue("Need the selector checkboxes value to find row by pk", hasSelectors());
 
-        getComponentElement().isDisplayed(); // refresh cache
+        getComponentElement().isEnabled(); // refresh cache
 
         Integer cached = _mapRows.get(pk);
         if (cached != null)

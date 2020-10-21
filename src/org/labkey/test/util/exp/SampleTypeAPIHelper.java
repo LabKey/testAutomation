@@ -7,7 +7,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.params.experiment.SampleSetDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.util.Arrays;
@@ -19,6 +19,11 @@ import java.util.Set;
 
 public class SampleTypeAPIHelper
 {
+    // Global constants to ease migration from "Sample Set" to "Sample Type"
+    public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
+    public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";
+    public static final String SAMPLE_TYPE_COLUMN_NAME = "Sample Set";
+
     /**
      * Create a sample type in the specified container with the fields provided.
      *
@@ -26,7 +31,7 @@ public class SampleTypeAPIHelper
      * @param def domain properties for the new sample type.
      * @return A TestDataGenerator for inserting rows into the created sample type.
      */
-    public static TestDataGenerator createEmptySampleType(String containerPath, SampleSetDefinition def)
+    public static TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition def)
     {
         try
         {
@@ -85,5 +90,4 @@ public class SampleTypeAPIHelper
 
         return sampleIds;
     }
-
 }

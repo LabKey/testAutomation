@@ -142,7 +142,7 @@ public class AssayAPITest extends BaseWebDriverTest
         String assayName = "testGpatAssay";
         String assayDescription = "generated for test purposes over remoteAPI";
 
-        Connection connection = createDefaultConnection(true);
+        Connection connection = createDefaultConnection();
         GetProtocolCommand getProtocolCommand = new GetProtocolCommand("General");                      // gets a template from the server
         ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, getCurrentContainerPath());
 
@@ -395,7 +395,7 @@ public class AssayAPITest extends BaseWebDriverTest
         try
         {
             // verify that plate metadata JSON is required
-            cmd.execute(createDefaultConnection(false), folderPath);
+            cmd.execute(createDefaultConnection(), folderPath);
         }
         catch (CommandException e)
         {
@@ -409,7 +409,7 @@ public class AssayAPITest extends BaseWebDriverTest
         try
         {
             // verify that the well location property is required
-            cmd.execute(createDefaultConnection(false), folderPath);
+            cmd.execute(createDefaultConnection(), folderPath);
         }
         catch (CommandException e)
         {
@@ -425,11 +425,11 @@ public class AssayAPITest extends BaseWebDriverTest
         resultRows.add(Maps.of("ptid", "555", "visitId", "111", "wellLocation", "E8"));
         resultRows.add(Maps.of("ptid", "666", "visitId", "111", "wellLocation", "G10"));
 
-        cmd.execute(createDefaultConnection(false), folderPath);
+        cmd.execute(createDefaultConnection(), folderPath);
 
         SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General." + assayName, "Data");
         selectRowsCmd.addFilter("run/name", runName, Filter.Operator.EQUAL);
-        SelectRowsResponse resp = selectRowsCmd.execute(createDefaultConnection(false), folderPath);
+        SelectRowsResponse resp = selectRowsCmd.execute(createDefaultConnection(), folderPath);
 
         List<Map<String, Object>> expectedRows = new ArrayList<>();
         expectedRows.add(Maps.of("wellLocation", "A11", "plateData/dilution", 0.005));
@@ -488,11 +488,11 @@ public class AssayAPITest extends BaseWebDriverTest
         JSONParser parser = new JSONParser();
         cmd.setPlateMetadata((JSONObject)parser.parse(PLATE_METADATA));
         cmd.setName(runName);
-        cmd.execute(createDefaultConnection(false), folderPath);
+        cmd.execute(createDefaultConnection(), folderPath);
 
         SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General." + assayName, "Data");
         selectRowsCmd.addFilter("run/name", runName, Filter.Operator.EQUAL);
-        SelectRowsResponse resp = selectRowsCmd.execute(createDefaultConnection(false), folderPath);
+        SelectRowsResponse resp = selectRowsCmd.execute(createDefaultConnection(), folderPath);
 
         List<Map<String, Object>> expectedRows = new ArrayList<>();
         expectedRows.add(Maps.of("wellLocation", "H11", "plateData/dilution", 0.005));

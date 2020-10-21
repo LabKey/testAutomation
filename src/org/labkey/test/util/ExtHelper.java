@@ -565,8 +565,8 @@ public class ExtHelper
          */
         public static Locator.XPathLocator extDialog(String title)
         {
-            return Locator.xpath("//span[" + Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
-        }
+            return Locator.tag("span").notHidden().withAttributeContaining("class", "window-header-text").containing(title);
+     }
 
         /**
          * Locates an Ext 3 window
