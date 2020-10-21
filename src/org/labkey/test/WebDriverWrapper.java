@@ -1806,7 +1806,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     {
                         return false;
                     }
-                }), "App didn't seem to load. No visible content. " + app.toString(), 5000);
+                }), "App didn't seem to load. No visible content. " + app.toString(), 10000);
         }
         mouseOut();
         _testTimeout = false;
