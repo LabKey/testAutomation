@@ -30,11 +30,8 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * User: tgaluhn
@@ -54,7 +51,7 @@ public class ModeratorReviewTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Collections.singletonList("announcements");
+        return Arrays.asList("announcements");
     }
 
     @Override

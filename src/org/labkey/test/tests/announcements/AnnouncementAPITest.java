@@ -412,6 +412,6 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList();
+        return Arrays.asList("announcements");
     }
 }

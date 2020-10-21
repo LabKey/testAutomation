@@ -22,6 +22,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
@@ -47,17 +48,17 @@ public class DiscussionLinkTest extends BaseWebDriverTest
 
     private void doSetup()
     {
-        _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createProject(getProjectName());
     }
 
     @Before
-    public void preTest() throws Exception
+    public void preTest()
     {
         goToProjectHome();
     }
 
     @Test
-    public void testDiscussionLink() throws Exception
+    public void testDiscussionLink()
     {
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Wiki");
@@ -72,8 +73,8 @@ public class DiscussionLinkTest extends BaseWebDriverTest
         //goto l and feel
         ProjectSettingsPage projectSettingsPage = goToProjectSettings();
         //confirm Enable discussion enabled checked
-        org.labkey.test.components.html.Checkbox enableDiscussionCheckbox = projectSettingsPage.getEnableDiscussionCheckbox();
-        assertEquals("Enable Discussion should be checked.",true, enableDiscussionCheckbox.isChecked());
+        Checkbox enableDiscussionCheckbox = projectSettingsPage.getEnableDiscussionCheckbox();
+        assertEquals("Enable Discussion should be checked.", true, enableDiscussionCheckbox.isChecked());
 
         //un-check Enabled
         enableDiscussionCheckbox.uncheck();
@@ -100,6 +101,6 @@ public class DiscussionLinkTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("announcement");
+        return Arrays.asList("announcements");
     }
 }
