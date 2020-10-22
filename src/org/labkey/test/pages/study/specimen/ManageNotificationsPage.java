@@ -14,6 +14,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
+/**
+ * This wraps the page served by 'org.labkey.query.reports.ReportsController.ManageNotificationsAction'
+ * Page layout is defined in '/org/labkey/query/reports/view/manageNotifications.jsp'
+ */
 public class ManageNotificationsPage extends LabKeyPage<ManageNotificationsPage.ElementCache>
 {
     public ManageNotificationsPage(WebDriver driver)

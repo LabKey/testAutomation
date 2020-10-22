@@ -682,7 +682,7 @@ public class SpecimenTest extends SpecimenBaseTest
         log("Verify specimen tsv attachment");
         EmailRecordTable emailRecordTable = goToEmailRecord();
 
-        emailRecordTable.clickSubject("Specimen Request Notification");
+        emailRecordTable.clickSubject("Study 001: Specimen Request Notification");
         waitForElement(Locator.linkWithText("SpecimenDetail.xls"));
 
         // Each notification should be have only the specimen request details, no specimen list
@@ -715,7 +715,7 @@ public class SpecimenTest extends SpecimenBaseTest
         log("Verify specimen xls attachment");
         emailRecordTable = goToEmailRecord();
 
-        emailRecordTable.clickSubject("Specimen Request Notification");
+        emailRecordTable.clickSubject("Study 001: Specimen Request Notification");
         waitForElement(Locator.linkWithText("SpecimenDetail.tsv"));
 
         // Each notification should be have only the specimen request details, no specimen list
