@@ -690,6 +690,8 @@ public class SpecimenTest extends SpecimenBaseTest
 
         enableEmailRecorder(); // Clear out previous notifications
         log("Setup text specimen attachment");
+        goToProjectHome();
+        clickFolder(getFolderName());
         waitAndClickAndWait(Locator.linkWithText("Manage"));
         waitAndClickAndWait(Locator.linkWithText("Manage Notifications"));
         manageNotificationsPage = new ManageNotificationsPage(getDriver());
@@ -767,9 +769,10 @@ public class SpecimenTest extends SpecimenBaseTest
         setFormElement(Locator.name("requestDescription"), "Two notifications.");
         clickButton("Save Changes and Send Notifications");
 
-        goToModule("Dumbster");
-
-        getArtifactCollector().dumpPageSnapshot("deactivatedUsers", null);
+        EmailRecordTable emailRecordTable = goToEmailRecord();
+        List<String> tos = emailRecordTable.getColumnDataAsText("To");
+        assertEquals("Active user should have received both notifications.", 2, tos.stream().filter(s -> s.equals(USER1)).count());
+        assertEquals("Inactive user should have received a notification when explicitly requested.", 1, tos.stream().filter(s -> s.equals(USER2)).count());
     }
 
     /**
