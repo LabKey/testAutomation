@@ -6,15 +6,15 @@ import org.labkey.remoteapi.CommandResponse;
 
 public class MessageThreadResponse extends CommandResponse
 {
-    private final TestAnnouncementModel _announcementModel;
+    private final AnnouncementModel _announcementModel;
 
     public MessageThreadResponse(String text, int statusCode, String contentType, JSONObject json, Command sourceCommand)
     {
         super(text, statusCode, contentType, json, sourceCommand);
-        _announcementModel = new TestAnnouncementModel((JSONObject) json.get("data"));
+        _announcementModel = new AnnouncementModel((JSONObject) json.get("data"));
     }
 
-    public TestAnnouncementModel getAnnouncementModel()
+    public AnnouncementModel getAnnouncementModel()
     {
         return _announcementModel;
     }

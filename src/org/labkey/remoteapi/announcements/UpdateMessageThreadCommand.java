@@ -4,9 +4,9 @@ import org.json.simple.JSONObject;
 
 public class UpdateMessageThreadCommand extends AbstractMessageThreadCommand
 {
-    private final TestAnnouncementModel _announcementModel;
+    private final AnnouncementModel _announcementModel;
 
-    public UpdateMessageThreadCommand(TestAnnouncementModel params)
+    public UpdateMessageThreadCommand(AnnouncementModel params)
     {
         super("updateThread");
         _announcementModel = params;

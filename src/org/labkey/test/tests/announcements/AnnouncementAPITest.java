@@ -12,7 +12,7 @@ import org.labkey.remoteapi.announcements.GetDiscussionsCommand;
 import org.labkey.remoteapi.announcements.GetDiscussionsResponse;
 import org.labkey.remoteapi.announcements.GetMessageThreadCommand;
 import org.labkey.remoteapi.announcements.MessageThreadResponse;
-import org.labkey.remoteapi.announcements.TestAnnouncementModel;
+import org.labkey.remoteapi.announcements.AnnouncementModel;
 import org.labkey.remoteapi.announcements.UpdateMessageThreadCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.DailyC;
@@ -56,11 +56,11 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         String containerPath = getProjectName() + "/" + folderName;
         _containerHelper.createSubfolder(getProjectName(), folderName);
 
-        TestAnnouncementModel parentThread = createThread(new TestAnnouncementModel().setTitle("parent"), containerPath);
+        AnnouncementModel parentThread = createThread(new AnnouncementModel().setTitle("parent"), containerPath);
 
         // Give it two responses
-        respondToThread(parentThread, new TestAnnouncementModel().setTitle("firstChild"), containerPath);
-        respondToThread(parentThread, new TestAnnouncementModel().setTitle("secondChild"), containerPath);
+        respondToThread(parentThread, new AnnouncementModel().setTitle("firstChild"), containerPath);
+        respondToThread(parentThread, new AnnouncementModel().setTitle("secondChild"), containerPath);
 
         // Act
         GetDiscussionsCommand cmd = new GetDiscussionsCommand(parentThread.getDiscussionSrcIdentifier());
@@ -78,7 +78,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     public void testCreateThread() throws Exception
     {
         // Arrange
-        TestAnnouncementModel preCreatedThread = new TestAnnouncementModel()
+        AnnouncementModel preCreatedThread = new AnnouncementModel()
                 .setTitle("FirstCreatedThread")
                 .setBody("testBody")
                 .setRendererType(WikiHelper.WikiRendererType.RADEOX);
@@ -89,7 +89,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
 
         // Assert
         assertThat("Expect success", response.getStatusCode(), is(200));
-        TestAnnouncementModel created = response.getAnnouncementModel();
+        AnnouncementModel created = response.getAnnouncementModel();
         assertThat("Expect title to match", created.getTitle(), is(preCreatedThread.getTitle()));
         assertThat("Expect body to match", created.getBody(), is(preCreatedThread.getBody()));
 
@@ -104,12 +104,12 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     public void testCreateThreadFailsIfReplyIsFalse() throws Exception
     {
         // Arrange
-        TestAnnouncementModel preCreatedThread = new TestAnnouncementModel()
+        AnnouncementModel preCreatedThread = new AnnouncementModel()
                 .setTitle("testRespondIfNotReply")
                 .setBody("testBody");
-        TestAnnouncementModel parentThread = createThread(preCreatedThread);
+        AnnouncementModel parentThread = createThread(preCreatedThread);
 
-        TestAnnouncementModel respondingThread = new TestAnnouncementModel().setTitle("wilNeverBeCreated");
+        AnnouncementModel respondingThread = new AnnouncementModel().setTitle("wilNeverBeCreated");
         respondingThread.setParent(parentThread.getEntityId());
 
         // Act
@@ -133,7 +133,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     public void testCreateThreadFailsIfNoParentIsSpecified() throws Exception
     {
         // Arrange
-        TestAnnouncementModel respondingThread = new TestAnnouncementModel().setTitle("wilNeverBeCreated");
+        AnnouncementModel respondingThread = new AnnouncementModel().setTitle("wilNeverBeCreated");
         respondingThread.setParent(null);
 
         // Ensure if "reply" is true but no "parent" is specified, then the API refuses
@@ -156,7 +156,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     public void testCreateThreadFailsIfSpecifiedParentDoesNotExist() throws Exception
     {
         // Arrange
-        TestAnnouncementModel respondingThread = new TestAnnouncementModel().setTitle("responseToNonExistentThread");
+        AnnouncementModel respondingThread = new AnnouncementModel().setTitle("responseToNonExistentThread");
         respondingThread.setParent("totally-bogus-entity-id");
 
         // Verify that if "reply" is true but "parent" is not specified, then it fails.
@@ -179,7 +179,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     public void testDeleteThreadByRowId() throws Exception
     {
         // Arrange
-        TestAnnouncementModel createdThread = createThread(new TestAnnouncementModel().setTitle("deleteMeByRowId"));
+        AnnouncementModel createdThread = createThread(new AnnouncementModel().setTitle("deleteMeByRowId"));
 
         // now confirm that the expected thread exists
         MessageThreadResponse confirm = getThread(createdThread);
@@ -209,7 +209,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     public void testDeleteThreadByEntityId() throws Exception
     {
         // Arrange
-        TestAnnouncementModel createdThread = createThread(new TestAnnouncementModel().setTitle("Delete By EntityId"));
+        AnnouncementModel createdThread = createThread(new AnnouncementModel().setTitle("Delete By EntityId"));
 
         // Confirm that the expected thread exists
         MessageThreadResponse confirm = getThread(createdThread);
@@ -239,9 +239,9 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     public void testRespondToExistingThread() throws Exception
     {
         // Arrange
-        TestAnnouncementModel createdParent = createThread(new TestAnnouncementModel().setTitle("Parent"));
+        AnnouncementModel createdParent = createThread(new AnnouncementModel().setTitle("Parent"));
 
-        TestAnnouncementModel childThread = new TestAnnouncementModel()
+        AnnouncementModel childThread = new AnnouncementModel()
                 .setTitle("Child")
                 .setBody("expected body")
                 .setDiscussionSrcIdentifier("test discussion src identifier")
@@ -255,14 +255,14 @@ public class AnnouncementAPITest extends BaseWebDriverTest
 
         // Assert
         assertThat("Expect success", childCreateResponse.getStatusCode(), is(200));
-        TestAnnouncementModel createdChild = childCreateResponse.getAnnouncementModel();
+        AnnouncementModel createdChild = childCreateResponse.getAnnouncementModel();
         assertThat(createdChild.getBody(), is("expected body"));
         assertThat(createdChild.getTitle(), is("Child"));
         assertThat(createdChild.getParent(), is(createdParent.getEntityId()));
         assertThat(childThread.getDiscussionSrcIdentifier(), is("test discussion src identifier"));
         assertThat(createdChild.getRendererType(), is(WikiHelper.WikiRendererType.MARKDOWN.toString()));
 
-        TestAnnouncementModel originalParent = getThread(createdParent).getAnnouncementModel();
+        AnnouncementModel originalParent = getThread(createdParent).getAnnouncementModel();
         assertTrue("Expect parent row to be updated with added child",
                 originalParent.getResponses().stream().anyMatch(a-> a.getEntityId().equals(createdChild.getEntityId())));
     }
@@ -271,13 +271,13 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     public void testUpdateThread() throws Exception
     {
         // Arrange
-        TestAnnouncementModel toUpdate = new TestAnnouncementModel()
+        AnnouncementModel toUpdate = new AnnouncementModel()
                 .setTitle("old title")
                 .setBody("old body")
                 .setDiscussionSrcIdentifier("old discussionSrcIdentifier")
                 .setRendererType(WikiHelper.WikiRendererType.MARKDOWN);
 
-        TestAnnouncementModel created = createThread(toUpdate)
+        AnnouncementModel created = createThread(toUpdate)
                 .setTitle("new title")
                 .setBody("new body")
                 .setDiscussionSrcIdentifier("whole new discussionSrcIdentifier")
@@ -289,7 +289,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
 
         // Assert
         assertThat("Expect success", response.getStatusCode(), is(200));
-        TestAnnouncementModel updated = response.getAnnouncementModel();
+        AnnouncementModel updated = response.getAnnouncementModel();
         assertThat("expect title to update", updated.getTitle(), is("new title"));
         assertThat("expect body to update", updated.getBody(), is("new body"));
         assertThat("don't expect discussionSrcIdentifier to update",
@@ -301,10 +301,10 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     public void testApiPermissions() throws Exception
     {
         // Arrange
-        TestAnnouncementModel preThread = new TestAnnouncementModel()
+        AnnouncementModel preThread = new AnnouncementModel()
                 .setTitle("Permissions Testing")
                 .setBody("forPermissionsTesting");
-        TestAnnouncementModel created = createThread(preThread);
+        AnnouncementModel created = createThread(preThread);
 
         goToProjectHome(getProjectName());
         impersonateRole("Reader");
@@ -319,7 +319,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         // create a thread
         try
         {
-            createThread(new TestAnnouncementModel());
+            createThread(new AnnouncementModel());
             fail("Reader should not have permissions to create a thread");
         }
         catch (CommandException success)
@@ -330,7 +330,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         // respond to a thread
         try
         {
-            respondToThread(created, new TestAnnouncementModel().setTitle("fake"), getProjectName());
+            respondToThread(created, new AnnouncementModel().setTitle("fake"), getProjectName());
             fail("Reader should not have permission to respond to a thread via createThread.api");
         }
         catch (CommandException success)
@@ -365,30 +365,30 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         stopImpersonatingHTTP();
     }
 
-    private TestAnnouncementModel createThread(TestAnnouncementModel thread) throws Exception
+    private AnnouncementModel createThread(AnnouncementModel thread) throws Exception
     {
         return createThread(thread, getProjectName());
     }
 
-    private TestAnnouncementModel createThread(TestAnnouncementModel thread, String containerPath) throws Exception
+    private AnnouncementModel createThread(AnnouncementModel thread, String containerPath) throws Exception
     {
         return new CreateMessageThreadCommand(thread)
                 .execute(createDefaultConnection(), containerPath)
                 .getAnnouncementModel();
     }
 
-    private MessageThreadResponse getThread(TestAnnouncementModel thread) throws Exception
+    private MessageThreadResponse getThread(AnnouncementModel thread) throws Exception
     {
         return getThread(thread, getProjectName());
     }
 
-    private MessageThreadResponse getThread(TestAnnouncementModel thread, String containerPath) throws Exception
+    private MessageThreadResponse getThread(AnnouncementModel thread, String containerPath) throws Exception
     {
         return new GetMessageThreadCommand(thread).execute(createDefaultConnection(), containerPath);
     }
 
-    private MessageThreadResponse respondToThread(TestAnnouncementModel parentThread,
-                                                  TestAnnouncementModel respondingThread,
+    private MessageThreadResponse respondToThread(AnnouncementModel parentThread,
+                                                  AnnouncementModel respondingThread,
                                                   String containerPath) throws Exception
     {
         CreateMessageThreadCommand replyCmd = new CreateMessageThreadCommand(respondingThread);

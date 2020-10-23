@@ -9,7 +9,7 @@ import java.util.List;
 
 public class GetDiscussionsResponse extends CommandResponse
 {
-    private List<TestAnnouncementModel> _threads;
+    private List<AnnouncementModel> _threads;
 
     public GetDiscussionsResponse(String text, int statusCode, String contentType, JSONObject json,
                                   GetDiscussionsCommand sourceCommand)
@@ -21,11 +21,11 @@ public class GetDiscussionsResponse extends CommandResponse
         JSONArray discussionThreads =(JSONArray)json.get("data");
         for (int i=0; i< discussionThreads.size(); i++)
         {
-            _threads.add(new TestAnnouncementModel((JSONObject)discussionThreads.get(i)));
+            _threads.add(new AnnouncementModel((JSONObject)discussionThreads.get(i)));
         }
     }
 
-    public List<TestAnnouncementModel> getThreads()
+    public List<AnnouncementModel> getThreads()
     {
         return _threads;
     }

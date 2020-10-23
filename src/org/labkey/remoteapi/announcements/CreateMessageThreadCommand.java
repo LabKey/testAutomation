@@ -4,11 +4,11 @@ import org.json.simple.JSONObject;
 
 public class CreateMessageThreadCommand extends AbstractMessageThreadCommand
 {
-    private final TestAnnouncementModel _announcementModel;
+    private final AnnouncementModel _announcementModel;
     private boolean _reply = false;
 
 
-    public CreateMessageThreadCommand(TestAnnouncementModel params)
+    public CreateMessageThreadCommand(AnnouncementModel params)
     {
         super("createThread");
         _announcementModel = params;

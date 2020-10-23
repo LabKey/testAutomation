@@ -9,7 +9,7 @@ import java.util.List;
 
 // POJO for working with responses from Announcements APIs.
 // This is modeled after AnnouncementModel on the server.
-public class TestAnnouncementModel
+public class AnnouncementModel
 {
     private String _approved;
     private String _body;
@@ -23,16 +23,16 @@ public class TestAnnouncementModel
     private String _entityId;
     private String _formattedHtml;
     private String _rendererType;
-    private List<TestAnnouncementModel> _responses = new ArrayList<>();
+    private List<AnnouncementModel> _responses = new ArrayList<>();
     private Long _rowId;
     private String _title;
     private String _parent;
 
-    public TestAnnouncementModel()
+    public AnnouncementModel()
     {
     }
 
-    public TestAnnouncementModel(JSONObject json)
+    public AnnouncementModel(JSONObject json)
     {
         if (json.get("approved") != null)
             _approved = json.get("approved").toString();
@@ -67,10 +67,10 @@ public class TestAnnouncementModel
 
         if (json.get("responses") != null)
         {
-            var responses = new ArrayList<TestAnnouncementModel>();
+            var responses = new ArrayList<AnnouncementModel>();
             var rawResponses = (JSONArray) json.get("responses");
             for (int i = 0; i < rawResponses.size(); i++)
-                responses.add(new TestAnnouncementModel((JSONObject) rawResponses.get(i)));
+                responses.add(new AnnouncementModel((JSONObject) rawResponses.get(i)));
             _responses = responses;
         }
     }
@@ -112,7 +112,7 @@ public class TestAnnouncementModel
         return _body;
     }
 
-    public TestAnnouncementModel setBody(String body)
+    public AnnouncementModel setBody(String body)
     {
         _body = body;
         return this;
@@ -183,7 +183,7 @@ public class TestAnnouncementModel
         return _discussionSrcIdentifier;
     }
 
-    public TestAnnouncementModel setDiscussionSrcIdentifier(String discussionSrcIdentifier)
+    public AnnouncementModel setDiscussionSrcIdentifier(String discussionSrcIdentifier)
     {
         _discussionSrcIdentifier = discussionSrcIdentifier;
         return this;
@@ -214,18 +214,18 @@ public class TestAnnouncementModel
         return _rendererType;
     }
 
-    public TestAnnouncementModel setRendererType(WikiHelper.WikiRendererType rendererType)
+    public AnnouncementModel setRendererType(WikiHelper.WikiRendererType rendererType)
     {
         _rendererType = rendererType.toString();
         return this;
     }
 
-    public List<TestAnnouncementModel> getResponses()
+    public List<AnnouncementModel> getResponses()
     {
         return _responses;
     }
 
-    public void setResponses(List<TestAnnouncementModel> responses)
+    public void setResponses(List<AnnouncementModel> responses)
     {
         _responses = responses;
     }
@@ -245,7 +245,7 @@ public class TestAnnouncementModel
         return _title;
     }
 
-    public TestAnnouncementModel setTitle(String title)
+    public AnnouncementModel setTitle(String title)
     {
         _title = title;
         return this;

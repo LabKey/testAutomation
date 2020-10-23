@@ -4,9 +4,9 @@ import org.json.simple.JSONObject;
 
 public class GetMessageThreadCommand extends AbstractMessageThreadCommand
 {
-    private final TestAnnouncementModel _announcementModel;
+    private final AnnouncementModel _announcementModel;
 
-    public GetMessageThreadCommand(TestAnnouncementModel params)
+    public GetMessageThreadCommand(AnnouncementModel params)
     {
         super("getThread");
        _announcementModel = params;
@@ -15,14 +15,14 @@ public class GetMessageThreadCommand extends AbstractMessageThreadCommand
     public GetMessageThreadCommand(String entityId)
     {
         super("getThread");
-        _announcementModel = new TestAnnouncementModel();
+        _announcementModel = new AnnouncementModel();
         _announcementModel.setEntityId(entityId);
     }
 
     public GetMessageThreadCommand(Long rowId)
     {
         super("getThread");
-        _announcementModel = new TestAnnouncementModel();
+        _announcementModel = new AnnouncementModel();
         _announcementModel.setRowId(rowId);
     }
 
