@@ -3,7 +3,7 @@ package org.labkey.remoteapi.announcements;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
-public class AbstractMessageThreadCommand extends PostCommand<MessageThreadResponse>
+public abstract class AbstractMessageThreadCommand extends PostCommand<MessageThreadResponse>
 {
     public AbstractMessageThreadCommand(String actionName)
     {
