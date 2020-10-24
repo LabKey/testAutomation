@@ -67,7 +67,7 @@ public class SpecimenCustomizeTest extends SpecimenBaseTest
 
     @Override
     @LogMethod
-    protected void doVerifySteps() throws Exception
+    protected void doVerifySteps()
     {
         configureSpecimenProperties();
 
@@ -82,13 +82,12 @@ public class SpecimenCustomizeTest extends SpecimenBaseTest
 
     private void configureSpecimenProperties()
     {
-
         goToManageStudy();
         clickAndWait(Locator.linkContainingText("Edit Specimen Event fields"));
 
         DomainDesignerPage designerPage = new DomainDesignerPage(getDriver());
         designerPage.fieldsPanel().addField(new FieldDefinition("Tally").setType(ColumnType.Integer));
-        designerPage.fieldsPanel().addField(new FieldDefinition("Note").setType(ColumnType.String));
+        designerPage.fieldsPanel().addField(new FieldDefinition("Note").setType(ColumnType.String).setImportAliases("Comment,Notables"));
         designerPage.fieldsPanel().addField(new FieldDefinition("Minutes").setType(ColumnType.Decimal));
         designerPage.fieldsPanel().addField(new FieldDefinition("Flag").setType(ColumnType.Boolean));
         designerPage.clickFinish();
