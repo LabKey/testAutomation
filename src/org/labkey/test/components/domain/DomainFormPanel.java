@@ -69,6 +69,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             fieldRow.setCharCount(fieldDefinition.getScale());
         if (fieldDefinition.getURL() != null)
             fieldRow.setUrl(fieldDefinition.getURL());
+        if (fieldDefinition.getImportAliases() != null)
+            fieldRow.setImportAliases(fieldDefinition.getImportAliases());
         if (fieldDefinition.getMvEnabled())
             fieldRow.setMissingValuesEnabled(fieldDefinition.getMvEnabled());
         if (fieldDefinition.getRequired())

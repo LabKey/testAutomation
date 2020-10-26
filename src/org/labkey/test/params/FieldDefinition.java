@@ -39,6 +39,7 @@ public class FieldDefinition extends PropertyDescriptor
     private Boolean _lookupValidatorEnabled;
     private String _url;
     private List<FieldValidator<?>> _validators;
+    private String _importAliases;
 
     public FieldDefinition(String name, ColumnType type)
     {
@@ -82,6 +83,8 @@ public class FieldDefinition extends PropertyDescriptor
             json.put("conceptURI", getType().getConceptURI());
         if (getURL() != null)
             json.put("url", getURL());
+        if (getImportAliases() != null)
+            json.put("importAliases", getImportAliases());
         if (getValidators() != null)
         {
             JSONArray propertyValidators = new JSONArray();
@@ -191,6 +194,17 @@ public class FieldDefinition extends PropertyDescriptor
     public FieldDefinition setURL(String url)
     {
         _url = url;
+        return this;
+    }
+
+    public String getImportAliases()
+    {
+        return _importAliases;
+    }
+
+    public FieldDefinition setImportAliases(String importAliases)
+    {
+        _importAliases = importAliases;
         return this;
     }
 
