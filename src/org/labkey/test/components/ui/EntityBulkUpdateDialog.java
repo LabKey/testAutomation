@@ -59,7 +59,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public EntityBulkUpdateDialog setTextArea(String fieldKey, String text)
     {
-        setEditableState("Description", true);
+        setEditableState(fieldKey, true);
         Input input = elementCache().textArea(fieldKey);
         getWrapper().waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
                 "the input did not become enabled in time", 2000);
@@ -156,17 +156,26 @@ public class EntityBulkUpdateDialog extends ModalDialog
         dismiss("Edit with Grid");
     }
 
-    public boolean isUpdateSamplesButtonEnabled()
+    public boolean isUpdateButtonEnabled()
     {
-        WebElement btn = elementCache().updateSamplesButton.findElement(this);
+        WebElement btn = elementCache().updateButton.findElement(this);
         return btn.getAttribute("disabled") == null;
     }
 
-    public void clickUpdateSamples()
+    public void clickUpdate()
     {
-        if (!isUpdateSamplesButtonEnabled())
-            getWrapper().log("the [Update Samples] button cannot be clicked, it is disabled");
-        dismiss("Update Samples");
+        String updateButtonText = getUpdateButtonText();
+        if (!isUpdateButtonEnabled())
+        {
+            getWrapper().log("the ["+updateButtonText+"] button cannot be clicked, it is disabled");
+        }
+        dismiss(updateButtonText);
+    }
+
+    private String getUpdateButtonText()
+    {
+         WebElement btn = elementCache().updateButton.waitForElement(this, 2000);
+         return btn.getText();
     }
 
     public void clickCancel()
@@ -232,8 +241,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
 
-        Locator updateSamplesButton = Locator.tagWithClass("button", "test-loc-submit-button")
-                .withText("Update Samples");
+        Locator updateButton = Locator.tagWithClass("button", "test-loc-submit-button");
     }
 
 }
