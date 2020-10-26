@@ -63,8 +63,11 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     public Pager clickPrevious()
     {
         if (elementCache().prevButton().isPresent())
-            _pagedComponent.doAndWaitForUpdate(()->
+        {
+            getWrapper().scrollIntoView(elementCache().prevButton().get());
+            _pagedComponent.doAndWaitForUpdate(() ->
                     elementCache().prevButton().get().click());
+        }
         return this;
     }
 
@@ -83,8 +86,11 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     public Pager clickNext()
     {
         if (elementCache().prevButton().isPresent())
-            _pagedComponent.doAndWaitForUpdate(()->
+        {
+            getWrapper().scrollIntoView(elementCache().nextButton().get());
+            _pagedComponent.doAndWaitForUpdate(() ->
                     elementCache().nextButton().get().click());
+        }
         return this;
     }
 
