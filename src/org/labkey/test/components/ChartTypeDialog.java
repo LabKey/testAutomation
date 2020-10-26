@@ -403,7 +403,7 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
 
         if(text.length() == 0)
         {
-            // If the lenght is 0 see if the drag and drop text is visible.
+            // If the length is 0 see if the drag and drop text is visible.
             if(dragAndDropElement.isDisplayed())
                 text = dragAndDropElement.getText();
             else
@@ -427,13 +427,9 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         {
             case Date:
                 getWrapper().click(elementCache().timeAxisDateBasedRadioButton);
-                getWrapper().waitForElementToDisappear(elementCache().disabledTimeInterval);
-                getWrapper().assertElementNotPresent(elementCache().disabledIntervalStartDate);
                 break;
             case Visit:
                 getWrapper().click(elementCache().timeAxisVisitBasedRadioButton);
-                getWrapper().waitForElement(elementCache().disabledTimeInterval);
-                getWrapper().assertElementPresent(elementCache().disabledIntervalStartDate);
                 break;
         }
         return this;
@@ -608,8 +604,6 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         public Locator.XPathLocator studyQueryCombo = Locator.xpath("//tr["+Locator.NOT_HIDDEN+" and ./td/input[@placeholder='Select a query']]");
         public Locator timeAxisDateBasedRadioButton = Locator.xpath("//label[text()='Date-Based']/preceding-sibling::input[@type='button']");
         public Locator timeAxisVisitBasedRadioButton = Locator.xpath("//label[text()='Visit-Based']/preceding-sibling::input[@type='button']");
-        public Locator disabledTimeInterval = Locator.xpath("//table[//label[text() = 'Time Interval:'] and contains(@class, 'x4-item-disabled')]");
-        public Locator disabledIntervalStartDate = Locator.xpath("//table[//label[text() = 'Interval Start Date:'] and contains(@class, 'x4-item-disabled')]");
     }
 
     public enum ChartType
