@@ -340,62 +340,6 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         dgen.deleteDomain(createDefaultConnection());
     }
 
-    /**
-     * regression for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38436
-     * @throws CommandException
-     * @throws IOException
-     */
-    @Test
-    @Ignore("ignoring result until issue 38436 can be resolved.")
-    public void exportMissingValueSampleTypeToTSV() throws CommandException, IOException
-    {
-        String missingValueTable = "mvSamplesForExport";
-        navigateToFolder(getProjectName(), FOLDER_NAME);
-
-        navigateToFolder(getProjectName(), FOLDER_NAME);
-        TestDataGenerator dgen = new TestDataGenerator("exp.materials", missingValueTable, getCurrentContainerPath())
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("mvStringData", FieldDefinition.ColumnType.String)
-                                .setMvEnabled(true).setLabel("MV Field"),
-                        TestDataGenerator.simpleFieldDef("vol", FieldDefinition.ColumnType.Decimal)
-                ));
-        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
-        dgen.addCustomRow(Map.of("name", "1st", "mvStringData", "Q", "vol", 17.5));
-        dgen.addCustomRow(Map.of("name", "2nd", "mvStringData", "Q", "vol", 19.5));
-        dgen.addCustomRow(Map.of("name", "3rd","mvStringData", "N", "vol", 22.25));
-        dgen.addCustomRow(Map.of("name", "4th","mvStringData", "N", "vol", 38.75));
-        dgen.insertRows(createDefaultConnection(), dgen.getRows());     // insert data via API rather than UI
-
-        // prepare expected values-
-        String expectedTSVData = dgen.writeTsvContents();
-        String[] tsvRows = expectedTSVData.split("\n");
-        List<String> dataRows = new ArrayList();
-        for (int i=1; i < tsvRows.length; i++) // don't validate columns; we expect labels instead of column names
-        {
-            dataRows.add(tsvRows[i]);
-        }
-
-        refresh();
-        DataRegionTable sampleTypeList =  DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).waitFor();
-        waitAndClick(Locator.linkWithText(missingValueTable));
-        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-
-        materialsList.checkAllOnPage();
-        DataRegionExportHelper exportHelper = new DataRegionExportHelper(materialsList);
-        File file = exportHelper.exportText(AbstractDataRegionExportOrSignHelper.TextSeparator.TAB);
-
-        TextSearcher exportFileSearcher = new TextSearcher(file);
-        String fileContents = Files.readString(Paths.get(file.getCanonicalPath()));
-        log("parsing file contents, expecting [" + expectedTSVData + "]");
-        log("actual: [" + fileContents + "]");
-        for (String expectedRow : dataRows)
-        {
-            assertTextPresent(exportFileSearcher, expectedRow);
-        }
-    }
-
-
     @Test
     public void sampleTypeWithMissingValueField() throws IOException, CommandException
     {
