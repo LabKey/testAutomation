@@ -1379,11 +1379,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters)
     {
+        return executeSelectRowCommand(schemaName, queryName, containerFilter, path, filters, List.of("*"));
+    }
+
+    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter,
+                                                         String path, @Nullable List<Filter> filters, @Nullable List<String> requestedColumns)
+    {
         Connection cn = createDefaultConnection();
         SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(containerFilter);
-        selectCmd.setColumns(Arrays.asList("*"));
+        selectCmd.setColumns(requestedColumns);
         if (filters != null)
             selectCmd.setFilters(filters);
 
