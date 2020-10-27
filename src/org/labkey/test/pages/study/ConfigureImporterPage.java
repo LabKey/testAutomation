@@ -44,7 +44,7 @@ public class ConfigureImporterPage extends LabKeyPage<ConfigureImporterPage.Elem
 
     /**
      * If no importer is enabled in the current folder, an upsell banner should appear.
-     * @return
+     * @return true if upsell banner is present
      */
     public boolean isUpsellBannerShown()
     {
@@ -56,14 +56,19 @@ public class ConfigureImporterPage extends LabKeyPage<ConfigureImporterPage.Elem
         return elementCache().importOptionPickerBanner().isPresent();
     }
 
+    public boolean isQueryConfigurationShown()
+    {
+        return elementCache().configureQueryBasedConnectionPane().isPresent();
+    }
+
     /**
      * this action is only available if there are more than 1 options to pick from- querybased,  freezerpro (or others?)
      * If either Professional(query-based) or Freezerpro are enabled on the folder, this page will not be shown
      * at the end of the "configure specimen import" link on the Manage Study page, instead you will be directed to views
      * from those modules so you can configure their importers accordingly
      *
-     * @param option
-     * @return
+     * @param option Use the text label next to the radio button
+     * @return The current page
      */
     public ConfigureImporterPage selectSpecimenImportType(String option)
     {
