@@ -120,6 +120,7 @@ public class FilesQueryTest extends BaseWebDriverTest
         Assert.assertFalse("Insert data button should be available", table.hasHeaderMenu("Insert data"));
         // update custom prop
 
+        stopImpersonating(false);
         log("Verify exp.files for user with \"See Absolute File Paths\" permission");
         impersonate(TEST_USER);
         verifyFileRecordsGrid(true, testFile1.getName(), updatedCustomPropValue, "/");
