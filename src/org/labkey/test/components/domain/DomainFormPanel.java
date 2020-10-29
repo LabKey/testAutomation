@@ -117,26 +117,29 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public DomainFieldRow addField(String name)
     {
+        if (isManuallyDefineFieldsPresent())
+            return manuallyDefineFields(name);
+
         getWrapper().scrollIntoView(elementCache().addFieldButton, true);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addFieldButton)); // give modal dialogs time to disappear
         elementCache().addFieldButton.click();
+
         List<DomainFieldRow> fieldRows = elementCache().findFieldRows();
         DomainFieldRow newFieldRow = fieldRows.get(fieldRows.size() - 1);
-
         newFieldRow.setName(name);
         return newFieldRow;
     }
 
     public boolean isManuallyDefineFieldsPresent()
     {
-        return getWrapper().isElementPresent(elementCache().manuallyDefineFieldsLoc);
+        return getThis().findElements(elementCache().manuallyDefineFieldsLoc).size() > 0;
     }
 
     public DomainFieldRow manuallyDefineFields(String name)
     {
-        getWrapper().scrollIntoView(elementCache().manuallyDefineFieldsBtn, true);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineFieldsBtn)); // give modal dialogs time to disappear
-        elementCache().manuallyDefineFieldsBtn.click();
+        getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineButton)); // give modal dialogs time to disappear
+        elementCache().manuallyDefineButton.click();
 
         DomainFieldRow newFieldRow = elementCache().findFieldRows().get(0);
         newFieldRow.setName(name);
@@ -328,7 +331,26 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         }
 
         Locator.XPathLocator manuallyDefineFieldsLoc = Locator.tagWithClass("div", "domain-form-manual-btn");
-        WebElement manuallyDefineFieldsBtn = manuallyDefineFieldsLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        protected WebElement manuallyDefineButton = new WebElementWrapper()
+        {
+            WebElement el = Locator.css(".domain-form-manual-btn").findWhenNeeded(DomainFormPanel.this);
+
+            @Override
+            public WebElement getWrappedElement()
+            {
+                return el;
+            }
+
+            @Override
+            public void click()
+            {
+                super.click();
+                WebDriverWrapper.waitFor(() -> {
+                    clearFieldCache();
+                    return findFieldRows().size() == 1;
+                }, "New manually defined field didn't appear", 10000);
+            }
+        };
 
         WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
 
