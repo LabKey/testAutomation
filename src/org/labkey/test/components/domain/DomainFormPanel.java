@@ -134,9 +134,9 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public DomainFieldRow manuallyDefineFields(String name)
     {
-        getWrapper().scrollIntoView(elementCache().manuallyDefineFieldsLink, true);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineFieldsLink)); // give modal dialogs time to disappear
-        elementCache().manuallyDefineFieldsLink.click();
+        getWrapper().scrollIntoView(elementCache().manuallyDefineFieldsBtn, true);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineFieldsBtn)); // give modal dialogs time to disappear
+        elementCache().manuallyDefineFieldsBtn.click();
 
         DomainFieldRow newFieldRow = elementCache().findFieldRows().get(0);
         newFieldRow.setName(name);
@@ -327,8 +327,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             return fieldRows.get(fieldNames.get(name));
         }
 
-        Locator.XPathLocator manuallyDefineFieldsLoc = Locator.tagWithClass("span", "domain-form-add-link");
-        WebElement manuallyDefineFieldsLink = manuallyDefineFieldsLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator manuallyDefineFieldsLoc = Locator.tagWithClass("div", "domain-form-manual-btn");
+        WebElement manuallyDefineFieldsBtn = manuallyDefineFieldsLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
 
