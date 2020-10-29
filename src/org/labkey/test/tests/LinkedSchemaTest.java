@@ -621,7 +621,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating list via API...");
         ListDefinition listDef = new IntListDefinition(LIST_NAME, "Key")
-                .setKeyName("Key")
                 .addField(new FieldDefinition("Name", FieldDefinition.ColumnType.String).setLabel("Name").setDescription("Name"))
                 .addField(new FieldDefinition("Age", FieldDefinition.ColumnType.Integer).setLabel("Age").setDescription("Age"))
                 .addField(new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean).setLabel("Crazy").setDescription("Crazy?"))
