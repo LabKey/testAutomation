@@ -314,10 +314,17 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public EditableGrid pasteFromCell(int row, String columnName, String pasteText)
     {
+        int initialRowCount = getRowCount();
         WebElement gridCell = getCell(row, columnName);
+        String indexValue = gridCell.getText();
         selectCell(gridCell);
 
         getWrapper().actionPaste(null, pasteText);
+
+        // wait for the cell value to change or the rowcount to change, and the target cell to go into highlight,
+        // ... or for a second and a half
+        getWrapper().waitFor(()-> (getRowCount() > initialRowCount || !indexValue.equals(gridCell.getText())) &&
+                        isInSelection(gridCell), 1500);
         return this;
     }
 
