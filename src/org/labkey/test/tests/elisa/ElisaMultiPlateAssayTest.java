@@ -106,7 +106,8 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
         assertTrue("metadata input format should be present if exp flag is set",
                 designerPage.isMetadataInputFormatSelectPresent());
 
-        assertThat("default input formt should be Manual", designerPage.getMetadataInputFormat(), is("Manual"));
+        assertThat("default input format should be Manual",
+                designerPage.getMetadataInputFormat(), is("Manual"));
     }
 
     @Test
