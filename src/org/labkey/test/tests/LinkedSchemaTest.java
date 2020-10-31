@@ -677,7 +677,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
 
         log("** Applying metadata to " + QUERY_NAME + " in linked schema container");
-        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + QUERY_NAME + "#metadata");
+        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&queryName=" + QUERY_NAME);
+        assertElementPresent(Locator.tagWithClass("div", "labkey-customview-message").withText("This query is not editable"));
+        _ext4Helper.clickExt4Tab("XML Metadata");
         setCodeEditorValue("metadataText", A_PEOPLE_QUERY_METADATA_OVERRIDE);
         clickButton("Save", 0);
         waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
