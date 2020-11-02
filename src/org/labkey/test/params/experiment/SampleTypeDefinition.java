@@ -30,6 +30,7 @@ public class SampleTypeDefinition extends DomainProps
     // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
     private Set<String> _dataParentAliases = new HashSet<>();
 
+    // Currently these values are only used by the SampleManager module.
     private MetricUnit _inventoryMetricUnit;
     private String _labelColor;
 
@@ -194,6 +195,14 @@ public class SampleTypeDefinition extends DomainProps
                 importAliases.put(columnName, aliasTable);
             }
             options.put("importAliases", importAliases);
+        }
+        if (getInventoryMetricUnit() != null)
+        {
+            options.put("metricUnit", getInventoryMetricUnit());
+        }
+        if (getLabelColor() != null)
+        {
+            options.put("labelColor", getLabelColor());
         }
         return options;
     }
