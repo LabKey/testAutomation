@@ -2,7 +2,6 @@ package org.labkey.test.params.list;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.domain.Domain;
-import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.property.DomainProps;
 
@@ -11,29 +10,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * TODO: Expand stub list definition and refactor list helpers to use it
- */
 public class ListDefinition extends DomainProps
 {
-    private static final String AUTO_INCREMENT_DOMAIN_KIND = "IntList";
     private static final String DOMAIN_KIND = "VarList";
 
     private String _name;
     private String _description;
     private List<FieldDefinition> _fields = new ArrayList<>();
-    private String _autoIncrementKey = null;
     private String _keyName;
 
     public ListDefinition(String name)
     {
         _name = name;
-    }
-
-    public ListDefinition setAutoIncrementKeyName(String keyName)
-    {
-        _autoIncrementKey = keyName;
-        return this;
     }
 
     public String getName()
@@ -71,7 +59,7 @@ public class ListDefinition extends DomainProps
 
     public List<FieldDefinition> getFields()
     {
-        return _fields;
+        return new ArrayList<>(_fields); // return a copy
     }
 
     public ListDefinition setFields(List<FieldDefinition> fields)
@@ -95,12 +83,7 @@ public class ListDefinition extends DomainProps
     protected Domain getDomainDesign()
     {
         Domain domain = new Domain(getName());
-        ArrayList<PropertyDescriptor> fields = new ArrayList<>(getFields());
-        if (_autoIncrementKey != null)
-        {
-            fields.add(new FieldDefinition(_autoIncrementKey, FieldDefinition.ColumnType.Integer).setPrimaryKey(true));
-        }
-        domain.setFields(fields);
+        domain.setFields(new ArrayList<>(getFields()));
         domain.setDescription(getDescription());
         return domain;
     }
@@ -109,7 +92,7 @@ public class ListDefinition extends DomainProps
     @Override
     protected String getKind()
     {
-        return _autoIncrementKey != null ? AUTO_INCREMENT_DOMAIN_KIND : DOMAIN_KIND;
+        return DOMAIN_KIND;
     }
 
     @NotNull
