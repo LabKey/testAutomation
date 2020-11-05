@@ -1,16 +1,25 @@
 package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.labkey.ui.core.Alert;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -198,6 +207,15 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return this;
     }
 
+    public File clickExportFields() throws Exception
+    {
+        getWrapper().scrollIntoView(elementCache().exportFieldsButton);
+        File[] exportFiles =  getWrapper().doAndWaitForDownload(()-> {
+            elementCache().exportFieldsButton.click();
+        }, 1);
+        return exportFiles[0];
+    }
+
     public DomainFormPanel setInferFieldFile(File file)
     {
         getWrapper().setFormElement(elementCache().fileUploadInput, file);
@@ -287,6 +305,9 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 }, "New field didn't appear", 10000);
             }
         };
+
+        protected WebElement exportFieldsButton = Locator.tagWithClass("div", "domain-toolbar-export-btn")
+                .findWhenNeeded(this);
 
         protected void clearFieldCache()
         {
