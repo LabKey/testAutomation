@@ -116,14 +116,15 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         clickButton("Edit Source", defaultWaitForPage);
         _ext4Helper.clickExt4Tab("XML Metadata");
         setCodeEditorValue("metadataText", getMetadataXML(true));
-        _ext4Helper.clickExt4Tab("Source");
         clickButton("Save", 0);
         waitForText(WAIT_FOR_JAVASCRIPT, "Saved");
+        _ext4Helper.clickExt4Tab("Source");
+        assertElementPresent(Locator.tagWithClass("div", "labkey-customview-message").withText("This query is not editable"));
         clickButton("Execute Query", 0);
         waitForText(WAIT_FOR_JAVASCRIPT, "Seattle");
         assertButtonPresent(METADATA_OVERRIDE_BUTTON);
         _ext4Helper.clickExt4Tab("Source");
-        clickButton("Save & Finish");
+        clickButton("Done");
         assertButtonPresent(METADATA_OVERRIDE_BUTTON);
 
         assertElementPresent(Locator.tagWithAttribute("a", "data-original-title","Insert data"));
@@ -139,7 +140,8 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         clickButton("Save", 0);
         waitForElement(Locator.id("status").withText("Saved"));
         _ext4Helper.clickExt4Tab("Source");
-        clickButton("Save & Finish");
+        assertElementPresent(Locator.tagWithClass("div", "labkey-customview-message").withText("This query is not editable"));
+        clickButton("Done");
         verifyMetadataButtons();
 
         // Create a wiki page to hold a query webpart with JavaScript-based button customization:
