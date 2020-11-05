@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -29,14 +30,16 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.SchemaHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -525,12 +528,13 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         log("Update the filter to use the wrapped field. Because the field is only wrapped and there is no foreign key it should error.");
         updatedMetaData = updatedMetaData.replace("ParticipantId/Study", "Pid2Consent/Study");
         _schemaHelper.updateLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
-        RelativeUrl queryURL = new RelativeUrl("query", "begin");
-        queryURL.setContainerPath(getCurrentContainerPath());
-        queryURL.addParameter("schemaName", "CommonData");
-        queryURL.navigate(this);
 
-        assertExt4MsgBox("An error occurred trying to load: Column Pid2Consent.Study not found in column map.", "OK");
+        beginAt("/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/query-begin.view?schemaName=CommonData&queryName=Demographics");
+        assertElementContains(Locator.tagWithClass("div", "lk-qd-error"),
+                "Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map.");
+
+        beginAt("/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/query-executeQuery.view?schemaName=CommonData&queryName=Demographics");
+        assertTextPresent("Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map.");
 
         log("Looks good, going home.");
         goToProjectHome();
@@ -613,27 +617,28 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    void createList()
+    void createList() throws IOException, CommandException
     {
-        log("** Importing some data...");
-        _listHelper.createList(getProjectName() + "/" + SOURCE_FOLDER, LIST_NAME,
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"),
-                new ListHelper.ListColumn("P", LIST_DEF_TITLE + " P", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("Q", LIST_DEF_TITLE + " Q", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("R", LIST_DEF_TITLE + " R", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("S", LIST_DEF_TITLE + " S", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("T", LIST_DEF_TITLE + " T", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("U", LIST_DEF_TITLE + " U", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("V", LIST_DEF_TITLE + " V", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("W", LIST_DEF_TITLE + " W", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("X", LIST_DEF_TITLE + " X", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("Y", LIST_DEF_TITLE + " Y", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelper.ListColumn("Z", LIST_DEF_TITLE + " Z", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL));
+        log("** Creating list via API...");
+        ListDefinition listDef = new IntListDefinition(LIST_NAME, "Key")
+                .addField(new FieldDefinition("Name", FieldDefinition.ColumnType.String).setLabel("Name").setDescription("Name"))
+                .addField(new FieldDefinition("Age", FieldDefinition.ColumnType.Integer).setLabel("Age").setDescription("Age"))
+                .addField(new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean).setLabel("Crazy").setDescription("Crazy?"))
+                .addField(new FieldDefinition("P", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " P").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("Q", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " Q").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("R", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " R").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("S", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " S").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("T", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " T").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("U", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " U").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("V", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " V").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("W", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " W").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("X", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " X").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("Y", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " Y").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("Z", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " Z").setURL("fake/" + LIST_DEF_URL));
+        listDef.getCreateCommand().execute(createDefaultConnection(), getProjectName() + "/" + SOURCE_FOLDER);
 
         log("** Importing some data...");
+        beginAt("/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/list-begin.view");
         _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData();
         _listHelper.submitTsvData(LIST_DATA);
@@ -672,7 +677,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
 
         log("** Applying metadata to " + QUERY_NAME + " in linked schema container");
-        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + QUERY_NAME + "#metadata");
+        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&queryName=" + QUERY_NAME);
+        assertElementPresent(Locator.tagWithClass("div", "labkey-customview-message").withText("This query is not editable"));
+        _ext4Helper.clickExt4Tab("XML Metadata");
         setCodeEditorValue("metadataText", A_PEOPLE_QUERY_METADATA_OVERRIDE);
         clickButton("Save", 0);
         waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);

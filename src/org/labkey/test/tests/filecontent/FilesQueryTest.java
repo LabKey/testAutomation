@@ -23,7 +23,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.DomainDesignerPage;
@@ -44,11 +43,9 @@ public class FilesQueryTest extends BaseWebDriverTest
     private static final String EXP_SCHEMA = "exp";
     private static final String CUSTOM_PROPERTY = "CustomProp";
     protected static final String TEST_USER = "user_files@filesquery.test";
+    protected static final String TEST_USER_NO_PATHS = "user_files_no_paths@filesquery.test";
     private static final String TEST_GROUP = "FilesQueryTestGroup";
     private static final File PIPELINE_FOLDER = TestFileUtils.getSampleData("studies/ExtraKeyStudy/study");
-
-    private PortalHelper _portalHelper = new PortalHelper(this);
-    private ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
 
     @Override
     protected @Nullable String getProjectName()
@@ -63,7 +60,7 @@ public class FilesQueryTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void doSetup() throws Exception
+    public static void doSetup()
     {
         FilesQueryTest initTest = (FilesQueryTest)getCurrentTest();
 
@@ -71,23 +68,26 @@ public class FilesQueryTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    protected void doCleanup(boolean afterTest)
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
-        _userHelper.deleteUsers(false, TEST_USER);
+        _userHelper.deleteUsers(false, TEST_USER, TEST_USER_NO_PATHS);
     }
 
     private void doSetupSteps()
     {
         _containerHelper.createProject(getProjectName(), null);
-        _portalHelper.addWebPart("Files");
-        _portalHelper.addQueryWebPart("FileRecords", EXP_SCHEMA, "Files", null);
+        new PortalHelper(this).doInAdminMode(_portalHelper -> {
+            _portalHelper.addWebPart("Files");
+            _portalHelper.addQueryWebPart("FileRecords", EXP_SCHEMA, "Files", null);
+        });
 
         DomainDesignerPage designerPage = _fileBrowserHelper.goToEditProperties();
         designerPage.fieldsPanel().addField(CUSTOM_PROPERTY);
         designerPage.clickFinish();
 
-        permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER);
+        ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+        permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER, TEST_USER_NO_PATHS);
         permissionsHelper.setPermissions(TEST_GROUP, "Project Administrator");
         permissionsHelper.setSiteAdminRoleUserPermissions(TEST_USER, "See Absolute File Paths");
     }
@@ -108,7 +108,7 @@ public class FilesQueryTest extends BaseWebDriverTest
         final String customPropValue2 = "CustomPropValue2";
         uploadFile(testFile2, customPropValue2, "This is another html file");
 
-        refresh();
+        impersonate(TEST_USER_NO_PATHS);
 
         log("Verify exp.files for user without \"See Absolute File Paths\" permission");
         verifyFileRecordsGrid(false, testFile1.getName(), customPropValue1, "/");
@@ -117,9 +117,10 @@ public class FilesQueryTest extends BaseWebDriverTest
         String updatedCustomPropValue = "UpdatedCustomPropValue";
         verifyUpdatingCustomFileProps(testFile1.getName(), updatedCustomPropValue);
         DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver()).find();
-        Assert.assertEquals("Insert data button should be available", false, table.hasHeaderMenu("Insert data"));
+        Assert.assertFalse("Insert data button should be available", table.hasHeaderMenu("Insert data"));
         // update custom prop
 
+        stopImpersonating(false);
         log("Verify exp.files for user with \"See Absolute File Paths\" permission");
         impersonate(TEST_USER);
         verifyFileRecordsGrid(true, testFile1.getName(), updatedCustomPropValue, "/");
@@ -127,7 +128,7 @@ public class FilesQueryTest extends BaseWebDriverTest
         verifyFileRecordsGrid(true, testFile2.getName(), customPropValue2, "/" + subFileFolder);
         updatedCustomPropValue = "UpdatedCustomPropValue2";
         verifyUpdatingCustomFileProps(testFile1.getName(), updatedCustomPropValue);
-        Assert.assertEquals("Insert data button should be available", true, table.hasHeaderMenu("Insert data"));
+        Assert.assertTrue("Insert data button should be available", table.hasHeaderMenu("Insert data"));
         stopImpersonating();
     }
 
