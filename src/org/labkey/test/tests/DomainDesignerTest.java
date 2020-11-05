@@ -32,6 +32,7 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.RangeValidatorDialog;
 import org.labkey.test.components.domain.RegexValidatorDialog;
 import org.labkey.test.components.domain.RegexValidatorPanel;
+import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
