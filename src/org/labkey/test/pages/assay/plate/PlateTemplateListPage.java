@@ -6,6 +6,9 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
+
+import java.util.List;
 
 /**
  * Stub page class. Lacks functionality enabling interaction with the list of existing templates.
@@ -34,6 +37,13 @@ public class PlateTemplateListPage extends LabKeyPage<PlateTemplateListPage.Elem
         clickAndWait(Locator.lkButton("create"));
 
         return new PlateDesignerPage(getDriver());
+    }
+
+    public List<String> getTemplateOptions()
+    {
+        Select select = new Select(elementCache().templateList);
+        List<WebElement> selectOptions = select.getOptions();
+        return getTexts(selectOptions);
     }
 
     @Override

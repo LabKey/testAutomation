@@ -28,6 +28,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
+import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.html.Checkbox.Checkbox;
@@ -106,11 +107,23 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public boolean isMetadataInputFormatSelectPresent()
+    {
+        expandPropertiesPanel();
+        return elementCache().metadataInputSelect().isPresent();
+    }
+
     public ReactAssayDesignerPage setMetaDataInputFormat(MetadataInputFormat format)
     {
         expandPropertiesPanel();
-        elementCache().metadataInputSelect.selectOption(format);
+        elementCache().metadataInputSelect().get().selectOption(format);
         return this;
+    }
+
+    public String getMetadataInputFormat()
+    {
+        expandPropertiesPanel();
+        return elementCache().metadataInputSelect().get().get();
     }
 
     public ReactAssayDesignerPage setSaveScriptData(boolean checked)
@@ -249,7 +262,11 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         final Select plateTemplateSelect = Select(Locator.id("assay-design-selectedPlateTemplate")).findWhenNeeded(propertiesPanel);
         final WebElement configureTemplatesLink = Locator.linkContainingText("Configure Templates").findWhenNeeded(propertiesPanel);
         final Select detectionMethodSelect = Select(Locator.id("assay-design-selectedDetectionMethod")).findWhenNeeded(propertiesPanel);
-        final OptionSelect<MetadataInputFormat> metadataInputSelect = OptionSelect.finder(Locator.id("assay-design-selectedMetadataInputFormat"), MetadataInputFormat.class).findWhenNeeded(propertiesPanel);
+        final Optional<OptionSelect<MetadataInputFormat>> metadataInputSelect()
+        {
+            return OptionSelect.finder(Locator.id("assay-design-selectedMetadataInputFormat"), MetadataInputFormat.class)
+                    .findOptional(propertiesPanel);
+        }
         final Checkbox saveScriptFilesCheckbox = Checkbox(Locator.checkboxById("assay-design-saveScriptFiles")).findWhenNeeded(propertiesPanel);
         final Checkbox editableRunsCheckbox = Checkbox(Locator.checkboxById("assay-design-editableRuns")).findWhenNeeded(propertiesPanel);
         final Checkbox editableResultCheckbox = Checkbox(Locator.checkboxById("assay-design-editableResults")).findWhenNeeded(propertiesPanel);
