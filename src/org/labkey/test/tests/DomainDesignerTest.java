@@ -20,6 +20,7 @@ import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.serverapi.collections.ArrayListMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -33,6 +34,7 @@ import org.labkey.test.components.domain.RangeValidatorDialog;
 import org.labkey.test.components.domain.RegexValidatorDialog;
 import org.labkey.test.components.domain.RegexValidatorPanel;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -98,7 +100,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)     // just make the list
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("Number", FieldDefinition.ColumnType.Integer)
+                        new FieldDefinition("Number", FieldDefinition.ColumnType.Integer)
                 ));
         dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
@@ -125,8 +127,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         dgen = new TestDataGenerator(lookupInfo)        // now put some test data in the new fields
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("Key", FieldDefinition.ColumnType.Integer),
-                        TestDataGenerator.simpleFieldDef("integerField", FieldDefinition.ColumnType.Integer)
+                        new FieldDefinition("Key", FieldDefinition.ColumnType.Integer),
+                        new FieldDefinition("integerField", FieldDefinition.ColumnType.Integer)
                 ));
         dgen.addCustomRow(Map.of("Number", 1, "integerField", 10000000, "decimalField", 6.022));
         dgen.addCustomRow(Map.of("Number", 2, "integerField", 8675309, "decimalField", 3.1415926));
@@ -161,9 +163,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
             .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("stringField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("multilineField", FieldDefinition.ColumnType.MultiLine)
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("stringField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("multilineField", FieldDefinition.ColumnType.MultiLine)
                 ));
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
@@ -207,8 +209,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("deleteMe", FieldDefinition.ColumnType.String)
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("deleteMe", FieldDefinition.ColumnType.String)
                 ));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
         List<PropertyDescriptor> createdFields = createResponse.getDomain().getFields();
@@ -248,7 +250,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
@@ -294,8 +296,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("firstCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
@@ -331,8 +333,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("firstCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
@@ -371,8 +373,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("firstCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         // go to the new domain designer and do some work here
@@ -395,8 +397,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("color", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         dgen.addCustomRow(Map.of("name", "first", "color", "orange"));
@@ -432,9 +434,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", list);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String)
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String)
                             .setRequired(true),                                                                 // <-- marked 'required'
-                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("color", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         dgen.addCustomRow(Map.of("name", "first", "color", "orange"));
@@ -490,8 +492,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("firstCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
@@ -511,8 +513,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("firstCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("firstCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
@@ -560,9 +562,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // go to the new domain designer and do some work here
@@ -602,9 +604,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -634,9 +636,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -667,9 +669,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
@@ -701,9 +703,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         // create a little test data
@@ -744,9 +746,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         dgen.addCustomRow(Map.of("name", "first", "extraField", "eleven", "testCol", "test", "hiddenField", "hidden", "shownField", "shown"));
@@ -773,9 +775,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -801,9 +803,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -830,9 +832,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -859,16 +861,16 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("color", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo1)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("extraField", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -904,15 +906,15 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", lookUplistName);
         TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("color", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen1.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "lists", mainListName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo1)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("testCol", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse1 = dgen.createDomain(createDefaultConnection(), "VarList", Map.of("keyName", "id"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", mainListName);
@@ -945,16 +947,16 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("color", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
         String listName1 = "lookupValidatorLookupList";         // this list will contain lookup values
         String lookupList1Item = listName1 + " (Integer)";
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName1);
         TestDataGenerator dgen1 = new TestDataGenerator(lookupInfo1)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("color", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse1 = dgen1.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
         dgen1.addCustomRow(Map.of("name", "joey", "color", "green"));
         dgen1.addCustomRow(Map.of("name", "billy", "color", "red"));
@@ -987,8 +989,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("color", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("color", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
@@ -1030,9 +1032,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteIceCream", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("favoriteSnack", FieldDefinition.ColumnType.String)));
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -1507,112 +1509,78 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertEquals(true, editedAquamap.get("bold"));
     }
 
-
     @Test
-    public void testExportFields() throws Exception
+    public void testExportImportListFields() throws Exception
     {
         String listName = "exportFieldsTestList";
 
+        // create a list
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
-        ConditionalFormatFilter eqFive = new ConditionalFormatFilter("5", Filter.Operator.EQUAL);
-        FieldDefinition.RangeValidator soonValidator = new FieldDefinition.RangeValidator("soonValidator", "between now and 2 days from now", "aaaa",
-                FieldDefinition.RangeType.GTE, "2020-11-04",
-                FieldDefinition.RangeType.LTE, "2020-11-06");
+        List<PropertyDescriptor> fields = importExportFields();
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumns(List.of(
-                        new FieldDefinition("textField", FieldDefinition.ColumnType.String)
-                            .setDescription("is texty").setLabel("text field"),
-                        new FieldDefinition("booleanField", FieldDefinition.ColumnType.Boolean)
-                            .setLabel("Boolean Field")
-                            .setRequired(true)
-                            .setURL("fake/list-def.url"),
-                        new FieldDefinition("attachmentField", FieldDefinition.ColumnType.Attachment)
-                            .setHidden(true),
-                        new FieldDefinition("decimalField", FieldDefinition.ColumnType.Decimal).
-                            setScale(1234).setFormat("0.####"),
-                        new FieldDefinition("intField", FieldDefinition.ColumnType.Integer)
-                            .setMvEnabled(true)
-                            .setConditionalFormats(List.of(new ConditionalFormat(List.of(eqFive), true, true, false))),
-                        new FieldDefinition("dateTimeField", FieldDefinition.ColumnType.DateAndTime)
-                            .setValidators(List.of(soonValidator))));
-        dgen.createList(createDefaultConnection(), "Key");
+                .withColumns(fields);
+        // collect the fields from the server response
+        List<PropertyDescriptor> createdFields = dgen.createList(createDefaultConnection(), "Key")
+                .getDomain().getFields();
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
+        // export the fields via the UI
         File exportFile = domainFormPanel.clickExportFields();
-        List<PropertyDescriptor> createdFields = getFieldsFromExportFile(exportFile);
+        List<String> uiFields = domainFormPanel.fieldNames();
+        Map<String, PropertyDescriptor> exportedFields = getFieldsFromExportFile(exportFile);
 
-        PropertyDescriptor stringField = createdFields.stream().filter(a-> a.getName().equals("textField"))
-                .findFirst().orElse(null);
-        assertNotNull("expected string field was not exported", stringField);
-        assertThat("description did not export", stringField.getDescription(), is("is texty"));
-        assertThat("label did not export", stringField.getLabel(), is("text field"));
-
-        PropertyDescriptor boolField = createdFields.stream().filter(a-> a.getName().equals("booleanField"))
-                .findFirst().orElse(null);
-        assertNotNull("expected boolean field was not exported", boolField);
-        assertTrue(boolField.getRequired());
-
-        PropertyDescriptor intfield = createdFields.stream().filter(a-> a.getName().equals("intField"))
-                .findFirst().orElse(null);
-        assertNotNull("expected integer field was not exported", intfield);
-        assertTrue("expect mvEnabled to be true", intfield.getMvEnabled());
-        assertEquals(1, intfield.getConditionalFormats().size());
-        assertEquals("format.column~eq=5", intfield.getConditionalFormats().get(0).queryFilterToJSONString());
-
-        PropertyDescriptor decimalField = createdFields.stream().filter(a-> a.getName().equals("decimalField"))
-                .findFirst().orElse(null);
-        assertNotNull("expected decimal field was not exported", decimalField);
-        assertThat(decimalField.getFormat(), is("0.####"));
-
-        PropertyDescriptor attachmentField = createdFields.stream().filter(a-> a.getName().equals("attachmentField"))
-                .findFirst().orElse(null);
-        assertNotNull("expected attachment field was not exported", attachmentField);
-        assertTrue(attachmentField.getHidden());
-
-        for (PropertyDescriptor intendedField : dgen.getColumns())
+        // confirm that the ones exported match the ones on the server
+        for (PropertyDescriptor createdField : createdFields)  // created fields will include Key, which wasn't passed in but we do want to validate
         {
-            PropertyDescriptor exportedField = createdFields.stream().filter(a-> a.getName().equals(intendedField.getName()))
-                    .findFirst().orElse(null);
-            assertNotNull("expected field ["+intendedField.getName()+"] was not exported", exportedField);
-            verifyExpectedFieldProperties(intendedField, exportedField);
+            String fieldName = createdField.getName();
+
+            if (!fieldName.equals("Key"))
+            {
+                // compare the field definition passed in to the one that came back
+                PropertyDescriptor intendedField = fields.stream().filter(a -> a.getName().equals(fieldName)).findFirst().orElse(null);
+                assertNotNull("a field that wasn't specified [" + fieldName + "] was created", intendedField);
+                verifyExpectedFieldProperties(intendedField, createdField);
+            }
+            // compare the created field properties to the exported field properties
+            PropertyDescriptor exportedField = exportedFields.get(fieldName);
+            assertNotNull("expected field [" + fieldName + "] was not exported", exportedField);
+            verifyExpectedFieldProperties(createdField, exportedField);
         }
+
+        // now create a list with the set of created Keys
+        String roundTripList = "roundTripListNameCreatedFromJsonFields";
+        EditListDefinitionPage listDefPage = _listHelper.beginCreateList(getProjectName(), roundTripList);
+        listDefPage.getFieldsPanel()
+                .setInferFieldFile(exportFile);
+        listDefPage.selectKeyField("Key");
+        listDefPage.clickSave();
+
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", roundTripList);
+        assertThat("expect list created from export to have the same fields",
+                domainDesignerPage.fieldsPanel().fieldNames(), is(uiFields));
     }
 
     @Test
-    public void testFileImportFieldsToNewDomain() throws Exception
+    public void testFileImportFieldsToNewSampleType() throws Exception
     {
         String sampleType = "importFieldsTestSampleType";
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
-        ConditionalFormatFilter gtFive = new ConditionalFormatFilter("5", Filter.Operator.GT);
-        FieldDefinition.RangeValidator soonValidator = new FieldDefinition.RangeValidator("soonValidator", "between now and 2 days from now", "aaaa",
-                FieldDefinition.RangeType.GTE, "2020-11-04",
-                FieldDefinition.RangeType.LTE, "2020-11-06");
+        List<PropertyDescriptor> fields = importExportFields();
+        fields.add(new FieldDefinition("name", FieldDefinition.ColumnType.String)); // need to add a 'name' field to a sampletype
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumns(List.of(
-                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
-                        new FieldDefinition("textField", FieldDefinition.ColumnType.String)
-                                .setDescription("is texty").setLabel("text field"),
-                        new FieldDefinition("booleanField", FieldDefinition.ColumnType.Boolean)
-                                .setLabel("Boolean Field")
-                                .setRequired(true)
-                                .setURL("fake/list-def.url"),
-                        new FieldDefinition("attachmentField", FieldDefinition.ColumnType.Attachment)
-                                .setHidden(true),
-                        new FieldDefinition("decimalField", FieldDefinition.ColumnType.Decimal).
-                                setScale(1234).setFormat("0.####"),
-                        new FieldDefinition("intField", FieldDefinition.ColumnType.Integer)
-                                .setMvEnabled(true)
-                                .setConditionalFormats(List.of(new ConditionalFormat(List.of(gtFive), true, true, false))),
-                        new FieldDefinition("dateTimeField", FieldDefinition.ColumnType.DateAndTime)
-                                .setValidators(List.of(soonValidator))));
-        dgen.createDomain(createDefaultConnection(), "SampleSet");
+                .withColumns(fields);
+        // get the fields from the server after creating the sampletype on the server
+        List<PropertyDescriptor> createdFields = dgen.createDomain(createDefaultConnection(), "SampleSet")
+                .getDomain().getFields();
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         String roundTripSampleType = "testSampleTypeWithImportedFields";
         File exportFile = domainFormPanel.clickExportFields();
+        List uiFields = domainFormPanel.fieldNames();       // capture the order of the fields in the UI; we will use this to validate ordering for import/export
+        ArrayListMap<String, PropertyDescriptor> exportedFields = getFieldsFromExportFile(exportFile);
         CreateSampleTypePage sampleTypeCreatePage = CreateSampleTypePage.beginAt(this, getProjectName());
         sampleTypeCreatePage.setName(roundTripSampleType);
         sampleTypeCreatePage.getFieldsPanel()
@@ -1621,34 +1589,91 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         DomainDesignerPage sampleTypeDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", roundTripSampleType);
         File roundTripFile = sampleTypeDesignerPage.fieldsPanel().clickExportFields();
-        List<PropertyDescriptor> roundTrippedFields = getFieldsFromExportFile(roundTripFile);
+        ArrayListMap<String, PropertyDescriptor> roundTrippedFields = getFieldsFromExportFile(roundTripFile);
 
-        for (PropertyDescriptor intendedField : dgen.getColumns())
+        for (PropertyDescriptor intendedField : fields) // fields are the ones we first sent in when creating the domain
         {
             String fieldName = intendedField.getName();
-            if (!fieldName.equals("name"))  // don't expect name col to export from sampletype, it is special
-            {
-                PropertyDescriptor exportedField = roundTrippedFields.stream().filter(a -> a.getName().equals(fieldName))
-                        .findFirst().orElse(null);
+
+            // first check that properties that came back from domain creation match what we sent in
+            if (fieldName != "name") // name is a magic column that must be specified when creating a sampleType
+            {                        // but which is never on the domain, cannot be added or imported or exported
+                PropertyDescriptor createdField = createdFields.stream().filter(a -> a.getName().equals(fieldName)).findFirst().orElse(null);
+                assertNotNull("expected field [" + fieldName + "] was not created", createdField);
+                verifyExpectedFieldProperties(intendedField, createdField);
+
+                // now confirm that properties come back from export still matching
+                PropertyDescriptor exportedField = roundTrippedFields.get(fieldName);
                 assertNotNull("expected field [" + intendedField.getName() + "] was not exported", exportedField);
                 verifyExpectedFieldProperties(intendedField, exportedField);
             }
         }
+
+        // ensure exported fields order the same as they appear on the page, and that this also applies when imported
+
+        for (int i=0; i<uiFields.size(); i++)
+        {
+            assertThat("Expect exported fields to be in the same order as their original UI",
+                    exportedFields.get(i).getName(), is(uiFields.get(i)));
+            assertThat("Expect round-trip fields to retain their original order",
+                    roundTrippedFields.get(i).getName(), is(uiFields.get(i)));
+        }
+        assertThat(exportedFields.keySet(), is(roundTrippedFields.keySet()));
+    }
+
+    private List<PropertyDescriptor> importExportFields()
+    {
+        ConditionalFormatFilter gtFive = new ConditionalFormatFilter("5", Filter.Operator.GT);
+        FieldDefinition.RangeValidator soonValidator = new FieldDefinition.RangeValidator("soonValidator", "between now and 2 days from now", "aaaa",
+                FieldDefinition.RangeType.GTE, "2020-11-04",
+                FieldDefinition.RangeType.LTE, "2020-11-06");
+
+        List<PropertyDescriptor> fields = new ArrayList<>();
+        fields.add(new FieldDefinition("textField", FieldDefinition.ColumnType.String)
+                        .setDescription("is texty").setLabel("text field"));
+        fields.add(new FieldDefinition("booleanField", FieldDefinition.ColumnType.Boolean)
+                        .setLabel("Boolean Field")
+                        .setRequired(true)
+                        .setURL("fake/list-def.url"));
+        fields.add(new FieldDefinition("attachmentField", FieldDefinition.ColumnType.Attachment)
+                        .setHidden(true));
+        fields.add(new FieldDefinition("decimalField", FieldDefinition.ColumnType.Decimal).
+                        setScale(1234).setFormat("0.####"));
+        fields.add(new FieldDefinition("intField", FieldDefinition.ColumnType.Integer)
+                        .setMvEnabled(true)
+                        .setConditionalFormats(List.of(new ConditionalFormat(List.of(gtFive), true, true, false))));
+        fields.add(new FieldDefinition("dateTimeField", FieldDefinition.ColumnType.DateAndTime)
+                        .setValidators(List.of(soonValidator)));
+        return fields;
     }
 
     private void verifyExpectedFieldProperties(PropertyDescriptor intendedField,  PropertyDescriptor actualField)
     {
         log("verifying properties for field [" +intendedField.getName()+ "]");
-        assertThat(actualField.getDescription(), is(intendedField.getDescription()));
-        assertThat(actualField.getLabel(), is(intendedField.getLabel()));
-        assertThat(actualField.getRequired(), is(intendedField.getRequired()));
-        assertThat(actualField.getHidden(), is(intendedField.getHidden()));
-        assertThat(actualField.getMvEnabled(), is(intendedField.getMvEnabled()));
-        assertThat(actualField.getDimension(), is(intendedField.getDimension()));
+        assertThat("Description does not match expected",
+                actualField.getDescription(), is(intendedField.getDescription()));
+        assertThat("Label does not match intended label",
+                actualField.getLabel(), is(intendedField.getLabel()));
+        assertThat("Required bit does not match expected",
+                actualField.getRequired(), is(intendedField.getRequired()));
+        assertThat("Hidden value does not match expected",
+                actualField.getHidden(), is(intendedField.getHidden()));
+        assertThat("MvEnabled bit does not match expected",
+                actualField.getMvEnabled(), is(intendedField.getMvEnabled()));
+        assertThat("Dimension does not match expected",
+                actualField.getDimension(), is(intendedField.getDimension()));
         if (intendedField.getPHI() != null)
-            assertThat(actualField.getPHI(), is(intendedField.getPHI()));
-        assertThat(actualField.getMeasure(), is(intendedField.getMeasure()));
-        assertThat(actualField.getFormat(), is(intendedField.getFormat()));
+            assertThat("PHI does not match specified value",
+                    actualField.getPHI(), is(intendedField.getPHI()));
+        assertThat("Expect measure bit to match intended measure",
+                actualField.getMeasure(), is(intendedField.getMeasure()));
+        assertThat("Format property should export",
+                actualField.getFormat(), is(intendedField.getFormat()));
+        if (intendedField.getAllProperties() != null)
+            assertThat("Key field property should export",
+                    actualField.getAllProperties().get("isPrimaryKey"),     // at some point, it will be nice to put isPrimaryKey on PropertyDescriptor
+                    is(intendedField.getAllProperties().get("isPrimaryKey")));  // even if as only a getter
+
         for (ConditionalFormat intendedFormat : intendedField.getConditionalFormats())
         {
             ConditionalFormat actualFormat = intendedField.getConditionalFormats().stream()
@@ -1659,15 +1684,16 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // on FieldDefinition, but not gettable on PropertyDescriptor
     }
 
-    private List<PropertyDescriptor> getFieldsFromExportFile(File exportFile) throws Exception
+    private ArrayListMap<String, PropertyDescriptor> getFieldsFromExportFile(File exportFile) throws Exception
     {
         JSONParser parser = new JSONParser();
         JSONArray  jsonArray = (JSONArray) parser.parse(new FileReader(exportFile));
 
-        List<PropertyDescriptor> exportFields = new ArrayList<>();
+        ArrayListMap<String, PropertyDescriptor> exportFields = new ArrayListMap<>();
         for (int i=0; i < jsonArray.size(); i++)
         {
-            exportFields.add(new PropertyDescriptor((JSONObject) jsonArray.get(i)));
+            PropertyDescriptor field = new PropertyDescriptor((JSONObject) jsonArray.get(i));
+            exportFields.put(field.getName(), field);
         }
 
         return exportFields;
