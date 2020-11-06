@@ -1516,7 +1516,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // create a list
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
-        List<PropertyDescriptor> fields = importExportFields();
+        List<PropertyDescriptor> fields = importExportTestFields();
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(fields);
         // collect the fields from the server response
@@ -1567,7 +1567,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String sampleType = "importFieldsTestSampleType";
 
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
-        List<PropertyDescriptor> fields = importExportFields();
+        List<PropertyDescriptor> fields = importExportTestFields();
         fields.add(new FieldDefinition("name", FieldDefinition.ColumnType.String)); // need to add a 'name' field to a sampletype
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(fields);
@@ -1621,7 +1621,40 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertThat(exportedFields.keySet(), is(roundTrippedFields.keySet()));
     }
 
-    private List<PropertyDescriptor> importExportFields()
+    @Test
+    public void testImportListFieldsToNonList() throws Exception
+    {
+        String listName = "listForFieldImportKeyTest";
+
+        // create a list
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        List<PropertyDescriptor> fields = importExportTestFields();
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(fields);
+        // collect the fields from the server response
+        List<PropertyDescriptor> createdFields = dgen.createList(createDefaultConnection(), "Key")
+                .getDomain().getFields();
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
+        File exportFile = domainFormPanel.clickExportFields();
+
+        String sampleTypeName = "sampleTypeWithNonKeyKeyField";
+        CreateSampleTypePage createSampleTypePage = CreateSampleTypePage.beginAt(this, getProjectName());
+        createSampleTypePage.setName(sampleTypeName)
+                .setDescription("created by exporting fields from a list with PK 'Key' field")
+                .getFieldsPanel()
+                .setInferFieldFile(exportFile);
+        createSampleTypePage.clickSave();
+
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleTypeName);
+        File sampleTypeFields = domainDesignerPage.fieldsPanel().clickExportFields();
+        ArrayListMap<String, PropertyDescriptor> sampleFields = getFieldsFromExportFile(sampleTypeFields);
+        PropertyDescriptor keyField = sampleFields.get("Key");
+        assertFalse("Expect field import to disregard PK on fields imported to SampleType",
+                (Boolean)keyField.getAllProperties().get("isPrimaryKey"));
+    }
+
+    private List<PropertyDescriptor> importExportTestFields()
     {
         ConditionalFormatFilter gtFive = new ConditionalFormatFilter("5", Filter.Operator.GT);
         FieldDefinition.RangeValidator soonValidator = new FieldDefinition.RangeValidator("soonValidator", "between now and 2 days from now", "aaaa",
