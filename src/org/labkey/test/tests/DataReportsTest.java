@@ -164,10 +164,9 @@ public class DataReportsTest extends ReportTest
         APIUserHelper apiUserHelper = new APIUserHelper(initTest);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(initTest);
 
-        // Create a author user
-        apiUserHelper.createUser(AUTHOR_USER, true, true);
+        // Create a site-developer that is an author in the project
+        initTest.createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, initTest.getProjectName());
         initTest.setInitialPassword(AUTHOR_USER, AUTHOR_USER_PW);
-        apiPermissionsHelper.addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, initTest.getProjectName());
 
         // Create a reader user
         apiUserHelper.createUser(READER_USER, true, true);
