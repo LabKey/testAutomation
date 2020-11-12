@@ -885,7 +885,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setDescription("LookUp in same container")
                 .collapse();
 
-        assertEquals("Incorrect detail message", "Current Folder > lists > lookUpList1", lookUpRow.detailsMessage());
+        assertEquals("Incorrect detail message", "New Field. Current Folder > lists > lookUpList1", lookUpRow.detailsMessage());
 
         domainDesignerPage.clickFinish();
 
@@ -929,7 +929,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .setDescription("LookUp in same container")
                 .collapse();
 
-        assertEquals("Incorrect detail message", "Current Folder > lists > lookUpList", lookUpRow.detailsMessage());
+        assertEquals("Incorrect detail message", "New Field. Current Folder > lists > lookUpList", lookUpRow.detailsMessage());
         domainDesignerPage.clickFinish();
 
         DomainResponse domainResponse = dgen.getDomain(createDefaultConnection());
