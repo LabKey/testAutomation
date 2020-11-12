@@ -5,10 +5,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
     <bean id="moduleBean" class="org.labkey.search.SearchModule">
         <property name="name" value="search"/>
-        <property name="version" value="18.1"/>
+        <property name="schemaVersion" value="18.1"/>
         <property name="requiredServerVersion" value="0.0"/>
         <property name="moduleDependencies" value=""/>
-
         <property name="label" value="Search Service"/>
         <property name="description">
           <value><![CDATA[The Search module offers full-text search of server contents, implemented by Lucene.]]></value>
@@ -24,7 +23,6 @@
         <property name="organizationUrl" value="https://www.labkey.com/"/>
         <property name="license" value="Apache 2.0"/>
         <property name="licenseUrl" value="http://www.apache.org/licenses/LICENSE-2.0"/>
-
         <property name="vcsRevision" value="Unknown"/>
         <property name="vcsUrl" value="Unknown"/>
         <property name="buildUser" value="adam"/>
@@ -37,7 +35,6 @@
         <property name="resourcePath" value=""/>
         <property name="buildNumber" value="Unknown"/>
         <property name="enlistmentId" value="8f681376-45d4-4951-98be-2a35657fb8ef"/>
-        <property name="consolidateScripts" value="true"/>
         <property name="manageVersion" value="true"/>
     </bean>
 </beans>
