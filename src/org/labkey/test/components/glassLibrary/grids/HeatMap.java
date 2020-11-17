@@ -88,7 +88,7 @@ public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
     public WebElement getSummaryLink(String rowLinkText)
     {
         WebElement row = getOptionalRow(rowLinkText).get();
-        return Locator.tagWithAttributeContaining("span", "title", "in the last 12 months")
+        return Locator.tagWithAttributeContaining("span", "title", " last 12 months")
                 .child("a").findElement(row);
     }
 
