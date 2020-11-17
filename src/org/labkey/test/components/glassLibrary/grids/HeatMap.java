@@ -45,11 +45,6 @@ public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
         return _driver;
     }
 
-    public String currentMonth()
-    {
-        return getColumnNames().get(12);
-    }
-
     public String getColumnByIndex(int index)
     {
         return getColumnNames().get(index);
