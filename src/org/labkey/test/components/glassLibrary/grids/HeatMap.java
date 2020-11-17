@@ -18,6 +18,9 @@ import java.util.Optional;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.util.TestLogger.log;
 
+/**
+ * Manipulates the HeatMap component from labkey-ui-components (components/src/internal/components/heatmap/HeatMap.tsx)
+ */
 public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
 {
     private final WebElement _el;
